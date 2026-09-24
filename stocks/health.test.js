@@ -749,7 +749,7 @@ describe('keyControl', () => {
         expect(rule.value).toBeNull();
         expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', pause: null, delegate: 'program', transferFee: null, rebase: 'program' });
         expect(rule.status).toBe('unknown');
-        expect(rule.note).toMatch(/never characterised/);
+        expect(rule.note).toMatch(/has not been recorded/);
     });
 
     test('the note names which authority is on a hot key', () => {
@@ -774,7 +774,7 @@ describe('keyControl', () => {
         const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
         const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
         expect(rule.status).toBe('unknown');
-        expect(rule.note).toMatch(/never characterised/);
+        expect(rule.note).toMatch(/has not been recorded/);
         // The value is still reported in the inputs — the rule skipped it, it did not hide it.
         expect(rule.inputs.rebase).toBe('hot-key');
     });

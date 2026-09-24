@@ -14,6 +14,7 @@ const ROOT = join(import.meta.dirname, '..');
 const OUT = join(ROOT, 'stocks-review-queue.json');
 const DISCOVERY_CANDIDATES = join(ROOT, 'stocks', 'data', 'discovery-candidates.json');
 const EVENT_RESOLUTIONS = join(ROOT, 'stocks', 'data', 'event-resolutions.json');
+const DEFI_FOOTPRINT = join(ROOT, 'stocks', 'data', 'defi-footprint.json');
 
 async function rows(databaseUrl, sql, label) {
     const out = await psql(databaseUrl, `SELECT COALESCE(json_agg(row_to_json(q)), '[]'::json)::text FROM (${sql}) q;`, label, ['-t', '-A']);
@@ -28,10 +29,11 @@ async function main() {
     }
     const env = { ...(await readEnvFile(join(ROOT, '.env'))), ...process.env };
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is missing from .env');
-    const [issuerDb, legalTemplates, candidateDb, resolutionDb, databaseClaims, changeEvents] = await Promise.all([
+    const [issuerDb, legalTemplates, candidateDb, footprint, resolutionDb, databaseClaims, changeEvents] = await Promise.all([
         readJson(join(ROOT, 'stocks-issuers.json')),
         readJson(join(ROOT, 'stocks-legal-templates.json')),
         readJson(DISCOVERY_CANDIDATES, { items: [] }),
+        readJson(DEFI_FOOTPRINT, { candidates: [] }),
         readJson(EVENT_RESOLUTIONS, { items: [] }),
         rows(env.DATABASE_URL, `
             SELECT issuer_slug, field, status, url, quote, accessed_at, last_checked_at, last_confirmed_at
@@ -61,10 +63,10 @@ async function main() {
     const openClaims = databaseClaims.filter((claim) =>
         !(['changed', 'source-gone'].includes(claim?.status) && reviewedSourceUrls.has(claim?.url)));
     const items = buildReviewQueue({ issuerDb, legalTemplates, databaseClaims: openClaims, changeEvents: eventReview.open,
-        discoveryCandidates: candidateDb.items ?? [], nowMs: Date.parse(generatedAt) });
+        discoveryCandidates: candidateDb.items ?? [], defiCandidates: footprint.candidates ?? [], nowMs: Date.parse(generatedAt) });
     const artifact = {
         generatedAt,
-        methodology: 'required fields + watcher state + unresolved consequential events + quarantined asset discoveries; versioned event resolutions remove reviewed alerts',
+        methodology: 'required fields + watcher state + unresolved consequential events + quarantined asset discoveries + on-chain DeFi footprint candidates; versioned event resolutions remove reviewed alerts',
         reviewedEvents: {
             count: eventReview.resolved.length,
             publicChanges: eventReview.resolved.filter(({ resolution }) => resolution.public === true).length,

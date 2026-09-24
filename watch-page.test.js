@@ -768,7 +768,7 @@ describe('watch.html and watch.css', () => {
     });
 
     test('no JavaScript and no styling decision is inline in the HTML', () => {
-        expect(HTML).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(HTML).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
         expect(HTML).not.toMatch(/\sstyle="/);
         expect(HTML).not.toMatch(/\son[a-z]+="/);
     });
@@ -857,7 +857,7 @@ describe('the model assessment beside a change (stocks/EVIDENCE.md §2.3)', () =
     test('the block is labelled, carries the disclaimer, and escapes everything the model wrote', () => {
         const html = W.modelAssessmentHtml(W.modelAssessmentView(VALID));
         expect(html).toContain('Model assessment');
-        expect(html).toContain("A model's reading of the change, not a legal conclusion.".replace("'", '&#39;'));
+        expect(html).toContain("A model's reading of the change. It is not a legal conclusion.".replace("'", '&#39;'));
         expect(html).toContain('<q>subject to issuer consent</q>');
         expect(html).toContain('claude-sonnet-4-5');
         expect(html).toContain('cost $0.0031');

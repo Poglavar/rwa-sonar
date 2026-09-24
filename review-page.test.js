@@ -33,7 +33,7 @@ describe('public evidence review queue', () => {
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/review.html"');
         expect(html).toContain('id="reviewQueue"');
         expect(html).not.toContain('noindex');
-        expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
         expect(readFileSync(path.join(__dirname, 'review.js'), 'utf8')).toContain("fetch('./stocks-review-queue.json')");
     });
 });

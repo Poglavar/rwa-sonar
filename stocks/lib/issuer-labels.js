@@ -247,52 +247,52 @@
 
     /** Ledger maturity, indexed by stage 0–4 (MODEL §3.1, vocabulary.md "Maturity Stage"). */
     const MATURITY_LEVEL_TOOLTIPS = [
-        'Level 0 — none of the four pillars: the blockchain is not the main ledger of ownership, so an ' +
-        'authoritative record sits somewhere else (a share register, a transfer agent, a broker’s books).',
-        'Level 1 — the blockchain is the main ledger of ownership (blockchainIsMainLedger): there is no ' +
+        'Level 0: none of the four pillars. The blockchain is not the main ledger of ownership, so the ' +
+        'authoritative record is somewhere else (a share register, a transfer agent, a broker’s books).',
+        'Level 1: the blockchain is the main ledger of ownership (blockchainIsMainLedger). There is no ' +
         'other authoritative record of who owns the asset.',
-        'Level 2, Tokenized — Level 1 plus unconditional transfers (unconditionalTransfers): the token ' +
-        'moves to any address without a gatekeeper — issuer, platform or regulator — approving it first.',
-        'Level 3, Issuer independent — Level 2 plus bearer redemption (bearerRedemption): presenting the ' +
+        'Level 2, Tokenized: Level 1 plus unconditional transfers (unconditionalTransfers). The token ' +
+        'moves to any address without approval from the issuer, a platform or a regulator.',
+        'Level 3, Issuer independent: Level 2 plus bearer redemption (bearerRedemption). Presenting the ' +
         'token is enough to redeem the underlying from the custodian, so the issuer is not a required party.',
-        'Level 4, Legally integrated — Level 3 plus a forced-transfer mechanism (forcedTransfers): tokens ' +
+        'Level 4, Legally integrated: Level 3 plus a forced-transfer mechanism (forcedTransfers). Tokens ' +
         'can be moved without the holder’s consent, so a court order, a theft or a lost key can be ' +
         'corrected on the ledger.'
     ];
 
     /** Claim depth, indexed by rung 0–4 (MODEL §3.2). */
     const CLAIM_RUNG_TOOLTIPS = [
-        'Rung 0, synthetic exposure — the holder owns a bet on the price (a derivative or a synthetic SPV ' +
-        'position), not the security and not a claim on one.',
-        'Rung 1, unsecured claim on the issuer — a structured note, tracker certificate or debt note with ' +
-        'no security interest: if the issuer fails, the holder is an unsecured creditor.',
-        'Rung 2, secured claim on collateral — the same note, but a security interest over the collateral ' +
+        'Rung 0, synthetic exposure: the holder has price exposure only (a derivative or a synthetic SPV ' +
+        'position), with no claim on the security.',
+        'Rung 1, unsecured claim on the issuer: a structured note, tracker certificate or debt note with ' +
+        'no security interest. If the issuer fails, the holder is an unsecured creditor.',
+        'Rung 2, secured claim on collateral: the same note, but a security interest over the collateral ' +
         'exists and is granted to a named security holder.',
-        'Rung 3, beneficial interest in the security — an SPV holds the share and the token is a claim on ' +
+        'Rung 3, beneficial interest in the security: an SPV holds the share and the token is a claim on ' +
         'that share, redeemable against it.',
-        'Rung 4, registered share — the holder is the registered owner of the share itself, the same class ' +
+        'Rung 4, registered share: the holder is the registered owner of the share itself, the same class ' +
         'as the listed security.'
     ];
 
     /** The definition of each market word, for the headers that cannot spell it out (MODEL §11.1). */
     const MARKET_TOOLTIPS = {
-        liquidity: 'Liquidity — the USD value of the reserves in this token’s DEX pools (Jupiter’s ' +
-            'aggregate over Raydium, Orca and Meteora): depth that can absorb a trade, not a count of ' +
-            'trades. A CEX venue never reports it.',
-        trades24: 'Trades 24h — number of buys plus sells in the last 24 hours (Jupiter). Null, not zero, ' +
+        liquidity: 'Liquidity: the USD value of the reserves in this token’s DEX pools (Jupiter’s ' +
+            'aggregate over Raydium, Orca and Meteora). This is pool depth; trade counts are a ' +
+            'separate column. A CEX venue never reports it.',
+        trades24: 'Trades 24h: number of buys plus sells in the last 24 hours (Jupiter). Empty (null, not zero) ' +
             'when the source does not report it.',
-        traders24: 'Traders 24h — distinct trading wallets in the last 24 hours (Jupiter). Summed across a ' +
+        traders24: 'Traders 24h: distinct trading wallets in the last 24 hours (Jupiter). Summed across a ' +
             'programme’s token addresses, so one wallet trading two tokens counts twice.',
-        tradesPerTrader: 'Trades per trader — trades 24h / traders 24h. The wash-trading tell: a few ' +
+        tradesPerTrader: 'Trades per trader: trades 24h / traders 24h. A high value suggests wash trading, with a few ' +
             'wallets producing thousands of trades.',
-        organic: 'Organic share — the part of 24h volume Jupiter classifies as non-bot flow, over total ' +
+        organic: 'Organic share: the part of 24h volume Jupiter classifies as non-bot flow, over total ' +
             '24h volume.',
-        venues: 'Venues — distinct DEX ids (DexScreener) plus exchange markets (CoinGecko) where the token ' +
+        venues: 'Venues: distinct DEX ids (DexScreener) plus exchange markets (CoinGecko) where the token ' +
             'has a pair.',
-        lastTrade: 'Last trade — the most recent per-venue timestamp across CoinGecko tickers. No on-chain ' +
+        lastTrade: 'Last trade: the most recent per-venue timestamp across CoinGecko tickers. No on-chain ' +
             'per-trade history is collected, so a DEX-only token has none.',
-        venueSpread: 'Venue spread — the gap between the lowest and highest price for the same token across ' +
-            'venues that traded in the last two hours with real depth (DEX pools ≥ $10k liquidity, ' +
+        venueSpread: 'Venue spread: the gap between the lowest and highest price for the same token across ' +
+            'venues that traded in the last two hours with enough depth (DEX pools ≥ $10k liquidity, ' +
             'exchange markets ≥ $5k 24h volume); a persistent gap is an arbitrage opportunity, a ' +
             'one-off gap is usually a stale quote.'
     };

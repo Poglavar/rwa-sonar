@@ -144,7 +144,8 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         const mint = text(row?.mint);
         const kind = text(row?.kind);
         const protocolId = text(row?.protocolId);
-        if (!date || !mint || !kind || !protocolId) continue;
+        // An unknown program holding a token is a review candidate, not yet a public protocol change.
+        if (!date || !mint || !kind || !protocolId || kind === 'defi-integration-candidate') continue;
         const key = `${date}|${kind}|${protocolId}`;
         if (!protocolGroups.has(key)) protocolGroups.set(key, { date, kind, protocolId, rows: [] });
         protocolGroups.get(key).rows.push(row);
@@ -155,13 +156,21 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         const assets = rows.map((row) => assetRef(row.mint, identityIndex));
         const count = assets.length;
         const verb = kind === 'token-added' ? 'entered'
+            : kind === 'market-added' ? 'gained a new market in'
+            : kind === 'market-removed' ? 'lost a market in'
+            : kind === 'defi-integration-added' ? 'is now held on-chain by'
+            : kind === 'defi-integration-removed' ? 'no longer visibly held by'
             : kind === 'token-removed' ? 'left'
                 : kind === 'ltv-changed' ? 'changed LTV in'
                     : kind === 'market-inactive' ? 'became inactive in' : 'changed in';
         const severity = rows.some((row) => row.severity === 'critical') ? 'critical'
             : rows.some((row) => row.severity === 'warning') ? 'warning'
                 : rows.some((row) => row.severity === 'caution') ? 'caution' : 'info';
-        const why = kind === 'token-removed'
+        const why = kind === 'defi-integration-added'
+            ? 'A protocol program was observed holding this exact token on-chain; that is where an integration shows up first, before or without a registry listing. It does not prove a user transaction succeeds.'
+            : kind === 'defi-integration-removed'
+                ? 'A protocol program no longer holds a visible balance of this exact token; the use may have ended or shrunk below the visible largest accounts.'
+                : kind === 'token-removed'
             ? 'A removed exact-token listing may eliminate a confirmed use or exit path; it does not prove positions were liquidated.'
             : kind === 'ltv-changed' || kind === 'collateral-value-drop'
                 ? 'Borrow capacity or liquidation exposure changed in the checked protocol registry.'
@@ -176,7 +185,7 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
             summary: count === 1 ? text(rows[0]?.summary) : `Daily exact-token registry comparison grouped ${count} ${protocolName} changes of the same kind.`,
             whyItMatters: why,
             consequence: why,
-            affectedHolders: kind === 'token-added'
+            affectedHolders: kind === 'token-added' || kind === 'defi-integration-added' || kind === 'market-added'
                 ? ['users considering this exact protocol route']
                 : ['current or prospective users of this exact protocol route'],
             before: count === 1 ? rows[0].before ?? null : null,

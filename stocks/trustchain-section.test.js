@@ -167,7 +167,7 @@ describe('the what-if section on the issuer panel', () => {
         const html = S.whatIfSectionHtml(SHEET, catalogue);
         expect(html).toContain('wi-badge wi-s-missing');
         expect(html).toContain('Not answered yet for this issuer');
-        expect(html).toContain('nobody has read the documents for it');
+        expect(html).toContain('Nobody has read the documents for this question yet');
     });
 
     it('states the rule that an outcome is never invented', () => {
@@ -179,7 +179,7 @@ describe('the what-if section on the issuer panel', () => {
     it('says the API did not answer rather than showing a gap that is not one', () => {
         const html = S.whatIfSectionHtml(null, catalogue, { failure: 'HTTP 503' });
         expect(html).toContain('which did not answer: HTTP 503');
-        expect(html).toContain('Nothing is shown rather than a partial sheet');
+        expect(html).toContain('We show nothing instead of a partial sheet');
         // An unreachable API must never look like "this issuer has no answers".
         expect(html).not.toContain('wi-badge');
         expect(html).not.toContain('No what-if answers have been recorded');

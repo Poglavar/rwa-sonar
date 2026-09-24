@@ -31,6 +31,12 @@
     const whatIfLib = (typeof __rwaWhatIf !== 'undefined')
         ? __rwaWhatIf
         : require('./stocks/lib/whatif-render.js');
+    // The schematic kit and the what-if sequence shaper; either may be absent (an older cached
+    // page), in which case the answer panel simply has no drawing.
+    const flowDiagram = (typeof __rwaFlowDiagram !== 'undefined') ? __rwaFlowDiagram
+        : (typeof module !== 'undefined' ? require('./stocks/lib/flow-diagram.js') : null);
+    const schematicsLib = (typeof __rwaSchematics !== 'undefined') ? __rwaSchematics
+        : (typeof module !== 'undefined' ? require('./stocks/lib/schematics.js') : null);
 
     const { escapeHtml, humanizeSlug } = fmt;
     const {
@@ -300,7 +306,7 @@
     function matrixHtml(matrix) {
         if (matrix.groups.length === 0) {
             return '<p class="wm-empty">No question matches these filters. '
-                + 'The questions are still there — clear a filter to see them.</p>';
+                + 'Clear a filter to see the questions.</p>';
         }
         const groups = matrix.groups.map((group) =>
             `<section class="wm-actor" aria-label="${escapeHtml(group.label)}">`
@@ -357,7 +363,7 @@
      * A `missing` cell shows what would have to be read for the question to be answered
      * (the catalogue's `lookFor`), because "nobody has looked" is more useful with the search in it.
      */
-    function answerPanelHtml(row, cell) {
+    function answerPanelHtml(row, cell, catalogue = null) {
         const answer = cell.answer;
         const status = cell.status;
         const parts = [
@@ -368,14 +374,18 @@
         ];
         if (answer === null || status === MISSING_STATUS) {
             parts.push('<p class="wi-outcome">Nobody has answered this question for this issuer yet. '
-                + 'The question stands and the gap is the finding — no outcome is guessed at here.</p>');
+                + 'We do not guess an outcome.</p>');
             if (row.lookFor !== null) {
                 parts.push(`<p class="wi-sub">What has to be read for it: ${escapeHtml(row.lookFor)}</p>`);
             }
             parts.push(dossierLinkHtml(cell));
             return parts.filter((part) => part !== '').join('');
         }
-        if (answer.outcome !== null) parts.push(`<p class="wi-outcome">${escapeHtml(answer.outcome)}</p>`);
+        // The drawn sequence carries the outcome sentence by sentence; the paragraph is the fallback
+        // when there is nothing to draw, so the same words are never printed twice.
+        const drawn = answerSequenceHtml(row, cell, catalogue);
+        if (drawn !== '') parts.push(drawn);
+        else if (answer.outcome !== null) parts.push(`<p class="wi-outcome">${escapeHtml(answer.outcome)}</p>`);
         if (answer.quote !== null) parts.push(`<blockquote class="wi-quote">${escapeHtml(answer.quote)}</blockquote>`);
         parts.push(whatIfLib.sourceHtml(answer));
         parts.push(whatIfLib.casesHtml(answer.cases));
@@ -389,6 +399,20 @@
         }
         parts.push(dossierLinkHtml(cell));
         return parts.filter((part) => part !== '').join('');
+    }
+
+    /**
+     * The answer drawn as a sequence (stocks/lib/schematics.js whatIfSpec): the catalogue's trigger
+     * at the failing actor, its path to the holder, then the outcome in the answer's own status.
+     * Nothing when the catalogue did not load or the answer is not drawable (not-applicable).
+     */
+    function answerSequenceHtml(row, cell, catalogue) {
+        if (!flowDiagram || !schematicsLib || !catalogue || !cell?.answer) return '';
+        const spec = schematicsLib.whatIfSpec({
+            mode: row.mode ?? cell.answer.mode, answer: cell.answer, catalogue,
+            issuerName: cell.name ?? cell.short ?? null, issuerSlug: cell.issuer ?? null
+        });
+        return spec === null ? '' : flowDiagram.figureHtml(spec, { id: 'wm-seq' });
     }
 
     /** The panel's way to the whole programme: its dossier page, named so the link reads alone. */
@@ -732,7 +756,7 @@
         const cell = row.cells.find((candidate) => candidate.issuer === issuerSlug);
         if (!cell) return;
         els.answerTitle.textContent = row.question ?? modeId;
-        els.answerBody.innerHTML = answerPanelHtml(row, cell);
+        els.answerBody.innerHTML = answerPanelHtml(row, cell, state.catalogue);
         els.answerBody.scrollTop = 0;
         if (typeof els.answer.showModal === 'function') els.answer.showModal();
         else els.answer.setAttribute('open', '');
@@ -844,14 +868,14 @@
             state.issuers = Array.isArray(issuers?.items) ? issuers.items : [];
             state.answers = indexAnswers(answers);
             if (state.modes.length === 0 || state.issuers.length === 0) {
-                setStatus('The API answered, but with no questions or no issuers — nothing to draw.', true);
+                setStatus('The API answered, but returned no questions or no issuers, so there is nothing to draw.', true);
                 return;
             }
             render();
             setStatus(null, false);
         } catch (err) {
             logError('the what-if surface did not answer', err.api ? JSON.stringify(err.api) : err.message);
-            setStatus(`${err.message}. Nothing is shown rather than a partial matrix.`, true);
+            setStatus(`${err.message}. We show nothing instead of a partial matrix.`, true);
         }
     }
 

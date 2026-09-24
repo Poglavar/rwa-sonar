@@ -134,16 +134,16 @@ describe('graphics and integration', () => {
         expect(existsSync(join(__dirname, 'design/dolphin-detectives/INTEGRATION.md'))).toBe(true);
     });
 
-    test('gallery distinguishes illustration from evidence and preserves the eight-slide pitch', () => {
+    test('gallery distinguishes illustration from evidence and points to the six-slide pitch', () => {
         const gallery = readFileSync(join(__dirname, 'design/dolphin-detectives/index.html'), 'utf8');
         expect(gallery).toContain('Current findings, observation times and review status stay in their own panels.');
         expect(gallery).toContain('not a measured risk distribution');
-        expect(gallery).toContain('The pitch remains eight slides.');
+        expect(gallery).toContain('The pitch is six slides.');
         expect(gallery).toContain('night-watch-v2-768.webp 768w');
         expect(gallery).toContain('survey-team-v2-768.webp 768w');
         expect(gallery).not.toContain('The existing pitch has not been edited');
         const pitch = readFileSync(join(__dirname, 'pitch/index.html'), 'utf8');
-        expect((pitch.match(/<section id="slide-/g) || [])).toHaveLength(8);
+        expect((pitch.match(/<section id="slide-/g) || [])).toHaveLength(6);
     });
 
     test('all integrated artwork references resolve and use web delivery rather than PNG masters', () => {

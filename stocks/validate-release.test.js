@@ -10,7 +10,7 @@ import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 import { releaseRsyncExcludes } from './lib/release-manifest.mjs';
 
-const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons', 'weekly']);
+const RELEASE_DIRECTORIES = new Set(['stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons', 'weekly', 'og', 'sitemaps']);
 
 /**
  * The staged-publication test publishes this subset rather than the real 29-family manifest: the
@@ -81,7 +81,7 @@ async function fixture() {
     await writeFile(join(root, 'stocks.html'), '<input id="globalSearch"><div id="comparisonView"></div>');
     await writeFile(join(root, 'protocols/index.json'), JSON.stringify([{ slug: 'nvda-kamino-one' }]));
     await writeFile(join(root, 'protocols/nvda-kamino-one.html'), '<h1>NVDAx × Kamino</h1>'
-        + '<p>Proof status — do not read a source listing as execution proof</p>'
+        + '<p>Proof status: a source listing does not prove execution</p>'
         + `<link rel="canonical" href="${ORIGIN}/protocols/nvda-kamino-one.html" />`);
     await writeFile(join(root, 'comparisons/index.json'), JSON.stringify({ schemaVersion: 1, builtAt, groups: [{
         ticker: 'NVDA', path: 'u-nvda.json', issuerCount: 1, tokenCount: 1, issuers: ['xstocks-backed'], mints: ['one']

@@ -117,7 +117,7 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
         const html = await readFile(join(root, path), 'utf8');
         const canonical = `<link rel="canonical" href="${baseUrl}/protocols/${dossier.slug}.html"`;
         if (!html.includes(canonical)) throw new Error(`${path}: missing route-specific canonical URL`);
-        requireHtmlIncludes(html, 'Proof status — do not read a source listing as execution proof', path);
+        requireHtmlIncludes(html, 'Proof status: a source listing does not prove execution', path);
     }
     const workspace = await readFile(join(root, 'stocks.html'), 'utf8');
     for (const marker of ['id="globalSearch"', 'id="comparisonView"']) {

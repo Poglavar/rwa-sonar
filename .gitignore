@@ -41,6 +41,12 @@ stocks-watchlist-changes.json
 /protocols/
 /comparisons/
 
+# Social preview images of the hand-written pages and the sitemaps: rebuilt on every refresh by
+# stocks/build-site-seo.mjs from the data (the committed pages carry the matching ?v= in their head).
+/og/
+/sitemap.xml
+/sitemaps/
+
 # The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
 # `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
 api/node_modules/
@@ -63,4 +69,6 @@ stocks/data/sources-state.json
 /stocks/data/redemption-observations.json
 /stocks/data/tracking-log.json
 /stocks/data/xstocks-float.json
+# The DeFi footprint scan (1.4 MB, server state); only its candidates are published, via stocks-defi-new.json.
+/stocks/data/defi-footprint.json
 

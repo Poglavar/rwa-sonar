@@ -14,7 +14,7 @@ const AREA_PATTERNS = [
 ];
 
 export const REVIEW_AREAS = ['ownership', 'insolvency', 'redemption', 'control', 'defi', 'other'];
-export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'reviewed-inference', 'stale', 'open-question', 'discovery-candidate'];
+export const REVIEW_ISSUES = ['changed', 'source-gone', 'conflict', 'missing', 'unsupported', 'reviewed-inference', 'stale', 'open-question', 'discovery-candidate', 'defi-integration-candidate'];
 
 function text(value) {
     return typeof value === 'string' ? value.trim() : '';
@@ -105,6 +105,7 @@ function actionFor(issue, area) {
     if (issue === 'stale') return 'Re-read the cited source and renew the checked/confirmed timestamps.';
     if (issue === 'open-question' && area === 'defi') return 'Obtain protocol or issuer evidence for enforceable custody, liquidation and exit after default.';
     if (issue === 'discovery-candidate') return 'Confirm the exact mint in an issuer-controlled registry or reviewed primary source before adding it to the public asset universe.';
+    if (issue === 'defi-integration-candidate') return 'Identify the program and product holding the token, then add it to the program registry and, if it is a real integration, to a collected registry or the reviewed products file.';
     if (issue === 'unsupported') return 'Replace inference or an unverified note with primary-source words, or explicitly retain it as unknown.';
     if (issue === 'reviewed-inference') return 'Keep this as a reviewed inference, not a source-confirmed fact; re-open it if its scope, reasoning or cited sources change.';
     return 'Locate primary evidence or record where we looked and why the answer remains unknown.';
@@ -204,6 +205,14 @@ function monitoringStateFor(issue, area) {
             conclusionValidityState: 'not established'
         };
     }
+    if (issue === 'defi-integration-candidate') {
+        return {
+            ...defaults,
+            retrievalState: 'on-chain holding observed',
+            contentComparisonState: 'program not attributed to a collected integration',
+            conclusionValidityState: 'not published as an integration until reviewed'
+        };
+    }
     if (issue === 'discovery-candidate') {
         return {
             ...defaults,
@@ -225,6 +234,7 @@ function resolutionCriteriaFor(issue, area) {
     if (issue === 'stale') return 'Re-fetch and compare the relevant source, then refresh the checked and reviewed timestamps separately.';
     if (issue === 'open-question' && area === 'defi') return 'Record exact protocol, issuer or legal evidence for custody, liquidation and exit after default.';
     if (issue === 'discovery-candidate') return 'Confirm the exact mint in an issuer-controlled registry or reviewed primary source before publication.';
+    if (issue === 'defi-integration-candidate') return 'Attribute the holding program with a primary source (protocol docs, verified build or official announcement) and record whether it is an integration, custody or plumbing.';
     return 'Record an analyst decision with the evidence used and the conclusion affected.';
 }
 
@@ -239,7 +249,8 @@ function titleFor(issue, field) {
         'reviewed-inference': 'Reviewed inference remains distinct from source confirmation',
         stale: 'Evidence needs re-checking',
         'open-question': 'Open enforcement question',
-        'discovery-candidate': 'New address needs identity review'
+        'discovery-candidate': 'New address needs identity review',
+        'defi-integration-candidate': 'Possible new DeFi integration'
     }[issue] ?? 'Evidence review needed';
     return `${prefix}: ${label}`;
 }
@@ -351,7 +362,7 @@ function claimsForField(issuer, field, databaseClaims) {
     return publicClaims(current);
 }
 
-export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], discoveryCandidates = [], nowMs = Date.now() }) {
+export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = [], changeEvents = [], discoveryCandidates = [], defiCandidates = [], nowMs = Date.now() }) {
     const issuers = Array.isArray(issuerDb?.issuers) ? issuerDb.issuers : [];
     const names = new Map(issuers.map((issuer) => [issuer.slug, issuer.name ?? issuer.slug]));
     const canonicalSlug = (raw) => {
@@ -465,6 +476,25 @@ export function buildReviewQueue({ issuerDb, legalTemplates, databaseClaims = []
             observedAt: candidate.lastSeenAt ?? candidate.firstSeenAt ?? null,
             severity: candidate.severity ?? 'caution',
             href: './review.html'
+        }));
+    }
+
+    // On-chain footprint candidates (stocks/data/defi-footprint.json): a program holding a tracked
+    // stock that no collected registry explains. Severity: an unknown program is caution; a known
+    // protocol whose exact use is simply not yet collected is informational.
+    for (const candidate of defiCandidates) {
+        if (!candidate?.mint || !candidate?.reason) continue;
+        const issuerSlug = canonicalSlug(candidate.issuer);
+        const who = candidate.protocolName ?? candidate.programId ?? 'unresolved program';
+        items.push(item({
+            issuerSlug,
+            issuerName: names.get(issuerSlug) ?? issuerSlug ?? 'Unattributed issuer',
+            field: `DeFi protocol use · ${candidate.symbol ?? candidate.mint.slice(0, 8)} · ${who}`,
+            issue: 'defi-integration-candidate',
+            detail: `${candidate.summary} Mint ${candidate.mint}; holding account owner(s) ${(candidate.owners ?? []).join(', ') || 'unknown'}.`,
+            observedAt: candidate.observedAt ?? null,
+            severity: candidate.reason === 'unlisted-integration' ? null : 'caution',
+            href: './stocks.html?view=defi#defiNewStrip'
         }));
     }
 

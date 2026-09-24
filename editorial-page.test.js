@@ -41,7 +41,7 @@ describe.each(GUIDES)('%s', (file, heading, diagnosticQuestion) => {
         expect(html).toContain('Questions to ask');
         expect(html).toContain(`rel="canonical" href="https://rwasonar.com/learn/${file}"`);
         expect(html).not.toContain('noindex');
-        expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
         expect(visibleWords(html).length).toBeGreaterThan(500);
     });
 });

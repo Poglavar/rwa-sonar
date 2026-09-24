@@ -65,8 +65,8 @@ describe('digest settings', () => {
     });
 
     test('connected label names the hour and zone, or says the digest is off', () => {
-        expect(D.connectedLabel({ enabled: true, hour: 7, timezone: 'Europe/Zagreb' })).toBe('Connected — daily digest at 07:00 Europe/Zagreb.');
-        expect(D.connectedLabel({ enabled: false, hour: 7, timezone: 'UTC' })).toBe('Connected — daily digest is off.');
+        expect(D.connectedLabel({ enabled: true, hour: 7, timezone: 'Europe/Zagreb' })).toBe('Connected. Daily digest at 07:00 Europe/Zagreb.');
+        expect(D.connectedLabel({ enabled: false, hour: 7, timezone: 'UTC' })).toBe('Connected. Daily digest is off.');
     });
 });
 

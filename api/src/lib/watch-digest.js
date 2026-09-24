@@ -166,8 +166,8 @@ export function formatDigest(watch, events, { baseUrl, date, changes = [] }) {
         const intro = [
             '',
             `${changes.length} document or on-chain change${changes.length === 1 ? '' : 's'} recorded for this target:`,
-            "Every recorded change is listed. A \"model assessment\" is a model's reading of the diff, not a legal "
-                + 'conclusion, and never decides what is listed here; the diff is on the linked page.'
+            "Every recorded change is listed. A \"model assessment\" is a model's reading of the diff. It is not a "
+                + 'legal conclusion and does not decide what is listed. The diff is on the linked page.'
         ];
         if (fits(intro.join('\n'))) {
             for (const line of intro) push(line);

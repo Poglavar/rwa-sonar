@@ -106,6 +106,9 @@ step "public change journal"; node stocks/build-change-journal.mjs --run
 # Never freeze a stale defi-usage.json after its fetch failed: the next successful midnight then
 # compares with the last genuine observation instead of erasing a change or inventing removals.
 if [ "$(date -u +%H)" = "00" ]; then
+    # Which programs hold each tracked mint (stocks/fetch-defi-footprint.mjs): finds integrations the
+    # protocol registries don't list. Bounded; a failed read is never a removal.
+    soft "DeFi footprint" node stocks/fetch-defi-footprint.mjs --run --budget=250 --resolve-budget=15
     if [ "$DEFI_USAGE_FRESH" -eq 1 ]; then
         step "DeFi daily snapshot"; node stocks/snapshot-defi.mjs --run
         step "DeFi daily changes";  node stocks/build-defi-changes.mjs --run
@@ -140,7 +143,10 @@ chmod -R u=rwX,go=rX "$DOCROOT/cards" "$DOCROOT/templates" "$DOCROOT/issuers" "$
 # surfaces phase above). They are ordinary site files that only a deploy's rsync would otherwise
 # copy, so install them here, each by an atomic rename, to keep the published counts current.
 step "static page snapshots"
-for page in index.html pitch/index.html; do
+# Every hand-written page carries build-time counts and a head block (og image hash, JSON-LD)
+# written by stocks/build-site-seo.mjs, so all of them are installed, each by an atomic rename.
+for page in $(node stocks/build-site-seo.mjs --list-pages); do
+    mkdir -p "$DOCROOT/$(dirname "$page")"
     install -m 0644 "$page" "$DOCROOT/$page.next-$$" && mv -f "$DOCROOT/$page.next-$$" "$DOCROOT/$page"
 done
 

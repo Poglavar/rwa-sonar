@@ -185,7 +185,7 @@ describe('legal template pages', () => {
     it('keeps a named product fee scoped on the programme template page', () => {
         const xstocks = templates.find((row) => row.issuer.slug === 'xstocks-backed');
         const html = renderTemplatePage(xstocks);
-        expect(html).toContain('Product example only — TSLAx; no programme-wide fee is confirmed.');
+        expect(html).toContain('Product example only (TSLAx); no programme-wide fee is confirmed.');
         expect(html).toContain('<details class="redemption-term">');
         expect(html).toContain('0.50%');
     });

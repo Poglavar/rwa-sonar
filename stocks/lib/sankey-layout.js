@@ -42,7 +42,7 @@
     }
 
     function addRow(link, row) {
-        link.rows.push({ symbol: row.symbol ?? null, mint: row.mint ?? null, dossier: row.dossier ?? null, usd: finite(row.usd), usdBasis: row.usdBasis ?? null, stageAsOf: row.stageAsOf ?? null });
+        link.rows.push({ symbol: row.symbol ?? null, mint: row.mint ?? null, dossier: row.dossier ?? null, usd: finite(row.usd), usdBasis: row.usdBasis ?? null, stageAsOf: row.stageAsOf ?? null, via: Array.isArray(row.via) ? row.via : [] });
         const usd = finite(row.usd);
         if (usd === null) link.noUsdRows += 1;
         else { link.usd = (link.usd ?? 0) + usd; link.usdRows += 1; }

@@ -984,7 +984,7 @@
                     const shade = svgEl('rect', {
                         x: bar.x, y: 0, width: bar.width, height: CHART.height, class: 'bar-hatched'
                     });
-                    shade.appendChild(svgEl('title', {}, `${bar.hourLabel} — before collection began, never sampled`));
+                    shade.appendChild(svgEl('title', {}, `${bar.hourLabel}: before collection began, never sampled`));
                     bars.appendChild(shade);
                 }
                 if (isNum(bar.total) && bar.total > 0) {
@@ -1021,7 +1021,7 @@
             if (geometry.max === 0) caption.push('No hour in this capture has a value for that metric yet.');
             const since = state.db && state.db.collectingSince ? fmtDateTime(state.db.collectingSince) : null;
             if (since && geometry.bars.some((bar) => bar.hatched)) {
-                caption.push(`Hatched hours are before collection began — collecting since ${since}, so they were never sampled and their bars are not comparable.`);
+                caption.push(`Hatched hours are before collection began on ${since}. They were never sampled, so their bars are not comparable.`);
             } else if (since) {
                 caption.push(`Collecting since ${since}.`);
             }

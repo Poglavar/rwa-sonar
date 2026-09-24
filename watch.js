@@ -72,9 +72,9 @@
     const SOURCE_STATUS_BLURBS = {
         new: 'registered, never fetched yet',
         ok: 'last fetch matched the stored hash',
-        changed: 'the text moved since we last read it',
-        gone: '404 or replaced — nothing left to re-read',
-        blocked: 'the host refuses us (403, bot wall, paywall)',
+        changed: 'the text changed since we last read it',
+        gone: '404 or replaced; nothing left to re-read',
+        blocked: 'the host blocks our fetch (403, bot wall, paywall)',
         error: 'the fetch failed for another reason'
     };
 
@@ -205,8 +205,8 @@
     /** What each claim status asserts. The bar's legend, and the chip's tooltip. */
     const CLAIM_STATUS_BLURBS = {
         confirmed: 'the source\'s own words were found verbatim',
-        changed: 'the quote is no longer in the source — a human decides, the claim is not false yet',
-        inference: 'our reading, not the source\'s words',
+        changed: 'the quote is no longer in the source; a person must review it before the claim is marked false',
+        inference: 'our reading; no source states it',
         unverified: 'recorded, not yet found verbatim in a source',
         'source-gone': 'the document it was read from has disappeared'
     };
@@ -568,7 +568,7 @@
     }
 
     /** What the page says under every model assessment, so nobody reads it as a finding. */
-    const MODEL_ASSESSMENT_DISCLAIMER = "A model's reading of the change, not a legal conclusion.";
+    const MODEL_ASSESSMENT_DISCLAIMER = "A model's reading of the change. It is not a legal conclusion.";
     const DIFF_EXCERPT_MAX = 4000;
 
     /**
@@ -1321,7 +1321,7 @@
             <span class="wat-tile-blurb">${escapeHtml(tile.blurb)}</span>
         </div>`).join('');
         els.sourceTiles.innerHTML = `<div class="wat-tiles">${kindTiles}</div>
-            <h3 class="wat-subhead">And what the last sweep found</h3>
+            <h3 class="wat-subhead">What the last sweep found</h3>
             <div class="wat-tiles">${statusTiles}</div>
             <p class="wat-tile-foot">${escapeHtml(fmtNumber(totals.versions))} stored versions ·
             ${escapeHtml(fmtNumber(totals.claims))} claims read from these sources ·
@@ -1366,9 +1366,9 @@
             const open = state.expanded.has(group.slug);
             const panelId = `sources-${group.slug}`;
             const flags = [
-                group.changed > 0 ? chip(`${fmtNumber(group.changed)} changed`, 'caution', 'the text moved since we last read it') : '',
+                group.changed > 0 ? chip(`${fmtNumber(group.changed)} changed`, 'caution', 'the text changed since we last read it') : '',
                 group.gone > 0 ? chip(`${fmtNumber(group.gone)} gone`, 'critical', 'nothing left to re-read') : '',
-                group.blocked > 0 ? chip(`${fmtNumber(group.blocked)} blocked`, 'warning', 'the host refuses us') : '',
+                group.blocked > 0 ? chip(`${fmtNumber(group.blocked)} blocked`, 'warning', 'the host blocks our fetch') : '',
                 group.errors > 0 ? chip(`${fmtNumber(group.errors)} error`, 'warning', 'the fetch failed') : ''
             ].join(' ');
             const name = `<span class="wat-issuer-name">${escapeHtml(group.name)}</span>`;
@@ -1453,7 +1453,7 @@
         if (!els.journalVisit || state.journalVisit === null) return;
         const summary = state.journalVisit;
         if (summary.firstVisit) {
-            els.journalVisit.innerHTML = '<strong>Your baseline starts here.</strong><span>On your next visit, this browser will show which public, outside-world changes are new. No account or personal data is used.</span>';
+            els.journalVisit.innerHTML = '<strong>Your baseline starts here.</strong><span>On your next visit, this browser will show which public external changes are new. No account or personal data is used.</span>';
             return;
         }
         const when = summary.previousVisitedAt
@@ -1614,7 +1614,7 @@
             : `<a href="${escapeHtml(row.sourceHref)}"${row.sourceTitle.truncated ? ` title="${escapeHtml(row.sourceTitle.full)}"` : ''}>${escapeHtml(row.sourceTitle.text)}</a>`;
         const archive = row.archiveHref === null ? '' : ` · <a href="${escapeHtml(row.archiveHref)}">archived copy</a>`;
         const quote = row.quote.empty
-            ? `<p class="wat-claim-quote wat-muted">No quote — ${escapeHtml(CLAIM_STATUS_BLURBS[row.status] ?? 'see the note')}</p>`
+            ? `<p class="wat-claim-quote wat-muted">No quote: ${escapeHtml(CLAIM_STATUS_BLURBS[row.status] ?? 'see the note')}</p>`
             : `<blockquote class="wat-claim-quote"${row.quote.truncated ? ` title="${escapeHtml(row.quote.full)}"` : ''}>${escapeHtml(row.quote.text)}</blockquote>`;
         const note = row.note.empty ? '' : `<p class="wat-claim-note">${cut(row.note)}</p>`;
         return `<li class="wat-claim">

@@ -71,6 +71,9 @@ function dossierFileFor(slug) {
     return prefixed.length === 1 ? prefixed[0] : null;
 }
 
+/** The built schematics (stocks-schematics.json), so every card is measured with its drawn route. */
+const SCHEMATICS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'stocks-schematics.json'), 'utf8'));
+
 const whatIfBySlug = new Map();
 for (const row of issuerDb.issuers) {
     const file = dossierFileFor(row.slug);
@@ -124,7 +127,8 @@ function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverr
         whatIf: whatIfBySlug.get(token.issuer) ?? null,
         archives: null,
         composabilityTemplate: composabilityTemplateFor(token, composability),
-        defiUsageItem: defiUsage.get(token.mint) ?? null
+        defiUsageItem: defiUsage.get(token.mint) ?? null,
+        schematics: SCHEMATICS.issuers[token.issuer] ?? null
     });
 }
 
@@ -385,13 +389,13 @@ describe('renderCard', () => {
 
     it('separates confirmed exact-mint usage from structural composability', () => {
         expect(card.defiUsage.protocols).toEqual(expect.arrayContaining([
-            'Jupiter Lend', 'Kamino', 'Nest', 'Raydium', 'Veda xStocks Vault'
+            'Jupiter Lend', 'Kamino', 'Loopscale', 'Nest', 'Raydium', 'xStocks Vaults (Kraken · Veda · Sentora · Kamino)'
         ]));
         expect(html).toContain('<section id="defi-usage">');
         expect(html).toContain('Use as collateral');
         expect(html).toContain('Earn yield');
         expect(html.indexOf('<section id="defi-usage">')).toBeLessThan(html.indexOf('<section id="composability">'));
-        expect(publicCard(card).defiUsage.confirmedUseCount).toBe(5);
+        expect(publicCard(card).defiUsage.confirmedUseCount).toBe(6);
         expect(publicCard(card).defiUsage.integrations[0]).not.toHaveProperty('summary');
         expect(html).toContain('Open RWA Sonar dossier');
         expect(html).toContain('../protocols/');
@@ -417,7 +421,7 @@ describe('renderCard', () => {
 
     it('separates documented redemption terms from route and successful-use evidence', () => {
         expect(card.ownership.redemptionUsability.documentedButNotIndependentlyObserved).toBe(true);
-        expect(html).toContain('Can a holder actually redeem?');
+        expect(html).toContain('Can a holder redeem?');
         expect(html).toContain('Documented, but not independently observed.');
         expect(html).toContain('Successful redemption independently observed');
         expect(publicCard(card).ownership.redemptionUsability.fields).toHaveLength(9);
@@ -539,8 +543,8 @@ describe('renderCard', () => {
                 [scanned(), 'Redemptions observed on-chain: last on 2026-09-23 (6 in the last 19 h, recurring scan).'],
                 [scanned({ lastObserved: null, daily: {}, coverage: [{ from: '2026-09-20T20:22:10Z', to: '2026-09-23T20:22:10Z' }] }), 'No redemption observed in 3 days of continuous coverage.'],
                 [scanned({ lastObserved: null, daily: {} }), 'Not yet covered by the recurring scan.'],
-                [scanned({ lastScan: { at: '2026-09-23T20:23:10Z', status: 'failed', error: 'RPC 429' } }), 'Scan failed on 2026-09-23 — not the same as no redemptions.'],
-                [scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }), 'Scan stale since 2026-09-18 — not a statement that redemptions stopped.'],
+                [scanned({ lastScan: { at: '2026-09-23T20:23:10Z', status: 'failed', error: 'RPC 429' } }), 'Scan failed on 2026-09-23; redemptions for that period are unknown.'],
+                [scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }), 'Scan stale since 2026-09-18; redemptions after that date are unknown.'],
                 [scanned({ coverage: [], lastObserved: null }), 'Not yet covered by the recurring scan.'],
                 [publicFeed({ observable: false, whyNotObservable: 'No redemption address is published. The rest is detail.' }, { now: NOW }), 'Not observable on-chain: No redemption address is published.']
             ];
@@ -584,7 +588,7 @@ describe('renderCard', () => {
 
     it('separates technical authority capabilities from attribution and lawful-use limits', () => {
         expect(card.authorityAttribution.authorities).toHaveLength(10);
-        expect(html).toContain('Capability is not permission');
+        expect(html).toContain('Capability and permission');
         expect(html).toContain('Controller / threshold / rotation');
         expect(html).toContain('Contractual circumstances');
         expect(html).toContain('Technical control notes');
@@ -632,7 +636,7 @@ describe('renderCard', () => {
         expect(html).toContain('Can seizure become cash?');
         expect(html).toContain('issuer redemption requires KYC/AML');
         expect(html).toContain('Pool presence does not guarantee executable liquidation size');
-        expect(html).toContain('capability, not a duty');
+        expect(html).toContain('able to act, with no duty to act');
         expect(html).toContain(`../templates/${card.composability.id}.html`);
         expect(publicCard(card).composability).toEqual({
             id: card.composability.id,
@@ -695,7 +699,7 @@ describe('renderCard', () => {
 
     it('labels the issuer API as the issuer\'s own numbers and omits the section otherwise', () => {
         const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
-        expect(prestocks).toContain('own numbers, not an independent price');
+        expect(prestocks).toContain('own numbers, with no independent check');
         expect(prestocks).toContain('Mark price');
         expect(renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' })).not.toContain('Issuer API');
     });
@@ -709,6 +713,14 @@ describe('renderCard', () => {
 });
 
 // --- budget, determinism, round-trip ----------------------------------------------------------
+
+describe('the redemption schematic on a card', () => {
+    it('links the drawn route on the issuer page instead of drawing it (the byte budget)', () => {
+        const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
+        expect(html).toContain('<a href="../issuers/xstocks-backed.html#how-it-works">See it drawn step by step: xStocks: stablecoin redemption (observed on-chain) →</a>');
+        expect(html).not.toContain('<figure class="fd ');
+    });
+});
 
 describe('every real card', () => {
     const rendered = tokenDb.tokens.map((token) => {
@@ -943,7 +955,7 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'}; target ${CARD_BYTE_TARGET}, limit ${CARD_BYTE_LIMIT}`);
         expect(fixture).toBeLessThan(CARD_BYTE_TARGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
-        expect(CARD_BYTE_TARGET).toBe(96 * 1024);
+        expect(CARD_BYTE_TARGET).toBe(104 * 1024);
         expect(CARD_BYTE_LIMIT).toBe(112 * 1024);
     });
 

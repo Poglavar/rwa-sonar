@@ -1,16 +1,16 @@
-# Evidence and watch: every claim backed, every source watched
+# Evidence and source watching
 
-The pitch has three legs: we read the same data from a specific angle, we surface facts buried
-in prospectuses, terms of service and small print, and **we keep watch**, so that a change in a
+RWA Sonar does three things: it reads the same data from a specific angle, it surfaces facts buried
+in prospectuses, terms of service and small print, and **it watches the sources**, so that a change in a
 treasury wallet, a float, a venue list, a legal term, a smart-contract toggle or an authority key
-is caught within a day and shown with its evidence. This document is the design for the third
-leg and for the "extreme quotation" the first two need.
+is caught within a day and shown with its evidence. This document is the design for the watching
+and for the "extreme quotation" (an exact quote behind every claim) that the first two need.
 
 Starting point (2026-09-17): 12 issuer dossiers in `stocks/data/issuers/` cite 292 distinct URLs
 (18 PDFs, 172 `documents[]` entries), findings and incidents carry a `source`, but only 12 of 108
 structured dossier fields name their source inline, and no source is fetched again after the day
 it was read. On-chain facts are refetched by the 6-hourly refresh and snapshotted daily, but a
-change only shows as a diff of numbers, not as an event with evidence.
+change shows only as a diff of numbers, with no event and no evidence attached.
 
 ## 1. Data model (schema `sonar`)
 
@@ -28,7 +28,7 @@ RWA Sonar's own research corrections never reappear as current evidence.
 
 Rules: `recorded_at` is when we wrote the claim, `last_checked_at` when a watcher last looked,
 `last_confirmed_at` when the quote was last found verbatim. A claim whose quote disappears from
-its source does not become false; it becomes `changed` with a change event and a human decides.
+its source is marked `changed` (it is not marked false), a change event is raised, and a human decides.
 
 ## 2. Watchers (one PM2 job, `stocks/watch-sources.mjs`, daily; parts hourly)
 
@@ -68,12 +68,12 @@ its source does not become false; it becomes `changed` with a change event and a
    (it is a document too, watched by 1). Each is a `claim` with `method = onchain` and a locator
    (account, field), so a change is a change event with before/after and the slot/signature.
 5. **Market watcher** (from the existing snapshots): float and supply moves, liquidity drops,
-   venue added/removed, volume regime change, top-1 holder change, multiplier (rebase) — already
+   venue added/removed, volume regime change, top-1 holder change, multiplier (rebase), all already
    in `lib/changes.mjs`; they become `change_event` rows with the snapshot dates as evidence.
 6. **DeFi protocol watcher** (daily): compare each exact token address + protocol integration in
    `stocks/data/history/<date>/defi.json`; report support added/removed, configured maximum LTV
    changes, a live market becoming inactive, and deposited collateral value falling at least 25%
-   from a prior value of at least $100,000. The first observation is a baseline, not an event.
+   from a prior value of at least $100,000. The first observation is stored as a baseline and raises no event.
    Published pool, reserve, vault, bank, config and oracle accounts are separately corroborated by
    batched Solana reads. Account existence supports the technical evidence; it does not prove the
    legal claim, economic value or that every advertised operation will succeed.
@@ -123,8 +123,8 @@ its source does not become false; it becomes `changed` with a change event and a
   `registry.npmjs.org/<package>`, crates.io (an empty Ember page) from `crates.io/api/v1/crates/<name>`,
   and securitize.io's `/disclosure/<slug>` and `/disclosure-library` pages (a React app) from the
   Builder.io content API, with the public key Securitize's own bundle ships to every browser (a
-  401/403 there means the key was rotated, not that we lost access). Only after the live page
-  refused us or rendered nothing, never after a 404 or 429; tried before Wayback, because it is the
+  401/403 there means Securitize rotated the key). Used only when the live page refused us or
+  rendered nothing (never after a 404 or 429), and tried before Wayback because it gives the
   publisher's current words. The companion JSON is reduced to what a reader of the page sees
   (description, versions, README, text blocks, links), without download counters or `updated_at`.
   The source keeps the cited URL; state carries `companionUrl`, `read_via = 'companion'`, and the
@@ -157,15 +157,14 @@ its source does not become false; it becomes `changed` with a change event and a
 - **An API's error answer can be the evidence.** An exact query URL whose cited response is a
   400/422 JSON body is read like any document. For example, Remora cites Jupiter's
   `/swap/v1/quote?inputMint=…` answering `{"error":"The token … is not tradable","errorCode":"TOKEN_NOT_TRADABLE"}`.
-  The outcome reads "same hash (http-400 JSON answer is the cited response)" or "new hash (…)", not
-  `blocked`. Only a JSON body counts, and only on a URL with its query. A bare route family
+  The outcome reads "same hash (http-400 JSON answer is the cited response)" or "new hash (…)", and
+  the source is not marked `blocked`. Only a JSON body counts, and only on a URL with its query. A bare route family
   (`…/swap/v1/quote`, a Sanity `/data/query/<dataset>` without `query`, a Drive `download` without
-  `id`) only answers "missing parameter", which is evidence of nothing. `isDocumentWatchable` keeps it out
+  `id`) only answers "missing parameter", which proves nothing. `isDocumentWatchable` keeps it out
   of the watch, as §2.3 already did for Raydium's bare `/pools/info/mint`.
 - **What-if answers are verified like claims.** `whatIf[]` quotes go through the same
   `quoteVerificationSources` mapping as `claims[]` (`dossierQuotes` in `lib/watch.mjs`), so an
-  answer citing a client-rendered page is checked against its declared companion, not the empty
-  shell.
+  answer citing a client-rendered page is checked against its declared companion.
 - **`--only-blocked` re-reads.** Selects only the sources whose stored state says the live host did
   not give us the document last time: `blocked`, read from a Wayback capture, or read through a
   companion. It never reuses the day's checkpoint entries for them, though the checkpoint is kept
@@ -183,7 +182,7 @@ its source does not become false; it becomes `changed` with a change event and a
   `sonar.change_judgment` with its tokens and `cost_usd`, and to the shared `llm-cost` ledger. An answer whose
   `quotedChange` fragments are not verbatim in the change text, or that says a change is material
   without quoting it, is stored `invalid` and never shown as text. The batch id is checkpointed
-  before polling, so the next run resumes it rather than paying twice. A batch still open after 12 h
+  before polling, so the next run resumes it and does not pay twice. A batch still open after 12 h
   (`STALLED_BATCH_MS`) is canceled (unprocessed requests are not billed), and that run judges
   directly. `--direct` does the same by hand: online calls at full price, at most 10, stored with
   `batch_id = 'direct'`. More than 25 items needs `--allow-large`. The second batch, 10 items,
@@ -195,11 +194,11 @@ its source does not become false; it becomes `changed` with a change event and a
   180 s window (linked by inference); and Superstate burn-to-book-entry conversions. It classifies
   them and folds them into `stocks/data/redemption-observations.json`, which the 00:17 refresh builds
   into each issuer's redemption block. Reads are oldest-first, at most 1,500 `getTransaction` calls
-  per address per run. Coverage extends only over what was read, and a backlog is carried
-  over, not skipped. A failed or partial scan is `scan-failed`/partial, never "no redemptions". PreStocks and
+  per address per run. Coverage extends only over what was read, and an unread backlog is carried
+  over to the next run. A failed or partial scan is recorded as `scan-failed`/partial, never as "no redemptions". PreStocks and
   Tessera are recorded as not observable, with a 1–3 call tripwire. Telegram is off; its
   `noticeLines` reach the morning digest through the central monitor. An observed completion is
-  what §7 means by a demonstrated redemption, as opposed to a `documented-process`.
+  what §7 calls a demonstrated redemption; without one the label stays `documented-process`.
 
 ## 3. Change kinds
 
@@ -211,17 +210,16 @@ wallet balance move), `holder-concentration`, `venue` (pool or market listed/del
 `float`, `liquidity`, `metadata` (token metadata URI content), `status` (issuer live/defunct).
 `litigation` (stocks/watch-caselaw.mjs: a new CourtListener opinion or RECAP docket, a new SEC
 litigation release or administrative proceeding, or a new docket entry naming an issuer's legal
-entity or party; a candidate for review — it never sets a what-if answer to `litigated`).
+entity or party. It is a candidate for review and never sets a what-if answer to `litigated`).
 
 ## 4. Presentation
 
 - **Every claim gets a chip.** Structured fields on dossiers and cards render the value plus a
   small "§" chip; hover or tap shows: the quote, the source title with link, the locator, the
   archived copy link, `recorded` and `last checked` timestamps, and `changed on <date>` in warning
-  colour when the source moved after the claim. Nothing else changes visually; the chip is the
-  whole UI cost.
-- **A conflict gets a side-by-side discrepancy record, not another chip.** `discrepancies[]`
-  contains a stable `id`, title, severity, observation date, impact, and two deliberately opposed
+  colour when the source moved after the claim. The chip is the only visual change.
+- **A conflict gets a side-by-side discrepancy record.** `discrepancies[]`
+  contains a stable `id`, title, severity, observation date, impact, and two opposing
   sides: `claim` and `reality`. Each side has its own plain-language text and one or more
   `{label, url, locator, accessedAt}` sources. The issuer card shows a compact count above the
   fold; opening it shows both propositions and both source trails together. This is reserved for
@@ -258,8 +256,8 @@ entity or party; a candidate for review — it never sets a what-if answer to `l
 
 The evidence model above answers "who said this?". The trust chain answers the two questions a
 holder actually has: **who stands between me and the company**, and **what happens when one of them
-fails**. One shared catalogue, `stocks/data/trust-chain.json`, so every issuer is measured against
-the same list and a gap is visible AS a gap: **13 actors**, **9 rights flows**, **38 failure
+fails**. There is one shared catalogue, `stocks/data/trust-chain.json`, so every issuer is measured against
+the same list and anything missing shows up as missing: **13 actors**, **9 rights flows**, **38 failure
 modes**. The logic is one file, `stocks/lib/trustchain.js` (UMD, so the page, the builders and jest
 all load the same copy) with `trustchain.mjs` adding the catalogue for the ESM callers.
 
@@ -267,20 +265,20 @@ all load the same copy) with `trustchain.mjs` adding the catalogue for the ESM c
 
 `buildChain(issuer, catalogue)` turns a dossier (or a built issuer record) into:
 
-- **nodes** — one per catalogue actor, filled from `parties.*` by each party's own `role`. An actor
-  nobody fills still appears with `parties: []`, because an empty seat is the finding: no transfer
+- **nodes**: one per catalogue actor, filled from `parties.*` by each party's own `role`. An actor
+  nobody fills still appears with `parties: []`, because the empty role is itself the finding: no transfer
   agent means the token is not the share, no security agent means holders are unsecured. One
-  exception, stated as a rule rather than a fudge: for `legalForm === 'registered-share'` the token
+  exception: for `legalForm === 'registered-share'` the token
   issuer **is** the company, so when `parties.tokenIssuers` is empty the security issuers fill that
-  seat.
-- **links** — one per catalogue flow, each carrying the fields it rests on (`{field, value,
-  claimStatus}`, a `null` status where nothing is claimed — a missing claim is not a weak claim),
+  role.
+- **links**: one per catalogue flow, each carrying the fields it rests on (`{field, value,
+  claimStatus}`, with a `null` status where nothing is claimed, so a missing claim stays distinct from a weak one),
   a one-line plain-text `summary` assembled from those values only, and **two independent grades**.
 
 ### 6.2 The two link grades
 
 Neither is ever typed by hand; both are computed from the dossier's claims, so a link cannot look
-firmer than the evidence under it. Colour is `evidence`, line style is `verification`.
+stronger than its evidence. Colour is `evidence`, line style is `verification`.
 
 | `evidence` | from the best claim status across the flow's fields |
 |---|---|
@@ -296,15 +294,15 @@ firmer than the evidence under it. Colour is `evidence`, line style is `verifica
 | `self-reported` | there are claims, but none of them qualifies above |
 | `none` | no claim touches any of the flow's fields |
 
-`issuer-statement` is deliberately **not** a third-party type: it is strength 1 in `lib/grade.mjs`
-because it is the issuer's own word, and grading that `attested` would make the word mean nothing.
+`issuer-statement` is **not** a third-party type: it is strength 1 in `lib/grade.mjs`
+because it is the issuer's own word, and grading it `attested` would make `attested` meaningless.
 `onchain` can hold with no claims at all (the reading is recorded in `keyGovernance.evidence`), so
-`verification: onchain` beside `evidence: unknown` is a real and meaningful pair.
+`verification: onchain` beside `evidence: unknown` is a valid combination.
 
 ### 6.3 The what-if answers
 
 Each dossier answers the 38 modes in its own `whatIf[]` (schema in the catalogue's `whatIfSchema`),
-with the same evidence discipline as `claims[]` — quote, url, locator, `accessedAt`:
+with the same evidence fields as `claims[]` (quote, url, locator, `accessedAt`):
 
 | status | means |
 |---|---|
@@ -319,19 +317,19 @@ with the same evidence discipline as `claims[]` — quote, url, locator, `access
 id, a bad status, a `documented`/`litigated` with neither quote nor url, a `litigated` with no
 `cases[]` (or a case with no name or url), an `unknown` with an empty `searched[]`, a missing
 `outcome`, a missing or unparseable `accessedAt` (required on every status except
-`not-applicable`, the one answer where nothing was read — that one needs a `note`). The loader runs
-it over every dossier and **throws rather than half-loading a research pass**, `stocks/trustchain.test.js`
-runs it over every real dossier in the suite, and the table's CHECK constraints are the last line.
+`not-applicable`, where nothing was read and a `note` is required instead). The loader runs
+it over every dossier and **throws, so a research pass is never half-loaded**, `stocks/trustchain.test.js`
+runs it over every real dossier in the suite, and the table's CHECK constraints are the final check.
 `validateCatalogue()` does the same for the catalogue: duplicate ids, dangling actor/flow/mode
 cross-references, and a mode no flow carries (which the chain could never reach).
 
 ### 6.4 Where it lands
 
 - `stocks-issuers.json`: every issuer record gains `chain` (nodes + graded links) and
-  `whatIfCounts` (the six counts). The full answers are **not** inlined — they are prose with
-  quotes and case citations, and the API serves them. The record also gained `parties` and
-  `knownExtensions`, because the chain must be rebuildable from the record alone, which is exactly
-  what `/api/issuers/:slug/chain` does.
+  `whatIfCounts` (the six counts). The full answers (prose with quotes and case citations) are
+  **not** inlined; the API serves them. The record also gained `parties` and
+  `knownExtensions`, so the chain can be rebuilt from the record alone, as
+  `/api/issuers/:slug/chain` does.
 - `sonar.failure_mode` (the catalogue, `ord` = its position in the file, which is the display
   order) and `sonar.what_if` (`id` = `<issuer_slug>:<mode>`), loaded by
   `stocks/load-db.mjs --only=whatif`. A mode with no answer has **no row**; an answer a dossier no
@@ -339,8 +337,8 @@ cross-references, and a mode no flow carries (which the chain could never reach)
   `<issuer>:<mode>` row stops being offered is the researcher having withdrawn it.
 - The source registry: every `whatIf[].url`, `whatIf[].cases[].url` and `whatIf[].searched[]` URL
   enters `sonar.source` and is watched and archived like any other, labelled by its failure **mode**
-  (`xstocks-backed:whatIf[account-frozen].searched[0]`) rather than its array index, which moves
-  whenever an answer is inserted above it.
+  (`xstocks-backed:whatIf[account-frozen].searched[0]`). The array index is not used because it
+  shifts whenever an answer is inserted above it.
 
 ### 6.5 Routes
 
@@ -353,17 +351,17 @@ cross-references, and a mode no flow carries (which the chain could never reach)
 
 ## 7. Technology + legal templates
 
-`stocks/lib/legal-templates.mjs` lifts issuer-level research into the reusable unit the assets
-actually share: **issuer programme + observed control recipe**. The join is exact and covers every
-current mint once. The output records the inheriting addresses and a separate exceptions list; an
-asset does not override its template merely because its ticker or market differs.
+`stocks/lib/legal-templates.mjs` groups issuer-level research by the unit the assets
+share: **issuer programme + observed control recipe**. The join is exact and covers every
+current mint once. The output records the inheriting addresses and a separate exceptions list; a
+different ticker or market alone does not make an asset an exception to its template.
 
-The evidence treatment is deliberately multidimensional:
+Evidence is recorded along several separate dimensions:
 
 - six confidence facets (ownership, custody/insolvency, eligibility, redemption, corporate
   actions and technical control), each naming the strongest source class and the number of claims;
 - a source register with authority, version, effective date, check date and archive URL as distinct
-  fields—unknown version/effective date stays `null` and is displayed as **not structured**;
+  fields; an unknown version/effective date stays `null` and is displayed as **not structured**;
 - a fixed precedence rule: mandatory law/registers, product-specific operative documents, base
   prospectus/programme terms, on-chain state for technical capability, operating documents and
   attestations, then marketing/third-party descriptions;
@@ -371,7 +369,7 @@ The evidence treatment is deliberately multidimensional:
 - redemption evidence labelled `documented-process` unless an actual completed transaction is
   recorded. A promise, UI route or operational manual is not a demonstrated redemption.
 
-The insolvency view never converts vocabulary into a result. “Trust”, “segregated”, “first
+The insolvency view never treats a word in the documents as an outcome. “Trust”, “segregated”, “first
 priority” and “bankruptcy remote” are displayed with the holder's standing, enforcement agent,
 commingling, perfection/priority and lien/set-off evidence found in the dossier; absent evidence is
 shown as absent. No such label is presented as a litigated insolvency outcome unless the underlying

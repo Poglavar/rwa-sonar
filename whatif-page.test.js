@@ -301,7 +301,7 @@ describe('the filters', () => {
         const none = matrix({ filters: { status: ['litigated'], actor: [] } });
         expect(none.shown).toBe(0);
         expect(W.matrixHtml(none)).toContain('No question matches these filters');
-        expect(W.matrixHtml(none)).toContain('clear a filter');
+        expect(W.matrixHtml(none)).toContain('Clear a filter');
     });
 
     test('status and actor together are AND', () => {
@@ -480,6 +480,19 @@ describe('the answer panel', () => {
         expect(html).toContain('wi-badge wi-s-documented');
     });
 
+    test('with the catalogue, an answer is also drawn as a sequence: trigger, path, then the outcome in its status', () => {
+        const { row, cell } = cellFor('keys-stolen', 'xstocks-backed');
+        const html = W.answerPanelHtml(row, cell, CATALOGUE);
+        expect(html).toContain('<figure class="fd fd-kind-sequence"');
+        expect(html).toContain('class="fd-step fd-st-catalogue" data-step="1"');
+        expect(html).toContain('class="fd-step fd-st-documented" data-step="3"');
+        expect(html).toContain('href="https://example.com/prospectus.pdf"');
+        // Without the catalogue, or for a not-applicable answer, nothing is drawn.
+        expect(W.answerPanelHtml(row, cell)).not.toContain('<figure');
+        const na = cellFor('custodian-insolvency', 'superstate-opening-bell');
+        expect(W.answerPanelHtml(na.row, na.cell, CATALOGUE)).not.toContain('<figure');
+    });
+
     test('an unknown answer shows where we looked, because the gap is only evidence with it', () => {
         const { row, cell } = cellFor('keys-stolen', 'superstate-opening-bell');
         const html = W.answerPanelHtml(row, cell);
@@ -509,7 +522,7 @@ describe('the answer panel', () => {
         const { row, cell } = cellFor('law-changes', 'xstocks-backed');
         const html = W.answerPanelHtml(row, cell);
         expect(html).toContain('Nobody has answered this question for this issuer yet');
-        expect(html).toContain('no outcome is guessed at here');
+        expect(html).toContain('We do not guess an outcome.');
         expect(html).toContain('What has to be read for it');
         // And never a quote, a source or a read date it does not have.
         expect(html).not.toContain('<blockquote');
@@ -578,6 +591,8 @@ describe('the page itself', () => {
             'stocks/lib/fmt.js',
             'stocks/lib/api-base.js',
             'stocks/lib/whatif-render.js',
+            'stocks/lib/flow-diagram.js',
+            'stocks/lib/schematics.js',
             'whatif.js',
             'nav-menus.js'
         ]);
@@ -590,7 +605,7 @@ describe('the page itself', () => {
     });
 
     test('the header states the rule that outcomes are never invented, and names all four statuses', () => {
-        expect(HTML).toContain('An outcome is never invented');
+        expect(HTML).toContain('We never invent an outcome');
         for (const word of ['documented', 'inferred', 'litigated', 'unknown']) {
             expect(HTML).toContain(`<em>${word}</em>`);
         }

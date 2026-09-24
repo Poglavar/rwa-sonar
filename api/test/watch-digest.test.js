@@ -246,7 +246,7 @@ describe('change events and model assessments in a digest', () => {
         expect(text).toContain('3 document or on-chain changes recorded for this target:');
         expect(text).toContain('model assessment: not material, info — Only a footer date changed.');
         expect(text).toContain(UNJUDGED.summary);
-        expect(text).toContain('never decides what is listed here');
+        expect(text).toContain('does not decide what is listed');
         expect(changeUrl(NOT_MATERIAL, BASE)).toBe(`${BASE}/watch.html#change-43`);
     });
 

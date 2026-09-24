@@ -109,7 +109,7 @@ describe('redemption usability model', () => {
             termScopes: { fees: { kind: 'product-example', products: ['TSLAx'], source: 'TSLAx product page' } }
         }, answerScope: 'programme' });
         expect(result.fields.find((field) => field.id === 'fees')).toMatchObject({
-            summary: 'Product example only — TSLAx; no programme-wide fee is confirmed.',
+            summary: 'Product example only (TSLAx); no programme-wide fee is confirmed.',
             scope: 'product-example-only', applicable: false, evidence: 'unknown',
             scopeContext: { source: 'TSLAx product page' }
         });
@@ -175,9 +175,9 @@ describe('recurring redemption-scan state line (describeObservationFeed)', () =>
 
     test('a failed, stale or uncovered scan never reads as "no redemptions"', () => {
         const failed = line(scanned({ lastScan: { at: '2026-09-22T06:00:00Z', status: 'failed', error: 'RPC 429' } }));
-        expect(failed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22 — not the same as no redemptions.' });
+        expect(failed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22; redemptions for that period are unknown.' });
         const stale = line(scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }));
-        expect(stale).toEqual({ state: 'stale', text: 'Scan stale since 2026-09-18 — not a statement that redemptions stopped.' });
+        expect(stale).toEqual({ state: 'stale', text: 'Scan stale since 2026-09-18; redemptions after that date are unknown.' });
         const uncovered = line(scanned({ coverage: [], lastObserved: null }));
         expect(uncovered).toEqual({ state: 'not-yet-covered', text: 'Not yet covered by the recurring scan.' });
         for (const result of [failed, stale, uncovered]) expect(result.text).not.toMatch(/^No redemption observed/);

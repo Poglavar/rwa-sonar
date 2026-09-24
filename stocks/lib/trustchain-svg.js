@@ -37,8 +37,8 @@
     /** What each grade means, one clause each — the legend's own words. */
     const EVIDENCE_LEGEND = {
         documented: 'the source’s own words, read and quoted',
-        inferred: 'our reading of the structure, not the source’s words',
-        asserted: 'written down, nobody has checked since',
+        inferred: 'our reading of the structure; no source states it',
+        asserted: 'recorded once and not re-checked since',
         unknown: 'nothing found for the fields this link rests on'
     };
 
@@ -46,7 +46,7 @@
         onchain: 'read off the ledger',
         attested: 'a third party vouches for it',
         'self-reported': 'only the issuer says so',
-        none: 'not verifiable from where we stand'
+        none: 'we cannot verify it'
     };
 
     /**
@@ -366,9 +366,9 @@
             `<li class="tc-key-item"><span class="tc-key-line ${verificationClass(grade)}"></span>`
             + `<strong>${escapeHtml(grade)}</strong> — ${escapeHtml(VERIFICATION_LEGEND[grade])}</li>`;
         return '<div class="tc-key">'
-            + '<div class="tc-key-group"><h5 class="tc-key-head">Colour — who said so</h5>'
+            + '<div class="tc-key-group"><h5 class="tc-key-head">Colour: who said so</h5>'
             + `<ul class="tc-key-list">${EVIDENCE_GRADES.map(swatch).join('')}</ul></div>`
-            + '<div class="tc-key-group"><h5 class="tc-key-head">Line — how it was checked</h5>'
+            + '<div class="tc-key-group"><h5 class="tc-key-head">Line: how it was checked</h5>'
             + `<ul class="tc-key-list">${VERIFICATION_GRADES.map(dash).join('')}</ul></div>`
             + '</div>';
     }

@@ -82,7 +82,7 @@
         } else if (token.venueCoverage === 'none-observed') {
             dex = `<p class="ex-missing">No DEX pool observed for this exact mint <small>· DexScreener, ${esc(fmtDateTime(token.dexFetchedAt))}</small></p>`;
         } else {
-            dex = '<p class="ex-missing">Venues were not collected for this mint, so whether a pool exists is unknown — not zero.</p>';
+            dex = '<p class="ex-missing">Venues were not collected for this mint, so we do not know whether a pool exists.</p>';
         }
         const r = view.redemptionLane(token, issuer);
         const redemption = `<div class="ex-lane"><h4>Issuer redemption <span class="ex-route route-${esc(r.state)}">${esc(r.label)}</span></h4><ul>${r.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>${r.url ? `<p>${link(r.url, 'Route source')}</p>` : ''}${r.minimum ? `<details><summary>Stated minimum and terms</summary><p>${esc(r.minimum)}</p></details>` : ''}</div>`;
@@ -147,7 +147,7 @@
             const basis = p.bases.map((b) => sankey.BASIS_LABELS[b] ?? b).join(' + ');
             const n = p.usdRows + p.noUsdRows;
             const amount = usd === null ? '<span class="ex-missing">USD not reported</span>' : `${esc(usd)} <small>${esc(basis)}${p.noUsdRows ? ` · +${p.noUsdRows} without USD` : ''}</small>`;
-            const tokens = p.rows.map((r) => `<li>${dossierLink(r.dossier, r.symbol)}${r.usd !== null ? ` · ${esc(fmtMoney(r.usd))}` : ''} <small>· as of ${esc(fmtDateTime(r.stageAsOf))}</small></li>`).join('');
+            const tokens = p.rows.map((r) => `<li>${dossierLink(r.dossier, r.symbol)}${r.usd !== null ? ` · ${esc(fmtMoney(r.usd))}` : ''}${r.via?.length ? ` <small>· routed via ${esc(r.via.join(', '))}; overlaps that lending link</small>` : ''} <small>· as of ${esc(fmtDateTime(r.stageAsOf))}</small></li>`).join('');
             return `<li class="stage-edge stage-${esc(p.stage)}"><div class="ex-flow-head"><span class="ex-flow-path">${esc(p.issuerName)} → ${esc(p.protocol)} → ${esc(p.actionLabel)}</span><span class="ex-flow-usd">${amount}</span></div>${stageChip(p.stage, p.rows[0]?.stageAsOf)}<details><summary>${n} exact-token integration${n === 1 ? '' : 's'}</summary><ul>${tokens}</ul></details></li>`;
         }).join('');
     }
@@ -202,7 +202,7 @@
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             data = await res.json();
         } catch (err) {
-            status(`Could not load stocks-exits.json (${err.message}). Nothing below is shown rather than guessed.`, true);
+            status(`Could not load stocks-exits.json (${err.message}). Nothing is shown below.`, true);
             throw err;
         }
         state.data = data;

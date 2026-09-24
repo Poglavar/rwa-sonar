@@ -38,11 +38,11 @@ describe('canonical issuer dossiers', () => {
         expect(html).toContain(`${sourced} of ${needed} required fields sourced`);
         expect(html).toContain('Unknown means not established, never “no”');
         expect(html).toContain('Published claim ≠ observed reality');
-        expect(html).toContain('not a history of edits to RWA Sonar');
+        expect(html).toContain('Edits to RWA Sonar’s own research are not listed here');
     });
 
     it('labels the TSLAx fee as a programme example instead of an issuer-wide term', () => {
-        expect(html).toContain('Product example only — TSLAx; no programme-wide fee is confirmed.');
+        expect(html).toContain('Product example only (TSLAx); no programme-wide fee is confirmed.');
         expect(html).toContain('<details class="redemption-term">');
         expect(html).toContain('0.50%');
     });
@@ -169,7 +169,7 @@ describe('recurring on-chain redemption scan on issuer dossiers', () => {
     it('never words a failed scan or the Superstate burn as redemptions observed, and explains the unobservable', () => {
         const failed = page('xstocks-backed', publicFeed({ observable: true, coverage: [{ from: '2026-09-22T00:00:00Z', to: '2026-09-23T00:00:00Z' }],
             lastScan: { at: '2026-09-23T06:00:00Z', status: 'failed', error: 'RPC 429' } }, { now: NOW }));
-        expect(line(failed)).toEqual(['Scan failed on 2026-09-23 — not the same as no redemptions.', 'scan failed']);
+        expect(line(failed)).toEqual(['Scan failed on 2026-09-23; redemptions for that period are unknown.', 'scan failed']);
         const superstate = page('superstate-opening-bell', publicFeed({ observable: true, mechanism: 'burn-to-book-entry-conversion', completionObservable: false,
             coverage: [{ from: '2026-08-24T20:27:42Z', to: '2026-09-23T20:26:42Z' }], daily: { '2026-09-10': { redemptions: 3 } },
             lastObserved: { blockTime: '2026-09-10T19:42:35Z' }, lastScan: { at: '2026-09-23T20:27:42Z', status: 'ok', backlog: 0 } }, { now: NOW }));
@@ -180,5 +180,32 @@ describe('recurring on-chain redemption scan on issuer dossiers', () => {
 
     it('prints nothing when the builder merged no feed', () => {
         expect(page('prestocks', undefined)).not.toContain('Recurring on-chain scan');
+    });
+});
+
+describe('issuer page schematics', () => {
+    const schematics = JSON.parse(readFileSync(join(root, 'stocks-schematics.json'), 'utf8'));
+    const issuer = issuers.issuers.find((row) => row.slug === 'ondo-global-markets');
+    const render = (entry) => renderIssuerPage({ issuer, tokens: [], templates: templates.templates, builtAt: issuers.builtAt,
+        schematics: entry }, { version: 'test' });
+
+    it('draws the redemption, creation and relationship figures, then the key what-if sequences, with unique ids', () => {
+        const html = render(schematics.issuers['ondo-global-markets']);
+        expect(html).toContain('<link rel="stylesheet" href="../flow-diagram.css?v=test" />');
+        const how = html.slice(html.indexOf('id="how-it-works"'), html.indexOf('</section>', html.indexOf('id="how-it-works"')));
+        expect(how).toContain('data-schematic-id="ondo-global-markets:redemption"');
+        expect(how).toContain('data-schematic-id="ondo-global-markets:creation"');
+        expect(how).toContain('data-schematic-id="ondo-global-markets:relationships"');
+        expect(html).toContain('id="what-happens"');
+        expect(html).toContain('data-schematic-id="ondo-global-markets:whatif:custodian-insolvency"');
+        const ids = [...html.matchAll(/aria-labelledby="(fd-\d+)-t/g)].map((m) => m[1]);
+        expect(ids.length).toBeGreaterThan(5);
+        expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it('draws nothing, not an empty frame, when there are no schematics', () => {
+        const html = render(null);
+        expect(html).not.toContain('id="how-it-works"');
+        expect(html).not.toContain('id="what-happens"');
     });
 });

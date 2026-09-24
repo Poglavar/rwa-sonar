@@ -36,9 +36,9 @@
     const KIND_MEANING = {
         'single-key': 'one private key (or a 1-of-n multisig, or a program whose upgrade key is one signer) can use this power alone',
         multisig: 'a threshold of several signers must approve; the threshold and any timelock are in the detail',
-        program: 'a program or its PDA signs; it is only as constrained as whoever can upgrade that program, shown underneath',
+        program: 'a program or its PDA signs; whoever can upgrade that program controls it, shown underneath',
         none: 'the power is not installed on any of the programme’s mints read from the chain',
-        unknown: 'the research has not established who holds it — shown as unknown, never guessed'
+        unknown: 'the research has not established who holds it, so it is shown as unknown'
     };
     const KINDS = ['single-key', 'multisig', 'program', 'none', 'unknown'];
 
@@ -188,8 +188,8 @@
     }
 
     function curveText(onCurve) {
-        if (onCurve === true) return 'on the ed25519 curve — a private key can exist for it';
-        if (onCurve === false) return 'off the curve — a program-derived address; no private key exists';
+        if (onCurve === true) return 'on the ed25519 curve: a private key can exist for it';
+        if (onCurve === false) return 'off the curve: a program-derived address with no private key';
         return 'curve not determined';
     }
 
@@ -253,7 +253,7 @@
         }
         for (const effect of Array.isArray(usage.effects) ? usage.effects : []) parts.push(`<p>On chain: ${escapeHtml(effect)}.</p>`);
         if (!usage.finding && !(usage.effects ?? []).length) {
-            parts.push('<p class="pm-sub">No use is on record in our data. That is not evidence the power was never used.</p>');
+            parts.push('<p class="pm-sub">No use is on record in our data. The power may still have been used.</p>');
         }
         if (row.governanceEvidence) {
             parts.push('<details class="pm-evidence"><summary>The dossier’s key-governance evidence (verbatim)</summary>'
@@ -337,7 +337,7 @@
             map = await res.json();
         } catch (err) {
             logError('power map did not load', err.message);
-            setStatus(`${err.message}. Nothing is shown rather than a partial map.`, true);
+            setStatus(`${err.message}. We show nothing instead of a partial map.`, true);
             return;
         }
         els.summary.textContent = summaryText(map);

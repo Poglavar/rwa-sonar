@@ -137,7 +137,7 @@ describe('landing/app separation', () => {
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');
         expect(html).toContain('X · @RWASonar');
-        expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
     test('carries the canonical X identity across the main public surfaces', () => {
@@ -149,15 +149,19 @@ describe('landing/app separation', () => {
         }
     });
 
-    test('every public page shares the large preview image with absolute URLs', () => {
-        const image = 'https://rwasonar.com/images/og-rwasonar.png?v=20260923';
+    test('every public page has its own large preview image with absolute URLs', () => {
+        // Page-specific images since 2026-09-24 (stocks/build-site-seo.mjs): og/<page>.png with a
+        // content-hash query, so X and the other preview fetchers re-read it when the numbers change.
+        const images = new Set();
         for (const file of ['index.html', 'stocks.html', 'whatif.html', 'monitor.html', 'watch.html', 'graph.html',
             'live.html', 'methodology.html', 'economics.html', 'learn/index.html', 'pitch/index.html']) {
             const page = readFileSync(join(__dirname, file), 'utf8');
             const canonical = page.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
             expect(canonical).toMatch(/^https:\/\/rwasonar\.com\//);
             expect(page).toContain(`<meta property="og:url" content="${canonical}" />`);
-            expect(page).toContain(`<meta property="og:image" content="${image}" />`);
+            const image = page.match(/<meta property="og:image" content="([^"]+)" \/>/)?.[1];
+            expect(image).toMatch(/^https:\/\/rwasonar\.com\/og\/[a-z-]+\.png\?v=[0-9a-f]{12}$/);
+            images.add(image);
             expect(page).toContain('<meta property="og:image:width" content="1200" />');
             expect(page).toContain('<meta property="og:image:height" content="630" />');
             expect(page).toMatch(/<meta property="og:title" content="[^"]+" \/>/);
@@ -166,6 +170,8 @@ describe('landing/app separation', () => {
             expect(page).toContain(`<meta name="twitter:image" content="${image}" />`);
             expect(page).not.toContain('content="summary" />');
         }
+        expect(images.size).toBe(11);
+        // The site-wide image stays the fallback whenever a page image cannot be rendered.
         expect(readFileSync(join(__dirname, 'images/og-rwasonar.png')).subarray(16, 24).toString('hex')).toBe('000004b000000276');
     });
 

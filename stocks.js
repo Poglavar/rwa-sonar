@@ -85,7 +85,7 @@ const {
 } = trustChainSection;
 const {
     DEFI_ACTION_LABELS, DEFI_ACTION_ORDER, composabilityTemplateForToken, composabilityTemplatesHtml,
-    controlExplicitlyOff, defiActionText, defiProtocolDirectoryHtml, defiProtocolRows, defiSourceRows,
+    controlExplicitlyOff, defiActionText, defiNewStripHtml, defiProtocolDirectoryHtml, defiProtocolRows, defiSourceRows,
     defiUsageCompactHtml, defiUsageDetailHtml, defiUsageIndex, filterDefiProtocols,
     productDecisionProfile, redemptionUsabilitySummary
 } = defiView;
@@ -130,6 +130,8 @@ if (typeof document !== 'undefined') {
         const TRUST_CHAIN_PATH = './stocks/data/trust-chain.json';
         const COMPOSABILITY_PATH = './stocks/data/composability-templates.json';
         const DEFI_USAGE_PATH = './stocks/data/defi-usage.json';
+        // Protocol additions / removals / review candidates (stocks/build-defi-changes.mjs).
+        const DEFI_NEW_PATH = './stocks-defi-new.json';
         const REVIEW_QUEUE_PATH = './stocks-review-queue.json';
         const JOURNAL_PATH = './stocks-change-journal.json';
 
@@ -309,6 +311,8 @@ if (typeof document !== 'undefined') {
             composabilityMethod: document.getElementById('composabilityMethod'),
             defiUsageSection: document.getElementById('defiUsageSection'),
             defiUsageStats: document.getElementById('defiUsageStats'),
+            defiNewStrip: document.getElementById('defiNewStrip'),
+            defiNewList: document.getElementById('defiNewList'),
             defiSourceCoverage: document.getElementById('defiSourceCoverage'),
             defiUsageMethod: document.getElementById('defiUsageMethod'),
             defiActionFilters: document.getElementById('defiActionFilters'),
@@ -531,7 +535,7 @@ if (typeof document !== 'undefined') {
             const tokenDb = await fetchJson(tokensPath);
             if (!tokenDb || !Array.isArray(tokenDb.tokens)) {
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage('failed', 'Token snapshot failed to load', `${tokensPath} is unavailable, so this is not evidence that no tokens exist. ${BUILD_HINT}.`, [
+                tokenTableMessage('failed', 'Token snapshot failed to load', `${tokensPath} is unavailable, so we cannot say which tokens exist. ${BUILD_HINT}.`, [
                     { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
                 ]);
                 renderStatus('tokens unavailable');
@@ -558,7 +562,7 @@ if (typeof document !== 'undefined') {
                 els.status.textContent = `No data: ${DISCOVERY_PATH} could not be loaded. ${BUILD_HINT}.`;
                 els.status.classList.add('status-error');
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage('failed', 'Discovery index failed to load', `${DISCOVERY_PATH} is unavailable; this is not evidence that no tokens exist.`, [
+                tokenTableMessage('failed', 'Discovery index failed to load', `${DISCOVERY_PATH} is unavailable, so we cannot say which tokens exist.`, [
                     { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
                 ]);
                 return;
@@ -680,6 +684,7 @@ if (typeof document !== 'undefined') {
             if (next === 'defi') {
                 renderDefiUsage();
                 renderComposability();
+                await renderDefiNewStrip();
             }
         }
 
@@ -717,6 +722,15 @@ if (typeof document !== 'undefined') {
                 : '';
             els.composabilityMethod.textContent = reviewed + (state.composability.methodology ?? '');
             els.composabilitySection.hidden = false;
+        }
+
+        /** "New in DeFi": the strip above the protocol directory; hidden when the feed is absent. */
+        async function renderDefiNewStrip() {
+            if (!els.defiNewStrip || !els.defiNewList || state.useSample) return;
+            const feed = await fetchJson(DEFI_NEW_PATH);
+            if (!feed) return;
+            els.defiNewList.innerHTML = defiNewStripHtml(feed);
+            els.defiNewStrip.hidden = false;
         }
 
         function renderDefiUsage() {
@@ -778,7 +792,7 @@ if (typeof document !== 'undefined') {
                 `${health.fresh}/${health.total} core feeds refreshed within 48 hours` +
                 `${health.healthy ? '' : ' · attention needed'}</summary><ul>${rows}</ul>` +
                 `${health.healthy ? '<p>All named core feeds are within the current 48-hour window.</p>'
-                    : dataStateHtml(noneCollected ? 'not-collected' : 'stale', noneCollected ? 'Core observations were not collected' : 'Some core observations are stale', 'Do not interpret an old or missing collector result as evidence that nothing changed.', [{ label: 'Inspect collector health', href: './monitor.html' }])}</details>`;
+                    : dataStateHtml(noneCollected ? 'not-collected' : 'stale', noneCollected ? 'Core observations were not collected' : 'Some core observations are stale', 'Changes since the last successful collection are unknown.', [{ label: 'Inspect collector health', href: './monitor.html' }])}</details>`;
         }
 
         function renderGlobalSearch() {
@@ -911,7 +925,7 @@ if (typeof document !== 'undefined') {
                     if (!comparisonBundleMatches(bundle, group, state.builtAt)) {
                         document.getElementById('comparisonHeading').textContent = `${group.ticker} · research unavailable`;
                         document.getElementById('comparisonSelectionSummary').textContent = '';
-                        els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The scoped research could not be loaded or does not match the current catalogue. This is not evidence of no wrappers or no risks.', [{ label: 'Retry', action: 'retry-comparison' }]);
+                        els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The research for this stock could not be loaded or does not match the current catalogue, so its wrappers and risks are unknown here.', [{ label: 'Retry', action: 'retry-comparison' }]);
                         return;
                     }
                     state.comparisonBundles.set(group.ticker, bundle);
@@ -949,10 +963,10 @@ if (typeof document !== 'undefined') {
             const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} priority-zero evidence changes. Marked legal conclusions are provisional.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
             els.comparisonView.innerHTML = reviewBanner + (models.length >= 1
                 ? sameStockComparisonHtml(group, models)
-                : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. Nothing is silently added to the selection.</p></div>') +
-                (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Follow the money: fees &amp; incentives →</a> <span>Initial programme research; not an all-in cost quote.</span></p>` : '') +
+                : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. We never add wrappers to your selection.</p></div>') +
+                (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Fees and incentives →</a> <span>Initial programme research; it does not include every cost.</span></p>` : '') +
                 (models.length ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
-                (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. These are not new legal-review dates.</p>` : '');
+                (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. Legal reviews have their own dates.</p>` : '');
             const history = els.comparisonView.querySelector('.comparison-history');
             history?.addEventListener('toggle', () => {
                 if (history.open && !history.dataset.loaded) {
@@ -982,7 +996,7 @@ if (typeof document !== 'undefined') {
                 select.addEventListener('change', draw); draw();
             } catch (_) {
                 if (request === state.historyRequest && panel.isConnected) output.innerHTML = dataStateHtml(
-                    'failed', 'History API unavailable', 'Current point-in-time conclusions remain visible, but the historical series could not be loaded. This is not a zero or an empty history.',
+                    'failed', 'History API unavailable', 'The historical series could not be loaded, so history is unknown (it is not zero or empty). Current conclusions are still shown.',
                     [{ label: 'Open health monitor', href: './monitor.html' }]
                 );
             }
@@ -1068,7 +1082,7 @@ if (typeof document !== 'undefined') {
             const visitDetail = visit.firstVisit
                 ? 'Return later and this browser will identify new issuer, venue, protocol and catalogue changes.'
                 : visit.unseen.length ? `Last baseline ${fmtRelativeTime(visit.previousVisitedAt)}. The newest changes are listed below.`
-                    : `No new outside-world changes since ${fmtRelativeTime(visit.previousVisitedAt)}.`;
+                    : `No new external changes since ${fmtRelativeTime(visit.previousVisitedAt)}.`;
             els.personalVisit.innerHTML = `<strong>${escapeHtml(visitHeading)}</strong><span>${escapeHtml(visitDetail)}</span>` +
                 (unseenRows.length ? `<ul class="personal-list">${unseenRows.join('')}</ul>` : '');
 
@@ -1407,7 +1421,7 @@ if (typeof document !== 'undefined') {
             for (const issuer of unplaced) {
                 items.push(
                     `<button type="button" class="legend-chip" data-slug="${escapeHtml(issuer.slug)}" ` +
-                    `title="${escapeHtml(issuer.name)} \u2014 claim depth could not be established from the documents">` +
+                    `title="${escapeHtml(issuer.name)} · claim depth could not be established from the documents">` +
                     `${escapeHtml(displayName(issuer.name, 32))} <span class="legend-note">claim depth unknown</span></button>`
                 );
             }
@@ -1541,19 +1555,19 @@ if (typeof document !== 'undefined') {
                 badge('Clawback', coverageLabel(control.clawback), coverageClass(control.clawback),
                     'A permanent delegate can move the token out of any wallet without the holder'),
                 badge('Freeze', coverageLabel(control.freezeAuthority), coverageClass(control.freezeAuthority),
-                    'A live freeze authority can immobilise any account'),
+                    'A live freeze authority can freeze any account'),
                 badge('Pause', coverageLabel(control.pausable), coverageClass(control.pausable),
-                    'The token can be halted wholesale'),
+                    'The whole token can be paused'),
                 badge('Allowlist', coverageLabel(control.allowlist), coverageClass(control.allowlist),
                     'New accounts start frozen; a holder must be onboarded before receiving'),
                 badge('Fee', fmtFeeBps(control.transferFeeBps), 'cov-neutral',
                     'Transfer-fee extension values configured on the tokens (0 bps still reserves the right to charge)'),
                 badge('Hook', coverageLabel(control.hookActive), coverageClass(control.hookActive),
-                    'A transfer-hook program actually installed and running on transfers'),
+                    'A transfer-hook program is installed and runs on every transfer'),
                 badge('Keys', keyGovernanceSummary(control.keyGovernance || issuer.keyGovernance), 'cov-neutral',
                     'How the mint, freeze, delegate and rebase authorities are held: multisig, program, or a plain hot wallet'),
                 badge('Freeze used', freezeExercisedLabel(control.freezeExercised), freezeExercisedClass(control.freezeExercised),
-                    'Whether the freeze authority has actually been exercised. "Unknown" is never "no".')
+                    'Whether the freeze authority has been exercised. "Unknown" is never "no".')
             ].join('');
 
             const metrics = [
@@ -1627,6 +1641,9 @@ if (typeof document !== 'undefined') {
             els.detailBody.innerHTML = detailHtml(issuer);
             showDetail();
             loadWhatIf(slug);
+            // Schematics (redemption, creation, who is involved) come from stocks-schematics.json via
+            // schematics-hook.js, which fills the #schematicBody placeholder detailHtml wrote.
+            if (typeof __rwaSchematicHook !== 'undefined') __rwaSchematicHook.fill(els.detailBody);
         }
 
         /**
@@ -1792,7 +1809,7 @@ if (typeof document !== 'undefined') {
                 field('Route currently available', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'route-currently-available')), true),
                 field('Successful redemption independently observed', redemptionAnswerHtml(redemptionAnswer(redemptionAnswers, 'successful-redemption')), true),
                 field('Recurring on-chain scan', redemptionUsability.feed?.text ?? null),
-                field('Secondary-market exit', 'Asset-specific — inspect an exact-token report.'),
+                field('Secondary-market exit', 'Asset-specific. See the exact-token report.'),
                 field('Notes', issuer.redemption?.notes, false, 'redemption.notes')
             ]));
 
@@ -1847,6 +1864,9 @@ if (typeof document !== 'undefined') {
             // from the record's own `chain`, so it is there the moment the panel opens; the answers
             // are fetched (loadWhatIf) into #whatIfBody, because 38 answers with their quotes are
             // prose the built file deliberately does not carry.
+            sections.push('<section class="detail-section" id="schematicSection"><h4>How it works, step by step</h4>'
+                + `<div id="schematicBody" data-schematic="issuer:${escapeHtml(issuer.slug)}" data-schematic-grid>`
+                + '<p class="fd-empty">Loading the schematics…</p></div></section>');
             sections.push(`<section class="detail-section" id="trustChainSection">`
                 + '<h4>Trust chain</h4>'
                 + `${chainSectionHtml(issuer)}</section>`);
@@ -2066,7 +2086,7 @@ if (typeof document !== 'undefined') {
             });
             // No activity record at all is its own statement, and a section of dashes would hide it.
             sections.push(!token.activity ? detailSection('Trading activity (24h)', [
-                field('Collected', 'Nothing yet — this token has no activity record in the build.')
+                field('Collected', 'No activity record for this token in this build.')
             ]) : detailSection('Trading activity (24h)', [
                 field('Buys', fmtNumber(activity.buys24)),
                 field('Sells', fmtNumber(activity.sells24)),
@@ -2210,7 +2230,7 @@ if (typeof document !== 'undefined') {
                 console.error(`[${new Date().toISOString()}] stocks: /api/tokens unavailable`, err);
                 state.tokenRows = [];
                 state.tokenTotal = 0;
-                tokenTableMessage('failed', 'Token API unavailable', 'The request failed. This is a collection or service failure—not evidence that no matching tokens exist.', [
+                tokenTableMessage('failed', 'Token API unavailable', 'The request failed, so we cannot say whether matching tokens exist.', [
                     { label: 'Retry token API', action: 'retry-token-table' },
                     { label: 'Open health monitor', href: './monitor.html' }
                 ]);

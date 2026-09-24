@@ -2530,6 +2530,34 @@ tr.asset-defunct td {
 .defi-custody-case > span { margin-top: 0.25rem; font-weight: 700; }
 .defi-custody-case > p { margin: 0.35rem 0 0; color: var(--muted-text); font-size: 0.76rem; line-height: 1.45; }
 
+/* "New in DeFi" strip (stocks-defi-new.json) and composite product routes. */
+.defi-new-strip { margin: 1rem 0; padding: 0.9rem; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--panel-border)); border-radius: 0.7rem; background: var(--card-bg); }
+.defi-new-head h3 { margin: 0.1rem 0 0; }
+.defi-new-list { display: grid; gap: 0.4rem; margin: 0.6rem 0 0; padding: 0; list-style: none; }
+.defi-new-list li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.2rem 0.6rem; align-items: baseline; padding: 0.45rem 0.55rem; border-radius: 0.45rem; background: var(--sunken-bg); font-size: 0.86rem; }
+.defi-new-badge { padding: 0.08rem 0.45rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; border: 1px solid var(--panel-border); }
+.defi-new-added .defi-new-badge { border-color: var(--up); color: var(--up); }
+.defi-new-removed .defi-new-badge { border-color: var(--sev-warning); color: var(--sev-warning); }
+.defi-new-candidate .defi-new-badge { border-color: var(--sev-caution); color: var(--sev-caution); }
+.defi-new-what { min-width: 0; overflow-wrap: anywhere; }
+.defi-new-what small, .defi-new-meta, .defi-new-dex, .defi-new-note { color: var(--muted-text); font-size: 0.76rem; }
+.defi-new-dex, .defi-new-note { margin: 0.5rem 0 0; }
+.defi-route { margin-top: 0.6rem; padding: 0.6rem; border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--panel-border)); border-radius: 0.5rem; background: var(--card-bg); }
+.defi-route-label { margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.035em; color: var(--accent); }
+.defi-route-legs { display: grid; gap: 0.3rem; margin: 0.45rem 0 0; padding-left: 1.2rem; font-size: 0.8rem; }
+.defi-route-legs li > strong { margin-right: 0.4rem; }
+.defi-route-legs li > span { color: var(--page-text); }
+.defi-route-legs li > a { margin-left: 0.4rem; white-space: nowrap; }
+.defi-route-legs li > small { display: block; color: var(--muted-text); line-height: 1.4; }
+.defi-route-holder, .defi-route-position { font-size: 0.8rem; line-height: 1.45; }
+.defi-route-position { padding: 0.45rem; border-left: 3px solid var(--sev-caution); background: var(--sunken-bg); }
+.defi-route-position small { color: var(--muted-text); }
+.defi-route-risks { margin-top: 0.45rem; font-size: 0.8rem; }
+.defi-route-risks ul { margin: 0.35rem 0 0; padding-left: 1.1rem; }
+@media (max-width: 760px) {
+    .defi-new-list li { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 760px) {
     .defi-usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .defi-use-grid { grid-template-columns: 1fr; }

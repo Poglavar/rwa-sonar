@@ -6,15 +6,18 @@ describe('web-native pitch deck', () => {
     const css = readFileSync(join(__dirname, 'pitch', 'pitch.css'), 'utf8');
     const js = readFileSync(join(__dirname, 'pitch', 'pitch.js'), 'utf8');
 
-    test('is a concise, indexable eight-slide Stocklana product narrative', () => {
-        expect((html.match(/<section id="slide-/g) || [])).toHaveLength(8);
+    test('is a concise, indexable six-slide Stocklana product narrative', () => {
+        expect((html.match(/<section id="slide-/g) || [])).toHaveLength(6);
+        expect((html.match(/<li><a href="#slide-/g) || [])).toHaveLength(6);
+        expect(html).toContain('<span id="slideLabel">01 / 06</span>');
         for (const heading of [
             'The ticker is familiar.',
             'The token is mysterious.',
             'Same stock reference.',
-            'AAPL comparison: answer first, evidence one click away.',
-            'Watchers detect changes. Analysts assess the consequences.',
+            'Ask what happens if it breaks.',
+            'It re-reads every source on a schedule.',
             'What Solana reveals about each token',
+            'Research you can use today',
             'Pilot users who need to rely on tokenized-stock evidence.'
         ]) expect(html).toContain(heading);
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
@@ -23,10 +26,15 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('25 Sep 2026, 4:00pm ET');
         expect(html).toContain('AAPLx');
         expect(html).toContain('AAPLon');
-        expect(html).toContain('XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3');
+        expect(html).toContain('very challenging to achieve');
+        expect(html).toContain('can reconstitute');
+        expect(html).toContain('81.0%');
+        expect(html).toContain('<!-- snapshot:pitch-proof:start -->');
         expect(html).toContain('PreStocks transfer fee 0.50%');
         expect(html).toContain('Stocklana main track first');
         expect(html).toContain('Code license choice remains pending owner confirmation');
+        // Team facts are the owner's to supply: missing ones stay visible placeholders, never invented.
+        expect(html).toContain('[Owner to add: team members, roles and relevant background]');
         expect(html).toContain('https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('Follow @RWASonar');
@@ -34,7 +42,7 @@ describe('web-native pitch deck', () => {
         expect(html).not.toContain('Colosseum · 2026');
         expect(html).not.toContain('The token is an exact address, not a brand label.');
         expect(html).not.toContain('noindex');
-        expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
     test('describes the product directly and keeps coverage and review qualifications', () => {

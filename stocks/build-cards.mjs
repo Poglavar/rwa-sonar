@@ -21,6 +21,7 @@ import {
     OG_SUBDIR, ensureOgDir, ensureOgImage, loadFonts, ogImageAlt, ogImageModel, pruneOgImages, renderOgSvg
 } from './lib/og-image.mjs';
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
+import { loadSchematics } from './lib/schematics-load.mjs';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -70,7 +71,6 @@ OUTPUT
   <out-dir>/<slug>.html   the card, everything readable rendered server-side
   <out-dir>/<slug>.json   the linked machine-readable record
   <out-dir>/index.json    [{slug, symbol, mint, issuer, status}] — what card.html resolves against
-  <out-dir>/sitemap.xml   public pages plus every generated card (when --base-url is present)
   <out-dir>/${OG_SUBDIR}/<slug>.<hash>.png  the card's 1200×630 og:image. Incremental: the hash covers
                           everything drawn plus the fonts, so an unchanged token is never re-rendered;
                           older hashes are pruned. Needs \`npm ci --prefix stocks/og\` (resvg); without
@@ -277,6 +277,7 @@ async function main() {
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
     const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
+    const schematics = await loadSchematics({ issuers: [...issuers.values()] });
     const archives = archiveIndex(sourcesState);
     const holders = indexBy(holderDb?.items, 'mint');
     const venues = indexBy(venueDb?.items, 'mint');
@@ -345,6 +346,7 @@ async function main() {
             composabilityTemplate: composabilityTemplateFor(token, composability),
             defiUsageItem: defiUsage.get(token.mint) ?? null,
             reviewItems: reviewQueue.items ?? [],
+            schematics: schematics.issuers[token.issuer] ?? null,
             materialChanges
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
@@ -361,27 +363,9 @@ async function main() {
 
     index.sort((a, b) => byString(a.slug, b.slug));
     await writeJson(join(outDir, 'index.json'), index, 0);
-    if (baseUrl !== null) {
-        const origin = baseUrl.trim().replace(/\/+$/, '');
-        const pages = [
-            '', 'assets.html', 'stocks.html', 'graph.html', 'whatif.html', 'watch.html',
-            'monitor.html', 'live.html', 'methodology.html', 'review.html', 'templates/', 'issuers/', 'protocols/', 'learn/',
-            'learn/beneficial-ownership.html', 'learn/bankruptcy-remoteness.html',
-            'learn/redemption.html', 'learn/issuer-control.html', 'learn/oracle-risk.html',
-            'learn/defi-custody.html'
-        ];
-        const urls = pages.map((page) => page ? `${origin}/${page}` : `${origin}/`)
-            .concat(index.map((entry) => `${origin}/cards/${encodeURIComponent(entry.slug)}.html`))
-            .concat((composabilityDb?.templates ?? []).map((template) =>
-                `${origin}/templates/${encodeURIComponent(template.id)}.html`))
-            .concat(issuerDb.issuers.map((issuer) =>
-                `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html`));
-        const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-            urls.map((url) => `  <url><loc>${url.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</loc></url>`).join('\n') +
-            '\n</urlset>\n';
-        await writeFile(join(outDir, 'sitemap.xml'), xml, 'utf8');
-    }
+    // The site's sitemaps are written by stocks/build-site-seo.mjs (sitemap.xml + sitemaps/) since
+    // 2026-09-24; remove the cards-only one an earlier build left here so it is not served stale.
+    await rm(join(outDir, 'sitemap.xml'), { force: true });
     const pruned = await pruneStale(outDir, new Set(index.map((entry) => entry.slug)));
     if (og !== null) {
         const ogPruned = await pruneOgImages(og.dir, og.keep);

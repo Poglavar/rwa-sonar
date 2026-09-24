@@ -49,21 +49,21 @@ export const HEALTH_RULES = [
         id: 'organic',
         dimension: 'market',
         label: 'Organic flow',
-        description: 'Whether the 24 h trading looks like many real traders rather than a handful of bots.',
+        description: 'Whether 24 h trading comes from many traders or from a few bots.',
         thresholds: { good: '≥ 10 % organic and ≤ 25 trades/trader', caution: 'one of the two fails', warning: 'both fail' }
     },
     {
         id: 'failedTx',
         dimension: 'market',
         label: 'Failed swaps',
-        description: 'Share of the sampled pool signatures that reverted instead of settling a swap.',
+        description: 'Share of the sampled pool signatures that reverted without settling a swap.',
         thresholds: { good: '≤ 20 %', caution: '≤ 50 %', warning: '> 50 %' }
     },
     {
         id: 'concentration',
         dimension: 'market',
         label: 'Holder concentration',
-        description: 'Supply share of the largest wallet this repo cannot name (issuer keys and burn addresses excluded).',
+        description: 'Supply share of the largest wallet we cannot identify (issuer keys and burn addresses excluded).',
         thresholds: { good: '≤ 25 %', caution: '≤ 50 %', warning: '> 50 %' }
     },
     {
@@ -106,7 +106,7 @@ export const HEALTH_RULES = [
         id: 'frozen',
         dimension: 'control',
         label: 'Frozen accounts',
-        description: 'Frozen token accounts among the top 20 holders — transfers there are blocked.',
+        description: 'Frozen token accounts among the top 20 holders. A frozen account cannot transfer.',
         thresholds: { good: 'none in the top 20', caution: '≥ 1 in the top 20', warning: null }
     },
     {
@@ -259,8 +259,8 @@ function organicRule(token) {
         const judgedOrganic = organicOk !== null;
         const passed = judgedOrganic ? organicOk : perTraderOk;
         const note = judgedOrganic
-            ? `judged on the ${fmt(organic)} % organic share alone — trades per trader is not reported`
-            : `judged on ${fmt(perTrader)} trades per trader alone — the organic share is not reported`;
+            ? `judged on the ${fmt(organic)} % organic share alone; trades per trader is not reported`
+            : `judged on ${fmt(perTrader)} trades per trader alone; the organic share is not reported`;
         return { status: passed ? 'good' : 'caution', value, inputs, note };
     }
 
@@ -485,7 +485,7 @@ function keyControlRule(issuer, token) {
     if (roles.length > 0 && unresolved.length === 0 && strong.length === roles.length) {
         return { status: 'good', value: null, inputs, note: `${strong.length} of ${roles.length} installed authorities held by a multisig or by a program with evidenced multisig upgrade governance, none by a hot key` };
     }
-    return { status: 'unknown', value: null, inputs, note: 'how the authority keys are held was never characterised' };
+    return { status: 'unknown', value: null, inputs, note: 'how the authority keys are held has not been recorded' };
 }
 
 /** 8. Transfers or issuer trading paused right now. Warning or good — never a caution. */

@@ -56,7 +56,7 @@
         documented: 'the issuer’s or a regulator’s own document addresses this case, and the quote is shown',
         inferred: 'the documents do not address it; the structure implies the answer and we say so',
         litigated: 'a court, tribunal or regulator decided this or a materially identical case',
-        unknown: 'we looked and the documents do not say — where we looked is listed',
+        unknown: 'we looked and the documents do not say; the places we looked are listed',
         'not-applicable': 'the case cannot arise for this structure, and the note says why',
         missing: 'nobody has answered this question for this issuer yet'
     };
@@ -358,7 +358,7 @@
         // hide that instead of showing it.
         const outcome = status === MISSING_STATUS
             ? (cut(answer?.outcome, maxOutcome)
-                ?? 'Not answered yet for this issuer. The question stands; nobody has read the documents for it.')
+                ?? 'Not answered yet for this issuer. Nobody has read the documents for this question yet.')
             : cut(answer?.outcome, maxOutcome);
         if (outcome !== null) body.push(`<p class="wi-outcome">${escapeHtml(outcome)}</p>`);
         if (quote && answer?.quote !== null && answer?.quote !== undefined) {

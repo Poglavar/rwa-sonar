@@ -90,8 +90,8 @@
 
     /** One line for a verified chat: what arrives, and when. */
     function connectedLabel(digest) {
-        if (!digest || digest.enabled !== true) return 'Connected — daily digest is off.';
-        return `Connected — daily digest at ${formatHour(digest.hour)} ${digest.timezone}.`;
+        if (!digest || digest.enabled !== true) return 'Connected. Daily digest is off.';
+        return `Connected. Daily digest at ${formatHour(digest.hour)} ${digest.timezone}.`;
     }
 
     /**
@@ -165,11 +165,11 @@
     const COPY = {
         heading: 'Daily digest on Telegram',
         contents: 'Once a day, one private Telegram message with this watch’s changes and the document or on-chain '
-            + 'changes recorded for its target, each with its model assessment where a model has read it (labelled '
-            + '“model assessment”: a reading, not a conclusion). Nothing is sent on a day with no change.',
-        privacy: 'We store only an encrypted Telegram chat id for this watch — never your name, number or messages. '
+            + 'changes recorded for its target, each with its model assessment where a model has read it. A model '
+            + 'assessment is not a legal conclusion. Nothing is sent on a day with no change.',
+        privacy: 'We store only an encrypted Telegram chat id for this watch. We do not store your name, number or messages. '
             + 'Stop at any time here, or send /stop to the bot.',
-        pending: 'Open Telegram and press Start in the chat with the bot. This page notices when it is done. '
+        pending: 'Open Telegram and press Start in the chat with the bot. This page updates once you have. '
             + 'The link works once and expires after 15 minutes.',
         expired: 'That link expired unused. Request a new one.',
         unavailable: 'Telegram digests are not available on this server yet.'

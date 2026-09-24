@@ -190,7 +190,11 @@ export function buildExits({
         dossiersByMint.get(d.mint).push(row);
         if (action) {
             flows.push({ symbol: row.symbol, mint: row.mint, issuer: row.issuer, protocolId: row.protocolId, protocol: row.protocol,
-                action, stage: row.stage, stageAsOf: row.stageAsOf, usd, usdBasis: basis, dossier: row.dossier });
+                action, stage: row.stage, stageAsOf: row.stageAsOf, usd, usdBasis: basis, dossier: row.dossier,
+                // A composite vault's collateral also sits in the lending market it routes through;
+                // `via` names those legs so the page can say the two links overlap, not add up.
+                ...(d.integration.composite ? { composite: true, via: [...new Set((d.integration.route ?? [])
+                    .map((leg) => leg.marketName ?? null).filter(Boolean))] } : {}) });
         }
     }
 
@@ -230,10 +234,11 @@ export function buildExits({
         builtAt,
         sources,
         caveats: [
-            'DEX liquidity is DexScreener pool liquidity (both sides of the pool), an upper bound on what could be sold, not a price-impact-free size.',
+            'DEX liquidity is DexScreener pool liquidity (both sides of the pool), an upper bound on what could be sold. Selling a large part of it would move the price.',
             'Redemption is shown as a route with its evidence state; no issuer publishes a capacity limit, so no dollar figure is shown for it.',
-            'Lending markets let a holder borrow against the token rather than sell it; the lender-exit rating describes what a lender can do after seizure.',
-            'Sankey USD mixes two measures, labelled per link: pool liquidity for DEX pools and the protocol-reported market size for lending markets.'
+            'Lending markets let a holder borrow against the token without selling it; the lender-exit rating describes what a lender can do after seizure.',
+            'Sankey USD mixes two measures, labelled per link: pool liquidity for DEX pools and the protocol-reported market size for lending markets.',
+            'A composite vault link (e.g. xStocks Vaults) carries the vault strategy\'s collateral, which also sits in the lending market named in its `via`; those two links overlap and must not be added together.'
         ],
         issuers: issuerOut,
         tokens: outTokens,

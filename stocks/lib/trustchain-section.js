@@ -25,14 +25,13 @@
      */
 
     /** What the panel says under the diagram, once, rather than in the HTML. */
-    const CHAIN_NOTE = 'Thirteen actors stand between a holder and the company; nine rights flows run '
-        + 'between them. A lane’s colour is how well the link is evidenced and its line style is how '
-        + 'it was verified — neither is typed by hand, both are computed from this dossier’s claims, '
-        + 'so a link cannot look firmer than what is under it. An actor nobody fills keeps its seat: an '
-        + 'empty one is the finding.';
+    const CHAIN_NOTE = 'Thirteen actors sit between a holder and the company, with nine rights flows '
+        + 'between them. A lane’s colour shows how well the link is evidenced and its line style shows '
+        + 'how it was verified. Both are computed from this dossier’s claims, so a link never looks '
+        + 'stronger than its evidence. A role nobody fills stays on the chart, so the gap is visible.';
 
     /** And under the what-if counts. The rule, in the one sentence it needs. */
-    const WHAT_IF_NOTE = 'The same 38 questions are put to every issuer, so a gap is visible as a gap. '
+    const WHAT_IF_NOTE = 'Every issuer gets the same 38 questions, so missing answers show as gaps. '
         + 'An outcome is never invented: it is documented only with the source’s own words, inferred '
         + 'when the structure implies it and we say so, litigated when a court or regulator decided it, '
         + 'and unknown when we looked and the documents do not say.';
@@ -44,8 +43,8 @@
     function chainSectionHtml(issuer) {
         const chain = issuer?.chain;
         if (!chain || !Array.isArray(chain.nodes) || chain.nodes.length === 0) {
-            return '<p class="tc-empty">No trust chain has been built for this issuer yet — it needs '
-                + 'the dossier’s <code>parties</code>, which this record does not carry.</p>';
+            return '<p class="tc-empty">No trust chain has been built for this issuer yet. It needs '
+                + 'the dossier’s <code>parties</code>, which this record does not include.</p>';
         }
         return `<p class="wi-note">${escapeHtml(CHAIN_NOTE)}</p>`
             + trustChainSvg.diagramHtml(chain, {
@@ -62,8 +61,8 @@
      */
     function whatIfSectionHtml(sheet, catalogue, { failure = null } = {}) {
         if (failure !== null) {
-            return `<p class="wi-fail">The answers live in the API, which did not answer: ${escapeHtml(failure)}. `
-                + 'Nothing is shown rather than a partial sheet.</p>';
+            return `<p class="wi-fail">The answers come from the API, which did not answer: ${escapeHtml(failure)}. `
+                + 'We show nothing instead of a partial sheet.</p>';
         }
         if (sheet === null) return '<p class="wi-empty">Loading the answer sheet…</p>';
         const answers = whatIfLib.answersFromApi(sheet.items);

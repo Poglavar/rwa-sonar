@@ -129,7 +129,7 @@ describe('the detail panel', () => {
     test('with no address and no record it says both plainly, and never claims the power was unused', () => {
         const { html } = P.detailHtml(ROW, ROW.cells[2], map);
         expect(html).toContain('No authority address for this power was read from the chain');
-        expect(html).toContain('That is not evidence the power was never used.');
+        expect(html).toContain('The power may still have been used.');
         expect(html).toContain('key-governance evidence (verbatim)');
     });
 
@@ -149,7 +149,10 @@ describe('the page itself', () => {
 
     test('scripts load fmt before powers.js, then the shared menus, all cache-busted', () => {
         const order = [...HTML.matchAll(/<script src="([^"?]+)/g)].map((match) => match[1]);
-        expect(order).toEqual(['stocks/lib/fmt.js', 'powers.js', 'nav-menus.js']);
+        expect(order).toEqual(['stocks/lib/fmt.js', 'powers.js',
+            // The catalogue funnel figure (funnel-figure.js) and the funnel layout's dependencies.
+            'stocks/lib/sort-values.js', 'stocks/lib/catalogue-counts.js', 'stocks/lib/issuer-labels.js',
+            'stocks/lib/funnel-layout.js', 'funnel-figure.js', 'nav-menus.js']);
         for (const match of HTML.matchAll(/(?:src|href)="((?:powers|stocks|app-shell|motion|nav-menus)[^"]*\.(?:js|css))"/g)) {
             expect(match[1]).toMatch(/\?v=/);
         }

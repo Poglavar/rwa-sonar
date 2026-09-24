@@ -2,8 +2,12 @@
 // I/O, reads no clock and never turns an unknown into a negative conclusion.
 
 import fmt from './fmt.js';
+import flowDiagram from './flow-diagram.js';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from './authority-attribution.mjs';
+import {
+    breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
+} from './site-seo.mjs';
 
 const { escapeHtml, isSafeUrl, fmtDate, fmtDateTime, fmtMoney, fmtNumber, fmtPct, cardSlug, humanizeSlug } = fmt;
 const DASH = '—';
@@ -54,7 +58,7 @@ function dataContext(issuer, builtAt) {
 function discrepancyHtml(rows) {
     if (!Array.isArray(rows) || rows.length === 0) return '';
     return `<section class="issuer-conflicts"><h2>Published claim ≠ observed reality</h2>
-        <p>These are changes or conflicts in the outside world—not a history of edits to RWA Sonar’s own research.</p>
+        <p>These are conflicts between what the issuer publishes and what we observed. Edits to RWA Sonar’s own research are not listed here.</p>
         <div class="issuer-conflict-grid">${rows.map((row) => `<article>
             <span>${esc(row.severity || 'caution')}</span><h3>${esc(row.title, 'Documented discrepancy')}</h3>
             <p><strong>Scope:</strong> ${esc(row.classification, Array.isArray(row.affectedMints) && row.affectedMints.length ? 'named token addresses' : 'issuer programme')}</p>
@@ -147,22 +151,73 @@ function whatIfHtml(slug, whatIf, questionCount) {
         + `<a href="../stocks.html?issuer=${id}">Read every answer in the issuer panel →</a></p>`;
     if (!Array.isArray(whatIf)) {
         return `<section class="issuer-whatif"><h2>What if a part of the chain fails?</h2>`
-            + `<p>No failure-scenario answer is recorded for this programme yet; the questions stand unanswered.</p>${links}</section>`;
+            + `<p>No failure-scenario answer is recorded for this programme yet.</p>${links}</section>`;
     }
     const counts = whatIfStatusCounts(whatIf, questionCount);
     const labels = { 'not-applicable': 'not applicable', missing: 'not yet answered' };
     const items = [...WHATIF_ANSWER_STATUSES, ...(counts.missing > 0 ? ['missing'] : [])]
         .map((status) => `<li class="whatif-${status}"><strong>${fmtNumber(counts[status])}</strong> ${labels[status] ?? status}</li>`).join('');
     return `<section class="issuer-whatif"><h2>What if a part of the chain fails?</h2>`
-        + `<p>${fmtNumber(counts.total)} failure scenarios — stolen keys, custodian insolvency, a frozen token, a regulator at the door — put to this programme in the same words as every other issuer. Documented means the issuer’s or a regulator’s own words address the case; inferred is our reading of the structure.</p>`
+        + `<p>We put ${fmtNumber(counts.total)} failure scenarios (stolen keys, custodian insolvency, a frozen token, regulator action) to this programme in the same words as every other issuer. Documented means the issuer’s or a regulator’s own words address the case; inferred is our reading of the structure.</p>`
         + `<ul class="whatif-counts" aria-label="Answers by status">${items}</ul>${links}</section>`;
 }
 
+/**
+ * "How it works, drawn": the programme's redemption and creation schematics and its relationship
+ * map, from stocks/lib/schematics.js (curated steps that each cite the field they rest on, and the
+ * dossier's parties). `schematics` null or empty draws nothing rather than an empty frame.
+ */
+function schematicSectionHtml(slug, schematics) {
+    const specs = [...(schematics?.redemption ?? []), ...(schematics?.creation ?? []),
+        ...(schematics?.relationships ? [schematics.relationships] : [])];
+    if (specs.length === 0) return '';
+    const figures = specs.map((spec, index) => flowDiagram.figureHtml(spec, { id: `fd-${index + 1}`, headingLevel: 3 })).join('');
+    return `<section class="issuer-schematics" id="how-it-works"><h2>How it works, step by step</h2>`
+        + `<p>Each numbered step cites where it comes from. Colour shows how we know it; a dashed step is not established.</p>`
+        + `<div class="fd-grid">${figures}</div></section>`;
+}
+
+/** The key failure scenarios drawn as sequences (trigger, path to the holder, the answer's outcome). */
+function whatIfFiguresHtml(schematics, offset) {
+    const specs = schematics?.whatIf ?? [];
+    if (specs.length === 0) return '';
+    const figures = specs.map((spec, index) => flowDiagram.figureHtml(spec, { id: `fd-${offset + index + 1}`, headingLevel: 3 })).join('');
+    return `<section class="issuer-whatif-drawn" id="what-happens"><h2>What happens if…</h2>`
+        + `<p>Six of the scenarios, drawn: where the failure starts, how it reaches the holder, and what this programme’s documents say happens next.</p>`
+        + `<div class="fd-grid">${figures}</div></section>`;
+}
+
+/** The dossier's SEO head: unique title, ≤160-character description, preview image and Report JSON-LD. */
+function issuerHead({ issuer, tokens, origin, canonical, ogImage }) {
+    const claim = issuer.grades?.claimLabel ? `holder claim: ${issuer.grades.claimLabel}` : 'holder claim not established';
+    const count = Array.isArray(tokens) ? tokens.length : 0;
+    const description = `${issuer.name} on Solana — ${claim}; redemption, who can freeze or move the tokens, failure scenarios and ${fmtNumber(count)} exact token${count === 1 ? '' : 's'}.`;
+    return seoHeadTags({
+        title: `${issuer.name} issuer dossier — RWA Sonar`,
+        description,
+        socialTitle: `${issuer.name}: what the token holder owns — RWA Sonar`,
+        socialDescription: `What you own, who can freeze or move the tokens, how redemption works and what happens if a party fails, for ${issuer.name} on Solana. Sourced from the issuer's own documents and the chain.`,
+        url: canonical,
+        type: 'article',
+        image: ogImage,
+        jsonLd: origin === null ? null : ldGraph([
+            organizationLd(origin),
+            reportLd({ origin, url: canonical, headline: `${issuer.name} issuer dossier`, description,
+                dateModified: issuer.evidence?.lastCheckedAt ?? null, image: ogImage?.url ?? null,
+                about: { '@type': 'Organization', name: issuer.issuingEntity || issuer.name } }),
+            breadcrumbLd([{ name: 'RWA Sonar', url: `${origin}/` }, { name: 'Issuer dossiers', url: `${origin}/issuers/` }, { name: issuer.name, url: canonical }])
+        ]),
+        sep: '\n'
+    });
+}
+
 /** `cardSlugs` is build-cards' collision-aware mint -> file-name map; a colliding symbol's card is not <symbol>.html.
+ *  `schematics` is this issuer's entry from stocks/lib/schematics.js (redemption, creation, relationships, whatIf).
  *  `whatIf` is the programme's dossier `whatIf[]` (null when no dossier file exists) and `whatIfQuestions` the
- *  catalogue's question count, so an unanswered question is counted rather than silently absent. */
-export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null, whatIf = null, whatIfQuestions = null },
-    { baseUrl = null, version = '', cardSlugs = null } = {}) {
+ *  catalogue's question count, so an unanswered question is counted rather than silently absent.
+ *  `ogImage` is the page's own absolute `{url, alt, width, height}` preview, null for the site image. */
+export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null, whatIf = null, whatIfQuestions = null, schematics = null },
+    { baseUrl = null, version = '', cardSlugs = null, ogImage = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html` : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
@@ -194,15 +249,11 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
     return `<!doctype html>
 <!-- Generated by stocks/build-legal-templates.mjs. Do not edit: rebuilt from the current reviewed dossier. -->
 <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${esc(issuer.name)} issuer dossier — RWA Sonar</title>
-<meta name="description" content="Claim, redemption, control, evidence and current Solana assets for ${esc(issuer.name)}." />
-<meta property="og:site_name" content="RWA Sonar" /><meta property="og:type" content="article" />
-<meta property="og:title" content="${esc(issuer.name)}: what the token holder owns — RWA Sonar" />
-<meta property="og:description" content="What you own, who can freeze or move the tokens, how redemption works and what happens if a party fails, for ${esc(issuer.name)} on Solana. Sourced from the issuer's own documents and the chain." />
-${canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}" />` : ''}${origin ? `<meta property="og:image" content="${escapeHtml(origin)}/images/og-rwasonar.png?v=20260923" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta name="twitter:card" content="summary_large_image" />` : '<meta name="twitter:card" content="summary" />'}
-<meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />
-${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}" />` : ''}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
-<link rel="stylesheet" href="../templates.css${v}" /></head><body>
+${issuerHead({ issuer, tokens, origin, canonical, ogImage })}
+<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
+${contactStylesheet('../')}
+<link rel="stylesheet" href="../templates.css${v}" />
+<link rel="stylesheet" href="../flow-diagram.css${v}" /></head><body>
 <header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header>
 <main class="issuer-dossier"><p class="eyebrow">Issuer programme dossier</p><h1>${esc(issuer.name)}</h1>
 <p class="lede">${esc(firstSentence(issuer.holderClaim))}</p>
@@ -211,27 +262,39 @@ ${dataContext(issuer, builtAt)}
 <section><h2>The short answer</h2><div class="issuer-verdict-grid">
 <article><small>What do you own?</small><strong>${esc(grades.claimLabel, 'Claim not established')}</strong><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="concept-link" href="../learn/beneficial-ownership.html">Understand ownership →</a></article>
 <article><small>Can you redeem?</small><strong>${yesNo(redemption.available)}</strong><p>${esc(redemptionReview?.evidenceLabel ?? eligibilityAnswer?.summary, 'Terms not established.')}</p><a class="concept-link" href="../learn/redemption.html">Understand redemption →</a></article>
-<article><small>Can the issuer intervene?</small><strong>${controlSummary(issuer.control)}</strong><p>Control is reported as observed powers, not collapsed into a score.</p><a class="concept-link" href="../learn/issuer-control.html">Understand issuer powers →</a></article>
+<article><small>Can the issuer intervene?</small><strong>${controlSummary(issuer.control)}</strong><p>Control is listed as observed powers, with no single score.</p><a class="concept-link" href="../learn/issuer-control.html">Understand issuer powers →</a></article>
 <article><small>Backing verification</small><strong>${esc(issuer.custodyVerification?.type, 'Not established')}</strong><p>${esc(firstSentence(issuer.custodyVerification?.notes))}</p><a class="concept-link" href="../learn/bankruptcy-remoteness.html">Understand insolvency protection →</a></article>
 </div></section>
+${schematicSectionHtml(issuer.slug, schematics)}
 ${discrepancyHtml(issuer.discrepancies)}
 ${whatIfHtml(issuer.slug, whatIf, whatIfQuestions)}
+${whatIfFiguresHtml(schematics, (schematics?.redemption?.length ?? 0) + (schematics?.creation?.length ?? 0) + 1)}
 <section><h2>Technology + legal templates</h2><p>These conclusions apply only to the exact programme and observed control recipe shown.</p><ul class="template-link-list">${templateLinks}</ul></section>
 <section><h2>Current Solana assets</h2><p>${fmtNumber(tokens.length)} exact token address${tokens.length === 1 ? '' : 'es'} currently inherit this issuer-level analysis unless an asset card records an exception. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer.slug)}">Watch this issuer programme →</a></p><ul class="asset-chips">${assetHtml(tokens, cardSlugs)}</ul></section>
 <details class="dossier-section" open><summary>Legal claim and issuing chain</summary><dl class="facts">${fact('Issuing entity', issuer.issuingEntity)}${fact('Entity jurisdiction', issuer.entityJurisdiction)}${fact('Governing law', issuer.governingLaw)}${fact('Regulatory status', issuer.regulatoryStatus)}${fact('Holder claim', issuer.holderClaim)}${fact('Underlying custodian', issuer.underlyingCustodian)}</dl></details>
 <details class="dossier-section"><summary>Who can exercise token controls</summary><p>${esc(authorityConclusion.headline)}</p><p>This is the representative current exact-token recipe. Open the technology + legal templates above for recipe differences. Programme and PDA labels are traced to the effective signer where reviewed evidence permits. Thresholds apply only to the named role; initiate-only members are not counted as voters.</p><dl class="facts">${authorityFacts}</dl></details>
 <details class="dossier-section"><summary>Redemption and holder eligibility</summary><p>Programme-level answer. Product examples remain labelled and do not establish another token’s terms.</p><dl class="facts">${redemptionUsability.fields.slice(0, 8).map(redemptionFact).join('')}${redemptionFeedFact(redemption.observationFeed)}${fact('Secondary-market exit', 'Asset-specific; inspect the exact-token report for current venues and liquidity.')}${fact('Timing / SLA', redemption.timing)}${fact('Transfer mechanism', issuer.transferRestrictions?.mechanism)}${fact('US persons excluded', yesNo(issuer.transferRestrictions?.usPersonsExcluded))}</dl></details>
 <details class="dossier-section"><summary>Backing, custody and insolvency</summary><dl class="facts">${fact('Collateral ratio', issuer.collateral?.ratio)}${fact('Composition', issuer.collateral?.composition)}${fact('Rehypothecation', issuer.collateral?.rehypothecation)}${fact('Bankruptcy remote', yesNo(issuer.bankruptcyRemote))}${fact('Security interest', yesNo(issuer.securityInterest?.exists))}${fact('Verification type', issuer.custodyVerification?.type)}${fact('Verification agent', issuer.custodyVerification?.agent)}${fact('Verification frequency', issuer.custodyVerification?.frequency)}${fact('Verification notes', issuer.custodyVerification?.notes)}</dl><p><a class="concept-link" href="../learn/defi-custody.html">How custody affects DeFi enforcement →</a></p></details>
-<details class="dossier-section"><summary>Corporate actions and economics</summary><p><a href="../economics.html?issuer=${encodeURIComponent(issuer.slug)}">Fees, who gets paid and long-term incentives →</a> · Initial programme research; coverage gaps remain explicit.</p><dl class="facts">${fact('Dividends', issuer.dividends)}${fact('Voting', issuer.voting)}${fact('Corporate actions', issuer.corporateActions)}${fact('Pricing', issuer.pricing)}</dl></details>
+<details class="dossier-section"><summary>Corporate actions and economics</summary><p><a href="../economics.html?issuer=${encodeURIComponent(issuer.slug)}">Fees, who gets paid and long-term incentives →</a> · Initial programme research; coverage gaps are marked.</p><dl class="facts">${fact('Dividends', issuer.dividends)}${fact('Voting', issuer.voting)}${fact('Corporate actions', issuer.corporateActions)}${fact('Pricing', issuer.pricing)}</dl></details>
 <details class="dossier-section"><summary>Primary documents and evidence</summary>${documentsHtml(issuer)}<p><a href="../watch.html">Inspect source freshness and individual claims →</a></p></details>
 <details class="dossier-section"><summary>Open research questions (${openQuestions.length})</summary>${openQuestions.length ? `<ul>${openQuestions.map((question) => `<li>${esc(question)}</li>`).join('')}</ul>` : '<p>No open question is currently recorded.</p>'}</details>
 <footer><p>Current reviewed understanding built ${esc(fmtDateTime(builtAt))}. This dossier is analysis, not investment or legal advice.</p><nav><a href="./index.html">All issuers</a><a href="../stocks.html?view=compare">Compare products</a><a href="../watch.html">See what changed</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a></nav></footer>
-</main></body></html>\n`;
+</main>
+${contactFooterHtml('../')}
+</body></html>\n`;
 }
 
-export function renderIssuerIndex(issuers, { baseUrl = null, version = '' } = {}) {
+export function renderIssuerIndex(issuers, { baseUrl = null, version = '', ogImage = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
     const cards = (Array.isArray(issuers) ? issuers : []).map((issuer) => `<article class="template-card"><span class="eyebrow">${esc(issuer.status)}</span><h2>${esc(issuer.name)}</h2><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="open-template" href="./${encodeURIComponent(issuer.slug)}.html">Open issuer dossier →</a></article>`).join('');
-    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Issuer dossiers — RWA Sonar</title><meta name="description" content="Canonical legal, control and evidence dossiers for tokenized-stock issuer programmes on Solana." /><meta property="og:site_name" content="RWA Sonar" /><meta name="twitter:card" content="summary" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />${origin ? `<link rel="canonical" href="${escapeHtml(origin)}/issuers/" />` : ''}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../templates.css${v}" /></head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div><footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main></body></html>\n`;
+    const canonical = origin ? `${origin}/issuers/` : null;
+    const description = 'Canonical legal, control and evidence dossiers for every tokenized-stock issuer programme on Solana: holder claim, redemption, keys and assets.';
+    const head = seoHeadTags({
+        title: 'Issuer dossiers — RWA Sonar', description, url: canonical, image: ogImage,
+        jsonLd: origin === null ? null : ldGraph([organizationLd(origin),
+            webPageLd({ origin, url: canonical, name: 'Issuer dossiers — RWA Sonar', description, type: 'CollectionPage' }),
+            breadcrumbLd([{ name: 'RWA Sonar', url: `${origin}/` }, { name: 'Issuer dossiers', url: canonical }])])
+    });
+    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />${head}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../templates.css${v}" />${contactStylesheet('../')}</head><body><header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="../learn/">Learn</a></nav></header><main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div><footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main>${contactFooterHtml('../')}</body></html>\n`;
 }

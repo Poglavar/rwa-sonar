@@ -167,6 +167,22 @@ describe('page', () => {
         expect(ogDescription(digest)).toMatch(/^21–27 Sep 2026, in progress: 1 material change \(model assessment\)/);
     });
 
+    test('the week carries its own preview image, Report + breadcrumb JSON-LD and the contact footer', () => {
+        const image = { url: 'https://rwasonar.com/weekly/og/2026-W39.0123456789ab.png', alt: 'Week 39 in numbers', width: 1200, height: 630 };
+        const html = renderWeekPage(digest, { baseUrl: 'https://rwasonar.com', ogImage: image });
+        expect(html).toContain(`<meta property="og:image" content="${image.url}" />`);
+        expect(html).toContain(`<meta name="twitter:image" content="${image.url}" />`);
+        const description = html.match(/<meta name="description" content="([^"]*)"/)[1];
+        expect(description.length).toBeLessThanOrEqual(160);
+        const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+        expect(ld['@graph'].map((node) => node['@type'])).toEqual(['Organization', 'Report', 'BreadcrumbList']);
+        expect(ld['@graph'][1].dateModified).toBe('2026-09-23T11:58:24Z');
+        expect(html).toMatch(/<footer class="site-contact"[\s\S]*href="https:\/\/t\.me\/rwa_sonar_bot"/);
+        const index = renderWeeklyIndex([digest], { baseUrl: 'https://rwasonar.com', ogImage: image });
+        expect(index).toContain(`<meta property="og:image" content="${image.url}" />`);
+        expect(index).toContain('"@type":"CollectionPage"');
+    });
+
     test('the current week is in progress as of the data time, and model readings are labelled and linked', () => {
         const html = renderWeekPage(digest);
         expect(html).toContain('In progress, as of <time datetime="2026-09-23T11:58:24Z">23 Sep 2026 11:58 UTC</time>');

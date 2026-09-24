@@ -317,7 +317,7 @@ describe('statusTilesFromFacet', () => {
             expect(typeof tile.blurb).toBe('string');
             expect(tile.blurb.length).toBeGreaterThan(10);
         }
-        expect(M.STATUS_BLURBS.unknown).toMatch(/not a clean bill of health/);
+        expect(M.STATUS_BLURBS.unknown).toMatch(/this is not a pass/);
     });
 });
 
@@ -411,13 +411,13 @@ describe('createSequence', () => {
 describe('describeApiFailure', () => {
     test('the status AND the path are in the sentence, because they are different problems', () => {
         expect(M.describeApiFailure({ path: '/api/tokens?health=warning', status: 500 }))
-            .toBe('API unreachable — GET /api/tokens?health=warning answered HTTP 500.');
+            .toBe('API unreachable: GET /api/tokens?health=warning answered HTTP 500.');
     });
 
     test('no status at all says the API did not answer, and names the reason it was given', () => {
         expect(M.describeApiFailure({ path: '/api/facets', message: 'Failed to fetch' }))
-            .toBe('API unreachable — GET /api/facets did not answer (Failed to fetch). Is the API running?');
-        expect(M.describeApiFailure({})).toMatch(/^API unreachable — GET the API did not answer\./);
+            .toBe('API unreachable: GET /api/facets did not answer (Failed to fetch). Check that the API is running.');
+        expect(M.describeApiFailure({})).toMatch(/^API unreachable: GET the API did not answer\./);
     });
 });
 

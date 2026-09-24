@@ -11,7 +11,13 @@ export const RELEASE_ARTIFACTS = [
     'stocks/data/discovery-candidates.json', 'stocks/data/identity-onchain.json', 'stocks/data/mint-identities.json',
     'stocks/data/history', 'cards', 'templates', 'issuers', 'protocols', 'comparisons',
     // Analysis pages added 2026-09-24: power map, flows and float, premium tracking, exit routes, weekly.
-    'stocks-power-map.json', 'stocks-flows.json', 'stocks-tracking.json', 'stocks-exits.json', 'weekly'
+    'stocks-power-map.json', 'stocks-flows.json', 'stocks-tracking.json', 'stocks-exits.json', 'weekly',
+    // Page preview images and the sitemaps (stocks/build-site-seo.mjs).
+    'og', 'sitemap.xml', 'sitemaps',
+    // DeFi additions feed (New in DeFi strip) and the curated program registry it attributes with.
+    'stocks-defi-new.json', 'stocks/data/defi-program-registry.json',
+    // Redemption, creation, what-if and relationship diagrams (stocks/build-schematics.mjs).
+    'stocks-schematics.json'
 ];
 
 // Release construction has explicit phases because the review queue reads the database, while
@@ -22,7 +28,7 @@ export const RELEASE_BUILD_STAGES = {
         'stocks/build-stocks-db.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
         'stocks/build-discovery-index.mjs',
         // Read the catalogue build-stocks-db just wrote.
-        'stocks/build-power-map.mjs', 'stocks/build-flows.mjs'
+        'stocks/build-power-map.mjs', 'stocks/build-flows.mjs', 'stocks/build-schematics.mjs'
     ],
     'pre-review': ['stocks/build-legal-templates.mjs'],
     surfaces: [
@@ -33,7 +39,9 @@ export const RELEASE_BUILD_STAGES = {
         'stocks/build-exits.mjs', 'stocks/build-tracking.mjs', 'stocks/build-weekly.mjs',
         // Last: reads the finished catalogue, templates and health. index.html and pitch/index.html
         // are ordinary site files, not manifest families; refresh-on-server.sh installs them itself.
-        'stocks/build-static-snapshot.mjs'
+        'stocks/build-static-snapshot.mjs',
+        // After the snapshot: writes each page's head block, preview image and the sitemaps.
+        'stocks/build-site-seo.mjs'
     ]
 };
 

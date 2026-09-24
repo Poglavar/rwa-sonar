@@ -4,6 +4,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import counts from './lib/catalogue-counts.js';
 import { RELEASE_BUILD_STAGES } from './lib/release-manifest.mjs';
+import { SITE_PAGES } from './lib/site-pages.mjs';
+
+const SITE_PAGE_PATHS = SITE_PAGES.map((page) => page.file ?? page.path ?? page);
 import {
     STATIC_SNAPSHOT_PAGES, landingSnapshotHtml, pitchProofHtml, renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
 } from './lib/static-snapshot.mjs';
@@ -82,11 +85,12 @@ describe('static snapshot regions', () => {
     });
 
     test('runs after the other release surfaces, and the scheduled refresh publishes every rewritten page', () => {
-        expect(RELEASE_BUILD_STAGES.surfaces.at(-1)).toBe('stocks/build-static-snapshot.mjs');
+        // The site-SEO step (head blocks, page images, sitemaps) runs last, right after the snapshot.
+        expect(RELEASE_BUILD_STAGES.surfaces.slice(-2)).toEqual(['stocks/build-static-snapshot.mjs', 'stocks/build-site-seo.mjs']);
         const refresh = readFileSync(join(ROOT, 'stocks/refresh-on-server.sh'), 'utf8');
-        const loop = refresh.match(/for page in ([^;]+); do\n\s+install -m 0644 "\$page" "\$DOCROOT\/\$page\.next-\$\$" && mv -f/);
-        expect(loop).not.toBeNull();
-        expect(loop[1].trim().split(/\s+/)).toEqual(STATIC_SNAPSHOT_PAGES);
+        // The refresh installs every page the SEO registry lists, which must include each snapshot page.
+        expect(refresh).toMatch(/for page in \$\(node stocks\/build-site-seo\.mjs --list-pages\); do/);
+        for (const page of STATIC_SNAPSHOT_PAGES) expect(SITE_PAGE_PATHS).toContain(page);
         expect(refresh.indexOf('static page snapshots')).toBeGreaterThan(refresh.indexOf('complete release surfaces'));
     });
 });

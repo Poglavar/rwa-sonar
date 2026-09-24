@@ -12,9 +12,11 @@ import { diffSnapshots } from './lib/changes.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { log, logWarn, logError, parseArgs, readJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
+import { absoluteImage, familyOgImage, finishFamilyOg, prepareFamilyOg } from './lib/og-family.mjs';
+import { fmtCount, weeklyOgModel } from './lib/page-og.mjs';
 import {
     WEEKLY_TABLE_PROBE, buildWeek, dataAsOf, parseTableProbe, renderWeekPage, renderWeeklyIndex,
-    summariseSnapshot, weekHeadlines, weeklyDbSql, weeksBetween
+    summariseSnapshot, weekHeadlines, weekLabel, weekRange, weeklyDbSql, weeksBetween
 } from './lib/weekly.mjs';
 
 const HERE = import.meta.dirname;
@@ -39,6 +41,7 @@ OPTIONS
                       left out rather than guessed.
   --out-dir=<dir>     Output directory (default ${DEFAULT_OUT_DIR}/, relative to the repo root).
   --no-db             Do not read DATABASE_URL even when it is set (the database parts show as not read).
+  --no-og-images      Keep the site preview image on every week page.
   --help              This text.
 
 INPUTS
@@ -55,6 +58,8 @@ OUTPUT
   <out-dir>/<YYYY-Www>.html  one per ISO week from the first snapshot's week to the newest input's
   <out-dir>/index.html       every week, newest first
   <out-dir>/latest.html      byte copy of the newest week page
+  <out-dir>/index.json       [{id, start, end, inProgress, asOf}] per week (the sitemap reads it)
+  <out-dir>/og/<id>.<hash>.png  each week's 1200×630 preview (npm ci --prefix stocks/og), re-rendered on change
 
   The build instant is the newest timestamp among the inputs, never the clock: the same inputs
   (files and database rows up to that instant) produce byte-identical pages.`);
@@ -167,10 +172,27 @@ async function main() {
 
     const digests = weeks.map((week, index) => buildWeek(week, weeks[index - 1] ?? null, asOf, inputs));
     await mkdir(outDir, { recursive: true });
+    const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
+    const og = await prepareFamilyOg({ outDir, urlPrefix: 'weekly', label: 'weekly', enabled: flags['no-og-images'] !== true && origin !== null });
+    const weekImage = async (digest) => absoluteImage(origin, await familyOgImage(og, digest.week.id, weeklyOgModel({
+        id: digest.week.id,
+        label: weekLabel(digest.week).replace(/^w/, 'W'),
+        range: weekRange(digest.week),
+        inProgress: digest.inProgress,
+        stats: [
+            { value: fmtCount(digest.numbers.tokens.value), label: 'tokens tracked' },
+            { value: fmtCount(digest.journal.length), label: 'issuer, venue or protocol changes' },
+            { value: digest.material === null ? null : fmtCount(digest.material.length), label: 'material changes (model assessment)' },
+            { value: fmtCount(digest.newTokens.reduce((sum, row) => sum + (row?.count ?? 0), 0)), label: 'tokens first catalogued' },
+            { value: fmtCount(digest.discrepancies.length), label: 'new claim ≠ reality discrepancies' }
+        ]
+    })));
     const keep = new Set();
     let latestHtml = '';
+    let latestImage = null;
     for (const [index, digest] of digests.entries()) {
-        const html = renderWeekPage(digest, { baseUrl, version: ASSET_VERSION, hasNext: index < digests.length - 1 });
+        latestImage = await weekImage(digest);
+        const html = renderWeekPage(digest, { baseUrl, version: ASSET_VERSION, hasNext: index < digests.length - 1, ogImage: latestImage });
         const name = `${digest.week.id}.html`;
         await writeFile(join(outDir, name), html, 'utf8');
         keep.add(name);
@@ -179,7 +201,12 @@ async function main() {
             + weekHeadlines(digest).map((line) => line.text).join(' · '));
     }
     await writeFile(join(outDir, 'latest.html'), latestHtml, 'utf8');
-    await writeFile(join(outDir, 'index.html'), renderWeeklyIndex(digests, { baseUrl, version: ASSET_VERSION }), 'utf8');
+    // The index shares the newest week's picture: its headline numbers are that week's.
+    await writeFile(join(outDir, 'index.html'), renderWeeklyIndex(digests, { baseUrl, version: ASSET_VERSION, ogImage: latestImage }), 'utf8');
+    await writeFile(join(outDir, 'index.json'), `${JSON.stringify(digests.map((digest) => ({
+        id: digest.week.id, start: digest.week.start, end: digest.week.end, inProgress: digest.inProgress, asOf: digest.asOf
+    })))}\n`, 'utf8');
+    await finishFamilyOg(og);
     const pruned = await pruneStale(outDir, keep);
     log(`wrote ${digests.length} week page(s), index.html and latest.html to ${outDir} as of ${asOf}`
         + `${pruned ? ` (pruned ${pruned} stale page(s))` : ''}`);

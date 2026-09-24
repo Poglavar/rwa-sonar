@@ -19,7 +19,7 @@ export const PROGRAMMES = [
     {
         slug: 'xstocks-backed', name: 'xStocks (Backed)',
         redeemed: { counted: true, countField: ['deposits'], coverageAddress: 'CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C',
-            what: 'Holder transfers to the issuer redemption address CgyuW2…, which the issuer sweeps into its treasury — the prospectus "de-activation". Every deposit counts, whether or not the stablecoin payout leg could be paired.' },
+            what: 'Holder transfers to the issuer redemption address CgyuW2…, which the issuer sweeps into its treasury (the prospectus calls this "de-activation"). Every deposit counts, whether or not the stablecoin payout leg could be paired.' },
         created: { counted: false,
             why: 'Issuance "activates" pre-created tokens by transferring them out of the issuer treasury S7vYFF…, which signs well over a thousand transactions a day; reading all of them would roughly double the observer\'s RPC budget, so it is not collected yet. The public-float table shows the net change between daily reads instead.' }
     },
@@ -33,7 +33,7 @@ export const PROGRAMMES = [
     {
         slug: 'superstate-opening-bell', name: 'Superstate Opening Bell',
         redeemed: { counted: true, countField: ['redemptions'], coverageAddress: null,
-            what: 'Issuer burns at the published equity burn address: a conversion of the token back to book-entry shares at the transfer agent, not a cash redemption.' },
+            what: 'Issuer burns at the published equity burn address: the token converts back to book-entry shares at the transfer agent and no cash is paid.' },
         created: { counted: false,
             why: 'Conversions from book-entry shares into tokens are issuer mints the observer does not read (it watches the burn address only).' }
     }

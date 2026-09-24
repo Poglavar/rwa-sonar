@@ -2,8 +2,8 @@
 
 Collects the exact Solana addresses of tokenized equities and related stock-like instruments that
 the pipeline can corroborate, then joins their on-chain facts, market state, issuer documents,
-legal structure and confirmed protocol use. It is a claims-versus-reality diligence layer, not a
-claim that no undiscovered token exists. Collection scripts feed `build-stocks-db.mjs` (grades +
+legal structure and confirmed protocol use, so issuer claims can be compared with what can be
+checked. It does not claim to have found every token that exists. Collection scripts feed `build-stocks-db.mjs` (grades +
 `stocks-issuers.json`/`stocks-tokens.json`, see MODEL.md), `build-graph.mjs` (`stocks-graph.json`) and the `stocks.html`/`graph.html` pages. Node 24, ESM
 `.mjs`, no npm dependencies (built-in `fetch` only).
 
@@ -37,12 +37,12 @@ admission signal for new discoveries. `fetch-onchain.mjs` reads only the admitte
 `data/universe.json`, never the candidate inbox. `fetch-reference-prices.mjs` reads both
 `universe.json` and `sponsor-apis.json`, so it runs last. Every script prints its usage and exits without doing anything when given no
 arguments or `--help`; `--run` is the switch that makes it work. Each one is resumable and
-idempotent — progress is checkpointed into `data/raw/` after every query/batch, and a re-run skips
+idempotent: progress is checkpointed into `data/raw/` after every query/batch, and a re-run skips
 what is already there (`--force` re-fetches everything).
 
 **`fetch-universe.mjs` reads its own previous output before it writes it**, because the universe is
 monotonic (`lib/universe.mjs`): a mint the current run's searches did not return is carried over
-from the existing `data/universe.json` rather than dropped. So run it in place — pointing `--out` at
+from the existing `data/universe.json` rather than dropped. So run it in place: pointing `--out` at
 a fresh path throws the accumulated `firstSeenAt` history away and makes every mint look new.
 It also reads `data/discovery-candidates.json`: a newly searched address is not published unless a
 reviewed manual source, issuer exact-mint registry, or concordant verified issuer tag + known
@@ -69,64 +69,64 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
 - **`build-stocks-db.mjs --run`** joins `universe.json`, `onchain.json`, `sponsor-apis.json` and
   `reference-prices.json` with the dossiers in `data/issuers/` and writes the full artifacts plus
   the compact first-load index into the repo root (`--out-dir=<dir>` puts them elsewhere):
-  - `stocks-discovery.json` (~840 kB in the 1,183-token build) — token/issuer identities, small
+  - `stocks-discovery.json` (~840 kB in the 1,183-token build): token/issuer identities, small
     market summaries, protocol-search rows and precomputed decision filters. Overview and Explore
     load this instead of paying for every dossier, venue and evidence claim. Comparison loads one
     generated `comparisons/u-<encoded-ticker>.json` bundle, including lone underlyings; issuer,
     discrepancy, DeFi and token-detail views request the fuller research when needed.
-  - `stocks-issuers.json` (~2.75 MB in the 1,183-token build) — the envelope carrying each input's own `fetchedAt` plus one
+  - `stocks-issuers.json` (~2.75 MB in the 1,183-token build): the envelope carrying each input's own `fetchedAt` plus one
     full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
-    + `tokenMints`). This is a full-research artifact, not the default comparison download.
-  - `stocks-tokens.json` (~3.29 MB in the 1,183-token build) — the same envelope, one record per mint, and an `issuerIndex`
+    + `tokenMints`). This is the full-research artifact; comparisons do not download it by default.
+  - `stocks-tokens.json` (~3.29 MB in the 1,183-token build): the same envelope, one record per mint, and an `issuerIndex`
     of six display fields per issuer (`slug`, `name`, `status`, `legalForm`, `claimRung`,
-    `maturityStageNum`). No dossier prose — no `documents`, `attestations`, `findings` or
-    `vocabulary` — which is what keeps it within the tested 3 KiB-per-mint budget as the catalogue
+    `maturityStageNum`). It carries no dossier prose (no `documents`, `attestations`, `findings` or
+    `vocabulary`), which keeps it within the tested 3 KiB-per-mint budget as the catalogue
     grows; `stocks-page.test.js` asserts that.
 
   All three files carry the same `builtAt`, so compact discovery and later full research cannot
   show two release timestamps. Tokens join by mint; Ondo's API items join on
   `ticker === underlyingTicker` and only for Ondo tokens. Issuers sort by slug and tokens by mint,
   so rebuilding unchanged inputs preserves record order (build timestamps still advance). It reports both file sizes and ends with
-  a per-issuer line — stage, score, claim rung, verification strength, liquidity, volume, holders,
-  median premium, paused mints — and a live-issuers-only total. Everything it is missing is warned
+  a per-issuer line (stage, score, claim rung, verification strength, liquidity, volume, holders,
+  median premium, paused mints) and a live-issuers-only total. Everything it is missing is warned
   about by name (a dossier without `status`, an issuer with tokens but no dossier, a mint with no
   on-chain row); nothing missing is ever silently read as zero.
 
   Both records also carry an **`activity`** block (MODEL.md §11.2 per token, §11.3 per issuer),
   joined from two sources that are never summed together: Jupiter's `stats24h` in `universe.json`
   gives the trade counts (`buys24`, `sells24`, `trades24`, `traders24`, `organicBuyers24`, and the
-  `tradesPerTrader` ratio that is the wash-trading tell), and `data/venues.json` — the one OPTIONAL
-  input, from `npm run stocks:venues` — gives the venue facts (`dexPairs`, `dexTxns24` from
+  `tradesPerTrader` ratio that signals wash trading), and `data/venues.json` (the one OPTIONAL
+  input, from `npm run stocks:venues`) gives the venue facts (`dexPairs`, `dexTxns24` from
   DexScreener's own `txns.h24`, `cexMarkets`, `venueCount`, `lastTradedAt`/`lastTradedVenue` from
   the CoinGecko tickers, and the cross-venue price gap `venueSpreadPct` between `venueSpreadLow` and
   `venueSpreadHigh` over the `venuesPriced` venues deep or busy enough to count: a DEX pool needs
   ≥ $10k liquidity, a CEX market ≥ $5k 24 h volume and a print within 2 h of the venues file's own
   `fetchedAt`, never the clock, so an old build regrades identically). CoinGecko lists DEX markets
   among its tickers, so a market whose name reduces to a `dexId` ("Raydium (CLMM)" → `raydium`) is
-  the same venue twice and its copy is dropped, keeping the DexScreener side — two prints of one
+  the same venue twice and its copy is dropped, keeping the DexScreener side, because two prints of one
   venue taken moments apart are not an arbitrage gap. Two different pools of the same dex are two
   venues and are both kept. Without `venues.json` the
   build warns and every venue-derived field is null; a token whose record came back empty gets 0
-  instead, because looked-up-and-found-nothing is not the same fact as never-looked-up. The
-  per-issuer aggregate sums the counts over the issuer's tokens — `traders24` is a Σ of per-token
-  wallet counts and ships with a `tradersNote` saying wallets may overlap — while `venueCount`,
+  instead, because "looked up and found nothing" is a different fact from "never looked up". The
+  per-issuer aggregate sums the counts over the issuer's tokens (`traders24` is a Σ of per-token
+  wallet counts and ships with a `tradersNote` saying wallets may overlap), while `venueCount`,
   `venuesTop` (the six biggest by 24 h volume, with liquidity only where a DEX pair reports it) and
-  the median `venueSpreadMedianPct` are per-venue, not per-token. The build prints one §11.3 row
+  the median `venueSpreadMedianPct` are counted per venue. The build prints one §11.3 row
   per issuer and the five tokens with the highest trades per trader. `stocks-tokens.json` is written
-  with a one-space indent to stay within its per-mint byte budget—same fields and values, less
-  serialization overhead.
+  with a one-space indent to stay within its per-mint byte budget (same fields and values, less
+  serialization overhead).
 - **`sync-assets-db.mjs`** applies MODEL.md §4 to the two site data files and is a **dry run by
   default**: it prints, per issuer, whether the record is created or updated and every field that
   changes old → new, plus every attestation row it would delete and insert. Only `--apply` writes.
   Each file keeps its own indentation (4 spaces for `rwa-assets-db.json`, 2 for
   `attestations-db.json`), untouched records keep their position and new records are appended.
   `--only=<slugs>` narrows it to some issuers; `--apply --out-dir=<dir>` rehearses the write
-  somewhere harmless. It writes only the TEN site booleans — a dossier value of `unknown` removes
+  somewhere harmless. It writes only the TEN site booleans. A dossier value of `unknown` removes
   the key instead, and `reflectLegalDecisions` / `meetingOfMinds` / `assetSelfCustody` are removed
   if present, because assets.html sums every non-general field and storing them shifts the score.
   An attestation whose schema still carries a `NEW:` prefix, or is absent from
   `attestation-types.json`, is skipped and reported rather than written (MODEL.md §5), and findings
-  are never written here — they live in the dossiers and in `stocks-issuers.json`.
+  are never written here; they live in the dossiers and in `stocks-issuers.json`.
 
 New files: `lib/grade.mjs` (pure grading rules, MODEL.md §3), `build-stocks-db.mjs`,
 `sync-assets-db.mjs`, and their suites `grade.test.js` and `sync.test.js`.
@@ -167,10 +167,10 @@ ordinary issuer prose remains programme-unspecified. Its shared answer contract 
 workspace and comparison views, issuer/template pages and token/issuer APIs. Contract terms, a
 working route and an independently observed redemption are separate questions. `lib/protocol-proof.js` supplies shared
 proof wording and the achieved stage's evidence date to the workspace, cards and protocol dossiers.
-Its stages are deliberately cumulative but not interchangeable: source-listed, market-observed,
+Its stages are cumulative, and each one means something different: source-listed, market-observed,
 configuration-decoded and action-simulated. A listed mint or existing account does not prove that
-a borrow, deposit, withdrawal or liquidation succeeded. A `source-gone` check is operational
-freshness, not a fresh legal review, so it cannot advance the dossier's `lastCheckedAt` date.
+a borrow, deposit, withdrawal or liquidation succeeded. A `source-gone` check only measures operational
+freshness. It is not a legal review, so it cannot advance the dossier's `lastCheckedAt` date.
 Reviewed inference requires recorded reasoning, sources and scope and remains distinct from a
 source-confirmed statement. Authority facts separate immediate
 capability, role-specific signing/upgrade paths, technical observations and contractual limitations.
@@ -196,7 +196,7 @@ installed here.
 ## Outputs
 
 Each committed file is `{ fetchedAt, source: {...}, items: [...] }`, sorted by mint so a re-run
-produces a readable diff rather than a reshuffle. `fetchedAt` and the market numbers move every run;
+produces a readable diff. `fetchedAt` and the market numbers move every run;
 nothing else should.
 
 ### `data/universe.json` — 1,183 catalogued tokens on 2026-09-20
@@ -217,7 +217,7 @@ Trimmed Jupiter record per token (`icon` and the 5m/1h/6h stat blocks dropped) p
 
 ### `data/discovery-candidates.json` — quarantine before publication
 
-Jupiter search tags are leads, not proof of authenticity. `lib/discovery-candidates.mjs` compares a
+A Jupiter search tag is a lead. It does not prove the token is authentic. `lib/discovery-candidates.mjs` compares a
 new exact mint against issuer registries, reviewed manual sources, known programme authorities,
 issuer tags, verification metadata, the inferred underlying ticker and known protocol listings.
 Only the first three kinds of corroboration can admit an address automatically; a protocol listing
@@ -236,22 +236,22 @@ bullish 1 and securitize 1 (both seeded; allowlisted registered shares that neve
 the previous file: a returned mint gets fresh data, and a mint the run did not return is KEPT with
 its old record and `seenInSearch: false`.
 
-This is not a precaution, it is a measurement. Re-running the same 118 queries on 2026-09-17 against
-the 441 mints known on 2026-09-16 **dropped 24 and added 30** — and a direct
+This rule comes from a measurement. Re-running the same 118 queries on 2026-09-17 against
+the 441 mints known on 2026-09-16 **dropped 24 and added 30**, and a direct
 `?query=<symbol>` still returned two of the dropped ones (CRWVx `Xs3trf…`, ABTon `129gRo…`) with
 their full `stocks`/`xstocks`/`equities` tags. Nothing had been delisted; the ranking inside each
 100-record page had simply moved. Before the merge that read as 30 `new-mint` and 24 `removed-mint`
-in the daily change log, which is a fabricated event in both directions.
+in the daily change log: false events in both directions.
 
 `firstSeenAt` for the 441 mints of 2026-09-16 was seeded from that day's universe `fetchedAt`
 (`2026-09-16T20:27:15Z`), the earliest date any file on disk proves, and nothing was backdated
 further. That founding cohort is therefore left out of the `newMints` feed: on the first recorded day
-every mint in existence was "first seen", so the date is a lower bound, not an arrival anyone watched.
+every mint in existence was "first seen", so the date is only a lower bound on when each mint appeared.
 
 ### `data/onchain.json` — 1,183 mints on 2026-09-20
 
 `{ mint, symbol, issuer, …capability flags…, owner, space }`. The flags flatten the Token-2022
-extensions into the things that decide how controllable a tokenized share actually is:
+extensions into the properties that decide how much control someone keeps over a tokenized share:
 `permanentDelegate` (+`permanentDelegateAddress`), `transferHookConfigured` /
 `transferHookProgram`, `pausable` (+`paused`), `defaultAccountStateFrozen`, `transferFeeBps`,
 `confidentialTransfers`, `scaledUiAmountMultiplier`, `metadataUri`, `metadataUpdateAuthority`,
@@ -286,16 +286,16 @@ manual sources and finalized mint-account observations. On 2026-09-20 it contain
 Solana addresses**, all catalogued and observed on-chain: 899 have current exact issuer-registry
 confirmation, 276 are programme-corroborated, six require lifecycle review because they are absent
 from a successful current registry, and two rest on reviewed primary sources. Identity, market and
-legal coverage are kept separate deliberately: being listed by an issuer proves token identity, not
-liquidity, circulating supply, legal rights or that anybody holds it. The 650 addresses promoted
+legal coverage are kept separate: an issuer listing proves which token it is, and says nothing about
+liquidity, circulating supply, legal rights or whether anybody holds it. The 650 addresses promoted
 from successful issuer registries still have partial venue, holder and reference-price coverage;
-those gaps remain null rather than keeping confirmed identities out of the catalogue.
+those gaps stay null, and the confirmed identities stay in the catalogue.
 
 `currentIssuerRegistry` is `listed` / `not-listed` only when that issuer feed succeeded. If the
 feed failed, it becomes `last-known-listed` or `unavailable`; failure is never interpreted as a
 delisting. Six previously catalogued addresses were absent from the successful 2026-09-20 feeds:
 the zero-supply legacy Backpack XYZ mint, plus IVZx, GMEDx, DOCUx, ARWRx and TEFx, all with non-zero
-raw supply. Those five xStocks cases are a review queue, not an automatic removal decision.
+raw supply. Those five xStocks cases go to the review queue; nothing is removed automatically.
 
 `data/identity-onchain.json` is the wider chain observation layer. It uses the same parser as
 `onchain.json` and can read issuer-listed addresses before catalogue admission. The 2026-09-20 pass
@@ -312,7 +312,7 @@ operational statuses instead of collapsing them into one “active token” bool
 One record per token pairing Jupiter's `usdPrice` with a reference price for the **underlying listed
 instrument**, plus `premiumPct = (jupiterPrice/refPrice − 1) × 100`. Sources are tried in descending
 order of independence and the one used is recorded in `refSource`, because a premium measured
-against an oracle and one measured against the issuer's own mark are not the same claim:
+against an oracle and one measured against the issuer's own mark are different claims:
 
 | `refSource` | where `refPrice` comes from | count on 2026-09-16 |
 |---|---|---|
@@ -321,7 +321,7 @@ against an oracle and one measured against the issuer's own mark are not the sam
 | `issuer-mark` | PreStocks / Tessera `markPrice` from `sponsor-apis.json`, joined on mint (private companies) | 11 |
 | `null` | no reference found, or a leveraged token | 88 |
 
-`refPrice`, `refConf` and `premiumPct` are `null` — **never 0** — when unknown, and `premiumPct` is
+`refPrice`, `refConf` and `premiumPct` are `null` (**never 0**) when unknown, and `premiumPct` is
 computed only when both prices are finite and positive. Leveraged Shift tokens get `refSource: null`
 and `note: "leveraged; no 1:1 reference"`: a 2x/3x NAV is path-dependent, so any premium against
 spot would be meaningless. `refPublishTime`/`refAgeSeconds` exist only for Pyth, the one source that
@@ -331,7 +331,7 @@ being filled with the run's fetch time, and the sponsor file's own `fetchedAt` i
 
 `underlyingTicker` here is the ticker the lookup actually used. For the untagged issuers
 (`superstate-opening-bell`, `securitize`, `bullish`) `classify.mjs` leaves it null, so the token
-symbol is used instead — that is how GLXY, EXOD and BLSH get a reference at all.
+symbol is used instead. That is how GLXY, EXOD and BLSH get a reference at all.
 
 **The Pyth key is entitled to a small subset of equity feeds, and a batch fails as a whole.** A
 `GET /v2/updates/price/latest` with 50 ids returns HTTP 403 `Not entitled: feed <id>` if *any one*
@@ -340,7 +340,7 @@ apart) and batches only the entitled ones. That probe is the expensive part, so 
 to `data/raw/pyth-entitlement-<date>.json` (`ok` / `not-entitled` / `error`) and reused for the rest
 of the day; `ok`/`not-entitled` are final, `error` entries are re-probed next run and make the exit
 code non-zero. `--force` re-probes everything. On 2026-09-16 only **3 of 244** matched feeds were
-entitled — TSLA, QQQ and VOO — covering 5 tokens. Prices themselves are never cached.
+entitled (TSLA, QQQ and VOO), covering 5 tokens. Prices themselves are never cached.
 
 ### `data/manual-mints.json`
 
@@ -360,34 +360,34 @@ Full untrimmed responses with fetch timestamps, and the resume checkpoints:
 `jupiter-search-<date>.json` (per-query log + the full raw record of every kept token),
 `mints-parsed-<date>.json` (every jsonParsed account), `sponsor-<id>-<date>.json`, `pyth-feeds-<date>.json`, `pyth-entitlement-<date>.json` (the reusable entitlement probe) and `pyth-latest-<date>.json`. ~8 MB per day,
 of which Ondo is 6 MB. Note the Jupiter raw file keeps full records only for tokens that passed the
-stock-tag filter — the 118 queries returned 10 416 records in total and keeping them all would be mostly memecoins.
+stock-tag filter: the 118 queries returned 10 416 records in total and keeping them all would be mostly memecoins.
 
 ## Provenance and caveats
 
-- **The universe is a union of searches, not an authoritative listing.** `lite-api.jup.ag/tokens/v2`
+- **The universe is built from searches, because no authoritative listing exists.** `lite-api.jup.ag/tokens/v2`
   has no working "all tokens with tag X" call (the tag endpoint rejects `stocks`), so
-  `lib/jupiter.mjs` fires 118 queries — issuer/product words plus ~89 well-known tickers and company
-  names — and keeps a record only if its `tags` contain `stocks`, `xstocks` or `equities`. An issuer
+  `lib/jupiter.mjs` fires 118 queries (issuer/product words plus ~89 well-known tickers and company
+  names) and keeps a record only if its `tags` contain `stocks`, `xstocks` or `equities`. An issuer
   whose name and tickers are all absent from that query list is invisible to this pipeline. Add
   queries, or seed `manual-mints.json`. **The ranking inside those pages also moves day to day**, so
-  the output is the union merged over the previous file and never shrinks — see "The universe is
-  monotonic" above.
+  the output is the union merged over the previous file and never shrinks (see "The universe is
+  monotonic" above).
 - **Jupiter rate-limits at roughly 60 calls/minute.** The default pace is 1100 ms and a 429 backs off
   2s/5s/15s; at 250 ms the last 16 of 118 queries were all rejected (2026-09-16). A query that still
   fails is recorded in `source.queriesFailed`, makes the exit code non-zero, and is retried by the
-  next run — the checkpoint only treats error-free queries as done.
-- **All 436 mints are Token-2022.** Not one is a classic SPL mint.
+  next run; the checkpoint only treats error-free queries as done.
+- **All 436 mints are Token-2022.**
 - **`transferHook.programId` was `null` on every single mint** on 2026-09-16: 432 mints reserve the
   hook slot but none has a hook program installed. The *authority* to install one later is retained,
-  which is the thing worth grading — not the current (empty) value.
+  and that retained authority is what we grade.
 - **Every mint has a live `mintAuthority` and `freezeAuthority`.** No issuer has renounced either.
-- **`scaledUiAmountMultiplier` is usually not 1** — 200 of 436 mints carry a multiplier that accrues
+- **`scaledUiAmountMultiplier` is usually not 1.** 200 of 436 mints carry a multiplier that accrues
   dividends and splits (PPLTon and NFLXon at `10`, VUGx at `6`, PALLon at `5`, AZNx at `0.511`,
   SOX3S at `0.1`). **A raw `supply` read without applying it is wrong.** Any grading or valuation
   step must multiply.
 - **`underlyingTicker` follows each issuer's symbol convention and nothing more.** It is null for
   PreStocks and Tessera (private companies) and for unknown issuers. Shift truncates its base
-  symbols, so `TSL2L` reduces to `TSL`, not `TSLA`, and `SOX3L` to `SOX`, not `SOXX` — joining Shift
+  symbols, so `TSL2L` reduces to `TSL`, not `TSLA`, and `SOX3L` to `SOX`, not `SOXX`. Joining Shift
   to a real ticker needs a lookup table this pipeline does not have.
 - **Backpack Securities uses a different mint authority for every token** (48 distinct ones for 48
   tokens), so `issuerFromMintAuthority` catches only SPCX. Tags are the primary signal; the authority
@@ -403,36 +403,36 @@ stock-tag filter — the 118 queries returned 10 416 records in total and keepin
   (FWDI, HSDT, EXOD) never reach a Jupiter pool and come from `manual-mints.json`.
 - **Prices come from two unrelated places and should not be mixed silently**: `usdPrice` in
   `universe.json` is Jupiter's AMM-derived price, while `sponsor-apis.json` carries the issuer's own
-  mark price for the underlying. The gap between them is a finding, not an error — the PreStocks
+  mark price for the underlying. The gap between them is itself a finding: the PreStocks
   SPACEX token was 22.4% below its sponsor's mark on 2026-09-16.
 - **Pyth is wired in but covers almost nothing with this key.** The Hermes feed *list* is public;
   the price endpoints need `PYTH_API_KEY` (read from the repo-root `.env` by `lib/env.mjs`, never
   logged) **and a per-feed grant on that key**. On 2026-09-16 the grant covered 3 of the 244 feeds
-  our tickers match — TSLA, QQQ, VOO — and everything else answered `403 Not entitled`. The Pyth Pro
+  our tickers match (TSLA, QQQ, VOO), and everything else answered `403 Not entitled`. The Pyth Pro
   / Lazer route (`POST pyth-lazer.dourolabs.app/v1/latest_price`, ids from
   `pyth.dourolabs.app/v1/symbols`) was tested the same day and has **identical** entitlements
-  (TSLA 200, NVDA and AAPL 403), so it buys nothing and is not implemented.
-- **`ondo-implied` is a quotient, not a quote.** `marketCap / sharesOutstanding` is the best
+  (TSLA 200, NVDA and AAPL 403), so it adds nothing and is not implemented.
+- **`ondo-implied` is a computed ratio.** `marketCap / sharesOutstanding` is the best
   independent underlying price available for 337 tokens, but it is only as good as Ondo's two
   inputs. It disagrees with Ondo's own `ondoPrice` by more than 5% for 16 of 442 assets, mostly by
   a clean split ratio (CRWD 4x, NFLX and KLAC 10x) where the token carries a
-  `scaledUiAmountMultiplier` — which is the *expected* direction: the implied price is per real
+  `scaledUiAmountMultiplier`, which is the *expected* direction: the implied price is per real
   share, `ondoPrice` is per token. ENLV is off by 14x and is simply bad input data.
-- **A premium on an illiquid mint is noise, not a finding.** The five largest absolute premiums on
+- **A premium on an illiquid mint means nothing.** The five largest absolute premiums on
   2026-09-16 were all on mints with essentially no Jupiter liquidity, where `usdPrice` is a stale
   AMM print: PYPLx +6119% ($0.05 liquidity), ASTSx +220% ($120), CRWDx +56% ($49). Filter on
-  `liquidity` before quoting any premium — across the 47 tokens above $50k, p10/p50/p90 was
+  `liquidity` before quoting any premium. Across the 47 tokens above $50k, p10/p50/p90 was
   −1.8 / −0.2 / +2.0 %.
 - **DexScreener is not a source here.** It was reported (brief, 2026-09-16) to under-report liquidity
   and volume against Jupiter for these mints; not independently re-measured in this pipeline.
 - **A paid RPC would make enumeration authoritative.** Helius or any provider that allows
   `getProgramAccounts` filtered by mint authority could list every mint an issuer has ever created,
-  including ones with no pool and no Jupiter listing, which is exactly the blind spot
-  `manual-mints.json` papers over. The public `api.mainnet-beta.solana.com` rejects those calls.
+  including ones with no pool and no Jupiter listing, which is the gap
+  `manual-mints.json` currently fills by hand. The public `api.mainnet-beta.solana.com` rejects those calls.
 
 ## Issuer dossiers, findings and the data model
 
-- `data/issuers/<slug>.json` — one hand-researched dossier per issuer (legal form, holder claim,
+- `data/issuers/<slug>.json`: one hand-researched dossier per issuer (legal form, holder claim,
   custody verification, redemption, transfer restrictions, rights, incidents, documents, the
   rwa-sonar vocabulary booleans with reasons, and attestations that reuse
   `attestation-types.json` slugs or propose `NEW:`-prefixed ones). Cited to primary sources;
@@ -440,10 +440,10 @@ stock-tag filter — the 118 queries returned 10 416 records in total and keepin
   Bell, PreStocks, Tessera, Bullish, Securitize (SECZ), Shift (leveraged ETF wrappers), Ventuals
   (defunct, never on Solana), Remora Markets (defunct) and Republic Mirror (no verifiable Solana mint;
   not in the universe).
-- `findings.md` — dated, evidenced log of everything verified during collection, including the
+- `findings.md`: dated, evidenced log of everything verified during collection, including the
   facts that contradict published claims (all mints are Token-2022; no transfer hook program is
   set anywhere; which freeze keys have actually been used; register-vs-chain supply breaks).
-- `SCHEMA-DRAFT.md` — the two-layer record model (machine token records vs issuer dossiers) and
+- `SCHEMA-DRAFT.md`: the two-layer record model (machine token records vs issuer dossiers) and
   the derived grades a later step computes.
 
 ## Layout
@@ -472,7 +472,7 @@ Optional `COINGECKO_API_KEY` in `../.env` (free Demo tier): the fetcher sends it
 CoinGecko at 2.1 s (30 req/min) instead of the keyless ~5 req/min, so a full run takes ~15 min instead of
 ~85. Ticker `trust_score` is null on the Demo tier too (measured 2026-09-16), so nothing may rank on it.
 
-`fetch-venues.mjs` answers "where does this token actually trade?" from two keyless sources and
+`fetch-venues.mjs` records where each token trades, using two keyless sources, and
 writes `data/venues.json` (MODEL.md §10.3). The two are never merged or summed, because they do not
 measure the same thing; the pure helpers in `lib/venues.mjs` do the aggregating and daily rotation.
 
@@ -484,7 +484,7 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
 ```
 
 - **DexScreener** `GET /tokens/v1/solana/<mint>` → one record per on-chain pool: `dexId`,
-  `pairAddress`, `quoteSymbol`, pool `liquidityUsd`, `volume24Usd`, `url`. Keyless and generous —
+  `pairAddress`, `quoteSymbol`, pool `liquidityUsd`, `volume24Usd`, `url`. Keyless and generous:
   441 mints at 250 ms apart in **2.2 min with zero 429s**.
 - **CoinGecko** `coins/list?include_platform=true` (3.7 MB, cached for the day in `data/raw/`) maps
   `platforms.solana` → coin id by exact, case-sensitive base58 match, then `coins/<id>/tickers`
@@ -495,7 +495,7 @@ node stocks/fetch-venues.mjs --run --max=6     # smoke test; --help for every fl
   unseen/oldest first. Including the daily coin-list request, the baseline is **7,530 calls in a
   30-day month or 7,781 in a 31-day month**, before retries, against the 10,000-call Demo allowance.
   The current 466-id universe turns over in about 1.9 days. The six-hourly DexScreener refresh
-  carries CoinGecko rows forward with their original timestamp rather than wiping or re-dating them.
+  carries CoinGecko rows forward with their original timestamp; it does not wipe or re-date them.
 - Every response is checkpointed **per item** to `data/raw/venues-checkpoint-<date>.json`, so a
   killed or rate-limited run resumes the same day and re-fetches only what failed (`ok`/`empty`/
   `not-found` are reused, `error` is retried). Verified: a run killed mid-phase resumed having made
@@ -524,7 +524,7 @@ The top ten by Σ volume: LBank $68.9 M (89 mints), KCEX $47.9 M (47), Raydium (
 MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M (9), Bybit $7.9 M
 (11), Meteora $6.7 M (65), CoinUp.io $6.1 M (2).
 
-**The venue picture splits the issuers in three**, and it does not follow the ladder:
+**By venue, the issuers fall into three groups**, and the grouping does not follow the claim-rung grades:
 
 | issuer | tokens | on a DEX | on a CG market | Σ DEX liquidity | Σ CEX volume | top venue |
 |---|---|---|---|---|---|---|
@@ -535,61 +535,59 @@ MEXC $28.7 M (141), Ondo Stocks $18.0 M (165), Gate $11.6 M (67), Raydium $8.8 M
 | prestocks | 8 | 8 | 6 | $550,229 | $1,002,452 | Meteora (cex) |
 | shift / superstate-opening-bell / securitize / bullish | 14 | 0 | 0 | — | — | **none** |
 
-- **Ondo is a CEX product with a token, not a DEX asset.** 212 mints, 4 pools, $8 k of on-chain
-  liquidity — against $164.7 M of 24 h CEX volume, 58% of the whole section's. Its own
+- **Ondo trades almost entirely on CEXs.** 212 mints, 4 pools, $8 k of on-chain
+  liquidity, against $164.7 M of 24 h CEX volume, 58% of the whole section's. Its own
   "Ondo Stocks" venue quotes 165 of them.
 - **Backpack is the opposite**: every one of its 48 mints has a pool, and its top venue is a DEX.
-- **14 tokens trade nowhere either source can see** — all four Superstate Opening Bell mints, all
+- **14 tokens trade nowhere either source can see**: all four Superstate Opening Bell mints, all
   eight Shift leveraged wrappers, SECZ and the Bullish mint. For those, a "market reality" grade
-  built on venue data has no input at all and must say so rather than score 0.
+  built on venue data has no input at all and must say so instead of scoring 0.
 
 #### Caveats
 
 - **A full daily CoinGecko pass does not fit the free quota.** The current 466 mapped ids require
   467 requests including the coin list: **14,010/month at 30 days** or **14,477 at 31 days**. That
-  is why the scheduled job rotates 250 ids rather than pretending “daily” means every asset daily.
+  is why the scheduled job rotates 250 ids a day, so each asset is refreshed about every two days.
 - **Carried-forward CoinGecko prices are not live prices.** They remain useful for venue coverage,
   reported volume and last-trade context, but once the CoinGecko snapshot is more than two hours
   older than the combined venues file it is excluded from the live cross-venue spread calculation.
 
-- **CoinGecko's free tier is ~5 requests/min keyless, not the documented 30.** The 30/min figure
+- **CoinGecko's free tier allows ~5 requests/min without a key.** The 30/min figure
   applies to a Demo API *key*; without one, `coins/<id>/tickers` served 3–6 requests before
   answering 429, whatever the pace. The script therefore doubles its pace on each 429 (2.5 s → 5 →
   10 → 12 s ceiling) and never speeds back up in a run. It converged after **3 rate limits** and
   then ran 400 consecutive requests at 12 s with none, so 12 s (5/min) is the sustainable rate and
   ~85 min is the floor for a full keyless CEX pass. A Demo key would cut it to ~15 min.
-- **`tickers[].trust_score` is null for every coin on the free tier** — 0 of 1,576. Re-measured the
-  same day against `coins/bitcoin/tickers`: 100 of 100 null. The field is carried through as null
-  rather than dropped, and `source.coingecko.tickersWithTrustScore` records the count so the
-  emptiness is visible in the data instead of looking like a parse loss. **The MODEL.md §10.3
+- **`tickers[].trust_score` is null for every coin on the free tier**: 0 of 1,576. Re-measured the
+  same day against `coins/bitcoin/tickers`: 100 of 100 null. The field is kept as null, and `source.coingecko.tickersWithTrustScore` records the count so the
+  emptiness is visible in the data and cannot be mistaken for a parse loss. **The MODEL.md §10.3
   `trustScore` field cannot be populated without a key**, so nothing downstream may rank on it.
-- **`cex[]` is "markets CoinGecko lists", not "centralised venues only".** CoinGecko mixes DEX
-  markets into the same array — Raydium (CLMM), Raydium and Meteora together are $51.9 M of that
-  $282.4 M. A consumer splitting CEX from DEX must filter on `marketId`, not trust the array name.
+- **`cex[]` means "markets CoinGecko lists" and includes some DEX markets.** CoinGecko mixes DEX
+  markets into the same array: Raydium (CLMM), Raydium and Meteora together are $51.9 M of that
+  $282.4 M. A consumer splitting CEX from DEX must filter on `marketId`.
   Note those DEX rows also disagree with DexScreener on the same pools, which is why §10.4 should
-  take `traded-on` DEX edges from `dex[]` and CEX edges from `cex[]` rather than mixing them.
+  take `traded-on` DEX edges from `dex[]` and CEX edges from `cex[]`, without mixing them.
 - **`is_anomaly` and `is_stale` tickers are not filtered.** This layer reports what the source says.
 - **DexScreener's coverage is narrower than Jupiter's, but its liquidity is not systematically
-  lower** — the "reported to under-report" caveat above is now measured against `universe.json` on
+  lower.** The "reported to under-report" caveat above is now measured against `universe.json` on
   the same day:
   - 210 mints have a positive Jupiter liquidity figure; DexScreener indexes **114**. The 96 it
-    misses hold **$28,446 in total** (~$296 each) — dust.
+    misses hold **$28,446 in total** (~$296 each), which is dust.
   - On the 113 comparable mints the DexScreener/Jupiter liquidity ratio is **p10 0.16, median 1.09,
     p90 2.94**, and DexScreener is the *higher* of the two on 63 of 113. In aggregate its Σ is 25%
     lower ($21.6 M vs $28.9 M), from a few large mints whose pools it does not index.
   - **24 h volume is where the gap is real**: Σ $32.4 M against Jupiter's $140.8 M, a factor of 4.3.
     Some of that is a counting convention (Jupiter's `stats24h.buyVolume + sellVolume`, plus router
-    volume across pools DexScreener does not index), so treat the two as not comparable rather than
-    one being wrong. **Use Jupiter for volume, DexScreener for venue identity.**
+    volume across pools DexScreener does not index), so treat the two as not comparable; neither is wrong. **Use Jupiter for volume, DexScreener for venue identity.**
 - **A pair can name the mint on its quote side.** Exactly one does (TSMon on `meteoradbc`), so its
-  `quoteSymbol` is the counter-asset rather than the quote token and the venue is not lost. It also
-  reports no liquidity at all, which stays `null` — not `0`, which would read as a measured empty
+  `quoteSymbol` is the counter-asset instead of the quote token, and the venue is kept. It also
+  reports no liquidity at all, which stays `null`. A `0` would read as a measured empty
   pool.
 
 ## Live tape
 
-`fetch-recent-trades.mjs` collects **individual trades** — the one layer of this dataset where
-per-trade truth exists, because every swap against a Solana pool is a transaction on the pool's
+`fetch-recent-trades.mjs` collects **individual trades**. This is the only layer of the dataset with
+per-trade data, because every swap against a Solana pool is a transaction on the pool's
 address that a public RPC will hand over. CEX trades are not available keyless, so the tape covers
 sampled DEX pools and says so (MODEL.md §12). `lib/trades.mjs` is pure (66 unit tests in
 `trades.test.js`, built on verbatim real transactions). `live.html` no longer decodes anything in the
@@ -609,7 +607,7 @@ run-job start trades node stocks/fetch-recent-trades.mjs --run --every=180   # k
 - **Per run**: `getSignaturesForAddress(pair, {limit: 50})`, then `getTransaction` for the successful
   signatures not already stored, oldest-first, round-robin across pools, capped at 120 transactions.
 - **Decode**: the POOL's own token-balance deltas. The pool gaining the token is a `sell`, losing it
-  a `buy` — reading the taker's side would be wrong for a routed swap, where the taker holds neither
+  a `buy`. Reading the taker's side would be wrong for a routed swap, where the taker holds neither
   asset. `size`, `quoteAmount`, `priceQuote` and `priceUsd` follow; a missing input stays null.
 - **Outputs**: `data/trades-24h.json` (rolling store, deduped by signature, pruned to 24 h, keeps
   `collectingSince`) and `stocks-trades.json` at the repo root. `fixtures/stocks-trades.sample.json`
@@ -632,56 +630,56 @@ run-job start trades node stocks/fetch-recent-trades.mjs --run --every=180   # k
 | wall time | 203.6 s | 210 s |
 | window after the run | 104 trades | 188 trades, 134 fee payers, $35.1 k |
 
-Run 2 re-read the same pools and stored **84 new trades and zero duplicates**, which is the dedupe
-and the resume in one number.
+Run 2 re-read the same pools and stored **84 new trades and zero duplicates**, which shows both the
+dedupe and the resume working.
 
 - **42–49% of recent transactions on these pools REVERTED** (Σ `failedTx` / Σ `signaturesSeen`), and
   it is wildly uneven: SKHY/USDC 96%, METAx/USDC 96%, SPYx/SOL 98% in run 2, CRCLx/SOL 88%,
-  GLDx/USDC 82% — against tOpenAI 10% and BROS 0%. These are losing arbitrage bots, and the share is
-  the honest measure of how much of a pool's "activity" never happened. They are counted and **never
+  GLDx/USDC 82%, against tOpenAI 10% and BROS 0%. These are losing arbitrage bots, and the share
+  measures how much of a pool's "activity" never happened. They are counted and **never
   fetched**: a reverted transaction changed no balance, so there is nothing in it to decode.
 - **`maxSupportedTransactionVersion: 0` is not enough.** The RPC refuses a transaction whose version
   exceeds the one asked for (error −32015) and names the version it wants. Ten of run 2's 120 swaps
-  were version 1 — 8% of real trades, silently lost until the refusal was retried at the named
+  were version 1 (8% of real trades), silently lost until the refusal was retried at the named
   version. Run 2's `unreadable` count is 0 because of that retry; run 1's 6 were all this.
-- **`getSignaturesForAddress` returns every transaction that MENTIONS the pool**, not just its
-  trades. An arbitrage bot lists several pools among its accounts and trades through only some, so
+- **`getSignaturesForAddress` returns every transaction that MENTIONS the pool**, including ones
+  that did not trade on it. An arbitrage bot lists several pools among its accounts and trades through only some, so
   the pool's own vaults come back byte-identical. Verified on BROS (`So111=7446874521`,
-  `BRVaZK=69492010` before *and* after, while other pools' balances moved). Those are correctly not
+  `BRVaZK=69492010` before *and* after, while other pools' balances moved). Those are not
   trades; they are counted `undecodable` and remembered, so a later run does not re-buy them.
 - **One sampled pool cannot be decoded at all: DKNG/ALLINU, the section's largest by 24 h volume
-  ($5.2 M).** Its vaults are owned by `GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL` — Raydium's
-  shared CP-Swap authority — not by the pair address, so the `owner === pair` rule can never match,
+  ($5.2 M).** Its vaults are owned by `GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL` (Raydium's
+  shared CP-Swap authority) and not by the pair address, so the `owner === pair` rule can never match,
   and matching that authority instead would mix pools together. 19 transactions fetched, 0 trades.
   It also quotes in a **memecoin**, so even a decoded trade would have no USD price. It costs ~1/15
-  of the budget per run for nothing; excluding it is a MODEL.md decision, not a code one.
+  of the budget per run for nothing; excluding it is a MODEL.md decision.
 - **A zero token balance arrives as `uiAmount: null`** with `uiAmountString: "0"`, and the float is
-  lossy besides — one real balance reported `uiAmount: 17852175.049329627` against
+  lossy as well: one real balance reported `uiAmount: 17852175.049329627` against
   `uiAmountString: "17852175.049329628"`. Every delta is therefore computed from the raw integer
   `amount` with BigInt: exact zero detection (so float residue cannot invent a movement and inflate
   `routed`) and no lost digits.
 - **The decode checks out against a source it never saw.** The SPYx/SOL sell in the test fixture
   resolves to **7.6755 SOL** per SPYx; DexScreener quoted the same pool at `priceNative` **7.6946**
-  the same minute — 0.25% apart, which is the spread. That assertion is in `trades.test.js`.
-- **The tape SAMPLES the hottest pools; it does not capture every trade.** The 50-signature window
+  the same minute, 0.25% apart, which is the spread. That assertion is in `trades.test.js`.
+- **The tape SAMPLES the busiest pools and misses trades.** The 50-signature window
   on SPYx/SOL spanned **137 seconds**, and a run takes ~210 s because the public RPC answered 61–74
-  **429s** despite the 600 ms pacing (effective throughput ~34 transactions/minute, not the nominal
+  **429s** despite the 600 ms pacing (effective throughput ~34 transactions/minute against the nominal
   100). With `--every` the collector schedules start-to-start: it subtracts the pass duration from
-  the requested interval, so a three-minute pass with `--every=10800` waits about 177 minutes rather
-  than drifting three minutes later on every cycle. In the measured run, 386 successful
+  the requested interval, so a three-minute pass with `--every=10800` waits about 177 minutes and does not
+  drift three minutes later on every cycle. In the measured run, 386 successful
   signatures were seen in run 2 against a budget of 120, leaving 235 for later. A complete tape on
-  these pools needs a paid RPC, not a smaller interval — the page must say "sampled", and
+  these pools needs a paid RPC; a smaller interval does not help. The page must say "sampled", and
   `collectingSince` is what bounds any claim made from the window.
-- **`pools[].signaturesSeen`, `failedTx`, `decoded` and `undecodable` describe the LAST RUN**, not
-  the 24-hour window, so they do not sum to `trades.length`. `collectingSince` is never reset unless
+- **`pools[].signaturesSeen`, `failedTx`, `decoded` and `undecodable` describe the LAST RUN** only,
+  not the 24-hour window, so they do not sum to `trades.length`. `collectingSince` is never reset unless
   `data/trades-24h.json` is deleted.
 
-### Round-trip prints are marked, not deleted
+### Round-trip prints are marked and kept
 
 A transaction that swaps through the **same pool twice** nets the pool's token delta to almost
 nothing while both quote legs land in full, so `quoteAmount / size` explodes. That produced a real
-tape row of **"NVDAx buy 0.0082 @ $60,799.88"** for a share worth ~$180 — arithmetically correct,
-economically meaningless, and it fed stored `priceUsd` and every hourly volume built from it.
+tape row of **"NVDAx buy 0.0082 @ $60,799.88"** for a share worth ~$180. The arithmetic was correct, the price
+was meaningless, and it fed stored `priceUsd` and every hourly volume built from it.
 
 Each pool therefore carries a `refPriceQuote`, its DexScreener price **in quote units**
 (`priceNative`, or `priceUsd` for a stablecoin-quoted pool), and a trade is marked
@@ -689,25 +687,25 @@ Each pool therefore carries a `refPriceQuote`, its DexScreener price **in quote 
 
 - `|priceQuote / refPriceQuote − 1| > 0.25`, or
 - one program was invoked **more than once with the pool among its accounts** (counting inner
-  instructions, which is where the AMM actually is — the router CPI's into it).
+  instructions, because the router CPIs into the AMM).
 
-A suspect row is **kept** — the transaction is real and the page greys it — but `tradeVolumeUsd`
-returns null for it, which is the single choke point that keeps it out of every hourly `volumeUsd`,
-`totals.volumeUsd` and price statistic. `totals.suspect` counts them so the exclusion is visible
-rather than silent. No reference price means "cannot judge", **not** "suspect" — otherwise
+A suspect row is **kept** (the transaction is real and the page greys it), but `tradeVolumeUsd`
+returns null for it, and that single function keeps it out of every hourly `volumeUsd`,
+`totals.volumeUsd` and price statistic. `totals.suspect` counts them so the exclusion is visible.
+No reference price means "cannot judge", **not** "suspect"; otherwise
 DKNG/ALLINU, which has no USD price at all, would have every row greyed.
 
-Measured on a 450-trade window (2026-09-16): **5 suspect, 1.1%** — 1 each on SPYx/SOL, DJT/SOL and
+Measured on a 450-trade window (2026-09-16): **5 suspect, 1.1%**: 1 each on SPYx/SOL, DJT/SOL and
 NVDAx/SOL and 2 on SPCX/SOL, all SOL-quoted pools, all caught by the price band.
 
 `--republish` rebuilds `stocks-trades.json` from the stored window with no RPC calls at all: it
 refreshes the 15 reference prices from DexScreener (~6 s) and recomputes buckets and totals. The
 structural half of the test needs the transaction, which the store does not keep, so a flag already
-on a stored trade is preserved rather than recomputed away.
+on a stored trade is preserved.
 
 **Do not run it against a live `--every` loop.** The loop holds the store in memory for the whole
-pass and flushes every 10 transactions, so its write lands on top of a concurrent republish — and
-because it is one long-lived process, a code change does not reach it until the job is restarted.
+pass and flushes every 10 transactions, so its write lands on top of a concurrent republish. Because
+it is one long-lived process, a code change does not reach it until the job is restarted.
 
 ## After-hours premium
 
@@ -725,7 +723,7 @@ America/New_York;0930-1600,0930-1600,0930-1600,0930-1600,0930-1600,C,C;0907/C,11
 `<IANA timezone>;<7 weekly entries Mon..Sun>;<holiday overrides MMDD/...>`, an entry being `C`,
 `HHMM-HHMM`, or ranges joined by `&` (a lunch break). `stocks/fetch-reference-prices.mjs` now
 persists that string and the feed's `marketHours` (`{isOpen, nextOpen, nextClose}`) on every item
-that matched a feed — **355 of 441 tokens** — and because the feed list needs no key, those fields
+that matched a feed (**355 of 441 tokens**), and because the feed list needs no key, those fields
 are filled in whether or not the key may read that feed's *price*. Only prices need the entitlement.
 
 `stocks/lib/market-hours.mjs` parses the string and answers `sessionAt(schedule, atMs)` →
@@ -733,32 +731,32 @@ are filled in whether or not the key may read that feed's *price*. Only prices n
 `Intl.DateTimeFormat.formatToParts` (so DST needs no table), open **inclusive** and close
 **exclusive**, holiday `C` reported in its own right and a half-day override (`1127/0930-1300`)
 honoured as a shortened trading day. Unparseable text yields `null`, and a null schedule is
-`unknown` — never "closed".
+`unknown`, never "closed".
 
 `stocks/lib/afterhours.mjs` then, per mint with **both** a parsed schedule and a reference price:
 premium per trade = `priceUsd / refPrice − 1` in percent, trades bucketed by session (a holiday
 counts as closed), each side the **median** of its bucket or `null` below **5 trades**, and
 `gapPct = closedPremiumPct − openPremiumPct` (null if either side is null). Suspect (round-trip)
 trades and trades with no USD price are excluded and counted in `skipped`. A mint with no Pyth feed
-— PreStocks' private companies, Tessera, and DJT/DKNG which matched a feed but have no reference
-price — has no listed market to be open or closed at all, so it is **omitted** and listed in
-`omittedMints` with its reason and trade count rather than emitted as a row of nulls.
+(PreStocks' private companies, Tessera, and DJT/DKNG, which matched a feed but have no reference
+price) has no listed market to be open or closed at all, so it is **omitted** and listed in
+`omittedMints` with its reason and trade count instead of appearing as a row of nulls.
 
 **The caveat, restated in the file's own `note`:** `refPrice` is the *last* reference price at
-build time, not a per-trade historical reference. While the underlying is shut that price does not
+build time. There is no per-trade historical reference. While the underlying is shut that price does not
 move, so the closed-session figure is sound; the open-session figure is measured against a
 reference that has since moved. Re-run `stocks:prices` and this build together.
 
 Measured on the first 2664-trade window (2026-09-16, collected 19:55–22:47 UTC): 10 measurable
-mints, **1825 closed-session trades and 8 open-session ones** — the tape started five minutes
+mints, **1825 closed-session trades and 8 open-session ones**. The tape started five minutes
 before the 16:00 New York close, so only METAx has both sides (open −1.23%, closed −1.19%, gap
 +0.03%). Widest closed-session premiums: CRCLx −5.44% on 276 trades, SPCX +3.49% on 243, GLDx
 −1.90% on 372. The gap column only becomes meaningful once the tape spans a whole session.
 
 ## Holders
 
-`fetch-holders.mjs` answers "who actually holds this token?" from the chain rather than from an
-aggregator — the concentration layer behind the claim that a tokenized share has a market.
+`fetch-holders.mjs` reads who holds each token from the chain directly, without an aggregator. It is
+the concentration data behind any claim that a tokenized share has a market.
 `lib/holders.mjs` is pure (60 unit tests in `holders.test.js`, every fixture a verbatim mainnet
 response) and does all the arithmetic; the fetcher only calls the RPC, checkpoints and shapes.
 
@@ -781,12 +779,12 @@ logged. The public endpoint is the fallback and will rate-limit a full 1,183-min
 3. **The wallets.** `getMultipleAccounts({encoding:'jsonParsed'})` over those token accounts, in
    batches of 100, for each account's `owner` and its frozen/initialized `state`.
 
-Token accounts are not holders — one wallet can hold several — so `dedupeOwners()` collapses them
+Token accounts are not holders (one wallet can hold several), so `dedupeOwners()` collapses them
 and `distinctOwnersTop20` says how many wallets the 20 accounts actually are.
 
-**The supply is read in the same run as the balances, and that is the whole point of phase 1.** The
+**Phase 1 exists so the supply is read in the same run as the balances.** The
 first measured run on 2026-09-16 took the denominator from `data/onchain.json`, fetched eight hours earlier, and **66 of
-441 mints came out holding more than 100% of their own supply** — CRCLon at 3,483%. Twenty-seven of
+441 mints came out holding more than 100% of their own supply**, CRCLon at 3,483%. Twenty-seven of
 those were the stale denominator; the other 39 were the arithmetic (below). `onchain.json` is still
 read, for the authority **labels** only, and the output records `supplyFetchedAt` separately from
 `inputs.onchainFetchedAtLabelsOnly` so the two can never be confused again.
@@ -801,7 +799,7 @@ token account's `uiAmount` but **not** to the mint's `supply` (measured 2026-09-
 denominator would overstate every share by the multiplier. Raw over raw, the multiplier cancels.
 Multiply by `onchain.json`'s `scaledUiAmountMultiplier` yourself for the issuer-displayed count.
 
-`top1SharePct` / `top5SharePct` / `top20SharePct` are **Σraw / supply — one division**, not a sum of
+`top1SharePct` / `top5SharePct` / `top20SharePct` are **Σraw / supply, one division**, not a sum of
 the per-account quotients. 39 mints are held *entirely* by their top 20, and summing `n` rounded
 quotients put them at `100.00000000000001`: a share above 100% that no denominator could fix,
 because it was the arithmetic. `Σraw` is exact in BigInt, so a fully-held mint is exactly `100` and
@@ -816,25 +814,25 @@ in existence.
 
 `ownerLabel` is `issuer-authority`, `burn-address`, or **null**. An owner is only named when
 something in this repo can name it, because a guessed label ("probably an exchange") gets read as
-evidence. `null` is the honest "we know the wallet, not who holds it".
+evidence. `null` means "we know the wallet but not who controls it".
 
-- **`issuer-authority`** — the key is an authority over one of the 1,183 mints. Read from data, never
+- **`issuer-authority`**: the key is an authority over one of the 1,183 mints. Read from data, never
   hardcoded: the authority *address* fields of each `onchain.json` record (`mintAuthority`,
   `freezeAuthority`, `permanentDelegateAddress`, `metadataUpdateAuthority`) **plus** every authority
-  on the live mint accounts phase 1 already fetched — `mintAuthority`, `freezeAuthority` and each
+  on the live mint accounts phase 1 already fetched: `mintAuthority`, `freezeAuthority` and each
   extension's `authority`/`delegate`/`updateAuthority`.
-- **`burn-address`** — the single entry in `KNOWN_OWNERS`: Superstate's shared Solana equity burn
+- **`burn-address`**: the single entry in `KNOWN_OWNERS`: Superstate's shared Solana equity burn
   address, cited by its dossier, by `burnAddressSolana` on every Superstate instrument in
   `sponsor-apis.json` and by `findings.md`. A burn label wins over an authority label for the same
   key, because "this supply was retired" is the stronger statement.
 
-Reading the extension authorities off the live mint accounts is what closes the gap: `onchain.json`
+Reading the extension authorities off the live mint accounts fills a gap: `onchain.json`
 flattens the Token-2022 extensions to capability *flags* and keeps only two authority addresses, so
-**`S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS`** — the `scaledUiAmountConfig` authority shared by
-all 156 xStocks mints, and the largest holder of essentially every xStock — appeared in no field of
+**`S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS`** (the `scaledUiAmountConfig` authority shared by
+all 156 xStocks mints, and the largest holder of essentially every xStock) appeared in no field of
 it and went unlabelled. It is now labelled from the chain, in the same run, with nothing hardcoded.
-Labels are global rather than per mint: an issuer's authority key holding a position in a *different*
-issuer's token is exactly the kind of thing worth seeing.
+Labels are global (one label per address across all mints), so an issuer's authority key holding a position in a *different*
+issuer's token is visible too.
 
 ### `data/holders.json` — 533 collected mint rows on 2026-09-20, sorted by mint
 
@@ -844,18 +842,18 @@ state, ownerLabel } ], top1SharePct, top5SharePct, top20SharePct, distinctOwners
 frozenAccountsTop20 } ] }`
 
 `top20` is the top **token accounts**, biggest-first. An account the RPC answered `null` for (closed)
-or that a failed batch never resolved keeps `owner: null` — and two unread accounts stay two
-unknowns rather than collapsing into one wallet. An account naming a *different* mint than the one
+or that a failed batch never resolved keeps `owner: null`, and two unread accounts stay two
+separate unknowns. An account naming a *different* mint than the one
 queried is reported as a `mintMismatch` and not attributed to either.
 
 Every phase checkpoints into `data/raw/holders-checkpoint-<date>.json` and the three resume
-**independently**, so a failure in one never costs the others their requests. That file is shared —
+**independently**, so a failure in one never costs the others their requests. That file is shared, so
 never run two instances at once.
 
 ### The `holders` block on token records
 
 `build-stocks-db.mjs` reads `data/holders.json` as an **optional** input (like `venues.json`: it
-warns by name when missing and leaves the block `null`, which reads as "not collected" rather than
+warns by name when missing and leaves the block `null`, which reads as "not collected", never as
 "nobody holds it") and puts a slim block on every token in `stocks-tokens.json`:
 
 ```json
@@ -864,7 +862,7 @@ warns by name when missing and leaves the block `null`, which reads as "not coll
              "top1OwnerLabel": "issuer-authority", "fetchedAt": "..." }
 ```
 
-The `top20` list itself is **not** carried over—it is the dominant part of the current 2.94 MB
+The `top20` list itself is **not** carried over. It is the largest part of the current 2.94 MB
 `holders.json`, and `stocks-tokens.json` has a per-mint byte budget `stocks-page.test.js` asserts. A consumer that wants the
 individual accounts reads `holders.json`. `sources.holders` in both built files carries the file's
 own `fetchedAt` plus its `supplyFetchedAt`.
@@ -875,9 +873,9 @@ own `fetchedAt` plus its `supplyFetchedAt`.
 control, legal/evidence and DeFi-composability distributions, the worst failing rule across the
 universe, a bounded static preview of tokens first catalogued in the last fortnight, a paginated
 filterable token table, daily changes, the curated event log, and Meteora pools joined against the
-collected trade tape. Its dense operational sections are progressively disclosed rather than being
-the default Explore experience. **It never re-implements a health rule.** Every status is read from the
-API, loaded from the verdicts `build-health.mjs` writes using `lib/health.mjs` — the one copy of the
+collected trade tape. Its dense operational sections are collapsed by default and are not part of
+the default Explore view. **It never re-implements a health rule.** Every status is read from the
+API, loaded from the verdicts `build-health.mjs` writes using `lib/health.mjs`, the one copy of the
 eleven checks. `monitor.js` only shapes, filters, sorts, joins and renders; its pure section is
 exported and covered by `monitor-page.test.js` in the repo root (`npx jest monitor-page`).
 
@@ -890,18 +888,18 @@ npm run stocks:changes      # node stocks/build-changes.mjs --run → stocks-cha
 
 `snapshot.mjs --run [--date=YYYY-MM-DD]` freezes one day of the universe into
 `tokens.json` and `issuers.json`, each `{date, builtAt, healthGeneratedAt, items:[...]}` sorted by
-mint / slug. `builtAt` is the **source build's** timestamp, not the time the snapshot ran, so a day
+mint / slug. `builtAt` is the **source build's** timestamp (not the time the snapshot ran), so a day
 reconstructed after the fact still says which build it describes. Only the diffable fields are kept
 (`lib/changes.mjs` `snapshotTokenRow` / `snapshotIssuerRow`): identity, the four control booleans
 plus the transfer fee, liquidity / volume / holder count, premium, venue spread, the holder
-concentration and the health verdict. `supplyRaw` and `uiMultiplier` stay **strings** — both exceed
-what a double represents exactly — and are compared as numbers only at diff time.
+concentration and the health verdict. `supplyRaw` and `uiMultiplier` stay **strings** (both exceed
+what a double represents exactly) and are compared as numbers only at diff time.
 
 Every recorded number is cut to **six significant figures**, which is what makes a re-run
 byte-identical: re-snapshotting an unchanged day produces no git diff at all. Re-running the same
 date simply overwrites it. A day of 441 mints is ~250 KB; that is close to the floor for rows keyed
 by readable names (the 21 field names alone cost ~130 KB across 441 rows), so a real reduction means
-dropping fields or going columnar, not reformatting.
+dropping fields or going columnar; reformatting will not help.
 
 An older day can be synthesised from a committed build:
 
@@ -913,7 +911,7 @@ node stocks/snapshot.mjs --run --date=2026-09-16 \
 ```
 
 A build older than the holders fetch or the health rules leaves those fields `null`, and **a field
-that is null on either side can never fire a numeric or health change** — so a reconstructed day
+that is null on either side can never fire a numeric or health change**, so a reconstructed day
 cannot invent movement. That is why the 2026-09-16 → 2026-09-17 diff lists no health change even
 though all 441 health fields differ: the earlier build had no health file at all.
 
@@ -924,7 +922,7 @@ though all 441 health fields differ: the earlier build had no health file at all
 newMintWindowDays, newMints, eventKinds, events}`. The **full** change list is kept for the newest
 pair only; every older pair is reduced to counts per kind, so the file stays small however many days
 accumulate. `kinds` travels with the data so the page groups the log in the order the diff declares
-rather than keeping its own copy. `events` is `stocks/data/events.json` newest-first, with that
+and keeps no copy of its own. `events` is `stocks/data/events.json` newest-first, with that
 file's own kind descriptions.
 
 `diffSnapshots` (pure, `stocks/changes.test.js`) reports only moves worth a line:
@@ -945,18 +943,18 @@ file's own kind descriptions.
 
 `selectNewMints` (pure, same test file) reads `stocks-tokens.json` and returns every token whose
 `firstSeenAt` falls inside the last **14 days**, newest first, as `{mint, symbol, name, issuer,
-issuerName, firstSeenAt, cardSlug}` — the slug from `lib/cards.mjs` `assignSlugs`, so a chip links to
+issuerName, firstSeenAt, cardSlug}`, with the slug from `lib/cards.mjs` `assignSlugs`, so a chip links to
 the card the build actually wrote. `stocks.html` renders only a bounded, static preview; the full
 list stays behind an explicit expansion. `monitor.html` exposes the same provenance as an advanced
-view. Two exclusions keep it honest:
+view. Two exclusions keep it accurate:
 
-- a token with **no `firstSeenAt`** is left out rather than dated today (a build older than the
+- a token with **no `firstSeenAt`** is left out, never dated today (a build older than the
   provenance fields says nothing about when its mints appeared);
 - a token first seen **on or before the first recorded snapshot day** is left out, because on that
-  day every mint in existence was "first seen" — 441 of them — and `firstSeenAt` is a lower bound
-  there, not an arrival.
+  day every mint in existence was "first seen" (441 of them), and `firstSeenAt` there is only a lower
+  bound.
 
-The public label says *first catalogued*, not *minted*: it is the day the pipeline first admitted
+The public label says *first catalogued*: it is the day the pipeline first admitted
 the exact token address. On 2026-09-17 the feed had 30 addresses, of which 8 had a first pool younger
 than three days; the rest were older tokens the search only surfaced then.
 
@@ -967,19 +965,19 @@ always produce byte-identical output.
 
 The health distributions, facets and paginated token rows come from `/api/facets` and
 `/api/tokens`. The remaining sections read `stocks-tokens.json` (market numbers, reference
-premium, last trade, and the issuer display names — note `issuerIndex` is an **array** of
-`{slug, name, …}`, not an object keyed by slug), `stocks-afterhours.json` (the session gap),
+premium, last trade, and the issuer display names; note `issuerIndex` is an **array** of
+`{slug, name, …}`; it is not an object keyed by slug), `stocks-afterhours.json` (the session gap),
 `stocks-changes.json`, `stocks/data/meteora.json` and `stocks-trades.json` (per-pool failed-signature
-share and newest trade), plus `cards/index.json` when it exists — a mint the card index names uses
-that slug, otherwise `fmt.cardSlug(symbol, mint)`. The tiles take their counts from API facets
-rather than recounting, so a tile cannot disagree with the filtered result; a pool the trade
+share and newest trade), plus `cards/index.json` when it exists (a mint the card index names uses
+that slug, otherwise `fmt.cardSlug(symbol, mint)`). The tiles take their counts from API facets
+and do not recount, so a tile cannot disagree with the filtered result; a pool the trade
 collector never reached shows a dash for its failed share, never `0 %`; and `unknown` sorts last in
-**both** directions, because "not measured" is not the smallest liquidity in the set.
+**both** directions, because "not measured" must not sort as the smallest liquidity in the set.
 
 ## Cards and health
 
 Two builders, both pure-function-first and both re-runnable at any time from the files already on
-disk — neither touches the network.
+disk. Neither touches the network.
 
 ```
 npm run stocks:health                                     -> stocks-health.json   (repo root)
@@ -993,7 +991,7 @@ The conservative overall status remains, but every item also carries independent
 `control`, `legal` and `composability` dimension verdicts; the top level carries their count distributions:
 `{generatedAt, sources, counts, dimensions, byDimension, byWorstRule, rules: HEALTH_RULES,
 items:[{mint, symbol, issuer, status, worstRuleId, dimensions, rules, values}]}`,
-sorted by mint. No rule `inputs`, no notes — that keeps it at about **981 kB** for 1,183 mints, small
+sorted by mint. It has no rule `inputs` and no notes, which keeps it at about **981 kB** for 1,183 mints, small
 enough for a page to fetch despite the four dimension verdicts, which is why it is written compact.
 Values are cut to six significant figures. `rules` carries the rule
 definitions once, so a consumer can label and threshold a status without importing anything.
@@ -1005,10 +1003,10 @@ is its own number and `byWorstRule` only counts judged statuses.
 
 `build-cards.mjs` writes `cards/<slug>.html`, `cards/<slug>.json` and `cards/index.json`
 (`[{slug, symbol, mint, issuer, status}]`, sorted by slug). It reads the built market files plus the
-reviewed `stocks/data/composability-templates.json` and observed `stocks/data/defi-usage.json` —
-`stocks-tokens.json`, `stocks-issuers.json`, `stocks/data/holders.json`, `stocks/data/venues.json`,
-`stocks-trades.json`, `stocks-afterhours.json`, `stocks/data/meteora.json` — and calls
-`evaluateHealth` **itself** rather than reading `stocks-health.json`, because a card shows each
+reviewed `stocks/data/composability-templates.json` and observed `stocks/data/defi-usage.json`
+(`stocks-tokens.json`, `stocks-issuers.json`, `stocks/data/holders.json`, `stocks/data/venues.json`,
+`stocks-trades.json`, `stocks-afterhours.json`, `stocks/data/meteora.json`) and calls
+`evaluateHealth` **itself** instead of reading `stocks-health.json`, because a card shows each
 rule's `inputs` and the health file deliberately drops them.
 
 - **Everything is rendered at build time**, so a card is complete with JavaScript off. `card.js` only
@@ -1024,30 +1022,28 @@ rule's `inputs` and the health file deliberately drops them.
   the full index; `stocks/cards.test.js` checks that every mint resolves uniquely.
 - **Determinism**: nothing reads a clock, every number is cut to six significant figures, and
   `builtAt` appears in the card's `<time datetime>` and its JSON record. Two builds from the
-  same inputs are byte-identical apart from that stamp — pinned by a test, and easy to check by hand
+  same inputs are byte-identical apart from that stamp. A test pins this, and it is easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
 - **Size**: 96 KiB is the normal raw-HTML target and produces a warning when crossed; 112 KiB is the
-  hard limit that fails the build. These are product regression thresholds, not browser or protocol
-  limits. The build also reports gzip size. The machine-readable record is a separate file rather
-  than a duplicate JSON payload embedded in every HTML page, preserving substantial headroom
-  without dropping an analytical section.
+  hard limit that fails the build. These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
+  payload is duplicated inside every HTML page; that leaves room without dropping an analytical section.
 - **The published record** (`cards/<slug>.json`, linked from the HTML with
   `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,
   every rule's status, value and `inputs`, the numbers, holder shares, the control surface, the
   venues and the per-source timestamps.
 - **At most five wallet addresses per card**, each shown truncated with the full address in a
-  `title`. A card is not a holder dump; the top-20 list stays in `stocks/data/holders.json`.
+  `title`. The top-20 list stays in `stocks/data/holders.json`.
 - `card.html?mint=…` / `?symbol=…` at the repo root is a 1 kB shim: it resolves the token against
   `cards/index.json` and replaces itself with the card, so a card can be linked by mint or ticker
   without knowing its file name. With JavaScript off it says so and links to `stocks.html`.
 
-`cards/` is gitignored — 2,368 generated files in the current build. Rebuild it on the server as part of
+`cards/` is gitignored (2,368 generated files in the current build). Rebuild it on the server as part of
 the refresh; never edit a card by hand.
 
 ### One copy of the formatters
 
 `stocks/lib/fmt.js` is UMD-wrapped (`module.exports` in node, `window.__rwaFmt` in a browser) and
-holds the display formatters — `fmtMoney`, `fmtPrice`, `fmtPct`, `fmtSignedPct`, `fmtNumber`,
+holds the display formatters: `fmtMoney`, `fmtPrice`, `fmtPct`, `fmtSignedPct`, `fmtNumber`,
 `fmtDateTime`, `fmtRelativeTime`, `escapeHtml`, `isSafeUrl`, `humanizeSlug`, `DASH`, `cardSlug`,
 `roundSignificant` and the rest. `stocks.js` resolves it (`typeof __rwaFmt !== 'undefined' ? __rwaFmt
 : require(...)`) and re-exports the same objects, and `stocks.html` loads it **before** `stocks.js`;
@@ -1056,28 +1052,28 @@ the ESM builders `import fmt from './lib/fmt.js'`. There is no second copy of an
 
 ## Funnel and recipes
 
-Two dimensions added on 2026-09-17, both pure and both built rather than counted in the browser.
+Two dimensions added on 2026-09-17. Both are pure and computed at build time.
 
 ### The control recipe — `stocks/lib/recipe.mjs`
 
 `controlRecipe(token)` reads a built token record (`{tokenProgram, control}`) and returns
 `{program, extensions, label}`: the token program by name, the control extensions that are **ON**,
-and one display label — `token-2022 · pausable + clawback`. It lives in its own file rather than in
-`lib/grade.mjs` (already 590 lines of scoring rules) because three callers group by it, and a label
-spelled two ways is two recipes.
+and one display label, e.g. `token-2022 · pausable + clawback`. It lives in its own file (not in
+`lib/grade.mjs`, already 590 lines of scoring rules) because three callers group by it, and a label
+spelled two ways would count as two recipes.
 
 - `extensions` is `pausable`, `clawback` (permanent delegate), `allowlist` (default-frozen account
-  state), `transfer-fee`, `transfer-hook`, `rebase`, always in **that** canonical order and never
-  alphabetical: the label is a fixed sentence, so the same switches always produce the same string.
+  state), `transfer-fee`, `transfer-hook`, `rebase`, always in **that** canonical order (never
+  alphabetical): the label is a fixed sentence, so the same switches always produce the same string.
   Adding a flag means appending to `RECIPE_EXTENSIONS`, never re-sorting it.
 - **`transfer-fee` is ON whenever the extension is installed, 0 bps included.** A recipe is what the
-  issuer *can* technically do, and a configured 0 bps still reserves the right to charge — the same
-  reading the issuer card's Fee badge already gives.
+  issuer *can* technically do, and a configured 0 bps still reserves the right to charge. The issuer card's
+  Fee badge reads it the same way.
 - **`unknown` and `… · none` are different facts.** A mint whose control flags are all null has not
   been read from the chain yet and is labelled `unknown`; a profiled mint with nothing switched on is
-  `token-2022 · none`. A raw program id nobody knows becomes `unknown` in the program slot rather
-  than being printed as an id.
-- The raw-id → name mapping is `tokenProgramName()` in `lib/classify.mjs` — the one place it exists,
+  `token-2022 · none`. A raw program id nobody knows becomes `unknown` in the program slot; the id
+  is not printed.
+- The raw-id → name mapping is `tokenProgramName()` in `lib/classify.mjs`, the one place it exists,
   now exported, and it passes an already-mapped name through so either shape can be handed to it.
 - Every token record carries `recipe`, and every issuer record carries `recipes: [{label, mints}]`
   (`recipeTally`, sorted by mints desc then label). Those counts always sum to the issuer's
@@ -1106,8 +1102,14 @@ compatibility or from an issuer naming an ecosystem partner. It accepts only:
   configured loan-to-value ratio is positive;
 - an observed DEX pool for the exact mint, with Meteora pools cross-checked against Meteora's own
   per-pool API where possible; or
-- a reviewed asset-specific live product in `data/defi-integrations.json`, currently the Veda vaults
-  for SPYx, QQQx and NVDAx exposed through Kraken Pro and curated by Sentora.
+- a reviewed asset-specific live product in `data/defi-integrations.json`, currently the Kraken
+  xStocks Vaults for SPYx, QQQx and NVDAx (Veda + Sentora + Kamino), modelled as a composite route
+  (see "On-chain DeFi footprint" below);
+- every Kamino market's own reserve list (`/v2/kamino-market` + `/kamino-market/{m}/reserves/metrics`),
+  which also carries curated/partner markets the cross-market registry omits, with each stock
+  reserve's risk configuration decoded from the chain (`lib/kamino-accounts.mjs`); and
+- Loopscale's keyless lending-vault registry (`tars.loopscale.com/v1/markets/lending_vaults/info`):
+  a vault whose strategy terms name the exact mint as collateral is a standing lender offer.
 
 Each integration names its protocol, status, available actions, access restrictions, live metrics,
 product link and evidence link. Actions are also published as explicit capability records: what the
@@ -1142,10 +1144,10 @@ have at least one confirmed use, 27 have at least one lending/collateral integra
 Jupiter Lend and 22 Nest; protocols overlap on some assets), 3 have a yield vault, 121 have a DEX
 pool, and 1,058 have none confirmed. Project 0's 145 current bank rows and Save's 753 current reserve rows were
 checked on the same run and matched zero stock-token addresses; those zeroes are published as checked
-coverage, not silently treated as proof that every other lending protocol was also checked.
+coverage for those two protocols only; they say nothing about lending protocols we did not check.
 
 The every-mint table gives each asset a compact protocol/action list; its detail panel and generated
-card show metrics and evidence. This is deliberately separate from the next structural assessment:
+card show metrics and evidence. This is kept separate from the structural assessment below:
 an asset can be technically composable with no adopter, or actively used despite material legal and
 control risks.
 
@@ -1163,12 +1165,12 @@ compared with the previous daily snapshot by `stocks/build-defi-changes.mjs`, wh
 - lending collateral value falling at least 25% when the previous value was at least $100,000.
 
 The value floor keeps a tiny or empty market from generating dramatic percentage alerts. A missing
-measurement is unknown, not zero, and never fires an LTV or collateral-value event. Human text says
+measurement is unknown (never zero) and never fires an LTV or collateral-value event. Human text says
 “token”; every event still carries the exact mint address and both snapshot timestamps as evidence.
 
 `stocks-defi-changes.json` publishes the full comparison and compact `noticeLines`. The central
 `alerts-server-telegram` monitor checks this artifact directly after the 00:17 refresh and retains
-those lines for its single morning digest. A separate six-hour refresh outcome check deliberately
+those lines for its single morning digest. A separate six-hour refresh outcome check
 strips notices, so the same event is not repeated by an operational monitor. The other six-hourly
 refreshes do not write protocol snapshots or send messages. If the midnight
 protocol fetch fails, no stale snapshot is written; the next successful midnight compares with the
@@ -1178,6 +1180,93 @@ last genuine observation, while the normal refresh-health alert reports the fail
 npm run stocks:defi-snapshot
 npm run stocks:defi-changes
 ```
+
+### On-chain DeFi footprint and "New in DeFi" — `stocks/data/defi-footprint.json`, `stocks-defi-new.json`
+
+Registries only report what a protocol chooses to publish. The chain cannot hide a use: a protocol
+can only hold a token in a token account, and that account's owner is a wallet, a program-owned data
+account or a program-derived address (PDA). `stocks/fetch-defi-footprint.mjs` (daily) reads the
+largest token accounts of every tracked mint — from a fresh `holders.json` where it exists, otherwise
+a rotating, budget-capped `getTokenLargestAccounts` scan — and attributes every owner:
+
+1. a curated address or a **derived authority PDA** (e.g. each Kamino market's lending-market
+   authority, seeds `["lma", market]`, derived locally from Kamino's market list);
+2. the program that owns the owner's data account (a pool, loan or vault state);
+3. a wallet, if the owner key is on the ed25519 curve (`lib/solana-address.mjs`, no dependency);
+4. otherwise a PDA, resolved once from the program that signs its **outgoing** transfers (an incoming
+   deposit only names the depositor, and routers such as OKX/Jupiter are ignored for that reason).
+
+Programs map to protocols through `stocks/data/defi-program-registry.json` (curated, sourced) plus
+Jupiter's keyless `program-id-to-label` map for DEXes. A holding above 0.5 % of supply or $10k by an
+**unknown program**, or by a **known protocol our registry collection does not list for that
+token/market**, becomes a review candidate (`stocks-review-queue.json`, area `defi`). The daily
+snapshot (`history/<date>/defi-footprint.json`, ~250 kB) is diffed by `build-defi-changes.mjs` into
+`defi-integration-added` / `-candidate` / `-removed` events next to the registry events, and the
+registry diff now also emits `market-added` / `market-removed` when a protocol adds a new market for
+a token it already lists. A mint that was not read on either day raises nothing; a removal also needs
+the old holding to be larger than today's visibility floor (the smallest of the top-20 accounts).
+Only the largest accounts are visible, so absence below that floor proves nothing.
+
+`stocks-defi-new.json` is the rolling 30-day "New in DeFi" feed (registry + chain, one row per
+day/token/protocol/market/change, DEX pool churn summarised) plus the current candidates; the stocks
+page DeFi tab renders it as the **New in DeFi** strip.
+
+RPC cost, measured 2026-09-24 on the Alchemy key: a full cold scan of all 1,158 mints with supply was
+**1,447 calls** (1,158 getTokenLargestAccounts, 222 getMultipleAccounts, 25 getSignaturesForAddress,
+42 getTransaction; ~10 min). A warm daily run with a fresh `holders.json` (533 mints free) costs
+≈ 45 owner-lookup calls + at most `--budget` (default 250) direct scans + ≤ 4 × `--resolve-budget`
+(default 15) PDA lookups: **≈ 300–600 calls/day**. `getProgramAccounts` is never used — the free tier
+throttles it on the first call.
+
+What the first run found that no collected registry listed (2026-09-24): the Kamino **Sentora
+xStocks Market** (NVDAx/SPYx/QQQx, the Kraken xStocks Vaults strategy), **METAx** in Kamino's
+xStocks Market, **Loopscale** lending-vault offers on TSLAx/NVDAx/SPYx/CRCLx, an **Exponent**
+market holding ≈ $1.18M of STRCx, and DEX pools DexScreener's 30-pair cap misses (Byreal ≈ $2.7M
+across CRCLx/GOOGLx/MCDx/MU/AMZNx/SKHY/SPCX; Hadron, GoonFi, BinaryFi, HumidiFi, Denali, Archer,
+Pump.fun; Raydium/Orca/Meteora pools for Backpack and PreStocks tokens). Still unattributed:
+`defAh9DW…` (a pre/post-swap wrapper around DFlow holding PreStocks tokens) and `8ZreFNtN…` (a
+`MintIndex` program holding a basket of Ondo tokens).
+
+#### Composite products — xStocks Vaults
+
+A vault that routes a token through other protocols is recorded as its **route**, one leg per
+protocol, program and exact account (`legs` + per-asset `routes` in `defi-integrations.json`):
+Kraken (Privy wallet on Ink) → Veda BoringVault on Ink (ERC-20 share, e.g. `sentoraNVDAx`
+`0xBeB4…4a66`) → Chainlink CCIP to Solana → vault-manager program `9TWFuaFP…` (`manage`) → Sentora
+strategy `BSE8uppf…` → Kamino **Sentora xStocks Market** `8BNUWRSi…` (xStock collateral, PYUSD debt) →
+Kamino Earn "Sentora PYUSD" `A2wsxhA7…` → rewards swapped back into the xStock. Each collection
+decodes the strategy's Kamino obligation, so the card shows the live loan-to-value, the liquidation
+threshold and the stock-price fall that would make the position liquidatable (2026-09-24: SPYx
+69 % vs 79 %, a 12.7 % fall; QQQx 68 % vs 78 %, 12.8 %; NVDAx 58 % vs 73 %, 20.5 %). The holder owns
+the Ink vault share, not the xStock; Kraken's 25 % performance fee differs from the 33.33 %
+configured on-chain; the 3-day withdrawal is operational (bridge + unwind), not contractual.
+
+```bash
+node stocks/fetch-defi-footprint.mjs --run [--budget=250] [--resolve-budget=15]
+```
+
+#### Coverage — Solana protocols and tokenized stocks (checked 2026-09-24)
+
+| Protocol | Stocks today | How we detect it | Collected |
+|---|---|---|---|
+| Kamino Lend (all 43 markets) | yes: xStocks Market (10), Sentora xStocks (3), STRCx, Superstate Opening Bell (FWDI, GLXY) | per-market reserve API + reserve decode + LMA PDAs on-chain | yes |
+| Kamino Earn vaults | no stock deposit vault (the Sentora PYUSD vault is the xStocks Vaults' yield leg) | `/kvaults/vaults` | via composite |
+| Jupiter Lend | yes: TSLAx, SPYx, QQQx, NVDAx (USDC and JupUSD vaults) | `/lend/v1/borrow/vaults` + footprint | yes |
+| Project 0 / marginfi | no | `ai.0.xyz/v1/banks` | yes (0 matches) |
+| Save / Solend | no | reserves API | yes (0 matches) |
+| Loopscale | yes: SECZ loan; vault offers on TSLAx/NVDAx/SPYx/CRCLx | on-chain Loan decode + lending-vault API | yes |
+| Nest | yes: 23 stock collaterals (xStocks, Backpack, Ondo) | mainnet manifest | yes |
+| xStocks Vaults (Veda/Sentora) | yes: SPYx, QQQx, NVDAx | reviewed composite + obligation decode | yes |
+| Exponent | yes: STRCx market (≈ $1.18M held) | footprint (programs `XP1BRL…`, `XPC1MM…`) | candidate — no public registry collected |
+| Drift → Velocity | no (no equity spot/perp markets on mainnet; relaunched perps-only) | footprint | watched |
+| Jupiter Perps | JLP no; SPCX/SNDK/SKHYNIX via the separate GUM order book (synthetic) | — | not a token use |
+| Flash Trade | SPY listed as non-virtual token, but no pool custody observed; rest synthetic | `flashapi.trade/tokens`, footprint | watched |
+| Phoenix perps, Bullet (ex-Zeta), Adrena | synthetic equity perps, no stock mint held | — | not a token use |
+| Raydium, Orca, Meteora (DLMM/DAMM/DBC) | yes, many pools | DexScreener (30-pair cap) + footprint | yes, gaps flagged by footprint |
+| Byreal, Hadron, GoonFi, BinaryFi, HumidiFi, Denali, Archer, Pump.fun, BisonFi | yes (found on-chain) | footprint + Jupiter labels | candidates |
+| Manifest | ≈ 1,360 permissionless markets on stock mints, ~70 with volume | footprint | watched |
+| OpenBook, Lifinity, Stabble, FluxBeam | no | footprint | watched |
+| Lulo, Carrot, Hylo, Solstice, Sanctum, Jito, RateX | none found | footprint | watched |
 
 ### Saved comparison and focused watches — Postgres + daily checks
 
@@ -1193,7 +1282,7 @@ edited watch records a baseline without raising an alert. Later daily runs compa
 comparison dimensions, exact-token presence/control/protocol support/liquidity, issuer status and
 mint set, or one exact protocol market's activity, maximum LTV and collateral value. The job writes
 the latest per-watch changes back to Postgres. Digest scheduling fields exist, but public personal
-delivery is deliberately not advertised or enabled until a verified private delivery channel can
+delivery is not advertised or enabled until a verified private delivery channel can
 be bound to the capability without leaking one visitor's watch into the operator's Telegram digest.
 The API rejects attempts to enable that reserved preference; legacy enabled rows are also excluded
 from the operator notice stream.
@@ -1204,19 +1293,19 @@ npm run stocks:watchlist-changes
 
 ### DeFi composability — `stocks/data/composability-templates.json`
 
-Composability is reviewed once per **issuer legal programme + exact control recipe**, not copied as
-1,183 apparently independent opinions. The current universe has nine such combinations. A coverage
+Composability is reviewed once per **issuer legal programme + exact control recipe**, and that one
+review applies to every token in the group. The current universe has nine such combinations. A coverage
 test compares their keys with every current token, so a newly discovered issuer or extension mix is
 `unknown` and breaks the test until somebody reviews it; it never inherits a nearby conclusion.
 
 The headline status asks one narrow question: can a permissionless smart-contract lender custody the
 token and realise value after borrower default without discretionary issuer help? The token page and
 card now turn that into a separate **exit-after-default** verdict: autonomous, conditional,
-issuer-dependent, fragile, unavailable or unknown. It deliberately separates technical custody from
+issuer-dependent, fragile, unavailable or unknown. It separates technical custody from
 economic control and combines the reviewed default outcome with confirmed collateral markets, exact-
 token DEX exits and holder redemption rights. Each template also
 answers four outcomes separately: smart-contract escrow, borrower default, protocol hack and
-inaccessible contract/key. The last two are deliberately not reduced to “good” or “bad”: a permanent
+inaccessible contract/key. The last two are not reduced to “good” or “bad”: a permanent
 delegate may rescue a hacked protocol while also making otherwise valid protocol custody non-final.
 Every template therefore says both what the mint can technically do and whether possession carries
 the legal/economic right a lender expects. An issuer capability is never presented as a duty to help.
@@ -1229,50 +1318,50 @@ collateral: the escrow and liquidation accounts must be approved by the transfer
 
 ### The funnel — `stocks/lib/funnel.mjs` → `stocks-funnel.json`
 
-`buildFunnel(tokens, issuers)` counts the four columns the stocks page draws above the grid — mints
-by instrument type → issuer programmes → control recipes → token programs — plus one edge per step
+`buildFunnel(tokens, issuers)` counts the four columns the stocks page draws above the grid (mints
+by instrument type → issuer programmes → control recipes → token programs), plus one edge per step
 carrying the number of mints that take it. `build-stocks-db.mjs` writes it as the third repo-root
 file, `stocks-funnel.json` (~7 kB, same `builtAt` as the other two), so the graphic shows the
 build's own numbers and a test can pin them.
 
-- A column's `total` is **the mints represented in it**, i.e. the sum of its node counts — not the
-  number of nodes. The reader gets "12 programmes" by counting circles; the heading prints
-  `total` for the mints column and the node count for every later one, which is the funnel itself:
+- A column's `total` is **the mints represented in it**, i.e. the sum of its node counts (not the
+  number of nodes). The reader gets "12 programmes" by counting circles; the heading prints
+  `total` for the mints column and the node count for every later one:
   1,183 → 12 → 6 → 1.
-- **An issuer with no mints is a node with `count: 0` and its `status`**, not an omission, so the
+- **An issuer with no mints is still a node, with `count: 0` and its `status`**, so the
   page's count of programmes and the funnel's cannot disagree. The graphic draws those hollow.
 - A mint whose issuer we cannot name keeps its mint, recipe and program node and **loses its two
-  issuer edges** rather than being invented into a programme; the issuers column's total is then
-  visibly lower than the mints column's, which is the honest reading.
+  issuer edges**; it is never assigned to a guessed programme. The issuers column's total is then
+  visibly lower than the mints column's, which is correct.
 
-The graphic itself is an inline SVG built by `stocks.js` from `funnelLayout(funnel, {width, height})`
-— a pure function in the same CommonJS tail as the other page helpers. Circle **area** is
+The graphic itself is an inline SVG built by `stocks.js` from `funnelLayout(funnel, {width, height})`,
+a pure function in the same CommonJS tail as the other page helpers. Circle **area** is
 proportional to the mint count (`r ∝ √count`, against the biggest count anywhere in the funnel, so a
 circle is comparable across columns) with a floor so a one-mint programme is still a dot; connector
 width follows the edge count, also floored; every `y` is clamped inside the box, and an edge whose
-endpoints are not both nodes is dropped instead of drawn to nowhere. Issuer circles carry
+endpoints are not both nodes is dropped. Issuer circles carry
 `data-slug`, so the page's existing click delegate opens the dossier (Enter/Space are wired by hand,
 because an SVG group is not a button). Colours are the theme's own custom properties, so dark and
 light need no second set of values; `stocks-page.test.js` asserts there is no literal colour in the
-block. The SVG keeps its natural 1100 px width and `.funnel-scroll` scrolls at phone widths — the
+block. The SVG keeps its natural 1100 px width and `.funnel-scroll` scrolls at phone widths; the
 page body never does.
 
 There is no sample fixture for the funnel, so `?db=sample` skips the fetch and the section hides
-itself rather than mixing live counts into fixture ones. Same for a missing file.
+itself so live counts are never mixed with fixture ones. Same for a missing file.
 
 ## The `sonar` Postgres schema
 
 The built files answer the questions the pages ask. They cannot answer a question that needs a
 *group by* across two of them, or one that needs yesterday as well as today, and the trade tape
 throws away everything older than 24 h on every publish. So the same data is also loaded into
-schema **`sonar`** of the one shared Postgres database (`geodata` — same name on the laptop, on
+schema **`sonar`** of the one shared Postgres database (`geodata`, the same name on the laptop, on
 valhalla and on prod; never a new database, always a new schema).
 
     node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims,whatif]
     npm run stocks:db
 
 `db/2026-09-17-sonar-stocks.sql` is the DDL: idempotent, re-runnable as a no-op, and it makes
-`geo_user` the owner of everything (the connecting role — `zagreb_user` or `magician` — is a
+`geo_user` the owner of everything (the connecting role, `zagreb_user` or `magician`, is a
 member, so the file `SET ROLE`s to it; DDL needs *ownership*, and `CREATE INDEX IF NOT EXISTS`
 checks it even when the index already exists, so one table owned by the wrong role would abort a
 whole later migration). `--ddl` applies it first and is what the server refresh passes.
@@ -1300,38 +1389,38 @@ control data is not treated as activity. `db/2026-09-19-sonar-snapshot-history.s
 installations before `/api/history/overview` aggregates those fields.
 
 The two what-if tables have their own DDL (`db/2026-09-18-sonar-whatif.sql`) and their own rules,
-both in `stocks/EVIDENCE.md` §6: a failure mode an issuer has not answered has **no row** (the gap
+both in `stocks/EVIDENCE.md` §6: a failure mode an issuer has not answered has **no row** (the missing answer
 is the finding, and the API reports it as `status: "missing"`), an answer a dossier no longer offers
-is **deleted**, and the loader runs `validateWhatIf()` over every dossier first and throws rather
-than half-loading a research pass.
+is **deleted**, and the loader runs `validateWhatIf()` over every dossier first and throws, so a research
+pass is never half-loaded.
 
 Each table keeps the facets worth grouping by as real typed columns **and** the whole source record
-as `jsonb` (`record`, or `row` on a snapshot), so flattening loses nothing — the record round-trips
+as `jsonb` (`record`, or `row` on a snapshot), so flattening loses nothing: the record round-trips
 byte-for-byte. Issuer-level facets (legal form, claim rung, maturity, verification) live on
-`stock_issuer` and are reached by joining, rather than being copied onto 1,183 token rows.
+`stock_issuer` and are reached by joining; they are not copied onto 1,183 token rows.
 
 Three properties make this safe to run on every refresh:
 
 - **Idempotent.** Every load is one `INSERT … ON CONFLICT DO UPDATE` whose `WHERE` compares each
   loaded column with `IS DISTINCT FROM`. When nothing changed the row is skipped entirely, so not
-  even `updated_at` moves — measured: a second consecutive run reports `0 inserted or updated` on
+  even `updated_at` moves. Measured: a second consecutive run reports `0 inserted or updated` on
   all four tables and leaves every `updated_at` equal to its `created_at`. Tamper with one column
-  in the database and the next run touches exactly that one row and repairs it, so the guard is
-  not decoration.
+  in the database and the next run touches exactly that one row and repairs it, which shows the
+  guard works.
 - **The trade table accumulates.** The JSON keeps a rolling 24 h window; the table keeps
   everything it has ever been shown. A signature already present has only `suspect` refreshed (a
-  trade can be re-flagged once its neighbours are known) — its price, size and side are never
-  rewritten by a later file. A trade with no `time` is skipped rather than given the collector's
-  clock as an event time.
+  trade can be re-flagged once its neighbours are known); its price, size and side are never
+  rewritten by a later file. A trade with no `time` is skipped; the collector's clock is never used
+  as an event time.
 - **No new dependency.** The pipeline has zero npm packages, so the loader shells out to `psql`
   with the whole document embedded as one dollar-quoted `::jsonb` literal. The tag is chosen
   against the document's own bytes (`$sonar$`, else `$sonar1$`, …), so nothing in the data can
-  terminate the literal early. `DATABASE_URL` comes from the repo `.env` and is never logged — a
+  terminate the literal early. `DATABASE_URL` comes from the repo `.env` and is never logged; a
   run prints the host and database name only.
 
 `stocks/lib/db-load.mjs` holds the builders and is pure: document in, SQL text out, no connection.
-`stocks/db-load.test.js` therefore tests the SQL as text, without a database — including that every
-column the builders insert actually exists in the DDL file, which is what catches a rename.
+`stocks/db-load.test.js` therefore tests the SQL as text, without a database, including that every
+column the builders insert exists in the DDL file, which catches a rename.
 
 ### What the schema is for
 
@@ -1382,9 +1471,9 @@ schema. First local load (2026-09-17): 12 issuers, 471 tokens, 912 snapshot rows
 
 ## Sources and watch
 
-The dossiers cite documents; nothing re-read them after the day they were read. This is the first
+The dossiers cite documents, and before this nothing re-read them after the day they were read. This is the first
 slice of `stocks/EVIDENCE.md`: a registry of every URL the dossiers rely on, and a watcher that
-fetches each one, normalises it to text, hashes it, and reports what changed — so a redemption
+fetches each one, normalises it to text, hashes it, and reports what changed, so a redemption
 clause, a fee schedule or a custodian that moves is caught within a day, with the diff beside it.
 
 ```
@@ -1404,8 +1493,8 @@ touching the other ~500 sources.
 ### The registry (`stocks/extract-sources.mjs`, `stocks/lib/sources.mjs`)
 
 Every string in every dossier under `stocks/data/issuers/` and in `stocks/data/canonical-parties.json`
-is walked, and every `http(s)` URL in it is collected **with the field path it was found in**. That
-path is the point: it says which claim leans on the document, so `documents[3].url`,
+is walked, and every `http(s)` URL in it is collected **with the field path it was found in**. The
+path matters because it says which claim relies on the document, so `documents[3].url`,
 `findings[2].evidence`, `attestations[5].link` and a URL buried in `redemption.fees` prose are all
 recorded, and a URL cited by three dossiers keeps all three citations.
 
@@ -1415,18 +1504,18 @@ recorded, and a URL cited by three dossiers keeps all three citations.
 - **Classified** `pdf` (by extension), `api` (an `api.*`/`lite-api.*`/`data.*` host, an `/api/`
   path, or `.json`) or `html`. The served `content-type` overrides this guess at fetch time.
 - **Titled** with the `documents[].title` when that is where the URL came from, otherwise with the
-  field path itself — `xstocks-backed:findings[7].evidence` is a more useful name than `null`.
-- **Truncated citations are reported, not guessed.** Two URLs in the dossiers are written with an
+  field path itself (`xstocks-backed:findings[7].evidence` is more useful than `null`).
+- **Truncated citations are reported and never guessed.** Two URLs in the dossiers are written with an
   ellipsis (`…/solana/token...`, `?query=...`); they are listed in `truncatedCitations` and never
   fetched, because what is left of them is not a URL.
 
-Measured on 2026-09-17: **337 distinct URLs** — 266 html, 53 api, 18 pdf — over 12 issuers plus 51
+Measured on 2026-09-17: **337 distinct URLs** (266 html, 53 api, 18 pdf) over 12 issuers plus 51
 cited only by `canonical-parties.json`, 6 of them cited by more than one dossier. Busiest hosts:
 `www.sec.gov` 30, `lite-api.jup.ag` 23, `shiftrwa.gitbook.io` 15, `docs.ondo.finance` 14,
 `support.backpack.exchange` 12, `docs.superstate.com` 9, `cdn.sanity.io` 7, `docs.tessera.pe` 7,
 `learn.backpack.exchange` 7, `data.sec.gov` 6.
 
-That count is a dated observation, not configuration. The active registry is regenerated from the
+That count is a dated observation. The active registry is regenerated from the
 current dossiers (543 URLs on 2026-09-21), and completion records publish `activeSources`,
 `attempted`, exact start/end times and status counts. Public coverage is joined to that active
 registry, so retired state/database rows cannot make the current watch look more complete.
@@ -1436,21 +1525,21 @@ registry, so retired state/database rows cannot make the current watch look more
 For client-rendered documentation, an issuer dossier can declare an explicit
 `quoteVerificationSources` mapping from the reader-facing citation to the issuer's official
 machine-readable companion (for example GitBook `llms-full.txt`). Claim ids and public links remain
-anchored to the readable citation; only exact-quote verification uses the companion. `whatIf[]`
+tied to the readable citation; only exact-quote verification uses the companion. `whatIf[]`
 answers go through the same mapping as `claims[]` (`dossierQuotes`). XML tags and
-Markdown link/emphasis syntax are treated as presentation, not substantive quote characters.
+Markdown link/emphasis syntax are treated as presentation and ignored when matching quotes.
 
 Sources are ordered **round-robin by host**, so the 1.5 s per-host floor almost never costs
 wall-clock time. Each fetch sends the stored
 `If-None-Match`/`If-Modified-Since`, has a 30 s timeout, and backs off 5 s then 15 s on 429/503.
 
 The User-Agent is a **browser string by default and per-host where a host requires otherwise**
-(`HOST_USER_AGENTS` in `lib/watch.mjs`). A browser string is what keeps most bot walls down, but the
+(`HOST_USER_AGENTS` in `lib/watch.mjs`). A browser string gets past most bot walls, but the
 SEC's access policy requires automated requests to declare who is asking: `*.sec.gov` gets
 `rwa-sonar source-watch contact@rwasonar.com`, and all 44 `sec.gov`/`archive.org` sources answer
-`ok` with it. Add a host to the table rather than weakening the default for everyone.
+`ok` with it. Add a host to the table; do not weaken the default for everyone.
 
-**Normalisation decides everything**, because it is what gets hashed:
+**Normalisation matters most**, because its output is what gets hashed:
 
 | kind | how |
 |---|---|
@@ -1461,9 +1550,9 @@ SEC's access policy requires automated requests to declare who is asking: `*.sec
 
 Then **churn lines are dropped**: a bare date or timestamp, a relative time (`2 hours ago`), a
 counter (`1,204 views`), a cookie banner, a spinner. A *labelled* date (`Last updated 2026-09-08`)
-is deliberately KEPT — it only moves when the document moves, and on a terms page it is the most
-informative line there. A bare base58 string is kept too: an authority key appearing in a document
-is exactly the signal this exists to catch.
+is KEPT: it only moves when the document moves, and on a terms page it is the most
+informative line there. A bare base58 string is kept too, because an authority key appearing in a document
+is one of the changes this watcher is meant to catch.
 
 Known publisher chrome is removed only with host-scoped rules (currently CoinDesk's live-news tail,
 Tekedia's rotating product shelf and CryptoTimes' related-news tail). Those rules are versioned: the first run after a rule change
@@ -1479,12 +1568,12 @@ Outcomes, and what each one means:
 | `blocked` | 400/401/403/405/406/451, a bot wall in the body, a JavaScript-only page, or 429 after backoff, when no companion or capture could be read | recorded with the reason, not retried forever |
 | `error` | 5xx, timeout, connection reset | **the run does not report success and exits non-zero** |
 
-A **bot wall is recognised from the body**, never from the headers: every Cloudflare-fronted site
+A **bot wall is recognised from the body**, never from the headers, every Cloudflare-fronted site
 sends `cf-ray` on a perfectly good 200, and a header check marked most of the web as blocked on the
 first run. A vendor header only annotates a status that already refused us. Vercel's "Security
 Checkpoint", served as a 429, is a wall too and skips the backoff.
 
-A `blocked` page is not the end of the read (EVIDENCE.md §2.8 has the detail). In order:
+A `blocked` page gets further attempts (EVIDENCE.md §2.8 has the detail). In order:
 
 1. **Same-publisher companion API** (`lib/companions.mjs`): npmjs.com → `registry.npmjs.org`,
    crates.io → `crates.io/api/v1/crates/<name>`, securitize.io disclosures → Builder.io's content
@@ -1501,7 +1590,7 @@ A `blocked` page is not the end of the read (EVIDENCE.md §2.8 has the detail). 
 Two more cases are not blocked. A source that is itself a `web.archive.org/web/<ts>/<url>` link is
 fetched as the raw `id_` capture, so the Wayback toolbar cannot register as a change. An exact
 API query whose cited response is its own 400/422 JSON answer is read as a document: Remora's
-Jupiter `/swap/v1/quote?inputMint=…` → `TOKEN_NOT_TRADABLE` is the evidence, not a failed request.
+Jupiter `/swap/v1/quote?inputMint=…` → `TOKEN_NOT_TRADABLE` is the evidence.
 A bare route family with no query only answers "missing parameter" and is left out of the watch.
 
 **Severity** (EVIDENCE.md §2.3): a changed line carrying one of redemption, fee, custody,
@@ -1510,9 +1599,8 @@ terminate, suspend, eligibility, lock-up, dividend is `caution` and writes a `le
 event naming the keywords; anything else is `info` and writes only a version row. Matching is on
 word boundaries, so `transferFeeBps` in a JSON body is not the word "fee". **`api` sources are
 capped at `info`** and never raise an event: a price endpoint changes between two fetches by
-design, and their movement belongs to the market and on-chain watchers (EVIDENCE.md §2.4-§2.5), not
-to the document watcher. The quote check that makes a lost quote a `warning` is slice 2 —
-`claimQuoteCheckHook()` is its named, inert placeholder and returns `null` rather than "nothing
+design, and their movement is handled by the market and on-chain watchers (EVIDENCE.md §2.4-§2.5). The quote check that makes a lost quote a `warning` is slice 2;
+`claimQuoteCheckHook()` is its named, inert placeholder and returns `null`, never "nothing
 lost".
 
 The diff (`lib/textdiff.mjs`) is an exact LCS while the changed region fits a 4M-cell table; above
@@ -1530,7 +1618,7 @@ stocks/data/sources-state.json                  per-URL hash/etag/last-checked (
 stocks/data/raw/sources-<date>.json             per-source checkpoint, resumable (gitignored)
 ```
 
-`<id>` is `left(sha256(url), 12)` — the same value as `sonar.source.id`, so nothing has to look an
+`<id>` is `left(sha256(url), 12)`, the same value as `sonar.source.id`, so nothing has to look an
 id up and a re-run addresses exactly the same rows. `check_every` is stored (default `1 day`) but this slice still looks at **every** source on every
 run; selecting only what is overdue belongs to the scheduled job in slice 3, and the query for it is
 in the DDL's examples. `db/2026-09-18-sonar-evidence.sql` creates
@@ -1548,7 +1636,7 @@ SELECT status, kind, count(*) FROM sonar.source GROUP BY 1, 2 ORDER BY 3 DESC;
 SELECT detected_at, kind, severity, subject_id, summary
   FROM sonar.change_event ORDER BY detected_at DESC LIMIT 50;
 
--- dead links we cite (findings, not failures)
+-- dead links we cite (these are findings about the sources)
 SELECT issuer_slug, url, http_status, error FROM sonar.source WHERE status = 'gone';
 ```
 
@@ -1556,34 +1644,34 @@ SELECT issuer_slug, url, http_status, error FROM sonar.source WHERE status = 'go
 
 - **First run: 337 sources, 0 errors, ~7 minutes.** 302 first versions stored; 2 gone; 33 blocked
   on 18 hosts.
-- **A re-run over the same 337 is a no-op where it should be**: `ok=260 changed=44 blocked=31
+- **A re-run over the same 337 changes nothing where nothing moved**: `ok=260 changed=44 blocked=31
   gone=2 error=0`, exit 0. Every one of the **18 PDFs** was unchanged (`http-304`), as were 213 html
   sources and all 44 `sec.gov`/`archive.org` documents. **No prospectus, terms page, docs page or
   SEC filing moved.** The 44 that changed are 20 live API endpoints (by design, capped at `info`)
-  and 24 pages carrying live widgets — coindesk and solanacompass articles with a rotating "related
+  and 24 pages carrying live widgets: coindesk and solanacompass articles with a rotating "related
   news" strip, `polymarket.com`, `kraken.com`, `ondo.finance/global-markets`, `superstate.com/assets`.
-- **Transient failures do redden a run, by design.** An earlier sweep ended `error=3` on an
+- **Transient failures make a run fail, by design.** An earlier sweep ended `error=3` on an
   `archive.org` 503, a `data.chain.link` `ECONNRESET` and a `docs.ondo.finance` connect timeout, and
-  exited non-zero. A daily job should carry a retry pass for exactly that class before it reports —
+  exited non-zero. A daily job should carry a retry pass for exactly that class before it reports.
   `archive.org`'s own 503s are now recorded as `blocked` instead (see `tolerates503`), because its
-  APIs were answering "temporarily offline" for part of 2026-09-17 and one third party's maintenance
-  window must not be indistinguishable from a broken watch.
+  APIs were answering "temporarily offline" for part of 2026-09-17, and one third party's maintenance
+  window must be distinguishable from a broken watch.
 - **Live price tickers were the one real churn source found by the second run**, and they are why
   the HTML normaliser drops a bare price or percentage line: a decrypt.co article reported a
   432-line change eleven minutes after the first fetch, all of it a BTC/ETH/BNB strip above the
   text. With the rule the same page churns by single digits or not at all.
 - **Wayback refuses us.** `--archive --limit=20` attempted 20 saves and archived **0**: an
   anonymous `GET https://web.archive.org/save/<url>` answers **HTTP 500** with the Save Page Now
-  form and no `Content-Location`, reproducible with plain curl, so it is their policy and not our
-  client. `archive_url` stays null rather than being invented, the failures are logged and never
+  form and no `Content-Location`, reproducible with plain curl, so it is their policy and our
+  client is fine. `archive_url` stays null and is never invented, the failures are logged and never
   fatal, and the fix is the archive.org account key EVIDENCE.md §2.2 already names. After
   `ARCHIVE_GIVE_UP_AFTER` (5) consecutive failures a pass says `archive-unavailable` once and stops
-  attempting, because an offline archive is one fact about the archive, not 300 facts about our
-  sources — and each attempt costs 5 s of pacing.
+  attempting, because an offline archive is one fact about the archive and should not be logged 300 times
+  against our sources, and each attempt costs 5 s of pacing.
 - **Two cited URLs are dead.** `https://remoramarkets.xyz/proof-of-reserves`
-  (remora-markets:`underlyingCustodian`) — the **domain no longer resolves**, and it is cited as the
+  (remora-markets:`underlyingCustodian`): the **domain no longer resolves**, and it is cited as the
   proof-of-reserves endpoint. `https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069`
-  (xstocks-backed:`sources[14]`) — 404.
+  (xstocks-backed:`sources[14]`): 404.
 - **Blocked hosts** are bot walls (`republic.com`, `europe.republic.com`, `www.theblock.co`,
   `www.businesswire.com`, `thedefiant.io`, `notice.co`, `learn.notice.co`, `www.coingecko.com`,
   `www.fsc.gi`, `www.jerseyfsc.org`, `cdn.prod.website-files.com`), rate limits that survive two
@@ -1596,16 +1684,16 @@ SELECT issuer_slug, url, http_status, error FROM sonar.source WHERE status = 'go
   (cited by the Ondo dossier): `pdftotext -layout` turned it into 605,034 characters of text. Next:
   164 pages / 466,993 chars (Backed's base prospectus) and 173 pages / 529,727 chars.
 - **One document needed a bigger client**: `superstate.com/assets/fwdi` sends a 14,990-byte `link:`
-  preload header, 17,456 bytes of headers in total, which is past undici's 16 KB cap — `fetch`
+  preload header, 17,456 bytes of headers in total, which is past undici's 16 KB cap, so `fetch`
   reports `UND_ERR_HEADERS_OVERFLOW` and no body. It is refetched through `node:https` with a
   256 KB `maxHeaderSize`, which reads it fine (4,612 characters).
 
 Tests: `stocks/sources.test.js`, `stocks/textdiff.test.js`, `stocks/watch.test.js`. The
-normalisation tests run against two real sources saved once under `stocks/fixtures/sources/` —
+normalisation tests run against two real sources saved once under `stocks/fixtures/sources/`:
 Backed's legal-documentation page and pages 1-2 of the Shift DAO Series 17 operating agreement,
 with the `pdftotext -layout` output kept beside the PDF so the suite needs no poppler binary. One
 test cross-checks every status, kind, severity and diff method the code can write against the check
-constraints in the DDL file, because a value the constraint forbids is a run that dies at the load
+constraints in the DDL file, because a value the constraint forbids would make a run die at the load
 step hours after the fetching.
 
 ### The change judge (`stocks/judge-changes.mjs`, `stocks/lib/change-judge.mjs`)
@@ -1621,7 +1709,7 @@ block under the row's diff excerpt, with a "Material changes (model)" filter chi
 
 `node stocks/judge-changes.mjs` (no flags) is a dry run: candidates, token count, estimated cost.
 `--run --limit=N` submits ONE batch, checkpoints its id under `stocks/data/raw/change-judge/` before
-polling, and resumes that batch on the next `--run` rather than paying for a second one. A batch
+polling, and resumes that batch on the next `--run` so it never pays for a second one. A batch
 still open after 12 h (`STALLED_BATCH_MS`) is canceled (unprocessed requests are not billed) and
 that run judges directly, so one stalled batch cannot block later runs; `--direct` does the same on
 demand (online calls at full price, at most 10, stored with `batch_id = 'direct'`). The second real
@@ -1633,7 +1721,7 @@ batch, 10 items, finished in about 45 minutes, all 10 valid, for $0.049.
 **Server prerequisites (`do`), as checked on 2026-09-23 before the job was declared.** Until then
 the judge had only run from the laptop. A server run needs:
 
-- `ANTHROPIC_API_KEY` in `/root/code/rwa-sonar/.env` — **absent** there today (only
+- `ANTHROPIC_API_KEY` in `/root/code/rwa-sonar/.env`: **absent** there today (only
   `DATABASE_URL` is set) on 2026-09-23. Adding it is the owner's decision; no key was copied.
 - The shared cost library: the script loads `$LLM_COST_LIB`, defaulting to
   `../agents/lib/llm-cost` next to the repo. On `do` that is `/root/code/agents/lib/llm-cost`,
@@ -1654,7 +1742,7 @@ the judge had only run from the laptop. A server run needs:
 Slice 2 of `EVIDENCE.md`: **every structured dossier field carries the words it came from**, and the
 page, the cards, Postgres and the API all read the same set.
 
-A claim is one asserted fact — a dossier field path, the verbatim `quote`, the `url`, the `locator`
+A claim is one asserted fact: a dossier field path, the verbatim `quote`, the `url`, the `locator`
 that finds it again, `accessedAt`, a `status` and an optional `note`:
 
 ```json
@@ -1667,28 +1755,28 @@ Claims live in each dossier's own `claims[]` array. A `findings`, `incidents` or
 entry that has gained a `quote` (and `accessedAt`, and sometimes `quoteNote`) **is** a claim too and
 is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
 
-- `stocks/lib/evidence.js` is the one copy of the logic — field-path parsing (`redemption.rails`,
+- `stocks/lib/evidence.js` is the one copy of the logic: field-path parsing (`redemption.rails`,
   `products[0]`, `vocabulary.titleDeed.value`, `parties["custodians"]`), the value at that path,
   the per-field index behind a chip, the trust ordering and the coverage arithmetic. UMD like
   `fmt.js`, so the browser loads the same file the builders import through `lib/evidence.mjs`.
-- `stocks/lib/trustchain.js` is the same idea one level up: the trust chain and the what-if
+- `stocks/lib/trustchain.js` applies the same approach to the trust chain and the what-if
   answers. It reads `stocks/data/trust-chain.json` (13 actors, 9 rights flows, 38 failure modes)
   and turns a dossier into a node per actor and a link per flow, each link graded twice from the
-  claims above — `evidence` (documented / inferred / asserted / unknown) and `verification`
+  claims above: `evidence` (documented / inferred / asserted / unknown) and `verification`
   (onchain / attested / self-reported / none). It also indexes and validates each dossier's
   `whatIf[]` answers. UMD like `evidence.js`, imported by the builders and the API through
   `lib/trustchain.mjs`. The full rules are in `stocks/EVIDENCE.md` §6.
-- **What needs a source** is `stocks/data/claim-fields.json` — 39 patterns, with `vocabulary.*.value`
+- **What needs a source** is `stocks/data/claim-fields.json`: 39 patterns, with `vocabulary.*.value`
   expanded against each dossier's own keys, and a path counted only when the record actually holds a
   value there (a field with nothing in it has nothing to quote). One file, read by the builders and
-  fetched by `stocks.js`, so the coverage number on a card, in `stocks-issuers.json` and in the
-  panel can never be three different numbers.
+  fetched by `stocks.js`, so the coverage number is the same on a card, in `stocks-issuers.json` and in the
+  panel.
 - **Coverage is fields with at least one CONFIRMED claim.** An `unverified` claim (written down,
-  nobody has re-read it) or an `inference` (our reading, not the source's words) is a claim but not
-  a source, and is counted separately. `contradicted-corrected` is an internal editorial-history
+  nobody has re-read it) or an `inference` (our reading of the source) is a claim but does not
+  count as a source, and is counted separately. `contradicted-corrected` is an internal editorial-history
   status: the research dossier and database retain it, while publication exposes the current quote
   as confirmed evidence and removes the correction narrative.
-- **An inference has neither a quote nor a URL** — that is its shape — so it carries a `note`
+- **An inference has neither a quote nor a URL**, so it carries a `note`
   naming what it rests on, and the derived list keeps it. Dropping those (an early version required
   quote-or-url) silently removed 8 real claims from the coverage counts and from SQL.
 - **`method` is derived from the locator**, never declared: `rpc:…` and `tx <sig>` are `onchain`,
@@ -1698,31 +1786,31 @@ is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
 
 `db/2026-09-18-sonar-claims.sql` creates `sonar.claim`; `node stocks/load-db.mjs --run --ddl
 --only=claims` loads it (the `--ddl` flag now applies all three `db/` files in dependency order,
-since the claim's `source_id` references `sonar.source`). The id is **content-addressed** —
-`<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>` — so a re-load is an upsert that addresses
+since the claim's `source_id` references `sonar.source`). The id is **content-addressed**
+(`<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>`), so a re-load is an upsert that addresses
 exactly the same row without looking anything up, and a second run touches nothing.
 
-Two consequences of that, both deliberate:
+Consequences:
 
 - `source_id` is resolved by **exact URL** against `sonar.source` inside the statement. No match
-  leaves it null rather than dropping the claim (489 of 1,263 rows joined on the first full load).
-- **Editing a quote or a URL produces a new id**, so the old row stays behind. Nothing deletes it —
-  `EVIDENCE.md` is explicit that a claim whose words have moved becomes `changed` for a human to
-  decide — but the loader counts the rows no dossier offers any more and **warns**, per issuer, with
+  leaves it null and the claim is kept (489 of 1,263 rows joined on the first full load).
+- **Editing a quote or a URL produces a new id**, so the old row stays behind. Nothing deletes it
+  (`EVIDENCE.md` says a claim whose words have moved becomes `changed` for a human to
+  decide), but the loader counts the rows no dossier offers any more and **warns**, per issuer, with
   the oldest `recorded_at`. The first real load left exactly one.
 - `recorded_at` is set on insert only; `last_checked_at` and `last_confirmed_at` are seeded from
   `accessedAt` on insert and then belong to `stocks/watch-sources.mjs`, which measures them by
   re-reading the source. Refreshing them from a dossier would make a stale claim look freshly
   checked.
-- The two CHECK constraints say what they mean: a claim must carry **a quote, a URL or a note**
+- The two CHECK constraints: a claim must carry **a quote, a URL or a note**
   (31 of 1,263 have neither quote nor URL, every one with a note), and a **`confirmed` claim must
-  have a quote or a URL** — you cannot claim the source's own words were found without having them.
+  have a quote or a URL**, because a claim cannot say the source's words were found without recording them.
 
 ### On the page and on the cards
 
 Every field with a claim gets a small `§` chip after its value; a field that needs one and has none
-gets a hollow `§?`. The chip is a `<details>` — it opens by tap and by keyboard with no script, and
-the summary's `title` gives the one-line hover — showing the quote, the source (under the title the
+gets a hollow `§?`. The chip is a `<details>` (it opens by tap and by keyboard with no script, and
+the summary's `title` gives the one-line hover) showing the quote, the source (under the title the
 dossier gave it, cut to one line with the whole of it in the attribute), the locator, the
 timestamps formatted with the full ISO in a `title`, the status badge (`unverified` in the caution
 colour, external `changed` / `source-gone` states in warning, `inference` muted) and the note. A line in the panel
@@ -1733,8 +1821,8 @@ Two things worth knowing before changing them:
 
 - A popover inside the panel's scroll container is clipped by it, so `stocks.js` scrolls an opening
   chip into view (with `scroll-margin-block`, or the box lands flush against the edge and reads as
-  cut) and closes the others. Below 560 px the popover is anchored to the whole row rather than to
-  the chip — anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
+  cut) and closes the others. Below 560 px the popover is anchored to the whole row instead of
+  the chip; anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
 - **A card has a target and a hard ceiling, and the chips cost real bytes.** `CARD_BYTE_TARGET` is
   96 KiB; `CARD_BYTE_LIMIT` is 112 KiB. The target warns, while only the ceiling blocks publication.
@@ -1744,7 +1832,7 @@ Two things worth knowing before changing them:
   in full by `/api/issuers/:slug/claims`), and the card shows the strongest claim per field with the
   quote cut to `QUOTE_MAX`. The build still FAILS on a card over the ceiling, and
   `stocks/cards.test.js` prints the widest real card's size on every run.
-- The panel additionally gained rows the need list requires but nothing rendered — lifecycle
+- The panel also gained rows the need list requires but nothing rendered: lifecycle
   status, what the holder owns, the issuer's stated token program, redemption fees/KYC/minimum, and
   a **Ledger maturity vocabulary** section for the twelve maturity questions, which are a third of
   what needs a source and previously had nowhere to show a chip.
@@ -1752,21 +1840,21 @@ Two things worth knowing before changing them:
 ### API
 
 `/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` (default order is TRUST
-order, not alphabetical), `/api/issuers/:slug/claims` (with a per-status summary),
+order), `/api/issuers/:slug/claims` (with a per-status summary),
 `/api/sources?issuer=&kind=&status=` (with `last_checked_at` and `archive_url`),
-`/api/changes?kind=&severity=&issuer=&since=&limit=` and `/api/rules` — the health rule ids with
-their labels, descriptions and thresholds, read once at import from `stocks-health.json`, which is
-the gap `monitor.js` papered over with a hard-coded `RULE_LABELS` map.
+`/api/changes?kind=&severity=&issuer=&since=&limit=` and `/api/rules` (the health rule ids with
+their labels, descriptions and thresholds, read once at import from `stocks-health.json`). It replaces
+the hard-coded `RULE_LABELS` map `monitor.js` used before.
 
 Three gaps the monitor page found are closed at the same time: a **filter value containing a comma**
 is now expressible (`?jurisdiction[]=Cayman Islands, with a Swiss arm`; a repeated plain parameter
 is OR too, and neither form is comma-split), `worst_rule`, `venue_spread_pct` and `top1_share_pct`
 are **sortable**, and `health_status` sorts by **severity** (good, caution, warning, then
-unmeasured) instead of alphabetically — which had put the two ends of the scale in the middle.
+unmeasured). Alphabetical order had put the two ends of the scale in the middle.
 `monitor.html` now offers those three columns as sortable.
 
-Tests: `stocks/evidence.test.js` (the shared logic, against `stocks/fixtures/dossier-claims.sample.json`
-— a hand-written dossier carrying every field-path form, every status, an inference with neither a
+Tests: `stocks/evidence.test.js` (the shared logic, against `stocks/fixtures/dossier-claims.sample.json`,
+a hand-written dossier carrying every field-path form, every status, an inference with neither a
 quote nor a URL, and an entry with no status at all, because the real dossiers gained their claims
 one issuer at a time and a test reading them would have passed on an empty array), the claim suites
 in `stocks/db-load.test.js` (id determinism, the value at each path form, insert-only timestamps,
@@ -1786,7 +1874,7 @@ whose **issuer plus observed control-recipe label** matches it. It writes:
   evidence freshness/coverage, external claim-vs-reality discrepancies, exact assets and links to its templates.
 
 The current nine templates cover all 1,183 locally built token addresses. An asset inherits the
-template only on an exact issuer/recipe match; `inheritance.exceptions[]` is deliberately separate
+template only on an exact issuer/recipe match; `inheritance.exceptions[]` is separate
 and empty until an asset-specific conclusion is actually recorded. The pages link back to the
 individual token cards, and cards, canonical issuer dossiers and the composability matrix link into the template.
 
@@ -1808,10 +1896,10 @@ The generated analysis keeps nine things separate instead of producing a legal s
    source authority/precedence, governing law, holder scope and review date.
 
 `document.version` and `document.effectiveDate` are present in the output even when null. A date
-embedded in a title is not silently promoted into legal metadata; the page prints **not structured**
-until research records it deliberately. The same rule applies to redemption evidence: issuer terms
+embedded in a title is not copied into legal metadata; the page prints **not structured**
+until research records it. The same rule applies to redemption evidence: issuer terms
 can establish a documented process, but only an observed transaction establishes an exercised
-redemption. All current templates say `documented-process`, not `observed-transaction`.
+redemption. All current templates say `documented-process`; none says `observed-transaction`.
 
 The server refresh builds the templates after the stock database and before the token cards, then
 publishes both the JSON and the generated directory. Tests: `stocks/legal-templates.test.js`, plus
@@ -1820,29 +1908,29 @@ the link assertions in `stocks/cards.test.js` and `stocks-page.test.js`.
 ## Chain watcher
 
 `stocks/watch-chain.mjs --run [--ddl] [--only=<issuer>] [--limit=n] [--rpc=<url>] [--wallets=n]
-[--metadata=n] [--no-db] [--no-telegram]` — slice 3 of `EVIDENCE.md` (§2.4), hourly. The document
+[--metadata=n] [--no-db] [--no-telegram]`: slice 3 of `EVIDENCE.md` (§2.4), hourly. The document
 watcher above refetches the PDFs and pages the dossiers cite once a day; this is its on-chain half,
-and it runs hourly because a key rotation or a pause is a different kind of news from a terms-of-
-service edit. All the decisions are pure and live in `stocks/lib/chainwatch.mjs`
+and it runs hourly because a key rotation or a pause matters sooner than a terms-of-service
+edit. All the decisions are pure and live in `stocks/lib/chainwatch.mjs`
 (`stocks/chainwatch.test.js`, 56 tests); the CLI does the IO.
 
 What a run reads, and what it costs: every mint in `stocks-tokens.json` with
 `getMultipleAccounts(jsonParsed)`, 100 per call and 250 ms apart (**12 calls** for 1,183 mints), the
 lamports of the labelled wallets in **1 more**, and one `getTokenAccountsByOwner` per labelled
-wallet (**up to 40**) — about **53 RPC calls per full run, ≈ 1.3 k a day at hourly**, the same order
+wallet (**up to 40**): about **53 RPC calls per full run, ≈ 1.3 k a day at hourly**, the same order
 as the hourly trade collector's ≈ 3.5 k (`--budget=125`) and comfortably inside the Alchemy free tier. Up to **50
-metadata documents** are paced at 1/s with a 10 s timeout; those are plain HTTPS, not RPC.
+metadata documents** are paced at 1/s with a 10 s timeout; those are plain HTTPS requests, outside the RPC count.
 `--wallets=0 --metadata=0` reduces a run to the 12 account batches.
 
-`sonar.mint_state` (`db/2026-09-18-sonar-chain.sql`) keeps **one row per mint per observed state**,
-not per read: a mint whose `state_hash` equals the latest stored hash is not written at all. The 22
+`sonar.mint_state` (`db/2026-09-18-sonar-chain.sql`) keeps **one row per mint per observed state**
+(not per read): a mint whose `state_hash` equals the latest stored hash is not written at all. The 22
 comparable columns (of 26; `mint`, `observed_at`, `slot` and `state_hash` describe the reading) are
 every authority (mint, freeze, permanent delegate, fee config, withdraw
 withheld, hook, scaled-UI, metadata update), every toggle (pausable, paused, default-frozen,
 transfer-fee bps and cap, withheld amount, hook program), the scaled-UI multiplier with its
 *scheduled* successor and effective date, the metadata URI, and the sha256 of the metadata JSON.
-`slot` is the response's own `context.slot` — the chain's statement of when the values were true —
-and is deliberately **not** hashed, or every mint would be "changed" hourly.
+`slot` is the response's own `context.slot` (the chain's statement of when the values were true)
+and is **not** hashed, or every mint would be "changed" hourly.
 `sonar.wallet_balance` keeps one row per (wallet, mint, reading) in UI units, `mint` null for SOL.
 
 Changes become `sonar.change_event` rows with `before`/`after`, the slot/observed_at pair and the
@@ -1852,36 +1940,36 @@ paused / default-frozen / fee bps / a hook switched on or off, `rebase` (caution
 `metadata` (caution) for a moved URI or a changed document, `treasury` (info ≥ 5 %, caution ≥ 25 %;
 SOL judged absolutely at 100 SOL) for a labelled wallet's balance.
 
-Eight decisions worth keeping, most of them ways of NOT crying wolf:
+Eight rules to keep, most of them there to avoid false alarms:
 
-- **A first sight is a baseline, not 471 events.** A mint with no stored state raises no field
+- **A first sight is a baseline and raises no field events.** A mint with no stored state raises no field
   events at all; its issuer gets one `info` "baseline recorded" instead. Measured: the first run
   wrote 471 states and **9 events**, one per issuer.
 - **A `null` metadata hash means "not fetched", never "empty".** A null → hash transition is a first
   observation and raises nothing; only hash → different hash is a `metadata` event. The hash is
-  carried forward while the URI is unchanged, so the universe is not re-fetched hourly — a cold
+  carried forward while the URI is unchanged, so the universe is not re-fetched hourly; a cold
   start works through it 50 at a time, in mint order.
-- **A supply move under 1 % is not news.** Ondo's supplies move with every subscription: the second
+- **A supply move under 1 % raises no event.** Ondo's supplies move with every subscription: the second
   run, 90 s after the first, saw **10 supply moves and 4 withheld-fee moves, and raised 0 events**
   while still recording all 63 changed states (50 of them only because a metadata hash was filled
   in). That is the property to re-check after any change here: *rows may grow, the feed may not*.
 - **`paused: null` is not `paused: false`.** A mint that CANNOT be paused is a different fact from
   one that is currently unpaused, so the plain SPL-token case leaves the column null.
 - **A hook program set or unset is a toggle; one program swapped for another is a rotation.** Same
-  severity, different sentence — the only field that appears in two kinds.
+  severity, different sentence; it is the only field that appears in two kinds.
 - **Numbers are text everywhere.** Supply is a u64 and the scaled-UI multiplier has 16 significant
   digits, so both are carried as decimal strings, inserted with `(r->>'x')::numeric` and read back
-  with `::text`. A `row_to_json` round trip through a JSON number is how a watcher invents a change
+  with `::text`. A `row_to_json` round trip through a JSON number would make the watcher report a change
   that never happened; there is a test that a state written and read back diffs as unchanged.
   `maximumFee` is the one value JSON.parse has already rounded before this code sees it (u64::MAX
-  arrives as a double), so it is stored as that double's exact digits — stable, which is what the
-  hash needs.
+  arrives as a double), so it is stored as that double's exact digits, which keeps the
+  hash stable.
 - **`decimals` changing is `critical`.** It cannot happen on a Token-2022 mint, and if it ever does,
   every balance in every wallet has been re-denominated.
-- **40 wallets is a cap, not the count.** `buildOwnerLabels` can name 83 addresses and each costs a
+- **40 wallets is a cap.** `buildOwnerLabels` can name 83 addresses and each costs a
   call, so the run reads the keys `classify.mjs` names outright plus the busiest authorities, ranked
-  deterministically. 7 of the 40 have no account on chain at all, which is recorded as 0 SOL — an
-  address with no account holds no lamports, and that is the RPC's answer rather than a guess.
+  deterministically. 7 of the 40 have no account on chain at all, which is recorded as 0 SOL: an
+  address with no account holds no lamports, and that is the RPC's own answer.
 
 Production passes use `--no-telegram`: `.last-chain-watch-stats.json` (gitignored) atomically records
 the exact run start/end, duration, read counts, events and failures, republishes the public collector
@@ -1889,18 +1977,18 @@ status immediately, and is checked by the central monitor. That monitor sends on
 morning digest. A manual run without `--no-telegram` can still post its own event summary when the
 Telegram credentials are present.
 
-A per-item failure poisons the exit code: a mint the RPC has no account for, an unparseable mint
+A per-item failure makes the exit code non-zero: a mint the RPC has no account for, an unparseable mint
 account, a malformed wallet balance, or a metadata fetch that failed for a reason that is ours
 (5xx, timeout, reset). A metadata 404 or 403 is a *finding* about the citation and logged as such,
-exactly as `gone` and `blocked` are for the document watcher — the taxonomy is shared
-(`decideOutcome` in `stocks/lib/watch.mjs`), not duplicated.
+exactly as `gone` and `blocked` are for the document watcher; both use the same taxonomy
+(`decideOutcome` in `stocks/lib/watch.mjs`).
 
 ## Redemption observer
 
 `stocks/observe-redemptions.mjs --run [--only=<slugs>] [--budget=n] [--max-pages=n] [--pace=ms]
 [--rpc=<url>] [--out=<file>] [--no-telegram]` runs daily as PM2 `rwa-redemptions` (23:05 UTC,
 `--run --no-telegram`). It is the recurring half of the observed-redemption evidence (EVIDENCE.md
-§2.9 and §7), because a documented redemption process is not a demonstrated one. Per observable issuer and
+§2.9 and §7), because a documented redemption process has not been shown to work until a redemption is observed. Per observable issuer and
 address it lists signatures newer than the checkpoint, reads them **oldest first** up to
 `--budget` (1,500 `getTransaction` calls per address by default), classifies them, and records
 coverage as the block-time interval in which every transaction was read:
@@ -1919,5 +2007,103 @@ reset coverage, and the build merges it into each issuer's redemption block. Eac
 record and checkpoints are written together, atomically, so a kill loses at most the issuer in
 progress. A backlog beyond the budget is carried to the next run, and one deeper than `--max-pages`
 is an explicit coverage gap. A failed RPC call marks that issuer's scan `failed` and the feed
-`scan-failed`, never "no redemptions", and the run exits non-zero. Telegram is off in production:
+`scan-failed` (never "no redemptions"), and the run exits non-zero. Telegram is off in production:
 `lastRun.noticeLines` reaches the morning digest through the central monitor.
+
+## Case-law watcher
+
+`stocks/watch-caselaw.mjs --run [--ddl] [--only=<issuer>] [--limit=n] [--entries=n] [--no-sec]
+[--fresh] [--no-db] [--no-telegram]` runs daily as PM2 `rwa-watch-caselaw` (04:23 UTC). It derives
+search phrases from the dossiers (every legal entity in each `issuingEntity`, the brand, and every
+token issuer, provider, transfer agent, custodian, parent and security agent, expanded to their
+legal names, with a stoplist for over-broad bare names) plus `data/caselaw-extra.json`, then
+searches CourtListener opinions and RECAP dockets and the SEC litigation-release and
+administrative-proceeding feeds. Cases go to `sonar.litigation_case` (`db/2026-09-23-sonar-caselaw.sql`);
+a new case or docket entry raises a `litigation` change event. It feeds the what-if layer's
+`litigated` status and never sets it: a dossier answer becomes `litigated` only when someone cites
+the decision. Reviewed dismissals live in `data/caselaw-reviewed.json`. Logic and tests:
+`lib/caselaw.mjs`, `caselaw.test.js`.
+
+## Analysis pages (built every refresh)
+
+Each builder reads only files that are already collected or built, never contacts a source unless
+stated, prints its usage without `--run`, and publishes a missing input as `null` with a reason,
+never as zero. All shaping lives in a pure, tested `lib/` module. They run in the `surfaces` stage
+of `lib/release-manifest.mjs`.
+
+### Who holds the keys — `build-power-map.mjs` → `stocks-power-map.json` (`powers.html`)
+
+One row per issuer programme, one cell per holder-affecting power: mint, freeze, move or burn
+(permanent delegate / clawback), pause, rebase (scaled-UI multiplier), transfer fee, and upgrade.
+Each cell names the holder kind as the authority-attribution model resolves it (`single-key`,
+`multisig` with its m-of-n and time lock, `program` and who can upgrade it, `none`, `unknown`),
+the exact authority addresses read from the chain with an on/off-curve check, and whether use of
+the power is on record. No governance is inferred in `lib/power-map.mjs`; it only reshapes
+`lib/authority-attribution.mjs`. Build of 23 Sep 2026: 84 cells, 21 single-key, 15 multisig, 10
+program, 12 none, 26 unknown.
+
+### Flows and float — `fetch-xstocks-float.mjs`, `build-flows.mjs` → `stocks-flows.json` (`flows.html`)
+
+- **Flows:** daily creations and redemptions per issuer from the redemption observer's rolling file
+  (§ Redemption observer). Ondo creations and redemptions are valued at the stablecoin leg of the same
+  transaction; otherwise the DEX trade tape at the event time, otherwise that day's snapshot price.
+  A day with unpriced units shows its priced part as a lower bound. Each day carries its covered
+  hours; an unread day is `null`. xStocks creations and Superstate conversions into tokens are not
+  collected, so their net flow is not computed.
+- **xStocks public float:** `fetch-xstocks-float.mjs --run` (a `soft` step of the six-hourly refresh)
+  reads every catalogued xStocks mint (supply, decimals, multiplier) and the Token-2022 balances of
+  the seven issuer-attributed wallets in `lib/xstocks-float.mjs`, each of which must still be cited in
+  the xStocks dossier or the run fails. Float = supply − inventory, in raw units. About 15 RPC calls;
+  any failed read ends the run without writing, because a missing wallet would overstate the float.
+  Output `data/xstocks-float.json` (gitignored) keeps the previous read and a daily history. Read of
+  24 Sep 2026 00:48 UTC: 833 mints, 99 priced, 81.0% of priced supply in issuer wallets ($2.03B of
+  $2.50B; median per mint above 99.99%), leaving an upper-bound public float of about $475M. The
+  issuer wallets now include `9U76mo3WuP28s4kYJ9CMH1CiQh6Ph3r5Zg5awZM5vMQd`, an xStocks inventory
+  wallet stocked only from the treasury, which the issuer itself excludes from its circulating
+  figure. Unattributed issuer inventory counts as float, so the float is an upper bound.
+
+### Tracking — `build-tracking.mjs` → `stocks-tracking.json` (`tracking.html`)
+
+Premium or discount of every wrapper to its underlying's reference price, as three kinds of point
+never joined into one line: Jupiter quotes fetched with the reference, daily-snapshot premiums, and
+hourly medians of on-chain trades. A trade is compared only with a reference from the same
+market-closed stretch or within 10 minutes (`PAIR_TOLERANCE_MS`); others are dropped and counted.
+The scaled-UI multiplier is not removed, so part of an xStocks premium can be accrued dividends.
+Because the trade tape is a rolling 24 h window, the builder keeps an accumulating, idempotent
+`data/tracking-log.json` (90 days, gitignored). The second chart plots the largest unnamed holder's
+share against pool liquidity, after setting aside issuer authorities and burn addresses.
+
+### Exits — `build-exits.mjs` → `stocks-exits.json` (`exits.html`)
+
+Per wrapper: DEX pools by venue (`data/venues.json`, `data/meteora.json`), the issuer's redemption
+route with its evidence state (documented, operational, observed; never a dollar capacity) and
+lending markets with their proof stage (`data/defi-usage.json`,
+`data/protocol-market-research.json`). Pool liquidity counts both sides of a pool, so it is an upper
+bound on what could be sold. Also the issuer → protocol → action rows for the DeFi Sankey.
+
+### This week — `build-weekly.mjs` → `weekly/` (gitignored)
+
+One page per ISO week (Monday 00:00 to Sunday 24:00 UTC) plus `index.html` and `latest.html` (a
+byte copy of the newest week, so a shared link carries that week's `og:` tags). Sections: material
+changes (model assessment), issuer/venue/protocol changes from the public journal, tokens first
+catalogued or removed, observed redemptions with scan coverage, health moves, discrepancies and
+watcher events. The newest week says "in progress, as of" its newest input. Deltas are stated only
+where both weeks were observed. `--base-url` is required for `og:url`; without it the tags are left
+out, never guessed. `--no-db` builds without the database parts, which then say "not read".
+
+### Per-token social preview images — `build-cards.mjs` + `stocks/og/`
+
+Each card gets a 1200×630 `og:image` at `cards/og/<slug>.<hash>.png`. The SVG is drawn by
+`lib/og-image.mjs` and rasterised by `stocks/og/render.mjs` with `@resvg/resvg-js`, the one npm
+dependency in the pipeline, kept in its own package (`npm ci --prefix stocks/og`) with bundled fonts
+only, so laptop and server draw identical pixels. PNGs are re-encoded as indexed colour
+(`lib/png-indexed.mjs`). The hash covers everything drawn plus the fonts, so an unchanged token is
+never re-rendered, and older hashes are pruned. Without the renderer, or with `--no-og-images`,
+every card keeps the site image.
+
+### Static page counts — `build-static-snapshot.mjs`
+
+Writes the current catalogue counts between `<!-- snapshot:landing:… -->` markers in `index.html`
+and `<!-- snapshot:pitch-proof:… -->` markers in `pitch/index.html`, so neither page ships a stale
+number or a "Loading…". A missing or repeated marker is an error. Keep both marker pairs when
+editing those pages.

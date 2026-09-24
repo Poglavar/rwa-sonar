@@ -71,8 +71,8 @@
             if (answerScope === 'programme' || productSymbol === null) {
                 const named = exampleProduct ?? 'a named product';
                 return {
-                    value: `Product example only — ${named}; no programme-wide ${fieldLabel(field)} is confirmed.`,
-                    summary: `Product example only — ${named}; no programme-wide ${fieldLabel(field)} is confirmed.`,
+                    value: `Product example only (${named}); no programme-wide ${fieldLabel(field)} is confirmed.`,
+                    summary: `Product example only (${named}); no programme-wide ${fieldLabel(field)} is confirmed.`,
                     completeText, scope: 'product-example-only', applicable: false, exampleProduct,
                     scopeContext, answerScope: 'programme'
                 };
@@ -86,7 +86,7 @@
                 };
             }
             return {
-                value: completeText, summary: 'Documented for this exact product — see complete terms.',
+                value: completeText, summary: 'Documented for this exact product. See complete terms.',
                 completeText, scope: 'exact-product-example', applicable: true, exampleProduct,
                 scopeContext, answerScope: 'product'
             };
@@ -97,7 +97,7 @@
                 value: completeText,
                 summary: answerScope === 'product'
                     ? `Programme term expressly applies across the product set, including ${productSymbol ?? 'this token'}.`
-                    : 'Documented across the programme product set — see complete terms.',
+                    : 'Documented across the programme product set. See complete terms.',
                 completeText, scope: 'programme-all-products', applicable: true, exampleProduct: null,
                 scopeContext, answerScope
             };
@@ -114,7 +114,7 @@
         }
 
         return {
-            value: completeText, summary: 'Documented at programme level — see complete terms.',
+            value: completeText, summary: 'Documented at programme level. See complete terms.',
             completeText, scope: 'programme', applicable: true, exampleProduct: null,
             scopeContext, answerScope: 'programme'
         };
@@ -205,10 +205,10 @@
         const offChainCompletion = feed.completionObservable === false;
         const lag = feed.lastScanStatus === 'partial' ? ' Scan is lagging.' : '';
         if (feed.state === 'scan-failed') {
-            return { state: feed.state, text: `Scan failed on ${isoDay(feed.lastScanAt) ?? 'an unknown date'} — not the same as no redemptions.` };
+            return { state: feed.state, text: `Scan failed on ${isoDay(feed.lastScanAt) ?? 'an unknown date'}; redemptions for that period are unknown.` };
         }
         if (feed.state === 'stale') {
-            return { state: feed.state, text: `Scan stale since ${isoDay(feed.coveredThrough) ?? 'an unknown date'} — not a statement that redemptions stopped.` };
+            return { state: feed.state, text: `Scan stale since ${isoDay(feed.coveredThrough) ?? 'an unknown date'}; redemptions after that date are unknown.` };
         }
         if (feed.state === 'not-yet-covered' || !isoDay(feed.coveredThrough)) {
             return { state: 'not-yet-covered', text: 'Not yet covered by the recurring scan.' };

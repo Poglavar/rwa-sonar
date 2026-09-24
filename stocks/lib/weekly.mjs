@@ -6,6 +6,9 @@
 // own newest timestamp, so the same inputs render byte-identical pages. Tested in ../weekly.test.js.
 
 import fmt from './fmt.js';
+import {
+    SITE_IMAGE, breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
+} from './site-seo.mjs';
 
 const { escapeHtml, fmtDate, fmtDateTime, fmtNumber, cardSlug } = fmt;
 
@@ -14,8 +17,8 @@ export const WEEK_MS = 7 * DAY_MS;
 const ISO_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2}))?$/;
 const WEEK_ID_RE = /^(\d{4})-W(\d{2})$/;
 
-/** The site-wide 1200×630 link-preview image (same one the cards use). */
-export const WEEKLY_OG_IMAGE = 'https://rwasonar.com/images/og-rwasonar.png?v=20260923';
+/** The site-wide 1200×630 link-preview image, used when a week's own image was not rendered. */
+export const WEEKLY_OG_IMAGE = SITE_IMAGE.url;
 /** How many rows one expandable list shows before it says how many more there are. */
 export const LIST_LIMIT = 40;
 
@@ -670,7 +673,7 @@ function materialSection(digest) {
     const rows = digest.material;
     let body;
     if (rows === null) {
-        body = '<p class="unknown">The change judge\'s verdicts (sonar.change_judgment) could not be read for this build, so this page says nothing about material changes — that is not the same as none.</p>';
+        body = '<p class="unknown">The change judge\'s verdicts (sonar.change_judgment) could not be read for this build, so this page cannot say whether any change was material.</p>';
     } else if (rows.length === 0) {
         body = '<p>No change detected this week was read as material by the change judge.</p>';
     } else {
@@ -679,7 +682,7 @@ function materialSection(digest) {
             + `<p>${escapeHtml(row.change ?? row.kind ?? '')}</p><q>${escapeHtml(row.assessment)}</q> `
             + `<a href="../watch.html?material=true#change-${encodeURIComponent(row.id)}">The diff and the reading →</a></li>`).join('')}</ul>`;
     }
-    const note = '<p class="muted">A language model\'s reading of each detected document or on-chain diff, not a legal conclusion. The diff it read is on the change feed.</p>';
+    const note = '<p class="muted">A language model\'s reading of each detected document or on-chain diff. It is not a legal conclusion. The diff it read is on the change feed.</p>';
     return section('material', 'Material changes (model assessment)', note + body, rows === null ? 'n/a' : String(rows.length));
 }
 
@@ -701,7 +704,7 @@ function journalSection(digest) {
                 + `${str(item.whyItMatters) ? `<p class="muted">${escapeHtml(item.whyItMatters)}</p>` : ''}${assetLinks}</li>`;
         }).join('')}</ul>`;
     return section('journal', 'Issuer, venue and protocol changes', body
-        + '<p class="muted">From the public change journal: real changes by issuers, venues, protocols and sources, and catalogue membership changes. RWA Sonar\'s own editorial corrections are excluded.</p>', String(rows.length));
+        + '<p class="muted">From the public change journal: changes by issuers, venues, protocols and sources, and catalogue membership changes. RWA Sonar\'s own editorial corrections are excluded.</p>', String(rows.length));
 }
 
 function tokensSection(digest) {
@@ -713,7 +716,7 @@ function tokensSection(digest) {
                 `all on ${issuerLink(group.issuer, group.issuerName)}`)}</ul>`).join('');
     const removedBody = digest.removed.length === 0 ? '<p>No token left the catalogue this week.</p>'
         : `<ul class="asset-chips">${listCap(digest.removed, (row) => `<li>${cardLink(row)} <span>gone by ${escapeHtml(row.date)}</span></li>`)}</ul>`;
-    const note = '<p class="muted">"First catalogued" is when RWA Sonar first confirmed the exact token address (stocks-tokens.json <code>firstSeenAt</code>), not when the issuer minted it. Tokens known when records began are not counted as new.</p>';
+    const note = '<p class="muted">"First catalogued" is when RWA Sonar first confirmed the exact token address (stocks-tokens.json <code>firstSeenAt</code>). The issuer may have minted it earlier. Tokens known when records began are not counted as new.</p>';
     return section('tokens', 'New and removed tokens', `${note}<h3>First catalogued (${escapeHtml(fmtNumber(added, 0))})</h3>${addedBody}<h3>Removed (${escapeHtml(fmtNumber(digest.removed.length, 0))})</h3>${removedBody}`,
         `+${fmtNumber(added, 0)} / −${fmtNumber(digest.removed.length, 0)}`);
 }
@@ -731,7 +734,7 @@ function redemptionSection(digest) {
     const table = observed.length === 0 ? '<p class="unknown">No issuer carried a redemption observation feed in this build.</p>'
         : `<div class="table-wrap"><table><thead><tr><th>Issuer</th><th>Redemptions observed</th><th>Scan coverage this week</th><th>Last scan</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     const missing = withoutFeed.length === 0 ? ''
-        : `<p class="muted">No on-chain redemption feed for: ${withoutFeed.map((row) => issuerLink(row.issuer, row.issuerName)).join(', ')}. Their redemptions are documented or unknown, not observed.</p>`;
+        : `<p class="muted">No on-chain redemption feed for: ${withoutFeed.map((row) => issuerLink(row.issuer, row.issuerName)).join(', ')}. Their redemptions are documented or unknown; none are observed on-chain.</p>`;
     const covered = observed.filter((row) => row.redemptions !== null);
     return section('redemptions', 'Redemptions observed', `${table}${missing}<p class="muted">Counted from the recurring on-chain scan (stocks/observe-redemptions.mjs). Hours not covered by a scan say nothing either way.</p>`,
         covered.length === 0 ? 'n/a' : fmtNumber(sum(covered, 'redemptions'), 0));
@@ -775,23 +778,18 @@ function sourcesFooter(digest) {
         return `<li>${escapeHtml(label)} · ${at}</li>`;
     }).join('');
     return `<footer><h2>Data</h2><ul class="wk-sources">${rows}</ul>`
-        + `<p class="muted">Built from the data's own timestamps (newest input ${time(digest.asOf)}); nothing on this page is written by hand. Missing values are shown as missing, never as zero.</p>`
+        + `<p class="muted">Built from the data's own timestamps (newest input ${time(digest.asOf)}); all text on this page is generated from that data. Missing values are shown as missing, never as zero.</p>`
         + '<p><a href="index.html">All weeks</a> · <a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a></p></footer>';
 }
 
-function head({ title, description, pageUrl, version, ogTitleText }) {
+/** The page head; `image` is the page's own absolute preview `{url, alt, width, height}`, null for the site image. */
+function head({ title, description, pageUrl, version, ogTitleText, image = null, jsonLd = null }) {
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
     return '<!doctype html>\n<!-- Generated by stocks/build-weekly.mjs. Do not edit: rebuilt from the built data on every refresh. -->\n'
         + '<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />\n'
-        + `<title>${escapeHtml(title)}</title>\n<meta name="description" content="${escapeHtml(description)}" />\n`
-        + '<meta property="og:site_name" content="RWA Sonar" /><meta property="og:type" content="article" />\n'
-        + `<meta property="og:title" content="${escapeHtml(ogTitleText)}" />\n<meta property="og:description" content="${escapeHtml(description)}" />\n`
-        + `<meta property="og:image" content="${escapeHtml(WEEKLY_OG_IMAGE)}" />\n`
-        + (pageUrl ? `<meta property="og:url" content="${escapeHtml(pageUrl)}" /><link rel="canonical" href="${escapeHtml(pageUrl)}" />\n` : '')
-        + '<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@RWASonar" /><meta name="twitter:creator" content="@RWASonar" />\n'
-        + `<meta name="twitter:title" content="${escapeHtml(ogTitleText)}" /><meta name="twitter:description" content="${escapeHtml(description)}" /><meta name="twitter:image" content="${escapeHtml(WEEKLY_OG_IMAGE)}" />\n`
+        + seoHeadTags({ title, description, socialTitle: ogTitleText, url: pageUrl, type: 'article', image, jsonLd, sep: '\n' }) + '\n'
         + '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />\n'
-        + `<link rel="stylesheet" href="../templates.css${v}" /><link rel="stylesheet" href="../weekly.css${v}" /></head><body>\n`
+        + `<link rel="stylesheet" href="../templates.css${v}" /><link rel="stylesheet" href="../weekly.css${v}" />${contactStylesheet('../')}</head><body>\n`
         + '<header class="site-head"><a href="../">RWA Sonar</a><nav><a href="../stocks.html?view=assets">Explore</a><a href="../stocks.html?view=compare">Compare</a><a href="../watch.html">Changes</a><a href="./">Weekly</a><a href="../learn/">Learn</a></nav></header>\n';
 }
 
@@ -803,7 +801,7 @@ function origin(baseUrl) {
  * One week's page. `baseUrl` is required for og:url and the canonical link; without it both are
  * left out rather than guessed. `hasNext` says whether a later week page exists.
  */
-export function renderWeekPage(digest, { baseUrl = null, version = '', hasNext = false } = {}) {
+export function renderWeekPage(digest, { baseUrl = null, version = '', hasNext = false, ogImage = null } = {}) {
     const site = origin(baseUrl);
     const pageUrl = site === null ? null : `${site}/weekly/${digest.week.id}.html`;
     const title = `${ogTitle(digest)} — RWA Sonar`;
@@ -814,13 +812,18 @@ export function renderWeekPage(digest, { baseUrl = null, version = '', hasNext =
     const nav = `<nav class="wk-nav" aria-label="Other weeks">${digest.prevWeek ? `<a href="${digest.prevWeek.id}.html">← ${escapeHtml(weekLabel(digest.prevWeek))}</a>` : '<span></span>'}`
         + `<a href="index.html">All weeks</a>${hasNext ? `<a href="${nextWeekId(digest.week)}.html">${escapeHtml(weekLabel(weekFromId(nextWeekId(digest.week))))} →</a>` : '<span></span>'}</nav>`;
     const headlines = `<ol class="wk-headlines">${weekHeadlines(digest).map((line) => `<li class="${line.empty ? 'wk-empty' : ''}"><a href="#${line.anchor}">${escapeHtml(line.text)}</a></li>`).join('')}</ol>`;
-    return head({ title, description, pageUrl, version, ogTitleText: ogTitle(digest) })
+    const jsonLd = site === null ? null : ldGraph([
+        organizationLd(site),
+        reportLd({ origin: site, url: pageUrl, headline: ogTitle(digest), description, dateModified: digest.asOf, image: ogImage?.url ?? null }),
+        breadcrumbLd([{ name: 'RWA Sonar', url: `${site}/` }, { name: 'Weekly', url: `${site}/weekly/` }, { name: weekLabel(digest.week), url: pageUrl }])
+    ]);
+    return head({ title, description, pageUrl, version, ogTitleText: ogTitle(digest), image: ogImage, jsonLd })
         + `<main class="wk-page"><p class="eyebrow">This week in tokenized stocks</p><h1>${escapeHtml(weekLabel(digest.week).replace(/^w/, 'W'))}</h1>`
         + `<p class="lede">${escapeHtml(weekRange(digest.week))} (Monday 00:00 UTC to Sunday 24:00 UTC) ${status}</p>${nav}`
         + `<section class="wk-top"><h2>Numbers of the week</h2>${numbersStrip(digest)}<h2>Headlines</h2>${headlines}</section>`
         + materialSection(digest) + journalSection(digest) + tokensSection(digest) + redemptionSection(digest)
         + statusSection(digest) + evidenceSection(digest)
-        + sourcesFooter(digest) + '</main></body></html>\n';
+        + sourcesFooter(digest) + `</main>${contactFooterHtml('../')}</body></html>\n`;
 }
 
 /** The id of the week after `week`. */
@@ -829,18 +832,24 @@ export function nextWeekId(week) {
 }
 
 /** weekly/index.html: every week, newest first, with its headlines as one line each. */
-export function renderWeeklyIndex(digests, { baseUrl = null, version = '' } = {}) {
+export function renderWeeklyIndex(digests, { baseUrl = null, version = '', ogImage = null } = {}) {
     const site = origin(baseUrl);
     const latest = digests.at(-1) ?? null;
     const description = 'A weekly, sourced digest of tokenized stocks on Solana: material changes, new and removed tokens, redemptions, health moves and evidence changes.';
     const rows = [...digests].reverse().map((digest) => `<article class="template-card"><h2><a href="${digest.week.id}.html">${escapeHtml(weekLabel(digest.week).replace(/^w/, 'W'))}</a></h2>`
         + `<p class="muted">${escapeHtml(weekRange(digest.week))}${digest.inProgress ? ` · in progress, as of ${time(digest.asOf)}` : ''}</p>`
         + `<ul class="wk-list wk-compact">${weekHeadlines(digest).map((line) => `<li class="${line.empty ? 'wk-empty' : ''}">${escapeHtml(line.text)}</li>`).join('')}</ul></article>`).join('');
+    const indexUrl = site === null ? null : `${site}/weekly/`;
+    const jsonLd = site === null ? null : ldGraph([
+        organizationLd(site),
+        webPageLd({ origin: site, url: indexUrl, name: 'This week in tokenized stocks — RWA Sonar', description, type: 'CollectionPage', dateModified: latest?.asOf ?? null }),
+        breadcrumbLd([{ name: 'RWA Sonar', url: `${site}/` }, { name: 'Weekly', url: indexUrl }])
+    ]);
     return head({ title: 'This week in tokenized stocks — RWA Sonar', description,
-        pageUrl: site === null ? null : `${site}/weekly/`, version, ogTitleText: 'This week in tokenized stocks' })
+        pageUrl: indexUrl, version, ogTitleText: 'This week in tokenized stocks', image: ogImage, jsonLd })
         + '<main class="wk-page"><p class="eyebrow">Weekly digest</p><h1>This week in tokenized stocks</h1>'
         + `<p class="lede">${escapeHtml(description)} Every figure comes from the built data and says when it was observed.</p>`
         + (latest ? `<p><a class="open-template" href="latest.html">Latest: ${escapeHtml(weekLabel(latest.week))} →</a></p>` : '<p class="unknown">No week has recorded data yet.</p>')
         + `<div class="template-grid">${rows}</div>`
-        + '<footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main></body></html>\n';
+        + `<footer><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar on X</a></footer></main>${contactFooterHtml('../')}</body></html>\n`;
 }

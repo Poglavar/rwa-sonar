@@ -321,7 +321,7 @@
                 + ((!model.compact || (model.xTicks.length - 1 - i) % 2 === 0) ? `<text x="${t.x.toFixed(1)}" y="${SH - SB + 16}" text-anchor="middle">${escapeHtml(fmtUsd(t.v))}</text>` : '')).join('');
         const dots = model.dots.map((d) => {
             const href = cardHref(d);
-            const label = `${d.symbol ?? d.mint} (${issuers?.[d.issuer] ?? d.issuer ?? 'issuer unknown'}): top unlabelled wallet ${d.top1SharePct.toFixed(1)}% of supply, liquidity ${fmtUsd(d.liquidityUsd)} (${d.liquiditySource}), ${isNum(d.holderCount) ? `${Math.round(d.holderCount).toLocaleString('en')} holders` : 'holder count unknown'}${d.corner ? ' — in the one-wallet corner' : ''}`;
+            const label = `${d.symbol ?? d.mint} (${issuers?.[d.issuer] ?? d.issuer ?? 'issuer unknown'}): top unlabelled wallet ${d.top1SharePct.toFixed(1)}% of supply, liquidity ${fmtUsd(d.liquidityUsd)} (${d.liquiditySource}), ${isNum(d.holderCount) ? `${Math.round(d.holderCount).toLocaleString('en')} holders` : 'holder count unknown'}${d.corner ? ', in the one-wallet, thin-liquidity corner' : ''}`;
             const r = d.r ?? 3.5;
             const cls = `trk-dot trk-i${d.slot}${d.r === null ? ' trk-dot-nocount' : ''}${d.corner ? ' trk-dot-corner' : ''}`;
             const shape = `<circle class="${cls}" cx="${d.cx.toFixed(1)}" cy="${d.cy.toFixed(1)}" r="${r.toFixed(1)}"/>`;
@@ -331,8 +331,8 @@
         }).join('');
         return `<svg class="trk-svg trk-scatter" viewBox="0 0 ${SW} ${SH}" role="group" aria-label="Top unlabelled holder share against pool liquidity, one dot per token">`
             + `<rect class="trk-corner" x="${c.x}" y="${c.y}" width="${c.w.toFixed(1)}" height="${c.h.toFixed(1)}"/>`
-            + `<text class="trk-corner-label" x="${c.x + 6}" y="${c.y + 16}">${model.compact ? 'one wallet,' : 'one wallet, nowhere to sell'}</text>`
-            + (model.compact ? `<text class="trk-corner-label" x="${c.x + 6}" y="${c.y + 32}">nowhere to sell</text>` : '')
+            + `<text class="trk-corner-label" x="${c.x + 6}" y="${c.y + 16}">${model.compact ? 'one wallet,' : 'one wallet, thin liquidity'}</text>`
+            + (model.compact ? `<text class="trk-corner-label" x="${c.x + 6}" y="${c.y + 32}">thin liquidity</text>` : '')
             + `<g class="trk-grid">${grid}</g>`
             + `<text class="trk-axis-title" x="${SW - SR}" y="${SH - 4}" text-anchor="end">pool liquidity (log) →</text>`
             + `<text class="trk-axis-title" x="${SL + 4}" y="${ST + (SH - ST - SB) - 6}">↑ top unlabelled wallet</text>`
@@ -415,7 +415,7 @@
         $('premiumDetail').innerHTML = '<p class="trk-hint">Tap or focus a point to see what it is made of.</p>';
         $('premiumHours').textContent = schedule?.closed
             ? 'Shaded: the US market for this share was closed (nights, weekends; darker = holiday). The reference price cannot move then; the token still trades.'
-            : 'Market hours unknown for this underlying, so nothing is shaded — unknown is not drawn as closed.';
+            : 'Market hours unknown for this underlying, so no hours are shaded.';
         const obs = underlying?.observations ?? 0;
         $('premiumCount').textContent = `${underlying?.ticker ?? '—'}: ${obs} observation${obs === 1 ? '' : 's'} across ${underlying?.wrappers.length ?? 0} wrapper${underlying?.wrappers.length === 1 ? '' : 's'}`;
     }
@@ -468,12 +468,12 @@
             state.data = await res.json();
         } catch (err) {
             log('load failed', err.message);
-            setStatus(`The tracking data did not load (${err.message}). Nothing is drawn rather than a guess.`, true);
+            setStatus(`The tracking data did not load (${err.message}). Nothing is drawn.`, true);
             return;
         }
         const list = state.data.premium?.underlyings ?? [];
         const pick = pickUnderlying(list, window.location.search);
-        if (pick.asked && !pick.found) setStatus(`No premium observation for “${pick.asked}” yet — showing ${pick.ticker}.`, false);
+        if (pick.asked && !pick.found) setStatus(`No premium observation for “${pick.asked}” yet. Showing ${pick.ticker}.`, false);
         else setStatus(null, false);
         const select = $('underlyingSelect');
         select.innerHTML = optionsHtml(list, pick.ticker);

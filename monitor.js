@@ -50,7 +50,7 @@
         good: 'every measured check passed',
         caution: 'at least one check in its middle band',
         warning: 'at least one check failed outright',
-        unknown: 'nothing measurable — not a clean bill of health'
+        unknown: 'nothing could be measured, so this is not a pass'
     };
 
     /** Where the per-token cards live, relative to this page. */
@@ -542,10 +542,10 @@
      */
     function describeApiFailure({ path = null, status = null, message = null } = {}) {
         const where = str(path) ?? 'the API';
-        if (isNum(status)) return `API unreachable — GET ${where} answered HTTP ${status}.`;
+        if (isNum(status)) return `API unreachable: GET ${where} answered HTTP ${status}.`;
         const why = str(message);
-        return `API unreachable — GET ${where} did not answer${why === null ? '' : ` (${why})`}. `
-            + 'Is the API running?';
+        return `API unreachable: GET ${where} did not answer${why === null ? '' : ` (${why})`}. `
+            + 'Check that the API is running.';
     }
 
     /** `{mint: record}` from stocks-afterhours.json, for the one column the slim row cannot carry. */
@@ -1077,7 +1077,7 @@
     function renderTable() {
         const math = pageMath({ total: state.total, page: state.page });
         els.tokenBody.innerHTML = state.rows.length === 0
-            ? `<tr><td colspan="13" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows — see the message above.')}</td></tr>`
+            ? `<tr><td colspan="13" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows. See the message above.')}</td></tr>`
             : state.rows.map(tokenTableRow).join('');
         els.tokenCount.textContent = state.error === null
             ? `${fmtNumber(state.total)} mint${state.total === 1 ? '' : 's'} match`
@@ -1116,7 +1116,7 @@
         const days = dayCounts(state.changes?.history);
 
         els.changeStrip.innerHTML = days.length === 0
-            ? '<p class="mon-empty">Only one snapshot day so far — there is nothing to compare it with.</p>'
+            ? '<p class="mon-empty">Only one snapshot day so far, so there is nothing to compare.</p>'
             : days.map((day) => `<span class="mon-day">
                 <span class="mon-day-range">${escapeHtml(fmtDate(day.from))} &rarr; ${escapeHtml(fmtDate(day.to))}</span>
                 <span class="mon-day-count">${escapeHtml(fmtNumber(day.total))} change${day.total === 1 ? '' : 's'}</span>
@@ -1173,7 +1173,7 @@
             ${escapeHtml(filter.label)} <strong>${escapeHtml(fmtNumber(filter.count))}</strong>
         </button>`).join('');
         if (view.baseline) {
-            els.defiChangeGroups.innerHTML = '<p class="mon-empty">Today is the first protocol snapshot. It establishes the baseline; existing integrations are not presented as new.</p>';
+            els.defiChangeGroups.innerHTML = '<p class="mon-empty">Today is the first protocol snapshot and sets the baseline. Integrations that already existed are not shown as new.</p>';
             return;
         }
         if (view.groups.length === 0) {

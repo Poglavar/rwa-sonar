@@ -1,141 +1,144 @@
 # RWA Sonar — tokenized stocks on Solana, explained
 
-> **Don't trust the ticker. Inspect the token.**
+> **The ticker is familiar. The token is mysterious.**
 
-Live product: [rwasonar.com](https://rwasonar.com/) · X: [@RWASonar](https://x.com/RWASonar)
+Live product: [rwasonar.com](https://rwasonar.com/) · X: [@RWASonar](https://x.com/RWASonar) ·
+Pitch: [rwasonar.com/pitch/](https://rwasonar.com/pitch/)
 
-RWA Sonar is a public transparency and analytics layer for tokenized real-world assets. Its
-current focus is Solana stocks: identify the exact token, explain what its holder actually owns,
-show who can intervene on-chain and off-chain, verify where it can really be used, and keep watching
-for changes. The product borrows the most useful idea from L2BEAT—make trust assumptions and the gap
-between claims and observable reality legible—but applies it to assets whose risks also run through
-issuers, custodians, transfer agents, legal documents and courts.
+RWA Sonar reads the legal documents and the Solana chain behind every tokenized stock it can find
+and answers five questions for each exact token address: **what the holder actually owns, who can
+intervene, how to exit, where it is used in DeFi, and what changed**. Every answer links to the words
+or the transaction it rests on, with the source, locator, date read and, where possible, an
+archived copy.
 
-**Try it:** [the stock workspace](https://rwasonar.com/stocks.html) ·
-[a shareable token report (NVDAx)](https://rwasonar.com/cards/NVDAx.html) ·
-[the what-if matrix](https://rwasonar.com/whatif.html) · [the pitch](https://rwasonar.com/pitch/)
+The idea comes from [L2BEAT](https://l2beat.com/faq): list the trust assumptions, and show where
+published claims differ from what can be observed. For tokenized stocks the smart contract is only
+part of the picture, so the analysis also covers issuers, custodians, transfer agents, legal terms
+and courts.
+
+**Try it:** [compare Apple's wrappers](https://rwasonar.com/stocks.html?view=compare&compare=AAPL) ·
+[who holds the keys](https://rwasonar.com/powers.html) ·
+[flows and float](https://rwasonar.com/flows.html) ·
+[exit routes](https://rwasonar.com/exits.html) ·
+[what if…](https://rwasonar.com/whatif.html) ·
+[this week](https://rwasonar.com/weekly/latest.html) ·
+[a token report (NVDAx)](https://rwasonar.com/cards/NVDAx.html)
 
 ## The problem, in one example
 
-Two tokens can both say "AAPL" and give their holders very different things. Ask one question of two
-issuers — *what happens if my keys are stolen?* — and the documents answer differently:
+Two tokens can both say "AAPL" and give their holders different things. AAPLx (xStocks) is a
+tracker certificate whose mint the issuer can pause, freeze and claw back; AAPLon (Ondo) is a
+structured note that can be paused and frozen but has no clawback. Neither makes the holder a
+registered Apple shareholder.
+
+Ask two issuers the same question, *what happens if my keys are stolen?*, and their documents answer
+differently:
 
 - **xStocks (Backed):** nothing comes back as of right. Under the prospectus neither the network nor
   the issuer can restore a lost key; the only replacement route is a Swiss court cancellation which
   the issuer itself calls "very challenging to achieve".
-- **Superstate Opening Bell:** stolen tokens are reconstituted — burned and reissued to a verified
-  wallet — and a thief's wallet cannot receive the shares at all, because every account starts frozen
-  until allowlisted.
+- **Superstate Opening Bell:** in a June 2025 letter to the SEC's Crypto Task Force, Superstate says
+  its transfer agent "can reconstitute" tokens (burn them and credit new ones) once the loss and the
+  holder's identity are confirmed. It is not promised, its Terms put hack risk on the holder, and its
+  liability is capped.
 
-Every answer on the site links to the exact words it rests on, with the source, locator, date read
-and an archived copy.
+## What the evidence has shown
 
-## What it does
+Dated findings from the current data, each linked from the page named:
 
-For each exact Solana token address, RWA Sonar answers five questions — **what you own, who can
-intervene, where you can use it, how you exit, and what you must keep trusting** — and keeps
-watching for changes:
+- **xStocks' power to move or burn any holder's tokens sits behind a 2-of-3 multisig with no time
+  lock** (read 20 Sep 2026). The permanent delegate on every xStocks mint is a Squads v4 vault with
+  threshold 2 of 3, time lock 0 and unnamed members. It has not been used on Solana: across all
+  1,844 transactions touching it from 10 Jun 2025 to 18 Sep 2026, no transfer or burn names it as
+  authority. ([powers.html](https://rwasonar.com/powers.html))
+- **81.0% of priced xStocks supply sits in issuer wallets** (read 24 Sep 2026). Redeemed xStocks
+  are not burned; the prospectus defines de-activation as a transfer back to the issuer. For the 99
+  xStocks with a market price, $2.03B of $2.50B of supply was in issuer-attributed wallets. These
+  include an inventory wallet the issuer itself excludes from its circulating figure. The
+  resulting public float, about $475M, is an upper bound. ([flows.html](https://rwasonar.com/flows.html))
+- **Loopscale's docs and the chain disagree** (23 Sep 2026). The docs call one key a co-signer that
+  "cannot initiate actions on its own"; on chain it is the protocol admin and signs refinances
+  alone. The docs describe a 3-of-5 upgrade multisig; the chain shows 4 of 7 voters and a 24-hour
+  time lock. (the SECZ/Loopscale protocol dossier)
+- **SECZ's controls come down to single keys.** Its pause authority is an ordinary keypair with no
+  multisig or time lock, and both Securitize programmes that hold mint and freeze are upgradeable by
+  one on-curve key. ([powers.html](https://rwasonar.com/powers.html),
+  [issuer dossier](https://rwasonar.com/issuers/securitize.html))
+- **Redemptions are observed on chain.** On 23 Sep 2026 the recurring scan read 218
+  Ondo redemptions and 370 creations in the 17.9 hours it covered, and 244 xStocks de-activation
+  deposits in 22.5 hours. ([flows.html](https://rwasonar.com/flows.html))
 
-- **Identity and structure:** about 1,300 exact token addresses across 12 issuer programmes (nine
-  with live tokens; Remora and Ventuals are defunct, Republic has no mint yet), each with a
-  shareable report and a legal-and-control template.
-- **Control:** live Token-2022 authorities and extensions — freeze, pause, permanent delegate,
-  allowlist, transfer fees, rebasing multipliers — attributed to the key, multisig or program that
-  actually holds them.
-- **What if:** a trust chain of 13 actors and nine rights flows, and 38 failure scenarios answered
-  for every issuer from its own documents. Each answer is *documented*, *inferred* (the reasoning is
-  shown), *litigated* (with the decision) or *unknown* (with where we looked). Nothing is invented.
-- **Use and exit:** exact-token DeFi support, separating a source listing from observed accounts,
-  decoded market configuration and simulation; redemption separating the legal right, eligibility,
-  the current official route and any observed completion.
-- **Watching:** an hourly on-chain control watcher, a daily watcher over 500+ cited documents that
-  checks every quoted claim verbatim and archives each version to the Wayback Machine, a daily
-  on-chain redemption observer, a decoded trade tape, and a public journal of material external
-  changes.
+## Pages
 
-Coverage is a dated observation of a changing system, not a claim of exhaustive coverage; the
-[methodology](https://rwasonar.com/methodology.html) lists the evidence rules and known blind spots.
-
-### Why Solana
-
-Solana's Token-2022 puts the issuer's powers on-chain: who can freeze, claw back, pause, rebase or
-charge a fee is readable from the mint account. RWA Sonar reads those powers for every tokenized
-stock on Solana, follows them to the key or multisig that holds them, and sets them beside what the
-legal documents promise — the gap between the two is where holder risk lives.
-
-## Why this is different
-
-[RWA.xyz](https://rwa.xyz/) is a broad, cross-chain directory and market-data platform.
-[DefiLlama's RWA dashboard](https://defillama.com/rwa) is especially strong at AUM, flows, DeFi TVL,
-utilization and rankings. RWA Sonar complements those products by going much deeper on one hard
-question: **what has to remain true for this particular token to behave like the stock exposure its
-ticker suggests?**
-
-That means RWA Sonar does not stop at price or market cap. It joins the exact Solana address to:
-
-- the legal claim and governing documents;
-- the issuer, custodian, transfer agent, security agent and other dependencies;
-- live Token-2022 authorities and extensions, including pause, freeze, clawback, allowlist, fees and
-  rebasing;
-- observed holders, markets, reference prices, spreads and decoded DEX trades;
-- confirmed, exact-address protocol support and the terms under which collateral can be liquidated;
-- claim-versus-reality discrepancies, source changes and on-chain changes, all with evidence.
-
-The inspiration is [L2BEAT](https://l2beat.com/faq): usage metrics matter, but trust assumptions,
-control paths and failure modes deserve first-class treatment. For RWAs, that analysis cannot end at
-the smart contract. RWA Sonar follows the chain from the underlying company and custodian through
-the legal wrapper and token issuer to the holder and any DeFi protocol that takes custody.
-
-## Product surfaces
-
-The public experience is deliberately progressive: start with the underlying stock, understand
-one wrapper or compare two, three or many, read the plain-language answer, then open the reasoning, cited evidence and
-raw technical data only when needed. The stable product navigation is **Explore · Compare · Changes
-· Learn**; collector and research operations remain available as advanced transparency surfaces.
+The stable navigation is **Explore · Compare · Changes · Learn**; the analysis pages sit under
+"Research tools".
 
 | Page | What it answers |
 |---|---|
-| [`/`](https://rwasonar.com/) | What changed, how the catalogue is growing, and why the legal/control layer matters |
-| [`/stocks.html`](https://rwasonar.com/stocks.html) | A task-led stock workspace with grouped explanatory search, a private personal briefing, wrapper comparisons, scoped evidence provenance, claims-versus-reality conflicts, confirmed DeFi use and shareable token-table views |
-| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One shareable, JavaScript-optional report that starts with ownership, intervention, exit, confirmed DeFi use and the largest unresolved risk |
-| [`/issuers/xstocks-backed.html`](https://rwasonar.com/issuers/xstocks-backed.html) | One canonical programme dossier: plain-English claim, redemption, controls, discrepancies, evidence context and exact assets |
-| `/protocols/` | Exact-token protocol dossiers separating source listing, account observations, configuration decoding and read-only simulation, with return links to the token and issuer |
-| [`/monitor.html`](https://rwasonar.com/monitor.html) | Paginated token health, four independent dimensions, snapshot changes and protocol changes |
-| [`/watch.html`](https://rwasonar.com/watch.html) | Focused exact-token, issuer and protocol-market watches; source-backed external changes with actor, affected holders, consequence and evidence, ranked by likely holder impact separately from watcher severity |
-| [`/whatif.html`](https://rwasonar.com/whatif.html) | A 38-scenario matrix: what happens if an actor, key, custodian, issuer or protocol fails? |
-| [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths and source-backed conclusions |
-| [`/graph.html`](https://rwasonar.com/graph.html) | The parties and rights flows behind each issuer programme |
-| [`/live.html`](https://rwasonar.com/live.html) | Decoded Solana DEX trades (collected hourly on the server, served by our API) plus paginated historical trade data |
+| [`/`](https://rwasonar.com/) | What RWA Sonar is, where to start, three sourced findings, what is watched and how often |
+| [`/stocks.html`](https://rwasonar.com/stocks.html) | Stock-first search and comparison of every wrapper of one stock (one, two or many), issuer panels, claims-versus-reality conflicts, DeFi use, a private briefing and shareable table views |
+| [`/cards/NVDAx.html`](https://rwasonar.com/cards/NVDAx.html) | One static, JavaScript-optional report per token, with its own social preview image |
+| [`/issuers/`](https://rwasonar.com/issuers/xstocks-backed.html) | One dossier per issuer programme: claim, redemption (documented, operational, observed), controls, discrepancies, evidence, assets |
+| [`/powers.html`](https://rwasonar.com/powers.html) | Who holds the keys: each issuer programme × seven powers (mint, freeze, move or burn, pause, rebase, transfer fee, upgrade), and whether one key, a multisig, a program, nobody or an unknown party holds each |
+| [`/flows.html`](https://rwasonar.com/flows.html) | Daily creations and redemptions per issuer read from the chain, like ETF flows, with covered hours per day; xStocks public float |
+| [`/tracking.html`](https://rwasonar.com/tracking.html) | Premium or discount of each wrapper to the underlying share, with US market-closed hours shaded; holder concentration against liquidity |
+| [`/exits.html`](https://rwasonar.com/exits.html) | Exit routes per wrapper: DEX pool liquidity by venue, issuer redemption route and its evidence state, lending markets; a DeFi usage Sankey by proof stage |
+| [`/whatif.html`](https://rwasonar.com/whatif.html) | Failure scenarios answered per issuer as documented, inferred, litigated or unknown, with a scoreboard of how many answers each issuer's documents support |
+| [`/weekly/latest.html`](https://rwasonar.com/weekly/latest.html) | This week in tokenized stocks: material changes (model assessment), issuer/venue/protocol changes, new tokens, observed redemptions, new discrepancies |
+| [`/watch.html`](https://rwasonar.com/watch.html) | The change feed, and saved watches on a token, issuer or protocol market with an optional private Telegram digest |
+| `/protocols/` | Exact-token protocol dossiers: source listing, observed accounts, decoded configuration, docs-versus-chain discrepancies |
+| [`/templates/`](https://rwasonar.com/templates/) | Reusable legal + control-recipe dossiers with ownership paths |
+| [`/graph.html`](https://rwasonar.com/graph.html) | The parties behind each programme and how rights pass between them |
+| [`/economics.html`](https://rwasonar.com/economics.html) | Fees charged to holders and compensation to other actors |
+| [`/live.html`](https://rwasonar.com/live.html) | Decoded DEX trades, collected hourly on the server and served by our API |
+| [`/monitor.html`](https://rwasonar.com/monitor.html) | Token health across four dimensions, snapshot and protocol changes |
+| [`/review.html`](https://rwasonar.com/review.html) | Evidence gaps and unreviewed external changes, prioritised |
 | [`/learn/`](https://rwasonar.com/learn/) | Plain-language guides to ownership, insolvency, redemption, issuer powers, oracles and DeFi custody |
-| [`/methodology.html`](https://rwasonar.com/methodology.html) | Evidence precedence, collector freshness, health definitions and known blind spots |
-| [`/review.html`](https://rwasonar.com/review.html) | The prioritized evidence gaps and unresolved external changes still needing human review |
-| [`/pitch/`](https://rwasonar.com/pitch/) | A short, web-native presentation of the problem, product, differentiation, current execution and vision |
+| [`/methodology.html`](https://rwasonar.com/methodology.html) | Evidence rules, monitoring jobs, model-assessment policy, redemption and float definitions, discrepancy types, live collector health, blind spots |
+| [`/pitch/`](https://rwasonar.com/pitch/) | A six-slide web deck |
 
-The public JSON API supports search, facets, paginated token and trade views, per-token history,
-issuers, claims, source changes, failure scenarios and saved comparison watches. See
-[`api/README.md`](api/README.md) for routes and examples.
+The public JSON API (`/api/`) serves search, facets, paginated tokens and trades, per-token
+history, issuers, claims, source changes, failure scenarios and saved watches. See
+[`api/README.md`](api/README.md).
+
+## The data
+
+- **Catalogue:** 1,183 exact, issuer-attributed and chain-observed Solana token addresses across
+  12 issuer programmes (9 with live tokens; Remora and Ventuals are defunct, Republic has no mint yet)
+  in the 22 Sep 2026 build. Admission needs a reviewed source or an issuer's own exact-mint registry.
+- **Issuer dossiers** (`stocks/data/issuers/`): hand-researched, every structured field carrying the
+  quote, URL, locator and date it came from.
+- **Machine-collected records** (`stocks/data/*.json`): mint state, venues, holders, reference
+  prices, trades, DeFi integrations, redemption observations, xStocks inventory. Built outputs are
+  the `stocks-*.json` files at the root, also loaded into the Postgres schema `sonar`.
+- **Daily snapshots** (`stocks/data/history/<date>/`) are committed and are the product's history.
 
 ## How it stays current
 
-- The public build refreshes every **6 hours**; generated pages and public JSON outputs are rebuilt
-  in dependency order, while each source category keeps its own last-successful timestamp.
-- The trade collector samples the busiest pools **hourly** on the server; `live.html` reads only our API, never a Solana RPC.
-- Token authorities, extensions, scheduled rebases and labelled wallets are checked **hourly**.
-- Cited legal and operational sources are checked **daily**. When a page refuses a script, the
-  watcher reads the publisher's own API for that page or its newest Wayback capture, and the record
-  says which. An archive.today copy is linked, never read.
-- Redemptions are observed on-chain **daily** (Ondo GM burns, xStocks deposit→payout, Superstate
-  conversions). The scan is checkpointed, and a failed or partial one is never reported as "no
-  redemptions".
-- Changed documents get a **daily** model assessment (at most 10 per day, costed per item). It is
-  shown beside the diff and never decides what is included.
-- CoinGecko CEX-market enrichment runs only **once daily**, capped at 250 ticker calls—about 7,530
-  calls in a 30-day month—while keyless DEX data can refresh every six hours.
-- Material external changes are rolled into one **morning digest** instead of generating alert spam.
+| Cadence (UTC) | Job | What it does |
+|---|---|---|
+| Hourly | `rwa-watch-chain` | Every catalogued mint's authorities, extensions, rebase multiplier, supply, metadata and labelled wallets; a change becomes a dated event with its slot |
+| Hourly | `rwa-trades` | Decodes swaps on the busiest pools; `live.html` reads only our API, never a Solana RPC |
+| Hourly | `rwa-watch-digest` | Private Telegram digests via @rwa_sonar_bot for saved watches, at the hour each owner chose |
+| Daily 02:41 | `rwa-watch` | Re-reads every cited source (576 on 23 Sep 2026), diffs it, re-checks quotes verbatim; falls back to the publisher's API, then a raw Wayback capture; archive.today is linked, never read |
+| Daily 04:23 | `rwa-watch-caselaw` | CourtListener and SEC litigation feeds for every issuer's entities; a hit is a lead for review, never an automatic "litigated" |
+| Daily 06:47 | `rwa-judge` | A model reads up to 10 changed documents in one batch; the verdict is shown as a model assessment beside the diff and never decides inclusion; cost recorded per item |
+| Daily 23:05 | `rwa-redemptions` | Checkpointed on-chain scan: Ondo burns, xStocks de-activations, Superstate conversions; PreStocks and Tessera recorded as not observable |
+| Every 6 h | `rwa-refresh` | Rebuilds and publishes every generated file (catalogue, cards and preview images, power map, flows and float, tracking, exits, weekly, review queue) |
 
-Automation detects and records change; it does not silently invent a legal conclusion. Internal
-research corrections are not public history: the public product shows the best current analysis.
-Real changes by an issuer, venue, protocol or on-chain authority remain dated, visible and sourced.
+A day that was not read is shown as missing, never as zero, and a failed scan is never shown as "none".
+Corrections to our own research are kept internally. Changes made by issuers, venues, protocols
+and on-chain authorities are published with a date and a source.
+
+## What is not covered
+
+- The catalogue is built from searches, since no official registry exists; an address we have not discovered is absent.
+- Holder counts are token accounts; one person can hold many, so they cannot say how many people own a token.
+- xStocks creations and Superstate conversions into tokens are not collected; PreStocks and Tessera
+  redemptions cannot be seen on chain; other issuers have no redemption scan.
+- The xStocks float is an upper bound, and most xStocks have no market price to value it with.
+- Legal analysis reads the structure of the documents. It is not a legal opinion and does not predict a court outcome.
+- Model assessments can be wrong; they never filter what is shown.
 
 ## Run locally
 
@@ -145,57 +148,44 @@ npm install --prefix api
 npm start
 ```
 
-Open the URL printed by the server. `npm start` launches the static site and the API on loopback,
-then prints separate static/API readiness lines. If `DATABASE_URL` is not present or the database
-is unreachable, the static site still starts and the API-backed panels show their unavailable state.
-
-For a static-only preview:
+`npm start` serves the site and the API on loopback and prints both readiness lines. Without a
+reachable `DATABASE_URL` the static site still starts and the API-backed panels show their
+unavailable state. For a static-only preview:
 
 ```bash
 npm run serve
 ```
 
-Local pages normally discover the API on port 3300. For a deterministic preview, especially when
-the static site uses a different hostname or port, open it with an explicit API origin:
+Pages find the API on port 3300 by default; pass an explicit origin when the hosts differ:
+`http://127.0.0.1:8113/stocks.html?api=http://127.0.0.1:3300`.
 
-```text
-http://127.0.0.1:8113/stocks.html?api=http://127.0.0.1:3300
-```
-
-`npm test` runs the fast headless stock, API and page suites without the previous duplicate
-`stocks-page` execution. Data collectors are explicit `--run` jobs; see
-[`stocks/README.md`](stocks/README.md) before refreshing any external source.
+`npm test` runs the fast headless stock, API and page suites. Data collectors are explicit `--run`
+jobs; read [`stocks/README.md`](stocks/README.md) before refreshing any external source.
 
 ## Hackathon package
 
-Built for the Stocklana hackathon on the
+Built for Stocklana on the
 [`colosseum-worlds-fair`](https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair) branch.
 Before the hackathon the project was a broader RWA catalogue; during Stocklana it became the
-stock-first Solana product described here: exact-token discovery, issuer dossiers, same-stock
-comparison, shareable reports, the what-if matrix, confirmed DeFi support, watchers and the pitch.
-Updates: [@RWASonar on X](https://x.com/RWASonar).
+Solana stock product described here. See [`SUBMISSION.md`](SUBMISSION.md).
 
 ## License
 
 The code license choice remains pending owner confirmation. Do not claim a specific open-source
-license until that is authorized. Third-party source documents, issuer marks, APIs and market data
-remain under their own terms.
+license until that is authorized. Third-party documents, issuer marks, APIs and market data remain
+under their own terms.
 
 ## Repository map
 
-- [`SUBMISSION.md`](SUBMISSION.md) — submission-ready short and long descriptions, differentiation
-  and demo flow.
-- [`UX-audit1.md`](UX-audit1.md) — the first full UX audit, implementation status and remaining
-  validation work.
-- [`TODO.md`](TODO.md) — the current product and research backlog.
-- [`next-steps.md`](next-steps.md) — the ordered product, UX and research roadmap following the
-  September 2026 refinement.
-- [`stocks/README.md`](stocks/README.md) — collection/build pipeline, outputs and operational rules.
-- [`stocks/MODEL.md`](stocks/MODEL.md) — the legal/technical grading model and its limits.
-- [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md) — claims, source watching, change detection and review.
-- [`stocks/findings.md`](stocks/findings.md) — dated research notes and primary-source findings.
-- `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh` — production refresh
-  and publication.
+- [`SUBMISSION.md`](SUBMISSION.md): submission descriptions, demo flow, claims to make precisely.
+- [`next-steps.md`](next-steps.md): open work.
+- [`TODO.md`](TODO.md): product and research backlog; [`UX-audit1.md`](UX-audit1.md): the first UX audit.
+- [`stocks/README.md`](stocks/README.md): collection/build pipeline, outputs and operational rules.
+- [`stocks/MODEL.md`](stocks/MODEL.md): the legal/technical grading model and its limits.
+- [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md): claims, source watching, change detection and review.
+- [`stocks/findings.md`](stocks/findings.md): dated research notes.
+- [`api/README.md`](api/README.md): API routes and private watch digests.
+- `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh`: production jobs,
+  refresh and publication.
 
-RWA Sonar is research, not investment or legal advice. Every conclusion should be independently
-verified before relying on it.
+RWA Sonar is research, not investment or legal advice. Verify every conclusion before relying on it.

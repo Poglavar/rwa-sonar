@@ -10,7 +10,7 @@
     const ISSUE_LABELS = {
         changed: 'Changed source', 'source-gone': 'Source gone', conflict: 'Conflict', missing: 'Missing',
         unsupported: 'Unsupported', stale: 'Stale', 'open-question': 'Open question',
-        'discovery-candidate': 'Candidate asset', 'reviewed-inference': 'Reviewed inference'
+        'discovery-candidate': 'Candidate asset', 'defi-integration-candidate': 'Possible DeFi integration', 'reviewed-inference': 'Reviewed inference'
     };
 
     function escapeHtml(value) {

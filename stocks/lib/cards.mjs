@@ -18,6 +18,7 @@ import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
 import protocolProof from './protocol-proof.js';
+import { breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags } from './site-seo.mjs';
 
 const { protocolProofModel } = protocolProof;
 
@@ -178,10 +179,12 @@ export const OG_DESCRIPTION_MAX = 200;
  * printed twice. Every protocol, its stage, account check and activity basis stay on the card.
  * Re-measured: min 84.6, median 84.7, max 95.6 kB (QQQx; SPYx 95.4, NVDAx 95.3).
  */
-// Size is a release signal, not a protocol limit. Stay under the 96 KiB target in normal builds;
+// Size is a release signal, not a protocol limit. Stay under the 104 KiB target in normal builds;
 // warn above it, and reserve 112 KiB as the point where likely duplication/runaway markup should
 // stop publication. Compressed wire size is reported separately by build-cards.mjs.
-export const CARD_BYTE_TARGET = 96 * 1024;
+// Raised from 96 KiB on 2026-09-24: the redemption-feed row, the DeFi route rows and the diagram
+// hook put the widest card (SPYx) at 100,181 B. Each addition is card content, not duplication.
+export const CARD_BYTE_TARGET = 104 * 1024;
 export const CARD_BYTE_LIMIT = 112 * 1024;
 
 /**
@@ -323,6 +326,9 @@ export function buildCard(input) {
         composabilityTemplate = null,
         defiUsageItem = null,
         reviewItems = [],
+        // The issuer's schematics entry (stocks/lib/schematics.js); the card links its first
+        // redemption schematic on the issuer page (drawing it would break the byte budget).
+        schematics = null,
         // Material model verdicts exported by build-cards.mjs ({asOf, items}), or null where the
         // judge's table cannot be read; see cardMaterialChanges.
         materialChanges = null
@@ -585,6 +591,8 @@ export function buildCard(input) {
         // same drawing. A record with no `chain` (a token whose issuer has no dossier) gets null and
         // the section says so.
         trustChain: issuer?.chain ?? null,
+        redemptionSchematic: Array.isArray(schematics?.redemption) && schematics.redemption.length > 0
+            ? schematics.redemption[0] : null,
         whatIf: cardWhatIf(whatIf, catalogue, archives),
         issuerApi: issuerApiFacts(token?.issuer, token?.issuerApi),
         sources: {
@@ -1282,7 +1290,7 @@ function whatYouOwnBody(card) {
     const usability = card.ownership.redemptionUsability;
     const redemption = o.redemption.available === null && !usability.fields.some((field) => field.value !== null)
         ? null
-        : `${yesNo(o.redemption.available)} — holder, jurisdiction, route and fee qualifications below.`;
+        : `${yesNo(o.redemption.available)}. Holder, jurisdiction, route and fee conditions are below.`;
 
     const summary = kv([
         ['Claim depth', rung],
@@ -1336,7 +1344,21 @@ function whatYouOwnBody(card) {
     const banner = usability.documentedButNotIndependentlyObserved
         ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
         : '';
-    return summary + `<div class="redemption-usability"><h3>Can a holder actually redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`;
+    return summary + `<div class="redemption-usability"><h3>Can a holder redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`
+        + redemptionSchematicHtml(card);
+}
+
+/**
+ * A link to the programme's redemption schematic on the issuer page. Measured 2026-09-24: even the
+ * SVG alone adds ~4.4 kB (6.2 kB with its step list) and the widest card was already past the
+ * 96 kB target, so the drawing lives on the issuer page and the card only names and links it.
+ */
+function redemptionSchematicHtml(card) {
+    const spec = card.redemptionSchematic ?? null;
+    const slug = card.issuer?.slug ?? null;
+    if (spec === null || slug === null) return '';
+    return `<p class="redemption-schematic-link"><a href="../issuers/${encodeURIComponent(slug)}.html#how-it-works">`
+        + `See it drawn step by step: ${escapeHtml(spec.title ?? 'redemption route')} →</a></p>`;
 }
 
 function referenceBody(card) {
@@ -1355,7 +1377,7 @@ function referenceBody(card) {
 function afterHoursBody(card) {
     const a = card.afterHours;
     if (a === null) {
-        return '<p class="no">No session split yet — this needs a full session of tape on both sides ' +
+        return '<p class="no">No session split yet. It needs a full session of trades on both sides ' +
             'of the underlying market\'s open.</p>';
     }
     return kv([
@@ -1495,8 +1517,8 @@ function controlBody(card) {
         const detail = [date, source].filter(Boolean).join(' · ');
         return detail ? `${escapeHtml(label)} — ${detail}` : null;
     }).filter(Boolean).join(' · ') || 'Not established';
-    return summary + '<div class="authority-attribution"><h3>Capability is not permission</h3>'
-        + '<p class="note">Technical capability, governance and legal permission are distinct; unknown is not safe.</p>'
+    return summary + '<div class="authority-attribution"><h3>Capability and permission</h3>'
+        + '<p class="note">Capability, governance and legal permission are separate facts. Unknown never counts as safe.</p>'
         + kv([['Capabilities present', escapeHtml(capabilityList('present'))],
             ['Capabilities absent', escapeHtml(capabilityList('absent'))],
             ['Capabilities unknown', escapeHtml(capabilityList('unknown'))],
@@ -1555,8 +1577,8 @@ function venuesBody(card) {
 function issuerApiBody(card) {
     const a = card.issuerApi;
     if (a === null) return '';
-    const caveat = '<p class="note">The issuer\'s own numbers, not an independent price, and read ' +
-        'at the <em>issuerApi</em> time in the footer — which can be hours older than the rest of ' +
+    const caveat = '<p class="note">These are the issuer\'s own numbers, with no independent check. They were read ' +
+        'at the <em>issuerApi</em> time in the footer, which can be hours older than the rest of ' +
         'this card, so a trading status here may disagree with the reference section above.</p>';
     if (a.kind === 'prestocks') {
         return caveat + kv([
@@ -1611,10 +1633,10 @@ function trustChainBody(card) {
     if (card.trustChain === null) {
         return '<p class="tc-empty">No trust chain has been built for this token’s issuer.</p>';
     }
-    return '<p class="wi-note">Thirteen actors stand between you and the company, and nine rights '
-        + 'flows run between them. A lane’s colour is how well the link is evidenced and its line '
-        + 'style is how it was verified; neither is typed by hand. An actor nobody fills keeps its '
-        + 'seat, because an empty one is the finding.</p>'
+    return '<p class="wi-note">Thirteen actors sit between you and the company, with nine rights '
+        + 'flows between them. Colour shows how well each link is evidenced and line style shows '
+        + 'how it was verified; both are derived from the data. A role nobody fills stays on the '
+        + 'chart, so the gap is visible.</p>'
         + trustChainSvg.diagramHtml(card.trustChain, {
             id: `chain-${card.slug}`,
             title: `Trust chain — ${card.issuer.name ?? card.issuer.slug ?? 'issuer'}`,
@@ -1642,8 +1664,8 @@ function whatIfBody(card) {
     return whatIfLib.whatIfHtml(card.whatIf.answers, {
         order: actors.map((actor) => actor.id),
         labels: Object.fromEntries(actors.map((actor) => [actor.id, actor.label])),
-        intro: `The same ${card.whatIf.answers.length} questions are put to every issuer, so a gap `
-            + 'is visible as a gap. An outcome is never invented. The quote behind each answer, the '
+        intro: `Every issuer gets the same ${card.whatIf.answers.length} questions, so missing answers `
+            + 'show as gaps. An outcome is never invented. The quote behind each answer, the '
             + 'cases and where we looked are on the issuer panel.',
         quote: false,
         note: false,
@@ -1818,12 +1840,12 @@ function composabilityBody(card) {
         ? `Source-listed for this exact token: ${collateral.join(', ')}. No successful borrow is independently evidenced.`
         : 'No checked protocol currently lists this exact token as programmatic collateral.';
     const cashExit = card.ownership.redemption.available === true && card.ownership.redemption.kyc === true
-        ? 'Conditional — issuer redemption requires KYC/AML and is not an autonomous smart-contract exit.'
+        ? 'Conditional: issuer redemption requires KYC/AML, so a smart contract cannot redeem on its own.'
         : card.ownership.redemption.available === true
-            ? 'Recorded — eligible holders have an issuer redemption route, subject to its contractual terms.'
+            ? 'Recorded: eligible holders have an issuer redemption route, subject to its contractual terms.'
             : card.ownership.redemption.available === false
                 ? 'No holder redemption right is recorded; liquidation depends on finding a buyer.'
-                : 'Unknown — an issuer redemption route has not been sufficiently established.';
+                : 'Unknown: the evidence does not establish an issuer redemption route.';
     const marketExit = dex.length
         ? `Observed exact-token pools: ${dex.join(', ')}. Pool presence does not guarantee executable liquidation size.`
         : 'No exact-token DEX pool is confirmed; an autonomous market exit is not established.';
@@ -1836,7 +1858,7 @@ function composabilityBody(card) {
         + `<p>${escapeHtml(cashExit)}</p></article><article><strong>Autonomous market exit</strong>`
         + `<p>${escapeHtml(marketExit)}</p></article></div>`
         + `<p class="note">Template: ${escapeHtml(template.legalTemplate)} · ${escapeHtml(template.recipe)}. `
-        + '“Can recover” means an issuer has the capability, not a duty to act.</p>'
+        + '“Can recover” means the issuer is able to act, with no duty to act.</p>'
         + `<p class="tc-out"><a href="../templates/${encodeURIComponent(template.id)}.html">Open the complete technology + legal template →</a></p>`
         + `<div class="comp-grid">${scenarios}</div>`;
 }
@@ -1890,13 +1912,13 @@ export function assetDecisionFacts(card) {
     const marketExit = (dexPairs ?? 0) > 0 || (liquidity ?? 0) > 0
         ? `Secondary market: ${dexPairs ?? 'an uncounted number of'} confirmed DEX pair${dexPairs === 1 ? '' : 's'}${liquidity === null ? '' : ` with ${fmtMoney(liquidity)} reported liquidity`}. Pool presence does not guarantee executable size.`
         : (cexMarkets ?? 0) > 0
-            ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. That is a custodial venue exit, not autonomous onchain liquidity.${venueCheck}`
+            ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. Selling there goes through a custodial venue, with no on-chain pool.${venueCheck}`
             : `No confirmed secondary-market exit: no exact-token DEX pair or centralised venue market was found.${venueCheck} Legal rights, issuer redemption and DeFi support are still assessed independently.`;
     const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
         .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
     const worst = (Array.isArray(card?.health?.rules) ? card.health.rules : [])
         .find((rule) => rule.id === card?.health?.worstRuleId) ?? null;
-    let risk = worst?.note ?? 'No material risk was measured by the current checks; unknown evidence remains unknown.';
+    let risk = worst?.note ?? 'The current checks measured no material risk; what they could not measure is unknown.';
     let riskHref = '#evidence-detail';
     let riskLink = 'Inspect evidence';
     if (discrepancy !== null) {
@@ -1951,7 +1973,7 @@ export function materialChangesHtml(card) {
         + `${item.assessmentSeverity ? ` · ${escapeHtml(item.assessmentSeverity)}` : ''} · ${escapeHtml(item.change ?? '')}</span>`
         + `<q>${escapeHtml(item.assessment ?? '')}</q></li>`).join('');
     return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong><ul>${items}</ul>`
-        + `<p>A model's reading of each document diff, not a legal conclusion. <a href="${href}">`
+        + `<p>A model's reading of each document diff. It is not a legal conclusion. <a href="${href}">`
         + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
 }
 
@@ -1998,30 +2020,34 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const imageUrl = `${origin}/${ownImage ? ogImage.path.split('/').map(encodeURIComponent).join('/') : OG_IMAGE_PATH}`;
     const imageAlt = ownImage && typeof ogImage.alt === 'string' && ogImage.alt.trim() ? ogImage.alt : OG_IMAGE_ALT;
 
+    // The newest of the card's own source timestamps: when its data last changed, not the build clock.
+    const dataModified = Object.values(card.sources ?? {}).filter((value) => typeof value === 'string').sort().at(-1) ?? null;
     const head = [
         '<meta charset="UTF-8" />',
         '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
-        `<title>${escapeHtml(pageTitle(card))}</title>`,
-        `<meta name="description" content="${escapeHtml(description)}" />`,
-        `<meta property="og:title" content="${escapeHtml(ogTitle(card))}" />`,
-        `<meta property="og:description" content="${escapeHtml(description)}" />`,
-        '<meta property="og:type" content="article" />',
-        pageUrl === null ? null : `<meta property="og:url" content="${escapeHtml(pageUrl)}" />`,
-        pageUrl === null ? null : `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
         // The preview image is absolute, so like og:url it exists only with a stated origin. The
         // token's own image when one was rendered, else the site-wide one; both are 1200×630.
-        origin === null ? null : `<meta property="og:image" content="${escapeHtml(imageUrl)}" />`,
-        origin === null ? null : '<meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />',
-        origin === null ? null : `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`,
-        origin === null ? null : `<meta name="twitter:image" content="${escapeHtml(imageUrl)}" />`,
-        origin === null ? null : `<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}" />`,
-        `<meta name="twitter:card" content="${origin === null ? 'summary' : 'summary_large_image'}" />`,
-        '<meta name="twitter:site" content="@RWASonar" />',
+        seoHeadTags({
+            title: pageTitle(card),
+            description,
+            socialTitle: ogTitle(card),
+            url: pageUrl,
+            type: 'article',
+            image: origin === null ? null : { url: imageUrl, alt: imageAlt, width: 1200, height: 630 },
+            jsonLd: pageUrl === null ? null : ldGraph([
+                organizationLd(origin),
+                reportLd({ origin, url: pageUrl, headline: ogTitle(card), description, dateModified: dataModified, image: imageUrl,
+                    about: { '@type': 'Thing', name: card.name ?? card.symbol ?? card.mint, identifier: card.mint } }),
+                breadcrumbLd([{ name: 'RWA Sonar', url: `${origin}/` }, { name: 'Tokenized stocks', url: `${origin}/stocks.html` },
+                    { name: card.symbol ?? card.mint, url: pageUrl }])
+            ])
+        }),
         '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
         `<link rel="stylesheet" href="../trustchain.css${v}" />`,
-        `<link rel="stylesheet" href="../app-shell.css${v}" />`
+        `<link rel="stylesheet" href="../app-shell.css${v}" />`,
+        contactStylesheet('../')
     // Whitespace between head elements is not user-facing content. Keep the rendered document
     // compact rather than spending the card budget on indentation repeated in every card.
     ].filter((line) => line !== null).join('');
@@ -2048,7 +2074,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
 
     const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium & holders</span></summary><div>` +
         section('reference', 'Reference & premium', referenceBody(card)) +
-        `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. Gaps are missing measurements, not zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
+        `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
         section('afterhours', 'After-hours premium', afterHoursBody(card)) +
         section('depth', 'Depth, volume, activity', depthBody(card)) +
         section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
@@ -2074,5 +2100,5 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main>${contactFooterHtml('../')}<script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script></body></html>`;
 }

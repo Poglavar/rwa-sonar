@@ -34,12 +34,12 @@ describe('public methodology page', () => {
     test('states what every domain can and cannot prove', () => {
         for (const phrase of [
             'Market', 'Control', 'Legal &amp; evidence', 'DeFi composability',
-            'Does not prove:', 'Known blind spots', 'Unknown is not safe', 'When sources disagree'
+            'Does not prove:', 'Known blind spots', 'Unknown stays unknown', 'When sources disagree'
         ]) expect(html).toContain(phrase);
     });
 
     test('publishes external change history without exposing internal editorial corrections', () => {
-        expect(html).toContain('Reality is allowed to change.');
+        expect(html).toContain('When sources change');
         expect(html).toContain('best current analysis');
         expect(html).toContain('continuing conflict between actors or sources remains visible');
         expect(html).not.toContain('Contradictions are retained as corrections');
@@ -49,7 +49,7 @@ describe('public methodology page', () => {
         expect(readFileSync(join(__dirname, 'methodology.js'), 'utf8')).toContain("fetchJson('./stocks-collector-status.json')");
         expect(html).toContain('id="collectorGrid"');
         expect(html).toContain('id="apiHealth"');
-        expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
+        expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
     test('uses the full responsive survey scene with a descriptive alternative', () => {
         expect(html).toContain('survey-team-v2-768.webp 768w');

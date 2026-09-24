@@ -8,9 +8,9 @@
     else root.__rwaDiscovery = factory();
 })(this, function () {
     const CLAIMS = [
-        'price exposure only — not ownership of the share',
-        'an unsecured claim against the token issuer — not a share in the company',
-        'a claim secured over collateral — not the underlying share itself',
+        'price exposure only; you do not own the share',
+        'an unsecured claim against the token issuer, with no share in the company',
+        'a claim secured over collateral; you do not own the underlying share',
         'a beneficial interest in shares held through an intermediary',
         'the registered share itself, subject to the official shareholder register'
     ];
@@ -61,7 +61,7 @@
         } else if (rung === null) {
             mainFailure = 'The primary dependency is legal clarity: the token may move while the holder’s enforceable rights remain unclear.';
         } else if (rung <= 1) {
-            mainFailure = 'The primary dependency is the issuer: the token holder may be only a general creditor, not an owner of ring-fenced shares.';
+            mainFailure = 'The primary dependency is the issuer: the token holder may be only a general creditor, with no claim to ring-fenced shares.';
         } else if (rung === 2) {
             mainFailure = 'The primary dependency is enforcement: value depends on a valid, perfected and practically enforceable security interest.';
         } else if (rung === 3) {
