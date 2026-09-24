@@ -430,6 +430,9 @@ body {
     border-radius: 12px;
     background: var(--card-bg);
     padding: 14px 16px;
+    /* Findings quote addresses and signatures: long unbroken base58 strings must wrap on phones. */
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .wat-journal-item.wat-journal-warning { border-top-color: var(--sev-warning); }
@@ -473,6 +476,12 @@ body {
     border-radius: 8px;
     background: var(--wat-inset);
     font-size: 0.82rem;
+}
+
+/* A URL has no spaces, so without this it runs across the arrow into the other column. */
+.wat-journal-move > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .wat-since-chips {
