@@ -38,6 +38,7 @@ and courts.
 - **Built during Stocklana:** the repository dates from 13 Feb 2026 as a broad RWA catalogue; `main`
   at `8f58030` (19 Aug 2026) is the pre-hackathon state, and every commit on this branch dates from
   16 Sep 2026 onwards. [`SUBMISSION.md`](SUBMISSION.md) has the form text and the full disclosure.
+- **Licence:** [MIT](LICENSE).
 - **Run it:** `npm install && npm install --prefix api && npm start` (details under
   [Run locally](#run-locally)); `npm test` runs the fast headless suites.
 - **Team:** Poglavar Svemira, solo ([@poglavars](https://x.com/poglavars) on X,
@@ -225,9 +226,8 @@ Solana stock product described here. See [`SUBMISSION.md`](SUBMISSION.md).
 
 ## License
 
-The code license choice remains pending owner confirmation. Do not claim a specific open-source
-license until that is authorized. Third-party documents, issuer marks, APIs and market data remain
-under their own terms.
+[MIT](LICENSE), © 2026 Poglavar Svemira. Third-party documents, issuer marks, APIs and market data
+quoted or cached here remain under their own terms.
 
 ## Repository map
 

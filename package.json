@@ -1,5 +1,6 @@
 {
   "name": "rwa-sonar",
+  "license": "MIT",
   "version": "1.0.0",
   "description": "RWA Sonar — how tokenized is it really",
   "main": "asset-modal.js",

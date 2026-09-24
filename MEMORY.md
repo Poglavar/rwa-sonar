@@ -79,3 +79,4 @@
 - 2026-09-24: **Team for submissions is Poglavar Svemira, solo** (owner decision): X @poglavars, Telegram @svemirsky, the owner's gmail, github.com/Poglavar; the site's own account stays @RWASonar. Form text lives in SUBMISSION.md "Form fields" (short ≤ 280, full ≤ 5,000 characters).
 - 2026-09-24: **No alerts-bot link in the site footer** (owner request); the bot stays reachable from watch.html.
 - 2026-09-24: **Snapshot-diff events keep the time a build first saw them** (`stampFirstSeen`, server-state ledger `stocks/data/event-first-seen.json`), because the day's snapshot is rewritten every refresh.
+- 2026-09-24: **The repository is MIT-licensed** (owner decision), © 2026 Poglavar Svemira; third-party documents and data keep their own terms.

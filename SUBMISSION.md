@@ -40,7 +40,7 @@ description ≤ 5,000 characters (Markdown), up to 3 sponsor tracks, a linked So
 Don't trust the ticker, inspect the token. RWA Sonar shows what each tokenized stock on Solana really gives you: what you legally own, who can freeze, move or burn it, where you can trade, redeem or borrow against it, and what changed, with a source for every claim.
 ```
 
-### Full description (4,550 of 5,000 characters)
+### Full description (4,576 of 5,000 characters)
 
 ````markdown
 ## RWA Sonar: tokenized stocks on Solana, explained
@@ -82,7 +82,7 @@ RWA Sonar answers these questions for every token, from the chain and the issuer
 Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher that keeps every version; a case-law watcher; a redemption observer; and a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history. The static site is rebuilt every 6 hours and published atomically. Data is keyless or free-tier where possible: Solana RPC, Jupiter, Pyth, CoinGecko and issuer APIs.
 
 ### Built during Stocklana
-The repository started on 13 Feb 2026 as a broad RWA catalogue. The last pre-hackathon state is `main` at `8f58030` (19 Aug 2026). Every commit on the `colosseum-worlds-fair` branch (227 by 24 Sep 2026) dates from 16 Sep 2026 onwards; together they turned it into the Solana tokenized-stock product described here. Open-source dependencies come through npm as usual.
+The repository started on 13 Feb 2026 as a broad RWA catalogue. The last pre-hackathon state is `main` at `8f58030` (19 Aug 2026). Every commit on the `colosseum-worlds-fair` branch (227 by 24 Sep 2026) dates from 16 Sep 2026 onwards; together they turned it into the Solana tokenized-stock product described here. The code is MIT-licensed; open-source dependencies come through npm as usual.
 
 ### Team
 Poglavar Svemira, solo: research, legal analysis, data pipelines and the site. X [@poglavars](https://x.com/poglavars) · Telegram [@svemirsky](https://t.me/svemirsky) · poglavar.svemira@gmail.com · [github.com/Poglavar](https://github.com/Poglavar)
@@ -202,10 +202,9 @@ composability checks, generated cards, monitor/watch surfaces, API-backed rows, 
 the submission/pitch package.
 
 Open-source components from others are used in the ordinary way through the project dependency tree.
-The code license choice remains pending owner confirmation; the submission should not claim a
-specific open-source license until that is authorized. Third-party documents, issuer terms, APIs and
-market data remain owned by their respective providers; RWA Sonar records citations and derived
-analysis, not ownership of those materials.
+The code is open source under the [MIT License](LICENSE) (chosen 24 Sep 2026). Third-party documents,
+issuer terms, APIs and market data remain owned by their respective providers; RWA Sonar records
+citations and derived analysis, not ownership of those materials.
 
 ## Team
 
