@@ -27,8 +27,9 @@ export function sourceWatchStatsFileName({ only = null, limit = null, onlyBlocke
 
 /**
  * The sources `--only-blocked` re-reads: those whose stored state says the live host did not give
- * us the document last time — `blocked` (a refusal, a bot wall, a JavaScript-only page, a 400/429),
- * the same refusal on a source no quote relies on (`reachable-unverified`),
+ * us the document last time — `blocked` (a refusal, a bot wall, a 400/429), `unreadable` (it
+ * answered with something that is not the document: a script-only page, a region block —
+ * lib/unreadable.mjs), the same on a source no quote relies on (`reachable-unverified`),
  * or read from an archived capture or a companion API because the live page refused us. A repair run over exactly
  * these measures what a fallback change buys without re-fetching the other ~500 sources.
  */
@@ -36,7 +37,8 @@ export function previouslyBlocked(sources, state) {
     return (Array.isArray(sources) ? sources : []).filter((source) => {
         const prev = state?.[source?.url];
         if (!prev) return false;
-        return prev.status === 'blocked' || prev.status === 'reachable-unverified' || prev.via === 'wayback' || prev.readVia === 'wayback'
+        return prev.status === 'blocked' || prev.status === 'unreadable' || prev.status === 'reachable-unverified'
+            || prev.via === 'wayback' || prev.readVia === 'wayback'
             || (typeof prev.companionUrl === 'string' && prev.companionUrl !== '');
     });
 }
@@ -291,18 +293,19 @@ export function normaliseByKind(kind, payload, { keepChurn = false } = {}) {
 
 /**
  * A stored version re-read for the quote check (a 304, or the same Wayback capture as last run):
- * the raw copy kept on disk -> `{text, quoteText, jsOnly}`, where `text` is the churn-filtered
- * reading (what was hashed) and `quoteText` the unfiltered one. `rawExt` is the stored file's
- * extension, `via` the reader recorded for it; `payload` is the raw file as a string — for a PDF,
- * pdftotext's output, which only the IO side can produce. `jsOnly` says the stored copy is itself a
- * JavaScript shell: a 304 then only confirms that nothing readable is still nothing readable.
+ * the raw copy kept on disk -> `{kind, text, quoteText}`, where `text` is the churn-filtered
+ * reading (what was hashed), `quoteText` the unfiltered one and `kind` what the copy was read as
+ * (html | pdf | api). `rawExt` is the stored file's extension, `via` the reader recorded for it;
+ * `payload` is the raw file as a string — for a PDF, pdftotext's output, which only the IO side can
+ * produce. Whether the stored copy is itself unreadable (a JavaScript shell, a region block: a 304
+ * then only confirms that nothing readable is still nothing readable) is lib/unreadable.mjs's call.
  * Null for a stored copy that cannot be re-read (a binary marker, an unparseable recordMap).
  */
 export function storedReading({ rawExt, via = null, payload }) {
     if (typeof payload !== 'string') return null;
     if (via === 'binary') return null;
     if (rawExt === 'pdf') {
-        return { text: pdfTextToText(payload), quoteText: pdfTextToText(payload, { keepChurn: true }), jsOnly: false };
+        return { kind: 'pdf', text: pdfTextToText(payload), quoteText: pdfTextToText(payload, { keepChurn: true }) };
     }
     if (rawExt === 'json' && via === 'notion') {
         let doc;
@@ -314,16 +317,16 @@ export function storedReading({ rawExt, via = null, payload }) {
         if (!doc?.recordMap || typeof doc.pageId !== 'string') return null;
         const rendered = renderNotionBlocks(doc.recordMap, doc.pageId);
         return {
+            kind: 'html',
             text: normaliseLines(rendered, { htmlWidgets: true }),
-            quoteText: normaliseLines(rendered, { htmlWidgets: true, keepChurn: true }),
-            jsOnly: false
+            quoteText: normaliseLines(rendered, { htmlWidgets: true, keepChurn: true })
         };
     }
     if (rawExt === 'json') {
-        return { text: jsonToText(payload), quoteText: jsonToText(payload, { keepChurn: true }), jsOnly: false };
+        return { kind: 'api', text: jsonToText(payload), quoteText: jsonToText(payload, { keepChurn: true }) };
     }
     const read = htmlDocumentText(payload);
-    return { text: read.text, quoteText: read.quoteText, jsOnly: isJsOnlyRead({ kind: 'html', text: read.text, rawHtml: payload }) };
+    return { kind: 'html', text: read.text, quoteText: read.quoteText };
 }
 
 /**
@@ -771,16 +774,17 @@ export function checkQuotes(text, quotes, { pdf = false } = {}) {
 }
 
 /**
- * The quote check for one source after one look at it. A `blocked` source — a JavaScript-only page,
- * a bot wall with no usable Wayback capture — has no text worth reading: the stub it served
- * ("Ventuals" for app.ventuals.com/sunset, whose letter renders only in a browser) is not the
- * document, so checking a quote against it would report every quote lost. Its quotes are "not
- * checkable": verdict null, counted in `notCheckable`, never `lost`. Other outcomes with no text
- * (gone, error) return null — nothing was checked and the previous verdicts stand.
+ * The quote check for one source after one look at it. A `blocked` source (a bot wall with no
+ * usable Wayback capture) or an `unreadable` one (a JavaScript-only page, a region block —
+ * lib/unreadable.mjs) has no text worth reading: the stub it served ("Ventuals" for
+ * app.ventuals.com/sunset, whose letter renders only in a browser) is not the document, so checking
+ * a quote against it would report every quote lost. Its quotes are "not checkable": verdict null,
+ * counted in `notCheckable`, never `lost`. Other outcomes with no text (gone, error) return null —
+ * nothing was checked and the previous verdicts stand.
  */
 export function quoteVerdicts({ status, text, quotes, kind = 'html' }) {
     const items = Array.isArray(quotes) ? quotes : [];
-    if (status === 'blocked') return { checked: 0, found: [], lost: [], skipped: 0, notCheckable: items.length };
+    if (status === 'blocked' || status === 'unreadable') return { checked: 0, found: [], lost: [], skipped: 0, notCheckable: items.length };
     if (typeof text !== 'string' || (status !== 'ok' && status !== 'changed')) return null;
     return { ...checkQuotes(text, items, { pdf: kind === 'pdf' }), notCheckable: 0 };
 }
@@ -844,6 +848,24 @@ export function userAgentFor(host, { fallback = DEFAULT_USER_AGENT } = {}) {
 }
 
 /**
+ * Hosts whose server sends the wrong intermediate certificate, with the repo file holding the one
+ * its leaf is really issued by. www.cysec.gov.cy sends "GoDaddy TLS Intermediate CA DV - R1v1" for
+ * a leaf issued by "Go Daddy Secure Certificate Authority - G2" (measured 2026-09-24), so Node fails
+ * with UNABLE_TO_VERIFY_LEAF_SIGNATURE where a browser fetches the right one itself. The extra
+ * certificate is added to the default roots for THAT host's requests only (watch-sources.mjs); the
+ * TLS check itself is never relaxed.
+ */
+export const EXTRA_CA_HOSTS = [
+    ['www.cysec.gov.cy', 'stocks/certs/godaddy-secure-ca-g2.pem']
+];
+
+/** The repo-relative CA file to add for `host`, or null. Exact host match only. */
+export function extraCaFor(host) {
+    const name = String(host ?? '').toLowerCase();
+    return EXTRA_CA_HOSTS.find(([h]) => h === name)?.[1] ?? null;
+}
+
+/**
  * Hosts whose 503 is their own outage rather than a fault in our watch. archive.org's availability
  * and CDX APIs were answering 503 "temporarily offline" on 2026-09-17; the dossiers cite six
  * `web.archive.org` URLs, and one third-party maintenance window must not turn the daily verdict
@@ -893,10 +915,10 @@ export function blockVendor(headers = {}) {
  * enable JavaScript, and almost no text once the markup is stripped. Notion-hosted terms of
  * service look exactly like this — `https://url.prestocks.com/terms-of-service` normalises to the
  * single word "Notion". It is not a bot wall and not an error: it is a document a fetch cannot
- * read, which is what `blocked` is for, with the reason saying so instead of silently hashing six
- * characters and calling the terms of service watched.
+ * read, which is what `unreadable` is for (lib/unreadable.mjs, which applies this test), with the
+ * reason saying so instead of silently hashing six characters and calling the terms of service watched.
  *
- * `blocked` is the verdict of last resort, though, not the first answer: where the document can be
+ * `unreadable` is the verdict of last resort, though, not the first answer: where the document can be
  * had another way, the watcher takes that way and this test never runs. PreStocks' Notion pages go
  * through lib/notion.mjs (`loadPageChunk`, 123 kB of real Terms) and Google Drive's viewer through
  * `driveDownloadUrl` above (the PDF itself). Both were `blocked`/two-line shells until 2026-09-18.
@@ -935,27 +957,17 @@ export function emptyPublishedPage(rawHtml = '') {
 }
 
 /**
- * Whether a 2xx read is a JavaScript-only shell (see `jsOnlyShell`). Only an HTML page read as
- * HTML can be one: a Notion page has already been read through its API, and a binary payload (a
- * zip, a PNG served as the cited "document") is watched as bytes — its one-line marker is short
- * and its body large by nature, which made `cdn.sanity.io/…zip` and a logo PNG "javascript-only"
- * once a run actually re-read them (2026-09-23).
- */
-export function isJsOnlyRead({ kind, binary = false, notion = false, text, rawHtml = '' }) {
-    if (notion || binary || kind !== 'html') return false;
-    if (emptyPublishedPage(rawHtml)) return false;
-    return jsOnlyShell(text, rawHtml);
-}
-
-/**
  * The validators (etag, last-modified) to store after one response, and the HTTP status of the
  * response they came from. Only a 2xx body's validators describe the document; a 304 confirms the
  * stored ones; anything else (404, 403, a bot wall) keeps what we had. Measured 2026-09-24: a
  * PreStocks FAQ bundle went 404 on Vercel, the 404 page's etag was stored, and a conditional GET
- * with it answered 304 — so a dead URL was reported `ok, http-304` on every later run.
+ * with it answered 304 — so a dead URL was reported `ok, http-304` on every later run. The same
+ * holds for a 2xx whose body was not the document (`readable: false` — a bot wall served with 200,
+ * an unreadable read, lib/unreadable.mjs): a region block's etag answered 304 would stand on the
+ * last readable version as if the document had been confirmed.
  */
-export function responseValidators({ httpStatus, headers = {}, prev = null } = {}) {
-    if (httpStatus >= 200 && httpStatus < 300) {
+export function responseValidators({ httpStatus, headers = {}, prev = null, readable = true } = {}) {
+    if (httpStatus >= 200 && httpStatus < 300 && readable) {
         return { etag: headers.etag ?? null, lastModified: headers['last-modified'] ?? null, validatorStatus: httpStatus };
     }
     const kept = { etag: prev?.etag ?? null, lastModified: prev?.lastModified ?? null, validatorStatus: prev?.validatorStatus ?? null };
@@ -1007,11 +1019,13 @@ export function apiAnswerIsDocument({ httpStatus = null, contentType = null, url
  * What state a fetch leaves a source in. Kept separate from the fetching so every branch is
  * testable: `ok` (200 and the same hash, or 304), `changed` (200 and a new hash), `gone` (404,
  * 410 or a host that no longer resolves — EVIDENCE.md §3 `document-gone`), `blocked` (the host
- * refuses us: 401/403/405/406/429-after-backoff/451, or a bot wall), `error` (anything else:
- * 5xx, timeout, reset — a run with one of these must not report success).
+ * refuses us: 401/403/405/406/429-after-backoff/451, or a bot wall), `unreadable` (a 2xx whose body
+ * is not the document — `unreadable` is lib/unreadable.mjs's verdict `{code, reason}`: no version,
+ * no change event, the last readable version stays the baseline), `error` (anything else: 5xx,
+ * timeout, reset — a run with one of these must not report success).
  */
 export function decideOutcome({ httpStatus = null, networkErrorCode = null, blocked = false,
-    sameHash = false, retriedAfterBackoff = false, jsOnly = false, vendor = null,
+    sameHash = false, retriedAfterBackoff = false, unreadable = null, vendor = null,
     host = null, apiAnswer = false } = {}) {
     if (networkErrorCode) {
         if (networkErrorCode === 'ENOTFOUND') {
@@ -1058,7 +1072,9 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
     }
     if (httpStatus !== null && httpStatus >= 200 && httpStatus < 300) {
         if (blocked) return { status: 'blocked', reason: 'bot wall served with a 200' };
-        if (jsOnly) return { status: 'blocked', reason: 'javascript-only page: no text without a browser' };
+        if (unreadable && unreadable.readable !== true) {
+            return { status: 'unreadable', code: unreadable.code ?? null, reason: unreadable.reason ?? 'couldn\'t read the response' };
+        }
         return sameHash ? { status: 'ok', reason: 'same hash' } : { status: 'changed', reason: 'new hash' };
     }
     // A host that is simply down today (archive.org's APIs were, on 2026-09-17) is recorded, not
@@ -1075,15 +1091,16 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
  * is reported as "not checkable" instead of silently passing; a source no dossier quotes — a
  * homepage in a `website` field, a listing named in a what-if's `searched` trail, a folder cited as
  * "the series" — has no words to check, and what its citation needs is that the host still answers
- * at that address. So a `blocked` source with NO registered quote whose host did answer (any HTTP
- * status: a 403 bot wall, a JavaScript shell) becomes `reachable-unverified`: reachable, content
- * not read. It still goes `gone` on a 404/410/NXDOMAIN like any other source. A refusal without an
- * HTTP answer (network timeout, expired certificate) proves nothing about reachability and stays
- * `blocked`, and so does any source a quote relies on — adding a quote to a dossier turns the same
- * refusal back into `blocked` on the next run. Returns the replacement `{status, reason}` or null.
+ * at that address. So a `blocked` or `unreadable` source with NO registered quote whose host did
+ * answer (any HTTP status: a 403 bot wall, a JavaScript shell, a region block) becomes
+ * `reachable-unverified`: reachable, content not read. It still goes `gone` on a 404/410/NXDOMAIN
+ * like any other source. A refusal without an HTTP answer (network timeout, expired certificate)
+ * proves nothing about reachability and stays `blocked`, and so does any source a quote relies on —
+ * adding a quote to a dossier turns the same refusal back into `blocked` (or `unreadable`) on the
+ * next run. Returns the replacement `{status, reason}` or null.
  */
 export function quotelessRefusal({ status, httpStatus = null, reason = '', quotesRegistered = 0 } = {}) {
-    if (status !== 'blocked' || quotesRegistered > 0) return null;
+    if ((status !== 'blocked' && status !== 'unreadable') || quotesRegistered > 0) return null;
     if (typeof httpStatus !== 'number' || !Number.isFinite(httpStatus)) return null;
     return {
         status: 'reachable-unverified',

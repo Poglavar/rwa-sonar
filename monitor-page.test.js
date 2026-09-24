@@ -423,7 +423,7 @@ describe('describeApiFailure', () => {
 
 // -------------------------------------------------------------- table rows
 
-describe('tokenRowsFromApi and gapIndex', () => {
+describe('tokenRowsFromApi and closedMarketIndex', () => {
     /** Two slim rows exactly as /api/tokens serves them, snake_case and all. */
     function items() {
         return [
@@ -447,7 +447,13 @@ describe('tokenRowsFromApi and gapIndex', () => {
         ];
     }
 
-    const gaps = M.gapIndex({ items: [{ mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', gapPct: -1.4 }] });
+    // One stocks-closed-market.json item in its real shape (SPYx: two Kamino markets, Nest, Loopscale).
+    const gaps = M.closedMarketIndex({ items: [{ mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', lenders: [
+        { protocolName: 'Kamino', displayName: 'Kamino Sentora xStocks Market', label: 'frozen at close', labelKind: 'frozen-at-close', liquidationLtvPct: 79 },
+        { protocolName: 'Kamino', displayName: 'Kamino xStocks Pool', label: 'frozen at close', labelKind: 'frozen-at-close', liquidationLtvPct: 75 },
+        { protocolName: 'Nest', displayName: 'Nest xStock markets', label: '24/7 token price', labelKind: 'token-24x7', liquidationLtvPct: 80 },
+        { protocolName: 'Loopscale', displayName: 'Loopscale Orca vaults', label: 'stale since 26 Aug 2026', labelKind: 'stale', liquidationLtvPct: 75 }
+    ] }] });
 
     test('the API\'s snake_case row becomes a table row, in the order the API returned it', () => {
         const rows = M.tokenRowsFromApi(items(), gaps);
@@ -468,12 +474,18 @@ describe('tokenRowsFromApi and gapIndex', () => {
         });
     });
 
-    test('the after-hours gap is joined in by mint, and a mint that file lacks keeps a NULL gap', () => {
+    test('each lender\'s closed-market label is joined in by mint; no lender and not loaded are different', () => {
         const rows = M.tokenRowsFromApi(items(), gaps);
-        expect(rows[0].gapPct).toBe(-1.4);
-        expect(rows[1].gapPct).toBeNull();
-        // Not 0: the gap only exists for mints with trades on both sides of the session boundary.
-        expect(M.tokenRowsFromApi(items(), new Map())[0].gapPct).toBeNull();
+        expect(rows[0].closedLenders.map((e) => `${e.protocolName}: ${e.label}`)).toEqual([
+            'Kamino: frozen at close', 'Nest: 24/7 token price', 'Loopscale: stale since 26 Aug 2026'
+        ]);
+        expect(rows[0].closedLenders[0].title).toBe('Kamino Sentora xStocks Market, Kamino xStocks Pool: frozen at close; liquidation at 75 / 79 % LTV');
+        // The file loaded and does not list the mint: no lender takes it.
+        expect(rows[1].closedLenders).toEqual([]);
+        // The file did not load: unknown, never "no lender".
+        expect(M.tokenRowsFromApi(items(), null)[0].closedLenders).toBeNull();
+        expect(M.closedMarketIndex(null)).toBeNull();
+        expect(M.closedMarketIndex({ items: 'nope' })).toBeNull();
     });
 
     test('every missing measurement stays null rather than becoming a zero in a cell', () => {
@@ -499,9 +511,23 @@ describe('tokenRowsFromApi and gapIndex', () => {
         expect(M.tokenRowsFromApi([{ mint: 'M', worst_rule: 'newRule' }], gaps)[0].worstRuleLabel).toBe('newRule');
     });
 
-    test('no items, and no after-hours file, yields no rows and throws nothing', () => {
+    test('no items, and no closed-market file, yields no rows and throws nothing', () => {
         expect(M.tokenRowsFromApi(null, null)).toEqual([]);
-        expect(M.gapIndex(null)).toEqual(new Map());
+        expect(M.closedMarketIndex(undefined)).toBeNull();
+    });
+
+    test('the page loads the shared closed-market wording before monitor.js and reads the new file', () => {
+        const { readFileSync } = require('node:fs');
+        const { join } = require('node:path');
+        const page = readFileSync(join(__dirname, 'monitor.html'), 'utf8');
+        const view = page.indexOf('stocks/lib/closed-market-view.js?v=');
+        expect(view).toBeGreaterThan(-1);
+        expect(view).toBeLessThan(page.indexOf('monitor.js?v='));
+        expect(page).toContain('<th>When closed</th>');
+        expect(page).not.toContain('After-hours gap');
+        const source = readFileSync(join(__dirname, 'monitor.js'), 'utf8');
+        expect(source).toContain("closedMarket: './stocks-closed-market.json'");
+        expect(source).not.toContain('stocks-afterhours.json');
     });
 });
 

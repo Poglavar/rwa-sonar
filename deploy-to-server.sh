@@ -73,7 +73,7 @@ git fetch origin "$BRANCH" --quiet
 # runtime files (the trade store/payload) survive `git clean -fd` in place. The next refresh run
 # rebuilds them from the deployed code anyway. First deploy: committed seed files ship where present.
 JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
-	stocks-afterhours.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
+	stocks-closed-market.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
 	stocks-change-journal.json
 	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
 	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json

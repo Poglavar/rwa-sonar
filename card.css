@@ -30,11 +30,9 @@
     --unknown-bg: color-mix(in srgb, var(--unknown) 10%, var(--card-bg));
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
-        --header-bg: #2b344b;
-    }
+:root:where([data-theme="dark"]) {
+    color-scheme: dark;
+    --header-bg: #2b344b;
 }
 
 * {
@@ -397,6 +395,90 @@ h1 {
     background: var(--unknown-bg);
 }
 
+/* A finding's severity word; "info" has no health status of its own. */
+.c-info {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--card-bg));
+}
+
+/* --- When the market is closed: one row per lending market ------------------------------ */
+
+.cm-list {
+    list-style: none;
+    margin: 0.5rem 0 0.75rem;
+    padding: 0;
+}
+
+.cm-list > li {
+    padding: 0.55rem 0;
+    border-top: 1px solid var(--panel-border);
+}
+
+.cm-list > li p {
+    margin: 0.25rem 0;
+}
+
+.cm-list > li i {
+    font-style: normal;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+    white-space: nowrap;
+}
+
+.cm-list > li small {
+    display: block;
+    color: var(--muted-text);
+    overflow-wrap: anywhere;
+}
+
+/* The label: the words carry the meaning, the colour only repeats it. */
+.cm-l {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cm-frozen,
+.cm-unknown {
+    color: var(--unknown);
+}
+
+.cm-overnight {
+    color: var(--accent);
+}
+
+.cm-token,
+.cm-signed {
+    color: var(--caution);
+}
+
+.cm-stale {
+    color: var(--warning);
+}
+
+.cm-f {
+    margin: 0.5rem 0;
+    padding-left: 1.1rem;
+}
+
+.cm-f li {
+    margin: 0.2rem 0;
+}
+
+.cm-src {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
 /* --- sections --------------------------------------------------------------------------- */
 
 section {
@@ -749,20 +831,18 @@ footer h2 {
     --wi-missing: #dc2626;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --tc-documented: #4ade80;
-        --tc-inferred: #60a5fa;
-        --tc-asserted: #fbbf24;
-        --tc-unknown: #6b7280;
-        --tc-node-bg: #1b2030;
-        --wi-documented: #4ade80;
-        --wi-litigated: #c4b5fd;
-        --wi-inferred: #60a5fa;
-        --wi-unknown: #fbbf24;
-        --wi-not-applicable: #6b7280;
-        --wi-missing: #f87171;
-    }
+:root:where([data-theme="dark"]) {
+    --tc-documented: #4ade80;
+    --tc-inferred: #60a5fa;
+    --tc-asserted: #fbbf24;
+    --tc-unknown: #6b7280;
+    --tc-node-bg: #1b2030;
+    --wi-documented: #4ade80;
+    --wi-litigated: #c4b5fd;
+    --wi-inferred: #60a5fa;
+    --wi-unknown: #fbbf24;
+    --wi-not-applicable: #6b7280;
+    --wi-missing: #f87171;
 }
 
 .defi-use-grid {

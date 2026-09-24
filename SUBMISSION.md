@@ -19,6 +19,75 @@ Official source links checked for this package:
 - Crypto World's Fair official rules:
   <https://colosseum.com/legal/Crypto%20World%27s%20Fair%20Hackathon%20Rules.pdf>
 
+## Form fields (Stocklana, hackathons.solana.com)
+
+Paste these into the form. Limits checked 24 Sep 2026: short description ≤ 280 characters, full
+description ≤ 5,000 characters (Markdown), up to 3 sponsor tracks, a linked Solana wallet required.
+
+| Field | Value |
+|---|---|
+| Project name | RWA Sonar |
+| GitHub repository | <https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair> |
+| Demo URL | <https://rwasonar.com/> |
+| Pitch video URL (≤ 3 min) | [recorded by the owner; paste the YouTube or Loom link] |
+| Technical video URL (≤ 5 min, optional) | — |
+| Team | Poglavar Svemira (solo) |
+| Sponsor tracks | Pyth; optionally Tessera. Not PreStocks (its rules exclude projects that also cover other pre-IPO tokens), not Meteora or Clawpump (no DBC pool or token launch). |
+
+### Short description (266 of 280 characters)
+
+```text
+Don't trust the ticker, inspect the token. RWA Sonar shows what each tokenized stock on Solana really gives you: what you legally own, who can freeze, move or burn it, where you can trade, redeem or borrow against it, and what changed, with a source for every claim.
+```
+
+### Full description (4,550 of 5,000 characters)
+
+````markdown
+## RWA Sonar: tokenized stocks on Solana, explained
+
+**Don't trust the ticker. Inspect the token.**
+
+Solana now has more than a thousand tokenized-stock addresses. Two tokens with the same ticker can give you very different things: a share on the company's own register, a note from an offshore issuer, an interest in a trust, or only price exposure. They also differ in who can freeze, move or burn your tokens, whether you can redeem, and what happens when the stock market is closed. A wallet or an explorer shows none of this.
+
+RWA Sonar answers these questions for every token, from the chain and the issuer's own documents, with a source for every claim.
+
+**Live:** https://rwasonar.com · **Pitch deck:** https://rwasonar.com/pitch/
+
+### What you can do with it
+- **Find a stock and compare its tokens.** Search "Apple" and put AAPLx and AAPLon side by side: what you own, who controls the token, where it trades, what redemption needs and which DeFi protocols accept it.
+- **Open one token's card**, a shareable page per token address: a plain answer first, then the evidence.
+- **Who holds the keys:** every issuer against seven powers that affect holders (mint, freeze, move or burn, pause, rebase balances, transfer fee, upgrade). Each cell says whether the power sits with one key, a multisig and its time lock, or a program, and whether it has been used.
+- **What if:** 38 failure scenarios (issuer insolvency, stolen keys, custodian failure and more), answered per issuer as documented, inferred, litigated or unknown.
+- **Flows and float, exit routes, premium to the stock, DeFi use**, and a **weekly summary**.
+- **Latest events** on the home page, and saved watches with private Telegram alerts.
+
+### Evidence read from Solana
+- Token-2022 extensions and authorities decoded per mint (permanent delegate, freeze, pausable, transfer fee, scaled-UI multiplier), with multisig members and time locks.
+- Mints, burns and redemptions read from transactions; issuer inventory wallets separated from the public float.
+- Exact-mint DeFi support checked on-chain (Kamino, Jupiter Lend, Loopscale, Nest and DEX pools).
+- An hourly lending watcher for liquidations of stock collateral and collateral price freezes (Kamino, Jupiter Lend, Loopscale).
+- Pyth market-hours schedules for session context, and Pyth reference prices where our feeds are entitled.
+
+### What the evidence shows (dated)
+- xStocks' power to move or burn holders' tokens sits with a 2-of-3 Squads vault with no time lock. Across 1,844 transactions (10 Jun 2025 to 18 Sep 2026) it was never used.
+- On 24 Sep 2026, about 81% of priced xStocks supply (about $2.2B of $2.7B) sat in issuer-attributed wallets. The public float is at most about $0.5B.
+- Loopscale's xStock price accounts have not updated since 26 Aug 2026 (TSLA since 11 Sep). Nine loans ($3,911) are past due and can neither roll over nor be liquidated.
+- Kamino and Jupiter Lend froze QQQx collateral for about 44 hours around a dividend adjustment (19 to 21 Sep 2026). Nobody could borrow, withdraw against debt or be liquidated.
+- PreStocks raised the transfer fee on all eight of its tokens from 0.50% to 1.00% on 19 Sep 2026.
+
+### Coverage
+1,404 token addresses from 12 issuer programmes, two of them wound down; 9 reviewed legal and technology templates; 11 health checks. Missing data stays "unknown" and never counts as a pass. This is structural research, not legal advice.
+
+### How it's built
+Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher that keeps every version; a case-law watcher; a redemption observer; and a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history. The static site is rebuilt every 6 hours and published atomically. Data is keyless or free-tier where possible: Solana RPC, Jupiter, Pyth, CoinGecko and issuer APIs.
+
+### Built during Stocklana
+The repository started on 13 Feb 2026 as a broad RWA catalogue. The last pre-hackathon state is `main` at `8f58030` (19 Aug 2026). Every commit on the `colosseum-worlds-fair` branch (227 by 24 Sep 2026) dates from 16 Sep 2026 onwards; together they turned it into the Solana tokenized-stock product described here. Open-source dependencies come through npm as usual.
+
+### Team
+Poglavar Svemira, solo: research, legal analysis, data pipelines and the site. X [@poglavars](https://x.com/poglavars) · Telegram [@svemirsky](https://t.me/svemirsky) · poglavar.svemira@gmail.com · [github.com/Poglavar](https://github.com/Poglavar)
+````
+
 ## Punchline
 
 **Don't trust the ticker. Inspect the token.**
@@ -125,6 +194,8 @@ Findings to lead with (verify against the live pages before recording; each is d
 ## Pre-existing vs hackathon work
 
 RWA Sonar existed before this Stocklana sprint as an RWA research/codebase and general site shell.
+The concrete boundary: the repository was created on 13 Feb 2026; `main` at `8f58030` (19 Aug 2026)
+is the pre-hackathon state; every commit on `colosseum-worlds-fair` dates from 16 Sep 2026 onwards.
 The hackathon branch concentrates the work into the Solana stock diligence product: exact-token
 cataloguing, stock-first Explore/Compare, Token-2022 control decoding, issuer templates, DeFi
 composability checks, generated cards, monitor/watch surfaces, API-backed rows, change journal and
@@ -138,9 +209,11 @@ analysis, not ownership of those materials.
 
 ## Team
 
-- **[Owner to add: team members, roles and relevant background.]**
-- **[Owner to add: contact for judges and pilot users.]**
-- **[Owner to add: demo video link.]**
+- **Poglavar Svemira**, a one-person team: research, legal analysis, on-chain data pipelines and the site.
+- Contact for judges and pilot users: X [@poglavars](https://x.com/poglavars), Telegram
+  [@svemirsky](https://t.me/svemirsky), poglavar.svemira@gmail.com, GitHub
+  [Poglavar](https://github.com/Poglavar). Project account: [@RWASonar](https://x.com/RWASonar).
+- Pitch video: recorded by the owner; the link goes in the form's Pitch Video URL field.
 
 ## Positioning
 
@@ -158,17 +231,21 @@ to hold, integrate, lend against or monitor a tokenized stock.
 - **Main track:** strongest fit. Stocklana asks for a real user/problem, a working end-to-end demo,
   Solana relevance and execution; RWA Sonar is directly about making Solana tokenized stocks safer to
   inspect and use.
-- **Pyth:** relevant but not a complete bounty claim by itself. The product uses the public Pyth feed
-  catalogue and schedules for market-session context and can compare stock-token references where
-  entitled feeds are available. Missing entitlement is shown rather than hidden.
+- **Pyth (tick it):** the product uses the public Pyth feed catalogue and schedules for market-session
+  context and compares stock-token prices with Pyth references where our feeds are entitled (missing
+  entitlement is shown, not hidden). The lending research and watcher read Pyth on-chain: Loopscale's
+  Pyth push accounts for its xStock collateral stopped updating on 26 Aug 2026, and Nest values xStock
+  collateral from Pyth Lazer's 24/7 token feeds. The form allows up to 3 sponsor tracks.
 - **Meteora:** relevant to venue discovery, liquidity and decoded trade monitoring. The product does
   not launch a Dynamic Bonding Curve pool, so it should not overclaim the DBC bounty.
 - **PreStocks:** useful coverage exists, including all eight PreStocks mints and the 19 Sep transfer
   fee change. However, the official Stocklana bounty says projects integrating any non-PreStocks
   pre-IPO tokens are ineligible. Because RWA Sonar also covers Tessera and other issuers, do not claim
   PreStocks bounty eligibility without an explicit exception from the sponsor.
-- **Tessera / Clawpump:** covered only where their public data and exact tokens are relevant. The
-  product should not pivot into token launch/trading mechanics solely to chase a bounty.
+- **Tessera (optional):** the catalogue covers tOpenAI, tKalshi and tSpaceX with the issuer's own
+  marks beside on-chain reality. The bounty asks for something that "drives value" to Tessera tokens,
+  and diligence is only an indirect fit.
+- **Clawpump:** no fit; it needs a token launched with a stock-paired pool.
 
 ## Business hypothesis
 
@@ -186,7 +263,7 @@ pilot usage with investors, issuers, wallets, lending protocols or risk teams.
 | 0:55 | Open one AAPL token card; show answer, reasoning, evidence and Token-2022 controls |
 | 1:25 | Open FGDLx; show the single-wrapper, no-confirmed-market answer |
 | 1:50 | Open "Who holds the keys"; show the xStocks move/burn cell (2-of-3, no time lock, unused through 18 Sep 2026), then flows.html's 81.0% float finding |
-| 2:15 | Open the PreStocks fee change or this week's summary; show before/after and the Solana evidence |
+| 2:15 | Home page's latest events: a lending price freeze (e.g. Loopscale's xStock prices frozen since 26 Aug) or the PreStocks fee change; open it and show the Solana evidence |
 | 2:40 | Close on public site, hackathon branch and pilot ask |
 
 ## Claims to make precisely

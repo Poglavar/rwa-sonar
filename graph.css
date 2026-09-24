@@ -23,24 +23,22 @@
     --type-audience: #6b7280;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
+:root:where([data-theme="dark"]) {
+    color-scheme: dark;
 
-        --type-programme: #a78bfa;
-        --type-security-issuer: #f87171;
-        --type-token-issuer: #fb923c;
-        --type-tokenization-provider: #fbbf24;
-        --type-transfer-agent: #4ade80;
-        --type-custodian: #2dd4bf;
-        --type-verification-agent: #60a5fa;
-        --type-parent: #818cf8;
-        --type-regulator: #cbd5e1;
-        --type-distributor: #f472b6;
-        --type-dex: #22d3ee;
-        --type-lending: #a3e635;
-        --type-audience: #9ca3af;
-    }
+    --type-programme: #a78bfa;
+    --type-security-issuer: #f87171;
+    --type-token-issuer: #fb923c;
+    --type-tokenization-provider: #fbbf24;
+    --type-transfer-agent: #4ade80;
+    --type-custodian: #2dd4bf;
+    --type-verification-agent: #60a5fa;
+    --type-parent: #818cf8;
+    --type-regulator: #cbd5e1;
+    --type-distributor: #f472b6;
+    --type-dex: #22d3ee;
+    --type-lending: #a3e635;
+    --type-audience: #9ca3af;
 }
 
 * {

@@ -58,18 +58,26 @@
     const SOURCE_KINDS = ['pdf', 'html', 'api', 'onchain'];
 
     /**
-     * `sonar.source.status` — all seven: EVIDENCE.md §1's four, the watcher's `new` and `error`, and
-     * `reachable-unverified` (db/2026-09-24-sonar-source-reachable.sql).
+     * `sonar.source.status` — all eight: EVIDENCE.md §1's four, the watcher's `new` and `error`,
+     * `reachable-unverified` (db/2026-09-24-sonar-source-reachable.sql) and `unreadable`
+     * (db/2026-09-24-sonar-source-unreadable.sql, stocks/lib/unreadable.mjs).
      */
-    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'reachable-unverified', 'error'];
+    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'error'];
 
     /**
      * Which colour band a source status belongs in. `changed` is not a fault — it is the watcher
      * doing its job — so it reads as caution, while `gone` (nothing left to read) is the worst.
      */
     const SOURCE_STATUS_TONE = {
-        new: 'info', ok: 'good', changed: 'caution', gone: 'critical', blocked: 'warning', 'reachable-unverified': 'info', error: 'warning'
+        new: 'info', ok: 'good', changed: 'caution', gone: 'critical', blocked: 'warning', unreadable: 'warning',
+        'reachable-unverified': 'info', error: 'warning'
     };
+
+    /**
+     * What a status is called where it is not self-explanatory. The row's error line then carries
+     * the reason the watcher stored: "couldn't read (region-restricted page): …".
+     */
+    const SOURCE_STATUS_LABELS = { unreadable: 'couldn\'t read' };
 
     /** What each source status means, so a tile is never a bare number. */
     const SOURCE_STATUS_BLURBS = {
@@ -78,6 +86,7 @@
         changed: 'the text changed since we last read it',
         gone: '404 or replaced; nothing left to re-read',
         blocked: 'the host blocks our fetch (403, bot wall, paywall)',
+        unreadable: 'the host answered, but not with the document (a region block, a script-only page, an RPC info page); no change is recorded from it',
         'reachable-unverified': 'the host answers but blocks our fetch; no quote relies on this page',
         error: 'the fetch failed for another reason'
     };
@@ -436,7 +445,7 @@
             byStatus: [...statuses].map(([key, count]) => ({
                 key,
                 count,
-                label: key,
+                label: SOURCE_STATUS_LABELS[key] ?? key,
                 tone: SOURCE_STATUS_TONE[key] ?? 'info',
                 blurb: SOURCE_STATUS_BLURBS[key] ?? 'a status this page does not know'
             }))
@@ -466,6 +475,7 @@
             citedAs: named === null ? rawTitle : null,
             kind: str(src?.kind) ?? 'unknown',
             status,
+            statusLabel: SOURCE_STATUS_LABELS[status] ?? status,
             tone: SOURCE_STATUS_TONE[status] ?? 'info',
             lastCheckedAt: str(src?.last_checked_at),
             lastChangedAt: str(src?.last_changed_at),
@@ -503,6 +513,7 @@
                     changed: 0,
                     gone: 0,
                     blocked: 0,
+                    unreadable: 0,
                     errors: 0,
                     archived: 0,
                     items: []
@@ -515,6 +526,7 @@
             if (row.status === 'changed') group.changed += 1;
             if (row.status === 'gone') group.gone += 1;
             if (row.status === 'blocked') group.blocked += 1;
+            if (row.status === 'unreadable') group.unreadable += 1;
             if (row.status === 'error') group.errors += 1;
             if (row.archiveHref !== null) group.archived += 1;
             group.items.push(row);
@@ -994,6 +1006,7 @@
         SOURCE_STATUSES,
         UNATTRIBUTED,
         SOURCE_STATUS_TONE,
+        SOURCE_STATUS_LABELS,
         SOURCE_STATUS_BLURBS,
         SOURCE_KIND_BLURBS,
         CHANGE_KINDS,
@@ -1351,7 +1364,7 @@
         return `<li class="wat-source">
             ${title}
             <p class="wat-source-meta">${chip(row.kind, 'info', SOURCE_KIND_BLURBS[row.kind] ?? '')}
-                ${chip(row.status, row.tone, SOURCE_STATUS_BLURBS[row.status] ?? '')}
+                ${chip(row.statusLabel, row.tone, SOURCE_STATUS_BLURBS[row.status] ?? '')}
                 ${str(row.citedAs) === null ? '' : `cited as <code>${escapeHtml(row.citedAs)}</code> ·`}
                 checked ${timeCell(row.lastCheckedAt)} ·
                 ${escapeHtml(fmtNumber(row.versions))} version(s) ·
@@ -1374,6 +1387,7 @@
                 group.changed > 0 ? chip(`${fmtNumber(group.changed)} changed`, 'caution', 'the text changed since we last read it') : '',
                 group.gone > 0 ? chip(`${fmtNumber(group.gone)} gone`, 'critical', 'nothing left to re-read') : '',
                 group.blocked > 0 ? chip(`${fmtNumber(group.blocked)} blocked`, 'warning', 'the host blocks our fetch') : '',
+                group.unreadable > 0 ? chip(`${fmtNumber(group.unreadable)} couldn't read`, 'warning', SOURCE_STATUS_BLURBS.unreadable) : '',
                 group.errors > 0 ? chip(`${fmtNumber(group.errors)} error`, 'warning', 'the fetch failed') : ''
             ].join(' ');
             const name = `<span class="wat-issuer-name">${escapeHtml(group.name)}</span>`;

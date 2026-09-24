@@ -1,0 +1,3799 @@
+{
+  "schema": "rwa-sonar-closed-market-v1",
+  "generatedAt": "2026-09-24T20:01:46Z",
+  "asOf": "2026-09-24T20:01:46Z",
+  "researchReviewedAt": "2026-09-24T14:58:15Z",
+  "freezeWindowDays": 30,
+  "labels": {
+    "frozen-at-close": "frozen at close",
+    "overnight-24x5": "24/5 overnight",
+    "token-24x7": "24/7 token price",
+    "signed-quote": "signed quote",
+    "stale": "stale since",
+    "not-researched": "not researched"
+  },
+  "method": "For each lending market that accepts a token: the price it uses while the US market is closed and its liquidation threshold, from on-chain reads recorded in stocks/data/protocol-market-research.json (oraclePricing); collateral price freezes of 20 minutes or more in the last 30 days from the lending watcher (sonar.lending_price_freeze), with how far it has read; the Monday gap from Kamino's hourly reserve history (the lender's price at the second hourly reading after Friday's close against its first reading after the reopening); Solana depth as the USD sale to USDC at which Jupiter reports a 5 % and a 10 % average price impact; and, only for tokens a lender prices from the token's own 24/7 trading (Nest), the weekend move of the token against Friday's reference from stocks-tracking.json. Exposure (collateral within the gap of liquidation) is not measured.",
+  "inputs": {
+    "tokensBuiltAt": "2026-09-23T11:58:24Z",
+    "defiUsageFetchedAt": "2026-09-24T15:48:42Z",
+    "freezes": {
+      "read": true,
+      "since": "2026-08-25T20:01:46Z",
+      "source": "localhost:5432/geodata"
+    },
+    "mondayGaps": {
+      "read": true,
+      "fetchedAt": "2026-09-24T19:34:21Z"
+    },
+    "depth": {
+      "read": true,
+      "fetchedAt": "2026-09-24T20:01:46Z"
+    },
+    "tracking": {
+      "read": true,
+      "generatedAt": "2026-09-23T22:43:23Z"
+    }
+  },
+  "weekend": {
+    "from": "2026-09-18T20:00:00Z",
+    "to": "2026-09-21T13:30:00Z"
+  },
+  "items": [
+    {
+      "mint": "2HehXG149TXuVptQhbiWAWDjbbuCsXSAtLTB5wc2aajK",
+      "symbol": "GLXY",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:superstate-pool",
+          "marketName": "Superstate Pool",
+          "displayName": "Kamino Superstate Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 30,
+          "liquidationLtvPct": 45,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Valued at the listed share's session price and frozen outside it; no on-chain market in the token can move it.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": null,
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 24.6,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 25.74498,
+                "gapPct": 4.65,
+                "movedWhileClosedPct": 5.39
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 24.33,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 23.85,
+                "gapPct": -1.97,
+                "movedWhileClosedPct": 3.82
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 26.29501,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 26.665,
+                "gapPct": 1.41,
+                "movedWhileClosedPct": 1.01
+              }
+            ]
+          }
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T20:01:46Z",
+          "session": "closed",
+          "priceUsd": null,
+          "noPrice": true,
+          "at5Pct": null,
+          "at10Pct": null
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": []
+    },
+    {
+      "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "symbol": "SECZ",
+      "lenders": [
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:secz-usdc-rwa",
+          "marketName": "Loopscale USDC RWA (SECZ)",
+          "displayName": "Loopscale USDC RWA vault",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 20,
+          "liquidationLtvPct": 40,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Valued at one end-of-day price, so a weekend without a new price blocks price-dependent actions.",
+          "source": null,
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:40:17Z",
+          "session": "open",
+          "priceUsd": 15.107362810483723,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 2500000,
+            "bound": "no-route"
+          },
+          "at10Pct": {
+            "usd": 2500000,
+            "bound": "no-route"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": []
+    },
+    {
+      "mint": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+      "symbol": "FWDI",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:superstate-pool",
+          "marketName": "Superstate Pool",
+          "displayName": "Kamino Superstate Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 25,
+          "liquidationLtvPct": 40,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Valued at the listed share's session price and frozen outside it; no on-chain market in the token can move it.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-21T18:19:22Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 7.69499,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 8.04499,
+                "gapPct": 4.55,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 6.55499,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 6.72,
+                "gapPct": 2.52,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 6.31004,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 6.28503,
+                "gapPct": -0.4,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T20:01:46Z",
+          "session": "closed",
+          "priceUsd": null,
+          "noPrice": true,
+          "at5Pct": null,
+          "at10Pct": null
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": []
+    },
+    {
+      "mint": "BoTx8y9ynfdxf5ZjWtCoBVkff52qKA82ysaLU8ZM6d8T",
+      "symbol": "BOT",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:17Z",
+          "session": "open",
+          "priceUsd": 29.399142058151988,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 101632,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 105279,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -2.4,
+          "widestPct": -2.72,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values BOT from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "DRAMjSWR7HRfJKjRkvQWYL2bcaejaVhuxEcjf4pAY4Cw",
+      "symbol": "DRAM",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:08Z",
+          "session": "open",
+          "priceUsd": 60.61221256934251,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 97135,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 169133,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": null
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values DRAM from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "HooDYv5RewLRiMLnEVq3VJqdqxhuE6c5eYvqejMC3e9A",
+      "symbol": "HOOD",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:34Z",
+          "session": "open",
+          "priceUsd": 121.03606150559072,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 90799,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 145293,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.03,
+          "widestPct": -0.03,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values HOOD from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "HrYNm6jTQ71LoFphjVKBTdAE4uja7WsmLG8VxB8ondo",
+      "symbol": "QQQon",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 60,
+          "liquidationLtvPct": 70,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:40:11Z",
+          "session": "open",
+          "priceUsd": 741.9635566912795,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 1279,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 5246,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 1.82,
+          "widestPct": 6.36,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values QQQon from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "MSTRdWXMeZxdE8osAQy3fA4rvTY5rgummDSMEx6U7Nz",
+      "symbol": "MSTR",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:50Z",
+          "session": "open",
+          "priceUsd": 161.65994243755298,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 230045,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 282371,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.8,
+          "widestPct": 1.84,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values MSTR from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+      "symbol": "MU",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:38:29Z",
+          "session": "open",
+          "priceUsd": 1076.9375672851559,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 2052012,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 2500000,
+            "bound": "above"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.25,
+          "widestPct": -0.63,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values MU from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "SKHYhSjuRWHgikq8eRKbtBbpABgJSkd7ytQV14i9EQ3",
+      "symbol": "SKHY",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:24Z",
+          "session": "open",
+          "priceUsd": 186.0552122848238,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 970984,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 1614803,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.07,
+          "widestPct": -0.42,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values SKHY from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
+      "symbol": "SNDK",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:01Z",
+          "session": "open",
+          "priceUsd": 1743.5800063442348,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 162962,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 168444,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.28,
+          "widestPct": -0.66,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values SNDK from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
+      "symbol": "SPCX",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:55:49Z",
+          "session": "open",
+          "priceUsd": 148.04243508159732,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 390973,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 513364,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.48,
+          "widestPct": -0.76,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values SPCX from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
+      "symbol": "TTWO",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:59Z",
+          "session": "open",
+          "priceUsd": 203.3462732200244,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 113009,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 133932,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": null
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values TTWO from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
+      "symbol": "SPCXx",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:56Z",
+          "session": "open",
+          "priceUsd": 146.38012194855395,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 1025857,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 1119576,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.34,
+          "widestPct": 0.82,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values SPCXx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH",
+      "symbol": "STRCx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:strcx-pool",
+          "marketName": "STRCx Pool",
+          "displayName": "Kamino STRCx Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 65,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Priced like the Kamino xStocks Pool, and selling about $75–80k of STRCx into the main Raydium pool can freeze the market.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:35Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 107.06048437655586,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 107.49502718478135,
+                "gapPct": 0.41,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 106.53270576653898,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 106.71008030746576,
+                "gapPct": 0.17,
+                "movedWhileClosedPct": 0.05
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 105.68431285262413,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 105.68290769172708,
+                "gapPct": 0,
+                "movedWhileClosedPct": 0.01
+              }
+            ]
+          }
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:38Z",
+          "session": "open",
+          "priceUsd": 106.91630612028179,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 101321,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 103722,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": [
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:strcx-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the STRCx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
+      "symbol": "COINx",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:45Z",
+          "session": "open",
+          "priceUsd": 198.45462526770308,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 564608,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 1026456,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.5,
+          "widestPct": -1.03,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values COINx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ",
+      "symbol": "QQQx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:sentora-xstocks-market",
+          "marketName": "Sentora xStocks Market",
+          "displayName": "Kamino Sentora xStocks Market",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 70,
+          "liquidationLtvPct": 78,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Priced like the Kamino xStocks Pool; xStocks Vaults holders carry its Monday re-mark and dividend freezes through the strategy's leveraged positions.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:25:38Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-19T17:28:45Z",
+                "endedAt": "2026-09-21T13:42:13Z",
+                "ongoing": false,
+                "lowHours": 44.2,
+                "highHours": 44.2,
+                "cause": "scope-suspension",
+                "observation": "kamino-refresh-log",
+                "endSignature": "26SQ52zVUSYVT3VajhK8fMg8aqYYMVaqRfbNGwWJ1k73GBZpimYjRHzD68PBYbngGjiZp7dMmawdqVtMUYePiXRw"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 723.5764086494204,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 734.881057183049,
+                "gapPct": 1.56,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 716.9684507039932,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 707.9038164359112,
+                "gapPct": -1.26,
+                "movedWhileClosedPct": 0.02
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 720.9743371974654,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 719.8613124145483,
+                "gapPct": -0.15,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 70,
+          "liquidationLtvPct": 72,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:33:36Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 0.9,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3dXtMksyhxLbku3CpHSNTybxHSYGMqSt61h5xjLt3tTDPARiA8Wup6HcHJ8Fm5qbUSmfNYPdp1gae1N5N46wbdT7"
+              },
+              {
+                "startedAt": "2026-09-19T17:28:45Z",
+                "endedAt": "2026-09-21T13:42:13Z",
+                "ongoing": false,
+                "lowHours": 44.2,
+                "highHours": 44.2,
+                "cause": "scope-suspension",
+                "observation": "kamino-refresh-log",
+                "endSignature": "26SQ52zVUSYVT3VajhK8fMg8aqYYMVaqRfbNGwWJ1k73GBZpimYjRHzD68PBYbngGjiZp7dMmawdqVtMUYePiXRw"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 723.5764086494204,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 734.881057183049,
+                "gapPct": 1.56,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 716.9684507039932,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 707.9038164359112,
+                "gapPct": -1.26,
+                "movedWhileClosedPct": 0.02
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 720.9743371974654,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 719.8613124145483,
+                "gapPct": -0.15,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "jupiter-lend",
+          "protocolName": "Jupiter Lend",
+          "marketId": "jupiter-lend:xstocks-vaults",
+          "marketName": "Jupiter Lend xStocks vaults 77-84",
+          "displayName": "Jupiter Lend xStock vaults",
+          "labelKind": "overnight-24x5",
+          "label": "24/5 overnight",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 75,
+          "liquidationLtvPct": 85,
+          "hidden": false,
+          "remark": "Sunday 20:00 ET, when the overnight session reopens",
+          "sentence": "Follows Chainlink's 24/5 price, so your weekly re-mark comes Sunday 20:00 ET from one overnight provider, and the vault can freeze around dividends.",
+          "source": {
+            "url": "https://api.jup.ag/lend/v1/borrow/vaults",
+            "label": "Jupiter Lend borrow vaults: oracle, oracleSources (sourceType chainlinkDataStreams), totals",
+            "accessedAt": "2026-09-24T14:23:20Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:51:00Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:38:00Z",
+                "endedAt": "2026-09-24T09:07:45Z",
+                "ongoing": false,
+                "lowHours": 0.5,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "jl-cache-refresh-gap",
+                "endSignature": "2PPL4KmFTzwhuUg3c2NoNJxWgSeXx8X6gGLWiccr9vNugfgwN3j9Ro6QZAVEyaZxAziSGnjJuCgvBGSKTS9zutJB"
+              },
+              {
+                "startedAt": "2026-09-19T17:29:01Z",
+                "endedAt": "2026-09-21T12:31:24Z",
+                "ongoing": false,
+                "lowHours": 43,
+                "highHours": 43,
+                "cause": "operator-suspension",
+                "observation": "jl-cache-refresh-gap",
+                "endSignature": "4yhWfLvG9sYD4JQaSE3pCuGqxsBqvt1ptt28KMgiFsoKRat59FXEowcvq8DjNPDvPMUjFC9HTa8iQzoJyYTpbWWV"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [],
+            "unmeasured": "re-marked Sunday 20:00 ET; not measured"
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 60,
+          "liquidationLtvPct": 70,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:collateral",
+          "marketName": null,
+          "displayName": "Loopscale",
+          "labelKind": "not-researched",
+          "label": "not researched",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": null,
+          "liquidationLtvPct": null,
+          "hidden": false,
+          "remark": null,
+          "sentence": "Seen taking this token; the price it uses when the market is closed has not been researched.",
+          "source": null,
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:03Z",
+          "session": "open",
+          "priceUsd": 743.9462868707446,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 565120,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 734145,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.05,
+          "widestPct": -0.18,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values QQQx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-suspended-around-corporate-action",
+          "name": "Collateral price suspended around a corporate action",
+          "severity": "caution",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino and Jupiter Lend, about 44 h from 19 Sep 2026",
+          "statement": "Kamino and Jupiter Lend stopped updating the QQQx collateral price for about 44 h (2026-09-19T17:28:25Z to 2026-09-21T13:42:13Z) around a corporate action; borrowing, withdrawing against debt and liquidation were blocked until an operator resumed it.",
+          "source": {
+            "url": "https://solscan.io/tx/26SQ52zVUSYVT3VajhK8fMg8aqYYMVaqRfbNGwWJ1k73GBZpimYjRHzD68PBYbngGjiZp7dMmawdqVtMUYePiXRw",
+            "label": "Scope ResumeSuspendedPrice for entry 280 (ChainlinkX QQQx/USD) by the Scope admin multisig vault",
+            "accessedAt": "2026-09-24T14:41:25Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:sentora-xstocks-market",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the QQQx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
+      "symbol": "GOOGLx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 60,
+          "liquidationLtvPct": 70,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:37:54Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 1,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3ZKVdN1HjNzhoJGfu8bQfthRrYoirH6UiK7hV3GLnRFCH7e9knpcQja52EN1B7y1NbWWsW4BG9LMdCcXUBr7Jf5V"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 349.9098504510666,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 354.35038166883385,
+                "gapPct": 1.27,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 339.254580282925,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 347.7346918184356,
+                "gapPct": 2.5,
+                "movedWhileClosedPct": 0.04
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 339.2345327379238,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 334.5935260701444,
+                "gapPct": -1.37,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:12Z",
+          "session": "open",
+          "priceUsd": 341.65748955167504,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 265076,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 294035,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.44,
+          "widestPct": 0.48,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values GOOGLx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the GOOGLx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+      "symbol": "TSLAx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 55,
+          "liquidationLtvPct": 65,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 364.33,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 376.06,
+                "gapPct": 3.22,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 365.48,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 360.8,
+                "gapPct": -1.28,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 353.9,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 359.915,
+                "gapPct": 1.7,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "jupiter-lend",
+          "protocolName": "Jupiter Lend",
+          "marketId": "jupiter-lend:xstocks-vaults",
+          "marketName": "Jupiter Lend xStocks vaults 77-84",
+          "displayName": "Jupiter Lend xStock vaults",
+          "labelKind": "overnight-24x5",
+          "label": "24/5 overnight",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 65,
+          "liquidationLtvPct": 75,
+          "hidden": false,
+          "remark": "Sunday 20:00 ET, when the overnight session reopens",
+          "sentence": "Follows Chainlink's 24/5 price, so your weekly re-mark comes Sunday 20:00 ET from one overnight provider, and the vault can freeze around dividends.",
+          "source": {
+            "url": "https://api.jup.ag/lend/v1/borrow/vaults",
+            "label": "Jupiter Lend borrow vaults: oracle, oracleSources (sourceType chainlinkDataStreams), totals",
+            "accessedAt": "2026-09-24T14:23:20Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:52:00Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:38:00Z",
+                "endedAt": "2026-09-24T09:07:45Z",
+                "ongoing": false,
+                "lowHours": 0.5,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "jl-cache-refresh-gap",
+                "endSignature": "5pjMsfRACqrLSTvhZPq7QWtP97Btv45uP2EcJgPoPTnSnrWbFb4gxPGbmJygHADDFaLWoyFvbLqQpgo9CB9Hm5M9"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [],
+            "unmeasured": "re-marked Sunday 20:00 ET; not measured"
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "marketName": "Loopscale USDC Orca and USDG Orca vaults (xStocks)",
+          "displayName": "Loopscale Orca vaults",
+          "labelKind": "stale",
+          "label": "stale since 11 Sep 2026",
+          "staleSince": "2026-09-11T23:59:59Z",
+          "staleStillAt": "2026-09-24T18:51:51Z",
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "never, while the price is stale",
+          "sentence": "The price has not updated for weeks, so loans can neither roll nor be liquidated: your collateral is locked and the lender cannot exit.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": null,
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-11T23:59:59Z",
+                "endedAt": null,
+                "ongoing": true,
+                "lowHours": 306.9,
+                "highHours": 306.9,
+                "cause": "stale-oracle-account",
+                "observation": "pyth-account-age",
+                "endSignature": null
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:21Z",
+          "session": "open",
+          "priceUsd": 379.0020073498993,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 515670,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 574200,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.1,
+          "widestPct": 0.18,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values TSLAx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-stale-blocks-liquidation",
+          "name": "Stale collateral price blocks rolling and liquidation",
+          "severity": "warning",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "short": "Loopscale, since 11 Sep 2026",
+          "statement": "Loopscale Orca vaults's TSLAx price was last published 11 Sep 2026 and was still stale at 2026-09-24T18:51:51Z; loans against it can neither roll nor be liquidated.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the TSLAx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+      "symbol": "MSTRx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 30,
+          "liquidationLtvPct": 40,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:46:49Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:25:22Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 0.8,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3nR4zsqHABPM49hLYgoMphbJKJ3tNAmpWFmBkbgyeqjjeHSrBw7kPgNGP17NyhvNua5eBL2g7YWHAtWdBRaLX8Gn"
+              },
+              {
+                "startedAt": "2026-09-21T08:45:56Z",
+                "endedAt": "2026-09-21T13:34:51Z",
+                "ongoing": false,
+                "lowHours": 4.2,
+                "highHours": 4.8,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3s6t3GJ4xMSXWTAgbmePyC7dEf675ponMjPkvdKhdtdAiBPUMMvq4ZTKAYMaxpy7ju4nSMEqY4w2rZXgyWrkbf4f"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 153.9,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 167.31,
+                "gapPct": 8.71,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 130.95,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 134.353,
+                "gapPct": 2.6,
+                "movedWhileClosedPct": 0.01
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 142.71,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 137.385,
+                "gapPct": -3.73,
+                "movedWhileClosedPct": 0.02
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:collateral",
+          "marketName": null,
+          "displayName": "Loopscale",
+          "labelKind": "not-researched",
+          "label": "not researched",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": null,
+          "liquidationLtvPct": null,
+          "hidden": false,
+          "remark": null,
+          "sentence": "Seen taking this token; the price it uses when the market is closed has not been researched.",
+          "source": null,
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:29Z",
+          "session": "open",
+          "priceUsd": 163.20476601772538,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 479808,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 642064,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": [
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the MSTRx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
+      "symbol": "METAx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 35,
+          "liquidationLtvPct": 45,
+          "hidden": true,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-18T20:31:07Z",
+                "endedAt": "2026-09-21T13:42:33Z",
+                "ongoing": false,
+                "lowHours": 65.2,
+                "highHours": 65.2,
+                "cause": "scope-suspension",
+                "observation": "kamino-refresh-log",
+                "endSignature": "2fsSorcbFFBozdHyiJ81AhxQ2SqShg21hKU3WSMZgfwjSToYc62chad28k1NJ1sgxpTa1j5My7JTRuy6GLyau8xk"
+              }
+            ],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 666.9292659647996,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 713.4085308921674,
+                "gapPct": 6.97,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 649.4992991251123,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 664.2330836301958,
+                "gapPct": 2.27,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 618.1674553408328,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 616.8143526822028,
+                "gapPct": -0.22,
+                "movedWhileClosedPct": 0.04
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:39Z",
+          "session": "open",
+          "priceUsd": 782.4219554650091,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 487663,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 544107,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.65,
+          "widestPct": 0.71,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values METAx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-suspended-around-corporate-action",
+          "name": "Collateral price suspended around a corporate action",
+          "severity": "caution",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino, about 65 h from 18 Sep 2026",
+          "statement": "Kamino stopped updating the METAx collateral price for about 65 h (2026-09-18T20:30:47Z to 2026-09-21T13:42:33Z) around a corporate action; borrowing, withdrawing against debt and liquidation were blocked until an operator resumed it.",
+          "source": {
+            "url": "https://solscan.io/tx/2fsSorcbFFBozdHyiJ81AhxQ2SqShg21hKU3WSMZgfwjSToYc62chad28k1NJ1sgxpTa1j5My7JTRuy6GLyau8xk",
+            "label": "Scope ResumeSuspendedPrice for entry 266 (ChainlinkX METAx/USD)",
+            "accessedAt": "2026-09-24T14:41:25Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the METAx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+      "symbol": "AAPLx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:08:37Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "yHqqzS3x3pgD2PeQwkzwmeGAwoaPNzoviKtH1rUCBFHKsVLE8c16NTv9kMWY9XTtwWyjwLJEGY8S1Gxh6r9w8hk"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 336.70209695342584,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 336.8877017207457,
+                "gapPct": 0.06,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 333.33612941635477,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 335.2674222654939,
+                "gapPct": 0.58,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 320.9256917312372,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 318.0162115948717,
+                "gapPct": -0.91,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:collateral",
+          "marketName": null,
+          "displayName": "Loopscale",
+          "labelKind": "not-researched",
+          "label": "not researched",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": null,
+          "liquidationLtvPct": null,
+          "hidden": false,
+          "remark": null,
+          "sentence": "Seen taking this token; the price it uses when the market is closed has not been researched.",
+          "source": null,
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:48Z",
+          "session": "open",
+          "priceUsd": 338.8845786880612,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 215390,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 267103,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.52,
+          "widestPct": -0.53,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values AAPLx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the AAPLx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+      "symbol": "NVDAx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:sentora-xstocks-market",
+          "marketName": "Sentora xStocks Market",
+          "displayName": "Kamino Sentora xStocks Market",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 62,
+          "liquidationLtvPct": 73,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Priced like the Kamino xStocks Pool; xStocks Vaults holders carry its Monday re-mark and dividend freezes through the strategy's leveraged positions.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:41Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 222.3476146539344,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 224.56638280484879,
+                "gapPct": 1,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 218.68138827364245,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 211.1786463096024,
+                "gapPct": -3.43,
+                "movedWhileClosedPct": 0.05
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 230.52144204880614,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 229.95091874557215,
+                "gapPct": -0.25,
+                "movedWhileClosedPct": 0.04
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 55,
+          "liquidationLtvPct": 65,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:37:54Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 1,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3ZKVdN1HjNzhoJGfu8bQfthRrYoirH6UiK7hV3GLnRFCH7e9knpcQja52EN1B7y1NbWWsW4BG9LMdCcXUBr7Jf5V"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 222.3476146539344,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 224.56638280484879,
+                "gapPct": 1,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 218.68138827364245,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 211.1786463096024,
+                "gapPct": -3.43,
+                "movedWhileClosedPct": 0.05
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 230.52144204880614,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 229.95091874557215,
+                "gapPct": -0.25,
+                "movedWhileClosedPct": 0.04
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "jupiter-lend",
+          "protocolName": "Jupiter Lend",
+          "marketId": "jupiter-lend:xstocks-vaults",
+          "marketName": "Jupiter Lend xStocks vaults 77-84",
+          "displayName": "Jupiter Lend xStock vaults",
+          "labelKind": "overnight-24x5",
+          "label": "24/5 overnight",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 65,
+          "liquidationLtvPct": 75,
+          "hidden": false,
+          "remark": "Sunday 20:00 ET, when the overnight session reopens",
+          "sentence": "Follows Chainlink's 24/5 price, so your weekly re-mark comes Sunday 20:00 ET from one overnight provider, and the vault can freeze around dividends.",
+          "source": {
+            "url": "https://api.jup.ag/lend/v1/borrow/vaults",
+            "label": "Jupiter Lend borrow vaults: oracle, oracleSources (sourceType chainlinkDataStreams), totals",
+            "accessedAt": "2026-09-24T14:23:20Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:52:01Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:00Z",
+                "endedAt": "2026-09-24T09:07:45Z",
+                "ongoing": false,
+                "lowHours": 0.5,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "jl-cache-refresh-gap",
+                "endSignature": "5qnz92Lpxpdg5XXfT3HRsUcbfRaRXGScQ1VrgDeDEUX4JrFs1Rbk2m38TZFVZ5wP25xnXJcnJY8KCMmx4wgHycqb"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [],
+            "unmeasured": "re-marked Sunday 20:00 ET; not measured"
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "marketName": "Loopscale USDC Orca and USDG Orca vaults (xStocks)",
+          "displayName": "Loopscale Orca vaults",
+          "labelKind": "stale",
+          "label": "stale since 26 Aug 2026",
+          "staleSince": "2026-08-26T15:54:46Z",
+          "staleStillAt": "2026-09-24T18:51:51Z",
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "never, while the price is stale",
+          "sentence": "The price has not updated for weeks, so loans can neither roll nor be liquidated: your collateral is locked and the lender cannot exit.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": null,
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-08-26T15:54:46Z",
+                "endedAt": null,
+                "ongoing": true,
+                "lowHours": 699,
+                "highHours": 699,
+                "cause": "stale-oracle-account",
+                "observation": "pyth-account-age",
+                "endSignature": null
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:36:57Z",
+          "session": "open",
+          "priceUsd": 223.9191162626266,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 1016454,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 1100325,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.04,
+          "widestPct": -0.1,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values NVDAx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-stale-blocks-liquidation",
+          "name": "Stale collateral price blocks rolling and liquidation",
+          "severity": "warning",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "short": "Loopscale, since 26 Aug 2026",
+          "statement": "Loopscale Orca vaults's NVDAx price was last published 26 Aug 2026 and was still stale at 2026-09-24T18:51:51Z; loans against it can neither roll nor be liquidated.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:sentora-xstocks-market",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the NVDAx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+      "symbol": "SPYx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:sentora-xstocks-market",
+          "marketName": "Sentora xStocks Market",
+          "displayName": "Kamino Sentora xStocks Market",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 72,
+          "liquidationLtvPct": 79,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Priced like the Kamino xStocks Pool; xStocks Vaults holders carry its Monday re-mark and dividend freezes through the strategy's leveraged positions.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:25:38Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 765.9672948324153,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 771.9814679029272,
+                "gapPct": 0.79,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 768.6525527083796,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 764.3631801087588,
+                "gapPct": -0.56,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 774.4705108681796,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 771.8557535828913,
+                "gapPct": -0.34,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 73,
+          "liquidationLtvPct": 75,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:39:40Z",
+                "endedAt": "2026-09-24T09:08:37Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "yHqqzS3x3pgD2PeQwkzwmeGAwoaPNzoviKtH1rUCBFHKsVLE8c16NTv9kMWY9XTtwWyjwLJEGY8S1Gxh6r9w8hk"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 765.9672948324153,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 771.9814679029272,
+                "gapPct": 0.79,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 768.6525527083796,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 764.3631801087588,
+                "gapPct": -0.56,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 774.4705108681796,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 771.8557535828913,
+                "gapPct": -0.34,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "jupiter-lend",
+          "protocolName": "Jupiter Lend",
+          "marketId": "jupiter-lend:xstocks-vaults",
+          "marketName": "Jupiter Lend xStocks vaults 77-84",
+          "displayName": "Jupiter Lend xStock vaults",
+          "labelKind": "overnight-24x5",
+          "label": "24/5 overnight",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 75,
+          "liquidationLtvPct": 85,
+          "hidden": false,
+          "remark": "Sunday 20:00 ET, when the overnight session reopens",
+          "sentence": "Follows Chainlink's 24/5 price, so your weekly re-mark comes Sunday 20:00 ET from one overnight provider, and the vault can freeze around dividends.",
+          "source": {
+            "url": "https://api.jup.ag/lend/v1/borrow/vaults",
+            "label": "Jupiter Lend borrow vaults: oracle, oracleSources (sourceType chainlinkDataStreams), totals",
+            "accessedAt": "2026-09-24T14:23:20Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:52:00Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-24T08:40:00Z",
+                "endedAt": "2026-09-24T09:07:45Z",
+                "ongoing": false,
+                "lowHours": 0.5,
+                "highHours": 0.5,
+                "cause": null,
+                "observation": "jl-cache-refresh-gap",
+                "endSignature": "4oZ9vfhEjJ2rdLFfcXTohKhHdkzVyiAPW3RWgCcKJiUUHyNiTBzQkPtBNytUdqPi8grqnuFsByEZaKZH1rWXAiaT"
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [],
+            "unmeasured": "re-marked Sunday 20:00 ET; not measured"
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 70,
+          "liquidationLtvPct": 80,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "marketName": "Loopscale USDC Orca and USDG Orca vaults (xStocks)",
+          "displayName": "Loopscale Orca vaults",
+          "labelKind": "stale",
+          "label": "stale since 26 Aug 2026",
+          "staleSince": "2026-08-26T15:54:46Z",
+          "staleStillAt": "2026-09-24T18:51:51Z",
+          "staleEndedAt": null,
+          "maxLtvPct": 60,
+          "liquidationLtvPct": 75,
+          "hidden": false,
+          "remark": "never, while the price is stale",
+          "sentence": "The price has not updated for weeks, so loans can neither roll nor be liquidated: your collateral is locked and the lender cannot exit.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": null,
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-08-26T15:54:46Z",
+                "endedAt": null,
+                "ongoing": true,
+                "lowHours": 699,
+                "highHours": 699,
+                "cause": "stale-oracle-account",
+                "observation": "pyth-account-age",
+                "endSignature": null
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:07Z",
+          "session": "open",
+          "priceUsd": 771.2919802044037,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 1856725,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 2462909,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.05,
+          "widestPct": 0.27,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values SPYx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-stale-blocks-liquidation",
+          "name": "Stale collateral price blocks rolling and liquidation",
+          "severity": "warning",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "short": "Loopscale, since 26 Aug 2026",
+          "statement": "Loopscale Orca vaults's SPYx price was last published 26 Aug 2026 and was still stale at 2026-09-24T18:51:51Z; loans against it can neither roll nor be liquidated.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:sentora-xstocks-market",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the SPYx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+      "symbol": "CRCLx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 30,
+          "liquidationLtvPct": 40,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:47:00Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-21T11:12:33Z",
+                "endedAt": "2026-09-21T13:34:51Z",
+                "ongoing": false,
+                "lowHours": 2.1,
+                "highHours": 2.4,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3s6t3GJ4xMSXWTAgbmePyC7dEf675ponMjPkvdKhdtdAiBPUMMvq4ZTKAYMaxpy7ju4nSMEqY4w2rZXgyWrkbf4f"
+              },
+              {
+                "startedAt": "2026-09-21T09:25:28Z",
+                "endedAt": "2026-09-21T10:21:13Z",
+                "ongoing": false,
+                "lowHours": 0.4,
+                "highHours": 0.9,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "31qK3Vi3F9r8oRfiKNHnQbJkgNcUPmdVSDvddMrttQCUsTPA1VDMPx2W51dCpk3NRe8WMvmhDZ6ScBN8KYoqrvGC"
+              }
+            ],
+            "shorter": 1
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 91.84,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 95.48,
+                "gapPct": 3.96,
+                "movedWhileClosedPct": 0.09
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 90.65,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 93.39500000000001,
+                "gapPct": 3.03,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 102.055,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 97.98,
+                "gapPct": -3.99,
+                "movedWhileClosedPct": 0
+              }
+            ]
+          }
+        },
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "marketName": "Nest xStocks and SPCX markets (Pyth Lazer)",
+          "displayName": "Nest xStock markets",
+          "labelKind": "token-24x7",
+          "label": "24/7 token price",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 50,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "none: it moves with the token all weekend",
+          "sentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        },
+        {
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "marketName": "Loopscale USDC Orca and USDG Orca vaults (xStocks)",
+          "displayName": "Loopscale Orca vaults",
+          "labelKind": "stale",
+          "label": "stale since 26 Aug 2026",
+          "staleSince": "2026-08-26T15:54:46Z",
+          "staleStillAt": "2026-09-24T18:51:51Z",
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 60,
+          "hidden": false,
+          "remark": "never, while the price is stale",
+          "sentence": "The price has not updated for weeks, so loans can neither roll nor be liquidated: your collateral is locked and the lender cannot exit.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": null,
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-08-26T15:54:46Z",
+                "endedAt": null,
+                "ongoing": true,
+                "lowHours": 699,
+                "highHours": 699,
+                "cause": "stale-oracle-account",
+                "observation": "pyth-account-age",
+                "endSignature": null
+              }
+            ],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:18Z",
+          "session": "open",
+          "priceUsd": 92.99587755758878,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 1025776,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 1575112,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": -0.25,
+          "widestPct": -0.46,
+          "widestAt": "2026-09-19T23:44:02Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:xstocks-pyth-lazer",
+          "short": "Nest",
+          "statement": "Nest xStock markets values CRCLx from the token's own 24/7 price, so weekend and night trading in the token can liquidate borrowers whatever the stock does.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        },
+        {
+          "schema": "collateral-oracle-stale-blocks-liquidation",
+          "name": "Stale collateral price blocks rolling and liquidation",
+          "severity": "warning",
+          "marketId": "loopscale:xstocks-orca-vaults",
+          "short": "Loopscale, since 26 Aug 2026",
+          "statement": "Loopscale Orca vaults's CRCLx price was last published 26 Aug 2026 and was still stale at 2026-09-24T18:51:51Z; loans against it can neither roll nor be liquidated.",
+          "source": {
+            "url": "https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy",
+            "label": "Pyth PriceUpdateV2 accounts used by the USDC Orca / USDG Orca MarketInformation (oracle type 6): publish times",
+            "accessedAt": "2026-09-24T14:47:00Z"
+          }
+        },
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the CRCLx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+      "symbol": "HOODx",
+      "lenders": [
+        {
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "marketId": "kamino:xstocks-pool",
+          "marketName": "xStocks Pool",
+          "displayName": "Kamino xStocks Pool",
+          "labelKind": "frozen-at-close",
+          "label": "frozen at close",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 30,
+          "liquidationLtvPct": 40,
+          "hidden": false,
+          "remark": "Monday 09:30 ET, in one step",
+          "sentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
+          "source": {
+            "url": "https://solscan.io/account/7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+            "label": "KLend reserves, TokenInfo at byte 5032 (name, heuristic, max TWAP divergence, max ages, Scope price feed, price and TWAP chains)",
+            "accessedAt": "2026-09-24T14:23:39Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": true,
+            "coverage": {
+              "readTo": "2026-09-24T18:39:33Z",
+              "checkedAt": "2026-09-24T18:53:00Z",
+              "since": "2026-09-16T00:00:00Z"
+            },
+            "episodes": [
+              {
+                "startedAt": "2026-09-21T12:31:09Z",
+                "endedAt": "2026-09-21T13:34:51Z",
+                "ongoing": false,
+                "lowHours": 0.5,
+                "highHours": 1.1,
+                "cause": null,
+                "observation": "kamino-refresh-log",
+                "endSignature": "3s6t3GJ4xMSXWTAgbmePyC7dEf675ponMjPkvdKhdtdAiBPUMMvq4ZTKAYMaxpy7ju4nSMEqY4w2rZXgyWrkbf4f"
+              }
+            ],
+            "shorter": 2
+          },
+          "mondayGaps": {
+            "read": true,
+            "weeks": [
+              {
+                "closeAt": "2026-09-18T21:00:00Z",
+                "closeValue": 119.86500000000001,
+                "reopenAt": "2026-09-21T14:00:00Z",
+                "reopenValue": 121.79,
+                "gapPct": 1.61,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-11T21:00:00Z",
+                "closeValue": 112.57,
+                "reopenAt": "2026-09-14T14:00:00Z",
+                "reopenValue": 114.55,
+                "gapPct": 1.76,
+                "movedWhileClosedPct": 0
+              },
+              {
+                "closeAt": "2026-09-04T21:00:00Z",
+                "closeValue": 122.065,
+                "reopenAt": "2026-09-08T14:00:00Z",
+                "reopenValue": 123.31,
+                "gapPct": 1.02,
+                "movedWhileClosedPct": 0.02
+              }
+            ]
+          }
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:37:28Z",
+          "session": "open",
+          "priceUsd": 120.90608494596711,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 555227,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 2500000,
+            "bound": "no-route"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": null,
+      "findings": [
+        {
+          "schema": "protocol-docs-oracle-fallback-contradicted",
+          "name": "Protocol docs promise an oracle fallback the configuration does not have",
+          "severity": "info",
+          "marketId": "kamino:xstocks-pool",
+          "short": "Kamino",
+          "statement": "Kamino's docs say Scope falls back to the next-best source when a feed goes stale; the HOODx price chain (MostRecentOf) errors instead, and Kamino xStock reserves have been observed stale for hours to days.",
+          "source": {
+            "url": "https://kamino.com/docs/security/oracles.md",
+            "label": "Kamino docs claim automatic fallback when a feed goes stale",
+            "accessedAt": "2026-09-24T14:46:36Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "iNTCy1qTsUEZQe3DSocLz1ZXXai34Gdw8THQh5rxFaF",
+      "symbol": "INTC",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 40,
+          "liquidationLtvPct": 50,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:39:43Z",
+          "session": "open",
+          "priceUsd": 126.27121426373233,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 106715,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 141315,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 0.73,
+          "widestPct": 1.26,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values INTC from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    },
+    {
+      "mint": "k18WJUULWheRkSpSquYGdNNmtuE2Vbw1hpuUi92ondo",
+      "symbol": "SPYon",
+      "lenders": [
+        {
+          "protocolId": "nest",
+          "protocolName": "Nest",
+          "marketId": "nest:jupiter-signed",
+          "marketName": "Nest Backpack and Ondo markets (jupiter-signed)",
+          "displayName": "Nest signed-price markets",
+          "labelKind": "signed-quote",
+          "label": "signed quote",
+          "staleSince": null,
+          "staleStillAt": null,
+          "staleEndedAt": null,
+          "maxLtvPct": 70,
+          "liquidationLtvPct": 80,
+          "hidden": false,
+          "remark": "none: it moves with the quote all weekend",
+          "sentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          },
+          "freezes": {
+            "read": true,
+            "watched": false,
+            "coverage": null,
+            "episodes": [],
+            "shorter": 0
+          },
+          "mondayGaps": null
+        }
+      ],
+      "depth": {
+        "read": true,
+        "weekday": {
+          "at": "2026-09-24T19:40:06Z",
+          "session": "open",
+          "priceUsd": 769.5042452053525,
+          "noPrice": false,
+          "at5Pct": {
+            "usd": 6300,
+            "bound": "interpolated"
+          },
+          "at10Pct": {
+            "usd": 7939,
+            "bound": "interpolated"
+          }
+        },
+        "weekend": null
+      },
+      "weekendMove": {
+        "read": true,
+        "move": {
+          "weekendFrom": "2026-09-18T20:00:00Z",
+          "weekendTo": "2026-09-21T13:30:00Z",
+          "observations": 2,
+          "trades": 0,
+          "medianPct": 5.6,
+          "widestPct": 10.89,
+          "widestAt": "2026-09-20T18:27:22Z"
+        }
+      },
+      "findings": [
+        {
+          "schema": "collateral-priced-from-token-trading",
+          "name": "Lending market prices the collateral from the token's own trading",
+          "severity": "caution",
+          "marketId": "nest:jupiter-signed",
+          "short": "Nest",
+          "statement": "Nest signed-price markets values SPYon from a price it signs from a Jupiter quote on the token, around the clock.",
+          "source": {
+            "url": "https://docs.nestusd.com/deployments/mainnet.json",
+            "label": "Nest mainnet manifest (collateral[]: oracleProvider, pythLazerFeedId, signedOracleFeedId, maxStalenessSeconds 120, maxConfidenceBps 200)",
+            "accessedAt": "2026-09-24T14:23:29Z"
+          }
+        }
+      ]
+    }
+  ]
+}

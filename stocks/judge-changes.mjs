@@ -92,11 +92,15 @@ async function queryJson(url, sql, label) {
 }
 
 async function loadEvents(url) {
+    // `dismissed`: a false-alarm resolution (stocks/dismiss-unreadable-events.mjs for a read that was
+    // not the document, or an editor's) — selectCandidates never sends such an event to the model.
     return queryJson(url, `SELECT coalesce(json_agg(row_to_json(t) ORDER BY t."detectedAt" DESC, t.id DESC), '[]')
-  FROM (SELECT id, to_char(detected_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "detectedAt",
-               kind, subject_type AS "subjectType", subject_id AS "subjectId", field, severity, summary, evidence
-          FROM sonar.change_event
-         WHERE kind IN (${JUDGED_KINDS.map((k) => `'${k}'`).join(', ')})) t;`, 'change events');
+  FROM (SELECT e.id, to_char(e.detected_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "detectedAt",
+               e.kind, e.subject_type AS "subjectType", e.subject_id AS "subjectId", e.field, e.severity, e.summary, e.evidence,
+               EXISTS (SELECT 1 FROM sonar.review_resolution rr
+                        WHERE rr.event_id = e.id AND rr.resolution = 'false-alarm') AS dismissed
+          FROM sonar.change_event e
+         WHERE e.kind IN (${JUDGED_KINDS.map((k) => `'${k}'`).join(', ')})) t;`, 'change events');
 }
 
 async function loadJudgedKeys(url, model) {

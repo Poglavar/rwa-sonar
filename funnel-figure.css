@@ -11,16 +11,6 @@
     --ff-border: rgba(100, 116, 139, 0.35);
     margin: 1.5rem 0;
 }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .funnel-figure {
-        --ff-text: #e5e9f2;
-        --ff-muted: #a3adc2;
-        --ff-accent: #a5b4fc;
-        --ff-link: #93c5fd;
-        --ff-bg: #151c2c;
-        --ff-border: rgba(148, 163, 184, 0.35);
-    }
-}
 :root[data-theme="dark"] .funnel-figure {
     --ff-text: #e5e9f2;
     --ff-muted: #a3adc2;

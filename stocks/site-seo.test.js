@@ -70,16 +70,16 @@ describe('seoHeadTags', () => {
 });
 
 describe('contact footer', () => {
-    test('carries X, the Telegram group, the alerts bot and GitHub, and no e-mail address', () => {
+    test('carries X, the Telegram channel and group and GitHub, no alerts bot and no e-mail address', () => {
         const html = contactFooterHtml('../');
-        for (const url of [CONTACT_LINKS.x, CONTACT_LINKS.telegramGroup, CONTACT_LINKS.bot, CONTACT_LINKS.github]) expect(html).toContain(`href="${url}"`);
+        for (const url of [CONTACT_LINKS.x, CONTACT_LINKS.telegramChannel, CONTACT_LINKS.telegramGroup, CONTACT_LINKS.github]) expect(html).toContain(`href="${url}"`);
         expect(html).toContain('RWA Sonar Watch');
-        expect(html).toContain('@rwa_sonar_bot');
-        expect(html).toContain('href="../watch.html"');
+        expect(html).not.toContain(`href="${CONTACT_LINKS.bot}"`);
+        expect(html).not.toContain('watch.html');
         // Icons come from one shared sprite; every link still has an accessible name.
-        for (const id of ['x', 'telegram', 'bell', 'github']) expect(html).toMatch(new RegExp(`<use href="\\.\\./images/contact-icons\\.svg\\?v=[0-9a-z]+#${id}"/>`));
-        expect(html.match(/<svg class="site-contact-icon" aria-hidden="true"/g)).toHaveLength(5);
-        expect(html.match(/<a href="https:[^"]+"[^>]*aria-label="[^"]+"/g)).toHaveLength(5);
+        for (const id of ['x', 'telegram', 'github']) expect(html).toMatch(new RegExp(`<use href="\\.\\./images/contact-icons\\.svg\\?v=[0-9a-z]+#${id}"/>`));
+        expect(html.match(/<svg class="site-contact-icon" aria-hidden="true"/g)).toHaveLength(4);
+        expect(html.match(/<a href="https:[^"]+"[^>]*aria-label="[^"]+"/g)).toHaveLength(4);
         expect(html).not.toMatch(/mailto:|@[a-z0-9-]+\.[a-z]{2,}/i);
     });
 });
@@ -256,7 +256,7 @@ describe('build-site-seo.mjs end to end', () => {
             expect(html).toContain(`href="${CONTACT_LINKS.telegramGroup}"`);
         }
         for (const file of Object.keys(CONTACT_ONLY_PAGES)) {
-            expect(fs.readFileSync(path.join(root, file), 'utf8')).toContain(`href="${CONTACT_LINKS.bot}"`);
+            expect(fs.readFileSync(path.join(root, file), 'utf8')).toContain(`href="${CONTACT_LINKS.telegramGroup}"`);
         }
     });
 

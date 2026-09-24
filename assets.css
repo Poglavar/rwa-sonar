@@ -94,33 +94,31 @@ th.sort-active {
     background: var(--rwa-cobalt-soft);
     color: var(--rwa-cobalt-dark);
 }
-@media (prefers-color-scheme: dark) {
-    th { background: #2b344b; }
-    th:hover { background: color-mix(in srgb, var(--rwa-cobalt-soft) 60%, #2b344b); }
-    .term-badge.ownership {
-        background: #1e3a5f;
-        color: #93c5fd;
-    }
-    .term-badge.transfers {
-        background: #064e3b;
-        color: #6ee7b7;
-    }
-    .term-badge.compliance {
-        background: #78350f;
-        color: #fcd34d;
-    }
-    .term-badge.recovery {
-        background: #831843;
-        color: #f9a8d4;
-    }
-    .term-badge.maturity {
-        background: #312e81;
-        color: #c7d2fe;
-    }
-    .term-badge.pillar {
-        background: #4c1d95;
-        color: #ddd6fe;
-    }
+:where(html[data-theme="dark"]) th { background: #2b344b; }
+:where(html[data-theme="dark"]) th:hover { background: color-mix(in srgb, var(--rwa-cobalt-soft) 60%, #2b344b); }
+:where(html[data-theme="dark"]) .term-badge.ownership {
+    background: #1e3a5f;
+    color: #93c5fd;
+}
+:where(html[data-theme="dark"]) .term-badge.transfers {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+:where(html[data-theme="dark"]) .term-badge.compliance {
+    background: #78350f;
+    color: #fcd34d;
+}
+:where(html[data-theme="dark"]) .term-badge.recovery {
+    background: #831843;
+    color: #f9a8d4;
+}
+:where(html[data-theme="dark"]) .term-badge.maturity {
+    background: #312e81;
+    color: #c7d2fe;
+}
+:where(html[data-theme="dark"]) .term-badge.pillar {
+    background: #4c1d95;
+    color: #ddd6fe;
 }
 .desc-clamp {
     display: -webkit-box;
@@ -291,11 +289,9 @@ th.sort-active {
     border-radius: 8px;
     border: 1px solid #e5e7eb;
 }
-@media (prefers-color-scheme: dark) {
-    .vocab-legend {
-        background: #1f2937;
-        border-color: #374151;
-    }
+:where(html[data-theme="dark"]) .vocab-legend {
+    background: #1f2937;
+    border-color: #374151;
 }
 .legend-item {
     display: flex;
@@ -433,13 +429,11 @@ th.sort-active {
 .x-logo-dark {
     display: none;
 }
-@media (prefers-color-scheme: dark) {
-    .x-logo-light {
-        display: none;
-    }
-    .x-logo-dark {
-        display: inline-block;
-    }
+:where(html[data-theme="dark"]) .x-logo-light {
+    display: none;
+}
+:where(html[data-theme="dark"]) .x-logo-dark {
+    display: inline-block;
 }
 .footer-separator {
     opacity: 0.7;
@@ -477,16 +471,14 @@ th.sort-active {
     height: 12px;
     object-fit: contain;
 }
-@media (prefers-color-scheme: dark) {
-    .link-pill {
-        background: #1f2937;
-        color: #d1d5db;
-        border-color: #4b5563;
-    }
-    .link-pill:hover {
-        background: #374151;
-        border-color: #6b7280;
-    }
+:where(html[data-theme="dark"]) .link-pill {
+    background: #1f2937;
+    color: #d1d5db;
+    border-color: #4b5563;
+}
+:where(html[data-theme="dark"]) .link-pill:hover {
+    background: #374151;
+    border-color: #6b7280;
 }
 @media (max-width: 860px) {
     .problem-wrap {

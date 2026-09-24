@@ -21,19 +21,17 @@
     --venue-h: #6b7280;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
-        --flash-bg: #3f3410;
-        --venue-a: #22d3ee;
-        --venue-b: #a78bfa;
-        --venue-c: #fbbf24;
-        --venue-d: #4ade80;
-        --venue-e: #f472b6;
-        --venue-f: #818cf8;
-        --venue-g: #60a5fa;
-        --venue-h: #9ca3af;
-    }
+:root:where([data-theme="dark"]) {
+    color-scheme: dark;
+    --flash-bg: #3f3410;
+    --venue-a: #22d3ee;
+    --venue-b: #a78bfa;
+    --venue-c: #fbbf24;
+    --venue-d: #4ade80;
+    --venue-e: #f472b6;
+    --venue-f: #818cf8;
+    --venue-g: #60a5fa;
+    --venue-h: #9ca3af;
 }
 
 * {

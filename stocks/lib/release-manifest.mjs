@@ -4,7 +4,7 @@ export const RELEASE_ARTIFACTS = [
     'release-evidence.json',
     'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
     'stocks-graph.json', 'stocks-health.json', 'stocks-collector-status.json', 'stocks-review-queue.json',
-    'stocks-afterhours.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
+    'stocks-closed-market.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
     'stocks-legal-templates.json',
     'stocks/data/venues.json', 'stocks/data/holders.json', 'stocks/data/meteora.json',
     'stocks/data/reference-prices.json', 'stocks/data/events.json', 'stocks/data/defi-usage.json',
@@ -37,11 +37,15 @@ export const RELEASE_BUILD_STAGES = {
     ],
     'pre-review': ['stocks/build-legal-templates.mjs'],
     surfaces: [
-        'stocks/build-legal-templates.mjs', 'stocks/build-cards.mjs',
+        'stocks/build-legal-templates.mjs',
+        // "When the market is closed" reads tracking (the weekend move in a 24/7 lender's price) and
+        // the lending watcher's rows in the database; the cards read it, so both come first.
+        'stocks/build-tracking.mjs', 'stocks/build-closed-market.mjs',
+        'stocks/build-cards.mjs',
         'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs',
-        // Exits reads protocols/index.json; tracking reads the after-hours output; weekly reads the
-        // snapshot, changes, journal and database state, so all three come after the dossiers.
-        'stocks/build-exits.mjs', 'stocks/build-tracking.mjs', 'stocks/build-weekly.mjs',
+        // Exits reads protocols/index.json; weekly reads the snapshot, changes, journal and
+        // database state, so both come after the dossiers.
+        'stocks/build-exits.mjs', 'stocks/build-weekly.mjs',
         // Reads the journal, the DeFi feed, the snapshots and the watcher rows; the snapshot step
         // below writes its newest rows into index.html, so it must come first.
         'stocks/build-events.mjs',

@@ -16,9 +16,7 @@
     --assertion: #2f6aa3;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root { --assertion: #b9d9ff; }
-}
+:root:where([data-theme="dark"]) { --assertion: #b9d9ff; }
 
 * { box-sizing: border-box; }
 body { margin: 0; background: radial-gradient(circle at 85% 0, rgba(49,84,216,.13), transparent 30rem), var(--bg); color: var(--text); line-height: 1.55; }

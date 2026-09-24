@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Six-hourly refresh of the tokenized-stocks data, run ON the server by PM2 (app `rwa-refresh`
 # in ecosystem.config.cjs) from the repo clone /root/code/rwa-sonar: re-fetches what the
-# keyless and keyed APIs report, rebuilds the graded database, health, after-hours, snapshot,
+# keyless and keyed APIs report, rebuilds the graded database, health, closed-market view, snapshot,
 # change log and complete generated dossiers, then stages and installs the outputs into the nginx docroot and verifies the
 # PUBLIC builtAt matches what was just built. A deploy never has to run this: the docroot copy
 # of every job-owned file is what people see, and the live tape (`rwa-trades`) publishes itself.
@@ -86,6 +86,13 @@ step "holders";   node stocks/fetch-holders.mjs --run
 soft "xstocks float" node stocks/fetch-xstocks-float.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
 soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
+# What lenders do when the US market is closed (stocks/build-closed-market.mjs in the surfaces
+# phase): Kamino's keyless hourly price history for the Monday gap (16 small calls), and Jupiter
+# keyless quotes for the Solana depth that moves each lender-accepted token 5 % and 10 % (~31
+# tokens, about 4-5 minutes, paced for the ~60/min limit). Each run samples the session it falls in,
+# so the six-hourly schedule builds weekday, overnight and weekend depth over time.
+soft "lender price history" node stocks/fetch-lender-price-history.mjs --run
+soft "solana depth" node stocks/fetch-solana-depth.mjs --run
 
 # 2. Seed DeFi collection with the catalogue just rebuilt from this run's universe/on-chain inputs.
 # fetch-defi-usage reads stocks-tokens.json to decide which exact mints to inspect. The complete
@@ -102,7 +109,6 @@ fi
 # Rebuild graph/health/discovery as well as issuer/token/funnel after the DeFi collector. This
 # second build is intentional: it turns the fresh protocol observations into public profiles.
 step "base release artifacts"; node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$BASE_URL"
-step "afterhours"; node stocks/build-afterhours.mjs --run
 step "snapshot";   node stocks/snapshot.mjs --run
 step "changes";    node stocks/build-changes.mjs --run
 step "public change journal"; node stocks/build-change-journal.mjs --run

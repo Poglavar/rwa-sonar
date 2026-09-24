@@ -66,12 +66,16 @@ const newestFirst = (a, b) => (Date.parse(b.detectedAt) - Date.parse(a.detectedA
  * first. `judgedKeys` are the dedupe keys that already carry a valid or invalid judgment for this
  * model and prompt version (an `error` one is retried). The representative event is the
  * `legal-term` one when the change has one (it carries the diff), else the newest; every lost quote
- * of the same change rides along, so the model sees all the words our dossiers relied on.
+ * of the same change rides along, so the model sees all the words our dossiers relied on. An event
+ * `dismissed` as a false alarm (raised from a read that was not the document — a region block, a
+ * script-only shell, an RPC info page: stocks/dismiss-unreadable-events.mjs) is not a change and
+ * never costs a model call.
  */
 export function selectCandidates(events, { judgedKeys = new Set() } = {}) {
     const groups = new Map();
     for (const event of Array.isArray(events) ? events : []) {
         if (!JUDGED_KINDS.includes(event?.kind)) continue;
+        if (event.dismissed === true) continue;
         const key = dedupeKey(event);
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(event);

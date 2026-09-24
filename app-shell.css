@@ -35,27 +35,31 @@
     --rwa-display: Georgia, "Times New Roman", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --rwa-ink: #f4f1e9;
-        --rwa-muted: #aeb5c7;
-        --rwa-paper: #192033;
-        --rwa-panel: #252d43;
-        --rwa-sunken: #20283b;
-        --rwa-line: #424b66;
-        --rwa-control-line: #59637f;
-        --rwa-cobalt: #91a6ff;
-        --rwa-cobalt-dark: #b9c6ff;
-        --rwa-cobalt-soft: #303a59;
-        --rwa-on-accent: #172033;
-        --rwa-coral: #ff7a72;
-        --rwa-coral-text: #ff9b94;
-        --rwa-amber: #f0b34d;
-        --rwa-green: #75c7a6;
-        --rwa-red: #ff8992;
-        --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
-    }
+:root:where([data-theme="dark"]) {
+    --rwa-ink: #f4f1e9;
+    --rwa-muted: #aeb5c7;
+    --rwa-paper: #192033;
+    --rwa-panel: #252d43;
+    --rwa-sunken: #20283b;
+    --rwa-line: #424b66;
+    --rwa-control-line: #59637f;
+    --rwa-cobalt: #91a6ff;
+    --rwa-cobalt-dark: #b9c6ff;
+    --rwa-cobalt-soft: #303a59;
+    --rwa-on-accent: #172033;
+    --rwa-coral: #ff7a72;
+    --rwa-coral-text: #ff9b94;
+    --rwa-amber: #f0b34d;
+    --rwa-green: #75c7a6;
+    --rwa-red: #ff8992;
+    --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
 }
+
+/* The theme is chosen by theme.js (Auto follows the device, or Light / Dark from the header switch),
+   which sets <html data-theme> before first paint; every dark rule keys on that attribute. The
+   browser's own surfaces (scrollbars, form controls) follow the same choice. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 /* Base roles every page shares. :where() keeps them at zero specificity, so a page's own rule for a
    specific component still wins; these only fill in what a page leaves unset. */
@@ -222,6 +226,49 @@ h1 { font-family: var(--rwa-display); font-weight: 500; }
 .app-header .app-nav details > div a:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
 .app-header .app-nav details > div a[aria-current="page"] { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); font-weight: 760; }
 
+/* Theme switch (theme.js, markup from stocks/lib/site-nav.js): the last item of the header row, an
+   icon button with a control border, muted like the header links and cobalt on hover like a button.
+   It shows the current mode's icon; <html data-theme-mode> is set by theme.js before first paint.
+   Without JavaScript nothing sets data-theme, so the switch is hidden instead of doing nothing. */
+.theme-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    position: relative;
+    box-sizing: border-box;
+    width: 32px;
+    height: 32px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--rwa-control-line);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.theme-switch:hover { border-color: var(--rwa-cobalt); color: var(--rwa-cobalt-dark); }
+.theme-icon { width: 18px; height: 18px; }
+.theme-icon use { display: none; }
+:root[data-theme-mode="auto"] .theme-icon-auto,
+:root[data-theme-mode="light"] .theme-icon-light,
+:root[data-theme-mode="dark"] .theme-icon-dark { display: inline; }
+/* The Research menu's text copy, styled as one of its links; shown only where the row has no room. */
+.app-header .theme-switch-menu {
+    display: none;
+    width: 100%;
+    height: auto;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 7px;
+    color: var(--rwa-ink);
+    text-align: left;
+}
+.app-header .theme-switch-menu:hover { background: var(--rwa-cobalt-soft); color: var(--rwa-cobalt-dark); }
+:root:not([data-theme]) .theme-switch { display: none; }
+
 body.app-page {
     color-scheme: light;
     --page-bg: var(--rwa-paper);
@@ -254,15 +301,13 @@ body.app-page {
     font-family: var(--rwa-font);
 }
 
-@media (prefers-color-scheme: dark) {
-    /* Every token body.app-page hard-codes as a light colour needs its dark value here (the rest
-       flip through the --rwa-* palette). Missing these left light-on-light chips and insets on
-       every app page in dark mode until 2026-09-23. Values match card.css's dark block. */
-    body.app-page {
-        color-scheme: dark;
-        --header-bg: #2b344b;
-        --sev-warning: #f0875c;
-    }
+/* Every token body.app-page hard-codes as a light colour needs its dark value here (the rest
+   flip through the --rwa-* palette). Missing these left light-on-light chips and insets on
+   every app page in dark mode until 2026-09-23. Values match card.css's dark block. */
+:where(html[data-theme="dark"]) body.app-page {
+    color-scheme: dark;
+    --header-bg: #2b344b;
+    --sev-warning: #f0875c;
 }
 
 .app-page > :not(.page-header):not(dialog) {
@@ -324,6 +369,22 @@ body.app-page {
        a header without a menu (the cards) keeps all four. */
     .app-nav:has(> details) > a:nth-of-type(4) { display: none; }
     .app-nav .nav-compact-only { display: block; }
+    /* The theme switch keeps its 32px box but gets a 44px target like the links beside it. */
+    .app-header .app-nav > .theme-switch::before { content: ""; position: absolute; inset: -6px 0 -6px -12px; }
     .app-page > :not(.page-header):not(dialog) { width: min(100% - 24px, 1180px); }
     .app-page > section, .app-page .method-note { padding: 16px; }
+}
+
+/* A phone-width row holds the brand, three links, the menu and the theme switch only with tighter
+   gaps (the 28px brand gap alone had pushed "Research" past the edge at 320px). */
+@media (max-width: 400px) {
+    .app-header { gap: 14px; }
+    .app-nav { gap: 10px; }
+}
+
+/* Too narrow for the brand, the links, the menu and the theme switch in one row (under 360px): the
+   switch leaves the row and its text copy at the end of the Research menu takes its place. */
+@media (max-width: 359px) {
+    .app-header .app-nav > .theme-switch { display: none; }
+    .app-header .theme-switch-menu { display: block; }
 }

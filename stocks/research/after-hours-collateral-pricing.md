@@ -311,7 +311,9 @@ What to show per token:
 4. The Monday gap per token: Friday close to Monday open. For Kamino and Jupiter Lend, pair it with collateral within that gap of liquidation.
 5. Keep the weekend premium only for tokens that a 24/7-priced lender (Nest) accepts, labelled as the weekend move in that lender's price.
 
-## Proposed `finding-types.json` entries (not wired)
+## `finding-types.json` entries
+
+Wired on 2026-09-24: the four types below are in `finding-types.json`, the programme-level findings are in `stocks/data/issuers/xstocks-backed.json`, and `stocks/build-closed-market.mjs` emits the per-token ones on each token card's "When the market is closed" section. The site now shows what each lender does when the market is closed instead of the closed-hours premium (see "Recommendation for the site" above).
 
 - **`collateral-priced-from-token-trading`**
   - category: valuation; polarity: negative; defaultSeverity: caution.

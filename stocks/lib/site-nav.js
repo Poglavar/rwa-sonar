@@ -1,6 +1,7 @@
 /*
- * The one site header: brand, the four primary links and the "Research" menu, in the markup and
- * order every page family uses (app-shell.css styles it). The ESM builders (cards, issuers, legal
+ * The one site header: brand, the four primary links, the "Research" menu and the theme switch, in
+ * the markup and order every page family uses (app-shell.css styles it; theme.js drives the switch,
+ * and themeScriptHtml() is the tag that loads it in every page's <head>). The ESM builders (cards, issuers, legal
  * templates, protocol dossiers, weekly) render it with siteHeaderHtml(); the hand-written pages carry
  * the same markup and site-header.test.js fails when one of them drifts from it. UMD-wrapped like
  * fmt.js, so a classic script could read window.__rwaSiteNav without a bare global.
@@ -45,6 +46,32 @@
     const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
     const esc = (value) => String(value).replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
+    /** Cache-busting stamps for theme.js and its icon sprite. Bump when the file changes. */
+    const THEME_JS_VERSION = '20260924y';
+    const THEME_ICONS_VERSION = '20260924y';
+    /** What the switch says before theme.js has read the stored choice (it relabels on load). */
+    const THEME_LABEL = 'Theme: Auto (follows your device)';
+
+    /**
+     * theme.js, synchronous, for the <head> of every page BEFORE its first stylesheet: it sets
+     * <html data-theme> before first paint, which every stylesheet's dark rules key on.
+     */
+    function themeScriptHtml(root = './') {
+        return `<script src="${root}theme.js?v=${THEME_JS_VERSION}"></script>`;
+    }
+
+    /**
+     * The theme switch: an icon button at the end of the header row (all three icons, CSS shows the
+     * current mode's) and a text copy at the end of the Research menu, which takes its place on a
+     * screen too narrow for both (app-shell.css). theme.js cycles the mode on a click of either.
+     */
+    function themeSwitchHtml(root) {
+        const use = (id) => `<use class="theme-icon-${id}" href="${root}images/theme-icons.svg?v=${THEME_ICONS_VERSION}#${id}"/>`;
+        return `<button class="theme-switch" type="button" aria-label="${THEME_LABEL}" title="${THEME_LABEL}">`
+            + `<svg class="theme-icon" aria-hidden="true" focusable="false">${use('auto')}${use('light')}${use('dark')}</svg></button>`;
+    }
+    const THEME_MENU_HTML = '<button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button>';
+
     /**
      * The header for a page `root` ('./' or '../') whose own nav entry is `current` (an href from
      * PRIMARY or RESEARCH, e.g. 'watch.html'; null when the page has none).
@@ -69,8 +96,9 @@
             + `<details class="app-nav-menu"><summary${inMenu ? ' aria-current="page"' : ''}>${MENU_LABEL}</summary><div>`
             + link(learn, 'nav-compact-only')
             + RESEARCH.map((item) => link(item)).join('')
-            + `</div></details></nav></header>`;
+            + THEME_MENU_HTML
+            + `</div></details>${themeSwitchHtml(root)}</nav></header>`;
     }
 
-    return { PRIMARY, RESEARCH, MENU_LABEL, siteHeaderHtml };
+    return { PRIMARY, RESEARCH, MENU_LABEL, THEME_JS_VERSION, siteHeaderHtml, themeScriptHtml };
 });

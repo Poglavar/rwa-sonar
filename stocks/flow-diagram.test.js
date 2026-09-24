@@ -176,7 +176,7 @@ describe('unknown steps are drawn as unknown', () => {
     it('the CSS draws unknown dashed and colours every status in both themes', () => {
         expect(CSS).toMatch(/\.fd-st-unknown[^{]*\.fd-arrow-line[^{]*\{[^}]*stroke-dasharray/);
         expect(CSS).toMatch(/\.fd-box-unknown\s*\{[^}]*stroke-dasharray/);
-        const dark = CSS.slice(CSS.indexOf('prefers-color-scheme: dark'));
+        const dark = CSS.slice(CSS.indexOf('[data-theme="dark"]'));
         for (const status of STATUSES) {
             expect(CSS).toContain(`--fd-${status}:`);
             expect(dark).toContain(`--fd-${status}:`);

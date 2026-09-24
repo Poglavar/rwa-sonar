@@ -49,7 +49,7 @@ const issuerDb = read('stocks-issuers.json');
 const holderDb = read('stocks', 'data', 'holders.json');
 const venueDb = read('stocks', 'data', 'venues.json');
 const tradeDb = read('stocks', 'fixtures', 'stocks-trades.sample.json');
-const afterhoursDb = read('stocks-afterhours.json');
+const closedMarketDb = read('stocks-closed-market.json');
 const meteoraDb = read('stocks', 'data', 'meteora.json');
 const catalogue = read('stocks', 'data', 'trust-chain.json');
 const composabilityDb = read('stocks', 'data', 'composability-templates.json');
@@ -86,7 +86,7 @@ for (const row of issuerDb.issuers) {
 const issuers = new Map(issuerDb.issuers.map((row) => [row.slug, row]));
 const holders = new Map(holderDb.items.map((row) => [row.mint, row]));
 const venues = new Map(venueDb.items.map((row) => [row.mint, row]));
-const afterhours = new Map((afterhoursDb.items ?? []).map((row) => [row.mint, row]));
+const closedMarket = new Map((closedMarketDb.items ?? []).map((row) => [row.mint, row]));
 const meteora = new Map((meteoraDb.items ?? []).map((row) => [row.pairAddress, row]));
 const pools = new Map();
 for (const pool of tradeDb.pools ?? []) {
@@ -101,7 +101,7 @@ const SOURCES = {
     holders: holderDb.fetchedAt,
     venues: venueDb.fetchedAt,
     trades: tradeDb.generatedAt,
-    afterhours: afterhoursDb.generatedAt,
+    closedMarket: closedMarketDb.generatedAt,
     meteora: meteoraDb.fetchedAt,
     defiUsage: defiUsageDb.fetchedAt
 };
@@ -118,7 +118,8 @@ function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverr
         issuer: issuerOverride ?? issuers.get(token.issuer) ?? null,
         holdersItem: holders.get(token.mint) ?? null,
         venuesItem: venues.get(token.mint) ?? null,
-        afterhoursItem: afterhours.get(token.mint) ?? null,
+        closedMarketItem: closedMarket.get(token.mint) ?? null,
+        closedMarketMeta: closedMarketDb,
         meteoraByPair: meteora,
         pools: pools.get(token.mint) ?? null,
         slug: SLUGS.get(token.mint),
@@ -276,7 +277,8 @@ describe('ogDescription', () => {
         const hostile = { ...card, name: 'Evil <script>alert("x")</script> & co', symbol: 'A"B<C' };
         const html = renderCard(hostile, { baseUrl: null, version: 'test' });
         const head = html.slice(0, html.indexOf('</head>'));
-        expect(head).not.toContain('<script');
+        // The head's one real script is theme.js; the hostile name must not add another.
+        expect(head.replace(/<script src="\.\.\/theme\.js\?v=\w+"><\/script>/, '')).not.toContain('<script');
         expect(head).toContain('&lt;script&gt;');
         expect(head).toContain('&quot;');
         expect(ogTitle(hostile)).toContain('A"B<C');
@@ -400,7 +402,7 @@ describe('renderCard', () => {
     });
 
     it('renders all sections in the order a reader needs them', () => {
-        const order = ['own', 'reference', 'afterhours', 'depth', 'holders', 'control',
+        const order = ['own', 'reference', 'closed-market', 'depth', 'holders', 'control',
             'defi-usage', 'composability', 'verification', 'venues', 'issuer-api', 'rules'];
         const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
         let cursor = -1;
@@ -909,7 +911,8 @@ describe('evidence chips on a card', () => {
             issuer: fixtureIssuer(),
             holdersItem: holders.get(token.mint) ?? null,
             venuesItem: venues.get(token.mint) ?? null,
-            afterhoursItem: null,
+            closedMarketItem: null,
+            closedMarketMeta: null,
             meteoraByPair: meteora,
             pools: null,
             slug: 'FIXTURE',
@@ -1348,5 +1351,62 @@ describe('model-assessed material changes on a card', () => {
         const withBlock = Buffer.byteLength(renderCard(cardFor('QQQx', BUILT_AT, exportOf(...items)), { version: 'v' }), 'utf8');
         expect(withBlock - bare).toBeLessThan(1024);
         expect(withBlock).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
+    });
+});
+
+// --- When the market is closed ------------------------------------------------------------------
+
+describe('the "When the market is closed" section on a card', () => {
+    const sectionOf = (html) => html.slice(html.indexOf('<section id="closed-market">'), html.indexOf('<section id="depth">'));
+
+    it('replaces the closed-hours premium: no premium-gap wording is left on any card', () => {
+        const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
+        expect(html).toContain('<section id="closed-market"><h2>When the market is closed</h2>');
+        expect(html).not.toContain('After-hours premium');
+        expect(html).not.toContain('Gap (closed − open)');
+        expect(publicCard(cardFor('NVDAx')).afterHours).toBeUndefined();
+    });
+
+    it('lists each lender with its closed-market label, liquidation threshold and borrower sentence', () => {
+        const card = cardFor('NVDAx');
+        const section = sectionOf(renderCard(card, { baseUrl: null, version: 'v' }));
+        const labels = card.closedMarket.lenders.map((l) => [l.protocolId, l.label, l.liquidationLtvPct]);
+        expect(labels).toEqual(expect.arrayContaining([
+            ['kamino', 'frozen at close', 65], ['jupiter-lend', '24/5 overnight', 75], ['nest', '24/7 token price', 60]
+        ]));
+        expect(labels.find((l) => l[0] === 'loopscale')[1]).toMatch(/^stale since \d{1,2} \w{3} 2026$/);
+        expect(section).toContain('<span class="cm-l cm-frozen">frozen at close</span>');
+        expect(section).toContain('<span class="cm-l cm-token">24/7 token price</span>');
+        expect(section).toContain('<i>liquidation at 65 % LTV</i>');
+        expect(section).toContain('a thin weekend sell-off can liquidate you');
+        expect(section).toContain('<dt>Exposure at the Monday gap</dt><dd>not measured</dd>');
+        // The weekend premium survives only as the weekend move in the 24/7 lender's own price.
+        expect(section).toContain('<dt>Weekend move in Nest&#39;s price</dt>');
+        const kaminoOnly = sectionOf(renderCard(cardFor('HOODx'), { baseUrl: null, version: 'v' }));
+        expect(kaminoOnly).not.toContain('Weekend move');
+    });
+
+    it('shows the findings its lenders carry, each with its source', () => {
+        const section = sectionOf(renderCard(cardFor('QQQx'), { baseUrl: null, version: 'v' }));
+        expect(section).toContain('Collateral price suspended around a corporate action');
+        expect(section).toContain('Lending market prices the collateral from the token&#39;s own trading</a>: Nest');
+        expect(section).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">Collateral price suspended around a corporate action<\/a>: Kamino and Jupiter Lend, about 44 h from 19 Sep 2026/);
+    });
+
+    it('a token no lender takes says so in one line; an unbuilt file is not called "no lender"', () => {
+        const none = cardFor('TSLAon');
+        expect(none.closedMarket.lenders).toEqual([]);
+        expect(sectionOf(renderCard(none, { baseUrl: null, version: 'v' }))).toContain('No Solana lending market we track takes this token as collateral');
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const unbuilt = buildCard({ token, slug: 'NVDAx', builtAt: BUILT_AT, sources: SOURCES, closedMarketItem: null, closedMarketMeta: null });
+        expect(unbuilt.closedMarket).toBeNull();
+        expect(renderCard(unbuilt, { baseUrl: null, version: 'v' })).toContain('Not built yet');
+    });
+
+    it('keeps the widest card with the most lenders inside the byte target', () => {
+        const widest = ['QQQx', 'NVDAx', 'SPYx', 'TSLAx'].map((symbol) => ({ symbol, bytes: Buffer.byteLength(renderCard(cardFor(symbol), { version: 'test' }), 'utf8') }))
+            .sort((a, b) => b.bytes - a.bytes)[0];
+        console.log(`[cards] widest multi-lender card ${widest.symbol} ${widest.bytes} B (target ${CARD_BYTE_TARGET})`);
+        expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
     });
 });

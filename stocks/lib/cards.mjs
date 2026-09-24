@@ -12,6 +12,7 @@ import discovery from './discovery.js';
 import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
+import closedMarketView from './closed-market-view.js';
 import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
@@ -299,7 +300,8 @@ function controlFlag(value) {
  * @param {object|null} input.holdersItem its stocks/data/holders.json .items[] record
  * @param {object|null} input.floatItem xStocks only: lib/xstocks-float.mjs cardFloatItem() ({floatUi, inventorySharePct, readAt})
  * @param {object|null} input.venuesItem its stocks/data/venues.json .items[] record
- * @param {object|null} input.afterhoursItem its stocks-afterhours.json .items[] record
+ * @param {object|null} input.closedMarketItem its stocks-closed-market.json .items[] record (null: no lender takes it)
+ * @param {object|null} input.closedMarketMeta that file's {generatedAt, researchReviewedAt, inputs}; null when the file is absent
  * @param {Map|null} input.meteoraByPair stocks/data/meteora.json .items[] keyed by pairAddress
  * @param {Array|null} input.pools its stocks-trades.json .pools[] entries
  * @param {string} input.slug the card file name (assignSlugs)
@@ -315,7 +317,8 @@ export function buildCard(input) {
         holdersItem = null,
         floatItem = null,
         venuesItem = null,
-        afterhoursItem = null,
+        closedMarketItem = null,
+        closedMarketMeta = null,
         meteoraByPair = null,
         pools = null,
         slug = '',
@@ -506,16 +509,7 @@ export function buildCard(input) {
             usdPrice: num(market.usdPrice),
             premiumPct: num(reference.premiumPct)
         },
-        afterHours: afterhoursItem === null ? null : {
-            source: str(afterhoursItem.source),
-            openPremiumPct: num(afterhoursItem.openPremiumPct),
-            closedPremiumPct: num(afterhoursItem.closedPremiumPct),
-            gapPct: num(afterhoursItem.gapPct),
-            tradesOpen: num(afterhoursItem.tradesOpen),
-            tradesClosed: num(afterhoursItem.tradesClosed),
-            windowFrom: str(afterhoursItem.windowFrom),
-            windowTo: str(afterhoursItem.windowTo)
-        },
+        closedMarket: closedMarketCard(closedMarketItem, closedMarketMeta),
         depth: {
             liquidityUsd: num(market.liquidity),
             vol24Usd: num(market.vol24),
@@ -615,7 +609,7 @@ export function buildCard(input) {
             holders: str(sources.holders),
             venues: str(sources.venues),
             trades: str(sources.trades),
-            afterhours: str(sources.afterhours),
+            closedMarket: str(sources.closedMarket),
             meteora: str(sources.meteora),
             defiUsage: str(sources.defiUsage)
         }
@@ -1009,7 +1003,7 @@ export function publicCard(card) {
             usdPrice: card.reference.usdPrice,
             premiumPct: card.reference.premiumPct
         },
-        afterHours: card.afterHours,
+        closedMarket: card.closedMarket,
         depth: card.depth,
         holders: card.holders,
         control: card.control,
@@ -1414,20 +1408,87 @@ function referenceBody(card) {
     ]);
 }
 
-function afterHoursBody(card) {
-    const a = card.afterHours;
-    if (a === null) {
-        return '<p class="no">No session split yet. It needs a full session of trades on both sides ' +
-            'of the underlying market\'s open.</p>';
+/**
+ * The card's copy of a stocks-closed-market.json item: null when that file was not built (the
+ * section says so), an empty lender list when no lending market takes the token. Only what the
+ * section renders and the JSON record needs; the full item stays in the dataset.
+ */
+function closedMarketCard(item, meta) {
+    if (meta === null || meta === undefined) return null;
+    const lenders = Array.isArray(item?.lenders) ? item.lenders : [];
+    const sourceUrl = (source) => (isSafeUrl(source?.url) ? source.url : null);
+    return {
+        researchedAt: str(meta.researchReviewedAt),
+        builtAt: str(meta.generatedAt),
+        lenders: lenders.map((l) => ({
+            protocolId: str(l.protocolId),
+            protocolName: str(l.protocolName),
+            marketId: str(l.marketId),
+            displayName: str(l.displayName) ?? str(l.protocolName),
+            labelKind: str(l.labelKind),
+            label: str(l.label),
+            staleSince: str(l.staleSince),
+            liquidationLtvPct: num(l.liquidationLtvPct),
+            maxLtvPct: num(l.maxLtvPct),
+            hidden: l.hidden === true,
+            sentence: str(l.sentence),
+            sourceUrl: sourceUrl(l.source),
+            freezes: l.freezes ?? null,
+            mondayGaps: l.mondayGaps ?? null
+        })),
+        depth: item?.depth ?? null,
+        weekendMove: item?.weekendMove ?? null,
+        findings: (Array.isArray(item?.findings) ? item.findings : []).map((f) => ({
+            schema: str(f.schema), name: str(f.name), severity: str(f.severity), marketId: str(f.marketId),
+            short: str(f.short), statement: str(f.statement), sourceUrl: sourceUrl(f.source)
+        }))
+    };
+}
+
+/**
+ * "When the market is closed": for each lending market that takes the token, the price it uses
+ * while the US market is closed (one of five labels), its liquidation threshold and one sentence
+ * for a borrower, then its freezes and Monday gap; below them the Solana depth, the weekend move
+ * where a lender prices from the token itself, and the findings. Wording: closed-market-view.js.
+ */
+function closedMarketBody(card) {
+    const c = card.closedMarket;
+    if (c === null) return '<p class="no">Not built yet (stocks/build-closed-market.mjs).</p>';
+    if (c.lenders.length === 0) {
+        return '<p class="no">No Solana lending market we track takes this token as collateral (Kamino, Jupiter Lend, '
+            + 'Nest and Loopscale checked; Project 0 and Save list no stock token).</p>';
     }
-    return kv([
-        ['Premium while open', a.openPremiumPct === null ? null : text(fmtSignedPct(a.openPremiumPct))],
-        ['Premium while closed', a.closedPremiumPct === null ? null : text(fmtSignedPct(a.closedPremiumPct))],
-        ['Gap (closed − open)', a.gapPct === null ? null : text(fmtSignedPct(a.gapPct))],
-        ['Trades measured', `${text(fmtNumber(a.tradesOpen))} open / ${text(fmtNumber(a.tradesClosed))} closed`],
-        ['Reference used', a.source === null ? null : text(a.source)],
-        ['Window', a.windowFrom === null ? null : `${time(a.windowFrom)} → ${time(a.windowTo)}`]
+    const V = closedMarketView;
+    // Byte-capped: one line per lender for the label and threshold, its sentence, and one line for
+    // freezes and the Monday gap. The per-market sources are in the linked data file.
+    const lenders = c.lenders.map((l) => {
+        const freezes = V.freezeText(l.freezes, l.protocolId);
+        const gaps = V.gapsText(l.mondayGaps, 2);
+        const meta = [freezes === null ? null : `Freezes (30 d): ${freezes}`, gaps === null ? null : `Monday gap: ${gaps}`].filter(Boolean);
+        return `<li><b>${escapeHtml(l.displayName ?? DASH)}</b> <span class="cm-l ${V.labelClass(l.labelKind)}">${escapeHtml(l.label ?? DASH)}</span>`
+            + `${l.liquidationLtvPct === null ? '' : ` <i>liquidation at ${escapeHtml(fmtNumber(l.liquidationLtvPct))} % LTV</i>`}`
+            + `${l.hidden ? ' <small>(reserve hidden in the app)</small>' : ''}`
+            + `${l.sentence === null ? '' : `<p>${escapeHtml(l.sentence)}</p>`}`
+            + `${meta.length ? `<small>${escapeHtml(meta.join(' · '))}</small>` : ''}</li>`;
+    }).join('');
+    const weekend = V.weekendMoveText(c.weekendMove);
+    const rows = kv([
+        ['Solana depth, sale to USDC', escapeHtml(V.depthText(c.depth))],
+        // Named after the lender(s) whose price follows the token (today only Nest).
+        [`Weekend move in ${[...new Set(c.lenders.filter((l) => l.labelKind === 'token-24x7' || l.labelKind === 'signed-quote').map((l) => l.protocolName))].join(' and ') || 'the lender'}'s price`,
+            weekend === null ? null : escapeHtml(weekend)],
+        ['Exposure at the Monday gap', 'not measured']
     ]);
+    // A finding's severity is its own word (info / caution / warning / critical), not a health status.
+    const severity = (sev) => `<b class="c-${['info', 'caution', 'warning', 'critical'].includes(sev) ? sev : 'unknown'}">${escapeHtml(sev ?? 'finding')}</b>`;
+    const findings = c.findings.length === 0 ? '' : `<ul class="cm-f">${c.findings.map((f) => `<li>${severity(f.severity)} `
+        + `${f.sourceUrl === null ? escapeHtml(f.name ?? f.schema ?? '') : link(f.sourceUrl, f.name ?? f.schema ?? '')}`
+        + `${f.short === null ? '' : `: ${escapeHtml(f.short)}`}</li>`).join('')}</ul>`;
+    const n = c.lenders.length;
+    return `<p class="cm-lead">${n === 1 ? 'One lending market takes' : `${n} lending markets take`} it; the price each uses while the US market is closed:</p>`
+        + `<ul class="cm-list">${lenders}</ul>${rows}${findings}`
+        + `<p class="cm-src">Read on-chain ${escapeHtml(fmtDate(c.researchedAt))}; freezes: our lending watcher; gaps: Kamino; depth: Jupiter. `
+        + '<a href="../stocks-closed-market.json">Data, sources</a></p>';
 }
 
 function depthBody(card) {
@@ -2076,6 +2137,8 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const head = [
         '<meta charset="UTF-8" />',
         '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+        // Sets <html data-theme> before the stylesheets below, so the chosen theme paints first.
+        siteNav.themeScriptHtml('../'),
         // The preview image is absolute, so like og:url it exists only with a stated origin. The
         // token's own image when one was rendered, else the site-wide one; both are 1200×630.
         seoHeadTags({
@@ -2124,7 +2187,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium & holders</span></summary><div>` +
         section('reference', 'Reference & premium', referenceBody(card)) +
         `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
-        section('afterhours', 'After-hours premium', afterHoursBody(card)) +
+        section('closed-market', 'When the market is closed', closedMarketBody(card)) +
         section('depth', 'Depth, volume, activity', depthBody(card)) +
         section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
 

@@ -169,7 +169,7 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
 .deck-controls { position: fixed; z-index: 80; right: 24px; bottom: 22px; display: flex; gap: 6px; }.deck-controls button { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; background: rgba(23,32,51,.88); color: white; cursor: pointer; backdrop-filter: blur(8px); }.deck-controls button:hover { border-color: #9db0ff; }.deck-controls button:disabled { opacity: .3; cursor: default; }
 .keyboard-hint { position: fixed; z-index: 70; left: 24px; bottom: 26px; margin: 0; padding: 7px 10px; border-radius: 999px; background: var(--ink); color: var(--on-dark-muted); font-size: .65rem; }
 
-/* Six-slide revision (2026-09-24): the cover's one ownership difference, labels and owner placeholders. */
+/* Six-slide revision (2026-09-24): the cover's one ownership difference, labels and the team line. */
 .cover-side { min-width: 0; }
 .cover-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 700px; margin-top: 14px; }
 .cover-diff > p { grid-column: 1 / -1; margin: 0; color: #aebcff; font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
@@ -183,14 +183,14 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
 .slide-violet .section-lede { font-size: clamp(.95rem, 1.5vw, 1.15rem); }
 .proof-label { margin: 24px 0 0; color: var(--violet-dark); font-size: .66rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .proof-label + .proof-strip { margin-top: 10px; }
-.placeholder { color: #ffd98a !important; font-style: italic; }
 #slide-4 .dimension-grid { margin-top: 30px; }
 #slide-4 .dimension-grid article { min-height: 0; }
 #slide-4 .dimension-grid h3 { margin-top: 30px; }
 #slide-4 .dimension-grid p { min-height: 0; margin-bottom: 16px; }
 #slide-6 .slide-inner { padding-bottom: 130px; }
 #slide-6 .close-grid h2 { font-size: clamp(3.2rem, 5.6vw, 5.8rem); }
-#slide-6 .section-lede.placeholder { margin-top: 14px; font-size: 1rem; }
+#slide-6 .section-lede.team-line { margin-top: 14px; font-size: 1rem; }
+#slide-6 .team-line a { color: inherit; }
 
 @media (max-width: 900px) {
     html { scroll-snap-type: none; }

@@ -5,7 +5,7 @@
 import {
     MAX_EVENTS, TITLE_MAX, buildEventsFeed, catalogueEvents, changeRowEvents, changeRowsPsql, changeRowsSelect,
     defiEvents, eventContext, eventTime, finaliseEvents, issuerStatusChanges,
-    journalEvents, mergeEvents, mergeLiveFeed, resolvedObservations, snapshotEvents
+    journalEvents, mergeEvents, mergeLiveFeed, resolvedObservations, snapshotEvents, stampFirstSeen
 } from './lib/events.mjs';
 import { foldSignaturePage, mintsToCheck } from './lib/mint-created.mjs';
 
@@ -301,6 +301,37 @@ describe('daily snapshot diffs', () => {
         expect(events.every((e) => e.at === '2026-09-22T18:28:54Z' && e.source === 'catalogue')).toBe(true);
         expect(tally['catalogue: liquidity drops on pools under $100k']).toBe(1);
         expect(tally['catalogue: health got worse']).toBe(1);
+    });
+});
+
+describe('market events keep their first-seen time', () => {
+    const drop = { kind: 'liquidity-drop', mint: 'MINTL', symbol: 'MCDx', issuer: 'xstocks-backed', before: 899000, after: 409000 };
+    const pause = { kind: 'paused', mint: 'MINTA', symbol: 'AAPLon', issuer: 'ondo-global-markets', field: 'paused', before: false, after: true };
+    const rewrite = (observedAt, changes, issuerChanges = []) => ({ from: '2026-09-21', to: '2026-09-22', toObservedAt: observedAt, changes, issuerChanges });
+    const byKind = (events) => Object.fromEntries(events.map((e) => [e.kind, e.at]));
+
+    test('a later rewrite of the same day keeps the first build\'s time, and a new crossing takes its own', () => {
+        const first = stampFirstSeen([rewrite('2026-09-22T06:17:00Z', [drop])], {}, '2026-09-20');
+        // Six hours later the day's snapshot is rewritten: the drop is still there (a new value), a pause appeared.
+        const later = stampFirstSeen([rewrite('2026-09-22T12:17:00Z', [{ ...drop, after: 380000 }, pause],
+            issuerStatusChanges({ items: [{ slug: 'shift', status: 'live' }] }, { items: [{ slug: 'shift', status: 'defunct' }] }))],
+        first.ledger, '2026-09-20');
+        const events = snapshotEvents(later.diffs, context());
+        expect(byKind(events)).toEqual({
+            'liquidity-collapse': '2026-09-22T06:17:00Z', pause: '2026-09-22T12:17:00Z', 'issuer-status': '2026-09-22T12:17:00Z'
+        });
+        // Without the ledger every event takes the latest rewrite's time, which is the bug this fixes.
+        expect(snapshotEvents([rewrite('2026-09-22T12:17:00Z', [drop])], context())[0].at).toBe('2026-09-22T12:17:00Z');
+    });
+
+    test('a grouped pause takes its earliest member, and the ledger drops days before the window', () => {
+        const other = { ...pause, mint: 'MINTB', symbol: 'MSFTon' };
+        const { ledger } = stampFirstSeen([rewrite('2026-09-22T06:17:00Z', [pause])], { '2026-09-01|paused|OLD||': '2026-09-01T06:00:00Z' }, '2026-09-20');
+        expect(Object.keys(ledger)).toEqual(['2026-09-22|paused|MINTA|paused|']);
+        const { diffs } = stampFirstSeen([rewrite('2026-09-22T18:17:00Z', [pause, other])], ledger, '2026-09-20');
+        const [event] = snapshotEvents(diffs, context());
+        expect(event.kind).toBe('pause');
+        expect(event.at).toBe('2026-09-22T06:17:00Z');
     });
 });
 

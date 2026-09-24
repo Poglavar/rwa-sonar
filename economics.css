@@ -1,10 +1,8 @@
 /* A readable cost-path and actor-map view; detailed evidence stays behind disclosures. */
 :root { --ink: var(--rwa-ink); --muted: var(--rwa-muted); --paper: var(--rwa-paper); --panel: var(--rwa-panel); --line: var(--rwa-line); --blue: var(--rwa-cobalt); --link: var(--rwa-cobalt-dark); --label: var(--rwa-cobalt-dark); --control-line: var(--rwa-control-line); --field: var(--rwa-panel); --sunken: var(--rwa-sunken); --control-bg: var(--rwa-sunken); }
 :root { --coverage-ink: #33527c; --coverage-line: #c9d8eb; --coverage-bg: #edf3fa; --pending-ink: #685938; --pending-bg: #f5f1e7; --pending-line: #e0d7c1; --kind-ink: #4e617c; --cap-ink: #8a5d0b; --warn-line: #bd9347; --warn-bg: #faf3e7; --warn-ink: #5e4926; }
-/* Dark mode follows the system like the rest of the site (this page stayed light until 2026-09-23). */
-@media (prefers-color-scheme: dark) {
-    :root { --coverage-ink: #b9c9e6; --coverage-line: #3a4a68; --coverage-bg: #1f2a40; --pending-ink: #e6cf9a; --pending-bg: #2b2618; --pending-line: #5a4c2c; --kind-ink: #a9b7cf; --cap-ink: #f0b35c; --warn-line: #d3a55a; --warn-bg: #2a2317; --warn-ink: #ecd6ad; }
-}
+/* Dark mode follows the site theme (theme.js sets <html data-theme>) like the rest of the site (this page stayed light until 2026-09-23). */
+:root:where([data-theme="dark"]) { --coverage-ink: #b9c9e6; --coverage-line: #3a4a68; --coverage-bg: #1f2a40; --pending-ink: #e6cf9a; --pending-bg: #2b2618; --pending-line: #5a4c2c; --kind-ink: #a9b7cf; --cap-ink: #f0b35c; --warn-line: #d3a55a; --warn-bg: #2a2317; --warn-ink: #ecd6ad; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.6; }
 a { color: var(--link); text-underline-offset: 3px; }

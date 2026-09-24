@@ -17,12 +17,14 @@
 // is the whole risk here: a normaliser that lets one churning line through reports a change every
 // single day, and one that strips too much hides the clause that changed.
 
+import { X509Certificate } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 import { kindFromContentType } from './lib/sources.mjs';
+import { classifyRead } from './lib/unreadable.mjs';
 import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
-    DEFAULT_USER_AGENT, archiveRefusal, conditionalHeaders, isJsOnlyRead, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
+    DEFAULT_USER_AGENT, EXTRA_CA_HOSTS, archiveRefusal, conditionalHeaders, extraCaFor, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     emptyPublishedPage, jsOnlyShell, jsonToText, looksLikeText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
@@ -85,11 +87,12 @@ describe('identity and paths', () => {
             'https://x.example/c': { status: 'ok', via: 'html' },
             'https://x.example/d': { status: 'ok', via: 'api', companionUrl: 'https://registry.example/d' },
             'https://x.example/e': { status: 'gone' },
-            'https://x.example/f': { status: 'reachable-unverified' }
+            'https://x.example/f': { status: 'reachable-unverified' },
             // g: never seen — not "previously blocked"
+            'https://x.example/h': { status: 'unreadable' }
         };
-        sources.push({ url: 'https://x.example/g' });
-        expect(previouslyBlocked(sources, state).map((s) => s.url.slice(-1))).toEqual(['a', 'b', 'd', 'f']);
+        sources.push({ url: 'https://x.example/g' }, { url: 'https://x.example/h' });
+        expect(previouslyBlocked(sources, state).map((s) => s.url.slice(-1))).toEqual(['a', 'b', 'd', 'f', 'h']);
         expect(previouslyBlocked(sources, {})).toEqual([]);
     });
 
@@ -298,6 +301,18 @@ describe('bot walls and javascript-only pages', () => {
         expect(decideOutcome({ httpStatus: 200, blocked: true }).status).toBe('blocked');
     });
 
+    test('a 2xx that is not the document is `unreadable`, never a changed hash (lib/unreadable.mjs)', () => {
+        const verdict = { readable: false, code: 'js-shell', reason: 'couldn\'t read (script-only page): 8 characters of text from 51 kB of markup' };
+        expect(decideOutcome({ httpStatus: 200, sameHash: false, unreadable: verdict }))
+            .toEqual({ status: 'unreadable', code: 'js-shell', reason: verdict.reason });
+        // A readable verdict leaves the hash comparison to decide; a bot wall is still a refusal.
+        expect(decideOutcome({ httpStatus: 200, sameHash: false, unreadable: { readable: true } }).status).toBe('changed');
+        expect(decideOutcome({ httpStatus: 200, blocked: true, unreadable: verdict }).status).toBe('blocked');
+        // Only a 2xx body is judged: a refusal or a 304 keeps its own outcome.
+        expect(decideOutcome({ httpStatus: 403, unreadable: verdict }).status).toBe('blocked');
+        expect(decideOutcome({ httpStatus: 304, unreadable: verdict }).status).toBe('ok');
+    });
+
     test('a Notion-style shell needs both no text and the noscript notice', () => {
         const raw = '<html><body><div id="root"></div>'
             + '<noscript>You need to enable JavaScript to run this app.</noscript></body></html>';
@@ -324,6 +339,28 @@ describe('per-host User-Agent', () => {
         // A host that merely CONTAINS the suffix is not a subdomain of it.
         expect(userAgentFor('fakesec.gov')).toBe(DEFAULT_USER_AGENT);
         expect(userAgentFor(null)).toBe(DEFAULT_USER_AGENT);
+    });
+});
+
+describe('per-host extra CA (a server that sends the wrong intermediate)', () => {
+    test('only www.cysec.gov.cy gets one, by exact host', () => {
+        expect(extraCaFor('www.cysec.gov.cy')).toBe('stocks/certs/godaddy-secure-ca-g2.pem');
+        expect(extraCaFor('WWW.CYSEC.GOV.CY')).toBe('stocks/certs/godaddy-secure-ca-g2.pem');
+        expect(extraCaFor('cysec.gov.cy')).toBeNull();
+        expect(extraCaFor('evil-www.cysec.gov.cy.example')).toBeNull();
+        expect(extraCaFor('docs.ondo.finance')).toBeNull();
+        expect(extraCaFor(null)).toBeNull();
+    });
+
+    test('the committed file parses and is GoDaddy\'s Secure CA G2, the issuer of CySEC\'s leaf', () => {
+        for (const [, file] of EXTRA_CA_HOSTS) {
+            const cert = new X509Certificate(readFileSync(new URL(`../${file}`, import.meta.url)));
+            expect(cert.subject).toMatch(/CN=Go Daddy Secure Certificate Authority - G2$/m);
+            expect(cert.issuer).toMatch(/CN=Go Daddy Root Certificate Authority - G2$/m);
+            expect(cert.ca).toBe(true);
+            expect(cert.fingerprint256).toBe('97:3A:41:27:6F:FD:01:E0:27:A2:AA:D4:9E:34:C3:78:46:D3:E9:76:FF:6A:62:0B:67:12:E3:38:32:04:1A:A6');
+            expect(new Date(cert.validTo).toISOString()).toBe('2031-05-03T07:00:00.000Z');
+        }
     });
 });
 
@@ -706,6 +743,14 @@ describe('quotelessRefusal: a refusal nothing quotes is reachability, not a bloc
             .toBe('reachable-unverified');
     });
 
+    test('an unreadable read nothing quotes is reachability too; a quoted one stays unreadable', () => {
+        const reason = 'couldn\'t read (region-restricted page): the host served a region-restriction notice';
+        const settled = quotelessRefusal({ status: 'unreadable', httpStatus: 200, reason, quotesRegistered: 0 });
+        expect(settled.status).toBe('reachable-unverified');
+        expect(settled.reason.startsWith(`${reason} — host answered HTTP 200`)).toBe(true);
+        expect(quotelessRefusal({ status: 'unreadable', httpStatus: 200, reason, quotesRegistered: 2 })).toBeNull();
+    });
+
     test('a quoted source stays blocked: its quotes are not checkable, and that is the finding', () => {
         expect(quotelessRefusal({ status: 'blocked', httpStatus: 403, reason: 'http-403 (bot wall)', quotesRegistered: 1 })).toBeNull();
     });
@@ -721,6 +766,18 @@ describe('quotelessRefusal: a refusal nothing quotes is reachability, not a bloc
     test('the new status is in the source status check', () => {
         const ddl = readFileSync(new URL('../db/2026-09-24-sonar-source-reachable.sql', import.meta.url), 'utf8');
         expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'reachable-unverified', 'error'\)\)/);
+    });
+
+    test('the unreadable status file is a superset, and it is the one the watcher applies', () => {
+        const ddl = readFileSync(new URL('../db/2026-09-24-sonar-source-unreadable.sql', import.meta.url), 'utf8');
+        expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'error'\)\)/);
+        expect(ddl).toMatch(/DROP CONSTRAINT IF EXISTS source_status_check/);
+        // Re-applying the narrower reachable list after an `unreadable` row exists would fail the
+        // whole load, so --ddl must apply the superset INSTEAD of it, not after it.
+        const watcher = readFileSync(new URL('./watch-sources.mjs', import.meta.url), 'utf8');
+        const list = watcher.slice(watcher.indexOf('const DDL_FILES = ['), watcher.indexOf('];', watcher.indexOf('const DDL_FILES = [')));
+        expect(list).toContain("'2026-09-24-sonar-source-unreadable.sql'");
+        expect(list).not.toContain("'2026-09-24-sonar-source-reachable.sql'");
     });
 });
 
@@ -932,6 +989,9 @@ describe('re-reading pages that were never actually read', () => {
         expect(responseValidators({ httpStatus: 200, headers: { etag: '"v2"' }, prev }))
             .toEqual({ etag: '"v2"', lastModified: null, validatorStatus: 200 });
         expect(responseValidators({ httpStatus: 304, headers: {}, prev })).toEqual({ ...notFound });
+        // A 2xx that was not the document (a region block, a script shell) keeps the stored ones too:
+        // its etag confirmed by a later 304 would stand on the last readable version.
+        expect(responseValidators({ httpStatus: 200, headers: { etag: '"geoblock"' }, prev, readable: false })).toEqual({ ...notFound });
         // A state entry with no proof that its validators came from a 2xx body gets a full GET.
         const { validatorStatus, ...legacy } = prev;
         expect(validatorStatus).toBe(200);
@@ -941,10 +1001,11 @@ describe('re-reading pages that were never actually read', () => {
 
     test('only an HTML read can be a JavaScript shell; bytes and Notion reads cannot', () => {
         const raw = 'x'.repeat(25_000);
-        expect(isJsOnlyRead({ kind: 'html', text: 'Securitize', rawHtml: raw })).toBe(true);
-        expect(isJsOnlyRead({ kind: 'html', binary: true, text: 'binary application/zip 25000 bytes sha256:ab', rawHtml: raw })).toBe(false);
-        expect(isJsOnlyRead({ kind: 'html', notion: true, text: 'Notion', rawHtml: raw })).toBe(false);
-        expect(isJsOnlyRead({ kind: 'pdf', text: 'x', rawHtml: raw })).toBe(false);
+        // A large page that reads as almost nothing, with no evidence of script rendering.
+        expect(classifyRead({ kind: 'html', text: 'Securitize', raw })).toMatchObject({ readable: false, code: 'near-empty' });
+        expect(classifyRead({ kind: 'html', binary: true, text: 'binary application/zip 25000 bytes sha256:ab', raw }).readable).toBe(true);
+        expect(classifyRead({ kind: 'html', via: 'notion', text: 'Notion', raw }).readable).toBe(true);
+        expect(classifyRead({ kind: 'pdf', text: 'x', raw }).readable).toBe(true);
     });
 
     test('a WordPress page published with an empty content area is read, not called a JavaScript shell', () => {
@@ -955,7 +1016,7 @@ describe('re-reading pages that were never actually read', () => {
         expect(text.length).toBeLessThan(JS_SHELL_TEXT_LIMIT);
         expect(jsOnlyShell(text, raw)).toBe(true);
         expect(emptyPublishedPage(raw)).toBe(true);
-        expect(isJsOnlyRead({ kind: 'html', text, rawHtml: raw })).toBe(false);
+        expect(classifyRead({ kind: 'html', text, raw })).toEqual({ readable: true });
         // Content in the div, or no WordPress generator, is not this case.
         expect(emptyPublishedPage(raw.replace('<div class="page-content">', '<div class="page-content"><p>Terms</p>'))).toBe(false);
         expect(emptyPublishedPage('<html><div class="page-content">  </div></html>')).toBe(false);
@@ -1027,15 +1088,19 @@ describe('quotes against a source that could not be read', () => {
     test('the stored copy of app.ventuals.com/sunset is a JavaScript shell', () => {
         const reading = storedReading({ rawExt: 'html', via: 'html', payload: VENTUALS_SUNSET });
         expect(reading.text).toBe('Ventuals');
-        expect(reading.jsOnly).toBe(true);
+        expect(reading.kind).toBe('html');
+        expect(classifyRead({ kind: reading.kind, via: 'html', text: reading.text, raw: VENTUALS_SUNSET }))
+            .toMatchObject({ readable: false, code: 'js-shell' });
     });
 
-    test('checked against that stub, the quote would be lost; for a blocked source it is not checkable', () => {
+    test('checked against that stub, the quote would be lost; for a blocked or unreadable source it is not checkable', () => {
         const stub = storedReading({ rawExt: 'html', payload: VENTUALS_SUNSET }).quoteText;
         // What happened before: a 304 made the source `ok`, and the stub "lost" the quote.
         expect(quoteVerdicts({ status: 'ok', text: stub, quotes: ventualsQuote }).lost).toHaveLength(1);
         const blocked = quoteVerdicts({ status: 'blocked', text: stub, quotes: ventualsQuote });
         expect(blocked).toEqual({ checked: 0, found: [], lost: [], skipped: 0, notCheckable: 1 });
+        expect(quoteVerdicts({ status: 'unreadable', text: stub, quotes: ventualsQuote }))
+            .toEqual({ checked: 0, found: [], lost: [], skipped: 0, notCheckable: 1 });
     });
 
     test('gone and error sources give no verdict at all; a readable one is checked as before', () => {
@@ -1113,7 +1178,7 @@ describe('the quote check reads the text before the churn filter', () => {
         const notion = storedReading({ rawExt: 'json', via: 'notion', payload: JSON.stringify({ pageId: 'root', recordMap }) });
         expect(notion.text).toBe('Terms\nMinimum investment');
         expect(notion.quoteText).toBe('Terms\nMinimum investment\n$50');
-        expect(notion.jsOnly).toBe(false);
+        expect(notion.kind).toBe('html');
         expect(storedReading({ rawExt: 'json', payload: '{"b":1,"a":2}' }).text).toBe(jsonToText('{"a":2,"b":1}'));
         expect(storedReading({ rawExt: 'html', via: 'binary', payload: 'PK\u0003\u0004' })).toBeNull();
     });

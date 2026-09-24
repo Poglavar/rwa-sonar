@@ -16,18 +16,6 @@
     --trk-grid: rgba(23, 32, 51, .1);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .app-page {
-        --trk-s1: #3987e5; --trk-s2: #d95926; --trk-s3: #199e70; --trk-s4: #c98500;
-        --trk-s5: #d55181; --trk-s6: #008300; --trk-s7: #9085e9; --trk-s8: #e66767;
-        --trk-other: #8d93a3;
-        --trk-band: rgba(145, 166, 255, .08);
-        --trk-band-holiday: rgba(145, 166, 255, .16);
-        --trk-corner: rgba(255, 137, 146, .1);
-        --trk-grid: rgba(244, 241, 233, .1);
-    }
-}
-
 :root[data-theme="dark"] .app-page {
     --trk-s1: #3987e5; --trk-s2: #d95926; --trk-s3: #199e70; --trk-s4: #c98500;
     --trk-s5: #d55181; --trk-s6: #008300; --trk-s7: #9085e9; --trk-s8: #e66767;

@@ -315,6 +315,14 @@ describe('change-event filters and statements', () => {
         expect(buildChangeCountSql({}).text).toContain(PUBLIC_CHANGE_CONDITION);
     });
 
+    test('public change lists exclude events dismissed as false alarms (a read that was not the document)', () => {
+        expect(PUBLIC_CHANGE_CONDITION).toMatch(/NOT EXISTS \(SELECT 1 FROM sonar\.review_resolution rr\s+WHERE rr\.event_id = e\.id AND rr\.resolution = 'false-alarm'\)/);
+        // One parenthesised condition, so an `AND ${PUBLIC_CHANGE_CONDITION}` cannot be split by precedence.
+        expect(PUBLIC_CHANGE_CONDITION.startsWith('(')).toBe(true);
+        expect(PUBLIC_CHANGE_CONDITION.endsWith(')')).toBe(true);
+        expect(buildChangeListSql({ kind: ['quote-lost'] }).text).toContain(PUBLIC_CHANGE_CONDITION);
+    });
+
     test('severity sorts worst-first, not alphabetically', () => {
         const { text } = buildChangeListSql({}, { sort: 'severity' });
         expect(text).toContain("WHEN 'critical' THEN 0");

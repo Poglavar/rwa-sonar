@@ -19,9 +19,7 @@ body.app-page {
     --ex-stage-not-established: var(--rwa-muted);
 }
 
-@media (prefers-color-scheme: dark) {
-    body.app-page { --ex-violet: #b8a2ff; }
-}
+:where(html[data-theme="dark"]) body.app-page { --ex-violet: #b8a2ff; }
 
 .ex-title {
     width: min(1180px, calc(100% - 40px));

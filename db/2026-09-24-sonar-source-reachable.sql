@@ -4,6 +4,9 @@
 -- host answered, which is all such a citation needs; its content was not read. Written by
 -- stocks/watch-sources.mjs. Idempotent. Needs db/2026-09-18-sonar-evidence.sql first.
 -- Apply BEFORE deploying a watcher that writes the new status, or the source load fails the check.
+-- SUPERSEDED by db/2026-09-24-sonar-source-unreadable.sql (the same list plus `unreadable`), which
+-- stocks/watch-sources.mjs --ddl applies instead. Do not re-apply this file once any source row is
+-- `unreadable`: its narrower CHECK would fail against those rows.
 
 SET client_min_messages = warning;
 

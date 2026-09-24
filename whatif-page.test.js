@@ -588,6 +588,7 @@ describe('the page itself', () => {
     test('the page loads the scripts it needs, fmt and api-base before whatif.js, then the shared header menus', () => {
         const order = [...HTML.matchAll(/<script src="([^"?]+)/g)].map((match) => match[1]);
         expect(order).toEqual([
+            './theme.js', // the site theme, first in <head> (theme.test.js)
             'stocks/lib/fmt.js',
             'stocks/lib/api-base.js',
             'stocks/lib/whatif-render.js',

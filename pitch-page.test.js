@@ -33,8 +33,10 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('PreStocks transfer fee 0.50%');
         expect(html).toContain('Stocklana main track first');
         expect(html).toContain('Code license choice remains pending owner confirmation');
-        // Team facts are the owner's to supply: missing ones stay visible placeholders, never invented.
-        expect(html).toContain('[Owner to add: team members, roles and relevant background]');
+        // Team facts are the owner's (supplied 24 Sep 2026); no placeholder is left on the public slide.
+        expect(html).toContain('Built by <strong>Poglavar Svemira</strong>, a one-person team');
+        for (const href of ['https://x.com/poglavars', 'https://t.me/svemirsky', 'https://github.com/Poglavar']) expect(html).toContain(`href="${href}"`);
+        expect(html).not.toContain('Owner to add');
         expect(html).toContain('https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('Follow @RWASonar');

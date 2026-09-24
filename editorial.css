@@ -105,7 +105,5 @@ section { padding: 78px 0; border-top: 1px solid var(--line); }
     .distinction { display: block; overflow-x: auto; white-space: normal; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; }.guide-card:hover { transform: none; } }
-@media (prefers-color-scheme: dark) {
-    body { background: radial-gradient(circle at 85% 4%, rgba(75, 104, 220, .18), transparent 26rem), var(--paper); }
-    .precedence-note { background: #111827; }
-}
+:where(html[data-theme="dark"]) body { background: radial-gradient(circle at 85% 4%, rgba(75, 104, 220, .18), transparent 26rem), var(--paper); }
+:where(html[data-theme="dark"]) .precedence-note { background: #111827; }

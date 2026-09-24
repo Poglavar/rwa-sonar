@@ -707,11 +707,56 @@ on a stored trade is preserved.
 pass and flushes every 10 transactions, so its write lands on top of a concurrent republish. Because
 it is one long-lived process, a code change does not reach it until the job is restarted.
 
-## After-hours premium
+## When the market is closed
 
-`npm run stocks:afterhours` (`stocks/build-afterhours.mjs --run`) → **`stocks-afterhours.json`**:
-per tokenized stock, the premium it traded at while its underlying market was **open** against the
-premium it traded at while that market was **closed**, and the gap between them.
+Replaces the old closed-hours premium (the median premium of closed-session trades minus the
+open-session one). That number did not predict what a holder loses: what decides it is **which
+price each lending market uses while the US market is shut**. Research and on-chain reads:
+`stocks/research/after-hours-collateral-pricing.md`; structured per market in
+`stocks/data/protocol-market-research.json` under `oraclePricing` (collateral per market with its
+liquidation threshold, `whenMarketClosed.behaviour`, a one-sentence `borrowerSentence`, dated
+`freezeEvents`).
+
+`npm run stocks:closed-market` (`stocks/build-closed-market.mjs --run`, surfaces phase) →
+**`stocks-closed-market.json`**, one item per token that at least one lending market takes:
+
+- **`lenders[]`**: per market, one of five labels for the price used while the market is closed —
+  *frozen at close* (Kamino, Loopscale SECZ), *24/5 overnight* (Jupiter Lend, Chainlink 24/5 mid),
+  *24/7 token price* (Nest xStocks, Pyth `Crypto.<T>X/USD`), *signed quote* (Nest Backpack/Ondo
+  markets) or *stale since <date>* (Loopscale xStocks) — plus the liquidation threshold and the
+  borrower sentence. A lending integration the DeFi collector saw that the research did not price
+  is labelled *not researched*. A stale label takes the lending watcher's ongoing episode when there
+  is one, and turns back into *frozen at close* once the watcher sees the price updated again.
+- **Freezes, last 30 days** per market, from `sonar.lending_price_freeze` (stocks/watch-lending.mjs),
+  episodes of 20 min or more with their length as a range, plus how far the watcher has read
+  (`sonar.lending_scan`). Nest is not watched for freezes (it prices in the same transaction).
+  Without `DATABASE_URL` the build records freezes as **not collected**, never as none.
+- **Monday gap** (Kamino markets): from `stocks/data/lender-price-gaps.json`, written by
+  `stocks/fetch-lender-price-history.mjs` from Kamino's **keyless** hourly reserve history
+  (`assetOraclePriceUSD`). Per weekend (a closed stretch of the US schedule containing a UTC
+  Saturday): the price at the second hourly reading after Friday's close against the first reading
+  in the regular session (2026-09-21: MSTRx +8.71 %, METAx +6.97 %, NVDAx +1.00 % — the research
+  note's figures). Jupiter Lend re-marks at Sunday 20:00 ET from the overnight session; its gap is
+  **not measured** (no keyless price history). **Exposure** (collateral within the gap of
+  liquidation) is **not measured** from data we collect.
+- **Solana depth**: from `stocks/data/solana-depth.json`, written by `stocks/fetch-solana-depth.mjs`:
+  for each lender-accepted token, a ladder of Jupiter keyless quotes selling $1k … $2.5M into USDC,
+  stopping at 10 % impact, plus one quote at the midpoint of each bracket; the sale that moves the
+  price 5 % and 10 % is interpolated (log-linear in size) or reported as a bound. Each refresh run
+  samples the session it falls in, so weekday, overnight and weekend depth accumulate (45 days kept).
+- **Weekend move** only where a lender prices from the token itself (Nest): the token's premium to
+  Friday's frozen reference during the latest weekend, from `stocks-tracking.json`.
+- **`findings[]`**: the four finding types in `finding-types.json` this data evidences, with a
+  source — `collateral-priced-from-token-trading`, `collateral-oracle-suspended-around-corporate-action`
+  (research-dated episodes plus the watcher's operator suspensions), `collateral-oracle-stale-blocks-liquidation`
+  and `protocol-docs-oracle-fallback-contradicted`. The programme-level versions are in the
+  issuer dossiers.
+
+The pure rules are in `stocks/lib/closed-market.mjs`, `lender-gaps.mjs` and `solana-depth.mjs`; the
+wording the cards and the monitor share is `stocks/lib/closed-market-view.js`. Both collectors run as
+soft steps of the six-hourly refresh; their stores are gitignored server state.
+
+### Market hours
 
 The session boundary is not guessed. Every equity feed in the **keyless** Hermes feed list
 (`/v2/price_feeds`) carries `attributes.schedule`, Pyth's market-schedule string:
@@ -721,10 +766,10 @@ America/New_York;0930-1600,0930-1600,0930-1600,0930-1600,0930-1600,C,C;0907/C,11
 ```
 
 `<IANA timezone>;<7 weekly entries Mon..Sun>;<holiday overrides MMDD/...>`, an entry being `C`,
-`HHMM-HHMM`, or ranges joined by `&` (a lunch break). `stocks/fetch-reference-prices.mjs` now
-persists that string and the feed's `marketHours` (`{isOpen, nextOpen, nextClose}`) on every item
-that matched a feed (**355 of 441 tokens**), and because the feed list needs no key, those fields
-are filled in whether or not the key may read that feed's *price*. Only prices need the entitlement.
+`HHMM-HHMM`, or ranges joined by `&` (a lunch break). `stocks/fetch-reference-prices.mjs` persists
+that string and the feed's `marketHours` (`{isOpen, nextOpen, nextClose}`) on every item that
+matched a feed, and because the feed list needs no key, those fields are filled in whether or not
+the key may read that feed's *price*.
 
 `stocks/lib/market-hours.mjs` parses the string and answers `sessionAt(schedule, atMs)` →
 `open | closed | holiday | unknown`, converting the instant into the schedule's own timezone with
@@ -732,26 +777,6 @@ are filled in whether or not the key may read that feed's *price*. Only prices n
 **exclusive**, holiday `C` reported in its own right and a half-day override (`1127/0930-1300`)
 honoured as a shortened trading day. Unparseable text yields `null`, and a null schedule is
 `unknown`, never "closed".
-
-`stocks/lib/afterhours.mjs` then, per mint with **both** a parsed schedule and a reference price:
-premium per trade = `priceUsd / refPrice − 1` in percent, trades bucketed by session (a holiday
-counts as closed), each side the **median** of its bucket or `null` below **5 trades**, and
-`gapPct = closedPremiumPct − openPremiumPct` (null if either side is null). Suspect (round-trip)
-trades and trades with no USD price are excluded and counted in `skipped`. A mint with no Pyth feed
-(PreStocks' private companies, Tessera, and DJT/DKNG, which matched a feed but have no reference
-price) has no listed market to be open or closed at all, so it is **omitted** and listed in
-`omittedMints` with its reason and trade count instead of appearing as a row of nulls.
-
-**The caveat, restated in the file's own `note`:** `refPrice` is the *last* reference price at
-build time. There is no per-trade historical reference. While the underlying is shut that price does not
-move, so the closed-session figure is sound; the open-session figure is measured against a
-reference that has since moved. Re-run `stocks:prices` and this build together.
-
-Measured on the first 2664-trade window (2026-09-16, collected 19:55–22:47 UTC): 10 measurable
-mints, **1825 closed-session trades and 8 open-session ones**. The tape started five minutes
-before the 16:00 New York close, so only METAx has both sides (open −1.23%, closed −1.19%, gap
-+0.03%). Widest closed-session premiums: CRCLx −5.44% on 276 trades, SPCX +3.49% on 243, GLDx
-−1.90% on 372. The gap column only becomes meaningful once the tape spans a whole session.
 
 ## Holders
 
@@ -966,7 +991,7 @@ always produce byte-identical output.
 The health distributions, facets and paginated token rows come from `/api/facets` and
 `/api/tokens`. The remaining sections read `stocks-tokens.json` (market numbers, reference
 premium, last trade, and the issuer display names; note `issuerIndex` is an **array** of
-`{slug, name, …}`; it is not an object keyed by slug), `stocks-afterhours.json` (the session gap),
+`{slug, name, …}`; it is not an object keyed by slug), `stocks-closed-market.json` (the "When closed" lender labels),
 `stocks-changes.json`, `stocks/data/meteora.json` and `stocks-trades.json` (per-pool failed-signature
 share and newest trade), plus `cards/index.json` when it exists (a mint the card index names uses
 that slug, otherwise `fmt.cardSlug(symbol, mint)`). The tiles take their counts from API facets
@@ -1005,7 +1030,7 @@ is its own number and `byWorstRule` only counts judged statuses.
 (`[{slug, symbol, mint, issuer, status}]`, sorted by slug). It reads the built market files plus the
 reviewed `stocks/data/composability-templates.json` and observed `stocks/data/defi-usage.json`
 (`stocks-tokens.json`, `stocks-issuers.json`, `stocks/data/holders.json`, `stocks/data/venues.json`,
-`stocks-trades.json`, `stocks-afterhours.json`, `stocks/data/meteora.json`) and calls
+`stocks-trades.json`, `stocks-closed-market.json`, `stocks/data/meteora.json`) and calls
 `evaluateHealth` **itself** instead of reading `stocks-health.json`, because a card shows each
 rule's `inputs` and the health file deliberately drops them.
 
@@ -1695,6 +1720,25 @@ with the `pdftotext -layout` output kept beside the PDF so the suite needs no po
 test cross-checks every status, kind, severity and diff method the code can write against the check
 constraints in the DDL file, because a value the constraint forbids would make a run die at the load
 step hours after the fetching.
+
+### Reads that are not the document (`stocks/lib/unreadable.mjs`, `stocks/dismiss-unreadable-events.mjs`)
+
+Every 2xx read (and every stored copy a 304 stands on) goes through `classifyRead`: a
+region-restriction page served to the server's region, a script-only shell, an RPC endpoint's info
+page, a text file hashed as bytes, a response with no text, or a collapse to a third of the last
+readable version is `unreadable` (db/2026-09-24-sonar-source-unreadable.sql, applied by the
+watcher's `--ddl` in place of the narrower reachable-unverified file). It records no version and no
+event; the last readable version stays the baseline. A read containing every quote registered on it
+is the document regardless. Tests: `stocks/unreadable.test.js` on real reads in
+`stocks/fixtures/unreadable/`.
+
+    node stocks/dismiss-unreadable-events.mjs --run [--apply] [--since=<date>] [--include-reader-fixed]
+
+re-judges the unacknowledged legal-term / quote-lost events against the stored copies they were
+raised from (run it on the server, where those copies are) and, with `--apply`, dismisses the ones
+raised from unreadable reads: a `false-alarm` `sonar.review_resolution` with the reason, and
+`acknowledged_at`. Idempotent. Dismissed events leave the public change feed, the digests, the
+weekly page, the cards and the change judge.
 
 ### The change judge (`stocks/judge-changes.mjs`, `stocks/lib/change-judge.mjs`)
 

@@ -270,6 +270,49 @@
     color: var(--muted-text);
 }
 
+/* --- "When closed": one label per lending market that takes the token -------------------- */
+
+/* stocks.css keeps every #tokenTable cell on one line; this one holds up to four labels, which must
+   wrap, so it needs the same id weight to override that. */
+#tokenTable td.mon-closed {
+    min-width: 13rem;
+    max-width: 20rem;
+    white-space: normal;
+}
+
+.mon-cm {
+    display: inline-block;
+    margin: 1px 4px 1px 0;
+    padding: 0 6px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.mon-cm.cm-frozen,
+.mon-cm.cm-unknown,
+.mon-cm-none {
+    color: var(--muted-text);
+}
+
+.mon-cm.cm-overnight {
+    color: var(--accent);
+}
+
+.mon-cm.cm-token,
+.mon-cm.cm-signed {
+    color: var(--sev-caution);
+}
+
+.mon-cm.cm-stale {
+    color: var(--sev-critical);
+}
+
+.mon-cm-none {
+    font-size: 0.8rem;
+}
+
 /* --- the explorer: facet panel beside the table ----------------------- */
 
 /* The panel sits beside the table on a wide screen and ABOVE it on a narrow one (the media query

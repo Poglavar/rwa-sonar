@@ -149,7 +149,8 @@ describe('the page itself', () => {
 
     test('scripts load fmt before powers.js, then the shared menus, all cache-busted', () => {
         const order = [...HTML.matchAll(/<script src="([^"?]+)/g)].map((match) => match[1]);
-        expect(order).toEqual(['stocks/lib/fmt.js', 'powers.js',
+        // theme.js is the site theme, first in <head> (theme.test.js).
+        expect(order).toEqual(['./theme.js', 'stocks/lib/fmt.js', 'powers.js',
             // The catalogue funnel figure (funnel-figure.js) and the funnel layout's dependencies.
             'stocks/lib/sort-values.js', 'stocks/lib/catalogue-counts.js', 'stocks/lib/issuer-labels.js',
             'stocks/lib/funnel-layout.js', 'funnel-figure.js', 'nav-menus.js']);

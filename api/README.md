@@ -205,8 +205,8 @@ network failure with **no status code**, which looks exactly like the API being 
 What the page needed and this API does not serve, so it is worth knowing before the next page is
 switched over:
 
-- **The after-hours gap** is not in the slim row (nor anywhere in the schema), so that one column
-  still reads `stocks-afterhours.json`.
+- **What each lender does when the market is closed** (the "When closed" column) is not in the slim
+  row (nor anywhere in the schema), so that one column reads `stocks-closed-market.json`.
 
 Four gaps that were listed here and are now closed (2026-09-18):
 

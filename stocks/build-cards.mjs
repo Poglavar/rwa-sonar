@@ -30,7 +30,7 @@ const REPO_ROOT = join(HERE, '..');
 const TOKENS_PATH = join(REPO_ROOT, 'stocks-tokens.json');
 const ISSUERS_PATH = join(REPO_ROOT, 'stocks-issuers.json');
 const TRADES_PATH = join(REPO_ROOT, 'stocks-trades.json');
-const AFTERHOURS_PATH = join(REPO_ROOT, 'stocks-afterhours.json');
+const CLOSED_MARKET_PATH = join(REPO_ROOT, 'stocks-closed-market.json');
 const HOLDERS_PATH = join(HERE, 'data', 'holders.json');
 const VENUES_PATH = join(HERE, 'data', 'venues.json');
 const METEORA_PATH = join(HERE, 'data', 'meteora.json');
@@ -43,7 +43,7 @@ const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260924u';
+const ASSET_VERSION = '20260924cm';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -62,7 +62,7 @@ OPTIONS
 
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
-  stocks-trades.json, stocks-afterhours.json, stocks/data/meteora.json,
+  stocks-trades.json, stocks-closed-market.json (When the market is closed), stocks/data/meteora.json,
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
@@ -173,6 +173,10 @@ async function readMaterialChanges(asOf) {
               AND e.detected_at <= ${at}
               AND NOT (e.kind = 'status' AND e.field = 'chain-watch'
                        AND COALESCE(e.summary, '') ~* '^baseline recorded:')
+              -- Dismissed as a false alarm: raised from a read that was not the document
+              -- (stocks/lib/unreadable.mjs), whatever the model said about it.
+              AND NOT EXISTS (SELECT 1 FROM sonar.review_resolution rr
+                               WHERE rr.event_id = e.id AND rr.resolution = 'false-alarm')
         ) r;`;
     const items = JSON.parse((await psql(env.DATABASE_URL, sql, 'material change verdicts', ['-t', '-A'])).trim() || '[]');
     return { asOf, items };
@@ -269,7 +273,8 @@ async function main() {
     const holderDb = await readJson(HOLDERS_PATH, { fetchedAt: null, items: [] });
     const venueDb = await readJson(VENUES_PATH, { fetchedAt: null, items: [] });
     const tradeDb = await readJson(TRADES_PATH, { generatedAt: null, pools: [] });
-    const afterhoursDb = await readJson(AFTERHOURS_PATH, { generatedAt: null, items: [] });
+    // Absent (never built here) is not the same as "no lender": the card says which.
+    const closedMarketDb = await readJson(CLOSED_MARKET_PATH, null);
     const meteoraDb = await readJson(METEORA_PATH, { fetchedAt: null, items: [] });
     const composabilityDb = await readJson(COMPOSABILITY_PATH, { reviewedAt: null, templates: [] });
     const defiUsageDb = await readJson(DEFI_USAGE_PATH, { fetchedAt: null, items: [] });
@@ -286,7 +291,7 @@ async function main() {
     const archives = archiveIndex(sourcesState);
     const holders = indexBy(holderDb?.items, 'mint');
     const venues = indexBy(venueDb?.items, 'mint');
-    const afterhours = indexBy(afterhoursDb?.items, 'mint');
+    const closedMarket = indexBy(closedMarketDb?.items, 'mint');
     const meteora = indexBy(meteoraDb?.items, 'pairAddress');
     const composability = indexComposabilityTemplates(composabilityDb?.templates);
     const defiUsage = indexBy(defiUsageDb?.items, 'mint');
@@ -302,14 +307,14 @@ async function main() {
         holders: holderDb?.fetchedAt ?? null,
         venues: venueDb?.fetchedAt ?? null,
         trades: tradeDb?.generatedAt ?? null,
-        afterhours: afterhoursDb?.generatedAt ?? null,
+        closedMarket: closedMarketDb?.generatedAt ?? null,
         meteora: meteoraDb?.fetchedAt ?? null,
         defiUsage: defiUsageDb?.fetchedAt ?? null
     };
 
     log(`read ${tokenDb.tokens.length} token(s), ${issuerDb.issuers.length} issuer(s), ` +
         `${holderDb?.items?.length ?? 0} holder record(s), ${venueDb?.items?.length ?? 0} venue record(s), ` +
-        `${afterhoursDb?.items?.length ?? 0} after-hours item(s), ${meteora.size} Meteora pool(s)`);
+        `${closedMarketDb === null ? 'NO stocks-closed-market.json' : `${closedMarketDb.items?.length ?? 0} closed-market item(s)`}, ${meteora.size} Meteora pool(s)`);
     const answered = [...whatIfBySlug.values()].filter((list) => list.length > 0).length;
     log(`what-if: ${TRUST_CHAIN.failureModes.length} failure mode(s) in catalogue ${TRUST_CHAIN.version}, ` +
         `${answered} of ${issuers.size} issuer(s) have answered them; ` +
@@ -343,7 +348,8 @@ async function main() {
             holdersItem: holders.get(token.mint) ?? null,
             floatItem: cardFloatItem(floatDb, token.mint),
             venuesItem: venues.get(token.mint) ?? null,
-            afterhoursItem: afterhours.get(token.mint) ?? null,
+            closedMarketItem: closedMarket.get(token.mint) ?? null,
+            closedMarketMeta: closedMarketDb,
             meteoraByPair: meteora,
             pools: pools.get(token.mint) ?? null,
             slug,

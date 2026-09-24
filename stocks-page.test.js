@@ -868,6 +868,7 @@ describe('the trust-chain section on the issuer panel', () => {
         // dependency order: each module comes after everything it takes, stocks.js after all.
         const order = [...html.matchAll(/<script src="([^"?]+)\?v=[^"]*"><\/script>/g)].map((m) => m[1]);
         expect(order).toEqual([
+            './theme.js', // the site theme, first in <head> (theme.test.js)
             'stocks/lib/fmt.js',
             'stocks/lib/discovery.js',
             'stocks/lib/evidence.js',

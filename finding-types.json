@@ -556,5 +556,41 @@
     "defaultSeverity": "info",
     "description": "The issuer's authority keys sign through a custody or signing service that also signs for other issuers, seen on-chain as a shared co-signer (on Solana, one durable-nonce authority key on the issuer's admin transactions). The shared key cannot move tokens or change a transaction, but the issuer's admin actions, including emergency freezes, depend on that provider being available, and one provider incident can affect several issuers at once.",
     "howToVerify": "Read the issuer authority keys' transactions (getSignaturesForAddress + getTransaction). If the first instruction is system advanceNonce, note its nonceAuthority; check that the same authority co-signs for unrelated wallets (many distinct fee payers, nonce accounts reused across them) and compare with the custody provider's documentation."
+  },
+  {
+    "schema": "collateral-priced-from-token-trading",
+    "name": "Lending market prices the collateral from the token's own trading",
+    "category": "valuation",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "A lending market values the tokenized stock from the token's own 24/7 trading price (for example a Pyth Crypto.<T>X/USD feed or a quote-derived signed price) instead of the listed share. Weekend and night moves in thin token markets can liquidate borrowers whatever the stock does.",
+    "howToVerify": "Decode the market's oracle configuration (Nest CollateralConfig.xstock_usd_feed_id / oracleProvider) and look the feed up in the Pyth Lazer symbol list (asset_type crypto, schedule O,O,O,O,O,O,O); for a signed price, read the protocol's price API for its source label."
+  },
+  {
+    "schema": "collateral-oracle-suspended-around-corporate-action",
+    "name": "Collateral price suspended around a corporate action",
+    "category": "market",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "The lending market stops updating the collateral price from about 24 hours before a split or dividend multiplier change until an operator resumes it. While stopped, borrowing, withdrawing against debt and liquidation are all blocked.",
+    "howToVerify": "Read the transaction logs on the reserve (\"Price is too old token=[X]\", PriceTooOld) around the Chainlink v10 activationDateTime, plus the operator's resume transaction (Scope ResumeSuspendedPrice, Jupiter Lend LogChainlinkDataStreamsFeedSuspended)."
+  },
+  {
+    "schema": "collateral-oracle-stale-blocks-liquidation",
+    "name": "Stale collateral price blocks rolling and liquidation",
+    "category": "market",
+    "polarity": "negative",
+    "defaultSeverity": "warning",
+    "description": "The collateral price account has not been updated for longer than the market's maximum price age, so loans against it can neither be rolled nor liquidated: the borrower's collateral is locked and the lender cannot exit.",
+    "howToVerify": "Decode the oracle account's publish time (Pyth PriceUpdateV2 publish_time at byte offset 93) with RPC getAccountInfo and compare it with the market's maximum price age; confirm on the loans that nothing has rolled or been liquidated since."
+  },
+  {
+    "schema": "protocol-docs-oracle-fallback-contradicted",
+    "name": "Protocol docs promise an oracle fallback the configuration does not have",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "info",
+    "description": "Protocol documentation says the price aggregator falls back to another source when one goes stale, but the configured price chain errors instead, and the reserve has been observed stale for hours or days.",
+    "howToVerify": "Compare the documentation's fallback statement with the decoded price chain (Kamino Scope OracleMappings: a MostRecentOf entry errors when any source is stale or the sources diverge) and with logged staleness windows (\"Price is too old\")."
   }
 ]

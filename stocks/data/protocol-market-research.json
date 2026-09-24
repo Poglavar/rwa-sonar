@@ -797,6 +797,7 @@
         },
         "gapRisk": "The price moves in one step at 09:30 ET Monday (2026-09-21: MSTRx +8.71 %, METAx +6.97 %, CRCLx +3.96 %, TSLAx +3.22 %). A gap over 5 % also fails the 1-hour TWAP check, which blocks new borrowing but not liquidation. At slot 450059788, 87 obligations with stock collateral ($0.25M deposits, $0.17M debt) were within 5 % of liquidation and 268 ($2.00M, $1.20M) within 20 %, on values stored at each obligation's last refresh. SPYx (73/75) and QQQx (70/72) leave under 3 % between maximum LTV and liquidation.",
         "holderMeaning": "Weekend or night trading in the token does not liquidate you. At the Monday open you are re-marked to the opening price in one step. If the stock is near a split or dividend, or the pre-market or token price moves more than 5 %, the market freezes: you cannot borrow or withdraw, and nobody can liquidate you until it resumes.",
+        "borrowerSentence": "Held at the last US close, so night and weekend token trading cannot liquidate you, but Monday's open re-marks you in one step, and the market freezes around dividends or when the token moves over 5 %.",
         "evidence": [
           {
             "kind": "onchain-rpc",
@@ -1043,6 +1044,7 @@
         },
         "gapRisk": "xStocks Vaults strategy obligations at 2026-09-24T01:07:27Z (defi-usage.json): QQQx LTV 68.0 % against 78 % (12.8 % fall to liquidation), SPYx 69.0 % against 79 % (12.7 %), NVDAx 58.0 % against 73 % (20.5 %). QQQx was suspended 2026-09-19T17:28Z → 2026-09-21T13:42Z.",
         "holderMeaning": "An xStocks Vaults share holder is exposed to this market's Monday re-mark and to the dividend-window freezes, through the strategy's leveraged obligations.",
+        "borrowerSentence": "Priced like the Kamino xStocks Pool; xStocks Vaults holders carry its Monday re-mark and dividend freezes through the strategy's leveraged positions.",
         "evidence": [
           {
             "kind": "onchain-rpc",
@@ -1156,6 +1158,7 @@
           ]
         },
         "holderMeaning": "As the xStocks Pool, and in addition a seller of about $75–80k into the main Raydium pool can freeze the market.",
+        "borrowerSentence": "Priced like the Kamino xStocks Pool, and selling about $75–80k of STRCx into the main Raydium pool can freeze the market.",
         "evidence": [
           {
             "kind": "onchain-rpc",
@@ -1264,6 +1267,7 @@
         },
         "gapRisk": "FWDI +4.55 % and GLXY +4.65 % from Friday to Monday (2026-09-18/21). FWDI debt is about $4.75M against $25.4M collateral (registry), roughly 19 % LTV against a 40 % threshold.",
         "holderMeaning": "Valued at the listed share price during its session; frozen otherwise.",
+        "borrowerSentence": "Valued at the listed share's session price and frozen outside it; no on-chain market in the token can move it.",
         "evidence": [
           {
             "kind": "onchain-rpc",
@@ -1427,6 +1431,7 @@
         },
         "gapRisk": "The weekly re-mark happens at Sunday 20:00 ET on the first overnight quote. Seized collateral has to be sold into Solana pools where $1M of SPYx moved the price 1.3 % and $2M 23.8 % (14:47 UTC), against 17,392 SPYx (~$13.4M) supplied; with a 3 % penalty, large liquidations may stall.",
         "holderMeaning": "Valued at Chainlink's 24/5 US equity price, including overnight trading. Your weekly re-mark comes Sunday evening from a single overnight provider. The vault can freeze around dividends, as QQQx did from Saturday to Monday.",
+        "borrowerSentence": "Follows Chainlink's 24/5 price, so your weekly re-mark comes Sunday 20:00 ET from one overnight provider, and the vault can freeze around dividends.",
         "evidence": [
           {
             "kind": "official-protocol-api",
@@ -1804,6 +1809,7 @@
         },
         "gapRisk": "No Monday gap in the oracle: the price moves over the weekend with the token, so borrowers carry weekend-liquidity risk instead.",
         "holderMeaning": "Your collateral is valued at the token's 24/7 price. A thin weekend sell-off in the token can liquidate you (8 % penalty, up to half the debt) even if the stock is unchanged at the open.",
+        "borrowerSentence": "Valued at the token's own 24/7 price, so a thin weekend sell-off can liquidate you (8 % penalty) even if the stock opens unchanged.",
         "evidence": [
           {
             "kind": "official-deployment-manifest",
@@ -2120,6 +2126,7 @@
           ]
         },
         "holderMeaning": "Your collateral is valued at a price Nest signs from a Jupiter quote, minus 2 %. For SPYon and QQQon the on-chain market is so thin that the quote is easy to move.",
+        "borrowerSentence": "Valued at a Nest-signed Jupiter quote minus 2 %, around the clock; where the Solana market is thin (SPYon, QQQon) that quote is easy to move.",
         "evidence": [
           {
             "kind": "official-deployment-manifest",
@@ -2225,6 +2232,7 @@
         },
         "gapRisk": "Not applicable while the feeds are stale: nothing can be liquidated.",
         "holderMeaning": "The price has not updated since August. Existing loans are stuck past their end date; the collateral is safe from price liquidation but locked, and the lender cannot exit either.",
+        "borrowerSentence": "The price has not updated for weeks, so loans can neither roll nor be liquidated: your collateral is locked and the lender cannot exit.",
         "dataQualityNote": "defi-usage.json reports $30.5k / $21.3k / $80.6k / $4.0k \"lent against\" TSLAx / NVDAx / SPYx / CRCLx. Those are the vaults' currentAllocationAmount; open principal against xStocks is about $3.9k.",
         "evidence": [
           {
@@ -2280,6 +2288,18 @@
         "relatedIntegrationIds": [
           "loopscale:collateral"
         ],
+        "collateral": [
+          {
+            "symbol": "SECZ",
+            "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "RedStone SECZ_EOD via the Loopscale BEAM adapter",
+            "maxLtvPct": 20,
+            "liquidationLtvPct": 40,
+            "sourceMarketId": "loopscale:secz-usdc-usdc-rwa-vault"
+          }
+        ],
+        "borrowerSentence": "Valued at one end-of-day price, so a weekend without a new price blocks price-dependent actions.",
         "priceSource": {
           "kind": "redstone-end-of-day",
           "summary": "See markets[] entry loopscale:secz-usdc-usdc-rwa-vault: BEAM adapter over the RedStone SECZ_EOD feed, max age 65,535 s."

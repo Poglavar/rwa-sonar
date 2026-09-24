@@ -59,7 +59,8 @@ OUTPUT
   feed carries that feed's \`schedule\` (the underlying market's trading hours, verbatim) and
   \`marketHours\` ({isOpen, nextOpen, nextClose}, unix seconds). Both come off the KEYLESS feed
   list, so they are filled in whether or not the key may read that feed's price, and are null only
-  when no feed matched. build-afterhours.mjs buckets trades by session with them.
+  when no feed matched. The tracking build, the lending watcher and the closed-market collectors
+  (fetch-lender-price-history.mjs, fetch-solana-depth.mjs) place instants in a session with them.
 
 NOTES
   The Hermes key is entitled to a SUBSET of equity feeds and a batched request fails as a whole
@@ -83,8 +84,9 @@ function resolveTicker(item) {
 /**
  * The underlying market's trading schedule, verbatim, off a matched feed — e.g.
  * `America/New_York;0930-1600,...;0907/C,...`. It rides on the KEYLESS feed list, so it is present
- * whether or not this key may read that feed's price, and lets build-afterhours.mjs place a trade
- * in an open or closed session without a Pyth key at all. Parsing lives in lib/market-hours.mjs.
+ * whether or not this key may read that feed's price, and lets the tracking build, the lending
+ * watcher and the closed-market collectors place an instant in an open or closed session without a
+ * Pyth key at all. Parsing lives in lib/market-hours.mjs.
  */
 function scheduleOf(feed) {
     const schedule = feed?.attributes?.schedule;

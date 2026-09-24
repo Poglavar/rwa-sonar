@@ -91,6 +91,21 @@ describe('selectCandidates', () => {
         expect(merged.lostQuotes.map((q) => q.claimId)).toEqual(['acme:a:1', 'acme:b:2']);
     });
 
+    test('an event dismissed as a false alarm (a read that was not the document) never reaches the model', () => {
+        const events = [
+            { ...quoteLost(20, { claim: 'acme:a:1', quote: 'first quote words here' }), dismissed: true },
+            { ...legalTerm(21, { hash: 'geo', at: '2026-09-19T05:19:06Z' }), dismissed: true },
+            legalTerm(22, { hash: 'real', at: '2026-09-22T00:00:00Z' }),
+            { ...legalTerm(23, { hash: 'x', at: '2026-09-23T00:00:00Z' }), dismissed: false }
+        ];
+        expect(selectCandidates(events).map((c) => c.eventId)).toEqual([23, 22]);
+        // A dismissed quote loss does not ride along with an open event of the same change either.
+        const change = [{ ...quoteLost(30, { claim: 'acme:b:2', quote: 'second quote words here' }), dismissed: true }, legalTerm(31)];
+        const [candidate] = selectCandidates(change);
+        expect(candidate.eventIds).toEqual([31]);
+        expect(candidate.lostQuotes).toEqual([]);
+    });
+
     test('a change already judged (by dedupe key) is not selected again', () => {
         const events = [legalTerm(1), legalTerm(2, { hash: 'h2' })];
         const judgedKeys = new Set([dedupeKey(events[0])]);

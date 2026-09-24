@@ -21,7 +21,9 @@ export const COLLECTOR_SPECS = [
     { id: 'reference-prices', label: 'Reference prices', cadenceHours: 6, file: 'prices', timestamp: 'fetchedAt', countPath: ['items'], unit: 'reference records', source: 'Pyth, issuer registries and reviewed sponsor sources' },
     { id: 'holders', label: 'Holder accounts', cadenceHours: 24, file: 'holders', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint holder samples', source: 'Solana/Jupiter holder data' },
     { id: 'trade-tape', label: 'Observed DEX trades', cadenceHours: 1, file: 'tradeWatch', fallbackFile: 'trades', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'updatedAt', countPath: ['windowTrades'], fallbackCountPath: ['trades'], unit: 'trades in rolling file', source: 'Solana pool transactions' },
-    { id: 'defi', label: 'Confirmed DeFi integrations', cadenceHours: 6, file: 'defi', timestamp: 'fetchedAt', countPath: ['items'], unit: 'tokens reviewed', source: 'Exact-mint protocol registries plus on-chain accounts' }
+    { id: 'defi', label: 'Confirmed DeFi integrations', cadenceHours: 6, file: 'defi', timestamp: 'fetchedAt', countPath: ['items'], unit: 'tokens reviewed', source: 'Exact-mint protocol registries plus on-chain accounts' },
+    { id: 'lender-gaps', label: 'Lender Monday gaps', cadenceHours: 6, file: 'lenderGaps', timestamp: 'fetchedAt', countPath: ['weekends'], unit: 'reserve weekends measured', source: 'Kamino keyless hourly reserve history' },
+    { id: 'solana-depth', label: 'Solana depth of lender-accepted tokens', cadenceHours: 6, file: 'solanaDepth', timestamp: 'fetchedAt', countPath: ['samples'], unit: 'depth samples (45 days)', source: 'Jupiter keyless quotes' }
 ];
 
 function valueAt(record, path) {
@@ -180,6 +182,8 @@ export async function refreshCollectorStatus({ outputs = [join(ROOT, 'stocks-col
         trades: 'stocks/data/trades-24h.json',
         tradeWatch: '.last-trade-watch-stats.json',
         defi: 'stocks/data/defi-usage.json',
+        lenderGaps: 'stocks/data/lender-price-gaps.json',
+        solanaDepth: 'stocks/data/solana-depth.json',
         sourceState: 'stocks/data/sources-state.json',
         sourceRegistry: 'stocks/data/sources.json',
         sourceWatch: '.last-source-watch-stats.json'

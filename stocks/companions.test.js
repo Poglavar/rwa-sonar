@@ -122,10 +122,49 @@ describe('securitize.io disclosures through Builder.io', () => {
     });
 });
 
+describe('securitize.io/investments/stocks through Builder.io translations', () => {
+    // The real answer of the companion URL below, 2026-09-24: the page's 36 text keys.
+    const TRANSLATIONS = JSON.parse(readFileSync(new URL('./fixtures/sources/securitize-builder-translations-stocks.json', import.meta.url), 'utf8'));
+
+    test('the Tokenized Public Stocks page maps to its translation keys', () => {
+        const companion = companionFor('https://securitize.io/investments/stocks');
+        expect(companion.reader).toBe('builder-translations');
+        const url = new URL(companion.url);
+        expect(url.origin + url.pathname).toBe('https://cdn.builder.io/api/v3/content/translations');
+        expect(url.searchParams.get('apiKey')).toBe('d39b51a544e84e2fbb2445f58c6c6f2c');
+        expect(url.searchParams.get('query.data.key.$regex')).toBe('investments-stocks|stocks-dive-deeper');
+        expect(url.searchParams.get('fields')).toBe('data.key,data.value');
+        expect(companionFor('https://securitize.io/investments/stocks/')?.reader).toBe('builder-translations');
+        expect(companionFor('https://securitize.io/investments')).toBeNull();
+    });
+
+    test('the text is one key per line in key order, and both quoted sentences are in it', () => {
+        const text = companionText('builder-translations', TRANSLATIONS);
+        const lines = text.split('\n');
+        expect(lines).toHaveLength(36);
+        expect([...lines].sort()).toEqual(lines);
+        // securitize-secz claims[82], and the sentence its locator cites beside it.
+        expect(quoteFound(text, 'Issuers engage Securitize; we coordinate with existing transfer agents or set up new ones.')).toBe(true);
+        expect(quoteFound(text, 'Everything is backed by legal registration and reconciliation with traditional ledgers.')).toBe(true);
+        // Builder's own order (newest edit first) does not move the text.
+        expect(companionText('builder-translations', { results: [...TRANSLATIONS.results].reverse() })).toBe(text);
+    });
+
+    test('an empty or possibly cut answer is refused rather than hashed', () => {
+        expect(() => companionText('builder-translations', { results: [] })).toThrow(/no entry/);
+        expect(() => companionText('builder-translations', {})).toThrow(/no results array/);
+        const full = { results: Array.from({ length: 100 }, (_, i) => ({ data: { key: `Texts.k${i}`, value: 'v' } })) };
+        expect(() => companionText('builder-translations', full)).toThrow(/query limit/);
+    });
+});
+
 describe('wantsCompanion', () => {
-    test('a refusal or a JavaScript-only page qualifies; gone, rate limits and good reads do not', () => {
+    test('a refusal or an unreadable read qualifies; gone, rate limits and good reads do not', () => {
         expect(wantsCompanion({ status: 'blocked', httpStatus: 403, reason: 'http-403 (bot wall)' })).toBe(true);
-        expect(wantsCompanion({ status: 'blocked', httpStatus: 200, reason: 'javascript-only page: no text without a browser' })).toBe(true);
+        // A JavaScript-only page is `unreadable` (lib/unreadable.mjs), as is a region block.
+        expect(wantsCompanion({ status: 'unreadable', httpStatus: 200, reason: 'couldn\'t read (script-only page): 10 characters' })).toBe(true);
+        expect(wantsCompanion({ status: 'unreadable', httpStatus: 200, reason: 'couldn\'t read (region-restricted page): …' })).toBe(true);
+        expect(wantsCompanion({ status: 'blocked', httpStatus: 200, reason: 'javascript-only page: no text without a browser' })).toBe(false);
         expect(wantsCompanion({ status: 'blocked', httpStatus: 200, botWall: true, reason: 'bot wall served with a 200' })).toBe(true);
         expect(wantsCompanion({ status: 'blocked', httpStatus: 429, reason: 'http-429 after backoff' })).toBe(false);
         expect(wantsCompanion({ status: 'gone', httpStatus: 404, reason: 'http-404' })).toBe(false);

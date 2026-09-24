@@ -24,6 +24,25 @@ and courts.
 [this week](https://rwasonar.com/weekly/latest.html) ·
 [a token report (NVDAx)](https://rwasonar.com/cards/NVDAx.html)
 
+## For judges
+
+- **Live:** <https://rwasonar.com/> (the jobs run on the server; the site rebuilds every 6 hours and
+  the latest-events box on the home page reads the live API). **Pitch deck:** <https://rwasonar.com/pitch/>.
+- **A three-minute route:**
+  1. [Compare Apple's tokens](https://rwasonar.com/stocks.html?view=compare&compare=AAPL): AAPLx
+     and AAPLon share a ticker but differ in what you own, who controls the token and where you can exit.
+  2. [Who holds the keys](https://rwasonar.com/powers.html): each issuer's power to freeze, move,
+     burn, mint, pause, rebase or charge fees, and who holds it.
+  3. [What if…](https://rwasonar.com/whatif.html), then a token's card such as
+     [NVDAx](https://rwasonar.com/cards/NVDAx.html), and the home page's latest events.
+- **Built during Stocklana:** the repository dates from 13 Feb 2026 as a broad RWA catalogue; `main`
+  at `8f58030` (19 Aug 2026) is the pre-hackathon state, and every commit on this branch dates from
+  16 Sep 2026 onwards. [`SUBMISSION.md`](SUBMISSION.md) has the form text and the full disclosure.
+- **Run it:** `npm install && npm install --prefix api && npm start` (details under
+  [Run locally](#run-locally)); `npm test` runs the fast headless suites.
+- **Team:** Poglavar Svemira, solo ([@poglavars](https://x.com/poglavars) on X,
+  [@svemirsky](https://t.me/svemirsky) on Telegram).
+
 ## The problem, in one example
 
 Two tokens can both say "AAPL" and give their holders different things. AAPLx (xStocks) is a
@@ -111,6 +130,7 @@ fails when a page drifts.
 | Role | Canonical style | Where |
 |---|---|---|
 | Site header | brand mark + "RWA Sonar", Explore · Compare · Changes · Learn, then the **Research** menu; muted links, current page ink and bold | `.app-header`, markup from `stocks/lib/site-nav.js` (`siteHeaderHtml`) |
+| Theme switch | last item of the header row: 32px icon button (half circle Auto, sun Light, moon Dark), control-line border, muted, cobalt on hover; a click cycles Auto → Light → Dark, remembered per browser. Under 360px it moves to the end of the Research menu as "Theme: …" | `.theme-switch`; `theme.js`, loaded first in every `<head>`, sets `<html data-theme>`, which every dark rule keys on (no `prefers-color-scheme` queries) |
 | Primary action | cobalt fill, `--rwa-on-accent` text, 8px radius, min 44px tall | `.button.button-primary` (on `<a>` or `<button>`) |
 | Secondary action | panel fill, control-line border, ink text, cobalt on hover | `.button` |
 | Filter chip / toggle, pressed | cobalt border, `--rwa-pressed-bg`, `--rwa-pressed-text`, weight 750 | `--rwa-pressed-*` in each page's `-active` / `[aria-pressed="true"]` rule |
@@ -129,8 +149,10 @@ fails when a page drifts.
 
 Deliberately different: the pitch deck (`/pitch/`) keeps its own dark stage and deck bar; charts,
 the trust map and the dolphin art keep their own series colours; `assets.html` keeps a full-width
-table layout; the script-free generated pages (issuers, templates, weekly, protocols) carry the same
-Research menu without `nav-menus.js`, so it closes from its own summary only.
+table layout; the generated pages without page scripts (issuers, templates, weekly, protocols) carry the same
+Research menu without `nav-menus.js`, so it closes from its own summary only (their one script is
+`theme.js`). The pitch deck and the `card.html` redirect shim load `theme.js` but show no switch: the
+deck has no light/dark themes and the shim has no header.
 
 ## The data
 

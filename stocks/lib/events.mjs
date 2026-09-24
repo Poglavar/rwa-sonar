@@ -946,7 +946,7 @@ const EXACT_FREEZE_ENDS = new Set(['next-refresh', 'scope-resume', 'next-update'
  * certainly had (to its exact end, or to the last stale sighting), `highMs` the length it may have
  * had (to its recorded end, or for an ongoing one to the last stale sighting).
  */
-function normaliseFreeze(row) {
+export function normaliseFreeze(row) {
     const startedAt = eventTime(row?.started_at);
     const endedAt = eventTime(row?.ended_at);
     const seenAt = eventTime(row?.last_seen_stale_at);
@@ -1062,9 +1062,49 @@ export function issuerStatusChanges(prev, next) {
     return out;
 }
 
+/** The snapshot change kinds that become events (snapshotEvents); only these enter the ledger. */
+const FIRST_SEEN_KINDS = new Set(['liquidity-drop', 'rebase', 'reverse-split', 'frozen-appeared', 'paused', 'unpaused', 'control-change', 'issuer-status']);
+
+/** The ledger key of one snapshot change: its day, kind, subject and (for a flag) direction. */
+function firstSeenKey(day, change) {
+    const direction = change?.kind === 'control-change' ? String(change?.after === true) : '';
+    return [day, change?.kind, change?.mint ?? change?.slug ?? '', change?.field ?? '', direction].join('|');
+}
+
 /**
- * Market and control moves from consecutive daily snapshots, dated by the newer snapshot's own
- * build time. Kept: pool liquidity halving on a token that had ≥ $100k, pauses, splits and reverse
+ * A day's snapshot is rewritten on every refresh, so the newer snapshot's build time moves forward
+ * and a same-day event would float back to the top as new. `ledger` ({key: at}) remembers when a
+ * build first saw each change; this stamps that time on each change as `firstObservedAt` and
+ * returns the diffs with the ledger to keep (only days from `sinceDay`, so it stays small).
+ */
+export function stampFirstSeen(diffs, ledger = {}, sinceDay = null) {
+    const kept = {};
+    for (const [key, at] of Object.entries(ledger ?? {})) {
+        if (eventTime(at) !== null && (sinceDay === null || key.slice(0, 10) >= sinceDay)) kept[key] = at;
+    }
+    const stamp = (day, observedAt, change) => {
+        if (!FIRST_SEEN_KINDS.has(change?.kind)) return change;
+        const key = firstSeenKey(day, change);
+        if (!(key in kept) && observedAt !== null) kept[key] = observedAt;
+        return { ...change, firstObservedAt: kept[key] ?? null };
+    };
+    const out = (Array.isArray(diffs) ? diffs : []).map((diff) => {
+        const observedAt = eventTime(diff?.toObservedAt) ?? eventTime(diff?.to);
+        const day = typeof diff?.to === 'string' ? diff.to : null;
+        if (day === null) return diff;
+        return {
+            ...diff,
+            changes: (Array.isArray(diff.changes) ? diff.changes : []).map((change) => stamp(day, observedAt, change)),
+            issuerChanges: (Array.isArray(diff.issuerChanges) ? diff.issuerChanges : [])
+                .map((status) => stamp(day, observedAt, { ...status, kind: 'issuer-status' }))
+        };
+    });
+    return { diffs: out, ledger: kept };
+}
+
+/**
+ * Market and control moves from consecutive daily snapshots, dated by the first build that saw each
+ * one (`firstObservedAt`, stampFirstSeen), else by the newer snapshot's own build time. Kept: pool liquidity halving on a token that had ≥ $100k, pauses, splits and reverse
  * splits, frozen top holders, control flags switched, and an issuer programme's status changing.
  * Health re-grades, multiplier drift, spreads and liquidity rises are daily noise.
  */
@@ -1072,10 +1112,11 @@ export function snapshotEvents(diffs, ctx, tally = null) {
     const out = [];
     const groups = new Map();
     for (const diff of Array.isArray(diffs) ? diffs : []) {
-        const at = eventTime(diff?.toObservedAt) ?? eventTime(diff?.to);
-        if (at === null) continue;
-        const day = at.slice(0, 10);
+        const diffAt = eventTime(diff?.toObservedAt) ?? eventTime(diff?.to);
+        if (diffAt === null) continue;
+        const day = diffAt.slice(0, 10);
         for (const change of Array.isArray(diff.changes) ? diff.changes : []) {
+            const at = eventTime(change?.firstObservedAt) ?? diffAt;
             const mint = text(change?.mint);
             const symbol = symbolOf(change?.symbol, mint);
             const issuer = issuerOf(change?.issuer, ctx);
@@ -1120,7 +1161,9 @@ export function snapshotEvents(diffs, ctx, tally = null) {
                     }
                     const key = `${issuer.slug}|${day}|${field}|${after}`;
                     if (!groups.has(key)) groups.set(key, { issuer, day, at, field, after, diffTo: diff.to, members: [] });
-                    groups.get(key).members.push({ mint, symbol });
+                    const group = groups.get(key);
+                    if (at < group.at) group.at = at;
+                    group.members.push({ mint, symbol });
                     break;
                 }
                 case 'new-mint':
@@ -1134,7 +1177,7 @@ export function snapshotEvents(diffs, ctx, tally = null) {
             const issuer = issuerOf(status.slug, ctx);
             const name = issuer.name ?? 'An issuer';
             out.push(makeEvent({
-                id: `legal-status-${slugPart(issuer.slug)}-${diff.to}`, at, kind: 'issuer-status', category: 'legal',
+                id: `legal-status-${slugPart(issuer.slug)}-${diff.to}`, at: eventTime(status.firstObservedAt) ?? diffAt, kind: 'issuer-status', category: 'legal',
                 title: status.after === 'defunct' ? `${name}: programme now listed as defunct` : `${name}: programme status changed from ${status.before} to ${status.after}`,
                 subject: { type: 'issuer', id: issuer.slug, name },
                 severity: status.after === 'defunct' ? 'warning' : 'caution',

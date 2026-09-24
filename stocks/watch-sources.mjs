@@ -15,6 +15,7 @@ import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { rootCertificates } from 'node:tls';
 
 import { readEnvFile } from './lib/env.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
@@ -30,13 +31,14 @@ import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     apiAnswerIsDocument, binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
+    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, driveDownloadUrl, dropboxDownloadUrl, extraCaFor, fileStamp, htmlDocumentText, isTextual,
     looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, quotelessRefusal, readProvenance, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
+import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
     parseCdxNewest, waybackNote, wantsWaybackFallback
@@ -50,11 +52,13 @@ const STATE_FILE = join(HERE, 'data', 'sources-state.json');
 const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
-// The evidence tables, then the read-provenance columns on them (read_via, capture_at).
+// The evidence tables, then the read-provenance columns on them (read_via, capture_at), then the
+// source status list — the unreadable file's list includes `reachable-unverified` and supersedes
+// db/2026-09-24-sonar-source-reachable.sql, which must not be re-applied once `unreadable` rows exist.
 const DDL_FILES = [
     join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
     join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'),
-    join(REPO, 'db', '2026-09-24-sonar-source-reachable.sql')
+    join(REPO, 'db', '2026-09-24-sonar-source-unreadable.sql')
 ];
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
 let runStatsFile = STATS_FILE;
@@ -134,7 +138,8 @@ WHAT A RUN DOES
 
   A page with a same-publisher machine-readable companion (lib/companions.mjs) is read from it
   when the live page refuses us or renders nothing: npm's registry, crates.io's API, Builder.io
-  content for securitize.io, and — for a Solscan transaction page — the chain itself, through
+  content (and, for /investments/stocks, Builder's translations) for securitize.io, and — for a
+  Solscan transaction page — the chain itself, through
   Solana RPC getTransaction (SOLANA_RPC_URL from .env; the URL is never logged or stored).
   A cited Next.js page chunk (/_next/static/chunks/app/<route>/page-<hash>.js) that answers 404
   after a redeploy is read from the chunk its route loads now.
@@ -145,11 +150,20 @@ WHAT A RUN DOES
 
   Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
   the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
-  or 429 after backoff — recorded with the reason and not retried forever) · reachable-unverified
-  (the same refusal on a source NO dossier quote relies on — a homepage, a listing, a folder: the
-  host answered, which is all such a citation needs; content not read) · error (5xx, timeout,
-  reset). A run with ANY error does not report success and exits non-zero; gone, blocked and
-  reachable-unverified are recorded findings, not failures.
+  or 429 after backoff — recorded with the reason and not retried forever) · unreadable (the host
+  answered 2xx but not with the document: a region block, a script-only page, an RPC info page, a
+  text file hashed as bytes, no text at all — lib/unreadable.mjs; no version, no diff, no change
+  event, the last readable version stays the baseline and the quotes are "not checkable") ·
+  reachable-unverified (a refusal or an unreadable read on a source NO dossier quote relies on — a
+  homepage, a listing, a folder: the host answered, which is all such a citation needs; content not
+  read) · error (5xx, timeout, reset). A run with ANY error does not report success and exits
+  non-zero; gone, blocked, unreadable and reachable-unverified are recorded findings, not failures.
+
+  A read that contains every dossier quote registered on it is the cited document, whatever it
+  looks like (a cited region-block page quoted verbatim is read as a document).
+
+  www.cysec.gov.cy sends the wrong intermediate certificate; its requests add the committed
+  intermediate (stocks/certs/) to the default roots (lib/watch.mjs EXTRA_CA_HOSTS).
 
 FILES
   stocks/data/sources.json                          input registry (extract-sources.mjs)
@@ -216,7 +230,7 @@ function pdfToText(buffer) {
  * not doing it for us here) and `Accept-Encoding` is dropped, because unlike undici this path does
  * not decompress.
  */
-function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5) {
+function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5, ca = null) {
     const plain = { ...headers };
     delete plain['Accept-Encoding'];
     return new Promise((resolvePromise) => {
@@ -231,12 +245,13 @@ function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5) {
             return;
         }
         const request = target.protocol === 'http:' ? httpRequest : httpsRequest;
-        const req = request(url, { method: 'GET', headers: plain, maxHeaderSize: 262_144 }, (res) => {
+        const tlsOptions = ca && target.protocol === 'https:' ? { ca } : {};
+        const req = request(url, { method: 'GET', headers: plain, maxHeaderSize: 262_144, ...tlsOptions }, (res) => {
             const redirect = [301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location;
             if (redirect && redirectsLeft > 0) {
                 res.resume();
                 resolvePromise(fetchWithBigHeaders(new URL(res.headers.location, url).toString(),
-                    headers, timeoutMs, redirectsLeft - 1));
+                    headers, timeoutMs, redirectsLeft - 1, ca));
                 return;
             }
             const chunks = [];
@@ -256,6 +271,18 @@ function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5) {
         req.on('error', (err) => fail(err.code || err.name));
         req.end();
     });
+}
+
+/**
+ * The trust store for a host that sends the wrong intermediate (lib/watch.mjs `extraCaFor`): the
+ * default roots plus that host's committed intermediate, or null for every other host. Read once.
+ */
+const extraCaCache = new Map();
+async function extraCaList(host) {
+    const file = extraCaFor(host);
+    if (!file) return null;
+    if (!extraCaCache.has(file)) extraCaCache.set(file, [...rootCertificates, await readFile(join(REPO, file), 'utf8')]);
+    return extraCaCache.get(file);
 }
 
 /** One GET, with the conditional headers the stored version allows. Never throws. */
@@ -280,6 +307,10 @@ async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
     };
     if (etag) headers['If-None-Match'] = etag;
     if (lastModified) headers['If-Modified-Since'] = lastModified;
+    // A host whose server sends the wrong intermediate is read through node:https with that host's
+    // extra CA (fetch's undici agent takes no per-request trust store without the undici package).
+    const ca = await extraCaList(hostOf(url));
+    if (ca) return fetchWithBigHeaders(url, headers, timeoutMs, 5, ca);
     try {
         const res = await fetch(url, {
             method: 'GET',
@@ -542,6 +573,34 @@ async function bytesToText(buffer, contentType, url) {
     return { kind, text: marker, quoteText: marker, via: 'binary', binary: true };
 }
 
+/** Character length of a stored text version, or null when there is none to read. */
+async function storedTextChars(textPath) {
+    if (typeof textPath !== 'string' || textPath === '') return null;
+    try {
+        return (await readFile(join(REPO, textPath), 'utf8')).length;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * lib/unreadable.mjs's verdict on one read, with the two inputs only the IO side has: the verdict
+ * of the dossier quotes registered on this source against this read (every one found means the read
+ * IS the cited document, whatever it looks like — Remora's region-block page is itself quoted), and,
+ * for a short read of a large page, the length of the last readable version on disk (`textPath`).
+ */
+async function classifyFresh({ kind, via = null, text, quoteText = null, raw, binary = false, quotes = [], textPath = null, prev = null }) {
+    const buffer = Buffer.isBuffer(raw) ? raw : Buffer.from(String(raw ?? ''), 'utf8');
+    const markup = binary ? '' : buffer.toString('utf8');
+    const check = Array.isArray(quotes) && quotes.length > 0 && typeof quoteText === 'string'
+        ? checkQuotes(quoteText, quotes, { pdf: kind === 'pdf' }) : null;
+    const previousChars = needsPreviousChars({ text, raw: markup }) ? await storedTextChars(textPath ?? prev?.textPath) : null;
+    return classifyRead({
+        kind, via, text, raw: markup, binary, bytesAreText: binary && looksLikeText(buffer), previousChars,
+        quotes: check && { checked: check.checked, lost: check.lost.length }
+    });
+}
+
 /** Everything about one source after one look at it. Written to the checkpoint as-is. */
 async function watchOne(source, prev, options) {
     const { timeoutMs } = options;
@@ -668,29 +727,50 @@ async function watchOne(source, prev, options) {
         }
     }
 
+    // Was what came back the document at all (lib/unreadable.mjs)? A region block, a script-only
+    // shell, an RPC info page or an empty body served with 200 is our reader failing, not the
+    // document changing: it gets no version, no diff and no event, and the last readable version
+    // stays the baseline. The Notion path has already read the document through its API, so the
+    // shell it came wrapped in is not evidence of anything (`via: 'notion'`).
+    const unreadable = text === null ? null : await classifyFresh({
+        kind: result.kind, via: result.via, text, quoteText, raw: notionPage ? raw : res.buffer,
+        binary: result.binary === true, quotes: options.quotes, prev
+    });
     const outcome = decideOutcome({
         host: hostOf(source.url),
         httpStatus: res.httpStatus,
         networkErrorCode: res.networkErrorCode,
         blocked,
         vendor,
-        // The Notion path has already read the document, so the shell it came wrapped in is not
-        // evidence of anything; only an unrewritten HTML page can still be a JavaScript shell.
-        jsOnly: isJsOnlyRead({ kind: result.kind, binary: result.binary === true, notion: notionPage, text, rawHtml: res.buffer.toString('utf8') }),
+        unreadable,
         sameHash: hash !== null && prev?.contentHash === hash,
         retriedAfterBackoff: res.retriedAfterBackoff,
         apiAnswer
     });
     result.status = outcome.status;
     result.reason = outcome.reason;
-    if (outcome.status === 'error' || outcome.status === 'blocked' || outcome.status === 'gone') {
+    if (outcome.status === 'error' || outcome.status === 'blocked' || outcome.status === 'gone' || outcome.status === 'unreadable') {
         result.error = outcome.reason;
     }
-    if (hash !== null) result.contentHash = hash;
+    const readable = outcome.status === 'ok' || outcome.status === 'changed';
+    if (outcome.status === 'unreadable') {
+        // Kept apart from `via`, which describes the stored text this row still stands on.
+        result.unreadableCode = outcome.code;
+        result.servedKind = result.kind;
+        result.servedVia = result.via;
+        result.kind = prev?.kind ?? source.kind;
+        result.via = null;
+        text = null;
+        quoteText = null;
+    }
+    // Only a read of the document moves the stored hash and the validators: an unreadable body's
+    // etag answered 304 later would stand on the last readable version as if it had been confirmed.
+    if (hash !== null && readable) result.contentHash = hash;
+    if (!readable) Object.assign(result, responseValidators({ httpStatus: res.httpStatus, headers: res.headers, prev, readable: false }));
     // The same publisher's machine-readable companion first (live, and the publisher's own words),
     // then an archived capture (lib/companions.mjs, lib/wayback.mjs).
     const companion = shellCompanion && wantsCompanion({
-        status: result.status, reason: result.reason, httpStatus: res.httpStatus, botWall: blocked, reader: shellCompanion.reader
+        status: result.status, httpStatus: res.httpStatus, botWall: blocked, reader: shellCompanion.reader
     }) ? shellCompanion : null;
     if (companion) {
         const read = await readFromCompanion(source, prev, result, companion, options);
@@ -865,7 +945,7 @@ async function archiveTodayMemento(url, pace) {
  * null (the result stays `blocked`, with the reason extended) when there is no usable capture or
  * the per-run cap is spent. Never an `error`: the archive failing us is not our watch failing.
  */
-async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
+async function readFromWayback(source, prev, result, { timeoutMs, wayback, quotes = [] }) {
     const liveReason = result.reason;
     if (wayback.used >= WAYBACK_FALLBACK_CAP) {
         if (!wayback.capLogged) {
@@ -985,7 +1065,11 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
     }
     const text = stripPublisherChrome(source.url, read.text);
     const quoteText = stripPublisherChrome(source.url, read.quoteText);
-    if (read.kind === 'html' && jsOnlyShell(text, res.buffer.toString('utf8'))) return giveUp('the capture is a javascript-only shell');
+    // The archive's crawler can be served the same shell or region block we were (lib/unreadable.mjs).
+    const captureRead = await classifyFresh({
+        kind: read.kind, via: read.via, text, quoteText, raw: res.buffer, binary: read.binary === true, quotes, prev
+    });
+    if (!captureRead.readable) return giveUp(`the capture is unreadable too — ${captureRead.reason}`);
     const hash = sha256Hex(text);
     result.kind = read.kind;
     result.bytes = res.buffer.length;
@@ -998,8 +1082,31 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback }) {
     return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
 }
 
+/**
+ * lib/unreadable.mjs's verdict on the stored version a new read would be diffed against. Only an
+ * old version can be unreadable — the watcher stopped recording unreadable reads as versions — but
+ * before it did, a region block (assets.backed.fi), a Drive viewer shell or an RPC info page was
+ * stored as a source's only version, and a first real read diffed against it is "the whole document
+ * appeared", not a change in the document.
+ */
+async function storedVersionVerdict(prev, previousText, quotes) {
+    const rawPath = prev?.rawPath ?? null;
+    const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
+    let buffer = Buffer.alloc(0);
+    if (rawPath && ext !== 'pdf') {
+        try {
+            buffer = await readFile(join(REPO, rawPath));
+        } catch {
+            // No raw copy: the stored text is judged alone.
+        }
+    }
+    const binary = prev?.via === 'binary' || /^binary \S+ \d+ bytes sha256:[0-9a-f]{64}$/.test(previousText.trim());
+    const kind = ext === 'pdf' ? 'pdf' : ext === 'json' && prev?.via !== 'notion' ? 'api' : 'html';
+    return classifyFresh({ kind, via: prev?.via ?? null, text: previousText, quoteText: previousText, raw: buffer, binary, quotes, textPath: null });
+}
+
 /** The diff and severity of a changed source, plus the files it just wrote. */
-async function recordChange(result, { text, raw, previousTextPath }) {
+async function recordChange(result, { text, raw, previousTextPath, prev = null, quotes = [] }) {
     // `rawKind` differs from `kind` only where the raw copy is not what the URL served: a Notion
     // page is an html source whose raw file is the recordMap JSON it was rendered from.
     const { rawPath, textPath } = await writeVersionFiles(result.id, result.fetchedAt,
@@ -1021,6 +1128,18 @@ async function recordChange(result, { text, raw, previousTextPath }) {
             summary: previousTextPath ? 'previous text missing on disk — no diff' : 'first version (nothing to diff against)',
             unified: null
         };
+        return;
+    }
+    // The last READABLE version is the baseline; a stored copy that never was one is not.
+    const baseline = previousTextPath === prev?.textPath ? await storedVersionVerdict(prev, previousText, quotes) : { readable: true };
+    if (!baseline.readable) {
+        result.baselineUnreadable = baseline.code;
+        result.diff = {
+            added: null, removed: null, method: 'none', severity: null, keywords: [],
+            summary: `first readable version — the stored version before it was unreadable, so there is nothing to diff against (${baseline.reason})`,
+            unified: null
+        };
+        await pruneVersions(result.id);
         return;
     }
     const diff = diffLines(previousText, text);
@@ -1082,13 +1201,14 @@ async function loadQuoteRegistry() {
  * back to the stored text file — to get:
  *  - the UNFILTERED text for the quote check (the stored .txt is churn-filtered, which drops a
  *    price alone on its line), recomputed rather than stored twice on disk;
- *  - whether the stored copy is itself a JavaScript shell. app.ventuals.com/sunset answered 304 to
- *    an etag whose stored text was the 8 characters "Ventuals", so it was `ok` and its quote was
- *    checked against the stub and reported lost. Such a source is `blocked`, as its live read is.
+ *  - whether the stored copy is itself unreadable (lib/unreadable.mjs). app.ventuals.com/sunset
+ *    answered 304 to an etag whose stored text was the 8 characters "Ventuals", so it was `ok` and
+ *    its quote was checked against the stub and reported lost; assets.backed.fi's only stored copies
+ *    are its region block. Such a source is `unreadable`, as its live read is.
  * PDFs cost a pdftotext each, so they are only re-read when a quote needs them.
  * Returns the text for the quote check, or null when there is none.
  */
-async function reviewStoredCopy(result, prev, { needQuotes }) {
+async function reviewStoredCopy(result, prev, { needQuotes, quotes = [] }) {
     const textPath = result.textPath ?? prev?.textPath ?? null;
     const readStoredText = async () => {
         if (!textPath) return null;
@@ -1102,22 +1222,29 @@ async function reviewStoredCopy(result, prev, { needQuotes }) {
     const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
     if (!rawPath || (ext === 'pdf' && !needQuotes)) return needQuotes ? readStoredText() : null;
     let reading = null;
+    let payload = null;
     try {
         const buffer = await readFile(join(REPO, rawPath));
-        const payload = ext === 'pdf' ? await pdfToText(buffer) : buffer.toString('utf8');
+        payload = ext === 'pdf' ? await pdfToText(buffer) : buffer.toString('utf8');
         reading = storedReading({ rawExt: ext, via: prev?.via ?? null, payload });
     } catch (err) {
         logWarn(`${result.url}: stored raw copy ${rawPath} unreadable (${err.code || err.message}) — quote check uses the stored text`);
     }
     if (reading !== null && sha256Hex(stripPublisherChrome(result.url, reading.text)) === result.contentHash) {
-        if (reading.jsOnly) {
-            result.status = 'blocked';
-            result.reason = 'javascript-only page: no text without a browser (the host answered'
-                + ` ${result.httpStatus === 304 ? '304' : 'with the same copy'} over a stored copy that is itself a JavaScript shell)`;
+        const text = stripPublisherChrome(result.url, reading.text);
+        const quoteText = stripPublisherChrome(result.url, reading.quoteText);
+        const stored = await classifyFresh({
+            kind: reading.kind, via: prev?.via ?? null, text, quoteText, raw: ext === 'pdf' ? '' : payload, quotes, textPath: null
+        });
+        if (!stored.readable) {
+            result.status = 'unreadable';
+            result.unreadableCode = stored.code;
+            result.reason = `${stored.reason} (the host answered ${result.httpStatus === 304 ? '304' : 'with the same copy'}`
+                + ' over a stored copy that is itself unreadable)';
             result.error = result.reason;
             return null;
         }
-        return needQuotes ? stripPublisherChrome(result.url, reading.quoteText) : null;
+        return needQuotes ? quoteText : null;
     }
     return needQuotes ? readStoredText() : null;
 }
@@ -1463,13 +1590,15 @@ async function main() {
         lastHitByHost.set(host, Date.now());
 
         const prev = previous[source.url] ?? null;
-        const { result, text, quoteText, raw, previousTextPath } = await watchOne(source, prev,
-            { timeoutMs: TIMEOUT_MS, wayback });
-        results.push(result);
         const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
-        // No fresh text: the read stands on the stored version, which may itself be a JS shell.
+        // The registered quotes go in with the fetch: a read that contains every one of them is the
+        // cited document whatever it looks like (lib/unreadable.mjs).
+        const { result, text, quoteText, raw, previousTextPath } = await watchOne(source, prev,
+            { timeoutMs: TIMEOUT_MS, wayback, quotes: registered });
+        results.push(result);
+        // No fresh text: the read stands on the stored version, which may itself be unreadable.
         const storedQuoteText = text === null && result.status === 'ok'
-            ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0 })
+            ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0, quotes: registered })
             : null;
         // A refusal on a source no quote relies on is reachability evidence, not a blocked
         // finding (lib/watch.mjs `quotelessRefusal`). After the stored-copy review, which can
@@ -1486,7 +1615,7 @@ async function main() {
         if (result.status === 'changed') {
             // The raw bytes only exist in memory, so the version files are written here, before
             // the checkpoint records the paths.
-            await recordChange(result, { text, raw, previousTextPath });
+            await recordChange(result, { text, raw, previousTextPath, prev, quotes: registered });
             if (result.normalizerUpgrade) {
                 result.versionRecorded = true;
                 result.status = 'ok';
@@ -1516,7 +1645,7 @@ async function main() {
                     lost: checked.lost.map((q) => ({ id: q.id, kind: q.kind, ref: q.ref, slug: q.slug, quote: q.quote }))
                 };
                 for (const q of checked.lost) logWarn(`quote lost in ${source.url}: ${q.slug} ${q.kind} ${q.ref}`);
-                if (checked.notCheckable) log(`${checked.notCheckable} quote(s) not checkable in ${source.url}: the source is blocked (${result.reason})`);
+                if (checked.notCheckable) log(`${checked.notCheckable} quote(s) not checkable in ${source.url}: the source is ${result.status} (${result.reason})`);
             }
         }
         // EVIDENCE.md §2.2: archive on first sight and on every new version. "First sight" is
@@ -1568,6 +1697,10 @@ async function main() {
     const state = {};
     for (const result of results) {
         const prev = previous[result.url] ?? null;
+        const read = result.status === 'ok' || result.status === 'changed';
+        // An unreadable read (lib/unreadable.mjs) produced no text: the hash, the text files and
+        // their provenance are still the last readable version's, so they are carried over whole.
+        const standsOnStored = Boolean(result.unreadableCode) && !read;
         state[result.url] = {
             id: result.id,
             kind: result.kind,
@@ -1585,16 +1718,23 @@ async function main() {
             archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
             versions: (prev?.versions ?? 0)
                 + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
-            normalizerVersion: result.normalizerVersion ?? prev?.normalizerVersion ?? 1,
+            // Only a read that produced text is read by the new extraction generation; a refusal or an
+            // unreadable read on the upgrade day leaves the upgrade (and its event-free baseline
+            // refresh) for the first real read.
+            normalizerVersion: read
+                ? (result.normalizerVersion ?? prev?.normalizerVersion ?? 1)
+                : (prev?.normalizerVersion ?? result.normalizerVersion ?? 1),
             // Provenance of the stored text: `wayback` means the live host refused us and the text
             // is from the capture dated `captureTimestamp` — never a live read. A 304 keeps the
             // reader of the text it confirmed.
-            via: result.via ?? (result.httpStatus === 304 ? (prev?.via ?? null) : null),
-            readVia: readProvenance(result, prev).readVia,
-            captureTimestamp: result.via === 'wayback' ? result.captureTimestamp : null,
-            captureUrl: result.via === 'wayback' ? result.captureUrl : null,
+            via: standsOnStored ? (prev?.via ?? null) : (result.via ?? (result.httpStatus === 304 ? (prev?.via ?? null) : null)),
+            readVia: standsOnStored ? (prev?.readVia ?? null) : readProvenance(result, prev).readVia,
+            captureTimestamp: standsOnStored ? (prev?.captureTimestamp ?? null) : (result.via === 'wayback' ? result.captureTimestamp : null),
+            captureUrl: standsOnStored ? (prev?.captureUrl ?? null) : (result.via === 'wayback' ? result.captureUrl : null),
             // The publisher's API the text was read from when the cited page gave us nothing.
-            companionUrl: result.companionUrl ?? null,
+            companionUrl: standsOnStored ? (prev?.companionUrl ?? null) : (result.companionUrl ?? null),
+            // Why the last look did not read the document (null when it did): lib/unreadable.mjs.
+            unreadableCode: read ? null : (result.unreadableCode ?? null),
             archiveTodayUrl: result.archiveTodayUrl ?? null,
             quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
         };
@@ -1630,7 +1770,7 @@ async function main() {
     for (const result of results) if (result.via) viaCounts[result.via] = (viaCounts[result.via] ?? 0) + 1;
     log(`watch-sources: read via ${Object.entries(viaCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join(' ')}`);
     log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s):`
-        + ` ${quoteTotals.found} found, ${quoteTotals.lost} lost, ${quoteTotals.notCheckable} not checkable (source blocked)`);
+        + ` ${quoteTotals.found} found, ${quoteTotals.lost} lost, ${quoteTotals.notCheckable} not checkable (source blocked or unreadable)`);
     if (quoteTotals.lost) {
         logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
         for (const r of results) for (const q of r.quotes?.lost ?? []) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
@@ -1644,6 +1784,17 @@ async function main() {
     if (gone.length) {
         logWarn(`${gone.length} cited URL(s) are gone — a finding about our dossiers, not a run failure:`);
         for (const r of gone) logWarn(`    ${r.reason} ${r.url} (${r.issuer ?? 'shared'}; cited in ${r.foundIn.length} place(s))`);
+    }
+    // Why a look did not read the document (lib/unreadable.mjs), counted whether the source ended
+    // `unreadable` or, with no quote relying on it, `reachable-unverified`.
+    const unreadableByCode = {};
+    for (const r of results) {
+        if (r.unreadableCode && r.status !== 'ok' && r.status !== 'changed') unreadableByCode[r.unreadableCode] = (unreadableByCode[r.unreadableCode] ?? 0) + 1;
+    }
+    const unreadableResults = results.filter((r) => r.status === 'unreadable');
+    if (unreadableResults.length) {
+        logWarn(`${unreadableResults.length} source(s) unreadable — the host answered, but not with the document; no version, no change event, the last readable version stays the baseline:`);
+        for (const r of unreadableResults) logWarn(`    ${r.url} (${r.issuer ?? 'shared'}): ${r.reason}`);
     }
     const unverified = results.filter((r) => r.status === 'reachable-unverified');
     if (unverified.length) {
@@ -1720,6 +1871,7 @@ async function main() {
         httpFetches: results.length - reusedFromCheckpoint,
         resumedFromCheckpoint: reusedFromCheckpoint,
         statusCounts: byStatus,
+        unreadableReasons: unreadableByCode,
         versionsRecorded: rows.versions.length,
         changeEvents: rows.events.length,
         materialEvents: materialEvents.length,

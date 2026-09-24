@@ -7,9 +7,10 @@
  *
  * WHAT IS STILL A FILE: the universe and DeFi change logs, the curated events and the Meteora pool
  * table read stocks-changes.json, stocks-defi-changes.json, stocks/data/meteora.json,
- * stocks-tokens.json and stocks-trades.json exactly as before, and the after-hours gap column reads
- * stocks-afterhours.json — the API's slim token row does not carry it. Those sections are
- * unaffected by the API being down; the table says so.
+ * stocks-tokens.json and stocks-trades.json exactly as before, and the "When closed" column reads
+ * stocks-closed-market.json (what each lending market that takes the token does while the US market
+ * is closed) — the API's slim token row does not carry it. Those sections are unaffected by the API
+ * being down; the table says so.
  *
  * The health RULES ARE NOT REIMPLEMENTED HERE, and neither are the statuses: every status and
  * worst-rule id on this page comes from the API, which serves what stocks/build-health.mjs wrote
@@ -30,6 +31,8 @@
     'use strict';
 
     const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
+    // The closed-market wording the token cards use too (stocks/lib/closed-market-view.js).
+    const closedMarketView = (typeof __rwaClosedMarket !== 'undefined') ? __rwaClosedMarket : require('./stocks/lib/closed-market-view.js');
     const {
         DASH, escapeHtml, isNum, isSafeUrl, fmtMoney, fmtNumber, fmtPrice, fmtPct, fmtSignedPct,
         fmtDate, fmtDateTime, fmtRelativeTime, fmtVenueSpreadPct, humanizeSlug, cardSlug
@@ -548,10 +551,14 @@
             + 'Check that the API is running.';
     }
 
-    /** `{mint: record}` from stocks-afterhours.json, for the one column the slim row cannot carry. */
-    function gapIndex(afterhours) {
+    /**
+     * `{mint: item}` from stocks-closed-market.json, for the one column the slim row cannot carry,
+     * or null when the file did not load — which is not the same as "no lender takes it".
+     */
+    function closedMarketIndex(doc) {
+        if (!doc || !Array.isArray(doc.items)) return null;
         const out = new Map();
-        for (const item of Array.isArray(afterhours?.items) ? afterhours.items : []) {
+        for (const item of doc.items) {
             const mint = str(item?.mint);
             if (mint !== null) out.set(mint, item);
         }
@@ -560,17 +567,18 @@
 
     /**
      * One table row per slim token row the API returned, in the API's order — the sort happened in
-     * Postgres and must not be re-decided here. The after-hours gap is joined in from
-     * stocks-afterhours.json by mint; a mint that file does not carry keeps a null gap, never 0.
+     * Postgres and must not be re-decided here. The lenders' closed-market labels are joined in from
+     * stocks-closed-market.json by mint: `closedLenders` is [] when the file loaded and no lender
+     * takes the token, and null when the file did not load (unknown, shown as a dash).
      */
-    function tokenRowsFromApi(items, gaps) {
-        const index = gaps instanceof Map ? gaps : new Map();
+    function tokenRowsFromApi(items, closedIndex) {
+        const index = closedIndex instanceof Map ? closedIndex : null;
         return (Array.isArray(items) ? items : []).map((item) => {
             const mint = str(item?.mint);
             const symbol = str(item?.symbol);
             const issuer = str(item?.issuer_slug);
             const worstRuleId = str(item?.worst_rule);
-            const gap = mint === null ? null : (index.get(mint) ?? null);
+            const closed = index === null || mint === null ? null : (index.get(mint) ?? { lenders: [] });
             return {
                 mint,
                 symbol,
@@ -588,7 +596,7 @@
                 vol24: num(item?.volume24_usd),
                 premiumPct: num(item?.premium_pct),
                 venueSpreadPct: num(item?.venue_spread_pct),
-                gapPct: num(gap?.gapPct),
+                closedLenders: closed === null ? null : closedMarketView.compactLenders(closed),
                 top1SharePct: num(item?.top1_share_pct),
                 holderCount: num(item?.holder_count),
                 lastTradedAt: str(item?.last_traded_at),
@@ -891,7 +899,7 @@
         pageMath,
         createSequence,
         describeApiFailure,
-        gapIndex,
+        closedMarketIndex,
         tokenRowsFromApi,
         newMintChips,
         newMintsWindowDays,
@@ -918,7 +926,7 @@
 
     /** The sections that are still files, not API routes. */
     const FILES = {
-        afterhours: './stocks-afterhours.json',
+        closedMarket: './stocks-closed-market.json',
         changes: './stocks-changes.json',
         defiChanges: './stocks-defi-changes.json',
         meteora: './stocks/data/meteora.json',
@@ -941,7 +949,7 @@
         total: 0,
         loading: false,
         error: null,
-        gaps: new Map(),
+        closedIndex: null,
         changes: null,
         defiChanges: null,
         defiKind: null,
@@ -970,7 +978,10 @@
             ? `<span class="mon-symbol">${symbol}</span>`
             : `<a class="mon-symbol" href="${escapeHtml(row.href)}">${symbol}</a>`;
         const premiumClass = !isNum(row.premiumPct) ? '' : row.premiumPct >= 0 ? ' num-up' : ' num-down';
-        const gapClass = !isNum(row.gapPct) ? '' : row.gapPct >= 0 ? ' num-up' : ' num-down';
+        const closed = row.closedLenders === null ? escapeHtml(DASH)
+            : row.closedLenders.length === 0 ? '<span class="mon-cm-none">no lender</span>'
+                : row.closedLenders.map((e) => `<span class="mon-cm ${escapeHtml(e.className)}" title="${escapeHtml(e.title)}">`
+                    + `${escapeHtml(e.protocolName)}: ${escapeHtml(e.label)}</span>`).join('');
         return `<tr>
             <td class="cell-token">${link}<span class="mon-name">${escapeHtml(row.name ?? '')}</span></td>
             <td>${escapeHtml(row.issuerName ?? row.issuer ?? DASH)}</td>
@@ -982,7 +993,7 @@
             <td class="num">${escapeHtml(fmtMoney(row.liquidity))}</td>
             <td class="num${premiumClass}">${escapeHtml(fmtSignedPct(row.premiumPct))}</td>
             <td class="num">${escapeHtml(fmtVenueSpreadPct(row.venueSpreadPct))}</td>
-            <td class="num${gapClass}">${escapeHtml(fmtSignedPct(row.gapPct))}</td>
+            <td class="mon-closed">${closed}</td>
             <td class="num">${escapeHtml(fmtPct(row.top1SharePct))}</td>
             <td><span title="${escapeHtml(fmtDateTime(row.lastTradedAt))}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</span></td>
         </tr>`;
@@ -1360,7 +1371,7 @@
             state.facets = facets?.facets ?? null;
             state.items = Array.isArray(tokens?.items) ? tokens.items : [];
             state.total = isNum(tokens?.total) ? tokens.total : 0;
-            state.rows = tokenRowsFromApi(state.items, state.gaps);
+            state.rows = tokenRowsFromApi(state.items, state.closedIndex);
             // The API clamps nothing about `page`: an offset past the end is an empty page, so the
             // reader is moved onto the last page that exists instead of being shown a blank table.
             const math = pageMath({ total: state.total, page: state.page });
@@ -1418,24 +1429,24 @@
     }
 
     /**
-     * The sections that are still files: the after-hours gap column, both change logs, the events
+     * The sections that are still files: the "When closed" column, both change logs, the events
      * and the Meteora pools. They are loaded beside the API calls and never block the table.
      */
     async function loadFileSections() {
-        const [afterhours, changes, defiChanges, meteora, tokens, trades] = await Promise.all([
-            loadFile(FILES.afterhours),
+        const [closedMarket, changes, defiChanges, meteora, tokens, trades] = await Promise.all([
+            loadFile(FILES.closedMarket),
             loadFile(FILES.changes),
             loadFile(FILES.defiChanges),
             loadFile(FILES.meteora),
             loadFile(FILES.tokens),
             loadFile(FILES.trades)
         ]);
-        state.gaps = gapIndex(afterhours);
+        state.closedIndex = closedMarketIndex(closedMarket);
         state.changes = changes;
         state.defiChanges = defiChanges;
         state.meteora = meteoraRows({ meteora, tokens, trades });
-        // The gap column belongs to rows that may already be on screen.
-        state.rows = tokenRowsFromApi(state.items, state.gaps);
+        // The "When closed" column belongs to rows that may already be on screen.
+        state.rows = tokenRowsFromApi(state.items, state.closedIndex);
         renderTable();
         renderNewMints();
         renderChanges();

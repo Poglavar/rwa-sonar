@@ -11,7 +11,7 @@ import { diffSnapshots } from './lib/changes.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import {
     JUDGMENT_TABLE_PROBE, LENDING_TABLE_PROBE, MAX_EVENTS, WINDOW_DAYS, buildEventsFeed, changeRowsPsql, eventContext,
-    issuerStatusChanges, lendingRowsPsql, lendingTimes
+    issuerStatusChanges, lendingRowsPsql, lendingTimes, stampFirstSeen
 } from './lib/events.mjs';
 import { log, logError, logWarn, parseArgs, readJson, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
@@ -48,6 +48,7 @@ INPUTS
   protocols/index.json          protocol dossier pages to link (optional)
   stocks/data/history/<date>/   daily tokens.json + issuers.json snapshots (market and control moves)
   stocks/data/mint-created.json creation times from stocks/fetch-mint-created.mjs (optional)
+  stocks/data/event-first-seen.json  when a build first saw each snapshot change (read and rewritten)
   stocks/data/event-resolutions.json  editorial decisions on watcher events (always this repo's copy)
   DATABASE_URL (.env)           sonar.change_event rows (chain, document and court watchers) with
                                 the change judge's latest valid reading, and the lending watcher's
@@ -162,7 +163,13 @@ async function main() {
     // Two spare days: a diff dated inside the window compares with the day before it.
     const sinceMs = Date.parse(fileAsOf) - (windowDays + 2) * DAY_MS;
     const since = new Date(sinceMs).toISOString().replace(/\.\d{3}Z$/, 'Z');
-    const { diffs, recordsBeginOn, newestBuiltAt } = await snapshotDiffs(root, days, since.slice(0, 10));
+    const snapshots = await snapshotDiffs(root, days, since.slice(0, 10));
+    const { recordsBeginOn, newestBuiltAt } = snapshots;
+    // When a build first saw each snapshot change: server state beside mint-created.json (gitignored),
+    // so a same-day event keeps its first time while the day's snapshot is rewritten every refresh.
+    const firstSeenFile = join(root, 'stocks', 'data', 'event-first-seen.json');
+    const firstSeen = stampFirstSeen(snapshots.diffs, (await readJson(firstSeenFile, { keys: {} }))?.keys ?? {}, since.slice(0, 10));
+    const diffs = firstSeen.diffs;
     const { rows, read } = await readChangeRows({ flags, since });
     const lending = await readLendingRows({ flags, since });
     const asOf = dataAsOf([fileAsOf, newestBuiltAt, ...rows.map((row) => row?.detected_at), ...lendingTimes(lending)]);
@@ -205,6 +212,7 @@ async function main() {
         events: feed.events
     };
     await writeJson(out, document);
+    await writeJson(firstSeenFile, { keys: firstSeen.ledger });
     log(`${feed.events.length} event(s) as of ${feed.asOf} → ${out}`);
     log(`by category: ${Object.entries(feed.counts.byCategory).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}`);
     log(`by source: ${Object.entries(feed.counts.bySource).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}`);

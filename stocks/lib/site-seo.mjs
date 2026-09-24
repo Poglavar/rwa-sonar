@@ -30,7 +30,7 @@ export const SITE_IMAGE = {
 /** Search engines cut a meta description near here; og:description may run longer. */
 export const META_DESCRIPTION_MAX = 160;
 /** Cache-busting stamp for site-contact.css. Bump when it changes. */
-export const CONTACT_CSS_VERSION = '20260924h';
+export const CONTACT_CSS_VERSION = '20260924i';
 
 /** `text` cut to `max` characters at a word boundary with an ellipsis; whitespace collapsed. */
 export function clampText(text, max = META_DESCRIPTION_MAX) {
@@ -196,7 +196,7 @@ export function seoHeadTags({
  * carries a few bytes per icon. They take the text colour and follow the light and dark themes.
  * Decorative: each link carries its own accessible name. Bump the stamp when the sprite changes.
  */
-const CONTACT_ICONS_VERSION = '20260924a';
+const CONTACT_ICONS_VERSION = '20260924b';
 const ICON = (root, id) => `<svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="${root}images/contact-icons.svg?v=${CONTACT_ICONS_VERSION}#${id}"/></svg>`;
 
 /**
@@ -210,12 +210,10 @@ export function contactFooterHtml(root = './', { variant = null, inner = false }
     const tag = inner ? 'div' : 'footer';
     const item = (href, icon, label, name, rel = ext) => `<li><a href="${href}" ${rel} aria-label="${name}">${icon}<span>${label}</span></a>`;
     return `<${tag} class="site-contact${inner ? ' site-contact-inner' : ''}${variant === 'dark' ? ' site-contact-dark' : ''}" aria-label="Contact and community">`
-        + `<p class="site-contact-title">Follow RWA Sonar, ask a question or get alerts</p><ul>`
+        + `<p class="site-contact-title">Follow RWA Sonar or ask a question</p><ul>`
         + item(CONTACT_LINKS.x, ICON(root, 'x'), '@RWASonar', 'RWA Sonar on X (@RWASonar)', 'target="_blank" rel="me noopener noreferrer"') + '</li>'
         + item(CONTACT_LINKS.telegramChannel, ICON(root, 'telegram'), 'Channel', 'Telegram channel: RWA Sonar') + '</li>'
         + item(CONTACT_LINKS.telegramGroup, ICON(root, 'telegram'), 'Group', `Telegram group: ${CONTACT_LINKS.telegramGroupName}`) + '</li>'
-        + item(CONTACT_LINKS.bot, ICON(root, 'bell'), 'Alerts bot', `Private alerts bot on Telegram: ${CONTACT_LINKS.botName}`)
-        + ` <a class="site-contact-aside" href="${root}watch.html">set up a watch</a></li>`
         + item(CONTACT_LINKS.github, ICON(root, 'github'), 'Code', 'Source code on GitHub: Poglavar/rwa-sonar') + '</li>'
         + `</ul></${tag}>`;
 }

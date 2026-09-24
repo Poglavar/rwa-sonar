@@ -1,6 +1,7 @@
 // Dark-mode completeness for the shared app shell: any colour token that body.app-page sets to a
 // literal hex value (instead of a --rwa-* palette variable, which flips on its own) must be
-// overridden in the dark-mode block, or dark pages get light surfaces under light text.
+// overridden in a dark-theme rule (keyed on <html data-theme="dark">, set by theme.js), or dark
+// pages get light surfaces under light text.
 const fs = require('fs');
 const path = require('path');
 
@@ -17,19 +18,23 @@ function block(source, startPattern) {
     return '';
 }
 
+/** Every rule that applies only in the dark theme (its selector names [data-theme="dark"]), joined. */
+function darkRules(source) {
+    return [...source.matchAll(/[^{}]*\[data-theme="dark"\][^{}]*\{[^}]*\}/g)].map((m) => m[0]).join('\n');
+}
+
 function literalColourTokens(text) {
     return [...text.matchAll(/(--[\w-]+)\s*:\s*#[0-9a-f]{3,8}\b/gi)].map((m) => m[1]);
 }
 
 describe('app shell dark-mode tokens', () => {
     const light = block(css, /body\.app-page\s*\{/);
-    const darkMedia = [...css.matchAll(/@media \(prefers-color-scheme: dark\)/g)]
-        .map((m) => block(css.slice(m.index), /@media/)).join('\n');
+    const dark = darkRules(css);
 
     test('every literal colour token on app pages has a dark override', () => {
         const literal = literalColourTokens(light);
         expect(literal.length).toBeGreaterThan(0);
-        const missing = literal.filter((token) => !new RegExp(`${token}\\s*:`).test(darkMedia));
+        const missing = literal.filter((token) => !new RegExp(`${token}\\s*:`).test(dark));
         expect(missing).toEqual([]);
     });
 });
@@ -47,8 +52,7 @@ describe('stocks page tokens (its own :root names, aliased to the shared palette
     const stocks = fs.readFileSync(path.join(__dirname, 'stocks.css'), 'utf8');
     test('text on accent-filled buttons is the shared on-accent colour, which flips in dark mode', () => {
         expect(stocks).toMatch(/:root\s*\{[^}]*--button-text:\s*var\(--rwa-on-accent\)/);
-        const darkBlocks = [...css.matchAll(/@media \(prefers-color-scheme: dark\)/g)]
-            .map((m) => block(css.slice(m.index), /@media/)).join('\n');
+        const darkBlocks = darkRules(css);
         expect(css).toMatch(/:root\s*\{[^}]*--rwa-on-accent:\s*#ffffff/);
         expect(darkBlocks).toMatch(/--rwa-on-accent:\s*#172033/);
     });

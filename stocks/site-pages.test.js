@@ -80,9 +80,10 @@ function expectContactFooter(html) {
     expect(match).toBeTruthy();
     if (match[1] === 'div') expect(match[3]).toBe('</footer>');
     const footer = match[0];
-    for (const url of [CONTACT_LINKS.x, CONTACT_LINKS.telegramGroup, CONTACT_LINKS.bot, CONTACT_LINKS.github]) {
+    for (const url of [CONTACT_LINKS.x, CONTACT_LINKS.telegramGroup, CONTACT_LINKS.github]) {
         expect(footer).toContain(`href="${url}"`);
     }
+    expect(footer).not.toContain(`href="${CONTACT_LINKS.bot}"`);
 }
 
 describe('hand-written pages', () => {

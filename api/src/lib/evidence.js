@@ -110,10 +110,16 @@ export const CHANGE_FROM = `FROM sonar.change_event e
 
 // First observation records prove that a watcher has established state; they are not changes in
 // an issuer, token, venue or legal document. Keep them available internally in change_event while
-// excluding them from every public history/change projection.
-export const PUBLIC_CHANGE_CONDITION = `NOT (e.kind = 'status'
+// excluding them from every public history/change projection. The same for an event dismissed as a
+// false alarm (sonar.review_resolution, db/2026-09-20-sonar-review-resolutions.sql): the watcher
+// raised it from a read that was not the document — a region block, a script-only shell, an RPC
+// info page (stocks/lib/unreadable.mjs, stocks/dismiss-unreadable-events.mjs) — or an editor found
+// nothing had changed. The row and its resolution stay; no change feed, digest or history shows it.
+export const PUBLIC_CHANGE_CONDITION = `(NOT (e.kind = 'status'
       AND e.field = 'chain-watch'
-      AND COALESCE(e.summary, '') ~* '^baseline recorded:')`;
+      AND COALESCE(e.summary, '') ~* '^baseline recorded:')
+      AND NOT EXISTS (SELECT 1 FROM sonar.review_resolution rr
+                       WHERE rr.event_id = e.id AND rr.resolution = 'false-alarm'))`;
 
 export const CHANGE_FILTERS = {
     kind: { sql: 'e.kind', kind: 'text' },

@@ -6,7 +6,8 @@
 // reads the companion only after the live page refused or rendered nothing, keeps the cited URL
 // as the source, and records the companion URL beside the result, so a companion read is never
 // mistaken for a read of the page itself. securitize.io is a React app whose disclosures are
-// Builder.io CMS entries fetched in the browser; the same entries come from Builder's content API.
+// Builder.io CMS entries fetched in the browser; the same entries come from Builder's content API
+// (and its Tokenized Public Stocks page's copy from Builder's `translations` model, one key each).
 // A Solscan transaction page (403 bot wall, never archived) describes an on-chain transaction; the
 // chain itself is the primary record, so its companion is Solana RPC `getTransaction`, rendered as
 // the text a reader of the explorer page relies on (logs, decoded instructions, balance changes).
@@ -25,6 +26,17 @@ import { htmlToText } from './watch.mjs';
  */
 const SECURITIZE_BUILDER_KEY = 'd39b51a544e84e2fbb2445f58c6c6f2c';
 const BUILDER_CONTENT = 'https://cdn.builder.io/api/v3/content';
+
+/**
+ * securitize.io/investments/stocks ("Tokenized Public Stocks") renders its copy from Builder.io's
+ * `translations` model: one entry per text key. The page's keys start `Texts.investments-stocks-`
+ * (hero, equity and investor cards) and `Texts.stocks-dive-deeper-` (How It Works) — 36 entries on
+ * 2026-09-24, among them `Texts.stocks-dive-deeper-step-1-desc-1`, the sentence securitize-secz
+ * claims[82] quotes. Read 100 at most; a full page means the query may have been cut, and
+ * `companionText` then refuses rather than hash a partial page.
+ */
+const SECURITIZE_TRANSLATION_KEYS = 'investments-stocks|stocks-dive-deeper';
+const TRANSLATIONS_LIMIT = 100;
 
 /** `{url, reader}` for a cited page with a same-publisher companion, or null. */
 export function companionFor(url) {
@@ -51,6 +63,15 @@ export function companionFor(url) {
         }
         if (/^\/disclosure-library\/?$/.test(parsed.pathname)) {
             return { url: `${BUILDER_CONTENT}/disclosure-library?apiKey=${SECURITIZE_BUILDER_KEY}&limit=1`, reader: 'builder-content' };
+        }
+        if (/^\/investments\/stocks\/?$/.test(parsed.pathname)) {
+            const query = new URLSearchParams({
+                apiKey: SECURITIZE_BUILDER_KEY,
+                limit: String(TRANSLATIONS_LIMIT),
+                'query.data.key.$regex': SECURITIZE_TRANSLATION_KEYS,
+                fields: 'data.key,data.value'
+            });
+            return { url: `${BUILDER_CONTENT}/translations?${query}`, reader: 'builder-translations' };
         }
         return null;
     }
@@ -180,6 +201,18 @@ export function companionText(reader, body) {
         if (html.length === 0 && links.length === 0) throw new Error('builder content: the entry has no text blocks or links');
         return text;
     }
+    if (reader === 'builder-translations') {
+        const entries = Array.isArray(doc?.results) ? doc.results : null;
+        if (entries === null) throw new Error('builder translations: no results array in the answer');
+        if (entries.length >= TRANSLATIONS_LIMIT) throw new Error(`builder translations: ${entries.length} entries, the query limit — the page may be cut`);
+        const rows = entries
+            .filter((e) => typeof e?.data?.key === 'string' && typeof e.data.value === 'string')
+            .map((e) => [e.data.key, e.data.value.trim()])
+            // Builder returns the newest-edited entry first; the key order is the page's own.
+            .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+        if (rows.length === 0) throw new Error('builder translations: no entry with a text key and value');
+        return rows.map(([key, value]) => `${key}: ${value}`).join('\n');
+    }
     if (reader === 'solana-tx') return solanaTxText(doc);
     throw new Error(`unknown companion reader ${reader}`);
 }
@@ -269,16 +302,18 @@ export function solanaTxText(tx) {
 }
 
 /**
- * Only a page that did not give us its text qualifies: a refusal (401/403, a bot wall) or a
- * JavaScript-only shell. Never a 404 (the package is gone, and saying so is the finding) or a 429 —
+ * Only a page that did not give us its text qualifies: a refusal (401/403, a bot wall) or an
+ * unreadable read (a JavaScript-only shell, a region block — lib/unreadable.mjs). Never a 404 (the
+ * package is gone, and saying so is the finding) or a 429 —
  * except for a `next-app-chunk`, where a 404 is the one outcome that qualifies: a content-hashed
  * build asset disappears on every deploy, and whether the page's words went with it is for the
  * chunk the page loads now to answer.
  */
-export function wantsCompanion({ status, reason = '', httpStatus = null, botWall = false, reader = null } = {}) {
+export function wantsCompanion({ status, httpStatus = null, botWall = false, reader = null } = {}) {
     if (reader === 'next-app-chunk') return status === 'gone' && (httpStatus === 404 || httpStatus === 410);
+    if (status === 'unreadable') return true;
     if (status !== 'blocked') return false;
-    return httpStatus === 401 || httpStatus === 403 || botWall === true || /^javascript-only page/.test(String(reason));
+    return httpStatus === 401 || httpStatus === 403 || botWall === true;
 }
 
 /** The run-log/checkpoint line for a companion read: what the live page did, where the text came from. */

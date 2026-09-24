@@ -27,7 +27,7 @@ const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const POWER_MAP_PATH = join(ROOT, 'stocks-power-map.json');
 const DEFAULT_OUT_DIR = 'templates';
 const DEFAULT_ISSUER_OUT_DIR = 'issuers';
-const ASSET_VERSION = '20260924u';
+const ASSET_VERSION = '20260924y';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages

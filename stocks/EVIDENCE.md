@@ -179,6 +179,22 @@ its source is marked `changed` (it is not marked false), a change event is raise
   `reachable-unverified`, not `blocked`. A 404/410 still makes it `gone`. With no HTTP answer at
   all (timeout, expired certificate) it stays `blocked`. As soon as a quote relies on the source,
   the same refusal is `blocked` again.
+- **A read that is not the document is `unreadable`** (2026-09-24, `classifyRead` in
+  `lib/unreadable.mjs`, db/2026-09-24-sonar-source-unreadable.sql). The host answered 2xx, but with
+  a region-restriction page served to the server's region (assets.backed.fi), a script-only shell
+  (a single-page app's `<div id="root"></div>`, a Next.js client page), an RPC endpoint's info page
+  (api.mainnet-beta.solana.com), a text file hashed as bytes, or no text at all. Such a read records
+  no version, no diff and no change event; its etag is not kept; its quotes are not checkable; the
+  last readable version stays the baseline, and a later readable read is diffed against that (a
+  stored version that was itself unreadable is no baseline: the next read is a first version).
+  `sonar.source.error` says `couldn't read (<reason>): …`, and the watch page shows it that way. A
+  read that contains every quote registered on it is the document whatever it looks like: Remora's
+  region-block page is itself cited and quoted. With no quote relying on the source, an unreadable
+  read is `reachable-unverified`, like a refusal. From 2026-09-17 to 2026-09-24 such reads raised 118
+  events (95 against the Solana RPC info page); the change judge rated 108 of them material, two
+  thirds of the 162 events it rated material. `stocks/dismiss-unreadable-events.mjs` dismisses them
+  as false alarms (a `false-alarm` review_resolution and `acknowledged_at`), which hides them from
+  every public change feed and digest and from the judge.
 - **Solscan transaction pages are read from the chain** (2026-09-24). `solscan.io/tx/<sig>`
   answers scripts with a 403 and has no Wayback captures. Its companion is Solana RPC
   `getTransaction` (jsonParsed, finalized, through `SOLANA_RPC_URL`; the keyed URL is never logged

@@ -9,13 +9,11 @@ body.app-page {
     --fl-cov-full: #7d8699;
 }
 
-@media (prefers-color-scheme: dark) {
-    body.app-page {
-        --fl-created: #6d84ea;
-        --fl-redeemed: #e0574f;
-        --fl-inventory: #56607a;
-        --fl-cov-full: #9aa3b8;
-    }
+:where(html[data-theme="dark"]) body.app-page {
+    --fl-created: #6d84ea;
+    --fl-redeemed: #e0574f;
+    --fl-inventory: #56607a;
+    --fl-cov-full: #9aa3b8;
 }
 
 .fl-title { margin: 0 auto 14px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.7rem, 4.6vw, 2.6rem); font-weight: 500; line-height: 1.12; }

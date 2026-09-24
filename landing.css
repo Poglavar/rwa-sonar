@@ -332,9 +332,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-@media (prefers-color-scheme: dark) {
-    body { background: radial-gradient(circle at 82% 8%, rgba(75, 104, 220, .18), transparent 27rem), linear-gradient(180deg, #20283d 0, var(--paper) 38rem); }
-    /* The bands sit a step below the dark paper so they still read as bands. */
-    :root { --band-bg: #111827; }
-    .positioning-grid article.positioning-primary { background: var(--band-bg); }
-}
+:where(html[data-theme="dark"]) body { background: radial-gradient(circle at 82% 8%, rgba(75, 104, 220, .18), transparent 27rem), linear-gradient(180deg, #20283d 0, var(--paper) 38rem); }
+/* The bands sit a step below the dark paper so they still read as bands. */
+:root:where([data-theme="dark"]) { --band-bg: #111827; }
+:where(html[data-theme="dark"]) .positioning-grid article.positioning-primary { background: var(--band-bg); }

@@ -29,12 +29,10 @@
     --down: var(--rwa-red);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
-        --header-bg: #2b344b;
-        --sev-warning: #f0875c;
-    }
+:root:where([data-theme="dark"]) {
+    color-scheme: dark;
+    --header-bg: #2b344b;
+    --sev-warning: #f0875c;
 }
 
 * {
@@ -2284,20 +2282,18 @@ tr.asset-defunct td {
     --wi-missing: #dc2626;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --tc-documented: #4ade80;
-        --tc-inferred: #60a5fa;
-        --tc-asserted: #fbbf24;
-        --tc-unknown: #6b7280;
-        --tc-node-bg: #1b2030;
-        --wi-documented: #4ade80;
-        --wi-litigated: #c4b5fd;
-        --wi-inferred: #60a5fa;
-        --wi-unknown: #fbbf24;
-        --wi-not-applicable: #6b7280;
-        --wi-missing: #f87171;
-    }
+:root:where([data-theme="dark"]) {
+    --tc-documented: #4ade80;
+    --tc-inferred: #60a5fa;
+    --tc-asserted: #fbbf24;
+    --tc-unknown: #6b7280;
+    --tc-node-bg: #1b2030;
+    --wi-documented: #4ade80;
+    --wi-litigated: #c4b5fd;
+    --wi-inferred: #60a5fa;
+    --wi-unknown: #fbbf24;
+    --wi-not-applicable: #6b7280;
+    --wi-missing: #f87171;
 }
 
 .comp-table-wrap {
@@ -2864,10 +2860,8 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
     .journey-grid :is(button, a):hover { transform: none; }
 }
 
-@media (prefers-color-scheme: dark) {
-    body { background: radial-gradient(circle at 82% 4%, rgba(75, 104, 220, .18), transparent 28rem), linear-gradient(180deg, #20283d 0, var(--page-bg) 38rem); }
-    .journey-grid :is(button, a),
-    .global-discovery,
-    .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide),
-    .analysis-disclosure { background: rgba(37, 45, 67, .88); }
-}
+:where(html[data-theme="dark"]) body { background: radial-gradient(circle at 82% 4%, rgba(75, 104, 220, .18), transparent 28rem), linear-gradient(180deg, #20283d 0, var(--page-bg) 38rem); }
+:where(html[data-theme="dark"]) .journey-grid :is(button, a),
+:where(html[data-theme="dark"]) .global-discovery,
+:where(html[data-theme="dark"]) .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide),
+:where(html[data-theme="dark"]) .analysis-disclosure { background: rgba(37, 45, 67, .88); }

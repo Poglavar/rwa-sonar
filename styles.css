@@ -34,6 +34,18 @@ tr.asset-defunct td {
     }
 }
 
+/* This page's header sits inside its 24px body gutter, narrower than the shared column, so the theme
+   switch moves into the Research menu up to 420px here (app-shell.css does it under 360px). */
+@media (max-width: 420px) {
+    .app-header .app-nav > .theme-switch {
+        display: none;
+    }
+
+    .app-header .theme-switch-menu {
+        display: block;
+    }
+}
+
 /* Asset Modal Styles */
 .modal {
     position: fixed;
@@ -219,18 +231,16 @@ tr.asset-defunct td {
     height: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .asset-logo--needs-light-bg {
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 16px;
-        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18);
-        padding: 6px;
-    }
+:where(html[data-theme="dark"]) .asset-logo--needs-light-bg {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18);
+    padding: 6px;
+}
 
-    .table-asset-logo.asset-logo--needs-light-bg {
-        border-radius: 12px;
-        padding: 4px;
-    }
+:where(html[data-theme="dark"]) .table-asset-logo.asset-logo--needs-light-bg {
+    border-radius: 12px;
+    padding: 4px;
 }
 
 .card-standard-badge a {

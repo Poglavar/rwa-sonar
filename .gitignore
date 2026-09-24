@@ -77,3 +77,10 @@ stocks/data/sources-state.json
 # Creation times of recently first-seen mints (stocks/fetch-mint-created.mjs): a server-side cache
 # of chain facts that never change, rebuilt on demand; the latest-events feed reads it.
 stocks/data/mint-created.json
+# When the events build first saw each daily-snapshot change (stocks/build-events.mjs): server state,
+# so a same-day market event keeps its first time while the day's snapshot is rewritten.
+stocks/data/event-first-seen.json
+# "When the market is closed" collectors' accumulating server state (stocks/fetch-lender-price-history.mjs,
+# stocks/fetch-solana-depth.mjs): ignored so a deploy's git clean never erases the weeks they build up.
+/stocks/data/lender-price-gaps.json
+/stocks/data/solana-depth.json
