@@ -355,6 +355,20 @@ describe('explicit quote verification companions', () => {
     });
 });
 
+test('a changed claim with a confirmed successor on the same field and URL is not watched again', () => {
+    const url = 'https://api.router.example/quote?mint=A';
+    const dossier = { claims: [
+        { field: 'redemption.eligibility', url, quote: '{"errorCode":"NO_ROUTES_FOUND"}', status: 'changed' },
+        { field: 'redemption.eligibility', url, quote: '{"errorCode":"TOKEN_NOT_TRADABLE"}', status: 'confirmed' },
+        { field: 'pricing.notes', url, quote: 'old price text', status: 'changed' }
+    ] };
+    expect(dossierQuotes('issuer', dossier).map((q) => q.quote)).toEqual([
+        '{"errorCode":"TOKEN_NOT_TRADABLE"}',
+        // No successor for this field: the lost quote stays watched and keeps being reported.
+        'old price text'
+    ]);
+});
+
 test('quote matching compares visible words across XML and Markdown representations', () => {
     expect(quoteFound('RepublicX LLC', '<entityName>RepublicX LLC</entityName>')).toBe(true);
     expect(quoteFound('The minimum is just $1.00 USD.', 'The minimum is just \\$1.00 USD.')).toBe(true);

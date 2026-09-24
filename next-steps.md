@@ -32,8 +32,10 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 
 7. **Send Loopscale the private note** — **you**, S. The public tweet covered the multisig; the
    refinance-admin finding goes privately (draft in the 23 Sep session).
-8. **Remora's Jupiter quote** — S, research. `redemption.eligibility` cites a Jupiter
-   `swap/v1/quote?inputMint=ALTP6…` URL whose response no longer carries the quoted text; re-quote.
+8. **Re-quote the remaining lost quotes** — M, research. The 24 Sep watcher run reported 82 quotes no
+   longer verbatim; 19 were history already replaced by a confirmed claim and are no longer watched. The
+   rest have no successor yet (e.g. Backpack's FINRA BrokerCheck pages): re-read each source and record
+   the current text as a new confirmed claim, keeping the old one as `changed`.
 9. **Sources still blocked** — M. Homepages cited without a quote (raydium.io, bybit.com, securitize.io,
    anduril.com, the CySEC listing, a CourtListener opinion) need a companion quote or an exclusion from
    the watch; Chainlink `data.chain.link` streams (tKalshi, tOpenAI) sit behind Vercel's check even in a

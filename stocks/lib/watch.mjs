@@ -680,8 +680,15 @@ export function verificationUrlFor(item, dossier) {
  */
 export function dossierQuotes(slug, dossier) {
     const out = [];
-    for (const claim of Array.isArray(dossier?.claims) ? dossier.claims : []) {
+    const claims = Array.isArray(dossier?.claims) ? dossier.claims : [];
+    // A `changed` claim with a confirmed successor (same field, same URL, new quote) is history: the
+    // source already said something else and the dossier recorded it. Only the successor is watched,
+    // so the old quote is not reported lost again on every run.
+    const confirmedAt = new Set(claims.filter((c) => c?.status === 'confirmed' && typeof c.quote === 'string')
+        .map((c) => `${c.field}\u0000${c.url}`));
+    for (const claim of claims) {
         if (typeof claim?.quote !== 'string' || typeof claim?.url !== 'string') continue;
+        if (claim.status === 'changed' && confirmedAt.has(`${claim.field}\u0000${claim.url}`)) continue;
         out.push({
             url: verificationUrlFor(claim, dossier), id: claimId(slug, claim.field, claim.url, claim.quote),
             kind: 'claim', ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url
