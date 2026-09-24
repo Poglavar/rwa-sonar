@@ -1,21 +1,118 @@
-/* Decorative motion: the small dolphin companions bob, the night-watch headlamps glow, and the
+/* Decorative motion: the small dolphin companions idle in place, a scout swims laps below the
+   landing page's night-watch story, the night-watch headlamps glow, and the
    inline-SVG sonar logo sweeps once on load. The watch patrol also reacts: its lamp flickers while
    the page's evidence loads, and it pings once when a material change landed in the last 24 hours.
    Everything here is ornament: it never touches data, evidence or warnings, and it is off entirely
    when the visitor asks for reduced motion. */
 
 @media (prefers-reduced-motion: no-preference) {
-    /* 1. A small companion floats: a few pixels up and down with a slight tilt, slowly. */
+    /* 1. A small companion idles in place: a slow drift, a slow tilt and, now and then, a small
+       roll about its long axis (a brief squash of its height). The three loops have unrelated
+       lengths, so the pose never repeats in lockstep, and a few offsets keep neighbours apart.
+       They use the individual translate/rotate/scale properties so the three never override. */
     .dolphin-bob {
-        animation: dolphin-bob 6.5s ease-in-out infinite;
+        animation: dolphin-drift 7.4s ease-in-out infinite, dolphin-tilt 11.3s ease-in-out infinite, dolphin-roll 19s ease-in-out infinite;
         transform-origin: 50% 60%;
         will-change: transform;
     }
 
-    @keyframes dolphin-bob {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-5px) rotate(-1.6deg); }
+    .dolphin-bob:nth-of-type(2n) { animation-delay: -3.1s, -6.4s, -11s; }
+    .dolphin-bob:nth-of-type(3n) { animation-delay: -5.2s, -2.7s, -4s; }
+    .intro-dolphin.dolphin-bob { animation-delay: -1.8s, -8.9s, -14.5s; }
+
+    @keyframes dolphin-drift {
+        0%, 100% { translate: 0 0; }
+        30% { translate: 3px -5px; }
+        55% { translate: -1px -3px; }
+        80% { translate: -3px 1px; }
     }
+
+    @keyframes dolphin-tilt {
+        0%, 100% { rotate: 0deg; }
+        35% { rotate: -2.2deg; }
+        70% { rotate: 1.4deg; }
+    }
+
+    @keyframes dolphin-roll {
+        0%, 78%, 90%, 100% { scale: 1 1; }
+        83% { scale: 1 .9; }
+        86% { scale: 1 1.03; }
+    }
+
+    /* 1b. The swimming scout: below the landing page's night-watch story a lane of open water
+       shows one scout (and a smaller, fainter one farther away) crossing, pausing off-screen,
+       and crossing back. Three nested layers: .swim-path carries it across the lane (it starts
+       with the dolphin just off the left edge and ends with it just off the right), .swim-body
+       adds the swimming wave (a small vertical sine with a tilt) and the img turns to face the
+       way it travels; the turn happens only while it is off-screen. */
+    :root .swim-lane {
+        display: block;
+        position: relative;
+        height: var(--swim-lane-h, 84px);
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .swim-path {
+        position: absolute;
+        inset: 0;
+        animation: swim-lap var(--swim-lap, 34s) ease-in-out infinite;
+        animation-delay: var(--swim-delay, 0s);
+        will-change: transform;
+    }
+
+    .swim-body {
+        position: absolute;
+        right: 100%;
+        top: var(--swim-top, 10px);
+        width: var(--swim-w, 96px);
+        animation: swim-wave 3.4s ease-in-out infinite;
+        transform-origin: 50% 55%;
+    }
+
+    .swim-body img {
+        display: block;
+        width: 100%;
+        height: auto;
+        animation: swim-face var(--swim-lap, 34s) linear infinite;
+        animation-delay: var(--swim-delay, 0s);
+    }
+
+    .swimmer-far {
+        --swim-w: 54px;
+        --swim-top: 4px;
+        --swim-lap: 51s;
+        --swim-delay: -24s;
+        opacity: .42;
+    }
+
+    .swimmer-far .swim-body { animation-duration: 4.6s; animation-delay: -1.3s; }
+
+    /* Out: 0-40%. Rest off the right edge: 40-50%. Back: 50-90%. Rest off the left: 90-100%. */
+    @keyframes swim-lap {
+        0%, 100% { transform: translateX(0); }
+        40%, 50% { transform: translateX(calc(100% + var(--swim-w, 96px))); }
+        90% { transform: translateX(0); }
+    }
+
+    /* Faces right on the way out, left on the way back; flips only while off-screen. */
+    @keyframes swim-face {
+        0%, 44.9% { transform: scaleX(1); }
+        45%, 94.9% { transform: scaleX(-1); }
+        95%, 100% { transform: scaleX(1); }
+    }
+
+    @keyframes swim-wave {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-6px) rotate(-3deg); }
+        50% { transform: translateY(0) rotate(0deg); }
+        75% { transform: translateY(5px) rotate(2.5deg); }
+    }
+
+    /* The site's `?reduceMotion` URL hook (landing.js and the workspace pages set .reduce-motion)
+       stops the same motion the media query does. */
+    .reduce-motion .swim-lane { display: none; }
+    .reduce-motion .dolphin-bob { animation: none; }
 
     /* 2. Headlamp glow: soft light pools placed where each painted beam lands, breathing out of
        step with one another as if the dolphins sweep the ice. Positions are fractions of the
@@ -67,7 +164,7 @@
     /* 4. The patrol dolphin's lamp flickers while the watch page loads its evidence (watch.js sets
        .is-searching until every section has answered). Slow, and only while loading. */
     .dolphin-bob.is-searching {
-        animation: dolphin-bob 6.5s ease-in-out infinite, lamp-search 3.2s ease-in-out infinite;
+        animation: dolphin-drift 7.4s ease-in-out infinite, dolphin-tilt 11.3s ease-in-out infinite, dolphin-roll 19s ease-in-out infinite, lamp-search 3.2s ease-in-out infinite;
     }
 
     @keyframes lamp-search {
@@ -94,6 +191,17 @@
         35% { transform: scale(2.1); opacity: .55; }
         100% { transform: scale(1); opacity: 1; }
     }
+}
+
+/* The swim lane exists only when motion is allowed: without it there is nothing to show, so the
+   lane takes no space. It spans the full width of the landing night-watch story, under its copy
+   and painting, so the swimmer never passes over text or links. */
+.swim-lane { display: none; }
+.research-story > .swim-lane { grid-column: 1 / -1; margin: -14px -28px -28px; border-radius: 0 0 22px 22px; }
+@media (max-width: 760px) {
+    .research-story > .swim-lane { --swim-lane-h: 58px; margin: -8px -18px -18px; }
+    .research-story .swimmer { --swim-w: 64px; --swim-top: 6px; --swim-lap: 26s; }
+    .research-story .swimmer-far { --swim-w: 38px; --swim-top: 2px; --swim-lap: 40s; }
 }
 
 /* The glow layer sits over the painting only; it is laid out even without motion so the markup
