@@ -350,6 +350,11 @@ export function stripPublisherChrome(url, text) {
         const index = output.indexOf(marker);
         if (index >= 0) output = output.slice(0, index);
     }
+    // FinCEN's MSB "Registration Status Information" transcript is generated per request and opens
+    // with the day it was printed ("Date: 09/24/2026"): the fetch date, not a registration date, so
+    // it would record a new version every day. The registration's own dates ("Authorized Signature
+    // Date", "Received Date") carry a different label and stay.
+    if (host === 'msb.fincen.gov') output = output.replace(/^[ \t]*Date:[ \t]*\d{2}\/\d{2}\/\d{4}[ \t]*(?:\n|$)/gm, '');
     return output.trim();
 }
 
@@ -364,7 +369,7 @@ export function publisherNormalizerVersion(url, kind = 'html') {
     const base = kind === 'html' ? 2 : 1;
     try {
         const host = new URL(url).hostname.toLowerCase();
-        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io'].includes(host) ? base + 1 : base;
+        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io', 'msb.fincen.gov'].includes(host) ? base + 1 : base;
     } catch {
         return base;
     }

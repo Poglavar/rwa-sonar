@@ -20,7 +20,7 @@ import { readEnvFile } from './lib/env.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
-import { companionFor, companionNote, companionText, wantsCompanion } from './lib/companions.mjs';
+import { companionFor, companionNote, companionText, currentNextChunk, wantsCompanion } from './lib/companions.mjs';
 import { DEFAULT_RPC, rpcCall } from './lib/solana-rpc.mjs';
 import { archiveTodayTimemapUrl, parseTimemapNewest } from './lib/archive-today.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
@@ -136,6 +136,8 @@ WHAT A RUN DOES
   when the live page refuses us or renders nothing: npm's registry, crates.io's API, Builder.io
   content for securitize.io, and — for a Solscan transaction page — the chain itself, through
   Solana RPC getTransaction (SOLANA_RPC_URL from .env; the URL is never logged or stored).
+  A cited Next.js page chunk (/_next/static/chunks/app/<route>/page-<hash>.js) that answers 404
+  after a redeploy is read from the chunk its route loads now.
 
   Quotes are checked against the text BEFORE the churn filter (a price alone on its line is churn
   for the hash, but may be the quoted words); a stored copy is re-read from its raw file for that.
@@ -551,8 +553,11 @@ async function watchOne(source, prev, options) {
     const normalizerVersion = publisherNormalizerVersion(source.url, source.kind);
     const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1);
     // A page with a companion API (lib/companions.mjs) is fetched unconditionally: its etag
-    // describes the shell, so a 304 would only confirm that the shell is still empty.
-    const conditional = companionFor(source.url) ? { etag: null, lastModified: null } : conditionalHeaders(prev, { normalizerUpgrade });
+    // describes the shell, so a 304 would only confirm that the shell is still empty. A companion
+    // with `liveValidators` (a build chunk: the URL is the document itself) keeps them.
+    const shellCompanion = companionFor(source.url);
+    const conditional = shellCompanion && !shellCompanion.liveValidators
+        ? { etag: null, lastModified: null } : conditionalHeaders(prev, { normalizerUpgrade });
 
     // A Google Drive file link serves its own JavaScript viewer, never the file; the bytes are at
     // `uc?export=download`; a Dropbox file link likewise serves its previewer until asked for
@@ -684,8 +689,9 @@ async function watchOne(source, prev, options) {
     if (hash !== null) result.contentHash = hash;
     // The same publisher's machine-readable companion first (live, and the publisher's own words),
     // then an archived capture (lib/companions.mjs, lib/wayback.mjs).
-    const companion = wantsCompanion({ status: result.status, reason: result.reason, httpStatus: res.httpStatus, botWall: blocked })
-        ? companionFor(source.url) : null;
+    const companion = shellCompanion && wantsCompanion({
+        status: result.status, reason: result.reason, httpStatus: res.httpStatus, botWall: blocked, reader: shellCompanion.reader
+    }) ? shellCompanion : null;
     if (companion) {
         const read = await readFromCompanion(source, prev, result, companion, options);
         if (read) return read;
@@ -710,6 +716,7 @@ async function watchOne(source, prev, options) {
 async function readFromCompanion(source, prev, result, companion, { timeoutMs }) {
     const liveReason = result.reason;
     if (companion.rpc) return readFromRpcCompanion(source, prev, result, companion);
+    if (companion.reader === 'next-app-chunk') return readFromChunkCompanion(source, prev, result, companion, { timeoutMs });
     const res = await fetchWithBackoff(companion.url, { etag: null, lastModified: null }, timeoutMs);
     const fail = (why) => {
         result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
@@ -777,6 +784,45 @@ async function readFromRpcCompanion(source, prev, result, companion) {
         reason: `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: companion.url })}`
     });
     return { result, text, quoteText, raw: body, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * A cited Next.js page chunk that answered 404 (a redeploy renamed it): fetch the route that loads
+ * it, take the chunk that page loads now (lib/companions.mjs `currentNextChunk`) and read it exactly
+ * as a direct read of the chunk would be read (`bytesToText`), so identical words under a new build
+ * hash give the same hash. `companionUrl` is the chunk actually read; `httpStatus` stays the 404.
+ */
+async function readFromChunkCompanion(source, prev, result, companion, { timeoutMs }) {
+    const liveReason = result.reason;
+    const fail = (why) => {
+        result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
+        result.error = result.reason;
+        logWarn(`companion: no read for ${source.url} — ${why}`);
+        return null;
+    };
+    const ok = (r) => r.httpStatus !== null && r.httpStatus >= 200 && r.httpStatus < 300;
+    const page = await fetchWithBackoff(companion.url, { etag: null, lastModified: null }, timeoutMs);
+    if (!ok(page)) return fail(`page ${companion.url}: ${page.httpStatus === null ? page.networkErrorCode : `http-${page.httpStatus}`}`);
+    let chunkUrl;
+    try {
+        chunkUrl = currentNextChunk(page.buffer.toString('utf8'), page.finalUrl ?? companion.url, companion.chunkPrefix);
+    } catch (err) {
+        return fail(err.message);
+    }
+    const res = await fetchWithBackoff(chunkUrl, { etag: null, lastModified: null }, timeoutMs);
+    if (!ok(res)) return fail(`chunk ${chunkUrl}: ${res.httpStatus === null ? res.networkErrorCode : `http-${res.httpStatus}`}`);
+    const read = await bytesToText(res.buffer, res.headers['content-type'], chunkUrl);
+    const text = stripPublisherChrome(source.url, read.text);
+    const quoteText = stripPublisherChrome(source.url, read.quoteText);
+    const hash = sha256Hex(text);
+    const same = prev?.contentHash === hash;
+    Object.assign(result, {
+        kind: read.kind, via: read.via, companionReader: companion.reader, companionUrl: chunkUrl, resolvedUrl: chunkUrl,
+        liveReason, contentType: res.headers['content-type'] ?? null, bytes: res.buffer.length, textChars: text.length,
+        contentHash: hash, status: same ? 'ok' : 'changed', error: null,
+        reason: `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: chunkUrl })}`
+    });
+    return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
 }
 
 /** The capture a previous run read this source from (`{timestamp, original}`), or null. */

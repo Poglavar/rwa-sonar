@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs';
 
-import { companionFor, companionNote, companionText, formatUnits, solanaTxText, wantsCompanion } from './lib/companions.mjs';
+import { companionFor, companionNote, companionText, currentNextChunk, formatUnits, solanaTxText, wantsCompanion } from './lib/companions.mjs';
 import { dossierQuotes, quoteFound } from './lib/watch.mjs';
 
 // A real getTransaction (jsonParsed, finalized) answer, trimmed to the fields the renderer reads:
@@ -132,6 +132,13 @@ describe('wantsCompanion', () => {
         expect(wantsCompanion({ status: 'ok', httpStatus: 200, reason: 'same hash' })).toBe(false);
     });
 
+    test('a Next.js page chunk qualifies only once it is gone', () => {
+        expect(wantsCompanion({ status: 'gone', httpStatus: 404, reason: 'http-404', reader: 'next-app-chunk' })).toBe(true);
+        expect(wantsCompanion({ status: 'ok', httpStatus: 200, reason: 'same hash', reader: 'next-app-chunk' })).toBe(false);
+        expect(wantsCompanion({ status: 'blocked', httpStatus: 403, reason: 'http-403 (bot wall)', reader: 'next-app-chunk' })).toBe(false);
+        expect(wantsCompanion({ status: 'error', httpStatus: 503, reason: 'http-503', reader: 'next-app-chunk' })).toBe(false);
+    });
+
     test('the note says the page was not read and names the companion', () => {
         expect(companionNote({ liveReason: 'http-403 (bot wall)', reader: 'npm-registry', url: 'https://registry.npmjs.org/x' }))
             .toBe("live page unreadable (http-403 (bot wall)); text read from the publisher's npm-registry companion — https://registry.npmjs.org/x");
@@ -191,5 +198,46 @@ describe('Solscan transaction pages through Solana RPC getTransaction', () => {
         expect(formatUnits('8160140778570159', 9)).toBe('8160140.778570159');
         expect(formatUnits('5000000', 6)).toBe('5');
         expect(formatUnits('0', 6)).toBe('0');
+    });
+});
+
+describe('Next.js page chunks renamed by a redeploy', () => {
+    // prestocks.com/faq keeps its 17 answers in the page chunk; page-eda8c20836ef75f8.js answered 404
+    // on 2026-09-24 and the page served that day loads page-d984255e63e260a7.js (both forms below
+    // are trimmed from that HTML: the <script src> and the flight payload's bare reference).
+    const FAQ_HTML = '<script src="/_next/static/chunks/app/faq/page-d984255e63e260a7.js" async="" nonce="x"></script>'
+        + '<script>self.__next_f.push([1,"6:I[42,[\\"static/chunks/1816-4f7d0bba9810fd96.js\\",\\"7505\\",'
+        + '\\"static/chunks/app/faq/page-d984255e63e260a7.js\\"],\\"default\\"]"])</script>';
+
+    test('a page chunk maps to the route that loads it; route groups drop out; dynamic routes have none', () => {
+        expect(companionFor('https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js')).toEqual({
+            url: 'https://prestocks.com/faq', reader: 'next-app-chunk', chunkPrefix: '/_next/static/chunks/app/faq/page-', liveValidators: true
+        });
+        expect(companionFor('https://x.example/_next/static/chunks/app/(marketing)/legal/terms/page-0a1b2c3d4e5f6a7b.js')?.url)
+            .toBe('https://x.example/legal/terms');
+        expect(companionFor('https://x.example/_next/static/chunks/app/page-0a1b2c3d4e5f6a7b.js')?.url).toBe('https://x.example/');
+        expect(companionFor('https://x.example/_next/static/chunks/app/docs/[slug]/page-0a1b2c3d4e5f6a7b.js')).toBeNull();
+        expect(companionFor('https://x.example/_next/static/chunks/app/@modal/page-0a1b2c3d4e5f6a7b.js')).toBeNull();
+        expect(companionFor('https://x.example/_next/static/chunks/1816-4f7d0bba9810fd96.js')).toBeNull();
+        expect(companionFor('https://x.example/_next/static/chunks/app/faq/layout-0a1b2c3d4e5f6a7b.js')).toBeNull();
+    });
+
+    test('the chunk the page loads now is found from either reference, once', () => {
+        expect(currentNextChunk(FAQ_HTML, 'https://prestocks.com/faq', '/_next/static/chunks/app/faq/page-'))
+            .toBe('https://prestocks.com/_next/static/chunks/app/faq/page-d984255e63e260a7.js');
+        // Only the flight payload names it: still the page's own origin.
+        expect(currentNextChunk('"static/chunks/app/faq/page-d984255e63e260a7.js"', 'https://prestocks.com/faq', '/_next/static/chunks/app/faq/page-'))
+            .toBe('https://prestocks.com/_next/static/chunks/app/faq/page-d984255e63e260a7.js');
+        // An asset prefix on the <script src> wins over the bare reference.
+        expect(currentNextChunk('"static/chunks/app/faq/page-abc123.js" <script src="https://cdn.example/_next/static/chunks/app/faq/page-abc123.js">',
+            'https://site.example/faq', '/_next/static/chunks/app/faq/page-'))
+            .toBe('https://cdn.example/_next/static/chunks/app/faq/page-abc123.js');
+    });
+
+    test('no chunk, or two different ones, is an error rather than a guess', () => {
+        expect(() => currentNextChunk('<html>moved</html>', 'https://prestocks.com/faq', '/_next/static/chunks/app/faq/page-'))
+            .toThrow(/loads no/);
+        expect(() => currentNextChunk('/_next/static/chunks/app/faq/page-aaa.js /_next/static/chunks/app/faq/page-bbb.js',
+            'https://prestocks.com/faq', '/_next/static/chunks/app/faq/page-')).toThrow(/2 different/);
     });
 });

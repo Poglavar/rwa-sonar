@@ -116,6 +116,20 @@ describe('identity and paths', () => {
         expect(publisherNormalizerVersion('https://api.example/v1/x', 'api')).toBe(1);
         expect(publisherNormalizerVersion('https://www.coindesk.com/x', 'pdf')).toBe(2);
     });
+
+    test('a FinCEN MSB transcript loses its print date and keeps the registration dates', () => {
+        // pdftotext of msb.fincen.gov/msb.registration.letter.php?ID=29770416, read 2026-09-24.
+        const transcript = (printed) => `MSB Registration Status Information\nDate: ${printed}\nInformation contained on this transcript has been provided to FinCEN\n`
+            + 'MSB Registration Number: 31000339714338\nRegistration Type: Corrected Report, Renewal\n'
+            + 'Authorized Signature Date: 09/01/2026\nReceived Date: 09/01/2026';
+        const url = 'https://msb.fincen.gov/msb.registration.letter.php?ID=29770416';
+        const read = stripPublisherChrome(url, transcript('09/24/2026'));
+        expect(read).toBe(stripPublisherChrome(url, transcript('09/25/2026')));
+        expect(read).not.toMatch(/^Date:/m);
+        expect(read).toContain('Authorized Signature Date: 09/01/2026\nReceived Date: 09/01/2026');
+        expect(stripPublisherChrome('https://issuer.example/x.pdf', transcript('09/24/2026'))).toContain('Date: 09/24/2026');
+        expect(publisherNormalizerVersion(url, 'pdf')).toBe(2);
+    });
 });
 
 describe('restart checkpoints', () => {

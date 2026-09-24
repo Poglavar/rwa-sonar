@@ -2128,10 +2128,10 @@
     },
     {
       "field": "redemption.successfulRedemptionObserved",
-      "quote": "2026-09-23T01:27:08Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 18 SPCXx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T01:27:24Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T01:27:46Z treasury pays 2777.22 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "quote": "block time 2026-09-23T01:27:46Z … spl-token transferChecked: amount 2777.22, authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, destination Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, source 4zzkPUnGWnWwsLvk9T9vgKFCDVF4yLioPNdxafikEUiV … owner GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y: 830333.218563 -> 833110.438563 (+2777.22)",
       "url": "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
-      "locator": "tx 5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe (slot 449553655); tx 4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz (slot 449553713); tx 4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4 (slot 449553798)",
-      "accessedAt": "2026-09-23T18:27:08Z",
+      "locator": "tx 4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4 (slot 449553798, block time 2026-09-23T01:27:46Z), the payout leg; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall. The deposit (tx 5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe, slot 449553655) and sweep (tx 4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz, slot 449553713) legs are separate claims citing their own transactions. Treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v; the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG owns the destination account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y",
+      "accessedAt": "2026-09-24T15:29:31Z",
       "status": "inference",
       "method": "observed on-chain transaction sequence",
       "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 154.29 against an independent DEX median of USD 154.85, with no other treasury payout to that wallet fitting the window.",
@@ -2143,14 +2143,14 @@
       ],
       "scope": "One SPCXx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
       "reviewedAt": "2026-09-23T18:27:08Z",
-      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+      "note": "RE-QUOTED 2026-09-24T15:29:31Z: the previous quote summarised all three legs in our own words and cited only the payout transaction, so it was never verbatim in one source: \"2026-09-23T01:27:08Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 18 SPCXx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T01:27:24Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T01:27:46Z treasury pays 2777.22 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG\". It is now the payout transaction's own rendered text; the deposit and sweep legs are claims of their own, each citing its transaction. Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
     },
     {
       "field": "redemption.successfulRedemptionObserved",
-      "quote": "2026-09-23T15:05:18Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 8.791851 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:05:35Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:06:04Z treasury pays 6598.936608 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "quote": "block time 2026-09-23T15:06:04Z … spl-token transferChecked: amount 6598.936608, authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, destination Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, source 4zzkPUnGWnWwsLvk9T9vgKFCDVF4yLioPNdxafikEUiV … owner GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y: 773314.755806 -> 779913.692414 (+6598.936608)",
       "url": "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
-      "locator": "tx 4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ (slot 449738800); tx 37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d (slot 449738865); tx 3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ (slot 449738972)",
-      "accessedAt": "2026-09-23T18:27:08Z",
+      "locator": "tx 3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ (slot 449738972, block time 2026-09-23T15:06:04Z), the payout leg; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall. The deposit (tx 4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ, slot 449738800) and sweep (tx 37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d, slot 449738865) legs are separate claims citing their own transactions. Treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v; the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG owns the destination account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y",
+      "accessedAt": "2026-09-24T15:29:31Z",
       "status": "inference",
       "method": "observed on-chain transaction sequence",
       "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 46 s (documented: 30 s under USD 200k), and an implied price of USD 750.57 against an independent DEX median of USD 756.75, with no other treasury payout to that wallet fitting the window.",
@@ -2162,14 +2162,14 @@
       ],
       "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
       "reviewedAt": "2026-09-23T18:27:08Z",
-      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+      "note": "RE-QUOTED 2026-09-24T15:29:31Z: the previous quote summarised all three legs in our own words and cited only the payout transaction, so it was never verbatim in one source: \"2026-09-23T15:05:18Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 8.791851 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:05:35Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:06:04Z treasury pays 6598.936608 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG\". It is now the payout transaction's own rendered text; the deposit and sweep legs are claims of their own, each citing its transaction. Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
     },
     {
       "field": "redemption.successfulRedemptionObserved",
-      "quote": "2026-09-23T15:17:48Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 12.416285 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:18:03Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:18:26Z treasury pays 9340.617004 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "quote": "block time 2026-09-23T15:18:26Z … spl-token transferChecked: amount 9340.617004, authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, destination Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, source 4zzkPUnGWnWwsLvk9T9vgKFCDVF4yLioPNdxafikEUiV … owner GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y: 769009.031682 -> 778349.648686 (+9340.617004)",
       "url": "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
-      "locator": "tx 2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf (slot 449741594); tx 3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH (slot 449741651); tx 3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa (slot 449741736)",
-      "accessedAt": "2026-09-23T18:27:08Z",
+      "locator": "tx 3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa (slot 449741736, block time 2026-09-23T15:18:26Z), the payout leg; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall. The deposit (tx 2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf, slot 449741594) and sweep (tx 3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH, slot 449741651) legs are separate claims citing their own transactions. Treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v; the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG owns the destination account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y",
+      "accessedAt": "2026-09-24T15:29:31Z",
       "status": "inference",
       "method": "observed on-chain transaction sequence",
       "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 752.29 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
@@ -2181,14 +2181,14 @@
       ],
       "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
       "reviewedAt": "2026-09-23T18:27:08Z",
-      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+      "note": "RE-QUOTED 2026-09-24T15:29:31Z: the previous quote summarised all three legs in our own words and cited only the payout transaction, so it was never verbatim in one source: \"2026-09-23T15:17:48Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 12.416285 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:18:03Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:18:26Z treasury pays 9340.617004 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG\". It is now the payout transaction's own rendered text; the deposit and sweep legs are claims of their own, each citing its transaction. Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
     },
     {
       "field": "redemption.successfulRedemptionObserved",
-      "quote": "2026-09-23T15:48:28Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 13.296576 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:48:43Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:49:08Z treasury pays 10069.086746 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG",
+      "quote": "block time 2026-09-23T15:49:08Z … spl-token transferChecked: amount 10069.086746, authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, destination Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, source 4zzkPUnGWnWwsLvk9T9vgKFCDVF4yLioPNdxafikEUiV … owner GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v, account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y: 790083.736285 -> 800152.823031 (+10069.086746)",
       "url": "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
-      "locator": "tx 3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7 (slot 449748521); tx 57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF (slot 449748577); tx 5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM (slot 449748671)",
-      "accessedAt": "2026-09-23T18:27:08Z",
+      "locator": "tx 5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM (slot 449748671, block time 2026-09-23T15:49:08Z), the payout leg; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall. The deposit (tx 3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7, slot 449748521) and sweep (tx 57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF, slot 449748577) legs are separate claims citing their own transactions. Treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v; the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG owns the destination account Hx83KYKFVwCUn5MVMxAzV3ma6eQhecQsjpXE7T9rAQ4Y",
+      "accessedAt": "2026-09-24T15:29:31Z",
       "status": "inference",
       "method": "observed on-chain transaction sequence",
       "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 40 s (documented: 30 s under USD 200k), and an implied price of USD 757.27 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
@@ -2200,7 +2200,7 @@
       ],
       "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
       "reviewedAt": "2026-09-23T18:27:08Z",
-      "note": "Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
+      "note": "RE-QUOTED 2026-09-24T15:29:31Z: the previous quote summarised all three legs in our own words and cited only the payout transaction, so it was never verbatim in one source: \"2026-09-23T15:48:28Z GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG transfers 13.296576 METAx to CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C; 2026-09-23T15:48:43Z same amount swept to treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS; 2026-09-23T15:49:08Z treasury pays 10069.086746 USDC to GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG\". It is now the payout transaction's own rendered text; the deposit and sweep legs are claims of their own, each citing its transaction. Observed redemption (three-leg). Recorded separately from the documented terms and the operational-availability check."
     },
     {
       "field": "keyGovernance.delegate",
@@ -2246,6 +2246,158 @@
       "accessedAt": "2026-09-23T19:33:34Z",
       "status": "confirmed",
       "note": "The collateral duty follows outstanding (activated) Products, not the mint's on-chain supply; de-activated inventory in the issuer wallet is on-chain supply but not an outstanding Product, so supply-versus-reserve comparisons must exclude it."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 154.29 against an independent DEX median of USD 154.85, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+        "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+        "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One SPCXx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T01:27:08Z … signers GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG … spl-token transferChecked: amount 18, authority GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, destination 2rXWts7z1oiSFTgdTnhQ1TaeZZWRPRbPtf8LQW81wZAf, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8, source 8eHUYM47Fg48ThGmWz7SKZc1fdkqPu5qTRWyTUhnqyse … owner CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8, account 2rXWts7z1oiSFTgdTnhQ1TaeZZWRPRbPtf8LQW81wZAf: 0 -> 18 (+18)",
+      "url": "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+      "locator": "tx 5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe (slot 449553655, block time 2026-09-23T01:27:08Z): leg 1 of 3 (deposit) of the SPCXx redemption paid out in tx 4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Deposit leg: the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, sole signer, sends 18 SPCXx to an account owned by the xStocks redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C. Recorded with the sweep (16 s later) and the payout (38 s after the deposit) as one observed redemption; the payout claim carries the quote a card shows."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 154.29 against an independent DEX median of USD 154.85, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+        "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+        "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One SPCXx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T01:27:24Z … signers 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C … spl-token transferChecked: amount 18, authority CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, destination BtZCJso2t4FZwPer7Dqv2tJQEf8JQXtUqB6e8eABdHNn, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8, source 2rXWts7z1oiSFTgdTnhQ1TaeZZWRPRbPtf8LQW81wZAf … owner S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, mint Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8, account BtZCJso2t4FZwPer7Dqv2tJQEf8JQXtUqB6e8eABdHNn: 353436.61296103 -> 353454.61296103 (+18)",
+      "url": "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+      "locator": "tx 4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz (slot 449553713, block time 2026-09-23T01:27:24Z): leg 2 of 3 (sweep) of the SPCXx redemption paid out in tx 4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Sweep leg: the redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, co-signing with fee payer 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, forwards the same 18 SPCXx to the treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS 16 s after the deposit; the treasury pays USDC 22 s later. The redemption address co-signs its own sweep with the sweeper's fee payer, so its key sits with the operator that sweeps it (the issuer side), not with the redeeming holder."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 46 s (documented: 30 s under USD 200k), and an implied price of USD 750.57 against an independent DEX median of USD 756.75, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+        "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+        "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:05:18Z … signers GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG … spl-token transferChecked: amount 8.791851, authority GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, destination 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source AaW1GmpHZxihfnuFH7HZFewfRHjkLd64jrims2r9e9Eg … owner CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr: 0 -> 8.791851 (+8.791851)",
+      "url": "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+      "locator": "tx 4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ (slot 449738800, block time 2026-09-23T15:05:18Z): leg 1 of 3 (deposit) of the METAx redemption paid out in tx 3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Deposit leg: the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, sole signer, sends 8.791851 METAx to an account owned by the xStocks redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C. Recorded with the sweep (17 s later) and the payout (46 s after the deposit) as one observed redemption; the payout claim carries the quote a card shows."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 46 s (documented: 30 s under USD 200k), and an implied price of USD 750.57 against an independent DEX median of USD 756.75, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+        "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+        "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:05:35Z … signers 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C … spl-token transferChecked: amount 8.791851, authority CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, destination 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr … owner S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4: 57492.27410934 -> 57501.06596034 (+8.791851)",
+      "url": "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+      "locator": "tx 37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d (slot 449738865, block time 2026-09-23T15:05:35Z): leg 2 of 3 (sweep) of the METAx redemption paid out in tx 3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Sweep leg: the redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, co-signing with fee payer 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, forwards the same 8.791851 METAx to the treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS 17 s after the deposit; the treasury pays USDC 29 s later. The redemption address co-signs its own sweep with the sweeper's fee payer, so its key sits with the operator that sweeps it (the issuer side), not with the redeeming holder."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 752.29 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+        "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+        "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:17:48Z … signers GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG … spl-token transferChecked: amount 12.416285, authority GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, destination 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source AaW1GmpHZxihfnuFH7HZFewfRHjkLd64jrims2r9e9Eg … owner CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr: 0 -> 12.416285 (+12.416285)",
+      "url": "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+      "locator": "tx 2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf (slot 449741594, block time 2026-09-23T15:17:48Z): leg 1 of 3 (deposit) of the METAx redemption paid out in tx 3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Deposit leg: the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, sole signer, sends 12.416285 METAx to an account owned by the xStocks redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C. Recorded with the sweep (15 s later) and the payout (38 s after the deposit) as one observed redemption; the payout claim carries the quote a card shows."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 38 s (documented: 30 s under USD 200k), and an implied price of USD 752.29 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+        "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+        "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:18:03Z … signers 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C … spl-token transferChecked: amount 12.416285, authority CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, destination 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr … owner S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4: 57501.06596034 -> 57513.48224534 (+12.416285)",
+      "url": "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+      "locator": "tx 3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH (slot 449741651, block time 2026-09-23T15:18:03Z): leg 2 of 3 (sweep) of the METAx redemption paid out in tx 3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Sweep leg: the redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, co-signing with fee payer 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, forwards the same 12.416285 METAx to the treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS 15 s after the deposit; the treasury pays USDC 23 s later. The redemption address co-signs its own sweep with the sweeper's fee payer, so its key sits with the operator that sweeps it (the issuer side), not with the redeeming holder."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 40 s (documented: 30 s under USD 200k), and an implied price of USD 757.27 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+        "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+        "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:48:28Z … signers GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG … spl-token transferChecked: amount 13.296576, authority GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, destination 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source AaW1GmpHZxihfnuFH7HZFewfRHjkLd64jrims2r9e9Eg … owner CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr: 0 -> 13.296576 (+13.296576)",
+      "url": "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+      "locator": "tx 3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7 (slot 449748521, block time 2026-09-23T15:48:28Z): leg 1 of 3 (deposit) of the METAx redemption paid out in tx 5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Deposit leg: the redeeming wallet GQEwLMrpyr9x99CnHFAnQhHrwm7a36Qc1FYEw9Cdp6kG, sole signer, sends 13.296576 METAx to an account owned by the xStocks redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C. Recorded with the sweep (15 s later) and the payout (40 s after the deposit) as one observed redemption; the payout claim carries the quote a card shows."
+    },
+    {
+      "field": "redemption.successfulRedemptionObserved",
+      "accessedAt": "2026-09-24T15:29:31Z",
+      "status": "inference",
+      "method": "observed on-chain transaction sequence",
+      "reasoning": "Each leg is an observed transaction; that they form one redemption is inferred: same wallet, deposit → sweep → payout in 40 s (documented: 30 s under USD 200k), and an implied price of USD 757.27 against an independent DEX median of USD 756.40, with no other treasury payout to that wallet fitting the window.",
+      "sources": [
+        "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+        "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+        "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+        "https://docs.xstocks.fi/docs/issuance-and-redemption/market-flow"
+      ],
+      "scope": "One METAx redemption on Solana through the stablecoin route by an unattributed direct client; not xPort and not evidence that a secondary-market holder can onboard.",
+      "reviewedAt": "2026-09-24T15:29:31Z",
+      "quote": "block time 2026-09-23T15:48:43Z … signers 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C … spl-token transferChecked: amount 13.296576, authority CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, destination 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, source 5JugscmoFDhwFmGjK2Nc3dnvge8AUoLg4ffzeuvdsnxr … owner S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, mint Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu, account 2GXgyotYtPsP3wFrCoKrbJri9aeDxr55PMYneyoWe7z4: 57513.48224534 -> 57526.77882134 (+13.296576)",
+      "url": "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+      "locator": "tx 57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF (slot 449748577, block time 2026-09-23T15:48:43Z): leg 2 of 3 (sweep) of the METAx redemption paid out in tx 5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM; Solana RPC getTransaction (jsonParsed, finalized) as rendered by stocks/lib/companions.mjs solanaTxText — the text the source watcher checks, since the Solscan page answers scripted clients with a 403 bot wall",
+      "note": "Sweep leg: the redemption address CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C, co-signing with fee payer 2f6LxotGVZ3KzvAN3NjJwJSM32WJEkt6uBGEA5YKGEqK, forwards the same 13.296576 METAx to the treasury S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS 15 s after the deposit; the treasury pays USDC 25 s later. The redemption address co-signs its own sweep with the sweeper's fee payer, so its key sits with the operator that sweeps it (the issuer side), not with the redeeming holder."
     }
   ],
   "whatIf": [

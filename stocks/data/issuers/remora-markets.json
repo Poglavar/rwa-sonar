@@ -63,7 +63,7 @@
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": null,
-    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. Third-party valuations disagree THREE ways for the same platform within a day, across more than two orders of magnitude: CoinGecko's 'Remora Markets Tokenized rStocks' category reports a ~$138.9M aggregate market cap, RWA.xyz reported $1.87M distributed asset value on 17 September 2026 ($2.13M on 24 September), and DefiLlama reports $479,846. Nor is any one of them self-consistent: DefiLlama's own daily series records $0 on 42 days between 2026-07-02 and 2026-09-10 before returning to $479,846. Treat all third-party valuation figures for these tokens as unreliable."
+    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. Third-party valuations disagree THREE ways for the same platform within a day, across more than two orders of magnitude: CoinGecko's 'Remora Markets Tokenized rStocks' category reports a ~$138.9M aggregate market cap, RWA.xyz reported $1.87M distributed asset value on 17 September 2026 ($2.13M on 24 September), and DefiLlama reported $479,846 on 18 September ($296,074 on 24 September, after a one-day $2,834,038 data point dated 20 September). Nor is any one of them self-consistent: DefiLlama's own daily series records $0 on 42 days between 2026-07-02 and 2026-09-10 before returning to $479,846, and its own record has flagged the protocol dead since 2026-02-23 while it keeps publishing a daily figure. Treat all third-party valuation figures for these tokens as unreliable."
   },
   "venues": [
     "Jupiter (aggregator; note the rTokens no longer carry Jupiter's 'stocks'/'rwa'/'equities' tags as of 2026-09-16 — only 'community-assist'/'token-2022'/'unknown')",
@@ -1122,8 +1122,17 @@
       "url": "https://api.llama.fi/protocol/remora-markets",
       "accessedAt": "2026-09-18T11:45:09Z",
       "locator": "top-level currentChainTvls; the tvl series ends {\"date\":1789516800,\"totalLiquidityUSD\":479846} (2026-09-16) and holds 42 zero-value days between 2026-07-02 and 2026-09-10",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T15:26:11Z): DefiLlama's currentChainTvls for Remora Markets now reads {\"Solana\":296074.00836}. The quoted 479846.22274 is in the watcher's stored copies through 2026-09-22T16:41:12Z and gone from the 2026-09-24T14:25:01Z copy. A live valuation cannot be a stable quote, so the new pricing.notes claim on the same URL quotes the record's key and keeps the figure as a dated reading. Earlier note: Adds the third leg of the aggregator disagreement the note already warned about. DefiLlama says $479,846 for the same platform on which CoinGecko's category says ~$138.9M and RWA.xyz says $1.87M — a spread of more than two orders of magnitude — and DefiLlama's own series is not self-consistent, printing $0 on 42 days of the last ten weeks before returning to $479,846."
+    },
+    {
+      "field": "pricing.notes",
+      "quote": "\"currentChainTvls\":{\"Solana\":",
+      "url": "https://api.llama.fi/protocol/remora-markets",
+      "locator": "top-level currentChainTvls key of DefiLlama's protocol record for Remora Markets (id 6669); the figure after the colon moves with every DefiLlama refresh, so it is recorded in the note as a dated reading and never quoted",
+      "accessedAt": "2026-09-24T15:26:11Z",
       "status": "confirmed",
-      "note": "Adds the third leg of the aggregator disagreement the note already warned about. DefiLlama says $479,846 for the same platform on which CoinGecko's category says ~$138.9M and RWA.xyz says $1.87M — a spread of more than two orders of magnitude — and DefiLlama's own series is not self-consistent, printing $0 on 42 days of the last ten weeks before returning to $479,846."
+      "note": "Replaces the 2026-09-18 figure quote on this URL (kept above as changed). Establishes that DefiLlama publishes a current Solana TVL for this platform; the number itself is a reading. Read 2026-09-24T15:26:11Z: \"currentChainTvls\":{\"Solana\":296074.00836}. The daily tvl series ends 2026-09-17 $479,805, 2026-09-18 $481,428, 2026-09-19 $484,918, 2026-09-20 $2,834,038, 2026-09-21 $296,074 (DefiLlama's own UTC-midnight `date` stamps) and still holds 42 zero-value days between 2026-07-02 and 2026-09-10 (46 since 2026-05-06). The same record flags the protocol as dead: \"deadFrom\":\"2026-02-23\" … \"deprecated\":true, with tvlCodePath pointing at DefiLlama's registries/deadAdapters.json. DefiLlama keeps printing, and moving, a TVL for an adapter it has itself retired — one more reason pricing.notes treats every third-party valuation of these tokens as unreliable."
     },
     {
       "field": "pricing.notes",

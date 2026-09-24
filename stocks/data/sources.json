@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-24T14:51:16Z",
-  "count": 619,
+  "generatedAt": "2026-09-24T15:45:08Z",
+  "count": 621,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -228,8 +228,8 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Exchange asset API — canonical SPCX contract address, decimals, deposit/withdraw minimums and fee (symbol SPCX.US)",
       "foundIn": [
-        "backpack-securities-spcx:claims[53].url",
-        "backpack-securities-spcx:claims[77].url",
+        "backpack-securities-spcx:claims[54].url",
+        "backpack-securities-spcx:claims[78].url",
         "backpack-securities-spcx:documents[7].url",
         "backpack-securities-spcx:incidents[4].source",
         "backpack-securities-spcx:redemption.minimum",
@@ -245,8 +245,8 @@
       "title": "Backpack Exchange markets API — SPCX.US_USDC (spot) and SPCX.US_USDC_PERP",
       "foundIn": [
         "backpack-securities-spcx:claims[0].url",
-        "backpack-securities-spcx:claims[80].url",
-        "backpack-securities-spcx:claims[87].url",
+        "backpack-securities-spcx:claims[81].url",
+        "backpack-securities-spcx:claims[88].url",
         "backpack-securities-spcx:documents[8].url",
         "backpack-securities-spcx:parties.distributors[0].source",
         "backpack-securities-spcx:sources[29]",
@@ -259,10 +259,10 @@
       "url": "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
       "kind": "api",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[70].url",
+      "title": "backpack-securities-spcx:claims[71].url",
       "foundIn": [
-        "backpack-securities-spcx:claims[70].url",
         "backpack-securities-spcx:claims[71].url",
+        "backpack-securities-spcx:claims[72].url",
         "backpack-securities-spcx:sources[30]",
         "backpack-securities-spcx:whatIf[price-source-fails].searched[7]"
       ]
@@ -271,9 +271,9 @@
       "url": "https://api.brokercheck.finra.org/search/firm/134284",
       "kind": "api",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[15].note",
+      "title": "backpack-securities-spcx:claims[16].note",
       "foundIn": [
-        "backpack-securities-spcx:claims[15].note",
+        "backpack-securities-spcx:claims[16].note",
         "backpack-securities-spcx:quoteVerificationSources[0].verificationUrl"
       ]
     },
@@ -281,9 +281,9 @@
       "url": "https://api.brokercheck.finra.org/search/firm/317194",
       "kind": "api",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[16].note",
+      "title": "backpack-securities-spcx:claims[17].note",
       "foundIn": [
-        "backpack-securities-spcx:claims[16].note",
+        "backpack-securities-spcx:claims[17].note",
         "backpack-securities-spcx:quoteVerificationSources[1].verificationUrl"
       ]
     },
@@ -322,9 +322,9 @@
       "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Step%20Labs%20LLC",
       "kind": "api",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[73].note",
+      "title": "remora-markets:claims[74].note",
       "foundIn": [
-        "remora-markets:claims[73].note",
+        "remora-markets:claims[74].note",
         "remora-markets:whatIf[dispute-forum].searched[4]"
       ]
     },
@@ -335,6 +335,7 @@
       "title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter",
       "foundIn": [
         "remora-markets:claims[68].url",
+        "remora-markets:claims[69].url",
         "remora-markets:documents[12].url",
         "remora-markets:sources[18]",
         "remora-markets:whatIf[price-source-fails].searched[4]"
@@ -344,22 +345,22 @@
       "url": "https://api.mainnet-beta.solana.com/",
       "kind": "api",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[106].sources[0]",
+      "title": "backpack-securities-spcx:claims[107].sources[0]",
       "foundIn": [
-        "backpack-securities-spcx:claims[106].sources[0]",
-        "backpack-securities-spcx:claims[106].url",
-        "backpack-securities-spcx:claims[110].url",
-        "backpack-securities-spcx:claims[118].url",
-        "backpack-securities-spcx:claims[56].url",
-        "backpack-securities-spcx:claims[60].url",
-        "backpack-securities-spcx:claims[62].url",
-        "backpack-securities-spcx:claims[69].url",
-        "backpack-securities-spcx:claims[74].url",
+        "backpack-securities-spcx:claims[107].sources[0]",
+        "backpack-securities-spcx:claims[107].url",
+        "backpack-securities-spcx:claims[111].url",
+        "backpack-securities-spcx:claims[119].url",
+        "backpack-securities-spcx:claims[57].url",
+        "backpack-securities-spcx:claims[61].url",
+        "backpack-securities-spcx:claims[63].url",
+        "backpack-securities-spcx:claims[70].url",
         "backpack-securities-spcx:claims[75].url",
         "backpack-securities-spcx:claims[76].url",
-        "backpack-securities-spcx:claims[81].url",
-        "backpack-securities-spcx:claims[94].url",
-        "backpack-securities-spcx:claims[96].url",
+        "backpack-securities-spcx:claims[77].url",
+        "backpack-securities-spcx:claims[82].url",
+        "backpack-securities-spcx:claims[95].url",
+        "backpack-securities-spcx:claims[97].url",
         "backpack-securities-spcx:discrepancies[0].reality.sources[1].url",
         "backpack-securities-spcx:sources[20]",
         "backpack-securities-spcx:sources[51]",
@@ -427,7 +428,7 @@
         "remora-markets:claims[61].sources[0]",
         "remora-markets:claims[62].url",
         "remora-markets:claims[63].url",
-        "remora-markets:claims[70].url",
+        "remora-markets:claims[71].url",
         "remora-markets:whatIf[account-frozen]",
         "remora-markets:whatIf[authority-key-compromised]",
         "remora-markets:whatIf[company-acquired]",
@@ -642,7 +643,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "NZ Companies Office record for the Introducing Broker — company 9406953, NZBN 9429053463876, incorporated 25 Feb 2026, Wanaka, and formerly named TREK LABS BROKERAGE SERVICES LIMITED until 29 May 2026",
       "foundIn": [
-        "backpack-securities-spcx:claims[115].url",
+        "backpack-securities-spcx:claims[116].url",
         "backpack-securities-spcx:documents[38].url",
         "backpack-securities-spcx:sources[47]"
       ]
@@ -702,7 +703,7 @@
       "issuer": "remora-markets",
       "title": "RWA.xyz platform page (live residual metrics)",
       "foundIn": [
-        "remora-markets:claims[69].url",
+        "remora-markets:claims[70].url",
         "remora-markets:documents[9].url",
         "remora-markets:incidents[4].quoteNote",
         "remora-markets:incidents[4].source",
@@ -991,9 +992,9 @@
       "title": "SPCX live product page — the only place the Intermediary Broker actually serving a region is disclosed: a geo-dependent footer naming Trek Brokerage Services Limited (Anjouan Offshore Finance Authority), not the SEC-registered firm the support pages name",
       "foundIn": [
         "backpack-securities-spcx:attestations[1].quoteNote",
-        "backpack-securities-spcx:claims[111].url",
-        "backpack-securities-spcx:claims[113].url",
-        "backpack-securities-spcx:claims[116].url",
+        "backpack-securities-spcx:claims[112].url",
+        "backpack-securities-spcx:claims[114].url",
+        "backpack-securities-spcx:claims[117].url",
         "backpack-securities-spcx:documents[35].url",
         "backpack-securities-spcx:parties.custodians[3].source",
         "backpack-securities-spcx:sources[44]",
@@ -1028,7 +1029,7 @@
       "title": "FINRA BrokerCheck — RQD Clearing, LLC (CRD 134284, SEC 8-66826)",
       "foundIn": [
         "backpack-securities-spcx:attestations[2].link",
-        "backpack-securities-spcx:claims[15].url",
+        "backpack-securities-spcx:claims[16].url",
         "backpack-securities-spcx:documents[11].url",
         "backpack-securities-spcx:parties.regulators[1].source",
         "backpack-securities-spcx:quoteVerificationSources[0].sourceUrl",
@@ -1051,7 +1052,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "FINRA BrokerCheck — Atomic Vaults Securities, LLC (CRD 317194, SEC 8-70868; formerly Olympus Mons Securities, LLC)",
       "foundIn": [
-        "backpack-securities-spcx:claims[16].url",
+        "backpack-securities-spcx:claims[17].url",
         "backpack-securities-spcx:documents[12].url",
         "backpack-securities-spcx:quoteVerificationSources[1].sourceUrl",
         "backpack-securities-spcx:sources[24]"
@@ -3411,6 +3412,14 @@
         "xstocks-backed:claims[119].sources[3]",
         "xstocks-backed:claims[120].sources[3]",
         "xstocks-backed:claims[121].sources[3]",
+        "xstocks-backed:claims[127].sources[3]",
+        "xstocks-backed:claims[128].sources[3]",
+        "xstocks-backed:claims[129].sources[3]",
+        "xstocks-backed:claims[130].sources[3]",
+        "xstocks-backed:claims[131].sources[3]",
+        "xstocks-backed:claims[132].sources[3]",
+        "xstocks-backed:claims[133].sources[3]",
+        "xstocks-backed:claims[134].sources[3]",
         "xstocks-backed:redemption.operationalEvidence.url",
         "xstocks-backed:sources[5]"
       ]
@@ -3465,11 +3474,11 @@
       "foundIn": [
         "backpack-securities-spcx:attestations[9].link",
         "backpack-securities-spcx:claims[11].url",
-        "backpack-securities-spcx:claims[31].sources[4]",
-        "backpack-securities-spcx:claims[34].url",
-        "backpack-securities-spcx:claims[40].url",
-        "backpack-securities-spcx:claims[92].url",
-        "backpack-securities-spcx:claims[95].url",
+        "backpack-securities-spcx:claims[32].sources[4]",
+        "backpack-securities-spcx:claims[35].url",
+        "backpack-securities-spcx:claims[41].url",
+        "backpack-securities-spcx:claims[93].url",
+        "backpack-securities-spcx:claims[96].url",
         "backpack-securities-spcx:documents[1].url",
         "backpack-securities-spcx:findings[2].evidence",
         "backpack-securities-spcx:incidents[1].source",
@@ -3490,13 +3499,13 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Securities — Tokenized Securities Asset Tokenization Terms of Service",
       "foundIn": [
-        "backpack-securities-spcx:claims[117].url",
+        "backpack-securities-spcx:claims[100].url",
+        "backpack-securities-spcx:claims[118].url",
         "backpack-securities-spcx:claims[12].url",
-        "backpack-securities-spcx:claims[23].url",
-        "backpack-securities-spcx:claims[28].url",
-        "backpack-securities-spcx:claims[31].sources[2]",
-        "backpack-securities-spcx:claims[84].url",
-        "backpack-securities-spcx:claims[99].url",
+        "backpack-securities-spcx:claims[24].url",
+        "backpack-securities-spcx:claims[29].url",
+        "backpack-securities-spcx:claims[32].sources[2]",
+        "backpack-securities-spcx:claims[85].url",
         "backpack-securities-spcx:discrepancies[0].reality.sources[0].url",
         "backpack-securities-spcx:documents[2].url",
         "backpack-securities-spcx:sources[2]",
@@ -3515,8 +3524,8 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Exchange — User Agreement (46pp; Schedule A is the full entity/jurisdiction map)",
       "foundIn": [
-        "backpack-securities-spcx:claims[31].sources[3]",
-        "backpack-securities-spcx:claims[90].note",
+        "backpack-securities-spcx:claims[32].sources[3]",
+        "backpack-securities-spcx:claims[91].note",
         "backpack-securities-spcx:documents[4].url",
         "backpack-securities-spcx:parties.parents[0].source",
         "backpack-securities-spcx:parties.tokenizationProviders[0].source",
@@ -3530,12 +3539,12 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Securities — Brokerage Services Terms of Service (24pp, last updated 2026-09-07; defines the Introducing Broker as Backpack Securities Global Limited, a New Zealand company, 'for non-U.S. customers'; omnibus account and SIPC language; s.6.1 margin/liquidation)",
       "foundIn": [
-        "backpack-securities-spcx:claims[112].url",
-        "backpack-securities-spcx:claims[27].url",
-        "backpack-securities-spcx:claims[31].sources[1]",
-        "backpack-securities-spcx:claims[32].url",
+        "backpack-securities-spcx:claims[113].url",
+        "backpack-securities-spcx:claims[28].url",
+        "backpack-securities-spcx:claims[32].sources[1]",
+        "backpack-securities-spcx:claims[33].url",
         "backpack-securities-spcx:claims[4].url",
-        "backpack-securities-spcx:claims[86].url",
+        "backpack-securities-spcx:claims[87].url",
         "backpack-securities-spcx:claims[8].url",
         "backpack-securities-spcx:documents[3].url",
         "backpack-securities-spcx:parties.custodians[2].source",
@@ -3553,52 +3562,52 @@
         "backpack-securities-spcx:attestations[4].link",
         "backpack-securities-spcx:attestations[5].link",
         "backpack-securities-spcx:attestations[7].link",
-        "backpack-securities-spcx:claims[101].url",
         "backpack-securities-spcx:claims[102].url",
         "backpack-securities-spcx:claims[103].url",
         "backpack-securities-spcx:claims[104].url",
         "backpack-securities-spcx:claims[105].url",
-        "backpack-securities-spcx:claims[107].url",
+        "backpack-securities-spcx:claims[106].url",
         "backpack-securities-spcx:claims[108].url",
         "backpack-securities-spcx:claims[109].url",
         "backpack-securities-spcx:claims[10].url",
-        "backpack-securities-spcx:claims[19].url",
+        "backpack-securities-spcx:claims[110].url",
         "backpack-securities-spcx:claims[1].url",
         "backpack-securities-spcx:claims[20].url",
         "backpack-securities-spcx:claims[21].url",
         "backpack-securities-spcx:claims[22].url",
-        "backpack-securities-spcx:claims[24].url",
+        "backpack-securities-spcx:claims[23].url",
         "backpack-securities-spcx:claims[25].url",
+        "backpack-securities-spcx:claims[26].url",
         "backpack-securities-spcx:claims[2].url",
-        "backpack-securities-spcx:claims[30].url",
-        "backpack-securities-spcx:claims[31].sources[0]",
         "backpack-securities-spcx:claims[31].url",
-        "backpack-securities-spcx:claims[33].url",
-        "backpack-securities-spcx:claims[36].url",
+        "backpack-securities-spcx:claims[32].sources[0]",
+        "backpack-securities-spcx:claims[32].url",
+        "backpack-securities-spcx:claims[34].url",
         "backpack-securities-spcx:claims[37].url",
         "backpack-securities-spcx:claims[38].url",
         "backpack-securities-spcx:claims[39].url",
         "backpack-securities-spcx:claims[3].url",
-        "backpack-securities-spcx:claims[41].url",
+        "backpack-securities-spcx:claims[40].url",
         "backpack-securities-spcx:claims[42].url",
         "backpack-securities-spcx:claims[43].url",
         "backpack-securities-spcx:claims[44].url",
-        "backpack-securities-spcx:claims[46].url",
+        "backpack-securities-spcx:claims[45].url",
         "backpack-securities-spcx:claims[47].url",
-        "backpack-securities-spcx:claims[51].url",
-        "backpack-securities-spcx:claims[55].url",
-        "backpack-securities-spcx:claims[58].url",
+        "backpack-securities-spcx:claims[48].url",
+        "backpack-securities-spcx:claims[52].url",
+        "backpack-securities-spcx:claims[56].url",
+        "backpack-securities-spcx:claims[59].url",
         "backpack-securities-spcx:claims[5].url",
-        "backpack-securities-spcx:claims[61].url",
-        "backpack-securities-spcx:claims[64].url",
-        "backpack-securities-spcx:claims[66].url",
+        "backpack-securities-spcx:claims[62].url",
+        "backpack-securities-spcx:claims[65].url",
+        "backpack-securities-spcx:claims[67].url",
         "backpack-securities-spcx:claims[6].url",
         "backpack-securities-spcx:claims[7].url",
-        "backpack-securities-spcx:claims[83].url",
-        "backpack-securities-spcx:claims[90].url",
-        "backpack-securities-spcx:claims[93].url",
-        "backpack-securities-spcx:claims[97].url",
+        "backpack-securities-spcx:claims[84].url",
+        "backpack-securities-spcx:claims[91].url",
+        "backpack-securities-spcx:claims[94].url",
         "backpack-securities-spcx:claims[98].url",
+        "backpack-securities-spcx:claims[99].url",
         "backpack-securities-spcx:claims[9].url",
         "backpack-securities-spcx:documents[0].url",
         "backpack-securities-spcx:findings[0].evidence",
@@ -3716,9 +3725,9 @@
       "url": "https://efts.sec.gov/LATEST/search-index?q=%22Step%20Labs%20LLC%22",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[73].note",
+      "title": "remora-markets:claims[74].note",
       "foundIn": [
-        "remora-markets:claims[73].note",
+        "remora-markets:claims[74].note",
         "remora-markets:whatIf[dispute-forum].searched[4]"
       ]
     },
@@ -4089,6 +4098,15 @@
       ]
     },
     {
+      "url": "https://id.securitize.io/gw/instant-trading-gw/v2/stocks/catalog",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[73].url",
+      "foundIn": [
+        "securitize-secz:claims[73].url"
+      ]
+    },
+    {
       "url": "https://investors.bullish.com/risk-factors-relating-tokenized-blsh-shares",
       "kind": "html",
       "issuer": "bullish-blsh",
@@ -4246,7 +4264,7 @@
       "issuer": "securitize-secz",
       "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
       "foundIn": [
-        "securitize-secz:claims[79].locator",
+        "securitize-secz:claims[80].locator",
         "securitize-secz:documents[20].url",
         "securitize-secz:whatIf[death-inheritance].searched[11]",
         "securitize-secz:whatIf[keys-stolen].searched[11]"
@@ -4684,6 +4702,25 @@
       ]
     },
     {
+      "url": "https://msb.fincen.gov/",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:claims[15].locator",
+      "foundIn": [
+        "backpack-securities-spcx:claims[15].locator",
+        "backpack-securities-spcx:claims[15].note"
+      ]
+    },
+    {
+      "url": "https://msb.fincen.gov/msb.registration.letter.php?ID=29770416",
+      "kind": "html",
+      "issuer": "backpack-securities-spcx",
+      "title": "backpack-securities-spcx:claims[15].url",
+      "foundIn": [
+        "backpack-securities-spcx:claims[15].url"
+      ]
+    },
+    {
       "url": "https://neuralink.com/",
       "kind": "html",
       "issuer": null,
@@ -4842,52 +4879,6 @@
         "prestocks:documents[9].url",
         "prestocks:quoteVerificationSources[0].verificationUrl",
         "prestocks:sources[14]"
-      ]
-    },
-    {
-      "url": "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
-      "kind": "html",
-      "issuer": "prestocks",
-      "title": "prestocks:whatIf[account-frozen].searched[1]",
-      "foundIn": [
-        "prestocks:whatIf[account-frozen].searched[1]",
-        "prestocks:whatIf[attestation-wrong].searched[1]",
-        "prestocks:whatIf[authority-key-compromised].searched[1]",
-        "prestocks:whatIf[backing-shortfall].searched[1]",
-        "prestocks:whatIf[chain-outage].searched[1]",
-        "prestocks:whatIf[change-jurisdiction].searched[1]",
-        "prestocks:whatIf[collateral-lent].searched[2]",
-        "prestocks:whatIf[company-acquired].searched[1]",
-        "prestocks:whatIf[company-bankrupt].searched[1]",
-        "prestocks:whatIf[company-delisted].searched[1]",
-        "prestocks:whatIf[corporate-action-mirroring].searched[1]",
-        "prestocks:whatIf[court-order].searched[1]",
-        "prestocks:whatIf[custodian-insolvency].searched[1]",
-        "prestocks:whatIf[death-inheritance].searched[1]",
-        "prestocks:whatIf[defrauded].searched[1]",
-        "prestocks:whatIf[dispute-forum].searched[1]",
-        "prestocks:whatIf[dividend-missing].searched[1]",
-        "prestocks:whatIf[issuer-change-of-control].searched[2]",
-        "prestocks:whatIf[issuer-insolvency].searched[1]",
-        "prestocks:whatIf[issuer-wind-down].searched[1]",
-        "prestocks:whatIf[keys-stolen].searched[1]",
-        "prestocks:whatIf[law-changes].searched[1]",
-        "prestocks:whatIf[liquidity-event].searched[1]",
-        "prestocks:whatIf[price-source-fails].searched[1]",
-        "prestocks:whatIf[program-bug].searched[1]",
-        "prestocks:whatIf[provider-fails].searched[1]",
-        "prestocks:whatIf[rebase-error].searched[1]",
-        "prestocks:whatIf[redemption-refused].searched[1]",
-        "prestocks:whatIf[regulator-action].searched[1]",
-        "prestocks:whatIf[sanctioned].searched[1]",
-        "prestocks:whatIf[security-agent-fails].searched[1]",
-        "prestocks:whatIf[tax-withholding].searched[1]",
-        "prestocks:whatIf[terms-changed].searched[1]",
-        "prestocks:whatIf[tokens-seized].searched[1]",
-        "prestocks:whatIf[transfer-agent-fails].searched[1]",
-        "prestocks:whatIf[venue-delists].searched[1]",
-        "prestocks:whatIf[venue-insolvency].searched[1]",
-        "prestocks:whatIf[voting-rights].searched[1]"
       ]
     },
     {
@@ -5364,10 +5355,10 @@
       "url": "https://remoramarkets.xyz/legal-documentation/terms-of-use",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[74].note",
+      "title": "remora-markets:claims[75].note",
       "foundIn": [
-        "remora-markets:claims[74].note",
-        "remora-markets:claims[74].quote",
+        "remora-markets:claims[75].note",
+        "remora-markets:claims[75].quote",
         "remora-markets:whatIf[dispute-forum].searched[2]",
         "remora-markets:whatIf[keys-stolen].searched[2]",
         "remora-markets:whatIf[terms-changed].searched[2]"
@@ -6204,9 +6195,9 @@
       "url": "https://securitize.io/investments/stocks",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[81].url",
+      "title": "securitize-secz:claims[82].url",
       "foundIn": [
-        "securitize-secz:claims[81].url",
+        "securitize-secz:claims[82].url",
         "securitize-secz:whatIf[transfer-agent-fails].searched[17]"
       ]
     },
@@ -7057,6 +7048,9 @@
       "title": "xstocks-backed:claims[120].sources[0]",
       "foundIn": [
         "xstocks-backed:claims[120].sources[0]",
+        "xstocks-backed:claims[131].sources[0]",
+        "xstocks-backed:claims[131].url",
+        "xstocks-backed:claims[132].sources[0]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[0].url"
       ]
     },
@@ -7067,6 +7061,9 @@
       "title": "xstocks-backed:claims[119].sources[1]",
       "foundIn": [
         "xstocks-backed:claims[119].sources[1]",
+        "xstocks-backed:claims[129].sources[1]",
+        "xstocks-backed:claims[130].sources[1]",
+        "xstocks-backed:claims[130].url",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[1].url"
       ]
     },
@@ -7078,6 +7075,8 @@
       "foundIn": [
         "xstocks-backed:claims[119].sources[2]",
         "xstocks-backed:claims[119].url",
+        "xstocks-backed:claims[129].sources[2]",
+        "xstocks-backed:claims[130].sources[2]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[2].url"
       ]
     },
@@ -7088,6 +7087,9 @@
       "title": "xstocks-backed:claims[120].sources[1]",
       "foundIn": [
         "xstocks-backed:claims[120].sources[1]",
+        "xstocks-backed:claims[131].sources[1]",
+        "xstocks-backed:claims[132].sources[1]",
+        "xstocks-backed:claims[132].url",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[1].url"
       ]
     },
@@ -7099,6 +7101,8 @@
       "foundIn": [
         "xstocks-backed:claims[120].sources[2]",
         "xstocks-backed:claims[120].url",
+        "xstocks-backed:claims[131].sources[2]",
+        "xstocks-backed:claims[132].sources[2]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[2].url"
       ]
     },
@@ -7109,6 +7113,9 @@
       "title": "xstocks-backed:claims[121].sources[0]",
       "foundIn": [
         "xstocks-backed:claims[121].sources[0]",
+        "xstocks-backed:claims[133].sources[0]",
+        "xstocks-backed:claims[133].url",
+        "xstocks-backed:claims[134].sources[0]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[0].url"
       ]
     },
@@ -7130,6 +7137,8 @@
       "foundIn": [
         "xstocks-backed:claims[118].sources[2]",
         "xstocks-backed:claims[118].url",
+        "xstocks-backed:claims[127].sources[2]",
+        "xstocks-backed:claims[128].sources[2]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[2].url"
       ]
     },
@@ -7140,6 +7149,9 @@
       "title": "xstocks-backed:claims[119].sources[0]",
       "foundIn": [
         "xstocks-backed:claims[119].sources[0]",
+        "xstocks-backed:claims[129].sources[0]",
+        "xstocks-backed:claims[129].url",
+        "xstocks-backed:claims[130].sources[0]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[0].url"
       ]
     },
@@ -7150,6 +7162,9 @@
       "title": "xstocks-backed:claims[118].sources[1]",
       "foundIn": [
         "xstocks-backed:claims[118].sources[1]",
+        "xstocks-backed:claims[127].sources[1]",
+        "xstocks-backed:claims[128].sources[1]",
+        "xstocks-backed:claims[128].url",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[1].url"
       ]
     },
@@ -7170,6 +7185,9 @@
       "title": "xstocks-backed:claims[121].sources[1]",
       "foundIn": [
         "xstocks-backed:claims[121].sources[1]",
+        "xstocks-backed:claims[133].sources[1]",
+        "xstocks-backed:claims[134].sources[1]",
+        "xstocks-backed:claims[134].url",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[1].url"
       ]
     },
@@ -7181,6 +7199,8 @@
       "foundIn": [
         "xstocks-backed:claims[121].sources[2]",
         "xstocks-backed:claims[121].url",
+        "xstocks-backed:claims[133].sources[2]",
+        "xstocks-backed:claims[134].sources[2]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[2].url"
       ]
     },
@@ -7191,6 +7211,9 @@
       "title": "xstocks-backed:claims[118].sources[0]",
       "foundIn": [
         "xstocks-backed:claims[118].sources[0]",
+        "xstocks-backed:claims[127].sources[0]",
+        "xstocks-backed:claims[127].url",
+        "xstocks-backed:claims[128].sources[0]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[0].url"
       ]
     },
@@ -7256,11 +7279,12 @@
       "url": "https://stocks.securitize.io/drs/brokers/general_instructions.md",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[76].note",
+      "title": "securitize-secz:claims[73].note",
       "foundIn": [
-        "securitize-secz:claims[76].note",
-        "securitize-secz:claims[78].note",
-        "securitize-secz:claims[80].url",
+        "securitize-secz:claims[73].note",
+        "securitize-secz:claims[77].note",
+        "securitize-secz:claims[79].note",
+        "securitize-secz:claims[81].url",
         "securitize-secz:openQuestions[2]",
         "securitize-secz:quoteVerificationSources[0].verificationUrl",
         "securitize-secz:whatIf[transfer-agent-fails].searched[15]"
@@ -7273,6 +7297,7 @@
       "title": "securitize-secz:claims[73].locator",
       "foundIn": [
         "securitize-secz:claims[73].locator",
+        "securitize-secz:claims[74].url",
         "securitize-secz:quoteVerificationSources[0].reason"
       ]
     },
@@ -7335,9 +7360,9 @@
         "securitize-secz:claims[21].sources[2]",
         "securitize-secz:claims[26].sources[2]",
         "securitize-secz:claims[27].sources[2]",
-        "securitize-secz:claims[73].url",
-        "securitize-secz:claims[76].url",
-        "securitize-secz:claims[78].url",
+        "securitize-secz:claims[73].note",
+        "securitize-secz:claims[77].url",
+        "securitize-secz:claims[79].url",
         "securitize-secz:documents[9].url",
         "securitize-secz:quoteVerificationSources[0].sourceUrl",
         "securitize-secz:sources[17]",
@@ -7537,9 +7562,9 @@
       "url": "https://support.backpack.exchange/backpack-securities",
       "kind": "html",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[59].note",
+      "title": "backpack-securities-spcx:claims[60].note",
       "foundIn": [
-        "backpack-securities-spcx:claims[59].note"
+        "backpack-securities-spcx:claims[60].note"
       ]
     },
     {
@@ -7548,8 +7573,8 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Support — Eligibility & Access (US, UK, UAE, Japan and Backpack EU excluded)",
       "foundIn": [
-        "backpack-securities-spcx:claims[59].url",
-        "backpack-securities-spcx:claims[91].url",
+        "backpack-securities-spcx:claims[60].url",
+        "backpack-securities-spcx:claims[92].url",
         "backpack-securities-spcx:documents[25].url",
         "backpack-securities-spcx:parties.audience[0].source",
         "backpack-securities-spcx:parties.audience[1].source",
@@ -7579,11 +7604,11 @@
       "title": "Backpack Support — Real Ownership & Legal Framework (names the introducing broker, clearing broker and intermediary broker with CRD numbers)",
       "foundIn": [
         "backpack-securities-spcx:attestations[1].link",
-        "backpack-securities-spcx:claims[26].url",
-        "backpack-securities-spcx:claims[29].url",
-        "backpack-securities-spcx:claims[65].url",
-        "backpack-securities-spcx:claims[79].url",
-        "backpack-securities-spcx:claims[85].url",
+        "backpack-securities-spcx:claims[27].url",
+        "backpack-securities-spcx:claims[30].url",
+        "backpack-securities-spcx:claims[66].url",
+        "backpack-securities-spcx:claims[80].url",
+        "backpack-securities-spcx:claims[86].url",
         "backpack-securities-spcx:documents[23].url",
         "backpack-securities-spcx:findings[4].evidence",
         "backpack-securities-spcx:parties.custodians[0].source",
@@ -7605,9 +7630,9 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Support — Stock Trading Hours & Fees (session structure; the weekend Order Book that sets prices when there is no US reference market)",
       "foundIn": [
-        "backpack-securities-spcx:claims[52].url",
-        "backpack-securities-spcx:claims[54].url",
-        "backpack-securities-spcx:claims[72].url",
+        "backpack-securities-spcx:claims[53].url",
+        "backpack-securities-spcx:claims[55].url",
+        "backpack-securities-spcx:claims[73].url",
         "backpack-securities-spcx:documents[9].url",
         "backpack-securities-spcx:sources[26]",
         "backpack-securities-spcx:whatIf[price-source-fails]",
@@ -7621,13 +7646,13 @@
       "title": "Backpack Support — Tokenized Securities (ownership-form comparison table: 'Tokenized claim' / 'Claim on SPV holding the underlying assets')",
       "foundIn": [
         "backpack-securities-spcx:attestations[6].link",
-        "backpack-securities-spcx:claims[100].url",
-        "backpack-securities-spcx:claims[106].sources[1]",
-        "backpack-securities-spcx:claims[57].url",
-        "backpack-securities-spcx:claims[68].url",
-        "backpack-securities-spcx:claims[73].url",
-        "backpack-securities-spcx:claims[78].url",
-        "backpack-securities-spcx:claims[79].note",
+        "backpack-securities-spcx:claims[101].url",
+        "backpack-securities-spcx:claims[107].sources[1]",
+        "backpack-securities-spcx:claims[58].url",
+        "backpack-securities-spcx:claims[69].url",
+        "backpack-securities-spcx:claims[74].url",
+        "backpack-securities-spcx:claims[79].url",
+        "backpack-securities-spcx:claims[80].note",
         "backpack-securities-spcx:discrepancies[0].claim.sources[0].url",
         "backpack-securities-spcx:documents[21].url",
         "backpack-securities-spcx:incidents[0].source",
@@ -7641,10 +7666,10 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Support — Tokenized Securities: Conversion Flow (deposit/withdraw mechanics, ~$0.50 withdrawal fee)",
       "foundIn": [
-        "backpack-securities-spcx:claims[106].sources[2]",
-        "backpack-securities-spcx:claims[45].url",
-        "backpack-securities-spcx:claims[49].url",
+        "backpack-securities-spcx:claims[107].sources[2]",
+        "backpack-securities-spcx:claims[46].url",
         "backpack-securities-spcx:claims[50].url",
+        "backpack-securities-spcx:claims[51].url",
         "backpack-securities-spcx:documents[22].url",
         "backpack-securities-spcx:incidents[4].source",
         "backpack-securities-spcx:sources[6]",
@@ -7658,8 +7683,8 @@
       "issuer": "backpack-securities-spcx",
       "title": "Backpack Support — Your Holdings, Dividends & Corporate Actions (feature status table: ACATS/DTCC, dividends, voting 'still being worked on')",
       "foundIn": [
-        "backpack-securities-spcx:claims[48].url",
-        "backpack-securities-spcx:claims[67].url",
+        "backpack-securities-spcx:claims[49].url",
+        "backpack-securities-spcx:claims[68].url",
         "backpack-securities-spcx:documents[24].url",
         "backpack-securities-spcx:findings[1].evidence",
         "backpack-securities-spcx:incidents[0].source",
@@ -7675,9 +7700,9 @@
       "url": "https://support.backpack.exchange/exchange/deposit-and-withdraw/crypto/deposit/unsupported-asset-deposits-and-manual-retrieval-policy",
       "kind": "html",
       "issuer": "backpack-securities-spcx",
-      "title": "backpack-securities-spcx:claims[35].url",
+      "title": "backpack-securities-spcx:claims[36].url",
       "foundIn": [
-        "backpack-securities-spcx:claims[35].url"
+        "backpack-securities-spcx:claims[36].url"
       ]
     },
     {
@@ -7710,8 +7735,8 @@
       "foundIn": [
         "backpack-securities-spcx:claims[13].url",
         "backpack-securities-spcx:claims[14].url",
-        "backpack-securities-spcx:claims[88].url",
         "backpack-securities-spcx:claims[89].url",
+        "backpack-securities-spcx:claims[90].url",
         "backpack-securities-spcx:documents[14].url",
         "backpack-securities-spcx:parties.regulators[0].source",
         "backpack-securities-spcx:sources[25]",
@@ -7726,23 +7751,23 @@
       "title": "backpack-securities-spcx:attestations[1].quoteNote",
       "foundIn": [
         "backpack-securities-spcx:attestations[1].quoteNote",
-        "backpack-securities-spcx:claims[100].locator",
-        "backpack-securities-spcx:claims[26].locator",
-        "backpack-securities-spcx:claims[29].locator",
-        "backpack-securities-spcx:claims[31].sources[5]",
-        "backpack-securities-spcx:claims[48].locator",
+        "backpack-securities-spcx:claims[101].locator",
+        "backpack-securities-spcx:claims[27].locator",
+        "backpack-securities-spcx:claims[30].locator",
+        "backpack-securities-spcx:claims[32].sources[5]",
         "backpack-securities-spcx:claims[49].locator",
         "backpack-securities-spcx:claims[50].locator",
-        "backpack-securities-spcx:claims[52].locator",
-        "backpack-securities-spcx:claims[54].locator",
-        "backpack-securities-spcx:claims[57].locator",
-        "backpack-securities-spcx:claims[65].locator",
-        "backpack-securities-spcx:claims[68].locator",
-        "backpack-securities-spcx:claims[72].locator",
+        "backpack-securities-spcx:claims[51].locator",
+        "backpack-securities-spcx:claims[53].locator",
+        "backpack-securities-spcx:claims[55].locator",
+        "backpack-securities-spcx:claims[58].locator",
+        "backpack-securities-spcx:claims[66].locator",
+        "backpack-securities-spcx:claims[69].locator",
         "backpack-securities-spcx:claims[73].locator",
-        "backpack-securities-spcx:claims[78].locator",
-        "backpack-securities-spcx:claims[85].locator",
-        "backpack-securities-spcx:claims[91].locator",
+        "backpack-securities-spcx:claims[74].locator",
+        "backpack-securities-spcx:claims[79].locator",
+        "backpack-securities-spcx:claims[86].locator",
+        "backpack-securities-spcx:claims[92].locator",
         "backpack-securities-spcx:incidents[0].quoteNote",
         "backpack-securities-spcx:sources[27]",
         "backpack-securities-spcx:whatIf[account-frozen].searched[5]",
@@ -8184,7 +8209,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "SPCX on-chain token metadata (Trek Labs)",
       "foundIn": [
-        "backpack-securities-spcx:claims[63].url",
+        "backpack-securities-spcx:claims[64].url",
         "backpack-securities-spcx:documents[30].url",
         "backpack-securities-spcx:sampleMints[0].source",
         "backpack-securities-spcx:sources[18]"
@@ -8452,9 +8477,9 @@
       "url": "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain&output=json",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[74].note",
+      "title": "remora-markets:claims[75].note",
       "foundIn": [
-        "remora-markets:claims[74].note",
+        "remora-markets:claims[75].note",
         "remora-markets:whatIf[dispute-forum].searched[2]",
         "remora-markets:whatIf[issuer-wind-down].searched[8]",
         "remora-markets:whatIf[keys-stolen].searched[2]",
@@ -8584,9 +8609,9 @@
       "url": "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[79].url",
+      "title": "securitize-secz:claims[80].url",
       "foundIn": [
-        "securitize-secz:claims[79].url",
+        "securitize-secz:claims[80].url",
         "securitize-secz:sources[30]"
       ]
     },
@@ -8716,7 +8741,7 @@
       "issuer": "remora-markets",
       "title": "Sitemap, remoramarkets.xyz (2026) — lists Privacy Policy, Terms of Use, Disclaimer and Service Providers (lastmod 2026-01-16); only the Privacy Policy was archived with content — archived",
       "foundIn": [
-        "remora-markets:claims[74].url",
+        "remora-markets:claims[75].url",
         "remora-markets:documents[14].url",
         "remora-markets:findings[3].quoteNote",
         "remora-markets:whatIf[dispute-forum].searched[1]",
@@ -8730,13 +8755,13 @@
       "issuer": "remora-markets",
       "title": "Privacy Policy, remoramarkets.xyz (2026) — names Step Labs LLC as \"Remora Markets\"; US non-targeting statement; no governing law — archived",
       "foundIn": [
-        "remora-markets:claims[72].url",
-        "remora-markets:claims[74].note",
-        "remora-markets:claims[75].url",
-        "remora-markets:claims[77].url",
+        "remora-markets:claims[73].url",
+        "remora-markets:claims[75].note",
+        "remora-markets:claims[76].url",
         "remora-markets:claims[78].url",
         "remora-markets:claims[79].url",
         "remora-markets:claims[80].url",
+        "remora-markets:claims[81].url",
         "remora-markets:documents[13].url",
         "remora-markets:findings[2].quoteNote",
         "remora-markets:findings[3].quoteNote",
@@ -8754,9 +8779,9 @@
       "url": "https://web.archive.org/web/20260203024338/https://remoramarkets.xyz/legal-documentation/privacy-policy",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[73].url",
+      "title": "remora-markets:claims[74].url",
       "foundIn": [
-        "remora-markets:claims[73].url"
+        "remora-markets:claims[74].url"
       ]
     },
     {
@@ -8783,9 +8808,9 @@
       "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[81].url",
+      "title": "remora-markets:claims[82].url",
       "foundIn": [
-        "remora-markets:claims[81].url",
+        "remora-markets:claims[82].url",
         "remora-markets:incidents[5].source",
         "remora-markets:sources[25]"
       ]
@@ -8796,8 +8821,8 @@
       "issuer": "remora-markets",
       "title": "Region-block page, remoramarkets.xyz (2026) — \"not available in your region due to regulatory requirements\"; the Disclaimer and Service Providers captures redirect here — archived",
       "foundIn": [
-        "remora-markets:claims[76].url",
-        "remora-markets:claims[78].note",
+        "remora-markets:claims[77].url",
+        "remora-markets:claims[79].note",
         "remora-markets:documents[15].url"
       ]
     },
@@ -10214,9 +10239,9 @@
       "issuer": "backpack-securities-spcx",
       "title": "SpaceX (Space Exploration Technologies Corp., CIK 0001181412) — final prospectus, Form 424B4, 2026-06-12. Searched in full: zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the underlying issuer is silent on tokenized versions of its shares.",
       "foundIn": [
-        "backpack-securities-spcx:claims[119].url",
-        "backpack-securities-spcx:claims[18].url",
-        "backpack-securities-spcx:claims[82].url",
+        "backpack-securities-spcx:claims[120].url",
+        "backpack-securities-spcx:claims[19].url",
+        "backpack-securities-spcx:claims[83].url",
         "backpack-securities-spcx:documents[17].url",
         "backpack-securities-spcx:parties.securitiesIssuers[0].source",
         "backpack-securities-spcx:sources[34]",
@@ -10265,9 +10290,9 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1782266/000190359626000325/primary_doc.xml",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[84].note",
+      "title": "securitize-secz:claims[85].note",
       "foundIn": [
-        "securitize-secz:claims[84].note"
+        "securitize-secz:claims[85].note"
       ]
     },
     {
@@ -10668,9 +10693,9 @@
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026065825/ea0264119-11.htm",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[83].url",
+      "title": "securitize-secz:claims[84].url",
       "foundIn": [
-        "securitize-secz:claims[83].url"
+        "securitize-secz:claims[84].url"
       ]
     },
     {
@@ -10747,11 +10772,11 @@
         "securitize-secz:claims[6].url",
         "securitize-secz:claims[70].url",
         "securitize-secz:claims[72].url",
-        "securitize-secz:claims[74].url",
-        "securitize-secz:claims[77].sources[0]",
-        "securitize-secz:claims[77].url",
+        "securitize-secz:claims[75].url",
+        "securitize-secz:claims[78].sources[0]",
+        "securitize-secz:claims[78].url",
         "securitize-secz:claims[7].url",
-        "securitize-secz:claims[82].url",
+        "securitize-secz:claims[83].url",
         "securitize-secz:claims[8].url",
         "securitize-secz:custodyVerification.link",
         "securitize-secz:documents[0].url",
@@ -10922,9 +10947,9 @@
       "url": "https://www.sec.gov/Archives/edgar/data/24179/000002417926000005/primary_doc.xml",
       "kind": "html",
       "issuer": "securitize-secz",
-      "title": "securitize-secz:claims[84].url",
+      "title": "securitize-secz:claims[85].url",
       "foundIn": [
-        "securitize-secz:claims[84].url"
+        "securitize-secz:claims[85].url"
       ]
     },
     {
@@ -10971,7 +10996,7 @@
       "issuer": "securitize-secz",
       "title": "EDGAR transfer-agent registration filings for Continental Stock Transfer & Trust Co, SEC File No. 084-00034, CIK 0000024179 — establishes that the independent registrar of record is itself an SEC-registered transfer agent with a current filing history (annual TA-2s through 2026-03-30, TA-1/A 2026-06-30)",
       "foundIn": [
-        "securitize-secz:claims[75].url",
+        "securitize-secz:claims[76].url",
         "securitize-secz:documents[17].url",
         "securitize-secz:sources[25]"
       ]
@@ -11037,7 +11062,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "SEC Crypto Task Force meeting memo, 2026-04-21 — the only primary record of Backpack engaging the SEC: attendees Can Sun, Mark Wetjen and BGR Group, agenda covering CFTC DCM/DCO licensing and potential SEC oversight of its products",
       "foundIn": [
-        "backpack-securities-spcx:claims[114].url",
+        "backpack-securities-spcx:claims[115].url",
         "backpack-securities-spcx:documents[36].url",
         "backpack-securities-spcx:sources[45]",
         "backpack-securities-spcx:whatIf[law-changes].searched[7]",
@@ -11153,7 +11178,7 @@
       "issuer": "backpack-securities-spcx",
       "title": "SEC Division of Corporation Finance — Staff Statement on Tokenized Securities, 2026-01-28 (issuer-sponsored vs third-party tokenization; onchain vs offchain recordkeeping does not change the federal securities laws)",
       "foundIn": [
-        "backpack-securities-spcx:claims[17].url",
+        "backpack-securities-spcx:claims[18].url",
         "backpack-securities-spcx:documents[15].url",
         "backpack-securities-spcx:parties.regulators[2].source",
         "backpack-securities-spcx:sources[35]",

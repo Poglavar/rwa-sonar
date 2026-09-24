@@ -10,6 +10,9 @@
 // A Solscan transaction page (403 bot wall, never archived) describes an on-chain transaction; the
 // chain itself is the primary record, so its companion is Solana RPC `getTransaction`, rendered as
 // the text a reader of the explorer page relies on (logs, decoded instructions, balance changes).
+// A Next.js App Router page chunk (/_next/static/chunks/app/<route>/page-<hash>.js) carries a build
+// hash that changes on every deploy, so a cited chunk answers 404 after the next release while the
+// page and its words are still there; its companion is the chunk the owning page loads now.
 // Pure: no network here (watch-sources.mjs does the IO).
 
 import { htmlToText } from './watch.mjs';
@@ -68,7 +71,54 @@ export function companionFor(url) {
         if (!m) return null;
         return { url: `https://crates.io/api/v1/crates/${m[1]}`, reader: 'crates-api' };
     }
-    return null;
+    return nextAppChunkCompanion(parsed);
+}
+
+/**
+ * `/_next/static/chunks/app/<route>/page-<hash>.js` -> the route that loads it, the page a reader
+ * opens (prestocks.com/faq for .../app/faq/page-d984255e63e260a7.js). Route groups — `(marketing)` —
+ * are not part of the URL and are dropped; a dynamic (`[slug]`), parallel (`@slot`) or intercepting
+ * segment cannot be turned back into one URL, so such a chunk has no companion. `liveValidators`:
+ * the cited URL is itself the document (an immutable build asset), so its own etag stays meaningful
+ * and the companion is read only once the chunk is gone.
+ */
+function nextAppChunkCompanion(parsed) {
+    const m = parsed.pathname.match(/^(\/_next\/static\/chunks\/app\/(?:(.+)\/)?page-)[A-Za-z0-9_-]+\.js$/);
+    if (!m) return null;
+    const segments = m[2] ? m[2].split('/') : [];
+    if (segments.some((s) => /^[[@]|^\(\.{1,3}\)/.test(decodeURIComponent(s)))) return null;
+    const route = segments.filter((s) => !/^\(.*\)$/.test(decodeURIComponent(s)));
+    return {
+        url: `${parsed.origin}/${route.join('/')}`,
+        reader: 'next-app-chunk',
+        chunkPrefix: m[1],
+        liveValidators: true
+    };
+}
+
+function escapeRegExp(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * The page chunk the owning page's HTML loads now: every reference to `<chunkPrefix><hash>.js` —
+ * the `<script src>` and the flight payload's bare `static/chunks/...` entry alike — resolved
+ * against the page URL, through an asset-prefix host when the `<script src>` names one. Exactly one
+ * hash, or it throws: none means the page no longer ships its words in that chunk (a real change,
+ * for the quote check to report), two would make the choice a guess.
+ */
+export function currentNextChunk(html, pageUrl, chunkPrefix) {
+    const tail = chunkPrefix.replace(/^\/_next\//, '');
+    const pattern = new RegExp(`((?:https?:\\/\\/[^"'\\s\\\\]+)?\\/_next\\/)?${escapeRegExp(tail)}([A-Za-z0-9_-]+)\\.js`, 'g');
+    const bases = new Map();
+    for (const match of String(html).matchAll(pattern)) {
+        // A bare flight-payload reference says nothing about the host; a `<script src>` may.
+        if (!bases.has(match[2]) || (match[1] && bases.get(match[2]) === '/_next/')) bases.set(match[2], match[1] ?? '/_next/');
+    }
+    if (bases.size === 0) throw new Error(`the page loads no ${chunkPrefix}*.js chunk`);
+    if (bases.size > 1) throw new Error(`the page loads ${bases.size} different ${chunkPrefix}*.js chunks`);
+    const [[hash, base]] = [...bases];
+    return new URL(`${base}${tail}${hash}.js`, pageUrl).href;
 }
 
 const line = (label, value) => (typeof value === 'string' && value.trim() !== '' ? `${label}: ${value.trim()}` : null);
@@ -220,9 +270,13 @@ export function solanaTxText(tx) {
 
 /**
  * Only a page that did not give us its text qualifies: a refusal (401/403, a bot wall) or a
- * JavaScript-only shell. Never a 404 (the package is gone, and saying so is the finding) or a 429.
+ * JavaScript-only shell. Never a 404 (the package is gone, and saying so is the finding) or a 429 —
+ * except for a `next-app-chunk`, where a 404 is the one outcome that qualifies: a content-hashed
+ * build asset disappears on every deploy, and whether the page's words went with it is for the
+ * chunk the page loads now to answer.
  */
-export function wantsCompanion({ status, reason = '', httpStatus = null, botWall = false } = {}) {
+export function wantsCompanion({ status, reason = '', httpStatus = null, botWall = false, reader = null } = {}) {
+    if (reader === 'next-app-chunk') return status === 'gone' && (httpStatus === 404 || httpStatus === 410);
     if (status !== 'blocked') return false;
     return httpStatus === 401 || httpStatus === 403 || botWall === true || /^javascript-only page/.test(String(reason));
 }

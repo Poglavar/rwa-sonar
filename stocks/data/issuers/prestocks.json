@@ -1525,7 +1525,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1543,7 +1543,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1561,7 +1561,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
         "grep over the full Terms of Service text for death, deceas, estate, probate, heir (word-boundary), inherit, succession, next of kin, beneficiary-of-estate — zero hits; \"succession\" occurs once, in the Release of Claims section about corporate succession, and \"beneficiar\" only in the denial that a holder is a beneficiary",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
@@ -1581,7 +1581,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1599,7 +1599,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1617,7 +1617,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1635,7 +1635,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"segregat\", \"client asset\", \"omnibus\", \"SIPC\", \"FDIC\" — the only hits are denials: no client-asset segregation protections and no FDIC/SIPC coverage",
         "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
@@ -1655,7 +1655,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1674,7 +1674,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1692,7 +1692,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1710,7 +1710,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "grep of the full Terms for \"insurance\", \"backstop\", \"rotation\", \"multisig\", \"quorum\" — multisig and quorum appear only in the risk factor, insurance only in the No Insurance denial, rotation not at all",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1729,7 +1729,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "grep of the full Terms and the FAQ for \"audit\" — only the disclaimers (\"not guaranteed to be audited or tested\"; audits \"are limited in scope, are not guarantees\"); no audit report, auditor name or audit page exists on the site",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1748,7 +1748,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "grep of the full Terms for \"extend\", \"toll\", \"deadline\", \"grace\" in the corporate-action and redemption sections — no extension or tolling of any deadline for any cause is provided (the only tolling is of limitation periods in the arbitration batching paragraph)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1767,7 +1767,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"unsecured\", \"pari passu\", \"subordinat\", \"rank\", \"waterfall\", \"priority\" — no ranking or waterfall statement of any kind",
         "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1786,7 +1786,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"notice period\", \"unclaimed\", \"escheat\", \"dormant\", \"run-off\", \"orderly\" — zero hits for every one of them",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1806,7 +1806,7 @@
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"change of control\", \"acquisition of us\", \"successor in interest\", \"put right\" — \"change of control\" has zero hits; \"successor\" appears only in the Released Parties definition, the No Third-Party Beneficiaries clause and the Assignment clause",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1824,7 +1824,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found",
         "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
@@ -1843,7 +1843,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
         "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
@@ -1863,7 +1863,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "grep of the full Terms for \"gate\", \"suspend redemption\", \"settlement deadline\", \"business days\" — no gating mechanic, queue, cap or settlement deadline is specified at all",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1882,7 +1882,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "stocks/data/sources-state.json — https://url.prestocks.com/terms-of-service is recorded status \"blocked\" with textPath and rawPath both null, so the watcher holds no captured version of this document and no change history exists locally",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1900,7 +1900,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"services agreement\", \"successor provider\", \"step-in\", \"transition\" — none of these exists; there is no provider agreement and no successor mechanism",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -1919,7 +1919,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"transfer agent\" — two hits, both disclaimers: the issuer is not one, and the referenced companies' own transfer agents are unaffiliated",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)"
       ],
@@ -1936,7 +1936,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"security agent\", \"collateral agent\", \"trustee\", \"pledge\", \"deed of charge\" — \"trustee\" appears twice (both in lists of things PreStocks is not, or of counterparties that may fail), \"pledge\" and the agent terms have zero hits"
       ],
       "note": "Why the case cannot arise: \"Collateralization describes the economic and operational arrangements we maintain. It does not of itself create a security interest, trust, custody relationship, or segregated, ring-fenced, or bankruptcy-remote claim\", and the Risk Factors add \"no creditor, security, priority, or insolvency claim against any company, special purpose vehicle, custodian, or against us\". The dossier's securityInterest.holder is an empty string and securityInterest.priority is \"unknown\", consistent with there being no such role. The absence is worse than a failing agent: with a pledge and a trustee, a holder has someone to enforce against; here the answer to the question of who enforces for holders is nobody, and holders \"have no direct relationship with, rights against, or claim on the assets of any SPV\"."
@@ -1952,7 +1952,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms for \"segregat\", \"omnibus\", \"client asset\", \"SIPC\", \"FDIC\", \"sub-custodian\" — every hit is a denial or a disclaimer; no custody account type is described",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -1971,7 +1971,7 @@
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
         "grep of the full Terms of Service text for \"rehypothec\" (0 hits), \"securities lending\" (0), \"pledge\" (0), \"encumbr\" (1 hit, in \"undisclosed encumbrances\" as a risk to the SPV's own title), \"lend\"/\"borrow\" (3 and 2 hits, all in unrelated contexts: a no-offer disclaimer and a note that token-level fees may misbehave in third-party lending markets)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
         "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
         "https://prestocks.com/api/prestocks (the description strings assert \"backed 1:1 by SPV exposure\" and say nothing about lending)",
@@ -1991,7 +1991,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "PreStocks site paths /attestations, /transparency, /proof-of-reserve and /reserves — all HTTP 404 on 2026-09-18",
         "https://prestocks.com/sitemap.xml (eleven URLs: home, /products and the nine per-company pages; no attestation or transparency page)",
         "grep of the full Terms and the FAQ for \"auditor\" — zero hits in either",
@@ -2011,7 +2011,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "grep of the full Terms for \"oracle\" (5 hits, all as a third-party failure risk or a manipulation vector, never as a price source for these tokens), \"NAV\", \"net asset value\" (one mention, as something prices may diverge from), \"halt\", \"closed market\" — no closed-market or disputed-price procedure exists",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2030,7 +2030,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -2048,7 +2048,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms and the FAQ for \"delist\" (in the Terms: once in the corporate-action list and once as an enforcement power; absent from the FAQ), \"take-private\", \"going private\", \"final valuation\", \"cash-out\" — no valuation method or timetable for any of them",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -2066,7 +2066,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2085,7 +2085,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "grep of the full Terms and the FAQ for \"multiplier\", \"rebase\", \"scaled\", \"spin-off\", \"rights issue\" — zero hits for every one of them in either document",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2104,7 +2104,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms and the FAQ for \"dividend\" (two hits in the Terms, both denials; the FAQ answer \"What rights do I get as a PreStocks holder?\" says the same), \"distribution\", \"pass-through\", \"reinvest\" — no dividend mechanic of any kind is described",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found"
@@ -2122,7 +2122,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "PreStocks Privacy Policy, last updated August 7, 2025 — https://prestocks.notion.site/privacy-policy",
         "grep of the full Terms of Service for \"FATCA\" (0 hits), \"CRS\" (0), \"treaty\" (0), \"W-8\" (0), \"1042\" (0), \"withholding rate\" (0); \"tax-reporting\" appears once, as a compliance trigger for freezing tokens",
         "grep of the Privacy Policy for tax reporting — nothing beyond the generic \"Complying with laws, regulations, and requests from government entities or law enforcement\"",
@@ -2142,7 +2142,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "rpc:getAccountInfo jsonParsed on the SPACEX, OPENAI and ANTHROPIC mints, slot 448063207 (2026-09-18)",
         "grep of the full Terms and the FAQ for \"multiplier\", \"rebase\", \"scaled\", \"restate\", \"correction\" — zero hits for all of them; the only error-handling language is the enforcement trigger and the fee-error disclaimer",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2161,7 +2161,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://prestocks.com/api/prestocks (all 8 products, markPrice vs tokenPrice, 2026-09-18)",
         "grep of the full Terms for \"liquidity event\" (2 hits, both in risk factors), \"waterfall\" (0), \"maturity\" (0), \"termination date\" (0) — no payout waterfall, maturity or expiry date is defined anywhere in the Terms",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2180,7 +2180,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "grep of the full Terms and the FAQ for \"proxy\", \"pass-through\", \"shareholder information\", \"annual report\", \"cap table\" — no proxy or information mechanism exists in either document",
         "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2199,7 +2199,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://www.sec.gov/newsroom/speeches-statements/corp-fin-statement-tokenized-securities-012826-statement-tokenized-securities",
         "grep of the full Terms for \"Regulation S\", \"Reg S\", \"exemption\", \"safe harbor\" — zero hits for all four; the only distribution statement is the secondary-transfer sentence",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
@@ -2218,7 +2218,7 @@
       "cases": [],
       "searched": [
         "PreStocks Terms of Service, last updated September 8, 2026 — full text read at https://prestocks.notion.site/terms-of-service (231 blocks via the Notion loadPageChunk API; https://url.prestocks.com/terms-of-service 308-redirects there and is recorded `blocked` in sources-state.json)",
-        "PreStocks FAQ, all 17 answers, read from the page bundle https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js because https://prestocks.com/faq renders them client-side",
+        "PreStocks FAQ, all 17 answers — https://prestocks.com/faq (the answers render client-side and were read from the page's JavaScript bundle, then named page-eda8c20836ef75f8.js; that name answered HTTP 404 on 2026-09-24 and the same 17 answers are in the bundle the page loads now, which the watcher reads through quoteVerificationSources)",
         "https://www.courtlistener.com/api/rest/v4/search/ — \"PreStocks\" (o: 0, r: 0 exact-phrase), PreStocks unquoted (only unrelated fuzzy hits), \"Xavier Ekkel\" (0), \"pre-IPO\" tokenized, \"tokenized\" \"SpaceX\" shares SPV (0), \"tokenized\" \"pre-IPO\" SPV void transfer restrictions (0), \"Republic Capital\" tokenized",
         "web search: PreStocks lawsuit / SEC / CFTC enforcement tokenized pre-IPO 2026; \"PreStocks\" regulator warning cease and desist investigation; SEC and CFTC litigation releases on tokenized pre-IPO shares — no action against PreStocks found",
         "grep of the full Terms for \"class action\", \"collective\", \"representative\", \"bellwether\", \"litigation funding\", \"security for costs\" — all present and all restrictive"
