@@ -8,6 +8,8 @@ const {
     activityFlags,
     issuerActivityRow,
     activityRows,
+    pairLegLabel,
+    quoteSymbolIndex,
     venueRows
 } = require('./lib/activity-rows.js');
 
@@ -182,6 +184,17 @@ describe('venueRows', () => {
         expect(row.pairFull).toBe('XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W/USDC');
     });
 
+    it('names a quote asset CoinGecko reports as an uppercased address instead of printing it', () => {
+        // Verbatim from coins/apple-xstock/tickers (Raydium CLMM), 2026-09-22.
+        const [row] = venueRows({ cex: [{
+            market: 'Raydium (CLMM)',
+            base: 'XSBEHLATCF6HDFPFZ5XEMDQW8NFAVCSP5BDUDRLJZJP',
+            target: 'EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V'
+        }] }, quoteSymbolIndex([{ mint: 'XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp', symbol: 'AAPLx' }]));
+        expect(row.pair).toBe('AAPLx/USDC');
+        expect(row.pairFull).toBe('XSBEHLATCF6HDFPFZ5XEMDQW8NFAVCSP5BDUDRLJZJP/EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V');
+    });
+
     it('drops an unusable link rather than emitting it as an href', () => {
         const [row] = venueRows({ cex: [{ market: 'Evil', url: 'javascript:alert(1)' }] });
         expect(row.url).toBeNull();
@@ -192,5 +205,36 @@ describe('venueRows', () => {
             expect(venueRows(bad)).toEqual([]);
         }
         expect(venueRows([null, {}, { nothing: true }])).toEqual([]);
+    });
+});
+
+describe('pairLegLabel / quoteSymbolIndex', () => {
+    const index = quoteSymbolIndex([
+        { mint: 'XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W', symbol: 'SPYx' },
+        // Two mints that uppercase alike are ambiguous: neither name is used.
+        { mint: 'AbCdEfGhJkLmNpQrStUvWxYz123456789abcdefghij', symbol: 'ONE' },
+        { mint: 'ABCDEFGHJKLMNPQRSTUVWXYZ123456789ABCDEFGHIJ', symbol: 'TWO' }
+    ]);
+
+    it('names USDC, USDT and SOL from their Solana mints in any case', () => {
+        expect(pairLegLabel('EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V')).toBe('USDC');
+        expect(pairLegLabel('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')).toBe('USDC');
+        expect(pairLegLabel('ES9VMFRZACERMJFRF4H2FYD4KCONKY11MCCE8BENWNYB')).toBe('USDT');
+        expect(pairLegLabel('SO11111111111111111111111111111111111111112')).toBe('SOL');
+        expect(pairLegLabel('0X55D398326F99059FF775485246999027B3197955')).toBe('USDT');
+    });
+
+    it('names our own mints from the token index and shortens an address nobody names', () => {
+        expect(pairLegLabel('XSOCS1TFEYFFHFVJ8ETZ528L3CAKBDBRQRAPNBBDF2W', index)).toBe('SPYx');
+        expect(pairLegLabel('XSOCS1TFEYFFHFVJ8ETZ528L3CAKBDBRQRAPNBBDF2W')).toBe('XSOC…DF2W');
+        expect(pairLegLabel('ABCDEFGHJKLMNPQRSTUVWXYZ123456789ABCDEFGHIJ', index)).toBe('ABCD…GHIJ');
+        expect(pairLegLabel('BJCRMWM8E25RGJKYAFE56FC7BXRGGPW96JUKXRJFEROT', index)).toBe('BJCR…EROT');
+    });
+
+    it('leaves a symbol alone and keeps a missing leg null', () => {
+        expect(pairLegLabel('USDT')).toBe('USDT');
+        expect(pairLegLabel('USDON', index)).toBe('USDON');
+        expect(pairLegLabel(null)).toBeNull();
+        expect(pairLegLabel('  ')).toBeNull();
     });
 });

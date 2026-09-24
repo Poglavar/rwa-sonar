@@ -264,6 +264,16 @@ describe('DeFi scanner', () => {
     });
 });
 
+describe('DeFi scanner: observed loans', () => {
+    test('a loan read on-chain is worded as an observed loan, never as a listing', () => {
+        const events = defiEvents({ items: [
+            { date: '2026-09-26', change: 'added', category: 'lending', severity: 'info', mint: 'MINTQ', symbol: 'QQQx', protocolId: 'loopscale', protocolName: 'Loopscale', basis: 'onchain-position' },
+            { date: '2026-09-26', change: 'added', category: 'lending', severity: 'info', mint: 'MINTS', symbol: 'SECZ', protocolId: 'loopscale', protocolName: 'Loopscale', basis: 'exact-token-registry' }
+        ] }, context());
+        expect(events.map((e) => e.title).sort()).toEqual(['First Loopscale loan against QQQx observed', 'Loopscale now lists SECZ for lending']);
+    });
+});
+
 describe('daily snapshot diffs', () => {
     const diff = {
         from: '2026-09-21', to: '2026-09-22', toObservedAt: '2026-09-22T18:28:54Z',

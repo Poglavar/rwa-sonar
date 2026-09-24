@@ -109,7 +109,7 @@
     function defiMetricText(entry) {
         const metrics = entry?.metrics ?? {};
         const parts = [];
-        if (isNum(metrics.sizeUsd)) parts.push(`${fmtMoney(metrics.sizeUsd)} market size`);
+        if (isNum(metrics.sizeUsd)) parts.push(`${fmtMoney(metrics.sizeUsd)} ${typeof metrics.sizeLabel === 'string' ? metrics.sizeLabel : 'market size'}`);
         if (isNum(metrics.maxLtvMin) || isNum(metrics.maxLtvMax)) {
             const low = isNum(metrics.maxLtvMin) ? metrics.maxLtvMin * 100 : null;
             const high = isNum(metrics.maxLtvMax) ? metrics.maxLtvMax * 100 : low;
@@ -139,6 +139,11 @@
         if (isNum(metrics.borrowLimitUsd)) parts.push(`${fmtMoney(metrics.borrowLimitUsd)} borrow cap`);
         if (isNum(metrics.pools)) parts.push(`${fmtNumber(metrics.pools)} pool${metrics.pools === 1 ? '' : 's'}`);
         if (isNum(metrics.positions)) parts.push(`${fmtNumber(metrics.positions)} position${metrics.positions === 1 ? '' : 's'}`);
+        // Only an integration that names its debt measure shows it (Loopscale: open loan principal).
+        if (isNum(metrics.debtAgainstCollateralUsd) && typeof metrics.debtLabel === 'string') {
+            parts.push(`${fmtMoney(metrics.debtAgainstCollateralUsd)} ${metrics.debtLabel}`);
+        }
+        if (isNum(metrics.loansPastEnd) && metrics.loansPastEnd > 0) parts.push(`${fmtNumber(metrics.loansPastEnd)} past end date`);
         return parts.join(' · ');
     }
 

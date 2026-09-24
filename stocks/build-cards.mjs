@@ -23,6 +23,7 @@ import {
 import { TRUST_CHAIN } from './lib/trustchain.mjs';
 import { loadSchematics } from './lib/schematics-load.mjs';
 import discrepancyView from './lib/discrepancy-view.js';
+import activityRows from './lib/activity-rows.js';
 
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
@@ -292,6 +293,8 @@ async function main() {
     const protocolDiscrepancies = discrepancyView.protocolDiscrepancyRecords(marketResearch,
         { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsageDb) });
     const pools = poolsByMint(tradeDb?.pools);
+    // CoinGecko reports an exchange pair quoted in one of our own tokens by its uppercased mint.
+    const quoteSymbols = activityRows.quoteSymbolIndex(tokenDb.tokens);
     const sources = {
         tokens: tokenDb.builtAt ?? null,
         issuers: issuerDb.builtAt ?? null,
@@ -354,7 +357,8 @@ async function main() {
             reviewItems: reviewQueue.items ?? [],
             schematics: schematics.issuers[token.issuer] ?? null,
             materialChanges,
-            protocolDiscrepancies
+            protocolDiscrepancies,
+            quoteSymbols
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');

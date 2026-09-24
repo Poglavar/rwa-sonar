@@ -334,7 +334,7 @@ describe('registry diff sees a new market inside an already-listed protocol', ()
 });
 
 describe('Loopscale lending-vault registry', () => {
-    test('a vault whose terms name the exact mint is a collateral market with the principal lent against it', () => {
+    test('a vault whose terms name the exact mint is a standing collateral offer; its allocation counter is not the loans', () => {
         const vaults = [{
             vault: { address: 'V1', principalMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', depositsEnabled: true },
             vaultMetadata: { name: 'USDC Orca' },
@@ -342,9 +342,14 @@ describe('Loopscale lending-vault registry', () => {
         }, { vault: { address: 'V2' }, vaultStrategy: { terms: { assetTerms: { OTHER: {} } } } }];
         const rows = loopscaleVaultMarkets(token, vaults);
         expect(rows).toEqual([expect.objectContaining({ vaultAddress: 'V1', debtSymbol: 'USDC', lenderApyPct: 2, source: 'lending-vault-registry' })]);
-        expect(rows[0].lentAgainstCollateral).toBeCloseTo(21337.692372, 6);
+        expect(rows[0].vaultAllocation).toBeCloseTo(21337.692372, 6);
+        // Without a Loan scan nothing is known about open loans: an offer, with no debt figure.
         const usage = buildDefiUsage({ tokens: [token], fetchedAt: 't', loopscaleVaults: vaults });
-        expect(usage.items[0].integrations).toEqual([expect.objectContaining({ protocolId: 'loopscale', status: 'live' })]);
+        expect(usage.items[0].integrations).toEqual([expect.objectContaining({ protocolId: 'loopscale', status: 'available' })]);
+        expect(usage.items[0].integrations[0].metrics).toMatchObject({ debtAgainstCollateralUsd: null, positions: null });
+        // With a Loan scan that found no Loan naming this mint, the open principal is a measured zero.
+        const scanned = buildDefiUsage({ tokens: [token], fetchedAt: 't', loopscaleVaults: vaults, loopscale: { fetchedAt: 't', positions: [] } });
+        expect(scanned.items[0].integrations[0].metrics).toMatchObject({ debtAgainstCollateralUsd: 0, positions: 0, debtLabel: 'open loan principal' });
     });
 });
 

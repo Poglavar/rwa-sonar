@@ -54,6 +54,9 @@ export function snapshotDefiIntegration(asset, integration) {
         protocolId: textOrNull(integration?.protocolId),
         protocolName: textOrNull(integration?.protocolName),
         integrationId: textOrNull(integration?.id),
+        // What the row rests on: a protocol's own listing, or (onchain-position) only loans or
+        // positions read on-chain, which is an observation and never a listing.
+        basis: textOrNull(integration?.proof?.sourceStatus),
         category: textOrNull(integration?.category),
         status: textOrNull(integration?.status),
         maxLtvMin: numberOrNull(metrics.maxLtvMin),
@@ -98,6 +101,12 @@ export function snapshotDefiUsage(usage) {
         }
     }
     return rows.sort((a, b) => compareText(integrationKey(a), integrationKey(b)));
+}
+
+const POSITION_BASIS = 'onchain-position';
+
+function basisSeen(snapshot, basis) {
+    return (Array.isArray(snapshot?.items) ? snapshot.items : []).some((row) => row?.basis === basis);
 }
 
 function indexRows(snapshot) {
@@ -178,6 +187,7 @@ export function diffDefiSnapshots(previous, current, {
     }
     const beforeRows = indexRows(previous);
     const afterRows = indexRows(current);
+    let baselined = 0;
     const keys = [...new Set([...beforeRows.keys(), ...afterRows.keys()])].sort();
     const events = [];
 
@@ -185,13 +195,21 @@ export function diffDefiSnapshots(previous, current, {
         const before = beforeRows.get(key);
         const after = afterRows.get(key);
         if (!before) {
-            events.push(event('token-added', after, null, after.status,
-                `${after.symbol ?? after.mint} now appears in ${after.protocolName ?? after.protocolId}'s checked registry.`));
+            // The first day a measurement runs (no row of that basis the day before) records a
+            // baseline: those rows existed before we could see them, so none is an addition.
+            if (after.basis === POSITION_BASIS && !basisSeen(previous, POSITION_BASIS)) {
+                baselined += 1;
+                continue;
+            }
+            events.push(event('token-added', after, null, after.status, after.basis === POSITION_BASIS
+                ? `A ${after.protocolName ?? after.protocolId} loan against ${after.symbol ?? after.mint} was first observed on-chain; no published listing names it.`
+                : `${after.symbol ?? after.mint} now appears in ${after.protocolName ?? after.protocolId}'s checked registry.`, { basis: after.basis }));
             continue;
         }
         if (!after) {
-            events.push(event('token-removed', before, before.status, null,
-                `${before.symbol ?? before.mint} no longer appears in ${before.protocolName ?? before.protocolId}'s checked registry.`));
+            events.push(event('token-removed', before, before.status, null, before.basis === POSITION_BASIS
+                ? `No open ${before.protocolName ?? before.protocolId} loan against ${before.symbol ?? before.mint} is observed any more.`
+                : `${before.symbol ?? before.mint} no longer appears in ${before.protocolName ?? before.protocolId}'s checked registry.`, { basis: before.basis }));
             continue;
         }
 
@@ -252,6 +270,8 @@ export function diffDefiSnapshots(previous, current, {
         fromFetchedAt: previous?.fetchedAt ?? null,
         toFetchedAt: current?.fetchedAt ?? null,
         counts,
+        // Rows recorded as the baseline of a measurement that ran for the first time.
+        baselined,
         events
     };
 }
@@ -349,6 +369,7 @@ export function buildDefiNewFeed(diffs, { maxDays = 30, slugs = new Map() } = {}
                 programId: event.programId ?? null,
                 category: event.category ?? null,
                 market: event.market ?? null,
+                basis: event.basis ?? null,
                 summary: event.summary ?? null
             });
         }

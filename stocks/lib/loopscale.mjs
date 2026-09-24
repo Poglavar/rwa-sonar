@@ -1,9 +1,9 @@
 // Loopscale (Solana order-book lending) detection, pure: which stock mints are posted as collateral
-// in Loopscale Loan accounts, decoded from the account bytes. Loopscale publishes no collateral
-// registry for these mints, so the evidence is the chain itself: a token account whose owner is a
-// Loan account of the Loopscale program (found through the top-20 holder scan), then that Loan's
-// own bytes. Program id and layout come from Loopscale's publications, recorded in
-// LOOPSCALE_ATTRIBUTION below; no offset here is guessed.
+// in Loopscale Loan accounts, and how much principal is open against each, decoded from the account
+// bytes. The evidence is the chain itself: every Loan account of the program (one getProgramAccounts
+// over the collateral slice, stocks/fetch-defi-usage.mjs), then the full bytes of each Loan whose
+// own collateral record names a tracked mint. Program id and layout come from Loopscale's
+// publications, recorded in LOOPSCALE_ATTRIBUTION below; no offset here is guessed.
 
 export const LOOPSCALE_PROGRAM_ID = '1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78';
 
@@ -108,6 +108,67 @@ export function base58(bytes) {
 
 /** The discriminator as the base58 string a getProgramAccounts memcmp filter takes. */
 export const LOAN_DISCRIMINATOR_BASE58 = base58(LOAN_DISCRIMINATOR);
+
+/** The five CollateralData slots of a Loan: the getProgramAccounts dataSlice that finds the loans. */
+export const LOAN_COLLATERAL_SLICE = Object.freeze({
+    offset: LOAN_LAYOUT.collateral, length: LOAN_LAYOUT.collateralSize * LOAN_LAYOUT.slots
+});
+
+/**
+ * The asset mints named in a Loan's collateral slots, from LOAN_COLLATERAL_SLICE bytes alone
+ * (Buffer/Uint8Array or base64). Only for choosing which Loans to read in full: the full decode
+ * (decodeLoan) is what a position is built from. Empty and zero-amount slots are skipped.
+ */
+export function collateralMintsFromSlice(data) {
+    const buf = typeof data === 'string' ? Buffer.from(data, 'base64') : Buffer.from(data ?? []);
+    const mints = [];
+    for (let i = 0; i < LOAN_LAYOUT.slots; i += 1) {
+        const o = i * LOAN_LAYOUT.collateralSize;
+        if (buf.length < o + LOAN_LAYOUT.collateralItem.amount + 8) break;
+        const mint = base58(buf.subarray(o, o + 32));
+        if (mint === DEFAULT_KEY || buf.readBigUInt64LE(o + LOAN_LAYOUT.collateralItem.amount) === 0n) continue;
+        mints.push(mint);
+    }
+    return mints;
+}
+
+/**
+ * Principal mints counted at $1. A ledger in any other principal (SOL, a volatile token) has no
+ * price here, so a token with such a loan gets no USD total rather than a partial one.
+ */
+export const STABLE_PRINCIPALS = Object.freeze({
+    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { symbol: 'USDC', decimals: 6 },
+    '2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH': { symbol: 'USDG', decimals: 6 },
+    Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: { symbol: 'USDT', decimals: 6 },
+    '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo': { symbol: 'PYUSD', decimals: 6 }
+});
+
+/**
+ * Open principal of one ledger, raw: principal_due − principal_repaid. The IDL names the pair but
+ * does not document it; it is read as total and paid so far, the shape the IDL's own interest pair
+ * had before it was replaced by a single interest_outstanding. Every open loan read on 2026-09-24
+ * had principal_repaid = 0, where both readings agree. Repaid above due is inconsistent → null.
+ */
+export function ledgerOpenPrincipalRaw(ledger) {
+    if (typeof ledger?.principalDueRaw !== 'string' || typeof ledger?.principalRepaidRaw !== 'string') return null;
+    const open = BigInt(ledger.principalDueRaw) - BigInt(ledger.principalRepaidRaw);
+    return open < 0n ? null : open.toString();
+}
+
+/**
+ * Open principal a loan owes, in USD, when it can be stated: every ledger's principal is a
+ * STABLE_PRINCIPALS mint. Null when any ledger is in another asset or is inconsistent.
+ */
+export function loanOpenPrincipalUsd(loan) {
+    let total = 0;
+    for (const ledger of Array.isArray(loan?.ledgers) ? loan.ledgers : []) {
+        const stable = STABLE_PRINCIPALS[ledger.principalMint] ?? null;
+        const raw = ledgerOpenPrincipalRaw(ledger);
+        if (stable === null || raw === null) return null;
+        total += Number(raw) / 10 ** stable.decimals;
+    }
+    return total;
+}
 
 function key(buf, offset) { return base58(buf.subarray(offset, offset + 32)); }
 function u64(buf, offset) { return buf.readBigUInt64LE(offset).toString(); }
@@ -358,51 +419,58 @@ function uiAmount(raw, decimals) {
 }
 
 /**
- * Candidate owner addresses from the saved top-20 holder scan: every wallet/account that holds one
- * of the covered mints. Only these are checked for a Loopscale owner, so coverage is exactly the
- * mints (and depths) holders.json reached.
+ * Positions from decoded Loans: one per (Loan, collateral entry) whose mint is tracked.
+ * `loans` maps loan address → decodeLoan() result; `symbolByMint` maps each tracked mint to its
+ * symbol (or null). Sorted by mint, then loan address, so a rebuild is stable.
  */
-export function holderOwners(holders) {
-    const owners = new Set();
-    for (const item of Array.isArray(holders?.items) ? holders.items : []) {
-        for (const row of Array.isArray(item?.top20) ? item.top20 : []) {
-            if (typeof row?.owner === 'string' && row.owner) owners.add(row.owner);
+export function loopscalePositions(loans, symbolByMint) {
+    const positions = [];
+    for (const [loanAddress, loan] of loans instanceof Map ? loans : []) {
+        for (const posted of Array.isArray(loan?.collateral) ? loan.collateral : []) {
+            if (!(symbolByMint instanceof Map) || !symbolByMint.has(posted.assetMint)) continue;
+            positions.push({ mint: posted.assetMint, symbol: symbolByMint.get(posted.assetMint) ?? null, loanAddress, loan, collateral: posted });
         }
     }
-    return [...owners].sort();
+    return positions.sort((a, b) => (a.mint < b.mint ? -1 : a.mint > b.mint ? 1 : a.loanAddress < b.loanAddress ? -1 : a.loanAddress > b.loanAddress ? 1 : 0));
 }
 
 /**
- * Join the holder scan with decoded Loans. `loans` maps loan address → decodeLoan() result.
- * Returns one position per (stock token account, loan) where the token account's owner is a Loan
- * and that Loan's own collateral record names the same mint; a mismatch is reported, not dropped.
+ * Open principal against ONE exact token, from its positions: a loan counts only when this mint
+ * is its sole collateral, since a loan against several assets cannot be split between them. USD is
+ * null when any loan cannot be attributed or priced — a partial sum would read as the whole.
  */
-export function loopscalePositions(holders, loans) {
-    const positions = [];
-    for (const item of Array.isArray(holders?.items) ? holders.items : []) {
-        for (const row of Array.isArray(item?.top20) ? item.top20 : []) {
-            const loan = loans.get(row?.owner);
-            if (!loan) continue;
-            const posted = loan.collateral.find((entry) => entry.assetMint === item.mint) ?? null;
-            positions.push({
-                mint: item.mint,
-                symbol: item.symbol ?? null,
-                tokenAccount: row.tokenAccount,
-                tokenAccountAmountUi: typeof row.amountUi === 'number' ? row.amountUi : null,
-                loanAddress: row.owner,
-                loan,
-                collateral: posted,
-                matchesLoanRecord: posted !== null
-            });
+export function openPrincipalAgainst(rows, observedAt) {
+    const observedMs = typeof observedAt === 'string' ? Date.parse(observedAt) : Number.NaN;
+    let usd = 0;
+    let unattributed = 0;
+    let unpriced = 0;
+    let pastEnd = 0;
+    for (const row of rows) {
+        if (row.loan.collateral.length !== 1) unattributed += 1;
+        else {
+            const loanUsd = loanOpenPrincipalUsd(row.loan);
+            if (loanUsd === null) unpriced += 1;
+            else usd += loanUsd;
         }
+        const ended = row.loan.ledgers.some((ledger) => ledger.endTime !== null && Date.parse(ledger.endTime) < observedMs);
+        if (Number.isFinite(observedMs) && ended) pastEnd += 1;
     }
-    return positions;
+    return {
+        openPrincipalUsd: unattributed + unpriced === 0 ? usd : null,
+        unattributedLoans: unattributed,
+        unpricedLoans: unpriced,
+        loansPastEnd: Number.isFinite(observedMs) ? pastEnd : null
+    };
+}
+
+function usdWhole(value) {
+    return `$${Math.round(value).toLocaleString('en-US')}`;
 }
 
 /** One lending integration per stock mint with decoded Loopscale collateral. */
 export function loopscaleUsage(token, scan) {
     const rows = (Array.isArray(scan?.positions) ? scan.positions : [])
-        .filter((row) => row.mint === token?.mint && row.matchesLoanRecord);
+        .filter((row) => row.mint === token?.mint);
     if (rows.length === 0) return [];
     const decimals = Number.isFinite(token?.decimals) ? token.decimals : null;
     const collateralTokens = rows.reduce((total, row) => total + (uiAmount(row.collateral.amountRaw, decimals) ?? 0), 0);
@@ -415,6 +483,13 @@ export function loopscaleUsage(token, scan) {
     const lqts = rows.map((row) => (row.configuration ? row.configuration.liquidationLtvPct / 100 : unambiguousCell(row.loan, row.loan.lqtMatrixCbps)))
         .filter((value) => Number.isFinite(value));
     const borrowing = rows.some((row) => row.loan.ledgers.some((ledger) => ledger.principalDueRaw !== '0'));
+    const open = openPrincipalAgainst(rows, scan?.fetchedAt ?? null);
+    const unstated = open.unattributedLoans + open.unpricedLoans;
+    const openText = open.openPrincipalUsd === null
+        ? `${unstated} of them ${unstated === 1 ? 'has' : 'have'} other collateral too or a non-stablecoin principal, so no USD total is given`
+        : `open principal against it: ${usdWhole(open.openPrincipalUsd)} in stablecoins`;
+    const pastEndText = (open.loansPastEnd ?? 0) > 0
+        ? `; ${open.loansPastEnd} of the loans ${open.loansPastEnd === 1 ? 'is' : 'are'} past ${open.loansPastEnd === 1 ? 'its' : 'their'} end date and still open` : '';
     return [{
         id: 'loopscale:collateral',
         protocolId: 'loopscale',
@@ -422,13 +497,18 @@ export function loopscaleUsage(token, scan) {
         category: 'lending',
         status: 'live',
         actions: borrowing ? ['collateral', 'borrow'] : ['collateral'],
-        summary: `This exact mint is posted as collateral in ${rows.length} Loopscale loan account${rows.length === 1 ? '' : 's'}, read and decoded directly on-chain. Loopscale lists no standing market for it: terms are set per lender strategy on its order book.`,
+        summary: `Posted as collateral in ${rows.length} Loopscale loan${rows.length === 1 ? '' : 's'}, read on-chain; ${openText}${pastEndText}.`,
         accessNote: 'Observed loans, not a published collateral listing. Loopscale and issuer eligibility, allowlisting and transfer restrictions apply to any new loan or liquidation transfer.',
         links: { use: 'https://app.loopscale.com/', protocol: 'https://docs.loopscale.com/resources/addresses' },
         metrics: {
             positions: rows.length,
             collateralTokens: decimals === null ? null : collateralTokens,
             sizeUsd: price === null || decimals === null ? null : collateralTokens * price,
+            sizeLabel: 'collateral posted',
+            // Principal due minus repaid on every Loan whose sole collateral is this mint.
+            debtAgainstCollateralUsd: open.openPrincipalUsd,
+            debtLabel: 'open loan principal',
+            loansPastEnd: open.loansPastEnd,
             maxLtvMin: ltvs.length ? Math.min(...ltvs) : null,
             maxLtvMax: ltvs.length ? Math.max(...ltvs) : null,
             liquidationLtvMin: lqts.length ? Math.min(...lqts) : null,
@@ -439,12 +519,14 @@ export function loopscaleUsage(token, scan) {
             return {
                 name: `Loopscale loan ${row.loanAddress.slice(0, 4)}…${row.loanAddress.slice(-4)}`,
                 loanAddress: row.loanAddress,
-                tokenAccount: row.tokenAccount,
                 borrower: row.loan.borrower,
                 collateralAmountRaw: row.collateral.amountRaw,
                 collateralTokens: uiAmount(row.collateral.amountRaw, decimals),
                 debtMint: ledger?.principalMint ?? null,
+                debtSymbol: STABLE_PRINCIPALS[ledger?.principalMint]?.symbol ?? null,
                 principalDueRaw: ledger?.principalDueRaw ?? null,
+                principalRepaidRaw: ledger?.principalRepaidRaw ?? null,
+                openPrincipalUsd: loanOpenPrincipalUsd(row.loan),
                 ledgerCount: row.loan.ledgers.length,
                 loanStartTime: row.loan.startTime,
                 ledgerEndTime: ledger?.endTime ?? null,
@@ -464,7 +546,7 @@ export function loopscaleUsage(token, scan) {
         evidence: [{
             type: 'onchain-account',
             url: `https://solscan.io/account/${rows[0].loanAddress}`,
-            note: `${rows.length} token account${rows.length === 1 ? '' : 's'} holding this mint ${rows.length === 1 ? 'is' : 'are'} owned by a Loan account of program ${LOOPSCALE_PROGRAM_ID}, and each Loan's own collateral record names this mint and amount.`
+            note: `${rows.length} Loan account${rows.length === 1 ? '' : 's'} of program ${LOOPSCALE_PROGRAM_ID} name${rows.length === 1 ? 's' : ''} this mint in ${rows.length === 1 ? 'its' : 'their'} own collateral record, with the amount posted and the principal due and repaid on each ledger.`
         }, {
             type: 'program-attribution',
             url: LOOPSCALE_ATTRIBUTION.sources[0].url,

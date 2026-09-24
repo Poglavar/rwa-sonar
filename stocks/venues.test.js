@@ -11,8 +11,10 @@ const {
     shapeDexPair,
     shapeTicker,
     indexSolanaCoinIds,
+    planCexTiers,
     planCoinIdRefresh,
     selectCoinIdsForRefresh,
+    watchedMintsFromWatches,
     sortVenues,
     topVenues,
     aggregateVenues,
@@ -233,6 +235,91 @@ describe('selectCoinIdsForRefresh', () => {
             coinIds: ['coin-a', 'coin-b'],
             newCoinIds: []
         });
+    });
+});
+
+describe('planCexTiers (daily tier + rotating tail)', () => {
+    // One mint per coin, as in production (1,169 mints ↔ 1,169 ids on 2026-09-24). `cex` and `dex`
+    // are the last known venues.json rows: exchange 24 h volume and DEX liquidity are what rank.
+    const item = (n, { at = null, cexVol = null, dexLiq = null, id = `coin-${n}` } = {}) => ({
+        mint: `mint-${n}`, coingeckoId: id, cexFetchedAt: at,
+        cex: cexVol === null ? [] : [{ market: 'M', volume24Usd: cexVol }],
+        dex: dexLiq === null ? [] : [{ dexId: 'd', liquidityUsd: dexLiq }]
+    });
+    const previous = [
+        item('aapl', { at: '2026-09-23T00:08:00Z', cexVol: 10_300_000, dexLiq: 265_000 }),
+        item('spy', { at: '2026-09-23T00:26:00Z', cexVol: 28_500_000, dexLiq: 3_646_000 }),
+        item('pool', { at: '2026-09-23T00:30:00Z', cexVol: null, dexLiq: 900_000 }),
+        item('old1', { at: '2026-09-19T00:00:00Z', cexVol: 50 }),
+        item('old2', { at: '2026-09-20T00:00:00Z', cexVol: 0, dexLiq: 0 }),
+        item('fresh', { at: '2026-09-22T00:00:00Z' }),
+        item('unseen'),
+        // Re-mapped since: its old volume belongs to another coin id and must not rank this one.
+        item('remapped', { at: '2026-09-18T00:00:00Z', cexVol: 99_000_000, id: 'old-id' })
+    ];
+    const mapping = new Map(previous.map((row) => [row.mint, row.coingeckoId === 'old-id' ? 'coin-remapped' : row.coingeckoId]));
+
+    test('refreshes the busiest coins every day even though they were read yesterday', () => {
+        const tiers = planCexTiers(mapping, previous, { dailyBudget: 5, priorityCount: 3 });
+        // CEX-volume ranking (spy, aapl, old1) and DEX-liquidity ranking (spy, pool, aapl), rank by
+        // rank: spy leads both; then aapl (2nd by volume) and pool (2nd by liquidity).
+        expect(tiers.priority).toEqual(['coin-spy', 'coin-aapl', 'coin-pool']);
+        expect(tiers.tail).toEqual(['coin-remapped', 'coin-unseen', 'coin-old1', 'coin-old2', 'coin-fresh']);
+        expect(tiers.ordered).toEqual([...tiers.priority, ...tiers.tail]);
+        // What the daily run actually requests: all three busy coins, then the two oldest tail coins.
+        expect(planCoinIdRefresh(tiers.ordered, new Set(), new Set(), 5).newCoinIds)
+            .toEqual(['coin-spy', 'coin-aapl', 'coin-pool', 'coin-remapped', 'coin-unseen']);
+    });
+
+    test('states the expected refresh interval of each tier', () => {
+        const tiers = planCexTiers(mapping, previous, { dailyBudget: 5, priorityCount: 3 });
+        // 5 tail coins at 5 − 3 = 2 per day.
+        expect(tiers.intervals).toEqual({ priorityDays: 1, tailDays: 2.5 });
+        // The production shape: 1,169 coins, 250 a day, 100 of them daily → 1,069 at 150/day.
+        const many = new Map(Array.from({ length: 1169 }, (_, i) => [`m${i}`, `c${i}`]));
+        const rows = Array.from({ length: 1169 }, (_, i) => ({ mint: `m${i}`, coingeckoId: `c${i}`, cex: [{ volume24Usd: i + 1 }] }));
+        const plan = planCexTiers(many, rows, { dailyBudget: 250, priorityCount: 100 });
+        expect(plan.priority).toHaveLength(100);
+        expect(plan.tail).toHaveLength(1069);
+        expect(plan.intervals.tailDays).toBeCloseTo(7.127, 3);
+        // No budget left for the tail is not an interval.
+        expect(planCexTiers(many, rows, { dailyBudget: 100, priorityCount: 100 }).intervals.tailDays).toBeNull();
+    });
+
+    test('puts saved watches first and never ranks a coin on a missing or zero figure', () => {
+        const tiers = planCexTiers(mapping, previous, { dailyBudget: 5, priorityCount: 3, watchedMints: ['mint-old2', 'mint-not-mapped'] });
+        expect(tiers.watched).toEqual(['coin-old2']);
+        expect(tiers.priority).toEqual(['coin-old2', 'coin-spy', 'coin-aapl']);
+        // Only four coins have a positive figure; a larger tier does not pad itself with the rest.
+        expect(planCexTiers(mapping, previous, { dailyBudget: 8, priorityCount: 6 }).priority)
+            .toEqual(['coin-spy', 'coin-aapl', 'coin-pool', 'coin-old1']);
+    });
+
+    test('without a priority tier it is the plain oldest/unseen-first rotation', () => {
+        const tiers = planCexTiers(mapping, previous, { dailyBudget: 5, priorityCount: 0 });
+        expect(tiers.priority).toEqual([]);
+        expect(tiers.ordered).toEqual(selectCoinIdsForRefresh(mapping, previous, null));
+        expect(tiers.intervals.priorityDays).toBeNull();
+    });
+});
+
+describe('watchedMintsFromWatches', () => {
+    const universe = [
+        { mint: 'A1', underlyingTicker: 'AAPL', issuer: 'xstocks-backed' },
+        { mint: 'A2', underlyingTicker: 'AAPL', issuer: 'ondo-global-markets' },
+        { mint: 'A3', underlyingTicker: 'AAPL', issuer: 'backpack-securities' },
+        { mint: 'T1', underlyingTicker: 'TSLA', issuer: 'xstocks-backed' }
+    ];
+
+    test('reads token, protocol-market and comparison watches the way the watch builder does', () => {
+        expect(watchedMintsFromWatches([
+            { watch_type: 'token', target: { mint: 'T1' } },
+            { watch_type: 'protocol-market', target: { mint: 'X9', integrationId: 'k', marketKey: 'm' } },
+            { watch_type: 'comparison', target: null, underlying_ticker: 'AAPL', issuer_slugs: ['xstocks-backed', 'ondo-global-markets'] },
+            // An issuer watch can span hundreds of mints; its busy ones already rank by volume.
+            { watch_type: 'issuer', target: { issuerSlug: 'backpack-securities' } }
+        ], universe)).toEqual(['A1', 'A2', 'T1', 'X9']);
+        expect(watchedMintsFromWatches(null, universe)).toEqual([]);
     });
 });
 

@@ -734,8 +734,9 @@ export function defiEvents(feed, ctx, tally = null) {
             continue;
         }
         const protocol = text(item.protocolName) ?? text(item.protocolId) ?? 'A protocol';
-        const key = `${protocol}|${change}|${use}|${at}`;
-        if (!groups.has(key)) groups.set(key, { protocol, change, use, at, category: item.category, items: [] });
+        const observed = item.basis === 'onchain-position';
+        const key = `${protocol}|${change}|${use}|${at}|${observed}`;
+        if (!groups.has(key)) groups.set(key, { protocol, change, use, at, observed, category: item.category, items: [] });
         groups.get(key).items.push({ ...item, mint });
     }
     note(tally, 'DeFi scanner: unconfirmed holdings under review', Array.isArray(feed?.candidates) ? feed.candidates.length : 0);
@@ -745,11 +746,16 @@ export function defiEvents(feed, ctx, tally = null) {
         const n = symbols.length;
         const added = group.change === 'added';
         const single = n === 1 ? group.items[0] : null;
-        const title = n === 1
-            ? (added ? `${group.protocol} now lists ${symbols[0]} for ${group.use}` : `${group.protocol} dropped ${symbols[0]} from ${group.use}`)
-            : withNames(added ? `${group.protocol} now lists ${n} tokens for ${group.use}` : `${group.protocol} dropped ${n} tokens from ${group.use}`, symbols);
+        // Loans read on-chain are observations: a loan opened or closed, never a listing added or dropped.
+        const title = group.observed
+            ? (n === 1
+                ? (added ? `First ${group.protocol} loan against ${symbols[0]} observed` : `No open ${group.protocol} loan against ${symbols[0]} any more`)
+                : withNames(added ? `First ${group.protocol} loans against ${n} tokens observed` : `No open ${group.protocol} loans against ${n} tokens any more`, symbols))
+            : n === 1
+                ? (added ? `${group.protocol} now lists ${symbols[0]} for ${group.use}` : `${group.protocol} dropped ${symbols[0]} from ${group.use}`)
+                : withNames(added ? `${group.protocol} now lists ${n} tokens for ${group.use}` : `${group.protocol} dropped ${n} tokens from ${group.use}`, symbols);
         out.push(makeEvent({
-            id: `defi-${slugPart(group.protocol)}-${group.change}-${slugPart(group.category)}-${group.at}`,
+            id: `defi-${slugPart(group.protocol)}-${group.change}-${slugPart(group.category)}${group.observed ? '-loans' : ''}-${group.at}`,
             at: group.at,
             kind: added ? 'defi-added' : 'defi-removed',
             category: 'defi', title,

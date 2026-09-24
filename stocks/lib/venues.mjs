@@ -192,6 +192,113 @@ export function selectCoinIdsForRefresh(coinIdByMint, previousItems, limit) {
     return limit === null ? ordered : ordered.slice(0, limit);
 }
 
+/** Ids ranked by a positive finite measure, largest first, ties by id. Null and 0 never rank. */
+function rankedIds(measureById) {
+    return [...measureById]
+        .filter(([, value]) => value !== null && value > 0)
+        .sort(([aId, a], [bId, b]) => (b - a) || (aId < bId ? -1 : aId > bId ? 1 : 0))
+        .map(([id]) => id);
+}
+
+/**
+ * The daily CoinGecko plan in two tiers (MODEL.md §11). The PRIORITY tier is refreshed every day:
+ * the coins behind a saved watch first, then the busiest coins, taken alternately from two
+ * rankings — last known exchange 24 h volume (Σ cex[].volume24Usd) and DEX pool liquidity
+ * (Σ dex[].liquidityUsd, refreshed every six hours). The two measures are not comparable, so
+ * neither is converted into the other: alternating keeps one from crowding out the other. The TAIL
+ * is every other mapped coin, oldest/unseen first (selectCoinIdsForRefresh), and shares what is
+ * left of the daily budget.
+ *
+ * Only a record whose `coingeckoId` equals today's mapping lends its figures; a coin with no
+ * measured activity never enters the priority tier on a missing number.
+ *
+ * Returns `{ ordered, priority, tail, watched, intervals }` where `ordered` is priority then tail
+ * (the input planCoinIdRefresh expects) and `intervals` is the expected days between refreshes per
+ * tier: 1 for the priority tier, tail size ÷ remaining daily budget for the tail (null when the
+ * budget leaves nothing for the tail, which the caller must refuse).
+ */
+export function planCexTiers(coinIdByMint, previousItems, { dailyBudget = null, priorityCount = 0, watchedMints = [] } = {}) {
+    const mapping = coinIdByMint instanceof Map ? coinIdByMint : new Map();
+    const previousByMint = new Map(
+        (Array.isArray(previousItems) ? previousItems : [])
+            .filter((item) => typeof item?.mint === 'string' && item.mint !== '')
+            .map((item) => [item.mint, item])
+    );
+    const cexVolume = new Map();
+    const dexLiquidity = new Map();
+    for (const [mint, coinId] of mapping) {
+        if (typeof coinId !== 'string' || coinId === '') continue;
+        const previous = previousByMint.get(mint);
+        const same = previous?.coingeckoId === coinId;
+        const volume = same ? sumOrNull((Array.isArray(previous.cex) ? previous.cex : []).map((t) => t?.volume24Usd)) : null;
+        // DEX liquidity is a property of the mint and is fresh whatever the CoinGecko mapping says.
+        const liquidity = sumOrNull((Array.isArray(previous?.dex) ? previous.dex : []).map((p) => p?.liquidityUsd));
+        // One coin id normally maps to one mint; if several, the busiest mint speaks for the coin.
+        cexVolume.set(coinId, Math.max(cexVolume.get(coinId) ?? -Infinity, volume ?? -Infinity));
+        dexLiquidity.set(coinId, Math.max(dexLiquidity.get(coinId) ?? -Infinity, liquidity ?? -Infinity));
+    }
+    const finite = (map) => new Map([...map].map(([id, value]) => [id, Number.isFinite(value) ? value : null]));
+
+    const limit = Number.isInteger(priorityCount) && priorityCount > 0 ? priorityCount : 0;
+    const priority = [];
+    const add = (id) => {
+        if (priority.length < limit && id !== undefined && !priority.includes(id)) priority.push(id);
+    };
+    const watched = [...new Set((Array.isArray(watchedMints) ? watchedMints : [])
+        .map((mint) => mapping.get(mint))
+        .filter((id) => typeof id === 'string' && id !== ''))].sort();
+    for (const id of watched) add(id);
+    const byCex = rankedIds(finite(cexVolume));
+    const byDex = rankedIds(finite(dexLiquidity));
+    for (let i = 0; priority.length < limit && (i < byCex.length || i < byDex.length); i += 1) {
+        add(byCex[i]);
+        add(byDex[i]);
+    }
+
+    const inPriority = new Set(priority);
+    const tail = selectCoinIdsForRefresh(mapping, previousItems, null).filter((id) => !inPriority.has(id));
+    const tailBudget = dailyBudget === null ? null : dailyBudget - priority.length;
+    return {
+        ordered: [...priority, ...tail],
+        priority,
+        tail,
+        watched: watched.filter((id) => inPriority.has(id)),
+        intervals: {
+            priorityDays: priority.length > 0 ? 1 : null,
+            tailDays: tail.length === 0 ? null
+                : tailBudget === null ? 1
+                    : tailBudget > 0 ? tail.length / tailBudget : null
+        }
+    };
+}
+
+/**
+ * The mints a saved watch (sonar.stock_watchlist rows) points at, for the priority tier: a token or
+ * protocol-market watch names its mint; a comparison watch names an underlying ticker and the
+ * issuers selected for it (lib/watchlists.mjs reads it the same way). An issuer watch is left out:
+ * one issuer can hold hundreds of mints, and its busy ones already rank by volume.
+ */
+export function watchedMintsFromWatches(watches, universeItems) {
+    const items = Array.isArray(universeItems) ? universeItems : [];
+    const mints = new Set();
+    for (const watch of Array.isArray(watches) ? watches : []) {
+        const type = watch?.watch_type ?? 'comparison';
+        if (type === 'token' || type === 'protocol-market') {
+            const mint = stringOrNull(watch?.target?.mint);
+            if (mint !== null) mints.add(mint);
+        } else if (type === 'comparison') {
+            const ticker = stringOrNull(watch?.underlying_ticker);
+            const issuers = new Set(Array.isArray(watch?.issuer_slugs) ? watch.issuer_slugs : []);
+            for (const item of items) {
+                if (ticker !== null && item?.underlyingTicker === ticker && issuers.has(item?.issuer) && stringOrNull(item?.mint) !== null) {
+                    mints.add(item.mint);
+                }
+            }
+        }
+    }
+    return [...mints].sort();
+}
+
 /** Apply a per-day request ceiling to an already oldest-first list. */
 export function planCoinIdRefresh(orderedCoinIds, attemptedIds, completedIds, limit) {
     const ordered = [...new Set(Array.isArray(orderedCoinIds) ? orderedCoinIds : [])];

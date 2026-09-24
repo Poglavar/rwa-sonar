@@ -342,7 +342,7 @@ describe('renderCard', () => {
         expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
             .toContain('No confirmed secondary-market exit');
         expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
-            .toContain('Coverage checked');
+            .toContain('DEX pools checked');
         expect(cardDiscrepancies(issuers.get('xstocks-backed'), tokenDb.tokens.find((row) => row.symbol === 'FGDLx'))).toEqual(xstocks.discrepancies);
         expect(cardFor('NVDAx').discrepancies).toHaveLength(0);
         expect(xstocksHtml).toContain('Claim ≠ observed reality');
@@ -743,6 +743,55 @@ describe('the redemption schematic on a card', () => {
         const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
         expect(html).toContain('<a href="../issuers/xstocks-backed.html#how-it-works">See it drawn step by step: xStocks: stablecoin redemption (observed on-chain) →</a>');
         expect(html).not.toContain('<figure class="fd ');
+    });
+});
+
+describe('exchange markets on a card are dated by their own CoinGecko read', () => {
+    const AAPLX = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+    // The live AAPLx record of 2026-09-24: DEX pools refreshed that day, exchange markets last read
+    // on 2026-09-22 by the daily CoinGecko rotation. The Raydium ticker is verbatim from CoinGecko,
+    // which uppercases the USDC mint it is quoted in.
+    const venuesItem = {
+        mint: AAPLX.mint, coingeckoId: 'apple-xstock', dexFetchedAt: '2026-09-24T12:13:06Z', cexFetchedAt: '2026-09-22T00:08:37Z',
+        dex: [],
+        cex: [
+            { market: 'Raydium (CLMM)', marketId: 'raydium-clmm', base: 'XSBEHLATCF6HDFPFZ5XEMDQW8NFAVCSP5BDUDRLJZJP', target: 'EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V', priceUsd: 338.84, volume24Usd: 3122530, trustScore: null, url: null, lastTradedAt: '2026-09-22T00:05:03+00:00' },
+            { market: 'BigONE', marketId: 'bigone', base: 'AAPLX', target: 'USDT', priceUsd: 339.66, volume24Usd: 2960000, trustScore: null, url: 'https://big.one/trade/AAPLX-USDT', lastTradedAt: '2026-09-22T00:04:00+00:00' }
+        ]
+    };
+    const build = (item) => buildCard({
+        token: { ...AAPLX, activity: { ...AAPLX.activity, cexMarkets: item.cex.length, lastTradedAt: item.cex[0]?.lastTradedAt ?? null, lastTradedVenue: item.cex[0]?.market ?? null } },
+        issuer: issuers.get(AAPLX.issuer), venuesItem: item, slug: 'AAPLx', builtAt: BUILT_AT,
+        sources: { ...SOURCES, venues: '2026-09-24T12:24:33Z' }
+    });
+
+    it('states the as-of date on the table, the venue count and the last trade seen', () => {
+        const card = build(venuesItem);
+        const html = renderCard(card, { version: 'v' });
+        const asOf = '<time datetime="2026-09-22T00:08:37Z">22 Sep 2026 00:08 UTC</time>';
+        expect(card.venues.cexAsOf).toBe('2026-09-22T00:08:37Z');
+        expect(publicCard(card).venues.cexAsOf).toBe('2026-09-22T00:08:37Z');
+        expect(html).toContain(`<p class="note">Exchange data as of ${asOf}, from CoinGecko. Each 24 h volume covers the 24 h before that time.</p>`);
+        expect(html).toContain(`2 exchange market(s) · exchange data as of ${asOf}`);
+        expect(html).toMatch(new RegExp(`Last exchange trade seen.*on Raydium \\(CLMM\\) · exchange data as of ${asOf.replace(/[()]/g, '\\$&')}`));
+    });
+
+    it('names the quote asset instead of printing CoinGecko\'s uppercased mint', () => {
+        const card = build(venuesItem);
+        const html = renderCard(card, { version: 'v' });
+        expect(card.venues.cex.map((row) => row.targetLabel)).toEqual(['USDC', 'USDT']);
+        expect(html).toContain('Raydium (CLMM) <span class="t">USDC</span>');
+        expect(html).not.toContain('EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V');
+        // The machine-readable record keeps what CoinGecko reported beside the label.
+        expect(publicCard(card).venues.cex[0].target).toBe('EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V');
+    });
+
+    it('dates an empty exchange check too, and says nothing about a date it does not have', () => {
+        const empty = renderCard(build({ ...venuesItem, cex: [] }), { version: 'v' });
+        expect(empty).toContain('No exchange market reported as of <time datetime="2026-09-22T00:08:37Z">');
+        const unmapped = renderCard(build({ ...venuesItem, coingeckoId: null, cexFetchedAt: null, cex: [] }), { version: 'v' });
+        expect(unmapped).toContain('<p class="no">No exchange market reported.</p>');
+        expect(unmapped).not.toContain('exchange data as of');
     });
 });
 

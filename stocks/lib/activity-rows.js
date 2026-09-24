@@ -103,16 +103,78 @@
     function shortenPairLeg(value) {
         if (typeof value !== 'string' || !value.trim()) return null;
         const leg = value.trim();
-        if (leg.length <= 12 || /[^A-Za-z0-9]/.test(leg)) return leg;
+        if (!isAddressLike(leg)) return leg;
         return `${leg.slice(0, 4)}…${leg.slice(-4)}`;
+    }
+
+    /** A pair leg that is an address (a Solana mint or an EVM contract), as opposed to a symbol. */
+    function isAddressLike(leg) {
+        return leg.length > 12 && !/[^A-Za-z0-9]/.test(leg);
+    }
+
+    /**
+     * Quote assets CoinGecko reports by address, keyed UPPERCASE because CoinGecko uppercases both
+     * legs of a DEX ticker (EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V is Solana USDC). Symbols
+     * checked against CoinGecko's own coin list (platforms.*) on 2026-09-24. Wrapped SOL is shown as
+     * SOL, the way DexScreener shows it on the DEX side of the same card.
+     */
+    const KNOWN_QUOTE_ASSETS = Object.freeze({
+        EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V: 'USDC',
+        ES9VMFRZACERMJFRF4H2FYD4KCONKY11MCCE8BENWNYB: 'USDT',
+        SO11111111111111111111111111111111111111112: 'SOL',
+        '2U1TSZSEQZ3QBWF3UNGPFC8TZMK2TDIWKNNRMWGWJGWH': 'USDG',
+        '2B1KV6DKPANXD5IXFNXCPJXMKWQJJAYMCZFHSFU24GXO': 'PYUSD',
+        // EVM legs of the same coins' Ethereum / BNB Chain pools.
+        '0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48': 'USDC',
+        '0X8AC76A51CC950D9822D68B83FE1AD97B32CD580D': 'USDC',
+        '0XDAC17F958D2EE523A2206206994597C13D831EC7': 'USDT',
+        '0X55D398326F99059FF775485246999027B3197955': 'USDT',
+        '0XBB4CDB9CBD36B01BD1CBAEBF2DE08D9173BC095C': 'WBNB',
+        '0XC02AAA39B223FE8D0A0E5C4F27EAD9083C756CC2': 'WETH'
+    });
+
+    /**
+     * Our own mints as a quote-asset index: UPPERCASE mint → symbol, from the token list
+     * ([{mint, symbol}]). Two mints that uppercase to the same key are ambiguous, so the key is
+     * dropped rather than letting list order pick a symbol.
+     */
+    function quoteSymbolIndex(tokens) {
+        const index = new Map();
+        const ambiguous = new Set();
+        for (const token of Array.isArray(tokens) ? tokens : []) {
+            const mint = token && typeof token.mint === 'string' ? token.mint.trim() : '';
+            const symbol = token && typeof token.symbol === 'string' ? token.symbol.trim() : '';
+            if (!mint || !symbol) continue;
+            const key = mint.toUpperCase();
+            if (index.has(key) && index.get(key) !== symbol) ambiguous.add(key);
+            else index.set(key, symbol);
+        }
+        for (const key of ambiguous) index.delete(key);
+        return index;
+    }
+
+    /**
+     * A pair leg as a reader should see it: a symbol stays as it is; an address becomes its symbol
+     * from KNOWN_QUOTE_ASSETS, then from `index` (quoteSymbolIndex), and an address neither knows is
+     * shortened to its ends. The full address is never printed as the label.
+     */
+    function pairLegLabel(value, index = null) {
+        if (typeof value !== 'string' || !value.trim()) return null;
+        const leg = value.trim();
+        if (!isAddressLike(leg)) return leg;
+        const key = leg.toUpperCase();
+        if (Object.prototype.hasOwnProperty.call(KNOWN_QUOTE_ASSETS, key)) return KNOWN_QUOTE_ASSETS[key];
+        if (index instanceof Map && index.has(key)) return index.get(key);
+        return shortenPairLeg(leg);
     }
 
     /**
      * The venues of one token as uniform rows for the detail panel, busiest first. Accepts either the
      * `{dex: [...], cex: [...]}` shape of venues.json or one flat array, and infers the kind from the
      * fields when an item does not name it, so a pair keeps rendering if the builder reshapes it.
+     * `symbolIndex` (quoteSymbolIndex) names our own mints when CoinGecko reports one as a leg.
      */
-    function venueRows(source) {
+    function venueRows(source, symbolIndex = null) {
         const items = [];
         if (Array.isArray(source)) {
             items.push(...source);
@@ -135,7 +197,7 @@
                 : (item.base && item.target ? `${item.base}/${item.target}` : null);
             const pair = kind === 'dex'
                 ? pairFull
-                : (item.base && item.target ? `${shortenPairLeg(item.base)}/${shortenPairLeg(item.target)}` : null);
+                : (item.base && item.target ? `${pairLegLabel(item.base, symbolIndex)}/${pairLegLabel(item.target, symbolIndex)}` : null);
             rows.push({
                 kind,
                 name: typeof name === 'string' && name.trim() ? name.trim() : DASH,
@@ -163,6 +225,9 @@
         activityFlags,
         issuerActivityRow,
         activityRows,
+        KNOWN_QUOTE_ASSETS,
+        pairLegLabel,
+        quoteSymbolIndex,
         shortenPairLeg,
         venueRows
     };

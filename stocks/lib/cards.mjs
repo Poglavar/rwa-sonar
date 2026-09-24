@@ -19,9 +19,11 @@ import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
 import protocolProof from './protocol-proof.js';
+import activityRowsLib from './activity-rows.js';
 import { breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags } from './site-seo.mjs';
 
 const { protocolProofModel } = protocolProof;
+const { pairLegLabel } = activityRowsLib;
 
 const {
     DASH,
@@ -303,6 +305,8 @@ function controlFlag(value) {
  * @param {string} input.slug the card file name (assignSlugs)
  * @param {string} input.builtAt the only value that may differ between two builds
  * @param {object} input.sources per-input fetch timestamps for the footer
+ * @param {Map|null} input.quoteSymbols UPPERCASE mint → symbol (activity-rows.js quoteSymbolIndex), so an
+ *     exchange pair quoted in one of our own tokens names it instead of printing its address
  */
 export function buildCard(input) {
     const {
@@ -335,7 +339,8 @@ export function buildCard(input) {
         materialChanges = null,
         // Protocol-market docs-vs-chain findings (discrepancy-view.js protocolDiscrepancyRecords);
         // only those on a market for this exact mint reach the card.
-        protocolDiscrepancies = []
+        protocolDiscrepancies = [],
+        quoteSymbols = null
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -585,7 +590,11 @@ export function buildCard(input) {
         },
         venues: {
             dex: venueRows(venuesItem?.dex, meteoraByPair),
-            cex: cexRows(venuesItem?.cex)
+            cex: cexRows(venuesItem?.cex, quoteSymbols),
+            // When CoinGecko was last read for THIS token. The exchange markets rotate through a
+            // daily call budget (fetch-venues.mjs), so they can be days older than the DEX pools;
+            // every exchange figure on the card is dated by this, never by the venues file time.
+            cexAsOf: str(venuesItem?.cexFetchedAt)
         },
         // Evidence (stocks/EVIDENCE.md §4): the issuer's coverage numbers for the footer line, and
         // the strongest claim per field for the evidence controls on the three issuer-derived sections.
@@ -647,8 +656,12 @@ function venueRows(dex, meteoraByPair) {
     });
 }
 
-/** The busiest exchange markets. */
-function cexRows(cex) {
+/**
+ * The busiest exchange markets. `target` is the quote asset exactly as CoinGecko reports it (a DEX
+ * ticker's is an UPPERCASED address); `targetLabel` is what a reader sees: a symbol, or a
+ * shortened address when neither the known quote assets nor our own mints name it.
+ */
+function cexRows(cex, quoteSymbols = null) {
     return (Array.isArray(cex) ? cex : [])
         .filter((row) => row && typeof row === 'object')
         .slice()
@@ -658,6 +671,7 @@ function cexRows(cex) {
         .map((row) => ({
             market: str(row.market),
             target: str(row.target),
+            targetLabel: pairLegLabel(row.target, quoteSymbols),
             priceUsd: num(row.priceUsd),
             volume24Usd: num(row.volume24Usd),
             url: safeUrl(row.url),
@@ -1432,18 +1446,21 @@ function depthBody(card) {
         venueSpreadHigh: d.venueSpreadHigh,
         venuesPriced: d.venuesPriced
     });
+    // Exchange markets, and the last trade seen on one, come from the CoinGecko read dated cexAsOf,
+    // which can be days older than the rest of this section; each such row carries that date.
+    const exchangeAsOf = card.venues.cexAsOf === null ? '' : ` · exchange data as of ${time(card.venues.cexAsOf)}`;
     const lastTrade = d.lastTradedAt === null
         ? null
-        : `${time(d.lastTradedAt)}${d.lastTradedVenue === null ? '' : ` on ${escapeHtml(d.lastTradedVenue)}`}`;
+        : `${time(d.lastTradedAt)}${d.lastTradedVenue === null ? '' : ` on ${escapeHtml(d.lastTradedVenue)}`}${exchangeAsOf}`;
 
     return kv([
         ['Liquidity', d.liquidityUsd === null ? null : text(fmtMoney(d.liquidityUsd))],
         ['Volume 24 h', d.vol24Usd === null ? null : text(fmtMoney(d.vol24Usd))],
         ['Organic share', organic],
         ['Flow 24 h', flow.length ? escapeHtml(flow.join(' · ')) : null],
-        ['Venues', `${text(fmtNumber(d.dexPairs))} DEX pair(s) · ${text(fmtNumber(d.cexMarkets))} exchange market(s)`],
+        ['Venues', `${text(fmtNumber(d.dexPairs))} DEX pair(s) · ${text(fmtNumber(d.cexMarkets))} exchange market(s)${d.cexMarkets === null ? '' : exchangeAsOf}`],
         ['Cross-venue spread', spread === DASH ? null : escapeHtml(spread)],
-        ['Last trade seen', lastTrade],
+        ['Last exchange trade seen', lastTrade],
         ['Holders', d.holderCount === null ? null : text(fmtNumber(d.holderCount))],
         ['Market cap', d.mcapUsd === null ? null : text(fmtMoney(d.mcapUsd))]
     ]);
@@ -1582,7 +1599,7 @@ function venuesBody(card) {
 
     const cexRowsHtml = card.venues.cex.map((row) => {
         const name = row.url === null ? text(row.market) : link(row.url, row.market ?? 'market');
-        const pair = row.target === null ? '' : ` <span class="t">${escapeHtml(row.target)}</span>`;
+        const pair = row.targetLabel === null ? '' : ` <span class="t">${escapeHtml(row.targetLabel)}</span>`;
         return `<tr><td>${name}${pair}</td><td class="n">${text(fmtPrice(row.priceUsd))}</td>` +
             `<td class="n">${text(fmtMoney(row.volume24Usd))}</td><td>${row.lastTradedAt === null ? DASH : time(row.lastTradedAt)}</td></tr>`;
     }).join('');
@@ -1592,11 +1609,16 @@ function venuesBody(card) {
           `<th scope="col">Price</th><th scope="col">Liquidity</th><th scope="col">Vol 24 h</th></tr></thead>` +
           `<tbody>${dexRows}</tbody></table></div>`
         : '<h3>DEX pools</h3><p class="no">No DEX pool reported.</p>';
+    // The CoinGecko read is rotated through a daily call budget, so the table states its own date
+    // and what its 24 h volume covers.
+    const asOf = card.venues.cexAsOf;
     const cex = cexRowsHtml
-        ? `<h3>Exchange markets</h3><div class="scroll"><table class="r"><thead><tr><th scope="col">Market</th>` +
+        ? `<h3>Exchange markets</h3>` +
+          `${asOf === null ? '' : `<p class="note">Exchange data as of ${time(asOf)}, from CoinGecko. Each 24 h volume covers the 24 h before that time.</p>`}` +
+          `<div class="scroll"><table class="r"><thead><tr><th scope="col">Market</th>` +
           `<th scope="col">Price</th><th scope="col">Vol 24 h</th><th scope="col">Last trade</th></tr></thead>` +
           `<tbody>${cexRowsHtml}</tbody></table></div>`
-        : '<h3>Exchange markets</h3><p class="no">No exchange market reported.</p>';
+        : `<h3>Exchange markets</h3><p class="no">No exchange market reported${asOf === null ? '' : ` as of ${time(asOf)}`}.</p>`;
     return dex + cex;
 }
 
@@ -1726,7 +1748,7 @@ function defiActions(actions) {
 function defiMetrics(entry) {
     const m = entry?.metrics ?? {};
     const parts = [];
-    if (isNum(m.sizeUsd)) parts.push(`${fmtMoney(m.sizeUsd)} market size`);
+    if (isNum(m.sizeUsd)) parts.push(`${fmtMoney(m.sizeUsd)} ${typeof m.sizeLabel === 'string' ? m.sizeLabel : 'market size'}`);
     if (isNum(m.maxLtvMin) || isNum(m.maxLtvMax)) {
         const low = isNum(m.maxLtvMin) ? m.maxLtvMin * 100 : m.maxLtvMax * 100;
         const high = isNum(m.maxLtvMax) ? m.maxLtvMax * 100 : low;
@@ -1756,6 +1778,9 @@ function defiMetrics(entry) {
     if (isNum(m.borrowLimitUsd)) parts.push(`${fmtMoney(m.borrowLimitUsd)} borrow cap`);
     if (isNum(m.pools)) parts.push(`${fmtNumber(m.pools)} pool${m.pools === 1 ? '' : 's'}`);
     if (isNum(m.positions)) parts.push(`${fmtNumber(m.positions)} position${m.positions === 1 ? '' : 's'}`);
+    // Only an integration that names its debt measure shows it (Loopscale: open loan principal).
+    if (isNum(m.debtAgainstCollateralUsd) && typeof m.debtLabel === 'string') parts.push(`${fmtMoney(m.debtAgainstCollateralUsd)} ${m.debtLabel}`);
+    if (isNum(m.loansPastEnd) && m.loansPastEnd > 0) parts.push(`${fmtNumber(m.loansPastEnd)} past end date`);
     return parts.join(' · ');
 }
 
@@ -1934,12 +1959,13 @@ export function assetDecisionFacts(card) {
     const dexPairs = Number.isFinite(card?.depth?.dexPairs) ? card.depth.dexPairs : null;
     const cexMarkets = Number.isFinite(card?.depth?.cexMarkets) ? card.depth.cexMarkets : null;
     const liquidity = Number.isFinite(card?.depth?.liquidityUsd) ? card.depth.liquidityUsd : null;
-    const venueCheck = card?.sources?.venues ? ` Coverage checked ${fmtDateTime(card.sources.venues)}.` : '';
+    const venueCheck = card?.sources?.venues ? ` DEX pools checked ${fmtDateTime(card.sources.venues)}.` : '';
+    const exchangeAsOf = card?.venues?.cexAsOf ? ` Exchange data as of ${fmtDateTime(card.venues.cexAsOf)}.` : '';
     const marketExit = (dexPairs ?? 0) > 0 || (liquidity ?? 0) > 0
         ? `Secondary market: ${dexPairs ?? 'an uncounted number of'} confirmed DEX pair${dexPairs === 1 ? '' : 's'}${liquidity === null ? '' : ` with ${fmtMoney(liquidity)} reported liquidity`}. Pool presence does not guarantee executable size.`
         : (cexMarkets ?? 0) > 0
-            ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. Selling there goes through a custodial venue, with no on-chain pool.${venueCheck}`
-            : `No confirmed secondary-market exit: no exact-token DEX pair or centralised venue market was found.${venueCheck} Legal rights, issuer redemption and DeFi support are still assessed independently.`;
+            ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. Selling there goes through a custodial venue, with no on-chain pool.${venueCheck}${exchangeAsOf}`
+            : `No confirmed secondary-market exit: no exact-token DEX pair or centralised venue market was found.${venueCheck}${exchangeAsOf} Legal rights, issuer redemption and DeFi support are still assessed independently.`;
     const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
         .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
     const worst = (Array.isArray(card?.health?.rules) ? card.health.rules : [])

@@ -1,16 +1,20 @@
-// Loopscale detection: Loan decoding against a real mainnet account read, the holder-scan join, and
-// how the resulting integration reads through the shared proof vocabulary.
+// Loopscale detection: Loan decoding against real mainnet account reads, the Loan-scan positions,
+// the open principal against each exact token, and how the integration reads through the shared
+// proof vocabulary.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
 const {
+    LOAN_COLLATERAL_SLICE,
     LOAN_DISCRIMINATOR_BASE58,
     LOOPSCALE_PROGRAM_ID,
     base58,
+    collateralMintsFromSlice,
     decodeLoan,
-    holderOwners,
+    ledgerOpenPrincipalRaw,
     loopscalePositions,
     loopscaleUsage,
+    openPrincipalAgainst,
     unambiguousCell
 } = require('./lib/loopscale.mjs');
 const { applyOnchainCorroboration, buildDefiUsage, integrationAccountRefs } = require('./lib/defi-usage.mjs');
@@ -19,19 +23,7 @@ const { protocolProofModel } = require('./lib/protocol-proof.js');
 const FIXTURE = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'loopscale-loan-secz.sample.json'), 'utf8'));
 const SECZ = { mint: '5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED', symbol: 'SECZ', issuer: 'securitize', decimals: 6, market: { usdPrice: 8 } };
 const USDC = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-
-function holdersFor(owner = FIXTURE.loan.address) {
-    return {
-        fetchedAt: '2026-09-20T08:19:40Z',
-        items: [{
-            mint: SECZ.mint, symbol: 'SECZ',
-            top20: [
-                { tokenAccount: '8B9bU9fU8PNbYJsTmom965tTUtEuFaoKMH8sUeKLsdhw', owner: 'Hv8FoJFsrQhoyrR6Lcz4KFcpqNHU1Kxj2yaFDKU6vJdp', amountUi: 130917.545784 },
-                { tokenAccount: FIXTURE.tokenAccount.address, owner, amountUi: 13391.402983 }
-            ]
-        }]
-    };
-}
+const TRACKED = new Map([[SECZ.mint, 'SECZ']]);
 
 describe('Loopscale Loan decoding (real mainnet account)', () => {
     const loan = decodeLoan(FIXTURE.loan.dataBase64);
@@ -87,35 +79,39 @@ describe('Loopscale Loan decoding (real mainnet account)', () => {
     });
 });
 
-describe('Loopscale holder join and integration record', () => {
+describe('Loopscale Loan scan and integration record', () => {
     const loans = new Map([[FIXTURE.loan.address, decodeLoan(FIXTURE.loan.dataBase64)]]);
 
-    test('owners are deduplicated from the top-20 scan', () => {
-        expect(holderOwners(holdersFor())).toEqual([FIXTURE.loan.address, 'Hv8FoJFsrQhoyrR6Lcz4KFcpqNHU1Kxj2yaFDKU6vJdp'].sort());
+    test('the collateral slice alone names the posted mint, which is how the scan picks Loans to read', () => {
+        const bytes = Buffer.from(FIXTURE.loan.dataBase64, 'base64');
+        const slice = bytes.subarray(LOAN_COLLATERAL_SLICE.offset, LOAN_COLLATERAL_SLICE.offset + LOAN_COLLATERAL_SLICE.length);
+        expect(collateralMintsFromSlice(slice.toString('base64'))).toEqual([SECZ.mint]);
+        expect(collateralMintsFromSlice(Buffer.alloc(LOAN_COLLATERAL_SLICE.length))).toEqual([]);
     });
 
-    test('only token accounts owned by a decoded Loan become positions; a record mismatch is flagged', () => {
-        const positions = loopscalePositions(holdersFor(), loans);
+    test('a position is a decoded Loan whose own collateral record names a tracked mint', () => {
+        const positions = loopscalePositions(loans, TRACKED);
         expect(positions).toHaveLength(1);
-        expect(positions[0]).toMatchObject({ mint: SECZ.mint, loanAddress: FIXTURE.loan.address, matchesLoanRecord: true });
-        const otherMint = { items: [{ ...holdersFor().items[0], mint: 'OtherMint1111111111111111111111111111111111' }] };
-        expect(loopscalePositions(otherMint, loans)[0].matchesLoanRecord).toBe(false);
-        expect(loopscaleUsage({ ...SECZ, mint: 'OtherMint1111111111111111111111111111111111' },
-            { positions: loopscalePositions(otherMint, loans) })).toEqual([]);
+        expect(positions[0]).toMatchObject({ mint: SECZ.mint, symbol: 'SECZ', loanAddress: FIXTURE.loan.address, collateral: { amountRaw: FIXTURE.tokenAccount.amount } });
+        expect(loopscalePositions(loans, new Map([['OtherMint1111111111111111111111111111111111', 'X']]))).toEqual([]);
+        expect(loopscaleUsage({ ...SECZ, mint: 'OtherMint1111111111111111111111111111111111' }, { positions })).toEqual([]);
     });
 
-    test('SECZ reads as decoded Loopscale collateral with a borrow against it', () => {
-        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(holdersFor(), loans) };
+    test('SECZ reads as decoded Loopscale collateral with its open principal labelled as such', () => {
+        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(loans, TRACKED) };
         const [row] = loopscaleUsage(SECZ, scan);
         expect(row).toMatchObject({ protocolId: 'loopscale', category: 'lending', status: 'live', actions: ['collateral', 'borrow'] });
-        expect(row.metrics).toMatchObject({ positions: 1, collateralTokens: 13391.402983, maxLtvMin: 0.2, liquidationLtvMax: 0.4 });
+        expect(row.metrics).toMatchObject({ positions: 1, collateralTokens: 13391.402983, maxLtvMin: 0.2, liquidationLtvMax: 0.4,
+            debtAgainstCollateralUsd: 1513.442034, debtLabel: 'open loan principal', sizeLabel: 'collateral posted', loansPastEnd: 0 });
+        expect(row.summary).toBe('Posted as collateral in 1 Loopscale loan, read on-chain; open principal against it: $1,513 in stablecoins.');
         expect(row.metrics.sizeUsd).toBeCloseTo(107131.22, 1);
-        expect(row.markets[0]).toMatchObject({ loanAddress: FIXTURE.loan.address, debtMint: USDC, principalDueRaw: '1513442034' });
+        expect(row.markets[0]).toMatchObject({ loanAddress: FIXTURE.loan.address, debtMint: USDC, debtSymbol: 'USDC', principalDueRaw: '1513442034',
+            principalRepaidRaw: '0', openPrincipalUsd: 1513.442034 });
         expect(integrationAccountRefs(row)).toEqual([{ address: FIXTURE.loan.address, role: 'loan-account', expectedOwner: LOOPSCALE_PROGRAM_ID }]);
     });
 
     test('through buildDefiUsage the proof stage is decoded, sourced from an on-chain position', () => {
-        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(holdersFor(), loans) };
+        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(loans, TRACKED) };
         const usage = buildDefiUsage({ tokens: [SECZ], loopscale: scan, fetchedAt: '2026-09-23T10:00:00Z' });
         const [integration] = usage.items[0].integrations;
         expect(integration.proof).toMatchObject({ sourceStatus: 'onchain-position', configurationDecoded: true, activityObserved: true, observedAt: '2026-09-23T10:00:00Z' });
@@ -130,6 +126,67 @@ describe('Loopscale holder join and integration record', () => {
     test('no scan means no Loopscale integration rather than an error', () => {
         expect(loopscaleUsage(SECZ, null)).toEqual([]);
         expect(buildDefiUsage({ tokens: [SECZ], fetchedAt: 'x' }).sources.loopscale).toBeNull();
+    });
+});
+
+describe('open Loopscale principal against each exact xStock (12 real Loan accounts)', () => {
+    const XS = JSON.parse(readFileSync(join(__dirname, 'fixtures', 'loopscale-loans-xstocks.sample.json'), 'utf8'));
+    const loans = new Map(XS.loans.map((row) => [row.address, decodeLoan(row.dataBase64)]));
+    const tracked = new Map(Object.entries(XS.mints).map(([symbol, mint]) => [mint, symbol]));
+    const scan = { fetchedAt: XS.readAt, slot: XS.slot, positions: loopscalePositions(loans, tracked) };
+    const bySymbol = (symbol) => loopscaleUsage({ mint: XS.mints[symbol], symbol, decimals: 8, market: { usdPrice: null } }, scan)[0];
+
+    test('every fixture account is a Loopscale Loan holding exactly one xStock', () => {
+        expect(XS.loans).toHaveLength(12);
+        for (const row of XS.loans) expect(row.owner).toBe(LOOPSCALE_PROGRAM_ID);
+        for (const loan of loans.values()) expect(loan.collateral).toHaveLength(1);
+        expect(scan.positions).toHaveLength(12);
+    });
+
+    test('the measure is the loans\' open principal, far below the vaults\' allocation counters', () => {
+        const measured = Object.fromEntries(Object.keys(XS.mints).map((symbol) => [symbol, bySymbol(symbol).metrics.debtAgainstCollateralUsd]));
+        expect(measured.TSLAx).toBeCloseTo(2885.186214, 6);
+        expect(measured.NVDAx).toBeCloseTo(74.123164, 6);
+        expect(measured.SPYx).toBeCloseTo(825.803192, 6);
+        expect(measured.CRCLx).toBeCloseTo(177.300766, 6);
+        expect(Object.values(measured).reduce((a, b) => a + b, 0)).toBeCloseTo(3962.413336, 5);
+        // What defi-usage.json reported as "lent against" before: the vault allocation counters.
+        for (const symbol of Object.keys(XS.mints)) expect(measured[symbol]).toBeLessThan(XS.vaultAllocationUsd[symbol]);
+        expect(bySymbol('TSLAx').metrics).toMatchObject({ positions: 3, debtLabel: 'open loan principal' });
+    });
+
+    test('9 of the 12 loans are past their end date at the read; 3 are not', () => {
+        const pastEnd = Object.keys(XS.mints).map((symbol) => bySymbol(symbol).metrics.loansPastEnd);
+        expect(pastEnd.reduce((a, b) => a + b, 0)).toBe(9);
+        expect(bySymbol('TSLAx').summary).toContain('2 of the loans are past their end date and still open');
+        expect(openPrincipalAgainst(scan.positions, '2026-08-01T00:00:00Z').loansPastEnd).toBe(0);
+    });
+
+    test('a loan that cannot be attributed to one token or priced in stablecoins gives no USD total', () => {
+        const [row] = scan.positions;
+        const mixed = { ...row, loan: { ...row.loan, collateral: [...row.loan.collateral, { ...row.loan.collateral[0], assetMint: 'Other' }] } };
+        const sol = { ...row, loan: { ...row.loan, ledgers: [{ ...row.loan.ledgers[0], principalMint: 'So11111111111111111111111111111111111111112' }] } };
+        expect(openPrincipalAgainst([mixed], XS.readAt)).toMatchObject({ openPrincipalUsd: null, unattributedLoans: 1 });
+        expect(openPrincipalAgainst([row, sol], XS.readAt)).toMatchObject({ openPrincipalUsd: null, unpricedLoans: 1 });
+        expect(ledgerOpenPrincipalRaw({ principalDueRaw: '100', principalRepaidRaw: '30' })).toBe('70');
+        expect(ledgerOpenPrincipalRaw({ principalDueRaw: '10', principalRepaidRaw: '30' })).toBeNull();
+    });
+
+    test('through buildDefiUsage the vault rows keep their allocation under its own name and set nothing else', () => {
+        const vaults = [{
+            vault: { address: '3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR', principalMint: USDC, depositsEnabled: true },
+            vaultMetadata: { name: 'USDC Orca' },
+            vaultStrategy: { strategy: { address: 'S1' }, terms: { assetTerms: { [XS.mints.TSLAx]: { durationAndApys: [[{}, 20000]], allocationInfo: { currentAllocationAmount: '30461176945' } } } } }
+        }];
+        const token = { mint: XS.mints.TSLAx, symbol: 'TSLAx', issuer: 'xstocks-backed', decimals: 8, market: { usdPrice: 400 } };
+        const [integration] = buildDefiUsage({ tokens: [token], loopscale: scan, loopscaleVaults: vaults, fetchedAt: XS.readAt }).items[0].integrations;
+        expect(integration.metrics.debtAgainstCollateralUsd).toBeCloseTo(2885.186214, 6);
+        expect(integration.markets.filter((m) => m.loanAddress)).toHaveLength(3);
+        const vaultRow = integration.markets.find((m) => m.source === 'lending-vault-registry');
+        expect(vaultRow.vaultAllocation).toBeCloseTo(30461.176945, 6);
+        expect(vaultRow).not.toHaveProperty('lentAgainstCollateral');
+        expect(integration.summary).toMatch(/1 lending vault lists it as collateral\.$/);
+        expect(integration.evidence.find((e) => e.type === 'protocol-api').note).toBe('1 Loopscale lending vault accepts this exact mint as collateral.');
     });
 });
 
@@ -172,7 +229,7 @@ describe('Loopscale upgrade authority is a Squads v4 vault (real mainnet multisi
     });
 
     test('the SECZ integration carries the upgrade-authority evidence into the dossier', () => {
-        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(holdersFor(), loans()) };
+        const scan = { fetchedAt: '2026-09-23T10:00:00Z', slot: FIXTURE.loan.slot, positions: loopscalePositions(loans(), TRACKED) };
         const [row] = loopscaleUsage(SECZ, scan);
         const ev = row.evidence.find((e) => e.type === 'program-upgrade-authority');
         expect(ev.url).toBe(`https://solscan.io/account/${UA.multisig}`);
@@ -250,8 +307,7 @@ describe('Loopscale SECZ market configuration (real mainnet accounts, one finali
     });
 
     test('the position carries the market terms and the integration reports the configuration, not the loan snapshot', () => {
-        const holders = { items: [{ mint: SECZ.mint, symbol: 'SECZ', top20: [{ tokenAccount: A.collateralTokenAccount.address, owner: A.loan.address, amountUi: 13391.402983 }] }] };
-        const [position] = loopscalePositions(holders, new Map([[A.loan.address, loan]]));
+        const [position] = loopscalePositions(new Map([[A.loan.address, loan]]), TRACKED);
         position.configuration = positionConfiguration(position, new Map([[A.marketInformation.address, market]]), new Map([[A.strategy.address, strategy]]));
         expect(position.configuration).toMatchObject({ oracleAccount: 'E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH', maxPriceAgeSeconds: 65535,
             maxUncertaintyPct: 5, maxLtvPct: 20, liquidationLtvPct: 40, collateralAllocationCapPct: null, lender: A.vault.address, apyPctByDuration: [7, null, null, null, null] });

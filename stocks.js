@@ -68,7 +68,7 @@ const {
     tokenFromApiRow, tokenPageMath, tokenViewStateFromUrl, tokenViewStateParams, workspaceViewFromUrl
 } = tokenView;
 const {
-    activityFlags, activityRows, venueRows
+    activityFlags, activityRows, quoteSymbolIndex, venueRows
 } = activityLib;
 const {
     funnelLayout, funnelSvg, funnelTitle
@@ -2110,8 +2110,10 @@ if (typeof document !== 'undefined') {
                 field('CEX markets', fmtNumber(activity.cexMarkets)),
                 field('Venues', fmtNumber(activity.venueCount)),
                 fieldAlways('Venue spread', fmtVenueSpread(activity), MARKET_TOOLTIPS.venueSpread),
-                field('Last trade', activity.lastTradedAt
-                    ? `${fmtRelativeTime(activity.lastTradedAt)} · ${escapeHtml(activity.lastTradedAt)}${activity.lastTradedVenue ? ' · ' + escapeHtml(activity.lastTradedVenue) : ''}`
+                // Seen in the CoinGecko exchange data, which is read on a daily rotation: dated by that read.
+                field('Last exchange trade', activity.lastTradedAt
+                    ? `${fmtRelativeTime(activity.lastTradedAt)} · ${escapeHtml(activity.lastTradedAt)}${activity.lastTradedVenue ? ' · ' + escapeHtml(activity.lastTradedVenue) : ''}` +
+                        `${typeof tokenVenueSource(token)?.cexFetchedAt === 'string' ? ` · exchange data as of ${escapeHtml(fmtDateTime(tokenVenueSource(token).cexFetchedAt))}` : ''}`
                     : null, true),
                 flagBadges.length
                     ? field('Flags', flagBadges.map((flag) =>
@@ -2143,7 +2145,14 @@ if (typeof document !== 'undefined') {
 
         /** Every DEX pair and CEX market this mint trades on, busiest first, each one linked. */
         function venuesSectionHtml(token) {
-            const rows = venueRows(tokenVenueSource(token));
+            const source = tokenVenueSource(token);
+            const rows = venueRows(source, quoteSymbolIndex(state.tokens));
+            // CoinGecko is read on a daily rotation, so the exchange rows carry their own date.
+            const cexAsOf = source && typeof source.cexFetchedAt === 'string' ? source.cexFetchedAt : null;
+            const cexNote = cexAsOf && rows.some((row) => row.kind === 'cex')
+                ? `<p class="detail-note">cex rows: CoinGecko data as of ${escapeHtml(fmtDateTime(cexAsOf))} ` +
+                    `(${escapeHtml(fmtRelativeTime(cexAsOf))}). Their 24 h volume covers the 24 h before that time.</p>`
+                : '';
             if (!rows.length) {
                 return '<section class="detail-section"><h4>Venues</h4>' +
                     `<p class="detail-empty">${state.venuesLoaded
@@ -2167,7 +2176,7 @@ if (typeof document !== 'undefined') {
                     `<td title="${escapeHtml(row.lastTradedAt || '')}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</td>` +
                     '</tr>';
             }).join('');
-            return `<section class="detail-section"><h4>Venues <span class="detail-count">${rows.length}</span></h4>` +
+            return `<section class="detail-section"><h4>Venues <span class="detail-count">${rows.length}</span></h4>${cexNote}` +
                 '<div class="venue-wrap"><table class="venue-table"><thead><tr>' +
                 '<th scope="col">Venue</th><th scope="col">Pair</th><th scope="col">Price</th>' +
                 '<th scope="col">Liquidity</th>' +

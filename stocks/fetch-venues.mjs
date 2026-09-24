@@ -9,8 +9,9 @@
 
 import { join, relative } from 'node:path';
 import { byString, fetchJson, isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
-import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, planCoinIdRefresh, selectCoinIdsForRefresh, shapeDexPair, shapeTicker, topVenues } from './lib/venues.mjs';
+import { aggregateByIssuer, aggregateVenues, indexSolanaCoinIds, planCexTiers, planCoinIdRefresh, shapeDexPair, shapeTicker, topVenues, watchedMintsFromWatches } from './lib/venues.mjs';
 import { readEnvFile } from './lib/env.mjs';
+import { describeUrl, psql } from './lib/psql.mjs';
 
 const HERE = import.meta.dirname;
 const UNIVERSE_PATH = join(HERE, 'data', 'universe.json');
@@ -45,6 +46,11 @@ const CG_BACKOFF_MS = [2000, 5000, 10000];
 // three steps instead of guessing a constant, and an additive step would have needed ten.
 const CG_PACE_MAX_MS = 12000;
 
+// With --coin-limit, this share of it is refreshed EVERY day (saved watches, then the busiest by
+// exchange volume and DEX liquidity) and the rest rotates through the long tail. At 250/day and
+// 1,169 mapped coins (2026-09-24): 100 daily, and 150/day for 1,069 tail coins, ~7.1 days apart.
+const DEFAULT_PRIORITY_SHARE = 0.4;
+
 // The checkpoint is written after EVERY item (it is ~6 KB per coin, so ~2.5 MB at the end — cheap),
 // so a kill costs at most one request and never costs correctness: the next run reads the file back
 // and skips every mint/coin already recorded. Progress is only LOGGED every LOG_EVERY items.
@@ -62,8 +68,13 @@ OPTIONS
   --with-coingecko      DexScreener plus CoinGecko. Explicit opt-in because this spends one
                         CoinGecko ticker request per mapped token.
   --only-cex            CoinGecko only. Explicit opt-in; needs today's coin list and is slow.
-  --coin-limit=<n>      Query at most n unique CoinGecko ids, choosing the oldest/unseen first.
-                        Intended for a quota-safe daily rotation; has no effect on DexScreener.
+  --coin-limit=<n>      Query at most n unique CoinGecko ids today (a quota-safe daily budget; no
+                        effect on DexScreener). The budget is split into two tiers, see below.
+  --priority-coins=<n>  With --coin-limit: how many coins are refreshed every day (default
+                        ${DEFAULT_PRIORITY_SHARE * 100} % of the limit, i.e. 100 of 250). Saved watches first, then
+                        the busiest by last known exchange 24 h volume and by DEX liquidity,
+                        alternately. The rest of the limit goes to the long tail, oldest/unseen
+                        first. Must be smaller than --coin-limit.
   --max=<n>             Process only the first n tokens by mint. For smoke tests.
   --force               Ignore today's checkpoint and re-fetch everything.
   --out=<path>          Output file (default stocks/data/venues.json).
@@ -90,7 +101,10 @@ NOTES
   CoinGecko's tickers[].trust_score is null for every coin on the free tier (re-measured
   2026-09-16, including for bitcoin); the field is carried through as null rather than dropped.
   CoinGecko markets include some DEXes (e.g. "Raydium (CLMM)"), so the cex[] array is
-  "markets CoinGecko lists", not "centralised venues only".`);
+  "markets CoinGecko lists", not "centralised venues only".
+  Saved watches are read from sonar.stock_watchlist when DATABASE_URL is in ../.env; without it (or
+  if the read fails) the priority tier is filled from volume and liquidity alone, and the log says so.
+  The expected refresh interval of each tier is logged and recorded in source.coingecko.tiers.`);
 }
 
 /** GET with retry on 429/5xx only. Returns `{res, rateLimited}`; `res` is null when it kept failing. */
@@ -306,6 +320,29 @@ async function fetchCexTickers(coinIds, state, checkpointPath) {
     return { rateLimited, errors, paceMs };
 }
 
+/**
+ * Saved watches (sonar.stock_watchlist), read only to put the coins people watch in the daily tier.
+ * Optional by design: without DATABASE_URL, or when the read fails, the tier is filled from volume
+ * and liquidity alone and the log says so. It never stops the market refresh.
+ */
+async function readSavedWatches(env) {
+    if (typeof env.DATABASE_URL !== 'string' || env.DATABASE_URL === '') {
+        log(`coingecko: no DATABASE_URL in ${ENV_PATH} — saved watches are not used for the daily tier`);
+        return [];
+    }
+    try {
+        const out = await psql(env.DATABASE_URL, `SELECT COALESCE(json_agg(json_build_object(
+            'watch_type', watch_type, 'target', target, 'underlying_ticker', underlying_ticker,
+            'issuer_slugs', issuer_slugs)), '[]'::json)::text FROM sonar.stock_watchlist;`, 'read saved watches', ['-t', '-A']);
+        const watches = JSON.parse(out.trim() || '[]');
+        log(`coingecko: ${watches.length} saved watch(es) read from ${describeUrl(env.DATABASE_URL)} sonar.stock_watchlist`);
+        return watches;
+    } catch (err) {
+        logWarn(`coingecko: saved watches unavailable (${String(err.message).split('\n')[0]}) — the daily tier uses volume and liquidity only`);
+        return [];
+    }
+}
+
 function usd(value) {
     if (typeof value !== 'number' || !Number.isFinite(value)) return 'n/a';
     return `$${Math.round(value).toLocaleString('en-US')}`;
@@ -334,6 +371,15 @@ async function main() {
         throw new Error(`--coin-limit must be a positive integer, got "${flags['coin-limit']}"`);
     }
     if (onlyDex && coinLimit !== null) throw new Error('--coin-limit requires --only-cex or --with-coingecko');
+    const priorityFlag = typeof flags['priority-coins'] === 'string' ? Number(flags['priority-coins']) : null;
+    if (priorityFlag !== null && (!Number.isInteger(priorityFlag) || priorityFlag < 0)) {
+        throw new Error(`--priority-coins must be a non-negative integer, got "${flags['priority-coins']}"`);
+    }
+    if (priorityFlag !== null && coinLimit === null) throw new Error('--priority-coins requires --coin-limit');
+    const priorityCoins = coinLimit === null ? 0 : priorityFlag ?? Math.floor(coinLimit * DEFAULT_PRIORITY_SHARE);
+    if (coinLimit !== null && priorityCoins >= coinLimit) {
+        throw new Error(`--priority-coins (${priorityCoins}) must be smaller than --coin-limit (${coinLimit}), or the long tail is never refreshed`);
+    }
 
     const universe = await readJson(UNIVERSE_PATH);
     if (!Array.isArray(universe?.items)) throw new Error(`${UNIVERSE_PATH}: expected {items:[...]}`);
@@ -373,8 +419,9 @@ async function main() {
     };
     if (force) logWarn(`--force: re-fetching ${onlyDex ? 'DexScreener' : onlyCex ? 'CoinGecko' : 'both sources'}; the unrequested source checkpoint is preserved`);
     else if (existing !== null) log(`checkpoint: ${checkpointPath} has ${Object.keys(state.dex).length} mint(s) and ${Object.keys(state.cex).length} coin(s) done`);
+    let env = {};
     if (!onlyDex) {
-        const env = await readEnvFile(ENV_PATH);
+        env = await readEnvFile(ENV_PATH);
         if (typeof env.COINGECKO_API_KEY === 'string' && env.COINGECKO_API_KEY !== '') {
             cgHeaders = { ...cgHeaders, 'x-cg-demo-api-key': env.COINGECKO_API_KEY };
             cgPaceMs = CG_PACE_KEYED_MS;
@@ -407,6 +454,7 @@ async function main() {
     let newTickerIdsSelected = 0;
     let cexFetchedAt = null;
     let cgFinalPaceMs = CG_PACE_MS;
+    let tiersRecord = null;
     if (!onlyDex) {
         const list = await fetchCoinsList({ force });
         cgListFetchedAt = list.fetchedAt;
@@ -420,13 +468,30 @@ async function main() {
         const solanaCoins = [...index.byAddress.keys()].length;
         log(`coingecko: ${solanaCoins} coin(s) carry a Solana address; ${coinIdByMint.size}/${selected.length} of our mints map to a coin id${cgDuplicates.length > 0 ? `, ${cgDuplicates.length} address(es) claimed by more than one coin` : ''}`);
         const allCoinIds = [...new Set(coinIdByMint.values())];
-        const orderedCoinIds = selectCoinIdsForRefresh(coinIdByMint, previousItems, null);
+        const watchedMints = coinLimit === null ? [] : watchedMintsFromWatches(await readSavedWatches(env), universe.items);
+        const tiers = planCexTiers(coinIdByMint, previousItems, { dailyBudget: coinLimit, priorityCount: priorityCoins, watchedMints });
+        if (coinLimit !== null) {
+            const tailPerDay = coinLimit - tiers.priority.length;
+            const tailDays = tiers.intervals.tailDays;
+            log(`coingecko tiers: daily ${tiers.priority.length} coin(s) (${tiers.watched.length} from ${watchedMints.length} watched mint(s), ` +
+                `the rest by exchange volume / DEX liquidity) — refreshed every day; tail ${tiers.tail.length} coin(s) at ${tailPerDay}/day — ` +
+                `each refreshed about every ${tailDays === null ? 'n/a' : tailDays.toFixed(1)} day(s)`);
+            tiersRecord = {
+                dailyBudget: coinLimit,
+                priorityCoins: tiers.priority.length,
+                watchedCoins: tiers.watched.length,
+                tailCoins: tiers.tail.length,
+                tailPerDay,
+                expectedRefreshDays: { priority: tiers.intervals.priorityDays, tail: tailDays === null ? null : Math.round(tailDays * 10) / 10 },
+                note: 'priority = saved watches, then the busiest by last known exchange 24 h volume and by DEX liquidity, alternately; tail = every other mapped coin, oldest/unseen first'
+            };
+        }
         const attemptedToday = new Set(force ? [] : Object.keys(existing?.cex ?? {}));
         const doneToday = new Set(Object.entries(state.cex)
             .filter(([, entry]) => TERMINAL.has(entry?.status))
             .map(([id]) => id));
         const { coinIds, newCoinIds } = planCoinIdRefresh(
-            orderedCoinIds,
+            tiers.ordered,
             attemptedToday,
             doneToday,
             coinLimit
@@ -434,7 +499,9 @@ async function main() {
         coinsQueried = coinIds.length;
         newTickerIdsSelected = newCoinIds.length;
         if (coinLimit !== null) {
-            log(`coingecko: daily quota cap ${coinLimit}; ${attemptedToday.size} id(s) already attempted today, ${newCoinIds.length} new id(s) selected oldest/unseen first (${allCoinIds.length} mapped total)`);
+            const newPriority = newCoinIds.filter((id) => tiers.priority.includes(id)).length;
+            log(`coingecko: daily quota cap ${coinLimit}; ${attemptedToday.size} id(s) already attempted today, ${newCoinIds.length} new id(s) selected ` +
+                `(${newPriority} daily-tier, ${newCoinIds.length - newPriority} tail oldest/unseen first; ${allCoinIds.length} mapped total)`);
         }
         const result = await fetchCexTickers(coinIds, state, checkpointPath);
         cgRateLimited += result.rateLimited;
@@ -538,6 +605,8 @@ async function main() {
                 coinsQueried,
                 newTickerIdsSelected,
                 coinLimit,
+                // Carried forward on DexScreener-only runs, like listFetchedAt: it describes the last CoinGecko plan.
+                tiers: onlyDex ? previous?.source?.coingecko?.tiers ?? null : tiersRecord,
                 coinsWithTickers,
                 tickers: tickerCount,
                 tickersWithTrustScore: withTrustScore,

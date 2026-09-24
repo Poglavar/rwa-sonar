@@ -3,7 +3,7 @@
 // by a protocol whose legal and control assumptions remain weak.
 
 import { byString } from './io.mjs';
-import { LOOPSCALE_PROGRAM_ID, loopscaleUsage } from './loopscale.mjs';
+import { LOOPSCALE_PROGRAM_ID, STABLE_PRINCIPALS, loopscaleUsage } from './loopscale.mjs';
 
 export const DEFI_ACTION_LABELS = {
     swap: 'Swap',
@@ -650,26 +650,23 @@ export function curatedUsage(token, curated, observations = new Map()) {
         });
 }
 
-
-const PRINCIPAL_DECIMALS = {
-    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { symbol: 'USDC', decimals: 6 },
-    '2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH': { symbol: 'USDG', decimals: 6 },
-    Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: { symbol: 'USDT', decimals: 6 },
-    '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo': { symbol: 'PYUSD', decimals: 6 }
-};
-
 /**
  * Loopscale lending vaults (keyless `tars.loopscale.com/v1/markets/lending_vaults/info`): a vault
- * whose strategy terms name this exact mint as accepted collateral is a standing lender offer. The
- * allocation is principal currently lent against that collateral. Returned as market rows so they
- * merge into the chain-decoded Loopscale integration when one exists.
+ * whose strategy terms name this exact mint as accepted collateral is a standing lender offer.
+ * Returned as market rows so they merge into the chain-decoded Loopscale integration when one exists.
+ *
+ * `vaultAllocation` is the vault's own `allocationInfo.currentAllocationAmount` for this collateral,
+ * kept under that name because it does NOT measure the loans: on 2026-09-24 it read $30.5k / $21.3k
+ * / $80.6k / $4.0k for TSLAx / NVDAx / SPYx / CRCLx while the Loan accounts held $3,962 of open
+ * principal against the four together (stocks/research/after-hours-collateral-pricing.md). What is
+ * lent against a token comes from the Loans (lib/loopscale.mjs openPrincipalAgainst).
  */
 export function loopscaleVaultMarkets(token, vaults) {
     const rows = [];
     for (const entry of Array.isArray(vaults) ? vaults : []) {
         const terms = entry?.vaultStrategy?.terms?.assetTerms?.[token?.mint];
         if (!terms) continue;
-        const principal = PRINCIPAL_DECIMALS[entry.vault?.principalMint] ?? null;
+        const principal = STABLE_PRINCIPALS[entry.vault?.principalMint] ?? null;
         const allocationRaw = num(terms.allocationInfo?.currentAllocationAmount);
         const apys = (Array.isArray(terms.durationAndApys) ? terms.durationAndApys : []).map((pair) => num(pair?.[1])).filter((value) => value !== null);
         rows.push({
@@ -678,7 +675,8 @@ export function loopscaleVaultMarkets(token, vaults) {
             strategyAddress: firstText(entry.vaultStrategy?.strategy?.address),
             debtMint: entry.vault?.principalMint ?? null,
             debtSymbol: principal?.symbol ?? null,
-            lentAgainstCollateral: allocationRaw === null || !principal ? null : allocationRaw / 10 ** principal.decimals,
+            vaultAllocation: allocationRaw === null || !principal ? null : allocationRaw / 10 ** principal.decimals,
+            vaultAllocationLabel: 'vault allocation counter (currentAllocationAmount); open loans are read from the Loan accounts',
             lenderApyPct: apys.length ? Math.max(...apys) / 10_000 : null,
             depositsEnabled: entry.vault?.depositsEnabled === true,
             paused: entry.pause === true || entry.pause?.paused === true,
@@ -688,34 +686,45 @@ export function loopscaleVaultMarkets(token, vaults) {
     return rows;
 }
 
-/** Merge lending-vault offers into the Loopscale integration (or create it from them alone). */
-function withLoopscaleVaults(token, integrations, vaults) {
+/**
+ * Merge lending-vault offers into the Loopscale integration (or create it from them alone). The
+ * vaults say who will lend; they never set how much IS lent. That is the chain-read loan measure,
+ * and when the Loan scan ran (`loanScan` non-null) a vault-only token is a measured zero: the scan
+ * reads every Loan account of the program, so no Loan names this mint.
+ */
+function withLoopscaleVaults(token, integrations, vaults, loanScan) {
     const markets = loopscaleVaultMarkets(token, vaults);
-    if (markets.length === 0) return integrations;
-    const lent = sum(markets.map((row) => row.lentAgainstCollateral));
+    const existing = integrations.find((entry) => entry.protocolId === 'loopscale');
+    if (markets.length === 0) {
+        if (existing) existing.summary = `${existing.summary} No lending vault lists it; terms are set per lender on the order book.`;
+        return integrations;
+    }
     const evidence = {
         type: 'protocol-api',
         url: 'https://tars.loopscale.com/v1/markets/lending_vaults/info',
-        note: `${markets.length} Loopscale lending vault${markets.length === 1 ? '' : 's'} accept this exact mint as collateral${lent ? `; ${Math.round(lent).toLocaleString('en-US')} of stablecoin principal currently lent against it` : ''}.`
+        note: `${markets.length} Loopscale lending vault${markets.length === 1 ? ' accepts' : 's accept'} this exact mint as collateral.`
     };
-    const existing = integrations.find((entry) => entry.protocolId === 'loopscale');
+    const listed = ` ${markets.length} lending vault${markets.length === 1 ? '' : 's'} list${markets.length === 1 ? 's' : ''} it as collateral.`;
     if (existing) {
+        existing.summary = `${existing.summary}${listed}`;
         existing.markets = [...(existing.markets ?? []), ...markets];
         existing.evidence = [...(existing.evidence ?? []), evidence];
-        existing.metrics = { ...(existing.metrics ?? {}), debtAgainstCollateralUsd: sum([existing.metrics?.debtAgainstCollateralUsd, lent]) };
         return integrations;
     }
+    const scanned = loanScan !== null && loanScan !== undefined;
     return [...integrations, {
         id: 'loopscale:collateral',
         protocolId: 'loopscale',
         protocolName: 'Loopscale',
         category: 'lending',
-        status: (lent ?? 0) > 0 ? 'live' : 'available',
+        status: 'available',
         actions: ['collateral', 'borrow'],
-        summary: 'Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).',
+        summary: `Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).${scanned ? ' No open loan against it was found on-chain.' : ''}`,
         accessNote: ACCESS_BY_ISSUER[token?.issuer] ?? 'Loopscale and issuer eligibility, allowlisting and transfer restrictions apply.',
         links: { use: 'https://app.loopscale.com/', protocol: 'https://docs.loopscale.com/' },
-        metrics: { debtAgainstCollateralUsd: lent, positions: null },
+        metrics: scanned
+            ? { positions: 0, debtAgainstCollateralUsd: 0, debtLabel: 'open loan principal' }
+            : { positions: null, debtAgainstCollateralUsd: null, debtLabel: 'open loan principal' },
         markets,
         evidence: [evidence]
     }];
@@ -737,7 +746,7 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
             ...loopscaleUsage(token, loopscale),
             ...curatedUsage(token, curated, compositeObservations),
             ...dexUsage(token, venueByMint.get(token.mint), meteoraByPair)
-        ], loopscaleVaults);
+        ], loopscaleVaults, loopscale);
         for (const integration of integrations) {
             integration.capabilities = capabilityRecords(integration.actions);
             integration.corroboration = null;
@@ -786,11 +795,9 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
             loopscale: loopscale === null ? null : {
                 fetchedAt: loopscale.fetchedAt ?? null,
                 programId: LOOPSCALE_PROGRAM_ID,
-                method: 'top-20 holder owners from holders.json checked for a Loopscale program owner; Loan accounts decoded from the published IDL',
-                holdersFetchedAt: loopscale.holdersFetchedAt ?? null,
-                mintsCovered: loopscale.mintsCovered ?? null,
-                ownersChecked: loopscale.ownersChecked ?? null,
-                loopscaleAccounts: loopscale.loopscaleAccounts ?? null,
+                method: 'every Loan account of the program listed with getProgramAccounts (discriminator filter, collateral slots only); each Loan whose collateral names a tracked mint read in full and decoded from the published IDL. Open principal = principal due − repaid per ledger, stablecoins at $1.',
+                loanScanRpc: loopscale.loanScanRpc ?? null,
+                loansScanned: loopscale.loansScanned ?? null,
                 loans: loopscale.loanCount ?? null,
                 positions: Array.isArray(loopscale.positions) ? loopscale.positions.length : 0,
                 rpcCalls: loopscale.rpcCalls ?? null,

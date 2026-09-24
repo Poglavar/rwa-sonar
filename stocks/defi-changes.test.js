@@ -44,6 +44,23 @@ describe('daily DeFi snapshots', () => {
         })]);
     });
 
+    test('loans read on-chain for the first time are a baseline; later ones are observed loans, never listings', () => {
+        const listed = { mint: 'MINT_T', symbol: 'TSLAx', protocolId: 'loopscale', protocolName: 'Loopscale', category: 'lending', status: 'live', basis: 'exact-token-registry' };
+        const loan = (mint, symbol) => ({ mint, symbol, protocolId: 'loopscale', protocolName: 'Loopscale', category: 'lending', status: 'live', basis: 'onchain-position' });
+        // Day 1 of the loan scan: AAPLx and MSTRx loans existed before we could see them.
+        const first = diffDefiSnapshots(snap('2026-09-24', [listed]), snap('2026-09-25', [listed, loan('MINT_A', 'AAPLx'), loan('MINT_M', 'MSTRx')]));
+        expect(first.events).toEqual([]);
+        expect(first.baselined).toBe(2);
+        // Day 2: a new loan against QQQx is a real observation, worded as one.
+        const second = diffDefiSnapshots(snap('2026-09-25', [listed, loan('MINT_A', 'AAPLx')]), snap('2026-09-26', [listed, loan('MINT_A', 'AAPLx'), loan('MINT_Q', 'QQQx')]));
+        expect(second.events).toHaveLength(1);
+        expect(second.events[0]).toMatchObject({ kind: 'token-added', symbol: 'QQQx', basis: 'onchain-position' });
+        expect(second.events[0].summary).toBe('A Loopscale loan against QQQx was first observed on-chain; no published listing names it.');
+        // The snapshot keeps the basis the diff relies on.
+        const [row] = snapshotDefiUsage({ items: [{ mint: 'MINT_A', symbol: 'AAPLx', integrations: [{ id: 'loopscale:collateral', protocolId: 'loopscale', category: 'lending', status: 'live', proof: { sourceStatus: 'onchain-position' } }] }] });
+        expect(row.basis).toBe('onchain-position');
+    });
+
     test('the first observation is a baseline, never hundreds of additions', () => {
         expect(diffDefiSnapshots(null, snap('2026-09-19', [row()])).events).toEqual([]);
     });
