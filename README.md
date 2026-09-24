@@ -37,7 +37,10 @@ and courts.
      [NVDAx](https://rwasonar.com/cards/NVDAx.html), and the home page's latest events.
 - **Built during Stocklana:** the repository dates from 13 Feb 2026 as a broad RWA catalogue; `main`
   at `8f58030` (19 Aug 2026) is the pre-hackathon state, and every commit on this branch dates from
-  16 Sep 2026 onwards. [`SUBMISSION.md`](SUBMISSION.md) has the form text and the full disclosure.
+  16 Sep 2026 onwards. The first commits on 16 Sep are large because they import catalogue data
+  fetched that day (the token, chain, price and sponsor-API files record fetch times of 16 Sep 2026)
+  and the issuer dossiers researched that day, not older work.
+  [`SUBMISSION.md`](SUBMISSION.md) has the form text and the full disclosure.
 - **Licence:** [MIT](LICENSE).
 - **Run it:** `npm install && npm install --prefix api && npm start` (details under
   [Run locally](#run-locally)); `npm test` runs the fast headless suites.
@@ -67,15 +70,16 @@ differently:
 Dated findings from the current data, each linked from the page named:
 
 - **xStocks' power to move or burn any holder's tokens sits behind a 2-of-3 multisig with no time
-  lock** (read 20 Sep 2026). The permanent delegate on every xStocks mint is a Squads v4 vault with
+  lock** (read 23 Sep 2026). The permanent delegate on every xStocks mint is a Squads v4 vault with
   threshold 2 of 3, time lock 0 and unnamed members. It has not been used on Solana: across all
-  1,844 transactions touching it from 10 Jun 2025 to 18 Sep 2026, no transfer or burn names it as
+  1,845 transactions touching it from 10 Jun 2025 to 23 Sep 2026, no transfer or burn names it as
   authority. ([powers.html](https://rwasonar.com/powers.html))
-- **81.0% of priced xStocks supply sits in issuer wallets** (read 24 Sep 2026). Redeemed xStocks
-  are not burned; the prospectus defines de-activation as a transfer back to the issuer. For the 99
-  xStocks with a market price, $2.03B of $2.50B of supply was in issuer-attributed wallets. These
-  include an inventory wallet the issuer itself excludes from its circulating figure. The
-  resulting public float, about $475M, is an upper bound. ([flows.html](https://rwasonar.com/flows.html))
+- **About 82 % of priced xStocks supply sits in issuer wallets** (read 24 Sep 2026). Redeemed
+  xStocks are not burned; the prospectus defines de-activation as a transfer back to the issuer. For
+  the 107 xStocks with a market price, $2.23B of $2.73B of supply was in issuer-attributed wallets.
+  These include an inventory wallet the issuer itself excludes from its circulating figure. The
+  resulting public float, about $497M, is an upper bound. ([flows.html](https://rwasonar.com/flows.html);
+  the home page and the pitch take these figures from the same `stocks-flows.json` at build time)
 - **Loopscale's docs and the chain disagree** (23 Sep 2026). The docs call one key a co-signer that
   "cannot initiate actions on its own"; on chain it is the protocol admin and signs refinances
   alone. The docs describe a 3-of-5 upgrade multisig; the chain shows 4 of 7 voters and a 24-hour
@@ -84,9 +88,9 @@ Dated findings from the current data, each linked from the page named:
   multisig or time lock, and both Securitize programmes that hold mint and freeze are upgradeable by
   one on-curve key. ([powers.html](https://rwasonar.com/powers.html),
   [issuer dossier](https://rwasonar.com/issuers/securitize.html))
-- **Redemptions are observed on chain.** On 23 Sep 2026 the recurring scan read 218
-  Ondo redemptions and 370 creations in the 17.9 hours it covered, and 244 xStocks de-activation
-  deposits in 22.5 hours. ([flows.html](https://rwasonar.com/flows.html))
+- **Redemptions are observed on chain.** On 23 Sep 2026 the recurring scan read 250
+  Ondo redemptions and 437 creations in the 20.9 hours it covered, and 246 xStocks de-activation
+  deposits in 23.1 hours. ([flows.html](https://rwasonar.com/flows.html))
 
 ## Pages
 
@@ -175,7 +179,7 @@ deck has no light/dark themes and the shim has no header.
 | Hourly | `rwa-trades` | Decodes swaps on the busiest pools; `live.html` reads only our API, never a Solana RPC |
 | Hourly | `rwa-watch-lending` | Liquidations of stock collateral and collateral price freezes at Kamino, Jupiter Lend, Nest and Loopscale, read from the lending programs' own transactions |
 | Hourly | `rwa-watch-digest` | Private Telegram digests via @rwa_sonar_bot for saved watches, at the hour each owner chose |
-| Daily 02:41 | `rwa-watch` | Re-reads every cited source (576 on 23 Sep 2026), diffs it, re-checks quotes verbatim; falls back to the publisher's API, then a raw Wayback capture; archive.today is linked, never read |
+| Daily 02:41 | `rwa-watch` | Re-reads every cited source (621 distinct URLs cited by the dossiers on 24 Sep 2026, `stocks/data/sources.json`), diffs it, re-checks quotes verbatim; falls back to the publisher's API, then a raw Wayback capture; archive.today is linked, never read |
 | Daily 04:23 | `rwa-watch-caselaw` | CourtListener and SEC litigation feeds for every issuer's entities; a hit is a lead for review, never an automatic "litigated" |
 | Daily 06:47 | `rwa-judge` | A model reads up to 10 changed documents in one batch; the verdict is shown as a model assessment beside the diff and never decides inclusion; cost recorded per item |
 | Daily 23:05 | `rwa-redemptions` | Checkpointed on-chain scan: Ondo burns, xStocks de-activations, Superstate conversions; PreStocks and Tessera recorded as not observable |

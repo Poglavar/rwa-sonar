@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="./site-contact.css?v=20260924i" />
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="./app-shell.css?v=20260924r" />
+    <link rel="stylesheet" href="./app-shell.css?v=20260925b" />
     <link rel="stylesheet" href="landing.css?v=20260924y" />
     <link rel="stylesheet" href="funnel-figure.css?v=20260924y" />
     <link rel="stylesheet" href="motion.css?v=20260924u" />
@@ -53,7 +53,7 @@
                     <a class="button button-primary" href="./stocks.html">Explore the catalogue</a>
                     <a class="button" href="./stocks.html?view=compare">Compare a stock's wrappers</a>
                 </div>
-                <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine"><!-- snapshot:landing:start --><span id="snapshotTokens">1,183</span> exact Solana token addresses from 9 issuer programmes with live tokens <span class="snapshot-qualifier">(of 12 tracked: Remora Markets and Ventuals Pre-IPO defunct; Republic Mirror: no mint yet)</span> · <span id="snapshotDateLabel">catalogue built</span> <time id="snapshotDate" datetime="2026-09-22T16:33:09Z">22 Sep 2026</time><!-- snapshot:landing:end --></span></p>
+                <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine"><!-- snapshot:landing:start --><span id="snapshotTokens">1,404</span> exact Solana token addresses from 9 issuer programmes with live tokens <span class="snapshot-qualifier">(of 12 tracked: Remora Markets and Ventuals Pre-IPO defunct; Republic Mirror: no mint yet)</span> · <span id="snapshotDateLabel">catalogue built</span> <time id="snapshotDate" datetime="2026-09-24T21:27:36Z">24 Sep 2026</time><!-- snapshot:landing:end --></span></p>
             </div>
 
             <article class="comparison-preview" aria-labelledby="comparisonPreviewTitle">
@@ -131,21 +131,16 @@
             </div>
             <div class="finding-grid">
                 <article>
-                    <p class="finding-kicker">Control · read on chain, 20 Sep 2026</p>
+                    <p class="finding-kicker">Control · read on chain, 23 Sep 2026</p>
                     <h3>xStocks' power to move or burn any holder's tokens sits behind a 2-of-3 multisig with no time lock.</h3>
                     <p>The permanent delegate on every xStocks mint is a Squads v4 vault: threshold 2 of 3, time lock 0,
-                        members unnamed. It has not been used on Solana: in all 1,844 transactions touching it from
-                        10 Jun 2025 to 18 Sep 2026, no transfer or burn names it as authority.</p>
+                        members unnamed. It has not been used on Solana: in all 1,845 transactions touching it from
+                        10 Jun 2025 to 23 Sep 2026, no transfer or burn names it as authority.</p>
                     <a href="./powers.html">See who holds each power →</a>
                 </article>
                 <article>
-                    <p class="finding-kicker">Float · read on chain, 24 Sep 2026</p>
-                    <h3>81.0% of priced xStocks supply sits in issuer wallets.</h3>
-                    <p>Redeemed xStocks are not burned: the prospectus defines de-activation as a transfer back to the
-                        issuer. Across the 99 xStocks with a market price, $2.03B of $2.50B of supply was held by
-                        issuer-attributed wallets, including an inventory wallet the issuer itself excludes from its
-                        circulating figure. That leaves a public float of about $475M at most. Supply overstates what
-                        the public holds; our float is an upper bound.</p>
+                    <!-- Written by stocks/build-static-snapshot.mjs from stocks-flows.json (the numbers flows.html shows). -->
+                    <!-- snapshot:float-finding:start --><p class="finding-kicker">Float · read on chain, 24 Sep 2026</p><h3>81.8% of priced xStocks supply sits in issuer wallets.</h3><p>Redeemed xStocks are not burned: the prospectus defines de-activation as a transfer back to the issuer. Across the 107 xStocks with a market price, $2.23B of $2.73B of supply was held by issuer-attributed wallets, including an inventory wallet the issuer itself excludes from its circulating figure. That leaves a public float of at most $497.37M. Supply overstates what the public holds; our float is an upper bound.</p><!-- snapshot:float-finding:end -->
                     <a href="./flows.html">Read flows and float →</a>
                 </article>
                 <article>
@@ -200,7 +195,7 @@
                 <li><span class="cadence">Hourly</span><div><h3>Token powers on chain</h3><p>Authorities, extensions, rebase multipliers and supply of every catalogued mint. A rotated key or a toggled extension becomes a dated event with its slot.</p></div></li>
                 <li><span class="cadence">Hourly</span><div><h3>DEX trades</h3><p>Swaps on the busiest pools, decoded on our server and served by our API to the <a href="./live.html">trades page</a>.</p></div></li>
                 <li><span class="cadence">Daily</span><div><h3>Every cited document</h3><p>Terms, prospectuses and docs pages are re-read and diffed, and each quote is re-checked word for word. A page a script cannot read falls back to the publisher's own API or a Wayback capture, and says so.</p></div></li>
-                <li><span class="cadence">Daily</span><div><h3>Redemptions on chain</h3><p>Ondo burns, xStocks de-activations and Superstate conversions. On 23 Sep the scan saw 218 Ondo redemptions in the 17.9 hours it read. PreStocks and Tessera redemptions are not visible on chain; the page says why.</p></div></li>
+                <li><span class="cadence">Daily</span><div><h3>Redemptions on chain</h3><p>Ondo burns, xStocks de-activations and Superstate conversions. <!-- snapshot:redemptions:start -->On 23 Sep 2026 the scan saw 250 Ondo redemptions and 437 creations in the 20.9 hours it read.<!-- snapshot:redemptions:end --> PreStocks and Tessera redemptions are not visible on chain; the page says why.</p></div></li>
                 <li><span class="cadence">Daily</span><div><h3>Model change assessment</h3><p>A language model reads each changed document and says whether it matters to holders. Its answer is shown next to the diff as a model assessment. It does not decide what is published. Cost is recorded per item.</p></div></li>
                 <li><span class="cadence">Daily</span><div><h3>Court and SEC filings</h3><p>CourtListener and SEC litigation feeds for every issuer's entities. A match is a lead for review; it never marks an answer "litigated" by itself.</p></div></li>
             </ul>

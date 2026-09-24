@@ -10,9 +10,12 @@
 .research-spot-wrap > .research-spot { max-width: 100%; }
 .learn-hero { grid-template-columns: minmax(0, 1fr) 230px; }
 .learn-hero .research-spot { max-width: 230px; }
-.watch-intro { grid-template-columns: minmax(0, 1fr) 130px; }
-.watch-intro { padding: 42px 0 58px; border-bottom: 1px solid var(--line, var(--panel-border, #d9d2c6)); }
-.watch-intro h1 { max-width: none; font-size: clamp(2.4rem, 4.5vw, 4.4rem); }
+/* The patrol dolphin's sonar ring (motion.css) swells to 1.45x the dolphin before it settles, so the
+   dolphin sits centred in a column 1.45x its width and the ring never leaves the hero: a column
+   only as wide as the dolphin let the ring past the right edge and made a phone page scroll. */
+.watch-intro { grid-template-columns: minmax(0, 1fr) 190px; padding: 42px 0 58px; border-bottom: 1px solid var(--line, var(--panel-border, #d9d2c6)); }
+.watch-intro .research-spot-wrap { width: 130px; justify-self: center; }
+.watch-intro h1 { max-width: none; margin: 0 0 .32em; font-size: clamp(2.4rem, 4.5vw, 4.4rem); }
 .watch-intro .method-note { margin-bottom: 12px; }
 .research-companion { max-width: 52ch; color: var(--muted, var(--muted-text, #68636f)); font-size: .86rem; }
 .watch-method-details { margin: 0 0 34px; color: var(--muted, var(--muted-text, #68636f)); }
@@ -23,11 +26,12 @@
     .research-spot { width: 80px; justify-self: start; }
     .learn-hero { grid-template-columns: 1fr; }
     .learn-hero .research-spot { width: 150px; }
-    .watch-intro { grid-template-columns: minmax(0, 1fr) 80px; padding: 24px 0; gap: 12px; }
+    .watch-intro { grid-template-columns: minmax(0, 1fr) 112px; padding: 24px 0; gap: 12px; }
     .watch-intro > div { display: contents; }
     .watch-intro h1, .watch-intro .method-note { grid-column: 1 / -1; }
     .watch-intro .research-companion { grid-column: 1; margin: 0; }
     .watch-intro .research-spot, .watch-intro .research-spot-wrap { grid-column: 2; grid-row: 3; }
     .research-spot-wrap { width: 80px; justify-self: start; }
     .research-spot-wrap > .research-spot { width: 100%; }
+    .watch-intro .research-spot-wrap { width: 76px; justify-self: center; }
 }

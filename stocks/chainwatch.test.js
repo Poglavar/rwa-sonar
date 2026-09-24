@@ -98,6 +98,9 @@ describe('parseMintState on real accounts', () => {
         expect(numericString(state.withheld)).toBe(state.withheld);
         expect(state.feeConfigAuthority).toBe('WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc');
         expect(state.withdrawWithheldAuthority).toBe('WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc');
+        // The epoch the newer fee applies from: Token-2022 sets it two epochs ahead, so the feed can
+        // say "scheduled" rather than "raised" while it is still in the future.
+        expect(state.transferFeeEpoch).toBe(1032);
         expect(state.defaultFrozen).toBe(false);
         // This mint has no scheduled multiplier change: Token-2022 spells that as timestamp 0, and
         // 0 must not become 1970-01-01 (see `unixToIso`).
@@ -265,6 +268,10 @@ describe('diffStates', () => {
         expect(diffStates(base(), next({ transferFeeBps: 50 }))[0]).toMatchObject({
             kind: 'extension-toggle', field: 'transfer_fee_bps', before: null, after: '50'
         });
+        // A fee row carries when the new fee applies and its cap; other rows do not.
+        const fee = diffStates(base(), next({ transferFeeBps: 300, transferFeeEpoch: 1043, transferFeeMax: '18446744073709551616', paused: true }));
+        expect(fee.find((e) => e.field === 'transfer_fee_bps').evidence.transferFee).toEqual({ newerEpoch: 1043, maximumFee: '18446744073709551616' });
+        expect(fee.find((e) => e.field === 'paused').evidence.transferFee).toBeUndefined();
         for (const [column] of TOGGLE_FIELDS) {
             expect(typeof column).toBe('string');
         }

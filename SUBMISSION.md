@@ -34,55 +34,58 @@ description ≤ 5,000 characters (Markdown), up to 3 sponsor tracks, a linked So
 | Team | Poglavar Svemira (solo) |
 | Sponsor tracks | Pyth; optionally Tessera. Not PreStocks (its rules exclude projects that also cover other pre-IPO tokens), not Meteora or Clawpump (no DBC pool or token launch). |
 
-### Short description (266 of 280 characters)
+### Short description (261 of 280 characters)
 
 ```text
-Don't trust the ticker, inspect the token. RWA Sonar shows what each tokenized stock on Solana really gives you: what you legally own, who can freeze, move or burn it, where you can trade, redeem or borrow against it, and what changed, with a source for every claim.
+Don't trust the ticker, inspect the token. For anyone buying, lending against or integrating a tokenized stock on Solana: what each token legally gives you, who can freeze, move or burn it, how to exit or borrow, and what changed, with a source for every claim.
 ```
 
-### Full description (4,576 of 5,000 characters)
+### Full description (4,970 of 5,000 characters)
 
 ````markdown
 ## RWA Sonar: tokenized stocks on Solana, explained
 
 **Don't trust the ticker. Inspect the token.**
 
-Solana now has more than a thousand tokenized-stock addresses. Two tokens with the same ticker can give you very different things: a share on the company's own register, a note from an offshore issuer, an interest in a trust, or only price exposure. They also differ in who can freeze, move or burn your tokens, whether you can redeem, and what happens when the stock market is closed. A wallet or an explorer shows none of this.
+AAPLx and AAPLon both say "Apple". One is a tracker certificate whose issuer can pause, freeze and claw back your tokens; the other is an Ondo note with no clawback. Neither makes you an Apple shareholder. A wallet or explorer shows none of this, and Solana now has more than 1,400 such token addresses.
 
-RWA Sonar answers these questions for every token, from the chain and the issuer's own documents, with a source for every claim.
+RWA Sonar answers, for every exact token address, from the chain and the issuer's own documents: what you own, who holds the keys, how you get out, where it works in DeFi, and what changed. Every answer links to the quote or the transaction.
 
-**Live:** https://rwasonar.com · **Pitch deck:** https://rwasonar.com/pitch/
+**Who it's for:** holders choosing between wrappers of the same stock; lenders and risk teams deciding what to accept as collateral; wallets and integrators that need a trust label per mint.
 
-### What you can do with it
-- **Find a stock and compare its tokens.** Search "Apple" and put AAPLx and AAPLon side by side: what you own, who controls the token, where it trades, what redemption needs and which DeFi protocols accept it.
-- **Open one token's card**, a shareable page per token address: a plain answer first, then the evidence.
-- **Who holds the keys:** every issuer against seven powers that affect holders (mint, freeze, move or burn, pause, rebase balances, transfer fee, upgrade). Each cell says whether the power sits with one key, a multisig and its time lock, or a program, and whether it has been used.
-- **What if:** 38 failure scenarios (issuer insolvency, stolen keys, custodian failure and more), answered per issuer as documented, inferred, litigated or unknown.
-- **Flows and float, exit routes, premium to the stock, DeFi use**, and a **weekly summary**.
-- **Latest events** on the home page, and saved watches with private Telegram alerts.
+**Live:** https://rwasonar.com · **Pitch:** https://rwasonar.com/pitch/
 
-### Evidence read from Solana
-- Token-2022 extensions and authorities decoded per mint (permanent delegate, freeze, pausable, transfer fee, scaled-UI multiplier), with multisig members and time locks.
-- Mints, burns and redemptions read from transactions; issuer inventory wallets separated from the public float.
-- Exact-mint DeFi support checked on-chain (Kamino, Jupiter Lend, Loopscale, Nest and DEX pools).
-- An hourly lending watcher for liquidations of stock collateral and collateral price freezes (Kamino, Jupiter Lend, Loopscale).
-- Pyth market-hours schedules for session context, and Pyth reference prices where our feeds are entitled.
+### What you can do
+- **Compare a stock's tokens** side by side: legal claim, controls, exit routes, DeFi support.
+- **Open a token's card**: a plain answer first, then the evidence.
+- **Who holds the keys:** 12 issuer programmes × 7 holder-affecting powers, each held by one key, a multisig (with threshold and time lock), a program, nobody, or unknown.
+- **What if:** 38 failure scenarios per issuer (insolvency, stolen keys...), answered as documented, inferred, litigated or unknown.
+- **Flows and float, exit routes, premium, weekly summary, latest events**, and saved watches with private Telegram alerts.
+
+### Why Solana
+Token-2022 puts the issuer's powers in the mint: permanent delegate, freeze, pause, transfer fee, scaled-UI multiplier. On Solana anyone can check, hourly, whether a mint allows more than the prospectus says. RWA Sonar decodes these per mint, resolves Squads multisigs and time locks, reads mints, burns and redemptions from transactions, and checks exact-mint support at Kamino, Jupiter Lend, Loopscale, Nest and DEX pools.
+
+### Pyth
+Pyth's market-hours schedules set the session for premiums and the closed-market view; Pyth prices are the reference where our feeds are entitled. The hourly lending watcher decodes the publish time of the Pyth price accounts lenders read (PriceUpdateV2) against each market's maximum age, which is how it found Loopscale's stale ones, and our research maps which Pyth feed each market prices from: equity, 24/7 token (Crypto.<T>X/USD) or none.
 
 ### What the evidence shows (dated)
-- xStocks' power to move or burn holders' tokens sits with a 2-of-3 Squads vault with no time lock. Across 1,844 transactions (10 Jun 2025 to 18 Sep 2026) it was never used.
-- On 24 Sep 2026, about 81% of priced xStocks supply (about $2.2B of $2.7B) sat in issuer-attributed wallets. The public float is at most about $0.5B.
-- Loopscale's xStock price accounts have not updated since 26 Aug 2026 (TSLA since 11 Sep). Nine loans ($3,911) are past due and can neither roll over nor be liquidated.
-- Kamino and Jupiter Lend froze QQQx collateral for about 44 hours around a dividend adjustment (19 to 21 Sep 2026). Nobody could borrow, withdraw against debt or be liquidated.
-- PreStocks raised the transfer fee on all eight of its tokens from 0.50% to 1.00% on 19 Sep 2026.
+- PreStocks raised its transfer fee from 0.50% to 1.00% on all eight tokens (19 Sep), then on 24 Sep scheduled 3.00% on seven, uncapped, from Solana epoch 1043 (about 26 Sep). Our hourly chain watcher flagged it the same day, before it takes effect.
+- xStocks' power to move or burn holders' tokens sits with a 2-of-3 Squads vault with no time lock. In 1,845 transactions (10 Jun 2025 to 23 Sep 2026) it was never used.
+- On 24 Sep, about 82% of priced xStocks supply ($2.23B of $2.73B) sat in issuer-attributed wallets. The public float is at most about $0.5B.
+- The Pyth price accounts Loopscale reads for xStock collateral have not updated since 26 Aug (TSLA since 11 Sep). Nine loans ($3,911) are past due and can neither roll over nor be liquidated.
+- Our lending watcher measured the freezes around corporate actions: Kamino held QQQx for 44 hours and METAx for 65 (18 to 21 Sep), Jupiter Lend QQQx for 43. Nobody could borrow, withdraw against debt or be liquidated.
 
 ### Coverage
-1,404 token addresses from 12 issuer programmes, two of them wound down; 9 reviewed legal and technology templates; 11 health checks. Missing data stays "unknown" and never counts as a pass. This is structural research, not legal advice.
+1,404 token addresses from 9 live issuer programmes (12 reviewed, including two wound down); 9 reviewed legal and technology templates; 11 health checks. Missing data stays "unknown" and never counts as a pass. Structural research, not legal advice.
 
 ### How it's built
-Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher that keeps every version; a case-law watcher; a redemption observer; and a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history. The static site is rebuilt every 6 hours and published atomically. Data is keyless or free-tier where possible: Solana RPC, Jupiter, Pyth, CoinGecko and issuer APIs.
+Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher that keeps every version; a case-law watcher; a redemption observer; a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history; the static site rebuilds every 6 hours. Sources: Solana RPC, Jupiter, Pyth, CoinGecko, issuer APIs.
+
+### Business model and next steps
+The public site stays free. Revenue hypothesis: paid alerts and an API for lenders, wallets and risk teams (exact-mint change feeds, collateral screens). No revenue yet; next: one pilot integrator and more lending markets.
 
 ### Built during Stocklana
-The repository started on 13 Feb 2026 as a broad RWA catalogue. The last pre-hackathon state is `main` at `8f58030` (19 Aug 2026). Every commit on the `colosseum-worlds-fair` branch (227 by 24 Sep 2026) dates from 16 Sep 2026 onwards; together they turned it into the Solana tokenized-stock product described here. The code is MIT-licensed; open-source dependencies come through npm as usual.
+The repository started on 13 Feb 2026 as a broad RWA catalogue. The last pre-hackathon state is `main` at `8f58030` (19 Aug 2026). Every commit on the `colosseum-worlds-fair` branch (230+) dates from 16 Sep 2026 onwards; the first ones import catalogue data fetched that day. MIT-licensed; open-source dependencies via npm.
 
 ### Team
 Poglavar Svemira, solo: research, legal analysis, data pipelines and the site. X [@poglavars](https://x.com/poglavars) · Telegram [@svemirsky](https://t.me/svemirsky) · poglavar.svemira@gmail.com · [github.com/Poglavar](https://github.com/Poglavar)
@@ -110,6 +113,8 @@ large or active it is. RWA Sonar explains what the holder owns, which parties th
 and whether the token behaves as its issuer says it does.
 
 ## Current snapshot
+
+*As of 22 Sep 2026; the Form fields above carry the current numbers.*
 
 Public build reviewed: **22 September 2026, 02:06:05 UTC**.
 
@@ -216,14 +221,28 @@ citations and derived analysis, not ownership of those materials.
 
 ## Positioning
 
-| Product | Good at | RWA Sonar's additional question |
-|---|---|---|
-| RWA.xyz | Cross-chain RWA directory, categorisation and market size/activity | What does this exact Solana wrapper legally and technically give its holder? |
-| DefiLlama RWA | AUM, TVL, flows, fees, utilization and rankings | Who can intervene, what can fail, and is exact-token protocol support enforceable and exit-ready? |
-| L2BEAT | Making L2 trust assumptions, upgrades and security models legible | The same trust-assumption analysis for RWAs, extended through legal title, custody, redemption and insolvency. |
+**One line for judges:** RWA.xyz and DefiLlama tell you how big tokenized stocks are; RWA Sonar
+tells you what you actually own when you hold one, who can take it away, and whether the issuer's
+claims match the chain: L2BEAT for tokenized stocks.
+
+| Product | Good at | What it does not answer | What RWA Sonar adds |
+|---|---|---|---|
+| RWA.xyz | Cross-chain RWA market data: value, holders, transfers, issuer league tables | What a holder legally owns, who controls the token, what happens in a failure | Per exact token address: legal claim, on-chain powers, redemption, shareholder rights, dated evidence |
+| DefiLlama RWA | TVL, AUM, flows, fees, rankings | Whether DeFi support is enforceable; what collateral does when the market is closed | What each lender does when the market is closed, observed freezes and liquidations, confirmed exact-token support |
+| L2BEAT | Trust assumptions of L2s: who can upgrade, censor, what is claimed vs true | Tokenized assets | The same method for tokenized stocks, extended past the contract to issuers, custodians, transfer agents, legal terms and courts |
+| Explorers and dashboards (Solscan, Birdeye, DEX Screener, Dune) | Raw transactions and market charts | What those transactions mean | Mints, redemptions and issuer wallets decoded into flows and float; Token-2022 extensions into "who can freeze or burn your tokens" |
+| Issuer transparency pages | Proof of reserves and attestations | Anything the issuer does not say about itself | Independent cross-checks, including where the issuer's docs contradict the chain |
+| Risk firms (e.g. LlamaRisk, Chaos Labs) | Deep collateral assessments for a paying protocol | Usually one-off, per client, not public or continuous | Public, continuous, one method for every token, with alerts on change |
 
 These tools complement each other. RWA Sonar covers the checks between seeing a ticker and deciding
 to hold, integrate, lend against or monitor a tokenized stock.
+
+- **"Why won't RWA.xyz just add this?"** The hard part is not the chart: it is reading prospectuses,
+  trust deeds and terms, decoding each issuer's on-chain powers, and re-checking both every day.
+  That is legal and chain work data aggregators are not built for.
+- **"Who pays?"** A hypothesis for pilots: lending protocols deciding what collateral to accept,
+  wallets and exchanges deciding what to list and what warnings to show, issuers wanting
+  independent verification. The public site stays free.
 
 ## Sponsor and bounty fit
 
@@ -255,15 +274,17 @@ pilot usage with investors, issuers, wallets, lending protocols or risk teams.
 
 ## Suggested three-minute recording
 
+Checked against the live site on 24–25 Sep 2026. Avoid the flows charts and the monitor's status
+counts unless the latest deploy has fixed them.
+
 | Time | Shot |
 |---|---|
-| 0:00 | Open landing and state the problem: a ticker does not tell you the legal claim or who controls the token |
-| 0:20 | Search Apple; compare AAPLx and AAPLon with market, control, legal/evidence and DeFi differences |
-| 0:55 | Open one AAPL token card; show answer, reasoning, evidence and Token-2022 controls |
-| 1:25 | Open FGDLx; show the single-wrapper, no-confirmed-market answer |
-| 1:50 | Open "Who holds the keys"; show the xStocks move/burn cell (2-of-3, no time lock, unused through 18 Sep 2026), then flows.html's 81.0% float finding |
-| 2:15 | Home page's latest events: a lending price freeze (e.g. Loopscale's xStock prices frozen since 26 Aug) or the PreStocks fee change; open it and show the Solana evidence |
-| 2:40 | Close on public site, hackathon branch and pilot ask |
+| 0:00 | Home: "The ticker is familiar. The token is mysterious." The AAPLx vs AAPLon example and the latest-events box |
+| 0:30 | Type "Apple" in the home search, open AAPL, compare the two wrappers (legal form, controls, liquidity, rights) |
+| 1:00 | AAPLx card: the five things to know first, the shareholder-rights strip, then Markets → "When the market is closed" (Kamino freezes at the close, Nest liquidates on the 24/7 price) |
+| 1:45 | SECZ card: a registered share, all five rights ✓, and "Claim ≠ observed reality" (Loopscale's docs say co-signer, the chain says admin) |
+| 2:10 | Who holds the keys: the grid, then the xStocks move/burn cell (2-of-3, no time lock, unused in 1,845 transactions to 23 Sep) |
+| 2:35 | The PreStocks event: a 3 % uncapped transfer fee scheduled on 7 tokens from epoch 1043, caught before it takes effect; close on the watch page and rwasonar.com |
 
 ## Claims to make precisely
 

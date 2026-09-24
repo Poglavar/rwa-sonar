@@ -1012,3 +1012,99 @@ describe('the explorer markup and styles the page needs', () => {
         expect(added).not.toMatch(/:\s*#[0-9a-fA-F]{3,6}/);
     });
 });
+
+// ------------------------------------------------------ page-fix pass, 2026-09-25
+
+describe('the verdict line under the status tiles', () => {
+    const tiles = (good, caution, warning, unknown = 0) => M.statusTilesFromFacet([
+        { value: 'good', count: good }, { value: 'caution', count: caution },
+        { value: 'warning', count: warning }, { value: 'unknown', count: unknown }
+    ], []);
+
+    test('with no good token it says so in plain words, and that the checks sort tokens by what fails', () => {
+        const line = M.statusVerdict(tiles(0, 1006, 398));
+        expect(line).toContain('No tokenized stock passes every check today');
+        expect(line).toContain('0 of 1,404');
+        expect(line).toMatch(/tell tokens apart by what fails/);
+        expect(line).toContain('398 fail one outright');
+        expect(line).toContain('1,006 have their worst check in the middle band');
+    });
+
+    test('a filtered view speaks about the selection, not the whole universe', () => {
+        expect(M.statusVerdict(tiles(0, 10, 2), { filtered: true })).toContain('No token in this selection passes every check');
+    });
+
+    test('when some pass, it counts them instead; nothing counted is no line at all', () => {
+        expect(M.statusVerdict(tiles(12, 1000, 404))).toBe('12 of 1,416 tokens pass every check we could run.');
+        expect(M.statusVerdict(tiles(0, 0, 0))).toBeNull();
+    });
+});
+
+describe('the caption over the worst-check bars agrees with the bars', () => {
+    const strip = M.ruleStripFromFacet([
+        { value: 'verification', count: 980 }, { value: 'tracking', count: 170 }, { value: 'concentration', count: 135 },
+        { value: 'liquidity', count: 93 }, { value: 'organic', count: 18 }, { value: 'defiComposability', count: 6 }, { value: 'failedTx', count: 2 }
+    ], []);
+
+    test('it names the total the bars add up to, and does not claim they are only outright failures', () => {
+        const caption = M.ruleStripCaption(strip);
+        expect(caption).toContain('1,404 tokens');
+        expect(caption).not.toMatch(/failing rule/);
+        expect(caption).toMatch(/failed outright \(warning\)/);
+        expect(caption).toMatch(/middle band \(caution\)/);
+    });
+
+    test('an empty strip has no caption', () => {
+        expect(M.ruleStripCaption([])).toBeNull();
+    });
+});
+
+describe('last trade: the newest of our trade tape and the CoinGecko ticker', () => {
+    const tape = M.tapeLastTrades({ trades: [
+        { mint: 'MINT_S', time: '2026-09-24T21:05:21Z' },
+        { mint: 'MINT_S', time: '2026-09-24T20:00:00Z' },
+        { mint: 'MINT_T', time: '2026-09-20T10:00:00Z' },
+        { mint: null, time: '2026-09-24T22:00:00Z' }
+    ] });
+
+    test('the tape wins when it is newer, and the row says where the time came from', () => {
+        const [row] = M.tokenRowsFromApi([{ mint: 'MINT_S', symbol: 'SPYx', last_traded_at: '2026-09-23T00:24:55.000Z' }], null, tape);
+        expect(row.lastTradedAt).toBe('2026-09-24T21:05:21Z');
+        expect(row.lastTradeSource).toBe('tape');
+    });
+
+    test('the ticker wins when it is newer; a token off the tape keeps the ticker; neither is a dash', () => {
+        const rows = M.tokenRowsFromApi([
+            { mint: 'MINT_T', last_traded_at: '2026-09-23T00:00:00.000Z' },
+            { mint: 'MINT_U', last_traded_at: '2026-09-22T00:00:00.000Z' },
+            { mint: 'MINT_V', last_traded_at: null }
+        ], null, tape);
+        expect(rows.map((r) => [r.lastTradedAt, r.lastTradeSource])).toEqual([
+            ['2026-09-23T00:00:00.000Z', 'coingecko'], ['2026-09-22T00:00:00.000Z', 'coingecko'], [null, null]
+        ]);
+    });
+
+    test('no tape file leaves the API value alone', () => {
+        expect(M.tapeLastTrades(null).size).toBe(0);
+        expect(M.tokenRowsFromApi([{ mint: 'MINT_S', last_traded_at: '2026-09-23T00:24:55.000Z' }], null)[0].lastTradedAt).toBe('2026-09-23T00:24:55.000Z');
+    });
+});
+
+describe('monitor layout and wording', () => {
+    const { readFileSync } = require('node:fs');
+    const { join } = require('node:path');
+    const html = readFileSync(join(__dirname, 'monitor.html'), 'utf8');
+    const css = readFileSync(join(__dirname, 'monitor.css'), 'utf8');
+
+    test('the page sections keep the shared side gutter (no margin shorthand that zeroes margin-inline)', () => {
+        const rule = /#countsSection,[\s\S]*?#meteoraSection\s*\{([^}]*)\}/.exec(css)[1];
+        expect(rule).not.toMatch(/(^|[\s;])margin\s*:/);
+    });
+
+    test('no internal names reach the reader in the visible copy', () => {
+        const visible = html.replace(/<!--[\s\S]*?-->/g, '').replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+        for (const word of ["API's", 'worst_rule', 'facet', 'stocks-closed-market.json', 'Postgres', '/api/tokens']) {
+            expect(visible).not.toContain(word);
+        }
+    });
+});

@@ -164,7 +164,7 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
 
 .user-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; margin-top: 48px; }.user-grid article { min-height: 245px; padding: 22px; border: 1px solid rgba(255,255,255,.13); border-radius: 12px; background: rgba(255,255,255,.035); }.user-grid span { color: var(--pink); font-size: .65rem; font-weight: 850; text-transform: uppercase; letter-spacing: .07em; }.user-grid h3 { margin: 42px 0 10px; font-family: Georgia, serif; font-size: 1.35rem; font-weight: 500; }.user-grid p { margin: 0; color: #aaa3b3; font-size: .72rem; line-height: 1.5; }.business-line { display: flex; gap: 24px; margin-top: 24px; padding: 16px 20px; border-left: 4px solid #9db0ff; background: rgba(255,255,255,.05); color: #bbb4c3; font-size: .78rem; }.business-line strong { color: white; }
 
-.slide-close { background: radial-gradient(circle at 10% 80%, rgba(49,84,216,.32), transparent 30rem), linear-gradient(140deg,#172033,#263862); color: white; }.close-grid { display: grid; grid-template-columns: 1fr minmax(360px,.62fr); align-items: center; gap: 7vw; }.close-grid h2 { font-size: clamp(3.7rem, 6.8vw, 7rem); }.ask-card { min-width: 0; padding: 30px; border: 1px solid rgba(255,255,255,.17); border-radius: 18px; background: rgba(255,255,255,.06); box-shadow: 0 35px 90px rgba(0,0,0,.24); }.ask-card > p { margin: 0 0 22px; color: var(--accent-text); font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.ask-card ul { display: grid; gap: 15px; margin: 0; padding-left: 20px; color: #d7d0dc; font-size: .86rem; line-height: 1.45; overflow-wrap: anywhere; }.close-actions { display: grid; gap: 8px; margin-top: 28px; }.close-actions a { display: flex; align-items: center; justify-content: center; min-height: 46px; border: 1px solid #9db0ff; border-radius: 8px; background: var(--violet); color: white; font-size: .77rem; font-weight: 820; text-decoration: none; }.close-actions a.secondary { background: transparent; }.deck-footer { position: absolute; left: 40px; right: 40px; bottom: 76px; display: flex; align-items: center; gap: 20px; color: var(--on-dark-muted); font-size: .65rem; }.deck-footer strong { color: white; }.deck-footer a { margin-left: auto; color: #b9c5f7; text-decoration: none; }
+.slide-close { background: radial-gradient(circle at 10% 80%, rgba(49,84,216,.32), transparent 30rem), linear-gradient(140deg,#172033,#263862); color: white; }.close-grid { display: grid; grid-template-columns: 1fr minmax(360px,.62fr); align-items: center; gap: 7vw; }.close-grid h2 { font-size: clamp(3.7rem, 6.8vw, 7rem); }.ask-card { min-width: 0; padding: 30px; border: 1px solid rgba(255,255,255,.17); border-radius: 18px; background: rgba(255,255,255,.06); box-shadow: 0 35px 90px rgba(0,0,0,.24); }.ask-card > p { margin: 0 0 22px; color: var(--accent-text); font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.ask-card ul { display: grid; gap: 15px; margin: 0; padding-left: 20px; color: #d7d0dc; font-size: .86rem; line-height: 1.45; overflow-wrap: anywhere; }.close-actions { display: grid; gap: 8px; margin-top: 28px; }.close-actions a { display: flex; align-items: center; justify-content: center; min-height: 46px; border: 1px solid #9db0ff; border-radius: 8px; background: var(--violet); color: white; font-size: .77rem; font-weight: 820; text-decoration: none; }.close-actions a.secondary { background: transparent; }.deck-footer { position: absolute; left: 40px; right: 40px; bottom: 76px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; color: var(--on-dark-muted); font-size: .65rem; }.deck-footer strong { color: white; white-space: nowrap; }.deck-footer > span { white-space: nowrap; }.deck-footer > a { color: #b9c5f7; text-decoration: none; }
 
 .deck-controls { position: fixed; z-index: 80; right: 24px; bottom: 22px; display: flex; gap: 6px; }.deck-controls button { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.2); border-radius: 50%; background: rgba(23,32,51,.88); color: white; cursor: pointer; backdrop-filter: blur(8px); }.deck-controls button:hover { border-color: #9db0ff; }.deck-controls button:disabled { opacity: .3; cursor: default; }
 .keyboard-hint { position: fixed; z-index: 70; left: 24px; bottom: 26px; margin: 0; padding: 7px 10px; border-radius: 999px; background: var(--ink); color: var(--on-dark-muted); font-size: .65rem; }
@@ -183,14 +183,32 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
 .slide-violet .section-lede { font-size: clamp(.95rem, 1.5vw, 1.15rem); }
 .proof-label { margin: 24px 0 0; color: var(--violet-dark); font-size: .66rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .proof-label + .proof-strip { margin-top: 10px; }
-#slide-4 .dimension-grid { margin-top: 30px; }
-#slide-4 .dimension-grid article { min-height: 0; }
-#slide-4 .dimension-grid h3 { margin-top: 30px; }
-#slide-4 .dimension-grid p { min-height: 0; margin-bottom: 16px; }
+/* Slide 3 carries two dated examples under the timeline and slide 4 the Pyth line: on a presentation
+   screen both are tighter so each still fits one 1366×768 screen. Phones scroll, so they keep the default. */
+@media (min-width: 901px) {
+    #slide-3 .slide-inner, #slide-4 .slide-inner { padding-top: calc(var(--bar-height) + 4vh); padding-bottom: 4vh; }
+    #slide-3 h2, #slide-4 h2 { font-size: clamp(2.8rem, 5.2vw, 5.4rem); }
+    #slide-3 .monitor-timeline { margin-top: 30px; }
+    #slide-3 .change-example { margin-top: 14px; }
+}
+#slide-4 .section-lede { max-width: 1040px; margin-top: 16px; }
+#slide-4 .dimension-grid { margin-top: 22px; }
+#slide-4 .dimension-grid article { min-height: 0; padding: 20px 22px; }
+#slide-4 .dimension-grid h3 { margin-top: 14px; }
+#slide-4 .dimension-grid p { min-height: 0; margin-bottom: 10px; }
+#slide-4 .dimension-grid small { padding-top: 10px; }
 #slide-6 .slide-inner { padding-bottom: 130px; }
 #slide-6 .close-grid h2 { font-size: clamp(3.2rem, 5.6vw, 5.8rem); }
 #slide-6 .section-lede.team-line { margin-top: 14px; font-size: 1rem; }
 #slide-6 .team-line a { color: inherit; }
+/* The site-wide contact line (stocks/lib/site-seo.mjs, variant 'dark') sits inside the deck footer.
+   The variant's standalone band (dark background, full-row width) is neutralised here so the line
+   reads as the footer's last item: right-aligned, wrapping under the brand on narrow screens. */
+.deck-footer .site-contact { flex: 0 1 auto; width: auto; margin: 0 0 0 auto; padding: 0; background: transparent; color: inherit; }
+.deck-footer .site-contact .site-contact-title { color: white; }
+/* What Pyth data does in the product (slide 4): one line under the four dimensions. */
+.pyth-line { max-width: none; margin: 16px 0 0; padding: 10px 16px; border-left: 4px solid #ffc9c2; background: rgba(255,255,255,.06); color: var(--on-dark-muted); font-size: .8rem; line-height: 1.5; }
+.pyth-line strong { color: white; }
 
 @media (max-width: 900px) {
     html { scroll-snap-type: none; }
@@ -210,6 +228,8 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
     .evidence-bridge { grid-template-columns: 1fr; }.bridge-core { width: 230px; margin: 0 auto; }.bridge-line { inset: -30px 50% -30px auto; width: 1px; height: auto; }.bridge-line i { left: -4px !important; right: auto !important; }.bridge-line i:first-child { top: 10%; }.bridge-line i:nth-child(2) { top: 50%; }.bridge-line i:last-child { top: auto; bottom: 10%; }
     .dimension-grid, .monitor-timeline, .proof-grid, .position-grid, .user-grid { grid-template-columns: 1fr 1fr; }.monitor-timeline::before { display: none; }
     .change-example { grid-template-columns: 1fr; gap: 8px; }.close-grid { padding-bottom: 130px; }
+    /* The deck footer wraps to three rows on a phone (brand, contact title, contact links). */
+    #slide-6 .slide-inner { padding-bottom: 160px; }
     .cover-diff { grid-template-columns: 1fr; }
     .keyboard-hint { display: none; }
 }
@@ -239,7 +259,7 @@ blockquote { margin: 40px 0 0; padding-left: 20px; border-left: 4px solid var(--
     .answer-flow, .dimension-grid, .monitor-timeline, .proof-grid, .position-grid, .user-grid { grid-template-columns: 1fr; }
     .answer-flow article, .dimension-grid article, .position-grid article, .user-grid article { min-height: 0; }.dimension-grid h3, .position-grid h3, .user-grid h3 { margin-top: 28px; }.dimension-grid p { min-height: 0; }.dimension-grid small { margin-top: 20px; }
     .scenario-list article { grid-template-columns: 1fr; gap: 6px; }
-    .ticker { font-size: 3rem; }.business-line { flex-direction: column; gap: 8px; }.deck-footer { left: 14px; right: 14px; gap: 8px; }.deck-footer span { display: none; }
+    .ticker { font-size: 3rem; }.business-line { flex-direction: column; gap: 8px; }.deck-footer { left: 14px; right: 14px; gap: 8px; }.deck-footer > span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

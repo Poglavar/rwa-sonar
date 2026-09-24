@@ -14,14 +14,16 @@ import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
 import closedMarketView from './closed-market-view.js';
 import holderRightsLib from './holder-rights.js';
-import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
+import { HEALTH_DIMENSIONS, REFERENCE_SOURCE_LABELS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
 import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
+import { timelockFrom } from './power-map.mjs';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
 import protocolProof from './protocol-proof.js';
 import activityRowsLib from './activity-rows.js';
+import { parseSchedule, sessionAt } from './market-hours.mjs';
 import { breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags } from './site-seo.mjs';
 
 const { protocolProofModel } = protocolProof;
@@ -346,7 +348,14 @@ export function buildCard(input) {
         // Protocol-market docs-vs-chain findings (discrepancy-view.js protocolDiscrepancyRecords);
         // only those on a market for this exact mint reach the card.
         protocolDiscrepancies = [],
-        quoteSymbols = null
+        quoteSymbols = null,
+        // The underlying's Pyth trading schedule (stocks/data/reference-prices.json `schedule`),
+        // so the card can say whether that market was open at the snapshot instant.
+        referenceSchedule = null,
+        // `{symbol, terms}` when the issuer's dossier was researched on ONE of its products
+        // (build-cards.mjs researchProducts): on every other product's card, whatever names that
+        // product is labelled as its example rather than read as a fact about this token.
+        researchProduct = null
     } = input ?? {};
 
     const market = token?.market ?? {};
@@ -357,6 +366,8 @@ export function buildCard(input) {
     const verdict = evaluateHealth({ token, issuer, holders: holdersItem, pools, composabilityTemplate });
     const top20 = Array.isArray(holdersItem?.top20) ? holdersItem.top20 : [];
     const secondaryMarketAvailable = Boolean((venuesItem?.dex?.length ?? 0) + (venuesItem?.cex?.length ?? 0));
+    const session = underlyingSession(referenceSchedule, sources.tokens);
+    const example = researchExampleFor(researchProduct, token);
 
     const card = {
         slug,
@@ -372,6 +383,8 @@ export function buildCard(input) {
             name: str(issuer?.name),
             status: str(issuer?.status)
         },
+        // The product the issuer's dossier was researched on, when it is not this token; null otherwise.
+        researchedOn: example === null ? null : example.symbol,
         // These are present-tense conflicts between a published representation and what another
         // authoritative source or the chain shows. They are deliberately separate from corrected
         // evidence claims, which record revisions to RWA Sonar's own research.
@@ -380,7 +393,9 @@ export function buildCard(input) {
             && item?.issuerSlug === (token?.issuer ?? issuer?.slug)).map((item) => ({
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
             })),
-        materialChanges: cardMaterialChanges(materialChanges?.items, token, { asOf: materialChanges?.asOf ?? null }),
+        materialChanges: cardMaterialChanges(materialChanges?.items, token, {
+            asOf: materialChanges?.asOf ?? null, issuerName: str(issuer?.name)
+        }),
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
@@ -471,7 +486,7 @@ export function buildCard(input) {
                 // Scope and preserve the source terms here, before card-size summary truncation.
                 // The model keeps product examples from becoming exact-token claims and gives the
                 // renderer complete text for an expandable qualification.
-                redemption: issuer?.redemption,
+                redemption: withExampleScopes(issuer?.redemption, example),
                 productSymbol: token?.symbol,
                 operationalRouteAvailable: issuer?.redemption?.operationalEvidence
                     ? issuer?.redemption?.operationalRouteAvailable : null,
@@ -508,7 +523,15 @@ export function buildCard(input) {
             source: str(reference.source),
             price: num(reference.price),
             ageSeconds: num(reference.ageSeconds),
-            marketOpen: bool(reference.marketOpen),
+            // The underlying market's session at the snapshot instant (the catalogue's builtAt),
+            // from its trading schedule. The feed's own is_open flag is true or false at the moment
+            // the prices were READ; printed bare it said "open" on a card built after the close.
+            // It is kept as `marketOpenAtRead`, with the read time beside it.
+            session,
+            sessionAt: session === null ? null : str(sources.tokens),
+            marketOpen: session === null ? null : session === 'open',
+            marketOpenAtRead: bool(reference.marketOpen),
+            readAt: str(sources.referencePrices),
             note: truncate(reference.note, PROSE_MAX_SHORT),
             usdPrice: num(market.usdPrice),
             premiumPct: num(reference.premiumPct)
@@ -561,6 +584,14 @@ export function buildCard(input) {
             paused: bool(control.paused),
             allowlist: controlFlag(control.allowlist),
             transferFeeBps: num(control.transferFeeBps),
+            // The fee's cap, any rise already scheduled on-chain, and the epoch they were read at
+            // (lib/classify.mjs transferFeeAtEpoch): a scheduled fee is not today's fee.
+            transferFeeCapped: bool(control.transferFeeCapped),
+            transferFeeScheduled: control.transferFeeScheduled && typeof control.transferFeeScheduled === 'object'
+                && Number.isInteger(control.transferFeeScheduled.bps) && Number.isInteger(control.transferFeeScheduled.epoch)
+                ? { bps: control.transferFeeScheduled.bps, epoch: control.transferFeeScheduled.epoch, capped: bool(control.transferFeeScheduled.capped) }
+                : null,
+            transferFeeReadEpoch: Number.isInteger(control.transferFeeReadEpoch) ? control.transferFeeReadEpoch : null,
             hookActive: controlFlag(control.hookActive)
         },
         authorityAttribution: shapeAuthorityAttribution({
@@ -575,7 +606,8 @@ export function buildCard(input) {
             // The fourth authority (MODEL.md §2.7): the scaled-UI-amount key that restates
             // every holder's displayed balance.
             rebase: str(issuer?.keyGovernance?.rebase),
-            evidence: truncate(issuer?.keyGovernance?.evidence, PROSE_MAX)
+            evidence: truncate(mentionsExample(issuer?.keyGovernance?.evidence, example)
+                ? `Read on ${example.symbol} (programme example): ${issuer.keyGovernance.evidence}` : issuer?.keyGovernance?.evidence, PROSE_MAX)
         },
         verification: {
             type: str(issuer?.custodyVerification?.type),
@@ -604,12 +636,13 @@ export function buildCard(input) {
         trustChain: issuer?.chain ?? null,
         redemptionSchematic: Array.isArray(schematics?.redemption) && schematics.redemption.length > 0
             ? schematics.redemption[0] : null,
-        whatIf: cardWhatIf(whatIf, catalogue, archives),
+        whatIf: cardWhatIf(whatIf, catalogue, archives, example),
         issuerApi: issuerApiFacts(token?.issuer, token?.issuerApi),
         sources: {
             tokens: str(sources.tokens),
             issuers: str(sources.issuers),
             issuerApi: str(sources.issuerApi),
+            referencePrices: str(sources.referencePrices),
             holders: str(sources.holders),
             venues: str(sources.venues),
             trades: str(sources.trades),
@@ -620,6 +653,50 @@ export function buildCard(input) {
     };
 
     return roundDeep(card);
+}
+
+/**
+ * `{symbol, pattern}` when `product` (the product an issuer's dossier was researched on) is not
+ * this token, else null. `pattern` matches any of the product's names as whole words.
+ */
+function researchExampleFor(product, token) {
+    const symbol = str(product?.symbol);
+    if (symbol === null || String(token?.symbol ?? '').toLowerCase() === symbol.toLowerCase()) return null;
+    const terms = [...new Set([symbol, ...(Array.isArray(product.terms) ? product.terms : [])].map(str).filter((term) => term !== null && term.length >= 3))];
+    const escaped = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    return { symbol, pattern: new RegExp(`\\b(?:${escaped.join('|')})\\b`) };
+}
+
+function mentionsExample(value, example) {
+    return example !== null && example !== undefined && typeof value === 'string' && example.pattern.test(value);
+}
+
+/**
+ * The issuer's redemption terms with every term that names the researched product scoped as that
+ * product's example (redemption-usability.js `product-example`), unless the dossier already scopes
+ * it. The complete text is kept; the card's summary then says the term is not confirmed for this token.
+ */
+function withExampleScopes(redemption, example) {
+    if (example === null || !redemption || typeof redemption !== 'object') return redemption;
+    const scopes = { ...(redemption.termScopes && typeof redemption.termScopes === 'object' ? redemption.termScopes : {}) };
+    for (const field of ['eligibility', 'minimum', 'fees', 'rails']) {
+        if (scopes[field] === undefined && mentionsExample(redemption[field], example)) {
+            scopes[field] = { kind: 'product-example', products: [example.symbol], source: `researched on ${example.symbol}` };
+        }
+    }
+    return { ...redemption, termScopes: scopes };
+}
+
+/**
+ * The underlying market's session at `atIso` from its Pyth trading schedule string: 'open',
+ * 'closed', 'holiday', or null when the schedule or the instant is missing or unreadable. Pure:
+ * the instant is an input (the catalogue's builtAt), never the clock.
+ */
+export function underlyingSession(schedule, atIso) {
+    const at = Date.parse(typeof atIso === 'string' ? atIso : '');
+    if (!Number.isFinite(at)) return null;
+    const session = sessionAt(parseSchedule(schedule), at);
+    return session === 'unknown' ? null : session;
 }
 
 /** The busiest DEX pools, with the Meteora pool detail merged in when meteora.json has it. */
@@ -706,7 +783,44 @@ function cexRows(cex, quoteSymbols = null) {
  * (else the earliest). Rows the builder did not mark `material: true` are ignored here as well.
  * Returns null when there is nothing to show, and the card then shows nothing.
  */
-export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MATERIAL_CHANGE_DAYS } = {}) {
+/** A dossier field path in words: `vocabulary.thirdPartyAttestation` -> "third party attestation". */
+function fieldWords(path) {
+    const words = String(path).replace(/\[[^\]]*\]/g, '').replace(/^vocabulary\./, '').replace(/\.value$/, '')
+        .split('.').filter(Boolean).map(labelize);
+    return words.join(' ') || String(path);
+}
+
+/** What a watcher's record path names: `sources[15]` -> "a listed source". */
+const RECORD_PATH_WORDS = {
+    sources: 'a listed source', documents: 'a listed document', incidents: 'an incident’s source',
+    whatIf: 'a what-if search', claims: 'a claim’s source'
+};
+
+/**
+ * A change watcher's summary in words. The watchers write for the review queue: the dossier slug
+ * and record path lead (`xstocks-backed:sources[15]: +9 -2 line(s) · keywords: fee`) and a lost
+ * quote names its claim by field path. A card says the issuer's name, the field in words and the
+ * line counts as a sentence. Text it does not recognise passes through unchanged.
+ */
+export function humanChangeSummary(summary, { issuerSlug = null, issuerName = null } = {}) {
+    if (typeof summary !== 'string') return null;
+    const ours = (slug) => issuerSlug !== null && (slug === issuerSlug || slug.startsWith(`${issuerSlug}-`));
+    return summary
+        .replace(/^([a-z0-9]+(?:-[a-z0-9]+)*)(?::([^\s:]+))?: /, (whole, slug, path) => {
+            if (!ours(slug) && slug !== 'shared') return whole;
+            const who = slug === 'shared' ? 'A shared source' : issuerName ?? humanizeSlug(slug);
+            const head = path === undefined ? null : /^\[?([A-Za-z]*)/.exec(path)[1];
+            const where = path === undefined ? '' : ` (${RECORD_PATH_WORDS[head] ?? fieldWords(path)})`;
+            return `${who}${where}: `;
+        })
+        .replace(/\bthe quoted words for claim ([\w.[\]-]+)/g, (_, path) => `the words we quoted for “${fieldWords(path)}”`)
+        .replace(/\bthe quoted words for what-if ([\w-]+)/g, (_, mode) => `the words we quoted for the what-if question “${humanizeSlug(mode).toLowerCase()}”`)
+        .replace(/\b[a-z0-9-]+:claims\[\d+\]\.url\b/g, 'the source that claim cites')
+        .replace(/\+(\d+) -(\d+) line\(s\)(?: \([\w-]+\))?/g, (_, added, removed) => `${added} line${added === '1' ? '' : 's'} added, ${removed} removed`)
+        .replace(/ · keywords: /g, ' · mentions ');
+}
+
+export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MATERIAL_CHANGE_DAYS, issuerName = null } = {}) {
     if (!Array.isArray(rows) || rows.length === 0 || token === null || typeof token !== 'object') return null;
     const end = Date.parse(asOf ?? '');
     if (!Number.isFinite(end)) return null;
@@ -733,7 +847,9 @@ export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MAT
         .map(({ row }) => ({
             id: str(String(row.id)),
             detectedAt: str(row.detectedAt),
-            change: truncate(row.summary, PROSE_MAX_SHORT) ?? str(row.kind),
+            // In words BEFORE the cut, so a cut can never leave half a field path behind.
+            change: truncate(humanChangeSummary(row.summary, { issuerSlug: token.issuer ?? null, issuerName }), PROSE_MAX)
+                ?? str(row.kind),
             assessmentSeverity: str(row.assessmentSeverity),
             assessment: truncate(row.assessmentSummary, PROSE_MAX)
         }));
@@ -749,7 +865,7 @@ export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MAT
  * `cases[]` survives (minus the holding prose) because a `litigated` answer whose citation was
  * dropped would be an assertion that a court decided something, with nothing to check.
  */
-export function cardWhatIf(whatIf, catalogue, archives = null) {
+export function cardWhatIf(whatIf, catalogue, archives = null, example = null) {
     if (!catalogue || !Array.isArray(catalogue.failureModes)) return null;
     const answers = whatIfLib.answersFromDossier(whatIf, catalogue, { archives }).map((answer) => ({
         mode: answer.mode,
@@ -757,7 +873,10 @@ export function cardWhatIf(whatIf, catalogue, archives = null) {
         flow: answer.flow,
         question: answer.question,
         status: answer.status,
-        outcome: truncate(answer.outcome, OUTCOME_MAX),
+        // An answer that names the researched product is labelled as its example; the label is
+        // inside the OUTCOME_MAX cut, so it costs outcome words rather than card bytes.
+        outcome: truncate(mentionsExample(answer.outcome, example)
+            ? `Researched on ${example.symbol} (programme example): ${answer.outcome}` : answer.outcome, OUTCOME_MAX),
         quote: null,
         url: answer.url,
         locator: truncate(answer.locator, LOCATOR_MAX),
@@ -772,6 +891,7 @@ export function cardWhatIf(whatIf, catalogue, archives = null) {
     }));
     return {
         version: str(catalogue.version),
+        researchedOn: example === null ? null : example.symbol,
         counts: whatIfLib.countAnswers(answers),
         // The actor order and labels ride along, because cards.mjs is pure and cannot read the
         // catalogue file the page fetches — and the groups must be in the same order in both.
@@ -787,11 +907,15 @@ export function cardEvidence(issuer) {
     const currentClaims = evidenceLib.publicClaims(Array.isArray(issuer?.claims) ? issuer.claims : []);
     const byField = evidenceLib.claimsByField(currentClaims);
     const needed = new Set(Array.isArray(issuer?.evidenceFields) ? issuer.evidenceFields : []);
+    const titles = documentTitles(issuer);
     const fields = {};
     for (const path of CARD_CLAIM_FIELDS) {
         const claims = (byField[path] ?? []).slice(0, CARD_CLAIMS_PER_FIELD).map((claim) => ({
             quote: truncate(claim.quote, QUOTE_MAX),
             url: safeUrl(claim.url),
+            // The document's own title from the dossier's register, so the link names what it opens
+            // rather than the host that serves it ("cdn.prod.website-files.com").
+            sourceTitle: truncate(titles.get(claim.url) ?? null, SOURCE_TITLE_MAX),
             locator: truncate(claim.locator, LOCATOR_MAX),
             status: str(claim.status),
             method: str(claim.method),
@@ -898,6 +1022,7 @@ export function publicCard(card) {
         instrumentType: card.instrumentType,
         tokenProgram: card.tokenProgram,
         issuer: card.issuer,
+        researchedOn: card.researchedOn,
         // Full prose and citations are already rendered immediately above this script. Keep only
         // a machine-readable summary in the byte-capped inlined record.
         discrepancies: card.discrepancies.map((row) => ({
@@ -1003,7 +1128,11 @@ export function publicCard(card) {
             source: card.reference.source,
             price: card.reference.price,
             ageSeconds: card.reference.ageSeconds,
+            session: card.reference.session,
+            sessionAt: card.reference.sessionAt,
             marketOpen: card.reference.marketOpen,
+            marketOpenAtRead: card.reference.marketOpenAtRead,
+            readAt: card.reference.readAt,
             usdPrice: card.reference.usdPrice,
             premiumPct: card.reference.premiumPct
         },
@@ -1153,11 +1282,12 @@ function cardChip(fields, ev, label) {
     const best = claims[0];
     const cls = CARD_STATUS_CLASS[best.status] ?? 'ev-muted';
     const body = claims.map((claim) => {
-        // The HOST, not the whole URL: the href carries the path, and printing it twice was the
-        // single biggest thing the chips cost when every field is sourced.
+        // Never the whole URL: the href carries the path, and printing it twice was the single
+        // biggest thing the chips cost when every field is sourced. The document's title (cut to
+        // SOURCE_TITLE_MAX) when the dossier registers one, else the host.
         const source = claim.url === null
             ? '<span class="t">no URL recorded</span>'
-            : link(claim.url, host(claim.url));
+            : link(claim.url, sourceLabel(claim.url, claim.sourceTitle));
         const stamp = claim.accessedAt === null ? '' : ` · read ${shortTime(claim.accessedAt)}`;
         return `<div class="ev-claim"><b class="${cls}">${escapeHtml(claim.status ?? 'claim')}</b>` +
             `${claim.quote === null ? '' : `<blockquote>${escapeHtml(claim.quote)}</blockquote>`}` +
@@ -1171,6 +1301,30 @@ function cardChip(fields, ev, label) {
     return `<details class="ev-chip"><summary class="${cls}" title="${escapeHtml(best.status ?? 'claim')}" ` +
         `aria-label="${escapeHtml(`Evidence for ${label}`)}">Evidence</summary>` +
         `<div class="ev-pop">${body}</div></details>`;
+}
+
+/** How long a source document's title may run as a link label; the locator follows it. */
+export const SOURCE_TITLE_MAX = 48;
+
+/** url -> title from the dossier's document register (`documents[]`). */
+function documentTitles(issuer) {
+    const titles = new Map();
+    for (const doc of Array.isArray(issuer?.documents) ? issuer.documents : []) {
+        const url = safeUrl(doc?.url);
+        const title = str(doc?.title);
+        if (url !== null && title !== null && !titles.has(url)) titles.set(url, title);
+    }
+    return titles;
+}
+
+/** Hosts that are an interface rather than a document, named for what they are. */
+const HOST_WORDS = { 'api.mainnet-beta.solana.com': 'Solana mainnet RPC' };
+
+/** A source link's label: the document's title when the register has one, else what serves it. */
+function sourceLabel(url, title = null) {
+    if (typeof title === 'string' && title !== '') return title;
+    const name = host(url);
+    return HOST_WORDS[name] ?? name;
 }
 
 /** The host of a URL, or the URL itself when it will not parse. */
@@ -1263,7 +1417,8 @@ function inputValue(value) {
 
 function inputPairs(inputs) {
     if (!inputs || typeof inputs !== 'object') return DASH;
-    const parts = Object.entries(inputs).map(([key, value]) => `${labelize(key)}: ${inputValue(value)}`);
+    const parts = Object.entries(inputs).map(([key, value]) => `${labelize(key)}: ${key === 'referenceSource'
+        ? referenceLabel(value) ?? DASH : inputValue(value)}`);
     return parts.length ? escapeHtml(parts.join(' · ')) : DASH;
 }
 
@@ -1290,7 +1445,7 @@ export function ogDescription(card) {
     if (issuer) parts.push(`${issuer}'s ${card.name ?? card.symbol ?? 'token'}`);
     if (card.ownership.claimLabel) parts.push(`holder claim: ${card.ownership.claimLabel}`);
     if (card.reference.premiumPct !== null) {
-        parts.push(`${fmtSignedPct(card.reference.premiumPct)} vs ${card.reference.source ?? 'reference'}`);
+        parts.push(`${fmtSignedPct(card.reference.premiumPct)} vs ${card.underlyingTicker ?? referenceLabel(card.reference.source) ?? 'reference'}`);
     }
     if (card.depth.liquidityUsd !== null) parts.push(`${fmtMoney(card.depth.liquidityUsd)} liquidity`);
     if (card.health.worstRuleId) {
@@ -1361,11 +1516,11 @@ function whatYouOwnBody(card) {
             : field.value === null ? 'Unknown' : String(field.summary ?? field.value);
         const claim = card.evidence?.fields?.[redemptionEvidenceField[field.id]]?.claims?.[0] ?? null;
         const source = claim?.url === null || claim?.url === undefined ? ''
-            : `<small class="redemption-source">${claim.quote === null ? '' : `<q>${escapeHtml(claim.quote)}</q> `}Source: ${link(claim.url, host(claim.url))}`
+            : `<small class="redemption-source">${claim.quote === null ? '' : `<q>${escapeHtml(claim.quote)}</q> `}Source: ${link(claim.url, sourceLabel(claim.url, claim.sourceTitle))}`
                 + `${claim.locator === null ? '' : ` · <code>${escapeHtml(claim.locator)}</code>`}</small>`;
         const complete = typeof field.completeText === 'string' && field.completeText !== ''
-            ? `<details class="redemption-term"><summary>${escapeHtml(value)}</summary><p>${escapeHtml(field.completeText)}</p>${source}</details>`
-            : `<b>${escapeHtml(value)}</b>`;
+            ? `<details class="redemption-term"><summary>${escapeHtml(humanDates(value))}</summary><p>${escapeHtml(humanDates(field.completeText))}</p>${source}</details>`
+            : `<b>${escapeHtml(humanDates(value))}</b>`;
         return `<div><dt>${escapeHtml(field.label)}</dt><dd>${complete}`
             + `<small class="evidence-state">${escapeHtml(humanizeSlug(field.evidence))}</small></dd></div>`;
     });
@@ -1375,7 +1530,7 @@ function whatYouOwnBody(card) {
     if (feed !== null) {
         const at = usability.fields.findIndex((field) => field.id === 'successful-redemption');
         usabilityRows.splice(at < 0 ? usabilityRows.length : at + 1, 0, '<div class="redemption-feed"><dt>Recurring on-chain scan (programme)</dt>'
-            + `<dd><b>${escapeHtml(feed.text)}</b><small class="evidence-state">${escapeHtml(humanizeSlug(feed.state))}</small></dd></div>`);
+            + `<dd><b>${escapeHtml(humanDates(feed.text))}</b><small class="evidence-state">${escapeHtml(humanizeSlug(feed.state))}</small></dd></div>`);
     }
     const banner = usability.documentedButNotIndependentlyObserved
         ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
@@ -1394,20 +1549,51 @@ function redemptionSchematicHtml(card) {
     const spec = card.redemptionSchematic ?? null;
     const slug = card.issuer?.slug ?? null;
     if (spec === null || slug === null) return '';
+    const example = card.researchedOn ? ` (researched on ${card.researchedOn}, a programme example)` : '';
     return `<p class="redemption-schematic-link"><a href="../issuers/${encodeURIComponent(slug)}.html#how-it-works">`
-        + `See it drawn step by step: ${escapeHtml(spec.title ?? 'redemption route')} →</a></p>`;
+        + `See it drawn step by step: ${escapeHtml(spec.title ?? 'redemption route')}${escapeHtml(example)} →</a></p>`;
+}
+
+const SESSION_WORDS = { open: 'open', closed: 'closed', holiday: 'closed for a market holiday' };
+
+/**
+ * How each reference-price source is derived, in words (the source's own name is health.mjs
+ * REFERENCE_SOURCE_LABELS, shared with the tracking rule's note). The record keeps the key.
+ */
+const REFERENCE_DERIVATION = {
+    'ondo-implied': 'Ondo’s asset registry: market capitalisation divided by shares outstanding. It carries no publish time, so the reference’s age is unknown.',
+    'issuer-mark': 'Published by the issuer itself, with no independent check. It carries no publish time, so the reference’s age is unknown.'
+};
+
+function referenceLabel(source) {
+    return source === null || source === undefined ? null : REFERENCE_SOURCE_LABELS[source] ?? humanizeSlug(source);
+}
+
+/**
+ * "closed at 24 Sep 2026 21:27 UTC; open when the reference price was read, 24 Sep 2026 19:08 UTC".
+ * The session at the snapshot instant leads; the feed's read-time flag follows only when it says
+ * something different, and always with its own time, so neither reads as "now".
+ */
+function sessionHtml(r) {
+    const atRead = r.marketOpenAtRead === null ? null
+        : `${r.marketOpenAtRead ? 'open' : 'closed'} when the reference price was read${r.readAt === null ? '' : `, ${time(r.readAt)}`}`;
+    if (r.session === null) return atRead;
+    const atSnapshot = `${SESSION_WORDS[r.session] ?? r.session} at ${time(r.sessionAt)}`;
+    return atRead !== null && r.marketOpenAtRead !== r.marketOpen ? `${atSnapshot}; ${atRead}` : atSnapshot;
 }
 
 function referenceBody(card) {
     const r = card.reference;
+    const label = referenceLabel(r.source);
+    const derived = (r.source === null ? null : REFERENCE_DERIVATION[r.source]) ?? r.note;
     return kv([
-        ['Reference source', r.source === null ? null : text(r.source)],
+        ['Reference source', label === null ? null : text(label.charAt(0).toUpperCase() + label.slice(1))],
         ['Reference price', r.price === null ? null : text(fmtPrice(r.price))],
         ['Reference age', r.ageSeconds === null ? null : text(fmtAgeSeconds(r.ageSeconds))],
-        ['Underlying market', r.marketOpen === null ? null : (r.marketOpen ? 'open' : 'closed')],
+        ['Underlying market', sessionHtml(r)],
         ['On-chain price (Jupiter)', r.usdPrice === null ? null : text(fmtPrice(r.usdPrice))],
         ['Premium', r.premiumPct === null ? null : text(fmtSignedPct(r.premiumPct))],
-        ['How the reference is derived', r.note === null ? null : escapeHtml(r.note)]
+        ['How the reference is derived', derived === null ? null : escapeHtml(derived)]
     ]);
 }
 
@@ -1518,7 +1704,7 @@ function depthBody(card) {
         : `${time(d.lastTradedAt)}${d.lastTradedVenue === null ? '' : ` on ${escapeHtml(d.lastTradedVenue)}`}${exchangeAsOf}`;
 
     return kv([
-        ['Liquidity', d.liquidityUsd === null ? null : text(fmtMoney(d.liquidityUsd))],
+        ['Liquidity (Jupiter, all pools)', d.liquidityUsd === null ? null : text(fmtMoney(d.liquidityUsd))],
         ['Volume 24 h', d.vol24Usd === null ? null : text(fmtMoney(d.vol24Usd))],
         ['Organic share', organic],
         ['Flow 24 h', flow.length ? escapeHtml(flow.join(' · ')) : null],
@@ -1559,9 +1745,25 @@ function holdersBody(card) {
     ]) + table;
 }
 
+/** "3.00 % (no cap)": basis points as a percentage, with the per-transfer cap when it is known. */
+function feeText(bps, capped) {
+    return `${(bps / 100).toFixed(2)} %${capped === false ? ' (no cap)' : ''}`;
+}
+
+/** "1.00 % (no cap) now, at epoch 1042; 3.00 % (no cap) scheduled from epoch 1043", or null with no fee read. */
+function transferFeeText(c) {
+    if (!isNum(c.transferFeeBps) && c.transferFeeScheduled === null) return null;
+    const now = isNum(c.transferFeeBps)
+        ? `${feeText(c.transferFeeBps, c.transferFeeCapped)}${c.transferFeeReadEpoch === null ? '' : ` now, at epoch ${c.transferFeeReadEpoch}`}`
+        : 'fee in effect not read';
+    const next = c.transferFeeScheduled;
+    return next === null ? now : `${now}; ${feeText(next.bps, next.capped)} scheduled from epoch ${next.epoch}`;
+}
+
 function controlBody(card) {
     const c = card.control;
     const g = card.keyGovernance;
+    const fee = transferFeeText(c);
     const authority = (value) => typeof value === 'string'
         ? `<code title="${escapeHtml(value)}">${escapeHtml(shortAddress(value))}</code>`
         : value === false ? 'None observed' : null;
@@ -1569,6 +1771,7 @@ function controlBody(card) {
         ['Mint authority', authority(c.mintAuthority)],
         ['Freeze authority', authority(c.freezeAuthority)],
         ['Permanent delegate', authority(c.permanentDelegate)],
+        ['Transfer fee', fee === null ? null : escapeHtml(fee)],
         ['Paused right now', c.paused === null ? null : yesNo(c.paused)],
         // Rebase changes the displayed economic balance, so keep it directly visible rather than
         // only in the consolidated governance line below.
@@ -1618,8 +1821,8 @@ function controlBody(card) {
         .join(' · ') || 'Not established';
     const technicalEvidence = [...technicalGroups.values()].map((group) => {
         const label = group.labels.join(', ');
-        const date = group.observedAt ? `observed ${group.observedAt}` : null;
-        const source = group.source && safeUrl(group.source) ? link(group.source, host(group.source))
+        const date = group.observedAt ? `observed ${escapeHtml(fmtDate(group.observedAt))}` : null;
+        const source = group.source && safeUrl(group.source) ? link(group.source, sourceLabel(group.source))
             : group.source ? escapeHtml(group.source) : null;
         const detail = [date, source].filter(Boolean).join(' · ');
         return detail ? `${escapeHtml(label)} — ${detail}` : null;
@@ -1669,10 +1872,10 @@ function venuesBody(card) {
     }).join('');
 
     const dex = dexRows
-        ? `<h3>DEX pools</h3><div class="scroll"><table class="r"><thead><tr><th scope="col">Pool</th>` +
+        ? `<h3>DEX pools (DexScreener)</h3><div class="scroll"><table class="r"><thead><tr><th scope="col">Pool</th>` +
           `<th scope="col">Price</th><th scope="col">Liquidity</th><th scope="col">Vol 24 h</th></tr></thead>` +
           `<tbody>${dexRows}</tbody></table></div>`
-        : '<h3>DEX pools</h3><p class="no">No DEX pool reported.</p>';
+        : '<h3>DEX pools (DexScreener)</h3><p class="no">No DEX pool reported.</p>';
     // The CoinGecko read is rotated through a daily call budget, so the table states its own date
     // and what its 24 h volume covers.
     const asOf = card.venues.cexAsOf;
@@ -1690,7 +1893,7 @@ function issuerApiBody(card) {
     const a = card.issuerApi;
     if (a === null) return '';
     const caveat = '<p class="note">These are the issuer\'s own numbers, with no independent check. They were read ' +
-        'at the <em>issuerApi</em> time in the footer, which can be hours older than the rest of ' +
+        'at the <em>issuer APIs</em> time in the footer, which can be hours older than the rest of ' +
         'this card, so a trading status here may disagree with the reference section above.</p>';
     if (a.kind === 'prestocks') {
         return caveat + kv([
@@ -1745,10 +1948,13 @@ function trustChainBody(card) {
     if (card.trustChain === null) {
         return '<p class="tc-empty">No trust chain has been built for this token’s issuer.</p>';
     }
+    const example = card.researchedOn
+        ? ` The diagram was drawn from the dossier researched on ${card.researchedOn}, a programme example: a party it names for that product (such as its underlying company) is not ${card.symbol ?? 'this token'}’s.`
+        : '';
     return '<p class="wi-note">Thirteen actors sit between you and the company, with nine rights '
         + 'flows between them. Colour shows how well each link is evidenced and line style shows '
         + 'how it was verified; both are derived from the data. A role nobody fills stays on the '
-        + 'chart, so the gap is visible.</p>'
+        + `chart, so the gap is visible.${escapeHtml(example)}</p>`
         + trustChainSvg.diagramHtml(card.trustChain, {
             id: `chain-${card.slug}`,
             title: `Trust chain — ${card.issuer.name ?? card.issuer.slug ?? 'issuer'}`,
@@ -1778,7 +1984,9 @@ function whatIfBody(card) {
         labels: Object.fromEntries(actors.map((actor) => [actor.id, actor.label])),
         intro: `Every issuer gets the same ${card.whatIf.answers.length} questions, so missing answers `
             + 'show as gaps. An outcome is never invented. The quote behind each answer, the '
-            + 'cases and where we looked are on the issuer panel.',
+            + 'cases and where we looked are on the issuer panel.'
+            + (card.whatIf.researchedOn ? ` These answers were researched on ${card.whatIf.researchedOn} and describe the programme; `
+                + `an answer that names ${card.whatIf.researchedOn} is marked as that example, not a fact about ${card.symbol ?? 'this token'}.` : ''),
         quote: false,
         note: false,
         cases: true,
@@ -1870,7 +2078,7 @@ function defiUsageBody(card) {
         const first = accessSeen.get(entry.accessNote);
         if (first) return `as for ${escapeHtml(first)} above.`;
         accessSeen.set(entry.accessNote, name);
-        return escapeHtml(entry.accessNote);
+        return escapeHtml(humanDates(entry.accessNote));
     };
     const rows = integrations.map((entry, index) => {
         const metrics = defiMetrics(entry);
@@ -1917,7 +2125,7 @@ function defiUsageBody(card) {
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
             `<strong>${escapeHtml(status)}</strong></header>` +
             `<p class="defi-actions">${escapeHtml(defiActions(entry.actions))}</p>` +
-            `<p>${escapeHtml(entry.summary ?? '')}</p>` +
+            `<p>${escapeHtml(humanDates(entry.summary ?? ''))}</p>` +
             `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
             `${markets.length ? `<p class="defi-metrics">Markets: ${escapeHtml(markets.join(', '))}</p>` : ''}` +
             `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
@@ -1995,6 +2203,192 @@ function healthDimensionsHtml(card) {
 
 const RISK_RANK = { critical: 4, warning: 3, caution: 2, info: 1 };
 
+/** An ISO instant inside generated prose ("stale at 2026-09-24T18:51:51Z") as a reader's date. */
+function humanDates(value) {
+    return String(value).replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z\b/g, (iso) => fmtDateTime(iso));
+}
+
+/** The holder-affecting powers the risk line looks for, most intrusive first, and where each key sits. */
+const HOLDER_POWERS = [
+    { ids: ['permanentDelegate', 'clawback'], words: 'move or burn any holder’s tokens', address: (control) => control?.permanentDelegate },
+    { ids: ['freeze'], words: 'freeze any holder’s account', address: (control) => control?.freezeAuthority }
+];
+
+/**
+ * How directly one installed power can be used: one private key, any one signer of a multisig, or
+ * a multisig whose reviewed notes record NO execution delay (so holders get no warning). A multisig
+ * whose delay is not recorded is not counted: an unknown delay is not the same as none.
+ */
+function powerExposure(row) {
+    if (row?.technicalCapability !== 'present') return null;
+    const type = row.governance?.type;
+    if (type === 'hot-key') return { kind: 'key', rank: 2, threshold: null };
+    if (type === 'single-signer-multisig') return { kind: 'one-signer', rank: 2, threshold: null };
+    if (type === 'multisig' && timelockFrom(row.governance?.technicalNotes)?.seconds === 0) {
+        return { kind: 'no-timelock', rank: 1, threshold: /^(\d+)\s*of\s*(\d+)/i.exec(row.governance?.signerThreshold ?? '') };
+    }
+    return null;
+}
+
+function exposureSentence(exposure, what, first) {
+    if (exposure.kind === 'key') {
+        return first ? `One private key can ${what}, with no second signature needed.` : `Another single private key can ${what}.`;
+    }
+    if (exposure.kind === 'one-signer') {
+        return first ? `Any one signer of a multisig can ${what}, with no second signature needed.` : `Any one signer of another multisig can ${what}.`;
+    }
+    const who = exposure.threshold ? `${exposure.threshold[1]} of ${exposure.threshold[2]} signers of ${first ? 'one' : 'another'} multisig`
+        : `${first ? 'A' : 'Another'} multisig`;
+    return first ? `${who} can ${what} at once: there is no time lock, so holders get no warning.` : `${who} can ${what}, with no time lock.`;
+}
+
+/**
+ * "One private key can move or burn any holder’s tokens …": the powers over holders' tokens that one
+ * key, one signer, or a multisig with no time lock can use. Powers held at the SAME address with the
+ * same exposure are named together; a second holder gets a second, shorter sentence.
+ */
+function powerRisk(card) {
+    const authorities = Array.isArray(card?.authorityAttribution?.authorities) ? card.authorityAttribution.authorities : [];
+    const found = [];
+    for (const power of HOLDER_POWERS) {
+        const best = power.ids.map((id) => powerExposure(authorities.find((row) => row.id === id)))
+            .filter(Boolean).sort((a, b) => b.rank - a.rank)[0];
+        if (!best) continue;
+        const address = power.address(card?.control);
+        found.push({ power, exposure: best, address: typeof address === 'string' ? address : null });
+    }
+    if (found.length === 0) return null;
+    const groups = [];
+    for (const entry of found.slice().sort((a, b) => b.exposure.rank - a.exposure.rank)) {
+        const same = groups.find((group) => group.exposure.kind === entry.exposure.kind && entry.address !== null
+            && group.address === entry.address && (group.exposure.threshold?.[0] ?? null) === (entry.exposure.threshold?.[0] ?? null));
+        if (same) same.words.push(entry.power.words);
+        else groups.push({ exposure: entry.exposure, address: entry.address, words: [entry.power.words] });
+    }
+    return groups.slice(0, 2).map((group, index) => exposureSentence(group.exposure, group.words.join(' and '), index === 0)).join(' ');
+}
+
+/** A lending market's stale, suspended or 24/7 collateral price, worst finding first. */
+function closedMarketRisk(card) {
+    const findings = Array.isArray(card?.closedMarket?.findings) ? card.closedMarket.findings : [];
+    const finding = ['critical', 'warning', 'caution'].map((severity) => findings.find((row) => row?.severity === severity
+        && typeof row.statement === 'string' && row.statement !== '')).find(Boolean);
+    return finding ? `If you borrow against it: ${humanDates(finding.statement)}` : null;
+}
+
+function redemptionRisk(card) {
+    const redemption = card?.ownership?.redemption ?? {};
+    if (redemption.available === false) return 'The issuer offers holders no redemption: the only way out is selling to another buyer.';
+    if (redemption.available === true && redemption.kyc === true) {
+        return 'Only holders who pass the issuer’s KYC checks can redeem; anyone else can only sell to another buyer.';
+    }
+    return null;
+}
+
+/** Which failing check a holder should hear about first when nothing above it applies. */
+const RISK_RULE_ORDER = ['paused', 'frozen', 'liquidity', 'tracking', 'concentration', 'spread', 'organic', 'failedTx',
+    'keyControl', 'verification', 'defiComposability'];
+
+const KEY_ROLE_WORDS = { mint: 'mint', freeze: 'freeze', pause: 'pause', delegate: 'move-or-burn', transferFee: 'transfer-fee', rebase: 'rebase' };
+
+function aboutPct(value) {
+    return value < 1 ? 'under 1 %' : `about ${Math.round(value)} %`;
+}
+
+function joinAnd(words) {
+    return words.length <= 1 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`;
+}
+
+/**
+ * A failing health check in a holder's words. Organic share is the part of 24 h VOLUME that
+ * Jupiter classes as non-bot flow (stocks/MODEL.md §11.1), not a share of traders, and is said so.
+ * A rule with no wording here keeps its own note.
+ */
+function ruleInWords(rule) {
+    const inputs = rule.inputs ?? {};
+    const value = rule.value;
+    if (rule.id === 'organic') {
+        const organicLow = isNum(inputs.organicSharePct) && inputs.organicSharePct < 10;
+        const perTraderHigh = isNum(inputs.tradesPerTrader) && inputs.tradesPerTrader > 25;
+        const perTrader = perTraderHigh ? `${fmtNumber(Math.round(inputs.tradesPerTrader))} trades per trading wallet over the last day` : null;
+        if (organicLow) {
+            return `Most trading looks automated: Jupiter counts only ${aboutPct(inputs.organicSharePct)} of the last day’s volume as organic (non-bot) trading.`
+                + (perTrader ? ` A few wallets make most trades (${perTrader}).` : '');
+        }
+        if (perTrader) return `A few wallets make most of the trades: ${perTrader}.`;
+    }
+    if (rule.id === 'liquidity' && isNum(value)) {
+        return `Thin market: only ${fmtMoney(value)} of reported DEX liquidity, so a large sale could move the price a long way.`;
+    }
+    if (rule.id === 'tracking' && isNum(value) && isNum(inputs.usdPrice) && isNum(inputs.referencePrice)) {
+        return `The token trades ${fmtPct(value, 1)} ${inputs.usdPrice >= inputs.referencePrice ? 'above' : 'below'} the price of the share it tracks.`;
+    }
+    if (rule.id === 'concentration' && isNum(value)) return `One unidentified wallet holds ${aboutPct(value)} of the supply.`;
+    if (rule.id === 'spread' && isNum(value)) return `Trading venues price it up to ${fmtPct(value, 1)} apart.`;
+    if (rule.id === 'failedTx' && isNum(value)) return `${aboutPct(value).replace(/^a/, 'A')} of the sampled swaps in its pools failed.`;
+    if (rule.id === 'paused') return 'Transfers are paused right now.';
+    if (rule.id === 'frozen' && isNum(value)) return `${fmtNumber(value)} of the 20 largest holder accounts ${value === 1 ? 'is' : 'are'} frozen.`;
+    if (rule.id === 'keyControl') {
+        const single = Object.entries(inputs).filter(([, type]) => type === 'hot-key' || type === 'single-signer-multisig')
+            .map(([role]) => KEY_ROLE_WORDS[role] ?? labelize(role));
+        if (single.length) return `A single private key holds the ${joinAnd(single)} power${single.length === 1 ? '' : 's'}.`;
+    }
+    if (rule.id === 'verification') {
+        if (value === 0) return 'No one independently verifies that reserves back the token.';
+        const gaps = [];
+        const plural = (n, one, many) => `${fmtNumber(n)} ${n === 1 ? one : many}`;
+        if (isNum(inputs.missingRequired) && inputs.missingRequired > 0) gaps.push(plural(inputs.missingRequired, 'required legal fact has no source', 'required legal facts have no source'));
+        if (isNum(inputs.unverifiedClaims) && inputs.unverifiedClaims > 0) gaps.push(plural(inputs.unverifiedClaims, 'claim awaits re-checking', 'claims await re-checking'));
+        if (isNum(inputs.inferenceUnreviewed) && inputs.inferenceUnreviewed > 0) gaps.push(plural(inputs.inferenceUnreviewed, 'inferred conclusion awaits review', 'inferred conclusions await review'));
+        if (isNum(value) && value < 3) gaps.push(`reserve verification is weak (${value} of 5)`);
+        if (gaps.length) return `The legal evidence has gaps: ${joinAnd(gaps)}.`;
+    }
+    return rule.note;
+}
+
+function healthRisk(card) {
+    const rules = Array.isArray(card?.health?.rules) ? card.health.rules : [];
+    for (const status of ['warning', 'caution']) {
+        const rule = RISK_RULE_ORDER.map((id) => rules.find((row) => row.id === id && row.status === status)).find(Boolean);
+        if (rule) {
+            const words = ruleInWords(rule);
+            if (typeof words === 'string' && words !== '') return words;
+        }
+    }
+    return null;
+}
+
+/**
+ * "Largest unresolved risk", one sentence a buyer can act on, first match wins: a source-backed
+ * claim-vs-reality conflict; a priority-zero evidence review; a power over holders' tokens that one
+ * key (or a multisig with no time lock) can use; a lending market's stale or 24/7 collateral price;
+ * a redemption this holder cannot use; and only then the worst failing health check, in words.
+ */
+export function largestRisk(card) {
+    const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
+        .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
+    if (discrepancy !== null && typeof discrepancy.title === 'string' && discrepancy.title !== '') {
+        return { value: discrepancy.title, href: '#discrepancies', link: 'Inspect claim vs reality' };
+    }
+    const review = Array.isArray(card?.underReview) ? card.underReview.length : 0;
+    if (review > 0) {
+        return {
+            value: `${review} priority-zero evidence change${review === 1 ? '' : 's'} may affect the inherited legal analysis.`,
+            href: `../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer?.slug ?? '')}`,
+            link: 'Open review queue'
+        };
+    }
+    const power = powerRisk(card);
+    if (power !== null) return { value: power, href: '#control', link: 'Inspect issuer powers' };
+    const lending = closedMarketRisk(card);
+    if (lending !== null) return { value: lending, href: '#closed-market', link: 'Inspect lending while the market is closed' };
+    const redemption = redemptionRisk(card);
+    if (redemption !== null) return { value: redemption, href: '#own', link: 'Inspect redemption terms' };
+    const health = healthRisk(card);
+    if (health !== null) return { value: health, href: '#rules', link: 'Inspect the health checks' };
+    return { value: 'The current checks measured no material risk; what they could not measure is unknown.', href: '#rules', link: 'Inspect the health checks' };
+}
+
 /** The five facts a holder should be able to read before opening any technical detail. */
 export function assetDecisionFacts(card) {
     const verdict = discovery.laypersonVerdict({
@@ -2030,23 +2424,7 @@ export function assetDecisionFacts(card) {
         : (cexMarkets ?? 0) > 0
             ? `No exact-token DEX exit is confirmed, but ${cexMarkets} centralised venue market${cexMarkets === 1 ? ' is' : 's are'} observed. Selling there goes through a custodial venue, with no on-chain pool.${venueCheck}${exchangeAsOf}`
             : `No confirmed secondary-market exit: no exact-token DEX pair or centralised venue market was found.${venueCheck}${exchangeAsOf} Legal rights, issuer redemption and DeFi support are still assessed independently.`;
-    const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
-        .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
-    const worst = (Array.isArray(card?.health?.rules) ? card.health.rules : [])
-        .find((rule) => rule.id === card?.health?.worstRuleId) ?? null;
-    let risk = worst?.note ?? 'The current checks measured no material risk; what they could not measure is unknown.';
-    let riskHref = '#evidence-detail';
-    let riskLink = 'Inspect evidence';
-    if (discrepancy !== null) {
-        risk = discrepancy.title ?? risk;
-        riskHref = '#discrepancies';
-        riskLink = 'Inspect claim vs reality';
-    }
-    if (Array.isArray(card?.underReview) && card.underReview.length) {
-        risk = `${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect the inherited legal analysis.`;
-        riskHref = `../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer?.slug ?? '')}`;
-        riskLink = 'Open review queue';
-    }
+    const risk = largestRisk(card);
     return [
         { id: 'ownership', label: 'What do you own?', value: verdict.headline,
             href: '#own', link: 'Inspect ownership and redemption' },
@@ -2056,7 +2434,8 @@ export function assetDecisionFacts(card) {
             href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
             href: '#defi-usage', link: 'Inspect source-listed protocols' },
-        { id: 'risk', label: 'Largest unresolved risk', value: typeof risk === 'string' ? risk.charAt(0).toUpperCase() + risk.slice(1) : risk, href: riskHref, link: riskLink }
+        { id: 'risk', label: 'Largest unresolved risk', value: risk.value.charAt(0).toUpperCase() + risk.value.slice(1),
+            href: risk.href, link: risk.link }
     ];
 }
 
@@ -2070,6 +2449,26 @@ function assetDecisionHtml(card) {
         + `<div class="asset-rights"><small>Shareholder rights you get</small>`
         + `${holderRightsLib.holderRightsStripHtml(holderRightsLib.holderRightsRows(card?.ownership?.holderRights), { href: '#holder-rights', legend: true })}</div>`
         + '</section>';
+}
+
+/**
+ * "$336.43 on Jupiter · -0.27% vs AAPL · $652.0k DEX liquidity (Jupiter, all pools)": the three
+ * numbers a buyer looks for first, each saying where it comes from. The liquidity is Jupiter's
+ * aggregate over every DEX pool; the pool table below and the exits page read DexScreener, which
+ * lists fewer pools and so a different total, and each is labelled with its source.
+ */
+export function priceLineHtml(card) {
+    const r = card.reference ?? {};
+    const parts = [];
+    if (isNum(r.usdPrice)) parts.push(`<b>${escapeHtml(fmtPrice(r.usdPrice))}</b> on Jupiter`);
+    if (isNum(r.premiumPct)) {
+        const against = card.underlyingTicker ?? referenceLabel(r.source) ?? 'the reference price';
+        parts.push(`<a href="#reference">${escapeHtml(fmtSignedPct(r.premiumPct))} vs ${escapeHtml(against)}</a>`);
+    }
+    if (isNum(card.depth?.liquidityUsd)) {
+        parts.push(`<a href="#depth">${escapeHtml(fmtMoney(card.depth.liquidityUsd))} DEX liquidity</a> (Jupiter, all pools)`);
+    }
+    return parts.length ? `<p class="price-line">${parts.join(' · ')}</p>` : '';
 }
 
 /** An absolute UTC timestamp; card.js appends the relative age to every <time> it finds. */
@@ -2087,7 +2486,7 @@ export function materialChangesHtml(card) {
     const block = card.materialChanges;
     if (block === null || block === undefined || block.items.length === 0) return '';
     const href = `../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(card.issuer?.slug ?? '')}&amp;material=true`;
-    const items = block.items.map((item) => `<li><span>${escapeHtml((item.detectedAt ?? '').slice(0, 10))}`
+    const items = block.items.map((item) => `<li><span>${escapeHtml(fmtDate(item.detectedAt))}`
         + `${item.assessmentSeverity ? ` · ${escapeHtml(item.assessmentSeverity)}` : ''} · ${escapeHtml(item.change ?? '')}</span>`
         + `<q>${escapeHtml(item.assessment ?? '')}</q></li>`).join('');
     return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong><ul>${items}</ul>`
@@ -2095,10 +2494,17 @@ export function materialChangesHtml(card) {
         + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
 }
 
+/** The footer's per-input timestamps, named for a reader rather than by their record keys. */
+const SOURCE_WORDS = {
+    tokens: 'catalogue', issuers: 'issuer dossiers', issuerApi: 'issuer APIs', referencePrices: 'reference prices',
+    holders: 'holders', venues: 'DEX pools', trades: 'trades', closedMarket: 'closed-market data',
+    meteora: 'Meteora pools', defiUsage: 'DeFi usage'
+};
+
 function footerBody(card) {
     const sources = Object.entries(card.sources)
         .filter(([, value]) => value !== null)
-        .map(([key, value]) => `${escapeHtml(key)} ${time(value)}`)
+        .map(([key, value]) => `${escapeHtml(SOURCE_WORDS[key] ?? labelize(key))} ${time(value)}`)
         .join(' · ');
     const evidence = evidenceLine(card.evidence);
     return `<footer><h2>Data</h2>` +
@@ -2174,6 +2580,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
+        priceLineHtml(card) +
         assetDecisionHtml(card) +
         `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
         `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +

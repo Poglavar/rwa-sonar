@@ -252,7 +252,13 @@
                 + `<p class="pm-sub">Finding <code>${escapeHtml(usage.finding.schema)}</code>${usage.finding.observedAt ? `, observed ${escapeHtml(usage.finding.observedAt)}` : ''}${usage.finding.evidence ? ` · evidence: ${escapeHtml(usage.finding.evidence)}` : ''}</p>`);
         }
         for (const effect of Array.isArray(usage.effects) ? usage.effects : []) parts.push(`<p>On chain: ${escapeHtml(effect)}.</p>`);
-        if (!usage.finding && !(usage.effects ?? []).length) {
+        if (usage.check) {
+            // A reviewed search of the authority's history (authorityFacts.<power>.useCheck): what it
+            // found over a stated window, never a promise about later use.
+            parts.push(`<p>${escapeHtml(usage.check.statement)}</p>`
+                + `<p class="pm-sub">Searched through ${escapeHtml(usage.check.through)}${usage.check.source ? ` · source: ${escapeHtml(usage.check.source)}` : ''}</p>`
+                + '<p class="pm-sub">A search of a stated window. It does not limit future use.</p>');
+        } else if (!usage.finding && !(usage.effects ?? []).length) {
             parts.push('<p class="pm-sub">No use is on record in our data. The power may still have been used.</p>');
         }
         if (row.governanceEvidence) {

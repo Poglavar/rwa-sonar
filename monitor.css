@@ -15,7 +15,18 @@
 #defiChangesSection,
 #eventsSection,
 #meteoraSection {
-    margin: 0 0 28px;
+    /* Vertical rhythm only: a `margin` shorthand here zeroed app-shell's `margin-inline: auto`
+       (an id outranks it), which pinned these panels to x=0 instead of the page gutter. */
+    margin-block: 0 28px;
+}
+
+/* The one plain line under the status tiles (statusVerdict in monitor.js). */
+.mon-verdict {
+    max-width: 90ch;
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--page-text);
 }
 
 .mon-subhead {

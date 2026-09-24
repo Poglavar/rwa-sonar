@@ -112,7 +112,7 @@ describe('use of a power', () => {
     });
 
     test('a multiplier other than 1 is an observed effect, counted over the mints', () => {
-        expect(usageFor('rebase', {}, chain)).toEqual({ state: 'effect-observed', finding: null, effects: ['the balance multiplier in force is not 1 on 1 of 2 mints'] });
+        expect(usageFor('rebase', {}, chain)).toEqual({ state: 'effect-observed', finding: null, effects: ['the balance multiplier in force is not 1 on 1 of 2 mints'], check: null });
     });
 
     test('a newMultiplier whose effective time has passed is the multiplier in force; a future one is scheduled', () => {
@@ -127,7 +127,41 @@ describe('use of a power', () => {
     test('no record is not-recorded, never a claim that the power was never used', () => {
         const usage = usageFor('moveBurn', {}, chain);
         expect(usage.state).toBe('not-recorded');
+        expect(usage.check).toBeNull();
         expect(JSON.stringify(usage)).not.toMatch(/never/);
+    });
+
+    test('a reviewed search of the authority’s history is carried as a bounded check, not as use', () => {
+        const useCheck = { statement: 'No transfer or burn in 10 transactions names it as authority.', through: '2026-09-23', source: 'rpc:getSignaturesForAddress X' };
+        const usage = usageFor('moveBurn', {}, chain, useCheck);
+        expect(usage).toMatchObject({ state: 'not-recorded', finding: null, check: useCheck });
+        // A check without its statement or its end date is no check at all.
+        expect(usageFor('moveBurn', {}, chain, { statement: 'x' }).check).toBeNull();
+    });
+});
+
+describe('the xStocks move / burn cell, from the dossier itself', () => {
+    const dossier = JSON.parse(require('node:fs').readFileSync(require('node:path').join(__dirname, 'data/issuers/xstocks-backed.json'), 'utf8'));
+    const issuer = { slug: 'xstocks-backed', name: 'xStocks', ...dossier };
+    const token = { mint: 'X1', issuer: 'xstocks-backed', control: { permanentDelegate: true } };
+    const chainByMint = new Map([['X1', mintAuthorities(rawMint({ delegate: '5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq' }))]]);
+    const cell = shapeIssuerRow(issuer, [token], chainByMint).cells.find((row) => row.power === 'moveBurn');
+
+    test('names the 2-of-3 Squads vault and its zero timelock, as keyGovernance evidence records', () => {
+        expect(cell).toMatchObject({ kind: 'multisig', signerThreshold: '2 of 3', timelock: { seconds: 0 } });
+        expect(cell.controller).toContain('Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot');
+        expect(cell.technicalNotes).toContain('5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq');
+        // Every fact is one the dossier's own evidence already states.
+        for (const text of ['Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot', 'threshold 2 of 3, timeLock 0', '1,845 transactions', '2026-09-23']) {
+            expect(dossier.keyGovernance.evidence).toContain(text);
+        }
+    });
+
+    test('carries the dossier’s search of the vault’s history as the use check', () => {
+        expect(cell.usage.state).toBe('not-recorded');
+        expect(cell.usage.check.statement).toContain('1,845 transactions');
+        expect(cell.usage.check.through).toBe('2026-09-23');
+        expect(dossier.keyGovernance.evidence).toContain(cell.usage.check.statement.replace(/\.$/, ''));
     });
 });
 

@@ -36,9 +36,13 @@ describe('flow chart', () => {
         expect(page.dayReadout(issuer, issuer.days[0])).toContain('created not read');
         expect(page.dayReadout(issuer, issuer.days[1])).toContain('net +$200.00');
     });
-    test('an uncollected side is stated, not drawn as zero', () => {
+    test('an uncollected side is stated, not drawn as zero: the chart is one-sided, the text says why', () => {
         const xs = { ...issuer, created: { counted: false, why: 'not collected yet' }, days: issuer.days.map((d) => ({ ...d, created: null, netUsd: null })) };
-        expect(page.flowChartSvg(xs)).toContain('creations not collected');
+        const svg = page.flowChartSvg(xs);
+        // No empty upper half with an error-looking label: the zero line is the top of the plot.
+        expect(svg).not.toContain('creations not collected');
+        expect(svg).toContain('creations not read');
+        expect(svg).not.toContain('created ↑');
         expect(page.flowTableHtml(xs)).toContain('not collected');
         expect(page.issuerHtml(xs)).toContain('not collected yet');
     });
@@ -49,6 +53,92 @@ describe('flow chart', () => {
     });
     test('no observation file → says so instead of drawing zero flows', () => {
         expect(page.flowsSectionHtml(null)).toMatch(/not zero flows/);
+    });
+});
+
+// The live observer recorded counts before it recorded amounts: a chart of dollars would be a flat
+// "$0" line over days that had hundreds of transactions (the home page quotes 218 Ondo redemptions).
+describe('flows without dollar amounts are plotted as counts', () => {
+    const countSide = (hours, count) => ({ coveredHours: hours, amountHours: 0, count: hours > 0 ? count : null, value: null });
+    const ondo = {
+        slug: 'ondo-global-markets', name: 'Ondo Global Markets', state: 'observed', amountsFrom: null, lastScanStatus: 'ok',
+        created: { counted: true, what: 'mints' }, redeemed: { counted: true, what: 'burns' },
+        days: [
+            ...['2026-09-19', '2026-09-20', '2026-09-21', '2026-09-22'].map((date) => ({ date, created: countSide(0), redeemed: countSide(0), netUsd: null })),
+            { date: '2026-09-23', created: countSide(20.9, 437), redeemed: countSide(20.9, 218), netUsd: null },
+            { date: '2026-09-24', created: countSide(0), redeemed: countSide(0), netUsd: null }
+        ]
+    };
+    const svg = page.flowChartSvg(ondo);
+
+    test('the counts are drawn as bars, labelled as counts, with no dollar axis', () => {
+        expect(page.flowMetric(ondo)).toBe('count');
+        expect((svg.match(/class="fl-bar fl-created/g) || []).length).toBe(1);
+        expect((svg.match(/class="fl-bar fl-redeemed/g) || []).length).toBe(1);
+        expect(page.issuerHtml(ondo)).toContain('<p class="fl-unit-note">Bars: transaction counts per day, amounts not recorded</p>');
+        expect(svg).toContain('counts per day, amounts not recorded');
+        expect(svg).toContain('437 tx');
+        expect(svg).not.toContain('$0');
+        expect(svg).not.toContain('No priced amounts');
+    });
+
+    test('the days before the observer first read are one labelled gap, still drawn as missing', () => {
+        expect(svg).toContain('not observed before 23 Sep');
+        expect((svg.match(/fl-cov-missing/g) || []).length).toBe(5);
+    });
+
+    test('a programme read every day with nothing happening says so instead of drawing a zero chart', () => {
+        const quiet = {
+            ...ondo, slug: 'superstate-opening-bell', name: 'Superstate Opening Bell', created: { counted: false, why: 'not read' },
+            days: ondo.days.map((d, i) => ({ ...d, created: null, redeemed: i < 5 ? { coveredHours: 24, amountHours: 0, count: 0, value: null } : countSide(0) }))
+        };
+        const quietSvg = page.flowChartSvg(quiet);
+        expect(quietSvg).toContain('No redemptions in the 5 days read');
+        expect(quietSvg).not.toMatch(/class="fl-bar /);
+    });
+
+    test('the header says the chart counts transactions, and the legend does not promise dollars', () => {
+        expect(page.issuerHtml(ondo)).toContain('the chart counts transactions');
+        expect(page.issuerHtml(ondo)).not.toContain('(counts only)');
+        expect(page.flowsSectionHtml({ issuers: [ondo] })).not.toContain('Created (USD)');
+    });
+
+    test('a priced window still plots dollars', () => {
+        expect(page.flowMetric(issuer)).toBe('usd');
+        expect(page.flowChartSvg(issuer)).toContain('$300.00');
+    });
+});
+
+describe('programmes with no on-chain redemption leg', () => {
+    const flows = { issuers: [], notObservable: [
+        { slug: 'prestocks', mechanism: 'discretionary-off-chain-request', why: 'Redemption is a discretionary off-chain request.' },
+        { slug: 'tessera', mechanism: 'terminal-burn-after-liquidity-event', why: 'Redemption is terminal and contingent.' },
+        { slug: 'new-issuer', mechanism: 'some-new-mechanism', why: 'x' }
+    ] };
+    const html = page.flowsSectionHtml(flows);
+
+    test('are named and described in words, never by their slugs', () => {
+        expect(html).toContain('<strong>PreStocks</strong>');
+        expect(html).toContain('<strong>Tessera</strong>');
+        expect(html).toContain('redemption only on request, at the issuer&#39;s discretion');
+        expect(html).toContain('redemption only by burning after a liquidity event');
+        expect(html).not.toMatch(/discretionary-off-chain-request|terminal-burn-after-liquidity-event|<strong>prestocks<|<strong>tessera</);
+        // An unknown one is humanised rather than printed raw.
+        expect(html).toContain('<strong>New issuer</strong>');
+        expect(html).toContain('some new mechanism');
+    });
+});
+
+describe('the lead finding', () => {
+    test('states the inventory share and the float against supply, from the data', () => {
+        const lead = page.leadHtml({ totals: { supplyUsd: 2727314161, inventoryUsd: 2229947731, floatUsd: 497366430, inventorySharePct: 81.76, pricedMints: 107 } });
+        expect(lead).toContain('82% of priced xStocks supply sits in issuer wallets');
+        expect(lead).toContain('$497.37M');
+        expect(lead).toContain('$2.73B');
+        expect(lead).toContain('href="#float"');
+    });
+    test('no float read, no lead', () => {
+        expect(page.leadHtml(null)).toBe('');
     });
 });
 

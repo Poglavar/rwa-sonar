@@ -14,7 +14,7 @@ import {
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { psql } from './lib/psql.mjs';
-import { readWhatIf } from './lib/issuer-whatif.mjs';
+import { dossierFileFor, readWhatIf } from './lib/issuer-whatif.mjs';
 import { cardFloatItem } from './lib/xstocks-float.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import {
@@ -40,10 +40,13 @@ const MARKET_RESEARCH_PATH = join(HERE, 'data', 'protocol-market-research.json')
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
+// The underlying's trading schedule per mint (Pyth feed list), so a card can say whether that
+// market was open at the snapshot instant rather than repeat the feed's read-time flag.
+const REFERENCE_PRICES_PATH = join(HERE, 'data', 'reference-prices.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260924cr';
+const ASSET_VERSION = '20260925cards';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -63,6 +66,7 @@ OPTIONS
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
   stocks-trades.json, stocks-closed-market.json (When the market is closed), stocks/data/meteora.json,
+  stocks/data/reference-prices.json (the underlying's trading schedule, for the session at build time),
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
@@ -117,6 +121,37 @@ function archiveIndex(state) {
         if (archive !== '') index[url] = archive;
     }
     return index;
+}
+
+/**
+ * The product each multi-product issuer's dossier was researched on, by the repo's filing
+ * convention: a dossier filed under a token-suffixed name (`backpack-securities-spcx.json`) was
+ * researched on that token. Only a suffix that IS one of the issuer's own token symbols counts.
+ * `terms` are the names that product goes by in the prose: its symbol, its ticker and the head of
+ * its token name ("SpaceX - Backpack Securities" -> "SpaceX"). Every other token of that issuer
+ * gets those passages labelled as the example (lib/cards.mjs researchExampleFor).
+ */
+async function researchProducts(dir, issuerSlugs, tokens) {
+    let files = [];
+    try {
+        files = (await readdir(dir)).filter((name) => name.endsWith('.json'));
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+        return new Map();
+    }
+    const out = new Map();
+    for (const slug of issuerSlugs) {
+        const file = dossierFileFor(slug, files);
+        if (file === null || file === `${slug}.json`) continue;
+        const suffix = file.slice(slug.length + 1, -'.json'.length).toLowerCase();
+        const own = tokens.filter((token) => token.issuer === slug);
+        const product = own.find((token) => String(token.symbol ?? '').toLowerCase() === suffix);
+        // A single-product programme has no OTHER card for the example to be mistaken on.
+        if (!product || own.length < 2) continue;
+        const nameHead = typeof product.name === 'string' ? product.name.split(/\s+[-–—(]\s*/)[0].trim() : null;
+        out.set(slug, { symbol: product.symbol, terms: [...new Set([product.symbol, product.underlyingTicker, nameHead].filter(Boolean))] });
+    }
+    return out;
 }
 
 /**
@@ -281,12 +316,17 @@ async function main() {
     const marketResearch = await readJson(MARKET_RESEARCH_PATH, { markets: [] });
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
+    const referenceDb = await readJson(REFERENCE_PRICES_PATH, { fetchedAt: null, items: [] });
     const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
     // xStocks public float (stocks/fetch-xstocks-float.mjs); absent on a machine that never read it.
     const floatDb = await readJson(join(HERE, 'data', 'xstocks-float.json'), null);
 
     const issuers = indexBy(issuerDb.issuers, 'slug');
     const whatIfBySlug = await readWhatIf(ISSUER_DOSSIER_DIR, [...issuers.keys()]);
+    const researchedOn = await researchProducts(ISSUER_DOSSIER_DIR, [...issuers.keys()], tokenDb.tokens);
+    for (const [slug, product] of researchedOn) {
+        log(`research example: ${slug}'s dossier was researched on ${product.symbol}; its other cards label what names ${product.terms.join('/')}`);
+    }
     const schematics = await loadSchematics({ issuers: [...issuers.values()] });
     const archives = archiveIndex(sourcesState);
     const holders = indexBy(holderDb?.items, 'mint');
@@ -295,6 +335,7 @@ async function main() {
     const meteora = indexBy(meteoraDb?.items, 'pairAddress');
     const composability = indexComposabilityTemplates(composabilityDb?.templates);
     const defiUsage = indexBy(defiUsageDb?.items, 'mint');
+    const referencePrices = indexBy(referenceDb?.items, 'mint');
     const protocolDiscrepancies = discrepancyView.protocolDiscrepancyRecords(marketResearch,
         { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsageDb) });
     const pools = poolsByMint(tradeDb?.pools);
@@ -304,6 +345,7 @@ async function main() {
         tokens: tokenDb.builtAt ?? null,
         issuers: issuerDb.builtAt ?? null,
         issuerApi: tokenDb.sources?.sponsorApis?.fetchedAt ?? null,
+        referencePrices: referenceDb?.fetchedAt ?? null,
         holders: holderDb?.fetchedAt ?? null,
         venues: venueDb?.fetchedAt ?? null,
         trades: tradeDb?.generatedAt ?? null,
@@ -364,7 +406,9 @@ async function main() {
             schematics: schematics.issuers[token.issuer] ?? null,
             materialChanges,
             protocolDiscrepancies,
-            quoteSymbols
+            quoteSymbols,
+            referenceSchedule: referencePrices.get(token.mint)?.schedule ?? null,
+            researchProduct: researchedOn.get(token.issuer) ?? null
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');

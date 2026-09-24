@@ -450,6 +450,25 @@
         }));
     }
 
+    /**
+     * One plain line under the tiles. No token passing every check is the page's headline fact, and
+     * without it "0 good" reads like a broken counter; the checks' job is to tell tokens apart by
+     * WHAT fails. `filtered` narrows the claim to the selection. Null when nothing is counted.
+     */
+    function statusVerdict(tiles, { filtered = false } = {}) {
+        const count = (status) => (Array.isArray(tiles) ? tiles : []).find((tile) => tile.status === status)?.count ?? 0;
+        const total = STATUSES.reduce((sum, status) => sum + count(status), 0);
+        if (total === 0) return null;
+        const good = count('good');
+        if (good > 0) return `${fmtNumber(good)} of ${fmtNumber(total)} tokens pass every check we could run.`;
+        const who = filtered ? 'No token in this selection passes every check' : 'No tokenized stock passes every check today';
+        const parts = [];
+        if (count('warning') > 0) parts.push(`${fmtNumber(count('warning'))} fail one outright`);
+        if (count('caution') > 0) parts.push(`${fmtNumber(count('caution'))} have their worst check in the middle band`);
+        if (count('unknown') > 0) parts.push(`${fmtNumber(count('unknown'))} could not be measured`);
+        return `${who} (0 of ${fmtNumber(total)}). The checks tell tokens apart by what fails: ${parts.join(', ')}.`;
+    }
+
     /** The same four-way distribution, kept separate for each health dimension. */
     function dimensionSummariesFromFacets(facets, filters) {
         return [
@@ -484,6 +503,19 @@
             share: total === 0 ? null : (row.count / total) * 100,
             active: selected.includes(row.id)
         }));
+    }
+
+    /**
+     * What the bars count, with the total they add up to. Every token not rated good has a worst
+     * check, and that check may have failed outright (warning) or only sit in its middle band
+     * (caution), so the bars are NOT "tokens with a failing rule" — the old caption said so and its
+     * bars summed to the whole universe. Null for an empty strip.
+     */
+    function ruleStripCaption(strip) {
+        const total = (Array.isArray(strip) ? strip : []).reduce((sum, rule) => sum + (isNum(rule.count) ? rule.count : 0), 0);
+        if (total === 0) return null;
+        return `Each bar counts the tokens whose worst-scoring check is that one: ${fmtNumber(total)} tokens, every token here that is not rated good. `
+            + 'That worst check failed outright (warning) for some and sits in its middle band (caution) for the rest; pick Warning above to see only outright failures. The bars filter the table too.';
     }
 
     // ------------------------------------------------------------ table paging
@@ -571,14 +603,16 @@
      * stocks-closed-market.json by mint: `closedLenders` is [] when the file loaded and no lender
      * takes the token, and null when the file did not load (unknown, shown as a dash).
      */
-    function tokenRowsFromApi(items, closedIndex) {
+    function tokenRowsFromApi(items, closedIndex, tapeIndex = null) {
         const index = closedIndex instanceof Map ? closedIndex : null;
+        const tape = tapeIndex instanceof Map ? tapeIndex : new Map();
         return (Array.isArray(items) ? items : []).map((item) => {
             const mint = str(item?.mint);
             const symbol = str(item?.symbol);
             const issuer = str(item?.issuer_slug);
             const worstRuleId = str(item?.worst_rule);
             const closed = index === null || mint === null ? null : (index.get(mint) ?? { lenders: [] });
+            const lastTrade = newestTrade(str(item?.last_traded_at), mint === null ? null : (tape.get(mint) ?? null));
             return {
                 mint,
                 symbol,
@@ -599,10 +633,37 @@
                 closedLenders: closed === null ? null : closedMarketView.compactLenders(closed),
                 top1SharePct: num(item?.top1_share_pct),
                 holderCount: num(item?.holder_count),
-                lastTradedAt: str(item?.last_traded_at),
+                lastTradedAt: lastTrade.at,
+                lastTradeSource: lastTrade.source,
                 href: cardHref(symbol, mint, item?.card_slug)
             };
         });
+    }
+
+    /**
+     * mint → newest trade time on our own trade tape (stocks-trades.json, the pools the live
+     * collector decodes). The API's `last_traded_at` is CoinGecko's exchange ticker, refreshed for
+     * only a few hundred tokens a day, so a heavily traded token could read "46 h ago" there.
+     */
+    function tapeLastTrades(trades) {
+        const out = new Map();
+        for (const trade of Array.isArray(trades?.trades) ? trades.trades : []) {
+            const mint = str(trade?.mint);
+            const time = str(trade?.time);
+            if (mint === null || time === null || !Number.isFinite(Date.parse(time))) continue;
+            const held = out.get(mint);
+            if (held === undefined || Date.parse(time) > Date.parse(held)) out.set(mint, time);
+        }
+        return out;
+    }
+
+    /** The newer of the CoinGecko ticker time and the tape time, and which one it was. */
+    function newestTrade(tickerAt, tapeAt) {
+        const t = tickerAt !== null && Number.isFinite(Date.parse(tickerAt)) ? Date.parse(tickerAt) : null;
+        const p = tapeAt !== null && Number.isFinite(Date.parse(tapeAt)) ? Date.parse(tapeAt) : null;
+        if (p !== null && (t === null || p > t)) return { at: tapeAt, source: 'tape' };
+        if (t !== null) return { at: tickerAt, source: 'coingecko' };
+        return { at: null, source: null };
     }
 
     /**
@@ -894,8 +955,11 @@
         facetGroups,
         filterChips,
         statusTilesFromFacet,
+        statusVerdict,
         dimensionSummariesFromFacets,
         ruleStripFromFacet,
+        ruleStripCaption,
+        tapeLastTrades,
         pageMath,
         createSequence,
         describeApiFailure,
@@ -950,6 +1014,7 @@
         loading: false,
         error: null,
         closedIndex: null,
+        tape: null,
         changes: null,
         defiChanges: null,
         defiKind: null,
@@ -995,8 +1060,17 @@
             <td class="num">${escapeHtml(fmtVenueSpreadPct(row.venueSpreadPct))}</td>
             <td class="mon-closed">${closed}</td>
             <td class="num">${escapeHtml(fmtPct(row.top1SharePct))}</td>
-            <td><span title="${escapeHtml(fmtDateTime(row.lastTradedAt))}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</span></td>
+            <td>${lastTradeCell(row)}</td>
         </tr>`;
+    }
+
+    /** "3 min ago" with where the time came from: our trade tape, or CoinGecko's ticker (which can lag). */
+    function lastTradeCell(row) {
+        if (row.lastTradedAt === null) return escapeHtml(DASH);
+        const tape = row.lastTradeSource === 'tape';
+        const title = `${fmtDateTime(row.lastTradedAt)}, ${tape ? 'newest trade on our own trade tape' : "CoinGecko's exchange ticker, refreshed for a few hundred tokens a day, so it can lag"}`;
+        return `<span title="${escapeHtml(title)}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</span>`
+            + `<span class="mon-sub">${tape ? 'our trade tape' : 'CoinGecko'}</span>`;
     }
 
     function renderTiles() {
@@ -1008,6 +1082,12 @@
             <span class="mon-tile-label">${escapeHtml(tile.label)}</span>
             <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
         </button>`).join('');
+        if (els.statusVerdict) {
+            const filtered = state.q !== '' || Object.keys(state.filters).some((name) => name !== 'health');
+            const line = state.facets === null ? null : statusVerdict(tiles, { filtered });
+            els.statusVerdict.textContent = line ?? '';
+            els.statusVerdict.hidden = line === null;
+        }
     }
 
     function renderDimensions() {
@@ -1025,6 +1105,7 @@
 
     function renderRuleStrip() {
         const strip = ruleStripFromFacet(state.facets?.worst_rule, state.filters.worst_rule);
+        if (els.ruleCaption) els.ruleCaption.textContent = ruleStripCaption(strip) ?? 'Each bar counts the tokens whose worst-scoring check is that one.';
         if (strip.length === 0) {
             els.ruleStrip.innerHTML = '<p class="mon-empty">No token in this selection has a worst failing rule.</p>';
             return;
@@ -1371,7 +1452,7 @@
             state.facets = facets?.facets ?? null;
             state.items = Array.isArray(tokens?.items) ? tokens.items : [];
             state.total = isNum(tokens?.total) ? tokens.total : 0;
-            state.rows = tokenRowsFromApi(state.items, state.closedIndex);
+            state.rows = tokenRowsFromApi(state.items, state.closedIndex, state.tape);
             // The API clamps nothing about `page`: an offset past the end is an empty page, so the
             // reader is moved onto the last page that exists instead of being shown a blank table.
             const math = pageMath({ total: state.total, page: state.page });
@@ -1442,11 +1523,12 @@
             loadFile(FILES.trades)
         ]);
         state.closedIndex = closedMarketIndex(closedMarket);
+        state.tape = tapeLastTrades(trades);
         state.changes = changes;
         state.defiChanges = defiChanges;
         state.meteora = meteoraRows({ meteora, tokens, trades });
         // The "When closed" column belongs to rows that may already be on screen.
-        state.rows = tokenRowsFromApi(state.items, state.closedIndex);
+        state.rows = tokenRowsFromApi(state.items, state.closedIndex, state.tape);
         renderTable();
         renderNewMints();
         renderChanges();
@@ -1550,6 +1632,8 @@
         els.tiles = document.getElementById('statusTiles');
         els.dimensions = document.getElementById('healthDimensions');
         els.ruleStrip = document.getElementById('ruleStrip');
+        els.statusVerdict = document.getElementById('statusVerdict');
+        els.ruleCaption = document.getElementById('ruleCaption');
         els.facetPanel = document.getElementById('facetPanel');
         els.chips = document.getElementById('activeFilters');
         els.chipList = document.getElementById('filterChips');

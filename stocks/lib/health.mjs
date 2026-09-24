@@ -195,6 +195,16 @@ export function topSharePctExcludingLabels(top20, n) {
 // Each returns `{status, value, inputs, note}`; evaluateHealth() adds the id, label and threshold
 // string from HEALTH_RULES so the order and the wording live in exactly one place.
 
+/**
+ * The reference-price sources (stocks/fetch-reference-prices.mjs `refSource`) as a reader says them.
+ * The inputs keep the key; notes, and the cards (lib/cards.mjs), use these words.
+ */
+export const REFERENCE_SOURCE_LABELS = {
+    pyth: 'the Pyth price',
+    'ondo-implied': 'Ondo’s implied price',
+    'issuer-mark': 'the issuer’s own mark price'
+};
+
 /** 1. |premiumPct| against the reference price of the underlying share. */
 function trackingRule(token) {
     const reference = token?.reference ?? null;
@@ -210,7 +220,8 @@ function trackingRule(token) {
     };
     const note = status === 'unknown'
         ? 'no reference price for the underlying share, so the premium cannot be measured'
-        : `on-chain price is ${fmt(value)} % ${premium >= 0 ? 'above' : 'below'} the ${inputs.referenceSource ?? 'reference'} price`
+        : `on-chain price is ${fmt(value)} % ${premium >= 0 ? 'above' : 'below'} `
+            + `${REFERENCE_SOURCE_LABELS[inputs.referenceSource] ?? `the ${inputs.referenceSource ?? 'reference'} price`}`
             + (inputs.marketOpen === false ? ' (underlying market closed)' : '');
     return { status, value, inputs, note };
 }

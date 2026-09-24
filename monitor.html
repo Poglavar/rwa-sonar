@@ -47,8 +47,8 @@
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260924r" />
-    <link rel="stylesheet" href="monitor.css?v=20260924cm" />
-    <link rel="stylesheet" href="app-shell.css?v=20260924r" />
+    <link rel="stylesheet" href="monitor.css?v=20260925a" />
+    <link rel="stylesheet" href="app-shell.css?v=20260925b" />
 </head>
 
 <body class="app-page">
@@ -68,7 +68,7 @@
             counted as a pass.</strong></p>
 
     <div class="data-line evidence-context"><span><small>Observed</small><strong>Universe built <time id="dataAsOf" datetime="">&hellip;</time></strong></span>
-        <span><small>Coverage</small><strong><span id="tokenTotal">&hellip;</span> tokens in the API</strong></span>
+        <span><small>Coverage</small><strong><span id="tokenTotal">&hellip;</span> tokens tracked</strong></span>
         <span><small>History</small><strong>Newest snapshot <span id="snapshotDate">&hellip;</span><span id="newMintsSummary" class="new-mints-summary" hidden> · <a id="newMintsSummaryLink" href="#newMints">new addresses</a></span></strong></span>
         <span><small>Limit</small><strong>Unknown checks are never counted as passes</strong></span></div>
 
@@ -88,10 +88,11 @@
     <section id="countsSection" aria-labelledby="countsHeading">
         <h2 id="countsHeading">Status counts</h2>
         <p class="section-note">Each tile filters the table below; click it again to clear, and click
-            a second status to see both. The counts are the API's <code>health</code> facet, which
-            ignores its own filter. With <em>warning</em> selected, the other three still show how
-            many tokens you would get by switching to them.</p>
+            a second status to see both. Picking a status does not change the tiles' own counts: with
+            <em>warning</em> selected, the other three still show how many tokens you would get by
+            switching to them.</p>
         <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by status"></div>
+        <p id="statusVerdict" class="mon-verdict" hidden></p>
 
         <h3 class="mon-subhead">The four dimensions</h3>
         <p class="section-note">Overall status is the worst measured result below. The four columns
@@ -99,26 +100,27 @@
             whether a DeFi protocol can enforce custody and default. “Unknown” means we did not measure it.</p>
         <div id="healthDimensions" class="mon-dimensions" aria-label="Health by dimension"></div>
 
-        <h3 class="mon-subhead">What the worst failing check is</h3>
-        <p class="section-note">Among the tokens that have a failing rule, each bar is that
-            rule's share. The API's <code>worst_rule</code> facet, and these filter too.</p>
+        <h3 class="mon-subhead">Which check scores worst</h3>
+        <p id="ruleCaption" class="section-note">Each bar counts the tokens whose worst-scoring check is that one.</p>
         <div id="ruleStrip" class="mon-rules" role="group" aria-label="Filter by worst rule"></div>
     </section>
 
     <section id="tokensSection" aria-labelledby="tokensHeading">
         <h2 id="tokensHeading">All mints, filterable by any property</h2>
-        <p class="section-note">The panel is every facet the API reports, with the count of tokens
-            behind each value. Two values inside one facet are OR; two facets are AND, and each
-            facet's counts exclude its own filter, so a count always says what you would get by
+        <p class="section-note">The panel lists every property you can filter by, with the count of
+            tokens behind each value. Two values inside one group are OR; two groups are AND, and each
+            group's counts leave out its own selection, so a count always says what you would get by
             clicking it. A symbol links to that token's card. <strong>Premium</strong> is the
             on-chain price against the reference price for the same underlying share;
             <strong>spread</strong> is the gap between the cheapest and dearest venue pricing it;
             <strong>When closed</strong> names each lending market that takes the token and the price it
             uses while the US market is closed: <em>frozen at close</em>, <em>24/5 overnight</em>,
             <em>24/7 token price</em>, <em>signed quote</em> or <em>stale since</em> a date (hover for the
-            liquidation threshold; the token's card has the freezes, Monday gaps and depth). It is the one
-            column still read from a file, <a href="./stocks-closed-market.json"><code>stocks-closed-market.json</code></a>,
-            because the API's slim row does not carry it. A dash is a missing measurement, never a zero.</p>
+            liquidation threshold; the token's card has the freezes, Monday gaps and depth; the
+            <a href="./stocks-closed-market.json">closed-market data</a> is downloadable).
+            <strong>Last trade</strong> is the newer of our own trade tape and CoinGecko's exchange
+            ticker, and says which; the ticker is refreshed for a few hundred tokens a day, so it can
+            lag. A dash is a missing measurement, never a zero.</p>
 
         <div class="mon-explorer">
             <aside id="facetPanel" class="mon-facets" aria-label="Filter by any property"></aside>
@@ -167,17 +169,17 @@
                     <span id="pageLabel" class="mon-page-label"></span>
                     <button id="nextPage" type="button" class="mon-reset">Next &rarr;</button>
                 </div>
-                <p class="section-note mon-sort-note">Only the columns with an arrow are sortable:
-                    the sort runs in Postgres, and <code>/api/tokens</code> accepts a whitelist of
-                    keys, so only those columns are offered.</p>
+                <p class="section-note mon-sort-note">Only the columns with an arrow are sortable. A
+                    sort runs over every matching token, not just this page; <strong>Last trade</strong>
+                    sorts by the CoinGecko time.</p>
             </div>
         </div>
     </section>
 
     <section id="changesSection" aria-labelledby="changesHeading">
         <h2 id="changesHeading">Change log <span id="changeRange" class="mon-range"></span></h2>
-        <p class="section-note">A snapshot of the universe is saved every day
-            (<code>stocks/data/history/&lt;date&gt;/</code>) and consecutive days are compared. Only
+        <p class="section-note">A snapshot of every tracked token is saved every day and
+            consecutive days are compared. Only
             these changes are reported: a pause, a rebase, a pool that halved from real
             liquidity, a venue spread crossing 5 %, a health status changing, a frozen account
             appearing, a control flag flipping. <strong>A field that was not measured on either day
@@ -198,23 +200,22 @@
         <div id="defiChangeFilters" class="mon-defi-filters" role="group" aria-label="Filter DeFi protocol changes"></div>
         <div id="defiChangeGroups"></div>
         <p class="section-note mon-defi-source">Every row retains the exact Solana token address and the
-            two observation times. The machine-readable evidence is
-            <a href="./stocks-defi-changes.json">stocks-defi-changes.json</a>.</p>
+            two observation times. The same evidence is downloadable as
+            <a href="./stocks-defi-changes.json">DeFi changes data</a>.</p>
     </section>
 
     <section id="eventsSection" aria-labelledby="eventsHeading">
         <h2 id="eventsHeading">Events</h2>
-        <p class="section-note">Hand-picked, dated incidents from the issuer dossiers. Each one is
-            recorded with its source under <code>stocks/data/issuers/</code> or in
-            <code>stocks/findings.md</code>. The list is curated by hand and is not updated automatically.</p>
+        <p class="section-note">Hand-picked, dated incidents from the issuer dossiers, each recorded
+            with its source. The list is curated by hand and is not updated automatically.</p>
         <ul id="eventList" class="mon-events"></ul>
     </section>
 
     <section id="meteoraSection" aria-labelledby="meteoraHeading">
         <h2 id="meteoraHeading">Meteora pools</h2>
         <p class="section-note">One row per Meteora pool, with the facts DexScreener does not report:
-            which Meteora product the pool is (a single <code>meteora</code> dexId covers DLMM and the
-            bonding curve), its bin step, its real fee configuration and its 24-hour fees as well as volume. <strong>Premium</strong> is that pool's own price against the token's
+            which Meteora product the pool is (DexScreener files the DLMM pools and the bonding
+            curve under one name), its bin step, its real fee configuration and its 24-hour fees as well as volume. <strong>Premium</strong> is that pool's own price against the token's
             reference price, so a pool quoting away from the venue aggregate shows up.
             <strong>Failed</strong> is the reverted share of the signatures the trade collector
             sampled on that pool. A dash means the collector never reached the pool. <span id="meteoraCount" class="token-count"></span></p>
@@ -251,7 +252,7 @@
     <script src="stocks/lib/fmt.js?v=20260924a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/closed-market-view.js?v=20260924a"></script>
-    <script src="monitor.js?v=20260924cm"></script>
+    <script src="monitor.js?v=20260925a"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 

@@ -28,8 +28,9 @@ body.app-page {
 .fl-chart { overflow: hidden; }
 .fl-svg text { fill: var(--rwa-muted); font-size: 12px; }
 .fl-axis line { stroke: var(--rwa-line); stroke-width: 1.5; }
-.fl-side { font-size: 11px; font-weight: 700; letter-spacing: .03em; }
-.fl-empty { font-size: 13px; }
+.fl-side { font-size: 11px; font-weight: 700; letter-spacing: .03em; paint-order: stroke; stroke: var(--rwa-panel); stroke-width: 4px; stroke-linejoin: round; }
+.fl-empty { font-size: 13px; font-style: italic; }
+.fl-unit-note { margin: 0; color: var(--rwa-muted); font-size: .76rem; font-weight: 700; }
 .fl-bar { stroke: var(--rwa-panel); stroke-width: 2; }
 .fl-created { fill: var(--fl-created); background: var(--fl-created); }
 .fl-redeemed { fill: var(--fl-redeemed); background: var(--fl-redeemed); }
@@ -60,6 +61,10 @@ body.app-page {
 .fl-alert { color: var(--rwa-red); font-weight: 650; }
 .fl-flag { color: var(--rwa-amber); font-size: .7rem; }
 .fl-finding { margin: 8px 0 10px; padding: 10px 12px; border-left: 4px solid var(--rwa-amber); border-radius: 8px; background: color-mix(in srgb, var(--rwa-amber) 10%, var(--rwa-panel)); font-size: .82rem; line-height: 1.45; }
+/* The page's lead finding (leadHtml in flows.js), above the float section it summarises. */
+#lead { margin: 14px auto 0; }
+.fl-lead { margin: 0; font-size: 1rem; line-height: 1.5; }
+.fl-lead a { white-space: nowrap; }
 .fl-details { margin: 6px 0 10px; }
 .fl-details summary { cursor: pointer; font-size: .82rem; font-weight: 700; color: var(--rwa-cobalt-dark); padding: 6px 0; }
 .fl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }

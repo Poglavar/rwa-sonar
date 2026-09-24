@@ -211,6 +211,10 @@ export function parseMintState(account, { mint = null, slot = null, observedAt =
         permanentDelegate: stringOrNull(summary.permanentDelegateAddress),
         transferFeeBps: intOrNull(newerFee?.transferFeeBasisPoints),
         transferFeeMax: numericString(newerFee?.maximumFee),
+        // Not a mint_state column: the epoch the newer fee applies from (Token-2022 sets it two
+        // epochs ahead). It rides only in a fee change's evidence, so the feed can tell a
+        // scheduled fee from one already charged.
+        transferFeeEpoch: intOrNull(newerFee?.epoch),
         withheld: numericString(transferFee?.withheldAmount),
         feeConfigAuthority: stringOrNull(transferFee?.transferFeeConfigAuthority),
         withdrawWithheldAuthority: stringOrNull(transferFee?.withdrawWithheldAuthority),
@@ -334,6 +338,8 @@ export function diffStates(prev, next, { symbol = null, issuer = null, detectedA
     };
     const label = symbol ?? mint ?? '(unknown mint)';
     const events = [];
+    // A fee change also records when the new fee applies and its cap (not in mint_state's hash).
+    const feeEvidence = { ...evidence, transferFee: { newerEpoch: next.transferFeeEpoch ?? null, maximumFee: show(next.transferFeeMax) } };
     const emit = (kind, field, before, after, severity, summary) => {
         events.push({
             detectedAt: at,
@@ -344,7 +350,7 @@ export function diffStates(prev, next, { symbol = null, issuer = null, detectedA
             before: show(before),
             after: show(after),
             severity,
-            evidence,
+            evidence: field === 'transfer_fee_bps' ? feeEvidence : evidence,
             summary
         });
     };

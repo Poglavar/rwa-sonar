@@ -6,7 +6,7 @@
 
 import { join, relative } from 'node:path';
 import { summarizeExtensions } from './lib/classify.mjs';
-import { DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, fetchMintAccounts } from './lib/solana-rpc.mjs';
+import { DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, fetchMintAccounts, rpcCall } from './lib/solana-rpc.mjs';
 import { byString, isoDate, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
@@ -34,10 +34,11 @@ NOTES
   Run fetch-universe.mjs first. Raw parsed accounts land in
   stocks/data/raw/mints-parsed-<date>.json and are the resume checkpoint: mints already
   present there are skipped. A 429 backs off 1s/2s/4s and then fails loudly rather than
-  silently reporting a mint with no extensions.`);
+  silently reporting a mint with no extensions. Each run reads getEpochInfo first: a Token-2022
+  transfer fee is reported as in effect at that epoch, with any already-scheduled change beside it.`);
 }
 
-function buildItems(accounts, universeByMint) {
+function buildItems(accounts, universeByMint, epoch) {
     const items = [];
     const missing = [];
     for (const [mint, entry] of Object.entries(accounts)) {
@@ -50,7 +51,7 @@ function buildItems(accounts, universeByMint) {
             mint,
             symbol: universeItem?.symbol ?? null,
             issuer: universeItem?.issuer ?? null,
-            ...summarizeExtensions(entry.account),
+            ...summarizeExtensions(entry.account, { epoch }),
             owner: entry.account.owner ?? null,
             space: entry.account.space ?? null
         });
@@ -96,6 +97,14 @@ async function main() {
     if (flags.limit) mints = mints.slice(0, Number(flags.limit));
     log(`universe ${inPath}: ${mints.length} mint(s), fetched ${universe.fetchedAt}`);
 
+    // The chain's epoch for this run decides which transfer-fee leg is in effect (a newly set fee
+    // starts two epochs later; lib/classify.mjs transferFeeAtEpoch). Read once; a failure is fatal,
+    // because without it a scheduled fee would be reported as today's.
+    const epochInfo = await rpcCall('getEpochInfo', [], { rpc });
+    const epoch = Number.isInteger(epochInfo?.epoch) ? epochInfo.epoch : null;
+    if (epoch === null) throw new Error(`getEpochInfo on ${rpc} returned no epoch: ${JSON.stringify(epochInfo)}`);
+    log(`epoch ${epoch} (slot ${epochInfo.absoluteSlot ?? '?'}): transfer fees are read as in effect at this epoch`);
+
     const empty = { startedAt: ts(), rpc, accounts: {} };
     const checkpoint = flags.force ? empty : await readJson(rawPath, empty);
     const todo = mints.filter((mint) => !checkpoint.accounts[mint]);
@@ -103,11 +112,12 @@ async function main() {
     if (skipped > 0) log(`resuming from ${rawPath}: ${skipped} mint(s) already read and skipped`);
 
     const writeAll = async () => {
-        const { items, missing } = buildItems(checkpoint.accounts, universeByMint);
+        const { items, missing } = buildItems(checkpoint.accounts, universeByMint, epoch);
         await writeJson(outPath, {
             fetchedAt: ts(),
             source: {
                 rpc,
+                epoch,
                 method: 'getMultipleAccounts',
                 encoding: 'jsonParsed',
                 batchSize,
@@ -122,6 +132,7 @@ async function main() {
                     transferHookConfigured: items.filter((i) => i.transferHookConfigured).length,
                     transferHookActive: items.filter((i) => i.transferHookProgram !== null).length,
                     withTransferFee: items.filter((i) => i.transferFeeBps !== null).length,
+                    withScheduledTransferFee: items.filter((i) => i.transferFeeScheduled !== null).length,
                     defaultAccountStateFrozen: items.filter((i) => i.defaultAccountStateFrozen).length
                 },
                 missingMints: missing

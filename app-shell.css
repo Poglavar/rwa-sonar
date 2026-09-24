@@ -432,8 +432,13 @@ body.app-page {
 .rights-detail thead th { color: var(--rwa-muted); font-size: .8rem; font-weight: 600; }
 .rights-source { display: block; margin-top: 3px; color: var(--rwa-muted); overflow-wrap: anywhere; }
 @media (max-width: 560px) {
+    /* Block, not table, so the width is what the container leaves after its own margins (issuer
+       pages indent sections; `width: 100%` plus that indent ran 6 px past a 375 px screen), and
+       the status chip may wrap rather than set the row's minimum width. */
+    .rights-detail, .rights-detail tbody, .rights-detail caption { display: block; width: auto; }
     .rights-detail thead { display: none; }
-    .rights-detail tr { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 8px 0; border-top: 1px solid var(--rwa-line); }
+    .rights-detail tr { display: grid; grid-template-columns: minmax(0, max-content) minmax(0, 1fr); gap: 4px 10px; padding: 8px 0; border-top: 1px solid var(--rwa-line); }
     .rights-detail th, .rights-detail td { padding: 0; border-top: 0; }
     .rights-detail td:last-child { grid-column: 1 / -1; }
+    .rights-detail .rights-chip { white-space: normal; }
 }

@@ -913,3 +913,35 @@ describe('the model assessment beside a change (stocks/EVIDENCE.md §2.3)', () =
         expect(block('.wat-diff pre')).toContain('overflow-wrap: anywhere');
     });
 });
+
+// The hero: the patrol dolphin's sonar ring grows to its largest scale (motion.css keyframes) before
+// settling, so its column must hold the ring at that scale. A column only as wide as the dolphin
+// let the ring past the right content edge at 1280 px and pushed a 375 px page 4 px wide.
+describe('watch hero layout', () => {
+    const ART = readFileSync(join(__dirname, 'research-art.css'), 'utf8');
+    const MOTION = readFileSync(join(__dirname, 'motion.css'), 'utf8');
+    const keyframes = MOTION.slice(MOTION.indexOf('@keyframes sonar-ping'), MOTION.indexOf('@keyframes', MOTION.indexOf('@keyframes sonar-ping') + 1));
+    const ringMax = Math.max(...[...keyframes.matchAll(/scale\(([\d.]+)\)/g)].map((m) => Number(m[1])));
+    const px = (block, prop) => Number(new RegExp(`${prop}:[^;]*?(\\d+)px`).exec(block)?.[1]);
+    const narrow = ART.slice(ART.indexOf('@media (max-width: 700px)'));
+    const wide = ART.slice(0, ART.indexOf('@media (max-width: 700px)'));
+    // The LAST rule for a selector is the one the cascade applies.
+    const rule = (css, selector) => {
+        const at = css.lastIndexOf(`${selector} {`);
+        return at < 0 ? '' : css.slice(at, css.indexOf('}', at));
+    };
+
+    test('the ring at its largest fits the dolphin\'s column, wide and narrow', () => {
+        expect(ringMax).toBeGreaterThanOrEqual(1.4);
+        for (const css of [wide, narrow]) {
+            const column = Number(/grid-template-columns: minmax\(0, 1fr\) (\d+)px/.exec(rule(css, '.watch-intro'))[1]);
+            const spot = px(rule(css, '.watch-intro .research-spot-wrap'), 'width');
+            expect(rule(css, '.watch-intro .research-spot-wrap')).toContain('justify-self: center');
+            expect(spot * ringMax).toBeLessThanOrEqual(column);
+        }
+    });
+
+    test('the heading keeps clear of the quote box under it', () => {
+        expect(rule(wide, '.watch-intro h1')).toMatch(/margin: 0 0 [.\d]+(em|px)/);
+    });
+});

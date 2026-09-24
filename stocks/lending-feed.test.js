@@ -48,12 +48,14 @@ const GAP_0924 = [
 ];
 
 describe('liquidations', () => {
-    test('grouped per market, token and UTC day with the collateral summed, linked to the token\'s dossier', () => {
+    // Lending events link to the token card's "When the market is closed" section, which names each
+    // lending market, its liquidation LTV and its recent freezes; the protocol dossier mentions none of them.
+    test('grouped per market, token and UTC day with the collateral summed, linked to the token card\'s closed-market section', () => {
         const events = liquidationEvents([liq('2026-09-21T13:31:00Z'), liq('2026-09-21T18:02:00Z', { collateral_usd: 80000 }), liq('2026-09-21T20:00:00Z')], ctx());
         expect(events).toHaveLength(1);
         expect(events[0]).toMatchObject({
             at: '2026-09-21T20:00:00Z', category: 'lending', kind: 'liquidations', source: 'lending watcher', severity: 'caution', origin: 'lending',
-            title: 'Kamino liquidated 3 NVDAx positions ($84k collateral)', href: './protocols/nvdax-kamino-kamino-collateral-xsc9qv.html'
+            title: 'Kamino liquidated 3 NVDAx positions ($84k collateral)', href: './cards/NVDAx.html#closed-market'
         });
     });
 
@@ -90,7 +92,7 @@ describe('collateral price freezes', () => {
         const [event] = freezeEvents(QQQX_FREEZE, ctx());
         expect(event).toMatchObject({
             at: '2026-09-19T17:28:45Z', kind: 'price-freeze', category: 'lending', severity: 'warning',
-            title: 'Kamino and Jupiter Lend froze the QQQx collateral price for 44 h', href: './protocols/qqqx-kamino-kamino-collateral-xs8s1u.html'
+            title: 'Kamino and Jupiter Lend froze the QQQx collateral price for 44 h', href: './cards/QQQx.html#closed-market'
         });
         // Exact lengths that differ by more than a tenth are given as a range.
         const [ranged] = freezeEvents([QQQX_FREEZE[0], { ...QQQX_FREEZE[2], ended_at: '2026-09-20T12:00:00Z' }], ctx());
@@ -107,9 +109,13 @@ describe('collateral price freezes', () => {
         const [event] = freezeEvents(GAP_0924, ctx());
         expect(event).toMatchObject({
             at: '2026-09-24T08:38:00Z', severity: 'caution', title: 'Kamino and Jupiter Lend froze 4 collateral prices for 30 min (NVDAx, QQQx, SPYx, TSLAx)',
-            href: './protocols/nvdax-kamino-kamino-collateral-xsc9qv.html'
+            // The first token the title names: NVDAx.
+            href: './cards/NVDAx.html#closed-market'
         });
         expect(freezeEvents([...QQQX_FREEZE, ...GAP_0924], ctx())).toHaveLength(2);
+        // A token with no known card falls back to its protocol dossier, then to the explorer.
+        const [noCard] = freezeEvents([{ ...QQQX_FREEZE[0], mint: 'XNOCARD' }], eventContext({ protocolPages: { 'XNOCARD|kamino': 'x-kamino' } }));
+        expect(noCard.href).toBe('./protocols/x-kamino.html');
     });
 
     test('with only KLend sightings, the length is the range between the last stale and the first fresh one', () => {

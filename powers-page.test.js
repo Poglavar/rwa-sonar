@@ -133,6 +133,19 @@ describe('the detail panel', () => {
         expect(html).toContain('key-governance evidence (verbatim)');
     });
 
+    test('a reviewed search of the authority’s history is shown with its window and source, in place of “no record”', () => {
+        const checked = cell({ power: 'freeze', kind: 'multisig', usage: { state: 'not-recorded', finding: null, effects: [], check: {
+            statement: 'Across all 1,845 transactions touching the vault (2025-06-10 to 2026-09-23) no transfer or burn names it as authority.',
+            through: '2026-09-23', source: 'rpc:getSignaturesForAddress 5aMNN…' } } });
+        const { html } = P.detailHtml(ROW, checked, map);
+        expect(html).toContain('<p>Across all 1,845 transactions touching the vault (2025-06-10 to 2026-09-23) no transfer or burn names it as authority.</p>');
+        expect(html).toContain('Searched through 2026-09-23 · source: rpc:getSignaturesForAddress 5aMNN…');
+        expect(html).toContain('It does not limit future use.');
+        expect(html).not.toContain('No use is on record in our data.');
+        // A checked cell still carries no "used" badge: the search found no use.
+        expect(P.usageBadge(checked.usage)).toBeNull();
+    });
+
     test('findCell finds a cell by issuer and power, and nothing for a wrong one', () => {
         expect(P.findCell(map, 'demo-issuer', 'freeze').cell.kind).toBe('multisig');
         expect(P.findCell(map, 'demo-issuer', 'upgrade')).toBeNull();

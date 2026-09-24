@@ -65,10 +65,10 @@ describe('GET /api/events', () => {
         expect(calls).toBe(2);
     });
 
-    test('merges the lending watcher\'s rows too, linking a token to its protocol dossier', async () => {
+    test('merges the lending watcher\'s rows too, linking a token to its card\'s closed-market section', async () => {
         const lending = {
             liquidations: [],
-            freezes: [{ protocol: 'kamino', market_id: 'kamino:xstocks-pool', mint: 'QQQ', symbol: 'QQQx', started_at: '2026-09-19T17:28:45Z', ended_at: '2026-09-21T13:42:13Z', last_seen_stale_at: '2026-09-21T13:39:54Z', cause: 'scope-suspension', end_basis: 'scope-resume', card_slug: null }]
+            freezes: [{ protocol: 'kamino', market_id: 'kamino:xstocks-pool', mint: 'QQQ', symbol: 'QQQx', started_at: '2026-09-19T17:28:45Z', ended_at: '2026-09-21T13:42:13Z', last_seen_stale_at: '2026-09-21T13:39:54Z', cause: 'scope-suspension', end_basis: 'scope-resume', card_slug: 'QQQx' }]
         };
         const hono = app({
             readFeed: async () => FEED, readPages: async () => ({ 'QQQ|kamino': 'qqqx-kamino' }),
@@ -76,7 +76,7 @@ describe('GET /api/events', () => {
         });
         const { body } = await get(hono, '/api/events');
         expect(body.events.find((e) => e.category === 'lending')).toMatchObject({
-            title: 'Kamino froze the QQQx collateral price for 44 h', href: './protocols/qqqx-kamino.html', at: '2026-09-19T17:28:45Z'
+            title: 'Kamino froze the QQQx collateral price for 44 h', href: './cards/QQQx.html#closed-market', at: '2026-09-19T17:28:45Z'
         });
     });
 

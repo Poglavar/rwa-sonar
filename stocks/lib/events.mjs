@@ -499,6 +499,8 @@ export function normaliseChangeRow(row) {
         evidence,
         symbol: text(row?.token_symbol) ?? text(evidence.symbol),
         cardSlug: text(row?.token_card_slug),
+        // The mint's transfer-fee cap at the reading (changeRowsSelect joins it for fee rows only).
+        feeMax: text(row?.transfer_fee_max) ?? (num(row?.transfer_fee_max) === null ? null : String(row.transfer_fee_max)),
         sourceUrl: text(row?.source_url) ?? text(evidence.url),
         sourceTitle: text(row?.source_title),
         sourceKind: text(row?.source_kind),
@@ -569,6 +571,86 @@ function rebaseEvent(row, ctx, tally) {
     });
 }
 
+// --- transfer fees: scheduled or in force ------------------------------------------------------
+
+/** Solana mainnet epochs are 432 000 slots with no warm-up, so a slot's epoch is exact. */
+const SLOTS_PER_EPOCH = 432000;
+/** Nominal slot time, used only for the "about <day>" a future epoch starts on. */
+const SLOT_MS = 400;
+/** Token-2022 puts a newly set transfer fee in force two epochs after the epoch it was set in. */
+const FEE_DELAY_EPOCHS = 2;
+/** A maximum fee at u64::MAX (stored as 2^64 after a float round-trip) is no cap at all. */
+const UNCAPPED_FEE = 1.8e19;
+
+/**
+ * When the fee a transfer_fee_bps row reports takes effect, relative to the reading. The chain
+ * watcher records Token-2022's NEWER fee, which a fee authority sets two epochs ahead, so a change
+ * it sees is usually scheduled, not yet charged. The new fee's epoch is the one the watcher
+ * recorded (evidence.transferFee.newerEpoch, from 2026-09-25) or, for an older row, inferred: when
+ * the two readings sit in one epoch the fee was set in it, so it starts two epochs later. Readings
+ * in different epochs still prove "scheduled" while the reading is before the earliest possible
+ * start. `unknown` when the row carries no slot.
+ */
+function feeSchedule(row) {
+    const ev = row.evidence ?? {};
+    const slot = num(ev.slot);
+    if (slot === null) return { state: 'unknown' };
+    const epoch = Math.floor(slot / SLOTS_PER_EPOCH);
+    const previous = num(ev.previousSlot);
+    const previousEpoch = previous === null ? null : Math.floor(previous / SLOTS_PER_EPOCH);
+    const newer = num(ev.transferFee?.newerEpoch) ?? (previousEpoch === epoch ? epoch + FEE_DELAY_EPOCHS : null);
+    if (newer !== null && newer <= epoch) return { state: 'in-effect', epoch: newer };
+    if (newer !== null) {
+        const observed = timeMs(text(ev.observedAt) ?? row.at);
+        return { state: 'scheduled', epoch: newer, startsMs: observed === null ? null : observed + (newer * SLOTS_PER_EPOCH - slot) * SLOT_MS };
+    }
+    if (previousEpoch !== null && epoch < previousEpoch + FEE_DELAY_EPOCHS) return { state: 'scheduled', epoch: null, startsMs: null };
+    return { state: 'unknown' };
+}
+
+/** The group's shared schedule: one state for every member, the epoch only when they all agree. */
+function groupFeeSchedule(members) {
+    const all = members.map(feeSchedule);
+    const state = all.every((s) => s.state === all[0].state) ? all[0].state : 'unknown';
+    const epochs = new Set(all.map((s) => s.epoch ?? null));
+    const epoch = state === 'scheduled' && epochs.size === 1 ? all[0].epoch : null;
+    return { state, epoch, startsMs: epoch === null ? null : all.find((s) => s.startsMs !== null)?.startsMs ?? null };
+}
+
+/** " (no cap)" when every member's maximum fee is u64::MAX; nothing when the cap is unknown or real. */
+function feeCapText(members) {
+    const caps = members.map((m) => num(m.evidence?.transferFee?.maximumFee) ?? num(m.feeMax));
+    return caps.length > 0 && caps.every((c) => c !== null && c >= UNCAPPED_FEE) ? ' (no cap)' : '';
+}
+
+/**
+ * The title of a transfer-fee change: "scheduled" while the new fee is still ahead of the reading
+ * (with its epoch and approximate day when known), "raised/lowered" once it applies, and "set …"
+ * when the rows cannot tell. The longest wording that fits TITLE_MAX wins.
+ */
+function transferFeeTitle(members, { who, symbols, on }) {
+    const first = members[0];
+    const a = num(first.before);
+    const b = num(first.after);
+    if (a === null && b !== null) return `${who} set a ${bpsText(b)} transfer fee${on}`;
+    if (b === null) return `${who} removed the transfer fee${on}`;
+    const schedule = groupFeeSchedule(members);
+    const cap = feeCapText(members);
+    const target = symbols.length === 1 ? ` on ${symbols[0]}` : ` on ${plural(symbols.length, 'token')}`;
+    if (schedule.state === 'scheduled') {
+        const day = schedule.startsMs === null ? null : dayText(new Date(schedule.startsMs).toISOString());
+        const when = schedule.epoch === null ? '' : ` from epoch ${schedule.epoch}${day ? `, about ${day}` : ''}`;
+        const candidates = [
+            `${who} scheduled its transfer fee to ${b > a ? 'rise' : 'fall'} from ${bpsText(a)} to ${bpsText(b)}${cap}${target}${when}`,
+            `${who} scheduled a ${bpsText(a)} → ${bpsText(b)} transfer fee${cap}${target}${when}`,
+            ...(day ? [`${who} scheduled a ${bpsText(a)} → ${bpsText(b)} transfer fee${cap}${target} from about ${day}`] : [])
+        ];
+        return candidates.find((c) => c.length <= TITLE_MAX) ?? candidates.at(-1);
+    }
+    if (schedule.state === 'in-effect') return `${who} ${b > a ? 'raised' : 'lowered'} the transfer fee${on} from ${bpsText(a)} to ${bpsText(b)}${cap}`;
+    return `${who} set a ${bpsText(b)} transfer fee${target}, ${b > a ? 'up' : 'down'} from ${bpsText(a)}`;
+}
+
 /** Authority and extension changes, grouped per issuer, day, field and before→after. */
 function chainGroupEvent(members, ctx) {
     const first = members[0];
@@ -595,11 +677,7 @@ function chainGroupEvent(members, ctx) {
         keys = [`pause|${issuer.slug}|${paused}`];
     } else if (field === 'transfer_fee_bps') {
         kind = 'transfer-fee';
-        const a = num(first.before);
-        const b = num(first.after);
-        if (a === null && b !== null) title = `${who} set a ${bpsText(b)} transfer fee${on}`;
-        else if (b === null) title = `${who} removed the transfer fee${on}`;
-        else title = `${who} ${b > a ? 'raised' : 'lowered'} the transfer fee${on} from ${bpsText(a)} to ${bpsText(b)}`;
+        title = transferFeeTitle(members, { who, symbols, on });
         keys = [`fee|${issuer.slug}`];
     } else if (field === 'default_frozen') {
         title = first.after === 'true' ? `${who} made new accounts start frozen${on}` : `${who} stopped freezing new accounts${on}`;
@@ -800,6 +878,16 @@ function lendingPage(mint, protocol, ctx) {
     return slug && /^[a-z0-9-]+$/.test(slug) ? `./protocols/${slug}.html` : null;
 }
 
+/**
+ * Where a lending event links: the token card's "When the market is closed" section, which names
+ * each lending market with its liquidation LTV and recent freezes. The protocol dossier (the
+ * fallback when no card is known) describes the market but mentions neither freezes nor liquidations.
+ */
+function lendingHref(member, protocol, ctx) {
+    const card = cardHref(member.mint, ctx, member.cardSlug);
+    return (card ? `${card}#closed-market` : null) ?? lendingPage(member.mint, protocol, ctx) ?? './stocks.html';
+}
+
 function joinWords(words) {
     if (words.length <= 1) return words[0] ?? '';
     return `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`;
@@ -900,7 +988,7 @@ export function liquidationEvents(rows, ctx, tally = null) {
                     : withNames(`${who} liquidation wave: ${members.length} positions in an hour (${collateralText(members)})`, symbols),
                 subject: symbols.length === 1 ? { type: 'token', id: top.mint, name: top.symbol } : { type: 'protocol', id: slugPart(protocol), name: who },
                 severity: sum.usd >= 100000 || members.length >= 2 * LIQUIDATION_WAVE_MIN ? 'critical' : 'warning',
-                href: lendingPage(top.mint, protocol, ctx) ?? cardHref(top.mint, ctx, top.cardSlug) ?? './stocks.html',
+                href: lendingHref(top, protocol, ctx),
                 source: SOURCES.lending, keys: [`liquidation|${protocol}|${members[0].at}`], origin: 'lending'
             }));
         }
@@ -925,7 +1013,7 @@ export function liquidationEvents(rows, ctx, tally = null) {
                 title: `${market} liquidated ${n} ${first.symbol} position${n === 1 ? '' : 's'} (${collateralText(members)})`,
                 subject: { type: 'token', id: first.mint, name: first.symbol },
                 severity: sum.usd >= 100000 ? 'warning' : sum.usd >= 10000 ? 'caution' : 'info',
-                href: lendingPage(first.mint, protocol, ctx) ?? cardHref(first.mint, ctx, first.cardSlug) ?? './stocks.html',
+                href: lendingHref(first, protocol, ctx),
                 source: SOURCES.lending, keys: [`liquidation|${protocol}|${first.mint}|${first.at.slice(0, 10)}`], origin: 'lending'
             }));
         }
@@ -1003,9 +1091,10 @@ export function freezeEvents(rows, ctx, tally = null) {
         const order = Object.keys(PROTOCOL_LABELS);
         const protocols = [...new Set(members.map((m) => m.protocol))].sort((a, b) => order.indexOf(a) - order.indexOf(b));
         const who = joinWords(protocols.map(protocolLabel));
-        // The link: the first-named protocol's dossier for the first token named.
-        const lead = members.filter((m) => m.protocol === protocols[0]).sort((a, b) => (a.symbol < b.symbol ? -1 : 1))[0];
         const symbols = [...new Set(members.map((m) => m.symbol))].sort();
+        // The link: the first token the title names, at the first-named protocol where it has one.
+        const lead = members.filter((m) => m.symbol === symbols[0])
+            .sort((a, b) => order.indexOf(a.protocol) - order.indexOf(b.protocol))[0];
         const ongoing = members.some((m) => m.ongoing);
         const longest = Math.max(...members.map((m) => m.lowMs));
         let title;
@@ -1024,7 +1113,7 @@ export function freezeEvents(rows, ctx, tally = null) {
             at: first.startedAt, kind: ongoing ? 'price-freeze-ongoing' : 'price-freeze', category: 'lending', title,
             subject: symbols.length === 1 ? { type: 'token', id: first.mint, name: first.symbol } : { type: 'protocol', id: slugPart(who), name: who },
             severity: ongoing || longest >= 6 * HOUR_MS ? 'warning' : 'caution',
-            href: lendingPage(lead.mint, lead.protocol, ctx) ?? cardHref(lead.mint, ctx, lead.cardSlug) ?? './stocks.html',
+            href: lendingHref(lead, lead.protocol, ctx),
             // No merge keys: no other source reports freezes, and a shared key would let two
             // separate episodes within 36 h swallow each other (lib mergeEvents sameFact).
             source: SOURCES.lending, keys: [], origin: 'lending', ongoing
@@ -1369,6 +1458,10 @@ export function changeRowsSelect({ sinceExpr, judgments }) {
                 e.evidence->>'issuer', ds.issuer_slug) AS issuer_slug,
        e.field, e.before, e.after, e.severity, e.evidence,
        t.symbol AS token_symbol, t.record->>'cardSlug' AS token_card_slug,
+       CASE WHEN e.field = 'transfer_fee_bps' THEN (
+         SELECT ms.transfer_fee_max::text FROM sonar.mint_state ms
+          WHERE ms.mint = e.subject_id AND ms.observed_at <= e.detected_at
+          ORDER BY ms.observed_at DESC LIMIT 1) END AS transfer_fee_max,
        ds.url AS source_url, ds.title AS source_title, ds.kind AS source_kind,
        ${judgmentColumns}
   FROM sonar.change_event e

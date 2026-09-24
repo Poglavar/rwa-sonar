@@ -19,7 +19,7 @@ import {
     verificationStrength
 } from './lib/grade.mjs';
 
-import { issuerLabel } from './lib/classify.mjs';
+import { controlFromOnchain, issuerLabel } from './lib/classify.mjs';
 import { CLAIM_FIELDS, dossierClaims, needed, publicClaims, summarise } from './lib/evidence.mjs';
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
@@ -205,39 +205,9 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
     const organicVol24 = sumFinite([stats?.buyOrganicVolume, stats?.sellOrganicVolume]);
 
     const tokenProgram = onchain?.tokenProgram ?? universeItem.tokenProgram ?? null;
-    const control = {
-        mintAuthority: onchain ? (onchain.mintAuthority ?? false) : null,
-        clawback: onchain ? onchain.permanentDelegate === true : null,
-        permanentDelegate: onchain
-            ? (onchain.permanentDelegateAddress ?? (onchain.permanentDelegate === false ? false : null))
-            : null,
-        freezeAuthority: onchain ? (onchain.freezeAuthority ?? false) : null,
-        pausable: onchain ? onchain.pausable === true : null,
-        paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
-        allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
-        // Presence is separate from the current bps: `0` is an installed extension and `null`
-        // from an older partial collector is unknown, not evidence of absence.
-        transferFee: onchain
-            ? (typeof onchain.transferFeeConfigured === 'boolean'
-                ? onchain.transferFeeConfigured
-                : (Array.isArray(onchain.extensionNames)
-                    ? onchain.extensionNames.includes('transferFeeConfig')
-                    : (Number.isFinite(onchain.transferFeeBps) ? true : null)))
-            : null,
-        transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
-        transferFeeConfigAuthority: onchain
-            ? (onchain.transferFeeConfigAuthority ?? null)
-            : null,
-        transferFeeWithdrawAuthority: onchain
-            ? (onchain.transferFeeWithdrawAuthority ?? null)
-            : null,
-        hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null,
-        // The scaled-UI-amount (rebase) extension being installed at all — NOT whether the
-        // multiplier is currently 1. A multiplier of 1 is a rebase that has not been used yet, and
-        // the capability is what the recipe and the keyControl health rule are about (MODEL.md
-        // §2.7): one signature from the rebase authority restates every holder's displayed balance.
-        rebase: onchain ? typeof onchain.scaledUiAmountMultiplier === 'string' : null
-    };
+    // The shared shaping (lib/classify.mjs, unit-tested there): capability flags, the transfer fee
+    // in effect at the read epoch and any fee already scheduled after it.
+    const control = controlFromOnchain(onchain);
 
     return {
         mint: universeItem.mint,

@@ -6,7 +6,9 @@
  * factory so it declares no globals; charts are inline SVG like stocks/lib/history-charts.js.
  *
  * A day the observer did not read is drawn as MISSING (hatched), never as a zero bar; a partly read
- * day shows its covered hours; a dollar total with unpriced units is marked as a lower bound.
+ * day shows its covered hours; a dollar total with unpriced units is marked as a lower bound. A
+ * programme whose days carry transaction counts but no dollar amounts is plotted as COUNTS, labelled
+ * so, rather than as a flat "$0" line.
  */
 (function (root, factory) {
     const api = factory();
@@ -16,7 +18,7 @@
     'use strict';
 
     const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
-    const { escapeHtml: esc, fmtMoney, fmtNumber, fmtPct, fmtDateTime } = fmt;
+    const { escapeHtml: esc, fmtMoney, fmtNumber, fmtPct, fmtDateTime, humanizeSlug, MONTHS } = fmt;
     const DASH = '—';
     const isNum = (x) => typeof x === 'number' && Number.isFinite(x);
 
@@ -60,33 +62,81 @@
     }
 
     /**
-     * One issuer's chart: created above the zero line, redeemed below, one column per day, and a
-     * coverage strip underneath. `scale` is the issuer's own max so small programmes stay legible;
-     * the axis labels say the scale.
+     * What one issuer's chart plots: 'usd' when every read day with transactions carries dollar
+     * amounts and something was priced, otherwise 'count'. One metric per chart, so a window where
+     * amounts began midway is not half dollars, half counts.
+     */
+    function flowMetric(issuer) {
+        let priced = false;
+        for (const day of issuer.days ?? []) {
+            for (const side of [day.created, day.redeemed]) {
+                if (!side || coverageState(side) === 'missing') continue;
+                if (isNum(side.count) && side.count > 0 && !side.value) return 'count';
+                if (isNum(side.value?.usd) && side.value.usd > 0) priced = true;
+            }
+        }
+        return priced ? 'usd' : 'count';
+    }
+
+    /** What a chart's bars measure, in words: the caption over the chart and its accessible name. */
+    function chartUnit(metric) {
+        return metric === 'usd' ? 'Bars: US dollars per day' : 'Bars: transaction counts per day, amounts not recorded';
+    }
+
+    /** One side's plotted amount under `metric`: dollars, or the transaction count of a read day. */
+    function sideAmount(side, metric) {
+        if (!side || coverageState(side) === 'missing') return null;
+        if (metric === 'usd') return isNum(side.value?.usd) ? side.value.usd : null;
+        return isNum(side.count) ? side.count : null;
+    }
+
+    function dayLabel(date) {
+        const [, m, d] = String(date).split('-').map(Number);
+        return m >= 1 && m <= 12 && d ? `${d} ${MONTHS[m - 1]}` : String(date);
+    }
+
+    /**
+     * One issuer's chart: created above the zero line, redeemed below (a programme with one side
+     * collected gets a one-sided chart), one column per day, and a coverage strip underneath.
+     * `scale` is the issuer's own max so small programmes stay legible; the axis labels say it.
      */
     function flowChartSvg(issuer, { width = 720 } = {}) {
         const days = issuer.days ?? [];
+        const metric = flowMetric(issuer);
+        const up = issuer.created?.counted === true;
+        const down = issuer.redeemed?.counted !== false;
         // Drawn at the container's own width so 12px text stays 12px on a phone.
-        const W = Math.max(300, Math.min(1100, Math.round(width))), H = W < 520 ? 200 : 236, L = 50, R = 8, T = 14, STRIP = 16, B = 40;
+        const W = Math.max(300, Math.min(1100, Math.round(width))), H = W < 520 ? 200 : 236, L = 58, R = 8, T = 14, STRIP = 16, B = 40;
         const plotH = H - T - B - STRIP - 8;
-        const mid = T + plotH / 2;
+        // The zero line: the middle for two sides; for one side, a line at the top (redemptions) or
+        // bottom (creations) with an 18 px band kept clear for the side's name.
+        const zero = up && down ? T + plotH / 2 : up ? T + plotH : T + 18;
+        const room = up && down ? plotH / 2 - 4 : plotH - 22;
         const slot = (W - L - R) / Math.max(days.length, 1);
         const bw = Math.max(4, Math.min(28, slot * 0.62));
-        const max = flowScale([issuer]);
-        const h = (usd) => (max && isNum(usd) ? Math.max(1.5, (usd / max) * (plotH / 2 - 4)) : 0);
+        let max = 0;
+        for (const day of days) for (const side of [day.created, day.redeemed]) {
+            const v = sideAmount(side, metric);
+            if (isNum(v)) max = Math.max(max, v);
+        }
+        const h = (v) => (max > 0 && isNum(v) ? Math.max(1.5, (v / max) * room) : 0);
         const x = (i) => L + i * slot + (slot - bw) / 2;
         const stripY = T + plotH + 8;
+        const axisText = (v) => (metric === 'usd' ? fmtMoney(v) : `${fmtNumber(v)} tx`);
         const cols = days.map((day, i) => {
             const c = day.created; const r = day.redeemed;
             const bars = [];
-            if (c?.value && isNum(c.value.usd) && c.value.usd > 0) {
-                bars.push(`<rect class="fl-bar fl-created${c.value.complete ? '' : ' fl-lower'}" x="${x(i).toFixed(1)}" y="${(mid - h(c.value.usd)).toFixed(1)}" width="${bw.toFixed(1)}" height="${h(c.value.usd).toFixed(1)}" rx="3"/>`);
+            const cv = up ? sideAmount(c, metric) : null;
+            const rv = down ? sideAmount(r, metric) : null;
+            const lower = (side) => (metric === 'usd' && !side.value.complete ? ' fl-lower' : '');
+            if (isNum(cv) && cv > 0) {
+                bars.push(`<rect class="fl-bar fl-created${lower(c)}" x="${x(i).toFixed(1)}" y="${(zero - h(cv)).toFixed(1)}" width="${bw.toFixed(1)}" height="${h(cv).toFixed(1)}" rx="3"/>`);
             }
-            if (r?.value && isNum(r.value.usd) && r.value.usd > 0) {
-                bars.push(`<rect class="fl-bar fl-redeemed${r.value.complete ? '' : ' fl-lower'}" x="${x(i).toFixed(1)}" y="${mid.toFixed(1)}" width="${bw.toFixed(1)}" height="${h(r.value.usd).toFixed(1)}" rx="3"/>`);
+            if (isNum(rv) && rv > 0) {
+                bars.push(`<rect class="fl-bar fl-redeemed${lower(r)}" x="${x(i).toFixed(1)}" y="${zero.toFixed(1)}" width="${bw.toFixed(1)}" height="${h(rv).toFixed(1)}" rx="3"/>`);
             }
-            if (isNum(day.netUsd)) {
-                const ny = mid - (day.netUsd >= 0 ? h(day.netUsd) : -h(-day.netUsd));
+            if (metric === 'usd' && up && down && isNum(day.netUsd)) {
+                const ny = zero - (day.netUsd >= 0 ? h(day.netUsd) : -h(-day.netUsd));
                 bars.push(`<line class="fl-net" x1="${(x(i) - 3).toFixed(1)}" x2="${(x(i) + bw + 3).toFixed(1)}" y1="${ny.toFixed(1)}" y2="${ny.toFixed(1)}"/>`);
             }
             // Coverage strip: the side that is collected decides it (redeemed is always collected).
@@ -99,24 +149,46 @@
             const hit = `<rect class="fl-hit" x="${(L + i * slot).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${(stripY + STRIP - T).toFixed(1)}" tabindex="0" role="img" aria-label="${esc(readout)}" data-readout="${esc(readout)}"><title>${esc(readout)}</title></rect>`;
             return `<g>${strip}${bars.join('')}${hit}</g>`;
         }).join('');
-        const axis = max
-            ? `<text x="${L - 6}" y="${T + 8}" text-anchor="end">${esc(fmtMoney(max))}</text><text x="${L - 6}" y="${mid + 4}" text-anchor="end">$0</text><text x="${L - 6}" y="${T + plotH}" text-anchor="end">${esc(fmtMoney(max))}</text>`
-            : `<text x="${L - 6}" y="${mid + 4}" text-anchor="end">$0</text>`;
-        const sideNames = `<text class="fl-side" x="${L + 4}" y="${T + 10}">${issuer.created?.counted ? 'created ↑' : 'creations not collected'}</text><text class="fl-side" x="${L + 4}" y="${T + plotH - 2}">redeemed ↓</text>`;
+        const zeroText = metric === 'usd' ? '$0' : '0';
+        const axis = max > 0
+            ? [up ? `<text x="${L - 6}" y="${T + 8}" text-anchor="end">${esc(axisText(max))}</text>` : '',
+                `<text x="${L - 6}" y="${(zero + (up && !down ? 0 : 4)).toFixed(1)}" text-anchor="end">${zeroText}</text>`,
+                down ? `<text x="${L - 6}" y="${T + plotH}" text-anchor="end">${esc(axisText(max))}</text>` : ''].join('')
+            : '';
+        const unit = chartUnit(metric);
+        const sideNames = (up ? `<text class="fl-side" x="${L + 4}" y="${T + 10}">created ↑</text>` : '')
+            + (down ? `<text class="fl-side" x="${L + 4}" y="${up ? T + plotH - 2 : T + 10}">redeemed ↓${up ? '' : ' (creations not read)'}</text>` : '');
+        // Days before the observer's first read are one labelled gap; a read window with nothing in it says so.
+        const read = days.map((day) => coverageState(day.redeemed ?? day.created) !== 'missing');
+        // Notes sit mid-plot, above the zero line when it runs through the middle.
+        const noteY = (up && down ? zero - 8 : T + plotH / 2 + 4).toFixed(1);
+        const firstRead = read.indexOf(true);
+        let note = '';
+        if (firstRead === -1) {
+            note = `<text class="fl-empty" x="${((L + W - R) / 2).toFixed(1)}" y="${noteY}" text-anchor="middle">No day read in this window</text>`;
+        } else {
+            if (firstRead >= 2) {
+                note += `<text class="fl-empty" x="${(L + (firstRead * slot) / 2).toFixed(1)}" y="${noteY}" text-anchor="middle">not observed before ${esc(dayLabel(days[firstRead].date))}</text>`;
+            }
+            if (max === 0) {
+                const what = up && down ? 'No creations or redemptions' : up ? 'No creations' : 'No redemptions';
+                const n = read.filter(Boolean).length;
+                note += `<text class="fl-empty" x="${(L + ((firstRead + days.length) * slot) / 2).toFixed(1)}" y="${noteY}" text-anchor="middle">${what} in the ${n} day${n === 1 ? '' : 's'} read</text>`;
+            }
+        }
         const xl = days.length ? [0, Math.floor((days.length - 1) / 2), days.length - 1]
             .map((i, k) => `<text x="${(x(i) + bw / 2).toFixed(1)}" y="${H - 6}" text-anchor="${k === 0 ? 'start' : k === 2 ? 'end' : 'middle'}">${esc(shortDate(days[i].date))}</text>`).join('') : '';
-        const empty = max ? '' : `<text class="fl-empty" x="${(L + W - R) / 2}" y="${mid - 8}" text-anchor="middle">No priced amounts in this window</text>`;
-        return `<svg class="fl-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="${esc(issuer.name)} daily flows, ${days.length} days">`
-            + `<g class="fl-axis"><line x1="${L}" x2="${W - R}" y1="${mid}" y2="${mid}"/>${axis}${xl}<text x="${L - 6}" y="${stripY + 10}" text-anchor="end">read</text></g>`
-            + `${sideNames}${empty}${cols}</svg>`;
+        return `<svg class="fl-svg" viewBox="0 0 ${W} ${H}" role="group" aria-label="${esc(issuer.name)} daily flows, ${days.length} days, ${esc(unit)}">`
+            + `<g class="fl-axis"><line x1="${L}" x2="${W - R}" y1="${zero}" y2="${zero}"/>${axis}${xl}<text x="${L - 6}" y="${stripY + 10}" text-anchor="end">read</text></g>`
+            + `${sideNames}${note}${cols}</svg>`;
     }
 
     function legendHtml() {
         return '<ul class="fl-legend">'
-            + '<li><i class="fl-key fl-created"></i>Created (USD)</li>'
-            + '<li><i class="fl-key fl-redeemed"></i>Redeemed (USD)</li>'
-            + '<li><i class="fl-key fl-lower-key"></i>Lower bound: some units unpriced</li>'
-            + '<li><i class="fl-key fl-net-key"></i>Net, where both sides were read all day</li>'
+            + '<li><i class="fl-key fl-created"></i>Created</li>'
+            + '<li><i class="fl-key fl-redeemed"></i>Redeemed</li>'
+            + '<li><i class="fl-key fl-lower-key"></i>Dollar lower bound: some units unpriced</li>'
+            + '<li><i class="fl-key fl-net-key"></i>Net dollars, where both sides were read all day</li>'
             + '<li><i class="fl-key fl-cov-full"></i>Day fully read</li>'
             + '<li><i class="fl-key fl-cov-partial"></i>Partly read</li>'
             + '<li><i class="fl-key fl-cov-missing"></i>Not read (missing, not zero)</li>'
@@ -151,13 +223,15 @@
         }
         const failed = issuer.state === 'scan-failed'
             ? `<p class="fl-alert">Last scan failed (${esc(issuer.lastScanError ?? 'unknown error')}): nothing is stated after ${esc(fmtDateTime(issuer.coveredThrough))}.</p>` : '';
-        const amounts = issuer.amountsFrom === null ? 'Amounts not recorded yet (counts only).'
-            : issuer.amountsFrom === 'first-coverage' ? 'Amounts recorded from the start of coverage.'
-                : `Amounts recorded from ${fmtDateTime(issuer.amountsFrom)}; earlier days carry counts only.`;
+        const counting = flowMetric(issuer) === 'count';
+        const amounts = issuer.amountsFrom === null ? 'Dollar amounts are not recorded yet, so the chart counts transactions.'
+            : issuer.amountsFrom === 'first-coverage' ? `Amounts recorded from the start of coverage${counting ? '; nothing in this window was priced, so the chart counts transactions' : ''}.`
+                : `Amounts recorded from ${fmtDateTime(issuer.amountsFrom)}; earlier days carry counts only${counting ? ', so the chart counts transactions' : ''}.`;
         const what = (side, label) => `<li><strong>${label}:</strong> ${side.counted ? esc(side.what) : `<span class="fl-na">not collected.</span> ${esc(side.why)}`}</li>`;
         return `<article class="fl-issuer" id="flow-${esc(issuer.slug)}">`
             + `<h3>${esc(issuer.name)}</h3>`
             + `<p class="fl-meta">Last scan ${esc(fmtDateTime(issuer.lastScanAt))} (${esc(issuer.lastScanStatus ?? DASH)}) · ${esc(amounts)}</p>${failed}`
+            + `<p class="fl-unit-note">${esc(chartUnit(flowMetric(issuer)))}</p>`
             + `<div class="fl-chart">${flowChartSvg(issuer, { width })}</div>`
             + `<ul class="fl-what">${what(issuer.created, 'Created')}${what(issuer.redeemed, 'Redeemed')}</ul>`
             + `<details class="fl-details"><summary>Daily numbers</summary>${flowTableHtml(issuer)}</details>`
@@ -223,6 +297,16 @@
             + `<h3>Issuer-attributed wallets</h3><p class="fl-note">${esc(float.attributionCaveat ?? '')}</p><ul class="fl-wallets">${wallets}</ul>`;
     }
 
+    /** The page's headline: how much of the priced xStocks supply the issuer itself holds. */
+    function leadHtml(float) {
+        const t = float?.totals;
+        if (!t || !isNum(t.inventorySharePct) || !isNum(t.floatUsd) || !isNum(t.supplyUsd)) return '';
+        return `<p class="fl-finding fl-lead"><strong>${esc(fmtPct(t.inventorySharePct, 0))} of priced xStocks supply sits in issuer wallets.</strong> `
+            + `Outside them, the public holds at most ${esc(fmtMoney(t.floatUsd))} of the ${esc(fmtMoney(t.supplyUsd))} the chain reports: `
+            + 'redeemed xStocks are not burned, they go back to issuer inventory and still count in the supply. '
+            + '<a href="#float">How the float is read</a></p>';
+    }
+
     function contextHtml(data) {
         const f = data.flows;
         const cells = [
@@ -234,14 +318,29 @@
         return cells.map(([k, v]) => `<span><small>${esc(k)}</small><strong>${esc(v)}</strong></span>`).join('');
     }
 
+    /** Names and plain-words mechanisms for the programmes the observer cannot see on-chain. */
+    const PROGRAMME_NAMES = { prestocks: 'PreStocks', tessera: 'Tessera' };
+    const MECHANISM_LABELS = {
+        'discretionary-off-chain-request': "redemption only on request, at the issuer's discretion",
+        'terminal-burn-after-liquidity-event': 'redemption only by burning after a liquidity event'
+    };
+    function programmeName(slug) { return PROGRAMME_NAMES[slug] ?? humanizeSlug(slug); }
+    function mechanismLabel(mechanism) {
+        return MECHANISM_LABELS[mechanism] ?? (typeof mechanism === 'string' && mechanism.trim() ? mechanism.replace(/[-_]+/g, ' ') : '');
+    }
+
     function flowsSectionHtml(flows, width) {
         if (!flows) return '<p class="fl-missing">No redemption-observer file was available to this build, so no flows are shown (not zero flows).</p>';
-        const notObs = (flows.notObservable ?? []).map((n) => `<li><strong>${esc(n.slug)}</strong> — ${esc(n.mechanism ?? '')}: ${esc(String(n.why ?? '').slice(0, 360))}${String(n.why ?? '').length > 360 ? '…' : ''}</li>`).join('');
+        const notObs = (flows.notObservable ?? []).map((n) => {
+            const why = String(n.why ?? '');
+            const mech = mechanismLabel(n.mechanism);
+            return `<li><strong>${esc(programmeName(n.slug))}</strong>${mech ? ` — ${esc(mech)}` : ''}. ${esc(why.slice(0, 360))}${why.length > 360 ? '…' : ''}</li>`;
+        }).join('');
         return legendHtml() + (flows.issuers ?? []).map((issuer) => issuerHtml(issuer, width)).join('')
             + (notObs ? `<h3>Not observable on-chain</h3><ul class="fl-what">${notObs}</ul>` : '');
     }
 
-    const api = { coverageState, sideLabel, dayReadout, flowScale, flowChartSvg, flowTableHtml, issuerHtml, floatChartSvg, floatTableHtml, floatSectionHtml, flowsSectionHtml, contextHtml };
+    const api = { coverageState, sideLabel, dayReadout, flowScale, flowMetric, flowChartSvg, flowTableHtml, issuerHtml, floatChartSvg, floatTableHtml, floatSectionHtml, flowsSectionHtml, leadHtml, contextHtml };
     if (typeof document === 'undefined') return api;
 
     // --- DOM ------------------------------------------------------------------------------------
@@ -265,6 +364,9 @@
             return;
         }
         $('context').innerHTML = contextHtml(data);
+        const lead = leadHtml(data.float);
+        $('lead').innerHTML = lead;
+        $('lead').hidden = lead === '';
         let drawnWidth = null;
         const draw = () => {
             const width = $('flowsBody').clientWidth;

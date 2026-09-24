@@ -188,13 +188,58 @@ describe('watcher rows: chain', () => {
             row(4, 'extension-toggle', { issuer_slug: 'ondo-global-markets', subject_id: 'MINTA', field: 'paused', before: 'false', after: 'true', evidence: { symbol: 'AAPLon' } })
         ], context());
         expect(events.map((e) => e.title)).toEqual([
-            'PreStocks raised the transfer fee on 2 tokens from 0.5 % to 1 % (ANDURIL, OPENAI)',
+            // No slot in these rows, so whether the new fee is in force yet is unknown: "set", not "raised".
+            'PreStocks set a 1 % transfer fee on 2 tokens, up from 0.5 % (ANDURIL, OPENAI)',
             'Ondo Global Markets changed the freeze authority of AAPLon',
             'Ondo Global Markets paused AAPLon'
         ]);
         expect(events.every((e) => e.category === 'keys')).toBe(true);
         expect(events[0]).toMatchObject({ href: './issuers/prestocks.html', subject: { type: 'issuer', id: 'prestocks' } });
         expect(events[1].href).toBe('./cards/AAPLon.html');
+    });
+
+    // Token-2022 puts a new transfer fee in force two epochs after it is set, and the chain watcher
+    // reads the NEWER fee, so a fee change it sees is scheduled, not yet charged. These rows are the
+    // watcher's real 2026-09-24 PreStocks rows (slots and times as stored).
+    const prestocksFee = (id, mint, symbol, evidence) => row(id, 'extension-toggle', {
+        subject_id: mint, issuer_slug: 'prestocks', field: 'transfer_fee_bps', before: '100', after: '300', detected_at: evidence.observedAt, evidence: { symbol, ...evidence }
+    });
+    const at1807 = { slot: 450105097, previousSlot: 450091617, observedAt: '2026-09-24T18:07:01Z' };
+    const at1859 = { slot: 450116882, previousSlot: 450105098, observedAt: '2026-09-24T18:59:28Z' };
+    const seven = (extra = {}, fields = {}) => [
+        ['P1', 'POLYMARKET', at1807], ['P2', 'KALSHI', at1807], ['P3', 'FIGUREAI', at1807], ['P4', 'NEURALINK', at1807],
+        ['P5', 'ANDURIL', at1807], ['P6', 'ANTHROPIC', at1859], ['P7', 'OPENAI', at1859]
+    ].map(([mint, symbol, ev], i) => ({ ...prestocksFee(i + 1, mint, symbol, { ...ev, ...extra }), ...fields }));
+
+    test('a fee change whose epoch is still ahead is worded as scheduled, with the epoch and its approximate day', () => {
+        const [event] = changeRowEvents(seven(), context());
+        // Both readings sit in epoch 1041 (slot / 432 000), so the new fee starts at epoch 1043.
+        expect(event.title).toBe('PreStocks scheduled a 1 % → 3 % transfer fee on 7 tokens from epoch 1043, about 26 Sep');
+        expect(event.title).not.toMatch(/raised/);
+        expect(event).toMatchObject({ category: 'keys', severity: 'warning', href: './issuers/prestocks.html' });
+    });
+
+    test('an uncapped fee says so (from the evidence, or the mint state beside the row), keeping the title in bounds', () => {
+        const recorded = changeRowEvents(seven({ transferFee: { newerEpoch: 1043, maximumFee: '18446744073709551616' } }), context())[0];
+        expect(recorded.title).toBe('PreStocks scheduled a 1 % → 3 % transfer fee (no cap) on 7 tokens from about 26 Sep');
+        const joined = changeRowEvents(seven({}, { transfer_fee_max: '18446744073709551616' }), context())[0];
+        expect(joined.title).toBe(recorded.title);
+        expect(recorded.title.length).toBeLessThanOrEqual(TITLE_MAX);
+        const single = changeRowEvents(seven({ transferFee: { newerEpoch: 1043, maximumFee: '18446744073709551616' } }).slice(0, 1), context())[0];
+        expect(single.title).toBe('PreStocks scheduled a 1 % → 3 % transfer fee (no cap) on POLYMARKET from about 26 Sep');
+    });
+
+    test('once the new fee is in force at the reading, it is "raised"', () => {
+        // Recorded epoch 1041 = the reading's own epoch: the fee already applies.
+        const [event] = changeRowEvents(seven({ transferFee: { newerEpoch: 1041, maximumFee: '5000' } }), context());
+        expect(event.title).toMatch(/^PreStocks raised the transfer fee on 7 tokens from 1 % to 3 %/);
+    });
+
+    test('readings in different epochs without a recorded epoch: still scheduled when it cannot be in force yet, epoch left out', () => {
+        const straddle = { slot: 450144000, previousSlot: 450000000, observedAt: '2026-09-25T02:00:00Z' };
+        const [event] = changeRowEvents(seven(straddle), context());
+        expect(event.title).toMatch(/^PreStocks scheduled its transfer fee to rise from 1 % to 3 % on 7 tokens/);
+        expect(event.title).not.toMatch(/epoch/);
     });
 
     test('a court docket names the party and the issuer', () => {

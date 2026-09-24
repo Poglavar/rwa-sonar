@@ -17,7 +17,9 @@ USAGE
 
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks-legal-templates.json, stocks-health.json,
-  stocks/data/defi-usage.json, stocks-events.json (the landing page's latest-events box)
+  stocks/data/defi-usage.json, stocks-events.json (the landing page's latest-events box),
+  stocks-flows.json (xStocks float, Ondo flows), stocks-power-map.json (powers cell counts),
+  stocks/data/sources.json (the cited-source registry the document watcher reads)
 
 OUTPUTS (rewritten in place, only between their snapshot markers)
   ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
@@ -27,12 +29,14 @@ async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (!flags.run || flags.help) return usage();
     const root = flags.root ?? REPO_ROOT;
-    const [tokens, issuers, templates, health, defi, events] = await Promise.all([
+    const [tokens, issuers, templates, health, defi, events, flows, powerMap, sources] = await Promise.all([
         readJson(join(root, 'stocks-tokens.json')), readJson(join(root, 'stocks-issuers.json')),
         readJson(join(root, 'stocks-legal-templates.json')), readJson(join(root, 'stocks-health.json')),
-        readJson(join(root, 'stocks/data/defi-usage.json')), readJson(join(root, 'stocks-events.json'))
+        readJson(join(root, 'stocks/data/defi-usage.json')), readJson(join(root, 'stocks-events.json')),
+        readJson(join(root, 'stocks-flows.json')), readJson(join(root, 'stocks-power-map.json')),
+        readJson(join(root, 'stocks/data/sources.json'))
     ]);
-    const facts = snapshotFacts({ tokens, issuers, templates, health, defi, events });
+    const facts = snapshotFacts({ tokens, issuers, templates, health, defi, events, flows, powerMap, sources });
     const pages = {};
     for (const page of STATIC_SNAPSHOT_PAGES) pages[page] = await readFile(join(root, page), 'utf8');
     const rendered = renderStaticSnapshots(pages, facts);
@@ -44,6 +48,7 @@ async function main() {
         await rename(temporary, target);
     }
     log(`static snapshot: ${facts.tokenCount} tokens, ${facts.programmes.withTokens}/${facts.programmes.total} programmes with tokens, built ${facts.builtAt}, `
-        + `${Math.min(facts.events.events.length, LANDING_EVENT_ROWS)} newest event(s) → ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
+        + `${Math.min(facts.events.events.length, LANDING_EVENT_ROWS)} newest event(s), float ${facts.float?.sharePct}% read ${facts.float?.readAt}, `
+        + `Ondo flows ${facts.flowDay?.date ?? 'none covered'}, ${facts.sourceCount} cited sources → ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
 }
 if (import.meta.filename === process.argv[1]) main().catch((error) => { logError(error.stack ?? String(error)); process.exit(1); });

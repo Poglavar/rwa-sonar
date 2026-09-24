@@ -3,6 +3,49 @@
   "reviewedAt": "2026-09-23T11:11:18Z",
   "items": [
     {
+      "id": "prestocks-transfer-fee-300bps-scheduled-2026-09-24",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-24",
+      "reviewedAt": "2026-09-24T23:17:00Z",
+      "issuerSlug": "prestocks",
+      "actor": "PreStocks programme authority",
+      "kind": "fee-change",
+      "severity": "warning",
+      "title": "PreStocks scheduled a 3 % transfer fee on 7 of its 8 tokens",
+      "summary": "Read on chain at finalized slot 450170982 (fee epoch 1042): all eight PreStocks mints charge 100 bps now. On seven of them (all but SPACEX) the transfer-fee configuration's newer fee is 300 bps from fee epoch 1043, which begins about 26 Sep 2026; SPACEX stays at 100 bps. The maximum fee remains u64::MAX, and the shared Squads-controlled address WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc remains both transfer-fee configuration authority and withheld-fee withdrawal authority. The chain watcher recorded the configuration change as 100 → 300 bps on 24 Sep; the 3 % is not charged before epoch 1043.",
+      "whyItMatters": "Transfers withhold 1.00 % now on all 8 PreStocks mints; 7 of them have 3.00 % scheduled from fee epoch 1043 (about 26 Sep 2026), uncapped, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "affectedHolders": [
+        "all holders and transferees of the seven affected tokens",
+        "protocol depositors, borrowers and liquidators moving those tokens"
+      ],
+      "before": "100 bps",
+      "after": "300 bps from fee epoch 1043",
+      "affectedMints": [
+        "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+        "PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+        "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+        "PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+        "Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+        "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
+      "sources": [
+        {
+          "label": "Solana account observation at finalized slot 450170982: transferFeeConfig olderTransferFee 100 bps (epoch 1039), newerTransferFee 300 bps (epoch 1043), maximumFee u64::MAX",
+          "url": "https://explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+        }
+      ],
+      "match": {
+        "issuerSlug": "prestocks",
+        "kind": "extension-toggle",
+        "field": "transfer_fee_bps",
+        "before": "100",
+        "after": "300",
+        "detectedOn": "2026-09-24"
+      }
+    },
+    {
       "id": "prestocks-transfer-fee-100bps-2026-09-19",
       "resolution": "confirmed",
       "public": true,

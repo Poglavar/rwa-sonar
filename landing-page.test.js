@@ -76,6 +76,27 @@ describe('landing update feed', () => {
         expect(items.map((item) => item.title)).toEqual(['Fee doubled', 'URL moved']);
     });
 
+    test('the PreStocks fee card says 1 % now and the scheduled 3 % with its epoch, as the chain reads', () => {
+        // The card is the journal built from the reviewed resolutions (stocks/build-change-journal.mjs).
+        const { buildChangeJournal } = require('./stocks/lib/change-journal.mjs');
+        const resolutions = JSON.parse(readFileSync(join(__dirname, 'stocks/data/event-resolutions.json'), 'utf8')).items;
+        const items = buildChangeJournal({ resolutions });
+        const cards = L.journalUpdates({ items }, 50).filter((item) => /PreStocks/.test(item.title));
+        const scheduled = cards.find((item) => /3\.00 %/.test(item.detail));
+        expect(scheduled).toBeTruthy();
+        expect(scheduled.detail).toContain('1.00 % now on all 8 PreStocks mints');
+        expect(scheduled.detail).toContain('7 of them');
+        expect(scheduled.detail).toContain('epoch 1043');
+        expect(scheduled.detail).toContain('uncapped');
+        // It outranks the older 19 Sep card, so the home page leads with the current state.
+        expect(cards.indexOf(scheduled)).toBe(0);
+        // The watcher's 100 → 300 bps rows are resolved by this entry, so they never read as a fee already charged.
+        const entry = resolutions.find((row) => row.match?.after === '300');
+        expect(entry).toMatchObject({ public: true, issuerSlug: 'prestocks', match: { field: 'transfer_fee_bps', before: '100', after: '300', detectedOn: '2026-09-24' } });
+        expect(entry.affectedMints).toHaveLength(7);
+        expect(entry.affectedMints).not.toContain('PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh'); // SPACEX stays at 1.00 %
+    });
+
     test('merges dated protocol, catalogue and issuer events newest first', () => {
         const items = L.recentUpdates({
             latest: { from: '2026-09-18', to: '2026-09-19', changes: [] },

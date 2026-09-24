@@ -635,7 +635,7 @@ describe('renderCard', () => {
         const rendered = renderCard(local);
         expect(rendered.split(note)).toHaveLength(2);
         expect(rendered).toContain('Freeze accounts, Pause transfers:');
-        expect(rendered).toContain('observed 2026-09-20');
+        expect(rendered).toContain('observed 20 Sep 2026');
     });
 
     it('does not promote source-listed DeFi support into a successful user action', () => {
@@ -1010,8 +1010,12 @@ describe('evidence chips on a card', () => {
             expect(title.length).toBeLessThan(30);
             expect(title).not.toContain('“');
         }
-        // The source prints as its host, not as the whole URL a second time.
-        expect(html).toContain('>fixture.example<');
+        // The source prints as the document's registered title (else its host), never as the
+        // whole URL a second time.
+        expect(html).toContain('href="https://fixture.example/tos" rel="nofollow noopener">Terms of Service (2026-08)<');
+        const untitled = { ...fixtureIssuer(), documents: [] };
+        expect(renderCard(buildCard({ token: tokenDb.tokens[0], issuer: untitled, slug: 'U', builtAt: BUILT_AT, sources: SOURCES }), { version: 'test' }))
+            .toContain('>fixture.example<');
     });
 
     it('costs a bounded number of bytes on a REAL fully-sourced issuer', () => {
@@ -1408,5 +1412,268 @@ describe('the "When the market is closed" section on a card', () => {
             .sort((a, b) => b.bytes - a.bytes)[0];
         console.log(`[cards] widest multi-lender card ${widest.symbol} ${widest.bytes} B (target ${CARD_BYTE_TARGET})`);
         expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
+    });
+});
+
+// --- judge-walkthrough fixes (2026-09-25) ---------------------------------------------------------
+
+describe('the underlying market session on a card', () => {
+    const AAPLX = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+    // The Pyth feed list's schedule for Equity.US.AAPL/USD, verbatim (stocks/data/reference-prices.json).
+    const SCHEDULE = 'America/New_York;0930-1600,0930-1600,0930-1600,0930-1600,0930-1600,C,C;0907/C,1126/C,1127/0930-1300,1224/0930-1300,1225/C,0101/C,0118/C,0215/C,0326/C,0531/C,0618/C,0705/C';
+    // The live snapshot of 2026-09-24: prices read at 19:08 UTC while New York was open (the feed
+    // said is_open), the catalogue and cards built at 21:27 UTC, after the 16:00 EDT close.
+    const build = (catalogueAt, { schedule = SCHEDULE, openAtRead = true } = {}) => buildCard({
+        token: { ...AAPLX, reference: { ...AAPLX.reference, marketOpen: openAtRead } },
+        issuer: issuers.get(AAPLX.issuer), slug: 'AAPLx', builtAt: '2026-09-24T21:27:45Z',
+        sources: { ...SOURCES, tokens: catalogueAt, referencePrices: '2026-09-24T19:08:02Z' },
+        referenceSchedule: schedule
+    });
+    const row = (html) => /<dt>Underlying market<\/dt><dd>(.*?)<\/dd>/.exec(html)?.[1] ?? null;
+
+    it('says closed in a snapshot built after the US close, even though the feed said open when read', () => {
+        const card = build('2026-09-24T21:27:36Z');
+        expect(card.reference.session).toBe('closed');
+        expect(card.reference.marketOpen).toBe(false);
+        expect(card.reference.marketOpenAtRead).toBe(true);
+        const html = renderCard(card, { version: 'v' });
+        expect(row(html)).toMatch(/^closed at <time datetime="2026-09-24T21:27:36Z">24 Sep 2026 21:27 UTC<\/time>/);
+        expect(row(html)).toContain('open when the reference price was read');
+        expect(publicCard(card).reference).toMatchObject({ marketOpen: false, session: 'closed', sessionAt: '2026-09-24T21:27:36Z' });
+    });
+
+    it('says open inside the session and names a holiday as one', () => {
+        expect(build('2026-09-24T15:00:00Z').reference.session).toBe('open');
+        const html = renderCard(build('2026-09-24T15:00:00Z'), { version: 'v' });
+        expect(row(html)).toMatch(/^open at /);
+        expect(row(html)).not.toContain('when the reference price was read');
+        expect(build('2026-11-26T15:00:00Z').reference.session).toBe('holiday');
+    });
+
+    it('does not claim a session it cannot compute, and keeps the read-time flag dated', () => {
+        const card = build('2026-09-24T21:27:36Z', { schedule: null });
+        expect(card.reference.marketOpen).toBeNull();
+        expect(row(renderCard(card, { version: 'v' }))).toMatch(/^open when the reference price was read, <time/);
+    });
+});
+
+describe('no internal key reaches a reader', () => {
+    const aaplx = cardFor('AAPLx');
+    const html = renderCard(aaplx, { version: 'v' });
+    const visible = (page) => page.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+
+    it('names the reference source in words, in the markets section and the link preview', () => {
+        expect(aaplx.reference.source).toBe('ondo-implied');
+        expect(html).toContain('<dt>Reference source</dt><dd>Ondo’s implied price');
+        expect(visible(html)).not.toContain('ondo-implied');
+        expect(ogDescription(aaplx)).not.toContain('ondo-implied');
+        expect(visible(renderCard(cardFor('SPACEX'), { version: 'v' }))).not.toContain('issuer-mark');
+    });
+
+    it('rewrites a watcher summary: issuer name, field in words, readable date', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const materialChanges = { asOf: '2026-09-23T12:00:00Z', items: [{
+            id: '7', detectedAt: '2026-09-19T08:00:00Z', kind: 'quote-lost', severity: 'warning',
+            summary: 'xstocks-backed: the quoted words for claim vocabulary.thirdPartyAttestation are no longer in xstocks-backed:claims[3].url',
+            subjectType: 'source', subjectId: 'x', issuerSlug: token.issuer, judgmentId: '9', representative: true, material: true,
+            assessmentSeverity: 'warning', assessmentSummary: 'The custody page moved.'
+        }, {
+            id: '8', detectedAt: '2026-09-18T08:00:00Z', kind: 'legal-term', severity: 'caution',
+            summary: 'xstocks-backed:sources[15]: +9 -2 line(s) · keywords: fee',
+            subjectType: 'source', subjectId: 'y', issuerSlug: token.issuer, judgmentId: '10', representative: true, material: true,
+            assessmentSeverity: 'caution', assessmentSummary: 'A fee changed.'
+        }] };
+        const block = visible(renderCard(cardFor('AAPLx', BUILT_AT, materialChanges), { version: 'v' }))
+            .split('Recent material changes')[1].split('A model')[0].replace(/\s+/g, ' ');
+        expect(block).toContain('19 Sep 2026 · warning · Kraken xStocks: the words we quoted for “third party attestation” are no longer in the source');
+        expect(block).toContain('Kraken xStocks (a listed source): 9 lines added, 2 removed · mentions fee');
+        for (const key of ['xstocks-backed', 'vocabulary.', 'claims[', 'sources[', '2026-09-19']) expect(block).not.toContain(key);
+    });
+
+    it('labels a claim’s source link with the document’s title, not its host', () => {
+        expect(html).not.toContain('>cdn.prod.website-files.com<');
+        expect(html).not.toContain('>api.mainnet-beta.solana.com<');
+        expect(html).toContain('>Base Prospectus, Backed Assets (JE) Limited');
+    });
+
+    it('prints dates as dates and the footer’s sources in words', () => {
+        expect(visible(html)).not.toMatch(/observed \d{4}-\d{2}-\d{2}/);
+        const footer = visible(html.slice(html.indexOf('<footer><h2>Data</h2>')));
+        expect(footer).toContain('catalogue');
+        expect(footer).not.toMatch(/\b(tokens|issuerApi|closedMarket|defiUsage)\b/);
+    });
+});
+
+describe('the largest unresolved risk, in a sentence a holder can read', () => {
+    const riskOf = (card) => assetDecisionFacts(card).find((row) => row.id === 'risk');
+    // A card with each earlier rung removed, so a test can reach the one below it.
+    const without = (card, ...rungs) => ({
+        ...card,
+        discrepancies: rungs.includes('discrepancy') ? [] : card.discrepancies,
+        underReview: rungs.includes('review') ? [] : card.underReview,
+        authorityAttribution: rungs.includes('powers') ? { authorities: [] } : card.authorityAttribution,
+        closedMarket: rungs.includes('closed') ? null : card.closedMarket,
+        ownership: rungs.includes('redemption')
+            ? { ...card.ownership, redemption: { ...card.ownership.redemption, available: true, kyc: false } } : card.ownership
+    });
+
+    it('never prints a health rule’s raw note', () => {
+        for (const symbol of ['AAPLx', 'NVDAx', 'SPACEX', 'AAPLon', 'GLXY', 'tKalshi', 'BLSH', 'SECZ', 'MU']) {
+            const card = cardFor(symbol);
+            const value = riskOf(card).value;
+            for (const rule of card.health.rules) if (rule.note) expect(value).not.toContain(rule.note);
+            expect(value).not.toMatch(/organic share and|trades per trader over/);
+        }
+    });
+
+    it('leads with a documented claim-vs-reality conflict, then a priority-zero review', () => {
+        const fgdl = cardFor('FGDLx');
+        expect(riskOf(fgdl)).toMatchObject({ value: fgdl.discrepancies[0].title, href: '#discrepancies' });
+        const p0 = [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }];
+        expect(riskOf({ ...fgdl, underReview: p0 }).href).toBe('#discrepancies');
+        const review = { ...without(fgdl, 'discrepancy'), underReview: p0 };
+        expect(riskOf(review).value).toContain('priority-zero evidence change');
+    });
+
+    it('then names a power over holders’ tokens that one key, or a multisig with no time lock, can use', () => {
+        // Bullish: the permanent delegate and the freeze authority are two different plain wallets.
+        const blsh = riskOf(cardFor('BLSH'));
+        expect(blsh.value).toBe('One private key can move or burn any holder’s tokens, with no second signature needed. Another single private key can freeze any holder’s account.');
+        expect(blsh.href).toBe('#control');
+        // Shift: one per-mint key holds both powers.
+        expect(riskOf(cardFor('SPX3L')).value).toBe('One private key can move or burn any holder’s tokens and freeze any holder’s account, with no second signature needed.');
+        const openai = riskOf(without(cardFor('OPENAI'), 'discrepancy'));
+        expect(openai.value).toBe('2 of 5 signers of one multisig can move or burn any holder’s tokens and freeze any holder’s account at once: there is no time lock, so holders get no warning.');
+        // xStocks' permanent delegate has no recorded time lock, so only the freeze qualifies.
+        expect(riskOf(without(cardFor('AAPLx'), 'discrepancy')).value)
+            .toBe('2 of 4 signers of one multisig can freeze any holder’s account at once: there is no time lock, so holders get no warning.');
+    });
+
+    it('then a lending market’s stale or 24/7 collateral price, dated in words', () => {
+        const tslax = riskOf(without(cardFor('TSLAx'), 'discrepancy', 'powers'));
+        expect(tslax.value).toMatch(/^If you borrow against it: Loopscale .* can neither roll nor be liquidated\.$/);
+        expect(tslax.value).not.toMatch(/\d{4}-\d{2}-\d{2}T/);
+        expect(tslax.href).toBe('#closed-market');
+    });
+
+    it('then a redemption this holder cannot use', () => {
+        const card = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed');
+        expect(riskOf(card).value).toBe('Only holders who pass the issuer’s KYC checks can redeem; anyone else can only sell to another buyer.');
+        const none = { ...card, ownership: { ...card.ownership, redemption: { ...card.ownership.redemption, available: false } } };
+        expect(riskOf(none).value).toBe('The issuer offers holders no redemption: the only way out is selling to another buyer.');
+    });
+
+    it('falls back to the worst market check, in words', () => {
+        const card = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed', 'redemption');
+        expect(card.health.worstRuleId).toBe('organic');
+        expect(riskOf(card).value).toBe('Most trading looks automated: Jupiter counts only about 5 % of the last day’s volume as organic (non-bot) trading.');
+        const allGood = { ...card, health: { ...card.health, rules: card.health.rules.map((rule) => ({ ...rule, status: 'good' })) } };
+        expect(riskOf(allGood).value).toBe('The current checks measured no material risk; what they could not measure is unknown.');
+    });
+});
+
+describe('a programme dossier researched on one product, on another product’s card', () => {
+    // backpack-securities-spcx.json: the Backpack dossier was researched on SPCX (build-cards.mjs
+    // reads the product from the dossier's file name). MU is another Backpack token.
+    const SPCX = { symbol: 'SPCX', terms: ['SPCX', 'SpaceX'] };
+    const cardOf = (symbol) => {
+        const token = tokenDb.tokens.find((row) => row.symbol === symbol);
+        return buildCard({ token, issuer: issuers.get(token.issuer), slug: symbol, builtAt: BUILT_AT, sources: SOURCES, catalogue,
+            whatIf: whatIfBySlug.get(token.issuer) ?? null, schematics: SCHEMATICS.issuers[token.issuer] ?? null, researchProduct: SPCX });
+    };
+    const mu = cardOf('MU');
+    const html = renderCard(mu, { version: 'v' });
+    const visible = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+
+    it('scopes a redemption term that names SPCX as SPCX’s, keeping the full text one tap away', () => {
+        const minimum = mu.ownership.redemptionUsability.fields.find((field) => field.id === 'minimum');
+        expect(minimum.value).toBe('No MU-specific minimum is confirmed; SPCX is a programme example only.');
+        expect(html).toContain('<summary>No MU-specific minimum is confirmed; SPCX is a programme example only.</summary>');
+        expect(mu.researchedOn).toBe('SPCX');
+        expect(publicCard(mu).researchedOn).toBe('SPCX');
+    });
+
+    it('labels every what-if outcome that rests on SPCX, and says so above the answers', () => {
+        const lent = mu.whatIf.answers.find((answer) => answer.mode === 'collateral-lent');
+        expect(lent.outcome.startsWith('Researched on SPCX (programme example): We could not establish')).toBe(true);
+        expect(lent.outcome.length).toBeLessThanOrEqual(OUTCOME_MAX + 1);
+        expect(visible).toContain('These answers were researched on SPCX');
+        const plain = mu.whatIf.answers.filter((answer) => answer.outcome !== null && !/\bSPCX\b|SpaceX/.test(answer.outcome));
+        expect(plain.length).toBeGreaterThan(10);
+    });
+
+    it('labels the schematic link and the trust chain as SPCX’s', () => {
+        expect(html).toMatch(/See it drawn step by step: [^<]*SPCX[^<]* \(researched on SPCX, a programme example\) →<\/a>/);
+        expect(visible).toContain('The diagram was drawn from the dossier researched on SPCX');
+    });
+
+    it('shows none of that on SPCX’s own card', () => {
+        const spcx = cardOf('SPCX');
+        const own = renderCard(spcx, { version: 'v' });
+        expect(spcx.researchedOn).toBeNull();
+        expect(own).not.toContain('programme example)');
+        expect(own).not.toContain('researched on SPCX');
+    });
+});
+
+describe('the transfer fee on a card', () => {
+    const OPENAI = tokenDb.tokens.find((row) => row.symbol === 'OPENAI');
+    // PreStocks OPENAI read at epoch 1042 (2026-09-24): 100 bps in effect, 300 bps set from epoch 1043,
+    // maximumFee u64::MAX on both legs (lib/classify.mjs transferFeeAtEpoch).
+    const build = (control) => buildCard({ token: { ...OPENAI, control: { ...OPENAI.control, ...control } },
+        issuer: issuers.get(OPENAI.issuer), slug: 'OPENAI', builtAt: BUILT_AT, sources: SOURCES });
+    const row = (html) => /<dt>Transfer fee<\/dt><dd>(.*?)<\/dd>/.exec(html)?.[1] ?? null;
+
+    it('shows the fee in effect and the scheduled one, each with its cap', () => {
+        const card = build({ transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042,
+            transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+        expect(row(renderCard(card, { version: 'v' }))).toBe('1.00 % (no cap) now, at epoch 1042; 3.00 % (no cap) scheduled from epoch 1043');
+        expect(publicCard(card).control).toMatchObject({ transferFeeBps: 100, transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+    });
+
+    it('shows a settled fee alone, and no row on a mint with no fee extension', () => {
+        const settled = build({ transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042, transferFeeScheduled: null });
+        expect(row(renderCard(settled, { version: 'v' }))).toBe('1.00 % (no cap) now, at epoch 1042');
+        expect(row(renderCard(cardFor('NVDAx'), { version: 'v' }))).toBeNull();
+    });
+});
+
+describe('the price line under a card’s title', () => {
+    const lineOf = (html) => /<p class="price-line">(.*?)<\/p>/.exec(html)?.[1] ?? null;
+    const plain = (fragment) => fragment.replace(/<[^>]+>/g, '');
+
+    it('says price, premium against the tracked share and DEX liquidity, naming where each comes from', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        const line = lineOf(html);
+        expect(line).not.toBeNull();
+        expect(plain(line)).toBe('$333.99 on Jupiter · -0.18% vs AAPL · $591.7k DEX liquidity (Jupiter, all pools)');
+        expect(line).toContain('href="#depth"');
+        // The header sits right under the title, before the five facts.
+        expect(html.indexOf('class="price-line"')).toBeLessThan(html.indexOf('The five things to know first'));
+    });
+
+    it('labels each liquidity figure with its source, so the two do not read as a contradiction', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        expect(html).toContain('<dt>Liquidity (Jupiter, all pools)</dt>');
+        expect(html).toContain('<h3>DEX pools (DexScreener)</h3>');
+    });
+
+    it('is left out when there is neither a price nor a liquidity figure', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const bare = buildCard({ token: { ...token, market: {}, reference: {} }, slug: 'X', builtAt: BUILT_AT, sources: SOURCES });
+        expect(lineOf(renderCard(bare, { version: 'v' }))).toBeNull();
+    });
+});
+
+describe('ISO instants inside generated prose', () => {
+    it('are printed as dates a reader can read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const item = defiUsage.get(token.mint);
+        const integration = { ...item.integrations[0], summary: 'The program was last upgraded 2026-06-17T20:57:58Z, slot 427147035.' };
+        const card = buildCard({ token, issuer: issuers.get(token.issuer), slug: 'NVDAx', builtAt: BUILT_AT, sources: SOURCES,
+            defiUsageItem: { ...item, integrations: [integration] } });
+        const html = renderCard(card, { version: 'v' });
+        expect(html).toContain('The program was last upgraded 17 Jun 2026 20:57 UTC, slot 427147035.');
+        expect(html).not.toContain('2026-06-17T20:57:58Z');
     });
 });

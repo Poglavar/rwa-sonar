@@ -8,7 +8,8 @@ import { SITE_PAGES } from './lib/site-pages.mjs';
 
 const SITE_PAGE_PATHS = SITE_PAGES.map((page) => page.file ?? page.path ?? page);
 import {
-    LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, landingEventsHtml, landingEventsUpdatedHtml, landingSnapshotHtml, pitchProofHtml,
+    LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, landingEventsHtml, landingEventsUpdatedHtml, landingFloatHtml, landingRedemptionsHtml,
+    landingSnapshotHtml, pitchFlowsHtml, pitchPowersHeadHtml, pitchPowersHtml, pitchProofHtml, pitchSourcesHtml,
     renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
 } from './lib/static-snapshot.mjs';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
@@ -28,7 +29,31 @@ const FILES = {
     issuers: { issuers: ISSUERS },
     templates: { templates: [{}, {}, {}] },
     health: { rules: Array.from({ length: 11 }, () => ({})) },
-    defi: { fetchedAt: '2026-09-21T00:00:00Z', counts: { withAnyConfirmedUse: 125 } },
+    defi: { fetchedAt: '2026-09-21T00:00:00Z', counts: { withAnyConfirmedUse: 125, integrations: 171 } },
+    // The shapes flows.html, powers.html and the source watcher read (stocks-flows.json,
+    // stocks-power-map.json, stocks/data/sources.json), trimmed to the fields the snapshot uses.
+    flows: {
+        flows: {
+            issuers: [
+                { slug: 'xstocks-backed', days: [{ date: '2026-09-23', redeemed: { coveredHours: 23.1, count: 246 }, created: null }] },
+                { slug: 'ondo-global-markets', days: [
+                    { date: '2026-09-22', created: { coveredHours: 5, count: 90 }, redeemed: { coveredHours: 5, count: 40 } },
+                    { date: '2026-09-23', created: { coveredHours: 20.9, count: 437 }, redeemed: { coveredHours: 20.9, count: 250 } },
+                    { date: '2026-09-24', created: { coveredHours: 0, count: null }, redeemed: { coveredHours: 0, count: null } }
+                ] }
+            ]
+        },
+        float: {
+            readAt: '2026-09-24T19:07:34Z',
+            totals: { supplyUsd: 2727314161, inventoryUsd: 2229947731, floatUsd: 497366430, pricedMints: 107, inventorySharePct: 81.76 }
+        }
+    },
+    powerMap: {
+        powers: Array.from({ length: 7 }, (_, i) => ({ id: `p${i}` })),
+        issuers: Array.from({ length: 12 }, (_, i) => ({ slug: `i${i}` })),
+        counts: { 'single-key': 26, multisig: 16, program: 8, none: 18, unknown: 16 }
+    },
+    sources: { generatedAt: '2026-09-24T15:45:08Z', count: 621 },
     events: {
         asOf: '2026-09-24T14:07:04Z',
         events: Array.from({ length: 12 }, (_, i) => ({
@@ -76,7 +101,57 @@ describe('static snapshot regions', () => {
         expect(html).toContain('<strong data-live-token-count>1,195</strong><span>exact Solana token addresses in the 22 Sep 2026 public snapshot');
         expect(html).toContain('<strong>3</strong><span>reviewed legal and technology templates');
         expect(html).toContain('<strong>11</strong><span>health checks');
-        expect(html).toContain('<strong>125</strong><span>assets with confirmed DeFi use in the 21 Sep 2026 composability snapshot');
+        // Two different DeFi counts exist (weekly shows the second): the label says which is which.
+        expect(html).toContain('<strong>125</strong><span>token addresses with at least one confirmed DeFi integration '
+            + '(171 token–protocol integrations in all) in the 21 Sep 2026 composability snapshot');
+    });
+
+    test('the xStocks float finding is read from stocks-flows.json, the numbers flows.html shows', () => {
+        const html = landingFloatHtml(facts);
+        expect(html).toContain('<p class="finding-kicker">Float · read on chain, 24 Sep 2026</p>');
+        expect(html).toContain('<h3>81.8% of priced xStocks supply sits in issuer wallets.</h3>');
+        expect(html).toContain('Across the 107 xStocks with a market price, $2.23B of $2.73B of supply');
+        expect(html).toContain('a public float of at most $497.37M');
+        expect(() => landingFloatHtml(snapshotFacts({ ...FILES, flows: { flows: FILES.flows.flows, float: null } }))).toThrow('xStocks float');
+    });
+
+    test('redemption counts are the newest Ondo day the scan covered, with its covered hours', () => {
+        expect(landingRedemptionsHtml(facts)).toBe('On 23 Sep 2026 the scan saw 250 Ondo redemptions and 437 creations in the 20.9 hours it read.');
+        const pitch = pitchFlowsHtml(facts);
+        expect(pitch).toContain('<p><strong>250 Ondo redemptions, 437 creations</strong></p>');
+        expect(pitch).toContain('On 23 Sep 2026, in the 20.9 hours the scan read.');
+        expect(pitch).toContain('on 24 Sep 2026 those wallets held 81.8% of priced xStocks supply ($2.23B of $2.73B)');
+        // A window with no covered Ondo day says so rather than printing a zero.
+        const uncovered = snapshotFacts({ ...FILES, flows: { ...FILES.flows, flows: { issuers: [{ slug: 'ondo-global-markets', days: [
+            { date: '2026-09-24', created: { coveredHours: 0, count: null }, redeemed: { coveredHours: 0, count: null } }] }] } } });
+        expect(landingRedemptionsHtml(uncovered)).toBe('No Ondo day in the current window has been read by the scan yet.');
+        expect(pitchFlowsHtml(uncovered)).not.toMatch(/\b0 Ondo/);
+    });
+
+    test('the pitch powers line is the power map’s own cell counts', () => {
+        expect(pitchPowersHeadHtml(facts)).toBe('12 programmes × 7 powers.');
+        expect(pitchPowersHtml(facts)).toBe('84 cells: 26 held by one key, 16 by a multisig, 8 by a program, 18 not installed, 16 unknown.');
+        expect(() => pitchPowersHtml(snapshotFacts({ ...FILES, powerMap: { powers: [], issuers: [], counts: {} } }))).toThrow('power map');
+    });
+
+    test('the source count is the cited-source registry the watcher reads, named for what it counts', () => {
+        expect(pitchSourcesHtml(facts)).toBe('Daily: 621 cited source URLs re-read');
+        expect(() => pitchSourcesHtml(snapshotFacts({ ...FILES, sources: {} }))).toThrow('cited source count');
+    });
+
+    test('the committed pages mark every data-driven number, so none can drift from its file', () => {
+        const landing = readFileSync(join(ROOT, 'index.html'), 'utf8');
+        const pitch = readFileSync(join(ROOT, 'pitch/index.html'), 'utf8');
+        for (const name of ['float-finding', 'redemptions']) expect(landing).toContain(`<!-- snapshot:${name}:start -->`);
+        for (const name of ['pitch-powers-head', 'pitch-powers', 'pitch-flows', 'pitch-sources']) expect(pitch).toContain(`<!-- snapshot:${name}:start -->`);
+        // No hand-typed copy of the figures the regions now carry.
+        expect(landing).not.toContain('81.0%');
+        expect(pitch).not.toContain('81.0%');
+        expect(pitch).not.toContain('576 cited sources');
+        const rendered = renderStaticSnapshots({ 'index.html': landing, 'pitch/index.html': pitch }, facts);
+        expect(rendered['index.html']).toContain('<!-- snapshot:float-finding:start --><p class="finding-kicker">Float · read on chain, 24 Sep 2026</p>');
+        expect(rendered['pitch/index.html']).toContain('<!-- snapshot:pitch-powers:start -->84 cells: 26 held by one key');
+        expect(rendered['pitch/index.html']).toContain('<!-- snapshot:pitch-sources:start -->Daily: 621 cited source URLs re-read<!-- snapshot:pitch-sources:end -->');
     });
 
     test('a missing input throws instead of writing a guessed number', () => {

@@ -113,6 +113,20 @@ h1 {
     color: var(--muted-text);
 }
 
+/* The price line under the title (cards.mjs priceLineHtml): price, premium, DEX liquidity, each sourced. */
+.card-head .price-line {
+    margin: -6px 0 14px;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.card-head .price-line b {
+    color: var(--page-text);
+    font-size: 1.15rem;
+}
+
 .asset-decision { margin: 0 0 12px; padding: clamp(14px, 2vw, 20px); border: 1px solid var(--panel-border); border-radius: 12px; background: var(--card-bg); }
 .asset-decision-kicker { margin: 0 0 10px; color: var(--accent); font-size: .7rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .asset-decision-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
@@ -163,6 +177,10 @@ h1 {
 .discrepancy-list { display: grid; gap: 12px; }
 
 .discrepancy-item {
+    min-width: 0;
+    /* Claim and reality prose quotes whole base58 addresses and URLs; unbroken they widened a
+       375 px phone page to 494 px (SECZ). */
+    overflow-wrap: anywhere;
     padding: 13px;
     border: 1px solid var(--panel-border);
     border-left: 4px solid var(--unknown);
@@ -196,6 +214,7 @@ h1 {
 }
 
 .discrepancy-side {
+    min-width: 0;
     padding: 11px;
     border: 1px solid var(--panel-border);
     border-radius: 7px;
@@ -557,6 +576,10 @@ h3:first-child {
 
 .redemption-usability dt { color: var(--muted-text); font-size: 0.76rem; }
 .redemption-usability dd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 3px 0 0; }
+/* A term's complete text quotes URLs (Backpack's asset API); unbroken, an opened term widened the phone page. */
+.redemption-usability dd > :first-child { min-width: 0; }
+.redemption-usability dd > .evidence-state { flex: none; }
+.redemption-term { overflow-wrap: anywhere; }
 .redemption-observation { padding: 12px 14px; border-left: 4px solid var(--unknown); background: color-mix(in srgb, var(--unknown) 8%, transparent); }
 .evidence-state { color: var(--muted-text); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
 

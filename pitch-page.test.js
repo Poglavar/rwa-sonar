@@ -28,8 +28,8 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('AAPLon');
         expect(html).toContain('very challenging to achieve');
         expect(html).toContain('can reconstitute');
-        expect(html).toContain('81.0%');
-        expect(html).toContain('<!-- snapshot:pitch-proof:start -->');
+        // The float, flows, powers and source figures are build-time regions (stocks/static-snapshot.test.js).
+        for (const region of ['pitch-proof', 'pitch-powers', 'pitch-flows', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
         expect(html).toContain('PreStocks transfer fee 0.50%');
         expect(html).toContain('Stocklana main track first');
         expect(html).toContain('Open source under the MIT licence');
@@ -112,6 +112,32 @@ describe('web-native pitch deck', () => {
         const hint = declarations('.keyboard-hint');
         expect(contrast(resolve(hint.color), resolve(hint.background))).toBeGreaterThanOrEqual(4.5);
         expect(contrast(resolve(declarations('.cover-art figcaption').color), declarations('.cover-art').background)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    test('says what Pyth data does in the product, without calling a stopped account a Pyth failure', () => {
+        const line = html.match(/<p class="pyth-line">[\s\S]*?<\/p>/)?.[0];
+        expect(line).toBeTruthy();
+        expect(line).toContain('market-hours schedule');
+        expect(line).toContain('closed-market view');
+        expect(line).toContain('the Pyth price accounts Loopscale reads stopped being updated on 26 Aug 2026 (TSLA on 11 Sep)');
+        expect(line).toContain('Pyth Lazer 24/7 token feeds');
+        expect(line).not.toMatch(/Pyth (?:failed|broke|went down|outage)/i);
+        expect(declarations('.pyth-line').color).toBeTruthy();
+    });
+
+    test('the site contact line sits inside the deck footer as text, not as a dark band', () => {
+        const footer = html.match(/<footer class="deck-footer">[\s\S]*?<\/footer>/)?.[0];
+        expect(footer).toContain('class="site-contact site-contact-inner');
+        // The page's own rule must neutralise the standalone dark band inside the footer ...
+        const inFooter = declarations('.deck-footer .site-contact');
+        expect(inFooter.background).toBe('transparent');
+        expect(inFooter.color).toBe('inherit');
+        // ... and the footer's link and phone rules must reach only its own items, never the contact
+        // links (margin-left:auto spread them across the row; `span` hid their labels on a phone).
+        expect(declarations('.deck-footer a')).toEqual({});
+        expect(css).not.toMatch(/\.deck-footer span\s*\{/);
+        expect(css).toMatch(/\.deck-footer > span\s*\{\s*display:\s*none;/);
+        expect(declarations('.deck-footer').flexWrap ?? declarations('.deck-footer')['flex-wrap']).toBe('wrap');
     });
 
     test('supports presentation navigation, live counts, mobile layout and print-to-PDF', () => {

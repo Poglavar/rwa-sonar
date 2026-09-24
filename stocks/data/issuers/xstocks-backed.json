@@ -509,6 +509,19 @@
       "observedAt": "2026-09-20",
       "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished."
     },
+    "permanentDelegate": {
+      "effectiveGovernance": "multisig",
+      "controller": "Squads v4 multisig Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot",
+      "signerThreshold": "2 of 3",
+      "observedAt": "2026-09-23",
+      "source": "Solana mainnet-beta RPC: getAccountInfo Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot at finalized slot 449675962 (Squads v4 Multisig layout; the vault PDA seeds [\"multisig\", multisig, \"vault\", 0] reproduce 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq)",
+      "technicalNotes": "Authority is vault index 0 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq; zero execution timelock; members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; beneficial identities unpublished. The same vault is transfer-hook, metadata-update and confidential-transfer authority.",
+      "useCheck": {
+        "statement": "Across all 1,845 transactions touching the vault (2025-06-10 to 2026-09-23) no transfer, transferChecked, burn or burnChecked names it as authority.",
+        "through": "2026-09-23",
+        "source": "rpc:getSignaturesForAddress 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq (1,845 signatures, 12 failed, 2025-06-10T13:23:35Z to 2026-09-23T16:48:21Z) and Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot (36 signatures), getTransaction jsonParsed on every successful one"
+      }
+    },
     "rebase": {
       "effectiveGovernance": "hot-key",
       "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",

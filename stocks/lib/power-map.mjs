@@ -220,12 +220,25 @@ function finding(issuer, schema) {
 }
 
 /**
+ * A reviewed search of the authority's transaction history (authorityFacts.<capability>.useCheck):
+ * what was searched and found, and the last day it covers. Kept only with both, since a check with
+ * no end date cannot say what it rules out.
+ */
+function useCheckFrom(check) {
+    const statement = str(check?.statement);
+    const through = str(check?.through);
+    if (statement === null || !/^\d{4}-\d{2}-\d{2}$/.test(through ?? '')) return null;
+    return { statement, through, source: str(check?.source) };
+}
+
+/**
  * Whether a power's use is on record. `recorded` = a dossier finding says it was exercised;
  * `effect-observed` = the chain read shows its effect now (a multiplier other than 1, a paused
  * mint, a non-zero fee or withheld fees, supply that was minted); `not-recorded` otherwise. Never
- * "never used": the absence of a record is not evidence of no use.
+ * "never used": the absence of a record is not evidence of no use. `check` is a reviewed search of
+ * the authority's history over a stated window (useCheckFrom); it bounds what is known, it is not use.
  */
-export function usageFor(powerId, issuer, chain) {
+export function usageFor(powerId, issuer, chain, useCheck = null) {
     const n = chain.length;
     const count = (predicate) => chain.filter(predicate).length;
     const effects = [];
@@ -254,7 +267,7 @@ export function usageFor(powerId, issuer, chain) {
         if (minted > 0) effects.push(`supply has been minted on ${minted} of ${n} mints`);
     }
     const state = recorded !== null ? 'recorded' : effects.length > 0 ? 'effect-observed' : 'not-recorded';
-    return { state, finding: recorded, effects };
+    return { state, finding: recorded, effects, check: useCheckFrom(useCheck) };
 }
 
 /**
@@ -325,7 +338,7 @@ export function shapeIssuerRow(issuer, tokens, chainByMint) {
             timelock: timelockFrom(governance?.technicalNotes ?? null),
             contractualCircumstances: governance?.contractualCircumstances ?? null,
             addresses: tallyAddresses(chain.map((entry) => entry.addresses[power.id] ?? [])),
-            usage: usageFor(power.id, issuer, chain),
+            usage: usageFor(power.id, issuer, chain, issuer?.authorityFacts?.[modelId]?.useCheck ?? null),
             inheritedFrom: null,
             sameAddressAs: []
         };

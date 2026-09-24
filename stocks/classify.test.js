@@ -10,7 +10,9 @@ const {
     issuerLabel,
     underlyingTicker,
     summarizeExtensions,
-    effectiveUiMultiplier
+    effectiveUiMultiplier,
+    transferFeeAtEpoch,
+    controlFromOnchain
 } = require('./lib/classify.mjs');
 
 // XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB — Tesla xStock, Token-2022, 8 decimals.
@@ -231,6 +233,9 @@ describe('summarizeExtensions', () => {
             defaultAccountStateFrozen: false,
             transferFeeConfigured: false,
             transferFeeBps: null,
+            transferFeeCapped: null,
+            transferFeeScheduled: null,
+            transferFeeReadEpoch: null,
             transferFeeConfigAuthority: null,
             transferFeeWithdrawAuthority: null,
             confidentialTransfers: true,
@@ -258,8 +263,12 @@ describe('summarizeExtensions', () => {
         expect(summary.mintAuthority).toBe('9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD');
     });
 
-    it('reads the newer transfer fee in basis points', () => {
-        expect(summarizeExtensions(ANDURIL_ACCOUNT).transferFeeBps).toBe(50);
+    it('reads the transfer fee in effect at the read epoch, in basis points', () => {
+        // ANDURIL: 0 bps from epoch 848, 50 bps from 1032 — read at 1040 the newer leg applies.
+        expect(summarizeExtensions(ANDURIL_ACCOUNT, { epoch: 1040 }).transferFeeBps).toBe(50);
+        expect(summarizeExtensions(ANDURIL_ACCOUNT, { epoch: 1031 }).transferFeeBps).toBe(0);
+        // With no epoch, two different legs leave the fee in effect unknown, never guessed.
+        expect(summarizeExtensions(ANDURIL_ACCOUNT).transferFeeBps).toBe(null);
         expect(summarizeExtensions(ANDURIL_ACCOUNT).transferFeeConfigured).toBe(true);
         expect(summarizeExtensions(TOPENAI_ACCOUNT).transferFeeBps).toBe(20);
         expect(summarizeExtensions(ANDURIL_ACCOUNT)).toMatchObject({
@@ -345,5 +354,51 @@ describe('effectiveUiMultiplier', () => {
             { extension: 'scaledUiAmountConfig', state }] } } } };
         expect(summarizeExtensions(account, { nowSeconds: 1_758_000_001 }).scaledUiAmountMultiplier).toBe('5');
         expect(summarizeExtensions(account, { nowSeconds: 1_757_999_999 }).scaledUiAmountMultiplier).toBe('1');
+    });
+});
+
+describe('the transfer fee in effect, and the one scheduled', () => {
+    // PreStocks OPENAI (PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF) read on 2026-09-24 at epoch 1042:
+    // 100 bps since epoch 1039, 300 bps set to start at epoch 1043, maximumFee u64::MAX on both legs.
+    const U64_MAX = 18446744073709552000;
+    const OPENAI_FEE = {
+        newerTransferFee: { epoch: 1043, maximumFee: U64_MAX, transferFeeBasisPoints: 300 },
+        olderTransferFee: { epoch: 1039, maximumFee: U64_MAX, transferFeeBasisPoints: 100 },
+        transferFeeConfigAuthority: 'WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc',
+        withdrawWithheldAuthority: 'WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc',
+        withheldAmount: 7515598568
+    };
+    const account = (state) => ({ ...ANDURIL_ACCOUNT, data: { ...ANDURIL_ACCOUNT.data, parsed: { ...ANDURIL_ACCOUNT.data.parsed, info: {
+        ...ANDURIL_ACCOUNT.data.parsed.info,
+        extensions: ANDURIL_ACCOUNT.data.parsed.info.extensions.map((ext) => (ext.extension === 'transferFeeConfig' ? { ...ext, state } : ext))
+    } } } });
+
+    it('reads the older leg before the newer one\'s epoch, and names the scheduled one', () => {
+        expect(transferFeeAtEpoch(OPENAI_FEE, 1042)).toEqual({ bps: 100, capped: false, scheduled: { bps: 300, epoch: 1043, capped: false } });
+        const summary = summarizeExtensions(account(OPENAI_FEE), { epoch: 1042 });
+        expect(summary).toMatchObject({ transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042,
+            transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+    });
+
+    it('reads the newer leg from its epoch on, with nothing left scheduled', () => {
+        expect(transferFeeAtEpoch(OPENAI_FEE, 1043)).toEqual({ bps: 300, capped: false, scheduled: null });
+        // PreStocks SPACEX: 100 bps from 1039, no pending change.
+        const spacex = { ...OPENAI_FEE, newerTransferFee: { epoch: 1039, maximumFee: U64_MAX, transferFeeBasisPoints: 100 },
+            olderTransferFee: { epoch: 1032, maximumFee: U64_MAX, transferFeeBasisPoints: 50 } };
+        expect(transferFeeAtEpoch(spacex, 1042)).toEqual({ bps: 100, capped: false, scheduled: null });
+    });
+
+    it('does not guess the fee in effect when the read epoch is unknown and the two legs differ', () => {
+        expect(transferFeeAtEpoch(OPENAI_FEE, null)).toEqual({ bps: null, capped: null, scheduled: null });
+        const flat = { ...OPENAI_FEE, newerTransferFee: { epoch: 987, maximumFee: 5000, transferFeeBasisPoints: 20 },
+            olderTransferFee: { epoch: 987, maximumFee: 5000, transferFeeBasisPoints: 20 } };
+        expect(transferFeeAtEpoch(flat, null)).toEqual({ bps: 20, capped: true, scheduled: null });
+    });
+
+    it('carries the fee in effect and the scheduled fee into the token control block', () => {
+        const control = controlFromOnchain(summarizeExtensions(account(OPENAI_FEE), { epoch: 1042 }));
+        expect(control).toMatchObject({ transferFee: true, transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042,
+            transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+        expect(controlFromOnchain(null)).toMatchObject({ transferFeeBps: null, transferFeeScheduled: null });
     });
 });

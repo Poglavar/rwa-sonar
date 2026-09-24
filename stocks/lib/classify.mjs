@@ -154,13 +154,45 @@ export function effectiveUiMultiplier(state, nowSeconds) {
     return value !== undefined && value !== null && Number.isFinite(Number(value)) ? String(value) : null;
 }
 
+/** One leg of a Token-2022 transfer-fee schedule: `{epoch, bps, capped}`, or null when unreadable. */
+function feeLeg(fee) {
+    const epoch = Number.isInteger(fee?.epoch) ? fee.epoch : null;
+    const bps = Number.isInteger(fee?.transferFeeBasisPoints) ? fee.transferFeeBasisPoints : null;
+    if (epoch === null || bps === null) return null;
+    // jsonParsed prints maximumFee as a number, and u64::MAX (the "no cap" value) parses as 2^64.
+    const max = Number(fee?.maximumFee);
+    return { epoch, bps, capped: Number.isFinite(max) ? max < 2 ** 64 : null };
+}
+
+/**
+ * The transfer fee in effect at `epoch`, and the change already scheduled after it. Token-2022
+ * keeps two legs: `olderTransferFee` applies until `newerTransferFee.epoch`, the newer one from that
+ * epoch on — so a newly set fee (always two epochs ahead) is NOT the fee in effect yet. PreStocks
+ * set 300 bps from epoch 1043 on seven mints while epoch 1042 still charged 100 bps.
+ *
+ * With no epoch the fee in effect is only known when both legs agree; otherwise it is null rather
+ * than a guess. Returns `{bps, capped, scheduled: {bps, epoch, capped} | null}`.
+ */
+export function transferFeeAtEpoch(state, epoch = null) {
+    const older = feeLeg(state?.olderTransferFee);
+    const newer = feeLeg(state?.newerTransferFee);
+    if (newer === null) return { bps: null, capped: null, scheduled: null };
+    const same = older !== null && older.bps === newer.bps && older.capped === newer.capped;
+    if (!Number.isInteger(epoch)) {
+        return same || older === null ? { bps: newer.bps, capped: newer.capped, scheduled: null } : { bps: null, capped: null, scheduled: null };
+    }
+    if (epoch >= newer.epoch || older === null) return { bps: newer.bps, capped: newer.capped, scheduled: null };
+    return { bps: older.bps, capped: older.capped, scheduled: same ? null : { bps: newer.bps, epoch: newer.epoch, capped: newer.capped } };
+}
+
 /**
  * Flatten a Token-2022 mint's extensions into the capability flags that matter for
  * grading how controllable a tokenized share is (who can seize, freeze, pause, tax or
  * re-denominate it) plus the plain mint facts. `nowSeconds` is the read time, which decides
- * whether a scheduled multiplier has taken effect.
+ * whether a scheduled multiplier has taken effect; `epoch` is the chain's epoch at the read, which
+ * decides which transfer-fee leg is in effect (transferFeeAtEpoch).
  */
-export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Date.now() / 1000) } = {}) {
+export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Date.now() / 1000), epoch = null } = {}) {
     const { info, owner } = unwrap(parsedMintInfo);
     const extensions = Array.isArray(info.extensions) ? info.extensions : [];
 
@@ -173,7 +205,7 @@ export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Da
     const scaled = findExtension(extensions, 'scaledUiAmountConfig');
     const metadata = findExtension(extensions, 'tokenMetadata');
 
-    const feeBps = transferFee?.state?.newerTransferFee?.transferFeeBasisPoints;
+    const fee = transferFee === null ? null : transferFeeAtEpoch(transferFee.state, epoch);
 
     return {
         tokenProgram: tokenProgramName(owner),
@@ -189,7 +221,12 @@ export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Da
         paused: typeof pausable?.state?.paused === 'boolean' ? pausable.state.paused : null,
         defaultAccountStateFrozen: defaultAccountState?.state?.accountState === 'frozen',
         transferFeeConfigured: transferFee !== null,
-        transferFeeBps: typeof feeBps === 'number' ? feeBps : null,
+        // The fee in effect at the read epoch, NOT simply the newer leg: a scheduled rise is
+        // reported beside it until its epoch arrives.
+        transferFeeBps: fee?.bps ?? null,
+        transferFeeCapped: fee?.capped ?? null,
+        transferFeeScheduled: fee?.scheduled ?? null,
+        transferFeeReadEpoch: transferFee !== null && Number.isInteger(epoch) ? epoch : null,
         // A zero current fee does not remove either administrative power.  Keep the two
         // authorities independently so downstream control assessment can distinguish an absent
         // extension from an installed, currently-zero fee schedule.
@@ -204,5 +241,57 @@ export function summarizeExtensions(parsedMintInfo, { nowSeconds = Math.floor(Da
         metadataUri: metadata?.state?.uri ?? null,
         metadataUpdateAuthority: metadata?.state?.updateAuthority ?? null,
         extensionNames: extensions.map((ext) => ext.extension).filter(Boolean).sort()
+    };
+}
+
+/** A finite number or null — never a 0 conjured out of null by Number(). */
+function finiteOrNull(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+/**
+ * A catalogue token's `control` block from its onchain.json item (summarizeExtensions' output), or
+ * every field null when the mint was never read. Shared by build-stocks-db.mjs; unit-tested in
+ * ../classify.test.js.
+ */
+export function controlFromOnchain(onchain) {
+    return {
+        mintAuthority: onchain ? (onchain.mintAuthority ?? false) : null,
+        clawback: onchain ? onchain.permanentDelegate === true : null,
+        permanentDelegate: onchain
+            ? (onchain.permanentDelegateAddress ?? (onchain.permanentDelegate === false ? false : null))
+            : null,
+        freezeAuthority: onchain ? (onchain.freezeAuthority ?? false) : null,
+        pausable: onchain ? onchain.pausable === true : null,
+        paused: typeof onchain?.paused === 'boolean' ? onchain.paused : null,
+        allowlist: onchain ? onchain.defaultAccountStateFrozen === true : null,
+        // Presence is separate from the current bps: `0` is an installed extension and `null`
+        // from an older partial collector is unknown, not evidence of absence.
+        transferFee: onchain
+            ? (typeof onchain.transferFeeConfigured === 'boolean'
+                ? onchain.transferFeeConfigured
+                : (Array.isArray(onchain.extensionNames)
+                    ? onchain.extensionNames.includes('transferFeeConfig')
+                    : (Number.isFinite(onchain.transferFeeBps) ? true : null)))
+            : null,
+        transferFeeBps: finiteOrNull(onchain?.transferFeeBps),
+        // Whether the fee in effect has a maximum per transfer (false: u64::MAX, no cap), the
+        // change already scheduled ({bps, epoch, capped}), and the epoch the two were read at.
+        transferFeeCapped: typeof onchain?.transferFeeCapped === 'boolean' ? onchain.transferFeeCapped : null,
+        transferFeeScheduled: onchain?.transferFeeScheduled && typeof onchain.transferFeeScheduled === 'object'
+            ? onchain.transferFeeScheduled : null,
+        transferFeeReadEpoch: Number.isInteger(onchain?.transferFeeReadEpoch) ? onchain.transferFeeReadEpoch : null,
+        transferFeeConfigAuthority: onchain
+            ? (onchain.transferFeeConfigAuthority ?? null)
+            : null,
+        transferFeeWithdrawAuthority: onchain
+            ? (onchain.transferFeeWithdrawAuthority ?? null)
+            : null,
+        hookActive: onchain ? typeof onchain.transferHookProgram === 'string' : null,
+        // The scaled-UI-amount (rebase) extension being installed at all — NOT whether the
+        // multiplier is currently 1. A multiplier of 1 is a rebase that has not been used yet, and
+        // the capability is what the recipe and the keyControl health rule are about (MODEL.md
+        // §2.7): one signature from the rebase authority restates every holder's displayed balance.
+        rebase: onchain ? typeof onchain.scaledUiAmountMultiplier === 'string' : null
     };
 }

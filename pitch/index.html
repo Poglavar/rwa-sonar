@@ -32,7 +32,7 @@
     <!-- seo:head:end -->
     <meta name="theme-color" content="#172033" />
     <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
-    <link rel="stylesheet" href="./pitch.css?v=20260924b" />
+    <link rel="stylesheet" href="./pitch.css?v=20260925a" />
     <link rel="stylesheet" href="../motion.css?v=20260924u" />
     <script src="../clarity.js?v=20260924a" defer></script>
     <script src="./pitch.js?v=20260922d" defer></script>
@@ -117,7 +117,7 @@
                 <div class="scenario-list">
                     <article><span>Keys stolen</span><div><strong>xStocks: nothing comes back as of right.</strong><p>Documented. The only replacement route is a Swiss court cancellation the issuer itself calls "very challenging to achieve".</p></div></article>
                     <article><span>Keys stolen</span><div><strong>Superstate: the transfer agent "can reconstitute" tokens.</strong><p>Documented. Burned and reissued once the loss and your identity are confirmed. Not promised, and liability is capped.</p></div></article>
-                    <article><span>Keys held</span><div><strong>12 programmes × 7 powers.</strong><p>21 cells held by one key, 15 by a multisig, 10 by a program, 12 not installed, 26 unknown. xStocks' power to move or burn holder tokens: a 2-of-3 multisig with no time lock, not used on Solana through 18 Sep 2026.</p></div></article>
+                    <article><span>Keys held</span><div><strong><!-- snapshot:pitch-powers-head:start -->12 programmes × 7 powers.<!-- snapshot:pitch-powers-head:end --></strong><p><!-- snapshot:pitch-powers:start -->84 cells: 26 held by one key, 16 by a multisig, 8 by a program, 18 not installed, 16 unknown.<!-- snapshot:pitch-powers:end --> xStocks' power to move or burn holder tokens: a 2-of-3 multisig with no time lock, not used on Solana through 23 Sep 2026.</p></div></article>
                 </div>
             </div>
             <p class="slide-number">02</p>
@@ -136,13 +136,10 @@
                 <div class="change-example">
                     <span class="change-label">Observed on Solana - 19 Sep 2026</span>
                     <p><s>PreStocks transfer fee 0.50%</s><strong>Transfer fee 1.00%</strong></p>
-                    <small>All eight mints changed from 50 bps to 100 bps at fee epoch 1039; evidence is the programme authority account observed at Solana slot 448348634.</small>
+                    <small>All eight mints changed from 50 bps to 100 bps at fee epoch 1039; evidence is the programme authority account observed at Solana slot 448348634. On 24 Sep seven of them scheduled 3.00%, uncapped, from fee epoch 1043 (about 26 Sep 2026).</small>
                 </div>
-                <div class="change-example">
-                    <span class="change-label">Flows and float - 23 Sep 2026</span>
-                    <p><strong>218 Ondo redemptions, 370 creations</strong></p>
-                    <small>In the 17.9 hours the scan read. Redeemed xStocks return to issuer wallets. On 24 Sep 2026 those wallets held 81.0% of priced xStocks supply, including an inventory wallet the issuer excludes from its circulating figure.</small>
-                </div>
+                <!-- Written by stocks/build-static-snapshot.mjs from stocks-flows.json (the numbers flows.html shows). -->
+                <div class="change-example"><!-- snapshot:pitch-flows:start --><span class="change-label">Flows and float - read on chain</span><p><strong>250 Ondo redemptions, 437 creations</strong></p><small>On 23 Sep 2026, in the 20.9 hours the scan read. Redeemed xStocks return to issuer wallets: on 24 Sep 2026 those wallets held 81.8% of priced xStocks supply ($2.23B of $2.73B), including an inventory wallet the issuer excludes from its circulating figure.</small><!-- snapshot:pitch-flows:end --></div>
             </div>
             <p class="slide-number">03</p>
         </section>
@@ -160,6 +157,7 @@
                     <article><span>03</span><h3>Docs vs chain</h3><p>Loopscale's docs call a key a co-signer that "cannot initiate actions on its own"; on chain it signs refinances alone.</p><small>Discrepancies keep both sides cited</small></article>
                     <article><span>04</span><h3>DeFi proof</h3><p>Protocol listing, account existence, decoded configuration and simulation are separate states.</p><small>Actual lending requires its own evidence beyond a registry listing</small></article>
                 </div>
+                <p class="pyth-line"><strong>Pyth in the product.</strong> The market-hours schedules in Pyth's feed list set the session for premiums and the closed-market view. Our lending watcher shows the Pyth price accounts Loopscale reads stopped being updated on 26 Aug 2026 (TSLA on 11 Sep), so those loans cannot roll or be liquidated. Nest values xStock collateral from Pyth Lazer 24/7 token feeds.</p>
             </div>
             <p class="slide-number">04</p>
         </section>
@@ -169,7 +167,7 @@
                 <p class="kicker">Built and running today</p>
                 <h2>Research you can use today</h2>
                 <div class="proof-grid">
-                    <!-- snapshot:pitch-proof:start --><article><strong data-live-token-count>1,183</strong><span>exact Solana token addresses in the 22 Sep 2026 public snapshot</span></article><article><strong>9</strong><span>reviewed legal and technology templates covering the catalogue</span></article><article><strong>11</strong><span>health checks split across market, control, legal/evidence and DeFi use</span></article><article><strong>125</strong><span>assets with confirmed DeFi use in the 22 Sep 2026 composability snapshot</span></article><!-- snapshot:pitch-proof:end -->
+                    <!-- snapshot:pitch-proof:start --><article><strong data-live-token-count>1,404</strong><span>exact Solana token addresses in the 24 Sep 2026 public snapshot</span></article><article><strong>9</strong><span>reviewed legal and technology templates covering the catalogue</span></article><article><strong>11</strong><span>health checks split across market, control, legal/evidence and DeFi use</span></article><article><strong>137</strong><span>token addresses with at least one confirmed DeFi integration (182 token–protocol integrations in all) in the 24 Sep 2026 composability snapshot</span></article><!-- snapshot:pitch-proof:end -->
                 </div>
                 <p class="proof-label">Pages</p>
                 <div class="proof-strip">
@@ -177,7 +175,7 @@
                 </div>
                 <p class="proof-label">Scheduled jobs</p>
                 <div class="proof-strip">
-                    <span>Hourly: chain watch</span><span>Hourly: trade collector</span><span>Hourly: Telegram watch digests</span><span>Daily: 576 cited sources</span><span>Daily: redemption observer</span><span>Daily: model change judge</span><span>Daily: case-law watch</span><span>Every 6 h: public build</span>
+                    <span>Hourly: chain watch</span><span>Hourly: trade collector</span><span>Hourly: Telegram watch digests</span><span><!-- snapshot:pitch-sources:start -->Daily: 621 cited source URLs re-read<!-- snapshot:pitch-sources:end --></span><span>Daily: redemption observer</span><span>Daily: model change judge</span><span>Daily: case-law watch</span><span>Every 6 h: public build</span>
                 </div>
                 <p id="liveSnapshot" class="snapshot-note">Live catalogue count loads from the public API. Each count records a dated observation within our coverage. Other tokens may exist outside it.</p>
             </div>
@@ -210,7 +208,7 @@
                 </div>
             </div>
             <footer class="deck-footer">
-                <strong>RWA Sonar</strong><span>Tokenized stocks, explained.</span><a href="https://rwasonar.com">rwasonar.com</a><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">@RWASonar</a>
+                <strong>RWA Sonar</strong><span>Tokenized stocks, explained.</span><a href="https://rwasonar.com">rwasonar.com</a>
             <!-- seo:contact:start -->
 <div class="site-contact site-contact-inner site-contact-dark" aria-label="Contact and community"><p class="site-contact-title">Follow RWA Sonar or ask a question</p><ul><li><a href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer" aria-label="RWA Sonar on X (@RWASonar)"><svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="../images/contact-icons.svg?v=20260924b#x"/></svg><span>@RWASonar</span></a></li><li><a href="https://t.me/rwasonar" target="_blank" rel="noopener noreferrer" aria-label="Telegram channel: RWA Sonar"><svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="../images/contact-icons.svg?v=20260924b#telegram"/></svg><span>Channel</span></a></li><li><a href="https://t.me/+eVeOD--RTv1kNDQx" target="_blank" rel="noopener noreferrer" aria-label="Telegram group: RWA Sonar Watch"><svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="../images/contact-icons.svg?v=20260924b#telegram"/></svg><span>Group</span></a></li><li><a href="https://github.com/Poglavar/rwa-sonar" target="_blank" rel="noopener noreferrer" aria-label="Source code on GitHub: Poglavar/rwa-sonar"><svg class="site-contact-icon" aria-hidden="true" focusable="false"><use href="../images/contact-icons.svg?v=20260924b#github"/></svg><span>Code</span></a></li></ul></div>
 <!-- seo:contact:end --></footer>
