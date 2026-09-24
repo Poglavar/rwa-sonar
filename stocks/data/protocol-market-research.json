@@ -2217,7 +2217,7 @@
         },
         "stalenessAndPause": {
           "maxPriceAgeSeconds": 900,
-          "note": "A stale price reverts; docs say lending and liquidation pause. 12 loans hold xStock collateral (~$3.9k principal); the USDC Orca xStock ledgers ended 2026-08-27T13:32:29Z and have been neither rolled nor liquidated."
+          "note": "A stale price reverts; docs say lending and liquidation pause. 12 loans hold xStock collateral ($3,962 principal); the 9 in the USDC Orca market ($3,911 principal) ended 2026-08-27T13:32:29Z and have been neither rolled nor liquidated; the other 3 sit in a market with a different oracle and are not yet due."
         },
         "dumpToLiquidate": {
           "verdict": "not-feasible",

@@ -55,7 +55,7 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     equity prices and freeze (QQQx 44 h, METAx 65 h); Loopscale's xStock prices have not updated since
     26 Aug. Replace the closed-hours premium with "what each lender does when the market is closed",
     Solana depth, freeze episodes and Monday-gap exposure; wire the four proposed finding types.
-13. **Loopscale: stuck loans and exposure** — S. Add the dead price feed (12 xStock loans overdue since
+13. **Loopscale: stuck loans and exposure** — S. Add the dead price feed (9 xStock loans overdue since
     27 Aug) to the private note (item 7). Our DeFi data counts vault allocations ($30–80k per token)
     as "lent against"; open principal is ~$3.9k — fix the measure.
 14. **Backpack's FinCEN registration number changed** — S. 31000329581307 → 31000339714338 between 18
