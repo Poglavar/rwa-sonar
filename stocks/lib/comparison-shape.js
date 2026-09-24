@@ -10,14 +10,15 @@
  */
 
 (function (root, factory) {
-    if (typeof module === 'object' && module.exports) module.exports = factory(require('./defi-view.js'), require('./discovery.js'), require('./fmt.js'), require('./evidence-view.js'), require('./issuer-labels.js'));
-    else root.__rwaComparisonShape = factory(root.__rwaDefiView, root.__rwaDiscovery, root.__rwaFmt, root.__rwaEvidenceView, root.__rwaIssuerLabels);
-})(this, function (defiView, discovery, fmt, evidenceView, issuerLabels) {
+    if (typeof module === 'object' && module.exports) module.exports = factory(require('./defi-view.js'), require('./discovery.js'), require('./fmt.js'), require('./evidence-view.js'), require('./issuer-labels.js'), require('./holder-rights.js'));
+    else root.__rwaComparisonShape = factory(root.__rwaDefiView, root.__rwaDiscovery, root.__rwaFmt, root.__rwaEvidenceView, root.__rwaIssuerLabels, root.__rwaHolderRights);
+})(this, function (defiView, discovery, fmt, evidenceView, issuerLabels, holderRightsLib) {
     const { aggregateComposabilityTemplates, lenderOutcomeModel, productDecisionProfile, redemptionUsabilitySummary } = defiView;
     const { laypersonVerdict, legalReviewStatus } = discovery;
     const { cardSlug, escapeHtml, fmtMoney, humanizeSlug, isNum, mintSuffix } = fmt;
     const { provenanceHtml, provenanceSummary } = evidenceView;
     const { issuerDossierHref } = issuerLabels;
+    const { holderRightsRows, holderRightsStripHtml } = holderRightsLib;
 
     function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability, nowMs = Date.now()) {
         const issuerMap = issuersBySlug instanceof Map ? issuersBySlug : new Map();
@@ -49,6 +50,7 @@
                 issuerName: issuer.name ?? humanizeSlug(row.issuer),
                 tokens,
                 verdict,
+                rights: holderRightsRows(issuer.holderRights),
                 review,
                 outcome,
                 protocols,
@@ -82,16 +84,25 @@
             .map((id) => conceptHelpHtml(id, 'Learn')).join('')}</nav>`;
     }
 
+    /** A wrapper's statuses for only the rights that differ between the wrappers compared. */
+    function rightsText(rows, ids) {
+        const list = (Array.isArray(rows) ? rows : []).filter((row) => ids.has(row.id));
+        return list.map((row) => `${row.label}: ${row.statusLabel.toLowerCase()}`).join(' · ');
+    }
+
     /** Only the decision-relevant fields whose values genuinely differ across same-stock wrappers. */
     function comparisonDifferenceRows(models) {
         const rows = Array.isArray(models) ? models : [];
+        const differing = new Set((rows[0]?.rights ?? []).map((right) => right.id)
+            .filter((id) => new Set(rows.map((model) => (model.rights ?? []).find((right) => right.id === id)?.status)).size > 1));
         const fields = [
             ['ownership', 'Legal claim', (model) => model.verdict?.ownership],
             ['redemption', 'Cash exit', (model) => model.outcome?.cashExit],
             ['control', 'Issuer intervention', (model) => model.verdict?.controlNote],
             ['defi', 'Collateral exit', (model) => `${model.outcome?.exitQuality?.label}: ${model.outcome?.exitQuality?.reason}`],
             ['defi', 'Source-listed DeFi use', (model) => model.outcome?.confirmedLending],
-            ['insolvency', 'Evidence status', (model) => `${model.review?.label}: ${model.review?.detail}`]
+            ['insolvency', 'Evidence status', (model) => `${model.review?.label}: ${model.review?.detail}`],
+            ['ownership', 'Shareholder rights', (model) => rightsText(model.rights, differing)]
         ];
         return fields.map(([concept, label, value]) => ({
             concept, label,
@@ -106,6 +117,7 @@
             `<small>${escapeHtml(entry?.explanation ?? '')}</small>`;
         const questions = [
             ['What do you own?', 'The legal claim—not the ticker on the token.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.ownership)}</strong><small>${escapeHtml(model.verdict.cooperation)}</small>`, 'ownership'],
+            ['Shareholder rights', 'Which rights of the share reach the token holder: ✓ as a shareholder, ◐ passed through by the issuer, ◌ only if the issuer decides, ✕ no, ? not stated. Details are on each token card.', 'legal-conclusion', (model) => holderRightsStripHtml(model.rights, { href: model.tokens[0] ? `./cards/${encodeURIComponent(model.tokens[0].cardSlug || cardSlug(model.tokens[0].symbol, model.tokens[0].mint))}.html#holder-rights` : null }), 'ownership'],
             ['Primary dependency', 'The structural dependency that could make the token diverge from the stock.', 'legal-conclusion', (model) => `<strong>${escapeHtml(model.verdict.mainFailure)}</strong>`, 'insolvency'],
             ['Redeem for cash', 'Whether seizure can become money without finding another buyer.', 'legal-conclusion', (model) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(model.outcome.status)}">${escapeHtml(model.outcome.cashExit)}</span>`, 'redemption'],
             ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status), 'defi'],
@@ -129,7 +141,7 @@
             : differences.length ? `${differences[0].label}: what changes between wrappers`
                 : 'No headline difference is established in the selected evidence. That does not make these wrappers interchangeable.';
         const productCards = columns.map((model) => `<article class="comparison-product-card"><header><a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a><span>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'}</span></header>`
-            + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
+            + `<p><strong>Own</strong>${escapeHtml(model.verdict.ownership)}</p><div class="comparison-rights"><strong>Shareholder rights</strong>${holderRightsStripHtml(model.rights)}</div><p><strong>Cash exit</strong>${escapeHtml(model.outcome.cashExit)}</p>`
             + `<p><strong>DeFi now</strong>${escapeHtml(model.outcome.confirmedLending)}</p><p><strong>Main dependency</strong>${escapeHtml(model.verdict.mainFailure)}</p>`
             + `<nav class="comparison-token-links" aria-label="Exact token reports">${tokenLinks(model)}</nav>${model.provenanceHtml}</article>`).join('');
         const questionCards = questions.map(([label, help, kind, render, concept]) => `<details class="comparison-question"><summary><span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(help)}</small></span><em class="evidence-kind evidence-kind-${escapeHtml(kind)}">${escapeHtml(humanizeSlug(kind))}</em></summary><div>`

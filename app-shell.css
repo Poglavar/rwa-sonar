@@ -388,3 +388,52 @@ body.app-page {
     .app-header .app-nav > .theme-switch { display: none; }
     .app-header .theme-switch-menu { display: block; }
 }
+
+/* Shareholder rights (stocks/lib/holder-rights.js): the compact strip at the top of cards and in
+   the comparison, and the detail table on the card's "What you own" and on issuer pages. The mark
+   carries the status, so the strip reads the same without colour. */
+.rights-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.rights-strip ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.rights-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border: 1px solid var(--rwa-line);
+    border-radius: 999px;
+    font-size: .82rem;
+    line-height: 1.5;
+    white-space: nowrap;
+    color: var(--rwa-muted);
+}
+.rights-mark { font-weight: 700; }
+.rights-yes { border-color: var(--rwa-green); color: var(--rwa-green); }
+.rights-value, .rights-discretion { border-color: var(--rwa-amber); color: var(--rwa-amber); }
+.rights-discretion { border-style: dashed; }
+.rights-strip .rights-no { text-decoration: line-through; text-decoration-thickness: 1px; }
+.rights-strip .rights-no .rights-mark { text-decoration: none; }
+.rights-legend { flex-basis: 100%; margin: 0; color: var(--rwa-muted); font-size: .8rem; }
+.rights-unknown, .rights-na { border-style: dotted; }
+.rights-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+.rights-more { font-size: .85rem; }
+.asset-rights { display: grid; gap: 6px; margin-top: 14px; }
+.asset-rights > small { color: var(--rwa-muted); font-weight: 600; }
+.rights-detail { width: 100%; margin: 16px 0; border-collapse: collapse; font-size: .92rem; }
+.rights-detail caption { margin-bottom: 6px; text-align: left; font-weight: 700; }
+.rights-detail th, .rights-detail td { padding: 8px 10px 8px 0; border-top: 1px solid var(--rwa-line); text-align: left; vertical-align: top; }
+.rights-detail thead th { color: var(--rwa-muted); font-size: .8rem; font-weight: 600; }
+.rights-source { display: block; margin-top: 3px; color: var(--rwa-muted); overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+    .rights-detail thead { display: none; }
+    .rights-detail tr { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 8px 0; border-top: 1px solid var(--rwa-line); }
+    .rights-detail th, .rights-detail td { padding: 0; border-top: 0; }
+    .rights-detail td:last-child { grid-column: 1 / -1; }
+}

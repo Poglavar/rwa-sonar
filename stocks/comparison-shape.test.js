@@ -74,6 +74,33 @@ describe('confirmed DeFi usage', () => {
     });
 });
 
+describe('shareholder rights in the comparison', () => {
+    const rights = JSON.parse(readFileSync(join(REPO, 'stocks/data/holder-rights.json'), 'utf8')).issuers;
+    const tokens = [
+        { mint: 'mint-x', symbol: 'AAPLx', underlyingTicker: 'AAPL', issuer: 'xstocks-backed' },
+        { mint: 'mint-o', symbol: 'AAPLon', underlyingTicker: 'AAPL', issuer: 'ondo-global-markets' }
+    ];
+    const issuers = new Map(tokens.map((token) => [token.issuer, { slug: token.issuer, name: token.issuer, holderRights: rights[token.issuer] }]));
+    const group = sameUnderlyingGroups(tokens)[0];
+    const models = sameStockComparisonModels(group, issuers, new Map(), null);
+
+    it('shows the rights strip per wrapper, linking to the card for the details', () => {
+        const html = sameStockComparisonHtml(group, models);
+        expect(html).toContain('<strong>Shareholder rights</strong>');
+        expect(html).toContain('href="./cards/AAPLx.html#holder-rights"');
+        expect(html.match(/class="rights-strip"/g).length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('names only the rights that differ, and never leads the decision summary', () => {
+        const row = comparisonDifferenceRows(models).find((entry) => entry.label === 'Shareholder rights');
+        expect(Object.fromEntries(row.values.map((entry) => [entry.issuer, entry.value]))).toEqual({
+            'xstocks-backed': 'Voting: no · Splits: passed through by the issuer',
+            'ondo-global-markets': 'Voting: only if the issuer decides · Splits: not stated'
+        });
+        expect(comparisonDifferenceRows(models).at(-1).label).toBe('Shareholder rights');
+    });
+});
+
 describe('decision comparison and saved-watch helpers', () => {
     it.each([1, 2, 3, 16])('renders a useful decision for %i wrappers without silently limiting the selection', (count) => {
         const tokens = Array.from({ length: count }, (_, index) => ({

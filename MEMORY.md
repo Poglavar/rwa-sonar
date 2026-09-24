@@ -80,3 +80,4 @@
 - 2026-09-24: **No alerts-bot link in the site footer** (owner request); the bot stays reachable from watch.html.
 - 2026-09-24: **Snapshot-diff events keep the time a build first saw them** (`stampFirstSeen`, server-state ledger `stocks/data/event-first-seen.json`), because the day's snapshot is rewritten every refresh.
 - 2026-09-24: **The repository is MIT-licensed** (owner decision), © 2026 Poglavar Svemira; third-party documents and data keep their own terms.
+- 2026-09-24: **Shareholder rights are an indicator at the top, details on detail pages** (owner decision): five rights (dividends, voting, reports & meetings, splits, takeovers) per issuer in `stocks/data/holder-rights.json`, each with a source; "yes" only where the holder owns the share itself, otherwise "passed through by the issuer", "only if the issuer decides", "no" or "not stated".

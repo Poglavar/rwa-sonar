@@ -403,7 +403,7 @@ function publicationValue(value) {
     return value;
 }
 
-function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItems, observation = null, builtAtClock = ts()) {
+function buildIssuer({ slug, dossier, holderRights = null }, tokens, onchainItems, prices, venuesItems, observation = null, builtAtClock = ts()) {
     const findings = Array.isArray(dossier.findings) ? dossier.findings : [];
     const keyGovernance = dossier.keyGovernance ?? { ...UNKNOWN_KEY_GOVERNANCE };
     const claim = claimRung(dossier);
@@ -442,6 +442,9 @@ function buildIssuer({ slug, dossier }, tokens, onchainItems, prices, venuesItem
         dividends: dossier.dividends ?? null,
         voting: dossier.voting ?? null,
         corporateActions: dossier.corporateActions ?? null,
+        // Which rights of the share reach the holder, curated with a source each
+        // (stocks/data/holder-rights.json, stocks/lib/holder-rights.js).
+        holderRights,
         pricing: dossier.pricing ?? null,
         // A deliberately separate layer for cases where a published statement, document or API
         // conflicts with stronger documentary, code or on-chain evidence. These are not ordinary
@@ -619,6 +622,9 @@ async function main() {
         logWarn(`no ${identitiesPath} — token lifecycle labels will be unavailable`);
     }
     const dossiers = await readDossiers(issuersDir);
+    const holderRightsPath = join(dataDir, 'holder-rights.json');
+    const holderRights = await readJson(holderRightsPath, null);
+    if (holderRights === null) logWarn(`no ${holderRightsPath}: shareholder rights will read as not stated`);
     const observationsPath = join(dataDir, 'redemption-observations.json');
     const observations = await readJson(observationsPath, null);
     if (observations === null) {
@@ -703,7 +709,7 @@ async function main() {
         const issuerTokens = tokensByIssuer.get(slug) ?? [];
         const onchainItems = issuerTokens.map((t) => onchainByMint.get(t.mint)).filter(Boolean);
         const venuesItems = issuerTokens.map((t) => venuesByMint.get(t.mint)).filter(Boolean);
-        return buildIssuer({ slug, dossier }, issuerTokens, onchainItems, referenceByMint, venuesItems,
+        return buildIssuer({ slug, dossier, holderRights: holderRights?.issuers?.[slug] ?? null }, issuerTokens, onchainItems, referenceByMint, venuesItems,
             observations?.issuers?.[slug] ?? null, observationClock);
     });
 

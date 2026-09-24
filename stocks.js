@@ -36,6 +36,8 @@ const defiView = (typeof __rwaDefiView !== 'undefined')
     ? __rwaDefiView : require('./stocks/lib/defi-view.js');
 const comparisonShape = (typeof __rwaComparisonShape !== 'undefined')
     ? __rwaComparisonShape : require('./stocks/lib/comparison-shape.js');
+const holderRightsView = (typeof __rwaHolderRights !== 'undefined')
+    ? __rwaHolderRights : require('./stocks/lib/holder-rights.js');
 const savedLib = (typeof __rwaSavedItems !== 'undefined')
     ? __rwaSavedItems : require('./stocks/lib/saved-items.js');
 const searchResults = (typeof __rwaSearchResults !== 'undefined')
@@ -1833,8 +1835,7 @@ if (typeof document !== 'undefined') {
             ]));
 
             sections.push(detailSection('Rights', [
-                field('Dividends', issuer.dividends, false, 'dividends'),
-                field('Voting', issuer.voting, false, 'voting'),
+                field('Shareholder rights', holderRightsView.holderRightsStripHtml(holderRightsView.holderRightsRows(issuer.holderRights)), true),
                 field('Corporate actions', issuer.corporateActions, false, 'corporateActions'),
                 field('Pricing reference', issuer.pricing && issuer.pricing.referenceMarket, false, 'pricing.referenceMarket'),
                 field('Arbitrageable', issuer.pricing && issuer.pricing.arbitrageable === true ? 'yes' : issuer.pricing && issuer.pricing.arbitrageable === false ? 'no' : null, false, 'pricing.arbitrageable'),

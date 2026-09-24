@@ -13,6 +13,7 @@ import evidenceLib from './evidence.js';
 import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
 import closedMarketView from './closed-market-view.js';
+import holderRightsLib from './holder-rights.js';
 import { HEALTH_DIMENSIONS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
@@ -81,7 +82,6 @@ export const CARD_CLAIM_FIELDS = [
     'redemption.available', 'redemption.eligibility', 'redemption.rails', 'redemption.fees',
     'transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
     'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism',
-    'dividends', 'voting',
     'keyGovernance.mint', 'keyGovernance.freeze', 'keyGovernance.delegate', 'keyGovernance.rebase',
     'custodyVerification.type', 'custodyVerification.agent', 'custodyVerification.frequency'
 ];
@@ -497,8 +497,9 @@ export function buildCard(input) {
                 usPersonsExcluded: bool(issuer?.transferRestrictions?.usPersonsExcluded),
                 mechanism: str(issuer?.transferRestrictions?.mechanism)
             },
-            dividends: truncate(issuer?.dividends, PROSE_MAX_SHORT),
-            voting: truncate(issuer?.voting, PROSE_MAX_SHORT),
+            // Which rights of the share reach the holder (stocks/data/holder-rights.json, curated per
+            // programme with a source each): the strip at the top and the table in "What you own".
+            holderRights: issuer?.holderRights ?? null,
             maturityStage: str(grades.maturityStage),
             maturityStageNum: num(grades.maturityStageNum),
             maturityScore: num(grades.maturityScore)
@@ -1343,8 +1344,6 @@ function whatYouOwnBody(card) {
         ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
             ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
                 'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
-        ['Dividends', o.dividends === null ? null : escapeHtml(o.dividends), 'dividends'],
-        ['Voting', o.voting === null ? null : escapeHtml(o.voting), 'voting'],
         ['Ledger maturity', maturity]
     ], card.evidence);
     const redemptionEvidenceField = {
@@ -1381,7 +1380,8 @@ function whatYouOwnBody(card) {
     const banner = usability.documentedButNotIndependentlyObserved
         ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
         : '';
-    return summary + `<div class="redemption-usability"><h3>Can a holder redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`
+    const rights = holderRightsLib.holderRightsDetailHtml(holderRightsLib.holderRightsRows(o.holderRights));
+    return summary + rights + `<div class="redemption-usability"><h3>Can a holder redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`
         + redemptionSchematicHtml(card);
 }
 
@@ -2067,6 +2067,8 @@ function assetDecisionHtml(card) {
         + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}">`
             + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
             + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
+        + `<div class="asset-rights"><small>Shareholder rights you get</small>`
+        + `${holderRightsLib.holderRightsStripHtml(holderRightsLib.holderRightsRows(card?.ownership?.holderRights), { href: '#holder-rights', legend: true })}</div>`
         + '</section>';
 }
 

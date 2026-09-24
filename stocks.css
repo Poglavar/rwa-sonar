@@ -995,6 +995,8 @@ section {
 .comparison-product-card header span { color: var(--muted-text); font-size: .68rem; }
 .comparison-product-card p { display: grid; grid-template-columns: 92px 1fr; gap: 10px; margin: 8px 0; font-size: .78rem; line-height: 1.45; }
 .comparison-product-card p strong { color: var(--muted-text); font-size: .66rem; text-transform: uppercase; }
+.comparison-product-card .comparison-rights { display: grid; gap: 6px; margin: 8px 0; }
+.comparison-product-card .comparison-rights > strong { color: var(--muted-text); font-size: .66rem; text-transform: uppercase; }
 .comparison-question-list { display: grid; gap: 7px; }
 .comparison-question { border: 1px solid var(--panel-border); border-radius: 9px; background: var(--card-bg); overflow: clip; }
 .comparison-question > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 15px; cursor: pointer; list-style: none; }

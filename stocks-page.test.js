@@ -891,6 +891,7 @@ describe('the trust-chain section on the issuer panel', () => {
             'stocks/lib/discrepancy-view.js',
             'stocks/lib/trustchain-section.js',
             'stocks/lib/defi-view.js',
+            'stocks/lib/holder-rights.js',
             'stocks/lib/comparison-shape.js',
             'stocks/lib/saved-items.js',
             'stocks/lib/search-results.js',

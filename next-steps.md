@@ -52,14 +52,9 @@ Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a 
     `backpack-trek-labs-fincen-renewal-2026-09-22` is recorded, but on prod the lost FinCEN quotes
     are events 904 and 905 (19 Sep) and the resolution says `detectedOn: 2026-09-22`, so it does not
     match them; event 164 exists only in the laptop database. Fix the resolution, then rerun.
-11. **Holder rights on each card** — **you** decide, S–M. Cards show one-word "Dividends" and
-    "Voting" rows; the full corporate-actions analysis sits collapsed on issuer pages in research
-    wording. Proposal: one plain line per right (dividends, voting, splits, mergers and takeovers,
-    spin-offs and rights issues, delisting, company reports) with its source, plus the token's
-    recent dividend reinvestments and the next scheduled one from its on-chain multiplier.
 ## After the hackathon
 
-12. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
+11. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
     issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
     and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
     said when nothing passed the bar. *Rules:* only reviewed journal entries, on-chain facts and
@@ -71,11 +66,11 @@ Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a 
     collector (Kamino, Jupiter Lend, Nest, Loopscale), and an ElevenLabs plan sized for ~15–20k
     characters a month (or captions only). *Start:* a weekly short plus a text-only daily post;
     go daily video only if engagement justifies it.
-13. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+12. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-14. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+13. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-15. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+14. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
