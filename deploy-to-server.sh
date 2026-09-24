@@ -62,7 +62,11 @@ cd "$REMOTE_REPO_DIR"
 # The scheduled refresh rewrites the same retained raw snapshots and release artifacts. Hold its
 # lock before reset so deployment builds one coherent release, rather than staging a moving mix.
 exec 9>"$REMOTE_REPO_DIR/.refresh.lock"
-flock 9
+if ! flock -n 9; then
+	echo "waiting for the running refresh to release its lock (a refresh takes about 13 minutes)" >&2
+	flock 9
+fi
+PREV_SHA="$(git rev-parse HEAD 2>/dev/null || true)"
 git fetch origin "$BRANCH" --quiet
 # The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) rewrite these
 # job-owned files on the server. Tracked generated files are set aside before reset; ignored
@@ -168,14 +172,22 @@ test -s "$REMOTE_DOCROOT/stocks-discovery.json"
 # Publication is complete. Release the shared lock before restarting the scheduled refresh;
 # otherwise its immediate run exits on our own lock instead of collecting with the new code.
 flock -u 9
-# The jobs, if registered: restart from the FILE so PM2 re-reads it, and kick a refresh so the
-# docroot gets data built by the code just deployed within minutes rather than at the next cron.
+# The jobs, if registered: restart from the FILE so PM2 re-reads it. Only the long-running
+# services restart on every deploy. A cron job (autorestart:false) starts a fresh node process
+# on each run, so it already runs the new code; restarting one starts a run immediately, and a
+# refresh run holds the release lock for ~13 minutes, which made the next deploy wait on it.
+# They are restarted only when ecosystem.config.cjs changed, so PM2 re-reads their settings.
 if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 	# Non-fatal: the mirror above is already done, and a job mid-restart makes PM2 answer
 	# "Process not found"; the file (not the name) is passed so PM2 re-reads it.
 	# Remove the retired one-off source watcher before persisting the canonical process set.
 	pm2 delete rwa-watch-first >/dev/null 2>&1 || true
-	for app in rwa-trades rwa-watch rwa-sonar-api rwa-refresh rwa-watch-chain; do
+	APPS="rwa-trades rwa-sonar-api"
+	if [ -z "$PREV_SHA" ] || ! git diff --quiet "$PREV_SHA" HEAD -- ecosystem.config.cjs; then
+		APPS="$APPS rwa-watch rwa-refresh rwa-watch-chain"
+		echo "ecosystem.config.cjs changed: restarting the scheduled jobs too" >&2
+	fi
+	for app in $APPS; do
 		pm2 restart ecosystem.config.cjs --only "$app" --update-env >/dev/null 2>&1 \
 			&& echo "restarted $app" >&2 || echo "WARNING: pm2 restart $app failed — check pm2 ls" >&2
 	done
