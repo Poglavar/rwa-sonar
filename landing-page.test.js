@@ -133,7 +133,7 @@ describe('landing/app separation', () => {
         expect(html).toContain('AAPLon');
         expect(html).toContain('name="search"');
         expect(html).toContain('Market size tells you what exists.');
-        expect(html).toContain('src="./clarity.js"');
+        expect(html).toMatch(/src="\.\/clarity\.js\?v=[0-9a-z]+"/);
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');
         expect(html).toContain('X · @RWASonar');
