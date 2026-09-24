@@ -24,12 +24,14 @@ import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     DEFAULT_USER_AGENT, archiveRefusal, conditionalHeaders, isJsOnlyRead, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
-    jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
+    emptyPublishedPage, jsOnlyShell, jsonToText, looksLikeText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
     verificationUrlFor,
     dossierQuotes,
     previouslyBlocked,
+    quotelessRefusal,
+    responseValidators,
     apiAnswerIsDocument,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient,
@@ -39,6 +41,7 @@ import {
 import { diffLines } from './lib/textdiff.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
+const JS_SHELL_TEXT_LIMIT = 600;
 const REAL_HTML = readFileSync(new URL('backed-fi-legal-documentation.html', FIXTURES), 'utf8');
 const REAL_PDF_TEXT = readFileSync(new URL('shift-dao-series-17-spx3l-pages-1-2.pdftotext.txt', FIXTURES), 'utf8');
 const DDL = readFileSync(new URL('../db/2026-09-18-sonar-evidence.sql', import.meta.url), 'utf8');
@@ -81,10 +84,12 @@ describe('identity and paths', () => {
             'https://x.example/b': { status: 'ok', via: 'wayback' },
             'https://x.example/c': { status: 'ok', via: 'html' },
             'https://x.example/d': { status: 'ok', via: 'api', companionUrl: 'https://registry.example/d' },
-            'https://x.example/e': { status: 'gone' }
-            // f: never seen — not "previously blocked"
+            'https://x.example/e': { status: 'gone' },
+            'https://x.example/f': { status: 'reachable-unverified' }
+            // g: never seen — not "previously blocked"
         };
-        expect(previouslyBlocked(sources, state).map((s) => s.url.slice(-1))).toEqual(['a', 'b', 'd']);
+        sources.push({ url: 'https://x.example/g' });
+        expect(previouslyBlocked(sources, state).map((s) => s.url.slice(-1))).toEqual(['a', 'b', 'd', 'f']);
         expect(previouslyBlocked(sources, {})).toEqual([]);
     });
 
@@ -369,6 +374,52 @@ test('a changed claim with a confirmed successor on the same field and URL is no
     ]);
 });
 
+test('a contradicted-corrected claim marked SUPERSEDED, with a confirmed successor, is retired but keeps its status', () => {
+    // xstocks-backed `chains`: the corrected 9-chain list (read 2026-09-17), superseded when the
+    // issuer added Optimism; the 10-chain successor is the claim the watch now checks.
+    const url = 'https://assets.backed.fi/legal-documentation';
+    const superseded = { field: 'chains', url, quote: 'xStocks Ethereum, Solana, Arbitrum', status: 'contradicted-corrected',
+        note: 'CORRECTION: … SUPERSEDED 2026-09-23: the quote above is the page as read on 2026-09-17.' };
+    const dossier = { claims: [
+        superseded,
+        { field: 'chains', url, quote: 'xStocks Ethereum, Solana, Arbitrum, Optimism', status: 'confirmed' },
+        // A correction that is NOT marked superseded is still the current reading: watched.
+        { field: 'legalForm', url, quote: 'a correction that still stands', status: 'contradicted-corrected', note: 'CORRECTION: …' },
+        { field: 'legalForm', url, quote: 'another reading', status: 'confirmed' }
+    ] };
+    expect(dossierQuotes('issuer', dossier).map((q) => q.quote)).toEqual([
+        'xStocks Ethereum, Solana, Arbitrum, Optimism', 'a correction that still stands', 'another reading'
+    ]);
+    expect(superseded.status).toBe('contradicted-corrected');
+    // Without a confirmed successor the superseded quote is still watched.
+    expect(dossierQuotes('issuer', { claims: [superseded] })).toHaveLength(1);
+});
+
+test('a Markdown file served as application/octet-stream is text, a zip is not', () => {
+    // stocks.securitize.io/drs/brokers/general_instructions.md, read 2026-09-24 (content-type
+    // application/octet-stream). Three securitize-secz quotes are verbatim in it.
+    const md = readFileSync(new URL('securitize-drs-general-instructions.md', FIXTURES));
+    expect(looksLikeText(md)).toBe(true);
+    expect(quoteFound(htmlDocumentText(md.toString('utf8')).quoteText,
+        'You still own the shares, but the broker holds them “in street name” on your behalf.')).toBe(true);
+    expect(looksLikeText(Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00]))).toBe(false);
+    expect(looksLikeText(Buffer.from([0xff, 0xfe, 0x41, 0x42]))).toBe(false);
+    expect(looksLikeText(Buffer.alloc(0))).toBe(false);
+});
+
+test('the quote reading keeps button text and inline script payloads; the hashed reading does not', () => {
+    // Modelled on superstate.com/assets/fwdi (2026-09-24): a SvelteKit data payload in an inline
+    // <script> carries the holdings breakdown the page renders, and a CTA sits in a <button>.
+    const html = '<main><p>Not available in jurisdictions subject to U.S. sanctions <button>Get FWDI</button></p></main>'
+        + '<script>__sveltekit_x={data:{balances:{total_balance_by_label:{by_label:{BookEntryAvailable:"1358783.900000"}},total_balance:"8723436.100000"}}}</script>'
+        + '<script src="/_app/start.js"></script>';
+    const { text, quoteText } = htmlDocumentText(html);
+    expect(quoteFound(quoteText, 'total_balance_by_label:{by_label:{BookEntryAvailable:"1358783.900000"}},total_balance:"8723436.100000"')).toBe(true);
+    expect(quoteFound(quoteText, 'subject to U.S. sanctions Get FWDI')).toBe(true);
+    expect(text).not.toContain('total_balance');
+    expect(text).not.toContain('Get FWDI');
+});
+
 test('quote matching compares visible words across XML and Markdown representations', () => {
     expect(quoteFound('RepublicX LLC', '<entityName>RepublicX LLC</entityName>')).toBe(true);
     expect(quoteFound('The minimum is just $1.00 USD.', 'The minimum is just \\$1.00 USD.')).toBe(true);
@@ -390,6 +441,8 @@ describe('decideOutcome', () => {
     });
 
     test('a permanently expired certificate is a visible access block, not a broken collector', () => {
+        expect(decideOutcome({ networkErrorCode: 'UNABLE_TO_VERIFY_LEAF_SIGNATURE', host: 'www.cysec.gov.cy' }))
+            .toEqual({ status: 'blocked', reason: 'tls: incomplete certificate chain (the server omits its intermediate certificate)' });
         expect(decideOutcome({ networkErrorCode: 'CERT_HAS_EXPIRED', host: 'remora.markets' }))
             .toEqual({ status: 'blocked', reason: 'tls: certificate expired' });
         expect(runFailed([{ status: 'blocked' }])).toBe(false);
@@ -630,6 +683,33 @@ describe('SQL', () => {
     });
 });
 
+describe('quotelessRefusal: a refusal nothing quotes is reachability, not a blocked finding', () => {
+    test('a bot-walled homepage with no quote is reachable-unverified, and the reason keeps the live refusal', () => {
+        const settled = quotelessRefusal({ status: 'blocked', httpStatus: 403, reason: 'http-403 (bot wall)', quotesRegistered: 0 });
+        expect(settled.status).toBe('reachable-unverified');
+        expect(settled.reason).toMatch(/^http-403 \(bot wall\) — host answered HTTP 403; no dossier quote relies on this source/);
+        expect(quotelessRefusal({ status: 'blocked', httpStatus: 200, reason: 'javascript-only page: no text without a browser' }).status)
+            .toBe('reachable-unverified');
+    });
+
+    test('a quoted source stays blocked: its quotes are not checkable, and that is the finding', () => {
+        expect(quotelessRefusal({ status: 'blocked', httpStatus: 403, reason: 'http-403 (bot wall)', quotesRegistered: 1 })).toBeNull();
+    });
+
+    test('no HTTP answer proves nothing about reachability; other outcomes are left alone', () => {
+        expect(quotelessRefusal({ status: 'blocked', httpStatus: null, reason: 'network timeout after backoff (host temporarily unavailable)' })).toBeNull();
+        expect(quotelessRefusal({ status: 'blocked', reason: 'tls: certificate expired' })).toBeNull();
+        expect(quotelessRefusal({ status: 'gone', httpStatus: 404, reason: 'http-404' })).toBeNull();
+        expect(quotelessRefusal({ status: 'ok', httpStatus: 200, reason: 'same hash' })).toBeNull();
+        expect(quotelessRefusal({ status: 'error', httpStatus: 500, reason: 'http-500' })).toBeNull();
+    });
+
+    test('the new status is in the source status check', () => {
+        const ddl = readFileSync(new URL('../db/2026-09-24-sonar-source-reachable.sql', import.meta.url), 'utf8');
+        expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'reachable-unverified', 'error'\)\)/);
+    });
+});
+
 describe('the code and the DDL agree', () => {
     // A value the watcher can write that the check constraint forbids is a run that dies at the
     // load step, hours after the fetching. Cross-check the two lists instead of hoping.
@@ -819,12 +899,30 @@ describe('documents behind a viewer, measured 2026-09-18', () => {
 
 describe('re-reading pages that were never actually read', () => {
     test('no conditional headers without stored text, or after an extraction upgrade', () => {
-        const stored = { etag: 'W/"abc"', lastModified: 'Tue, 22 Sep 2026 10:00:00 GMT', textPath: 'stocks/data/sources/x/t.txt' };
+        const stored = { etag: 'W/"abc"', lastModified: 'Tue, 22 Sep 2026 10:00:00 GMT', textPath: 'stocks/data/sources/x/t.txt', validatorStatus: 200 };
         expect(conditionalHeaders(stored)).toEqual({ etag: 'W/"abc"', lastModified: 'Tue, 22 Sep 2026 10:00:00 GMT' });
         // securitize.io's Terms: an etag but never any text — a 304 would be `ok` over nothing.
         expect(conditionalHeaders({ etag: 'W/"abc"', lastModified: null, textPath: null })).toEqual({ etag: null, lastModified: null });
         expect(conditionalHeaders(stored, { normalizerUpgrade: true })).toEqual({ etag: null, lastModified: null });
         expect(conditionalHeaders(null)).toEqual({ etag: null, lastModified: null });
+    });
+
+    test('a 404 page\'s etag is never stored, so a dead URL cannot be confirmed by a 304', () => {
+        // PreStocks' FAQ bundle, 2026-09-24: Vercel served the 404 page with an etag; sent back as
+        // If-None-Match it answered 304, and the watcher reported the dead URL `ok, http-304`.
+        const prev = { etag: '"doc"', lastModified: 'Thu, 24 Sep 2026 09:40:44 GMT', validatorStatus: 200, textPath: 't.txt' };
+        const notFound = responseValidators({ httpStatus: 404, headers: { etag: '"404-page"', 'last-modified': 'x' }, prev });
+        expect(notFound).toEqual({ etag: '"doc"', lastModified: 'Thu, 24 Sep 2026 09:40:44 GMT', validatorStatus: 200 });
+        expect(responseValidators({ httpStatus: 403, headers: { etag: '"wall"' }, prev: null }))
+            .toEqual({ etag: null, lastModified: null, validatorStatus: null });
+        expect(responseValidators({ httpStatus: 200, headers: { etag: '"v2"' }, prev }))
+            .toEqual({ etag: '"v2"', lastModified: null, validatorStatus: 200 });
+        expect(responseValidators({ httpStatus: 304, headers: {}, prev })).toEqual({ ...notFound });
+        // A state entry with no proof that its validators came from a 2xx body gets a full GET.
+        const { validatorStatus, ...legacy } = prev;
+        expect(validatorStatus).toBe(200);
+        expect(conditionalHeaders(legacy)).toEqual({ etag: null, lastModified: null });
+        expect(conditionalHeaders({ ...prev, validatorStatus: 404 })).toEqual({ etag: null, lastModified: null });
     });
 
     test('only an HTML read can be a JavaScript shell; bytes and Notion reads cannot', () => {
@@ -833,6 +931,20 @@ describe('re-reading pages that were never actually read', () => {
         expect(isJsOnlyRead({ kind: 'html', binary: true, text: 'binary application/zip 25000 bytes sha256:ab', rawHtml: raw })).toBe(false);
         expect(isJsOnlyRead({ kind: 'html', notion: true, text: 'Notion', rawHtml: raw })).toBe(false);
         expect(isJsOnlyRead({ kind: 'pdf', text: 'x', rawHtml: raw })).toBe(false);
+    });
+
+    test('a WordPress page published with an empty content area is read, not called a JavaScript shell', () => {
+        // The real 2025-05-16 Wayback capture (id_) of remora.markets/whitepaper/: 93 kB of theme
+        // markup, an <h1> title and an empty page-content div. Its emptiness is what the dossier cites.
+        const raw = readFileSync(new URL('remora-whitepaper-wayback-20250516143234.html', FIXTURES), 'utf8');
+        const { text } = htmlDocumentText(raw);
+        expect(text.length).toBeLessThan(JS_SHELL_TEXT_LIMIT);
+        expect(jsOnlyShell(text, raw)).toBe(true);
+        expect(emptyPublishedPage(raw)).toBe(true);
+        expect(isJsOnlyRead({ kind: 'html', text, rawHtml: raw })).toBe(false);
+        // Content in the div, or no WordPress generator, is not this case.
+        expect(emptyPublishedPage(raw.replace('<div class="page-content">', '<div class="page-content"><p>Terms</p>'))).toBe(false);
+        expect(emptyPublishedPage('<html><div class="page-content">  </div></html>')).toBe(false);
     });
 });
 

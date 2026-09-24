@@ -27,7 +27,8 @@ export function sourceWatchStatsFileName({ only = null, limit = null, onlyBlocke
 
 /**
  * The sources `--only-blocked` re-reads: those whose stored state says the live host did not give
- * us the document last time — `blocked` (a refusal, a bot wall, a JavaScript-only page, a 400/429)
+ * us the document last time — `blocked` (a refusal, a bot wall, a JavaScript-only page, a 400/429),
+ * the same refusal on a source no quote relies on (`reachable-unverified`),
  * or read from an archived capture or a companion API because the live page refused us. A repair run over exactly
  * these measures what a fallback change buys without re-fetching the other ~500 sources.
  */
@@ -35,7 +36,7 @@ export function previouslyBlocked(sources, state) {
     return (Array.isArray(sources) ? sources : []).filter((source) => {
         const prev = state?.[source?.url];
         if (!prev) return false;
-        return prev.status === 'blocked' || prev.via === 'wayback' || prev.readVia === 'wayback'
+        return prev.status === 'blocked' || prev.status === 'reachable-unverified' || prev.via === 'wayback' || prev.readVia === 'wayback'
             || (typeof prev.companionUrl === 'string' && prev.companionUrl !== '');
     });
 }
@@ -72,7 +73,16 @@ const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|header|form
  * minimum investment) inside a `<header>`, so quotes of those words read as lost (2026-09-23).
  * Chrome kept in the quote text costs nothing: a quote is looked FOR, extra lines cannot lose it.
  */
-const DROP_BLOCKS_KEEP_HEADER = /<(script|style|noscript|template|svg|iframe|nav|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+const DROP_BLOCKS_KEEP_HEADER = /<(script|style|noscript|template|svg|iframe|nav|form|select)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+
+/**
+ * The quote reading also keeps `<button>` text (dropped above only for the hash: "Get", "Invest"
+ * are chrome) and appends every inline `<script>` body. A server-rendered page can carry the words
+ * it renders as a data payload: superstate.com/assets/fwdi ships its holdings breakdown as a
+ * SvelteKit object inside a `<script>`, and a quote of it read as lost (2026-09-24). Like the
+ * header rule above, extra text in the quote reading cannot lose a quote; the hash never sees it.
+ */
+const INLINE_SCRIPT = /<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script\s*>/gi;
 
 /** Elements that end a line of text. */
 const BLOCK_END = /<\/(p|div|li|tr|td|th|h[1-6]|section|article|blockquote|pre|table|thead|tbody|ul|ol|dl|dd|dt|figure|figcaption|main|aside|address|details|summary)\s*>/gi;
@@ -201,12 +211,14 @@ export function normaliseLines(text, { htmlWidgets = false, keepChurn = false } 
 export function htmlToText(html, { forQuotes = false } = {}) {
     let text = String(html);
     text = text.replace(/<!--[\s\S]*?-->/g, ' ');
+    const payloads = forQuotes ? [...text.matchAll(INLINE_SCRIPT)].map((m) => m[1].trim()).filter((body) => body !== '') : [];
     // Two passes: a <nav> inside a <header> only disappears once its parent has gone.
     const drop = forQuotes ? DROP_BLOCKS_KEEP_HEADER : DROP_BLOCKS;
     text = text.replace(drop, ' ').replace(drop, ' ');
     text = text.replace(/<br\s*\/?>/gi, '\n').replace(BLOCK_END, '\n');
     text = text.replace(/<[^>]*>/g, ' ');
     text = decodeEntities(text);
+    if (payloads.length) text = `${text}\n${payloads.join('\n')}`;
     return normaliseLines(text, { htmlWidgets: true, keepChurn: forQuotes });
 }
 
@@ -435,6 +447,26 @@ const TEXTUAL = /(^text\/)|html|xml|json|javascript|csv|plain|urlencoded/i;
 
 export function isTextual(contentType) {
     return TEXTUAL.test(String(contentType ?? ''));
+}
+
+/**
+ * A body the server labelled as bytes (`application/octet-stream`) that is really text: valid
+ * UTF-8 with no NUL and hardly any other control characters. stocks.securitize.io serves its broker
+ * instructions (`/drs/brokers/general_instructions.md`) that way, and three quotes verbatim in it
+ * were reported lost because the file was hashed as a binary marker (2026-09-24). A zip, an image
+ * or a PDF fails the UTF-8 or the NUL test.
+ */
+export function looksLikeText(buffer) {
+    const bytes = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer ?? '');
+    if (bytes.length === 0 || bytes.includes(0)) return false;
+    let text;
+    try {
+        text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    } catch {
+        return false;
+    }
+    const controls = (text.match(/[\u0001-\u0008\u000e-\u001f\u007f]/g) ?? []).length;
+    return controls / text.length < 0.001;
 }
 
 /**
@@ -672,6 +704,18 @@ export function verificationUrlFor(item, dossier) {
 }
 
 /**
+ * A claim that records what a source USED to say: `changed`, or a `contradicted-corrected`
+ * correction whose note marks it `SUPERSEDED` (xstocks-backed `chains`: the 9-chain list the
+ * issuer later extended to 10). With a confirmed successor on the same field and URL it is
+ * history and is not watched. Its status stays as it is; the publication view needs
+ * `contradicted-corrected` to show the correction.
+ */
+function retiredByConfirmedSuccessor(claim) {
+    if (claim.status === 'changed') return true;
+    return claim.status === 'contradicted-corrected' && /\bSUPERSEDED\b/.test(String(claim.note ?? ''));
+}
+
+/**
  * Every quote one dossier relies on, as `{url, id, kind, ref, slug, quote, citedUrl}`: `url` is
  * where the watcher checks the words (the declared companion, when there is one), `citedUrl` the
  * citation readers see. `claims[]` get the sonar.claim id, `whatIf[]` answers the sonar.what_if id;
@@ -688,7 +732,7 @@ export function dossierQuotes(slug, dossier) {
         .map((c) => `${c.field}\u0000${c.url}`));
     for (const claim of claims) {
         if (typeof claim?.quote !== 'string' || typeof claim?.url !== 'string') continue;
-        if (claim.status === 'changed' && confirmedAt.has(`${claim.field}\u0000${claim.url}`)) continue;
+        if (retiredByConfirmedSuccessor(claim) && confirmedAt.has(`${claim.field}\u0000${claim.url}`)) continue;
         out.push({
             url: verificationUrlFor(claim, dossier), id: claimId(slug, claim.field, claim.url, claim.quote),
             kind: 'claim', ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url
@@ -871,6 +915,21 @@ const JS_SHELL_RAW_MIN = 20_000;
 const JS_SHELL_TEXT_MAX = 300;
 
 /**
+ * A server-rendered WordPress page whose content area was published empty: the theme's
+ * `<div class="page-content">` (or `entry-content`) holds nothing but whitespace. That is not a
+ * JavaScript shell — nothing is left for a browser to render — and the emptiness is the evidence:
+ * Remora Markets' Whitepaper, Terms & Conditions, Privacy Policy and KYC Info pages were created
+ * blank on 2025-02-25 and archived that way (2025-05-16 Wayback captures, 93 kB of theme markup
+ * around 320 characters of navigation), and the dossier cites them to show exactly that. Such a
+ * page is read like any other: hashed, watched, `ok` while it stays empty.
+ */
+export function emptyPublishedPage(rawHtml = '') {
+    const raw = String(rawHtml);
+    if (!/<meta[^>]+name="generator"[^>]+content="WordPress/i.test(raw)) return false;
+    return /<div class="(?:page|entry)-content">\s*<\/div>/.test(raw);
+}
+
+/**
  * Whether a 2xx read is a JavaScript-only shell (see `jsOnlyShell`). Only an HTML page read as
  * HTML can be one: a Notion page has already been read through its API, and a binary payload (a
  * zip, a PNG served as the cited "document") is watched as bytes — its one-line marker is short
@@ -879,7 +938,26 @@ const JS_SHELL_TEXT_MAX = 300;
  */
 export function isJsOnlyRead({ kind, binary = false, notion = false, text, rawHtml = '' }) {
     if (notion || binary || kind !== 'html') return false;
+    if (emptyPublishedPage(rawHtml)) return false;
     return jsOnlyShell(text, rawHtml);
+}
+
+/**
+ * The validators (etag, last-modified) to store after one response, and the HTTP status of the
+ * response they came from. Only a 2xx body's validators describe the document; a 304 confirms the
+ * stored ones; anything else (404, 403, a bot wall) keeps what we had. Measured 2026-09-24: a
+ * PreStocks FAQ bundle went 404 on Vercel, the 404 page's etag was stored, and a conditional GET
+ * with it answered 304 — so a dead URL was reported `ok, http-304` on every later run.
+ */
+export function responseValidators({ httpStatus, headers = {}, prev = null } = {}) {
+    if (httpStatus >= 200 && httpStatus < 300) {
+        return { etag: headers.etag ?? null, lastModified: headers['last-modified'] ?? null, validatorStatus: httpStatus };
+    }
+    const kept = { etag: prev?.etag ?? null, lastModified: prev?.lastModified ?? null, validatorStatus: prev?.validatorStatus ?? null };
+    if (httpStatus === 304) {
+        return { ...kept, etag: headers.etag ?? kept.etag, lastModified: headers['last-modified'] ?? kept.lastModified };
+    }
+    return kept;
 }
 
 /**
@@ -894,6 +972,9 @@ export function conditionalHeaders(prev, { normalizerUpgrade = false } = {}) {
     if (!prev || normalizerUpgrade || typeof prev.textPath !== 'string' || prev.textPath === '') {
         return { etag: null, lastModified: null };
     }
+    // Only validators a 2xx body gave us (`responseValidators`). A state entry without that proof
+    // may hold a 404 page's etag, which the host then confirms with a 304 forever.
+    if (!(prev.validatorStatus >= 200 && prev.validatorStatus < 300)) return { etag: null, lastModified: null };
     return { etag: prev.etag ?? null, lastModified: prev.lastModified ?? null };
 }
 
@@ -933,6 +1014,13 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
         }
         if (networkErrorCode === 'CERT_HAS_EXPIRED') {
             return { status: 'blocked', reason: 'tls: certificate expired' };
+        }
+        // The server sends its leaf certificate without the intermediate (www.cysec.gov.cy,
+        // measured 2026-09-24: openssl "unable to verify the first certificate"). Browsers fetch the
+        // missing intermediate themselves; Node does not. A host misconfiguration, not our failure,
+        // so it is a refusal with the reason rather than an error that fails every run.
+        if (networkErrorCode === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
+            return { status: 'blocked', reason: 'tls: incomplete certificate chain (the server omits its intermediate certificate)' };
         }
         if (networkErrorCode === 'ETIMEDOUT' && retriedAfterBackoff && tolerates503(host)) {
             return { status: 'blocked', reason: 'network timeout after backoff (host temporarily unavailable)' };
@@ -975,6 +1063,27 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
     }
     if (httpStatus !== null) return { status: 'error', reason: `http-${httpStatus}` };
     return { status: 'error', reason: 'no response' };
+}
+
+/**
+ * A refusal nothing depends on is not a finding. `blocked` exists so that a quote we cannot check
+ * is reported as "not checkable" instead of silently passing; a source no dossier quotes — a
+ * homepage in a `website` field, a listing named in a what-if's `searched` trail, a folder cited as
+ * "the series" — has no words to check, and what its citation needs is that the host still answers
+ * at that address. So a `blocked` source with NO registered quote whose host did answer (any HTTP
+ * status: a 403 bot wall, a JavaScript shell) becomes `reachable-unverified`: reachable, content
+ * not read. It still goes `gone` on a 404/410/NXDOMAIN like any other source. A refusal without an
+ * HTTP answer (network timeout, expired certificate) proves nothing about reachability and stays
+ * `blocked`, and so does any source a quote relies on — adding a quote to a dossier turns the same
+ * refusal back into `blocked` on the next run. Returns the replacement `{status, reason}` or null.
+ */
+export function quotelessRefusal({ status, httpStatus = null, reason = '', quotesRegistered = 0 } = {}) {
+    if (status !== 'blocked' || quotesRegistered > 0) return null;
+    if (typeof httpStatus !== 'number' || !Number.isFinite(httpStatus)) return null;
+    return {
+        status: 'reachable-unverified',
+        reason: `${reason} — host answered HTTP ${httpStatus}; no dossier quote relies on this source, so reachability is all its citation needs (content not read)`
+    };
 }
 
 /** A run fails on `error` only: `gone` is a finding about the citation, `blocked` is the host. */

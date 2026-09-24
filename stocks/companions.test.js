@@ -2,8 +2,15 @@
 // what text a companion answer becomes (trimmed real answers of registry.npmjs.org and the
 // crates.io API, 2026-09-23), and which live outcomes qualify for a companion read.
 
-import { companionFor, companionNote, companionText, wantsCompanion } from './lib/companions.mjs';
-import { quoteFound } from './lib/watch.mjs';
+import { readFileSync } from 'node:fs';
+
+import { companionFor, companionNote, companionText, formatUnits, solanaTxText, wantsCompanion } from './lib/companions.mjs';
+import { dossierQuotes, quoteFound } from './lib/watch.mjs';
+
+// A real getTransaction (jsonParsed, finalized) answer, trimmed to the fields the renderer reads:
+// an Ondo GM RedeemForUsdc of RTXon, slot 449655006, read 2026-09-24.
+const RTXON_REDEEM = JSON.parse(readFileSync(new URL('./fixtures/sources/solana-tx-ondo-rtxon-redeem.json', import.meta.url), 'utf8'));
+const RTXON_SIG = '4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN';
 
 const NPM = {
     _id: '@superstateinc/allowlist',
@@ -128,5 +135,61 @@ describe('wantsCompanion', () => {
     test('the note says the page was not read and names the companion', () => {
         expect(companionNote({ liveReason: 'http-403 (bot wall)', reader: 'npm-registry', url: 'https://registry.npmjs.org/x' }))
             .toBe("live page unreadable (http-403 (bot wall)); text read from the publisher's npm-registry companion — https://registry.npmjs.org/x");
+    });
+});
+
+describe('Solscan transaction pages through Solana RPC getTransaction', () => {
+    test('a solscan /tx/<signature> page maps to an RPC call whose descriptor carries no RPC URL', () => {
+        const companion = companionFor(`https://solscan.io/tx/${RTXON_SIG}`);
+        expect(companion).toEqual({
+            url: `solana-rpc:getTransaction:${RTXON_SIG}`,
+            reader: 'solana-tx',
+            rpc: { method: 'getTransaction', params: [RTXON_SIG, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0, commitment: 'finalized' }] }
+        });
+        expect(companionFor('https://solscan.io/token/12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo')).toBeNull();
+        expect(companionFor('https://solscan.io/tx/not-a-signature')).toBeNull();
+    });
+
+    test('the chain\'s answer becomes identity, verbatim logs, decoded instructions and balance changes', () => {
+        const lines = solanaTxText(RTXON_REDEEM).split('\n');
+        expect(lines.slice(0, 6)).toEqual([
+            `transaction ${RTXON_SIG}`,
+            'slot 449655006',
+            'block time 2026-09-23T08:54:45Z',
+            'status success',
+            'fee payer 9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG',
+            'signers 9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG'
+        ]);
+        expect(lines).toContain('Program log: Instruction: RedeemForUsdc');
+        expect(lines).toContain('#2.7 spl-token burnChecked: amount 0.877296251, account 8CLHPVvu5EEmQPYFkNAXdWoQkJAKpMscmq41KT5Gcui8, '
+            + 'authority 9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG, mint 12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo');
+        expect(lines).toContain('#1 program KeccakSecp256k11111111111111111111111111111 (not decoded)');
+        expect(lines).toContain('owner 9BB7Tt5uE5VdRsxA5XRqrjwNaq8XtgAUQW8czA6ymUPG, mint 12BvLZtzjdssAycxPeBQUjukhmgQpULAvy6SroYdondo, '
+            + 'account 8CLHPVvu5EEmQPYFkNAXdWoQkJAKpMscmq41KT5Gcui8: 0.877296251 -> 0 (-0.877296251)');
+        // Sections in a fixed order, so a quote's ellipsis fragments can rely on it.
+        expect(lines.indexOf('program logs:')).toBeLessThan(lines.indexOf('instructions:'));
+        expect(lines.indexOf('instructions:')).toBeLessThan(lines.indexOf('token balance changes:'));
+        expect(companionText('solana-tx', JSON.stringify(RTXON_REDEEM))).toBe(solanaTxText(RTXON_REDEEM));
+    });
+
+    test('the Ondo dossier\'s quote for this transaction is found in the rendered chain answer', () => {
+        const dossier = JSON.parse(readFileSync(new URL('./data/issuers/ondo-global-markets.json', import.meta.url), 'utf8'));
+        const quoted = dossierQuotes('ondo-global-markets', dossier).filter((q) => q.citedUrl === `https://solscan.io/tx/${RTXON_SIG}`);
+        expect(quoted).toHaveLength(1);
+        expect(quoteFound(solanaTxText(RTXON_REDEEM), quoted[0].quote)).toBe(true);
+    });
+
+    test('a null answer (not found, not finalized) is an error, never an empty document', () => {
+        expect(() => solanaTxText(null)).toThrow('transaction not found');
+        expect(() => companionText('solana-tx', 'null')).toThrow('transaction not found');
+    });
+
+    test('base units format exactly, without floating point', () => {
+        expect(formatUnits('877296251', 9)).toBe('0.877296251');
+        expect(formatUnits('9916733845527', 6)).toBe('9916733.845527');
+        expect(formatUnits('-168381097', 6)).toBe('-168.381097');
+        expect(formatUnits('8160140778570159', 9)).toBe('8160140.778570159');
+        expect(formatUnits('5000000', 6)).toBe('5');
+        expect(formatUnits('0', 6)).toBe('0');
     });
 });

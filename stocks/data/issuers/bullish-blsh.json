@@ -762,12 +762,12 @@
     },
     {
       "field": "issuingEntity",
-      "quote": "\"name\":\"Bullish Digital TA LLC\",\"tickers\":[],\"exchanges\":[],\"ein\":\"000000000\",\"lei\":null,\"description\":\"\",\"website\":\"\",\"investorWebsite\":\"\",\"category\":\"\",\"fiscalYearEnd\":\"1231\",\"stateOfIncorporation\":\"DE\",\"stateOfIncorporationDescription\":\"DE\"",
+      "quote": "\"name\":\"Bullish Digital TA LLC\" … \"stateOfIncorporation\":\"DE\",\"stateOfIncorporationDescription\":\"DE\"",
       "url": "https://data.sec.gov/submissions/CIK0002096796.json",
       "locator": "data.sec.gov submissions for CIK 0002096796, json path $.name and $.stateOfIncorporation",
-      "accessedAt": "2026-09-17T15:22:09Z",
+      "accessedAt": "2026-09-24T14:26:22Z",
       "status": "contradicted-corrected",
-      "note": "MAJOR CORRECTION. The dossier states there is no separate digital transfer agent and that EQ is the single transfer agent for both forms. Bullish has its OWN SEC-registered transfer agent: Bullish Digital TA LLC, a Delaware LLC, CIK 0002096796, SEC Transfer Agent File No. 084-07032, FINS 379602, principal office 61 Ninth Avenue, 5th Floor, New York. TA-1 filed 2025-11-18, registration effective per EFFECT 2025-12-18, annual TA-2 filed 2026-03-31 — i.e. registered and effective almost six months BEFORE the 2026-05-05 tokenization launch. Its TA-1 item 8(a) names Bullish US Holdings LLC as \"Parent Company\" and \"Sole Member of Applicant\", with Bullish Global, BMH and BMC1 as controlling shareholders. So the architecture is the two-transfer-agent shape the dossier attributes only to Superstate: an independent recordkeeping TA (Equiniti, 084-00416) plus the issuer’s own digital TA."
+      "note": "RE-QUOTED 2026-09-24T14:26:22Z, source unchanged: same name, EIN 000000000 and Delaware incorporation. The previous quote was a contiguous run of keys in served order, which the watcher's keys-sorted rendering of the JSON cannot match; now quoted as two fragments in an order valid in both. MAJOR CORRECTION. The dossier states there is no separate digital transfer agent and that EQ is the single transfer agent for both forms. Bullish has its OWN SEC-registered transfer agent: Bullish Digital TA LLC, a Delaware LLC, CIK 0002096796, SEC Transfer Agent File No. 084-07032, FINS 379602, principal office 61 Ninth Avenue, 5th Floor, New York. TA-1 filed 2025-11-18, registration effective per EFFECT 2025-12-18, annual TA-2 filed 2026-03-31 — i.e. registered and effective almost six months BEFORE the 2026-05-05 tokenization launch. Its TA-1 item 8(a) names Bullish US Holdings LLC as \"Parent Company\" and \"Sole Member of Applicant\", with Bullish Global, BMH and BMC1 as controlling shareholders. So the architecture is the two-transfer-agent shape the dossier attributes only to Superstate: an independent recordkeeping TA (Equiniti, 084-00416) plus the issuer’s own digital TA."
     },
     {
       "field": "entityJurisdiction",
@@ -816,12 +816,12 @@
     },
     {
       "field": "regulatoryStatus",
-      "quote": "\"name\":\"Equiniti Trust Company, LLC /TA\",\"tickers\":[],\"exchanges\":[],\"ein\":\"133439945\",\"lei\":null,\"description\":\"\",\"website\":\"\",\"investorWebsite\":\"\",\"category\":\"\",\"fiscalYearEnd\":null",
+      "quote": "\"name\":\"Equiniti Trust Company, LLC /TA\"",
       "url": "https://data.sec.gov/submissions/CIK0000005876.json",
-      "locator": "data.sec.gov submissions for CIK 0000005876, json path $.name",
-      "accessedAt": "2026-09-17T15:13:03Z",
+      "locator": "data.sec.gov submissions for CIK 0000005876, json path $.name (ein \"133439945\")",
+      "accessedAt": "2026-09-24T14:26:22Z",
       "status": "confirmed",
-      "note": "Registration verified from EDGAR rather than from Bullish’s assertion: 68 TA filings, all under File No. 084-00416, the most recent TA-1/A 2026-07-31, TA-2/A twice on 2026-06-17, TA-1/A 2026-05-28 and TA-2 2026-03-31 — all as the dossier lists. $.formerNames confirms \"AMERICAN STOCK TRANSFER & TRUST CO, LLC /TA\"."
+      "note": "RE-QUOTED 2026-09-24T14:26:22Z, source unchanged: same name and EIN 133439945. The previous quote ran the keys together in served order, which a keys-sorted comparison cannot match; the name is quoted on its own. Registration verified from EDGAR rather than from Bullish’s assertion: 68 TA filings, all under File No. 084-00416, the most recent TA-1/A 2026-07-31, TA-2/A twice on 2026-06-17, TA-1/A 2026-05-28 and TA-2 2026-03-31 — all as the dossier lists. $.formerNames confirms \"AMERICAN STOCK TRANSFER & TRUST CO, LLC /TA\"."
     },
     {
       "field": "legalForm",
@@ -1266,12 +1266,12 @@
     },
     {
       "field": "vocabulary.thirdPartyAttestations.value",
-      "quote": "\"name\": \"Bullish Ordinary Shares\", \"symbol\": \"BLSH\", \"description\": \"Bullish is an institutionally focused",
+      "quote": "\"description\": \"Bullish is an institutionally focused global digital asset platform that provides market infrastructure and information services. … \"image\": \"https://assets.bullish.com/metadata/blsh.png\"",
       "url": "https://assets.bullish.com/metadata/blsh.json",
-      "locator": "assets.bullish.com/metadata/blsh.json, opening keys",
-      "accessedAt": "2026-09-17T15:13:14Z",
+      "locator": "assets.bullish.com/metadata/blsh.json, whole document: four keys, name \"Bullish Ordinary Shares\", symbol \"BLSH\", description, image",
+      "accessedAt": "2026-09-24T14:26:23Z",
       "status": "confirmed",
-      "note": "\"no\": the whole document is name, symbol, description and image, re-read in full 2026-09-17, and the mint’s additionalMetadata array is empty with its update authority on the issuer side. No attestation, proof-of-reserve, auditor report, smart-contract audit, reconciliation or public API exists. EQ is a genuine independent registered transfer agent today but publishes no confirmation — and the dossier’s reliance on that independence is now weaker, since the group holds its own transfer-agent registration."
+      "note": "RE-QUOTED 2026-09-24T14:26:23Z, source unchanged: the file still holds exactly the same four keys. The previous quote ran name, symbol and description in served order, which the watcher's keys-sorted rendering reorders (description, image, name, symbol); description and image are in the same order in both and are quoted now. \"no\": the whole document is name, symbol, description and image, re-read in full 2026-09-17, and the mint’s additionalMetadata array is empty with its update authority on the issuer side. No attestation, proof-of-reserve, auditor report, smart-contract audit, reconciliation or public API exists. EQ is a genuine independent registered transfer agent today but publishes no confirmation — and the dossier’s reliance on that independence is now weaker, since the group holds its own transfer-agent registration."
     },
     {
       "field": "vocabulary.aiReady.value",
@@ -1455,12 +1455,12 @@
     },
     {
       "field": "corporateActions",
-      "quote": "What if I lose my wallet? Contact Equiniti through Shareholder Central.",
+      "quote": "Contact Equiniti through Shareholder Central.",
       "url": "https://investors.bullish.com/stock/tokenized-blsh-shares",
-      "locator": "Investor FAQ \"What if I lose my wallet?\"",
-      "accessedAt": "2026-09-18T11:50:00Z",
+      "locator": "Investor FAQ, answer under the accordion heading \"What if I lose my wallet?\" (the heading is button text in the served HTML, <span class=\"lfg-acc--text\">What if I lose my wallet?</span>, which the watcher's HTML reader drops; the answer is the <p> in region faqfield_field_nir_faq_field_node_7286-sect-1)",
+      "accessedAt": "2026-09-24T14:14:47Z",
       "status": "confirmed",
-      "note": "THE INTERNAL CONFLICT, on the same investor-relations site as the risk factor above: the FAQ offers \"Contact Equiniti through Shareholder Central.\" - a support path with no stated remedy, evidentiary standard, fee, turnaround or appeal - while the risk factor says the loss may be irrecoverable and disclaims replacement or compensation. The risk factor is the operative statement. Recorded because a holder reading only the FAQ would form the opposite expectation."
+      "note": "RE-QUOTED, source unchanged. The previous quote joined the FAQ question and its answer; both are still in the served HTML, but the question is the label of the accordion button and the watcher's reader drops button text, so the joined quote could never be found. The answer alone is quoted now and the question is in the locator. Read from the watcher's stored copy of 2026-09-22T16:46:06Z, which the site confirmed current with HTTP 304 at 2026-09-24T14:14:47Z; direct re-fetches from this host at 14:25-14:26Z (curl and a headed Chrome) were answered \"Access Denied\" by the site's CDN. THE INTERNAL CONFLICT, on the same investor-relations site as the risk factor above: the FAQ offers \"Contact Equiniti through Shareholder Central.\" - a support path with no stated remedy, evidentiary standard, fee, turnaround or appeal - while the risk factor says the loss may be irrecoverable and disclaims replacement or compensation. The risk factor is the operative statement. Recorded because a holder reading only the FAQ would form the opposite expectation."
     },
     {
       "field": "bankruptcyRemote",

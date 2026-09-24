@@ -787,12 +787,12 @@
     },
     {
       "field": "status",
-      "quote": "FWDI total_supply 8723436.100000, circulating_supply 7280819.200000, features.is_token_enabled_any_chain true, features.is_trade_enabled_any_chain true",
+      "quote": "\"cusip\":\"349862409\" … \"is_token_enabled_any_chain\":true,\"is_trade_enabled_any_chain\":true",
       "url": "https://api.superstate.com/v2/instruments",
-      "locator": "json path $.FWDI.total_supply / .circulating_supply / .features",
-      "accessedAt": "2026-09-17T15:12:40Z",
+      "locator": "json path $.FWDI: cusip, then features.is_token_enabled_any_chain / is_trade_enabled_any_chain",
+      "accessedAt": "2026-09-24T14:23:13Z",
       "status": "confirmed",
-      "note": "API-derived. Only FWDI and GLXY carry is_token_enabled_any_chain true; EXOD, HSDT and their trade flags are false, so \"live\" rests on two of the five instruments."
+      "note": "RE-QUOTED 2026-09-24T14:23:13Z, source unchanged: FWDI is still token- and trade-enabled, and its supply is still total_supply \"8723436.100000\", circulating_supply \"7280819.200000\" (identical to 2026-09-17). The previous quote was a path: value summary, not words the response contains; the FWDI flags are now quoted verbatim, anchored to FWDI's CUSIP, as fragments in an order valid both in the served JSON and in the watcher's keys-sorted rendering. The supply numbers are kept here as a dated reading because they move with every mint. API-derived. Only FWDI and GLXY carry is_token_enabled_any_chain true; EXOD, HSDT and their trade flags are false, so \"live\" rests on two of the five instruments."
     },
     {
       "field": "issuingEntity",
@@ -1058,9 +1058,9 @@
       "quote": "total_balance_by_label:{by_label:{\"AdminSeed-Kamino-SolMainnet-900\":\"0.100000\",BookEntryAvailable:\"1358783.900000\",BookEntryIssuerApprovalRsu:\"83833.000000\",\"Defi_Kamino-SolMainnet-900\":\"3156493.100000\",\"Defi_LpPosition-Kamino-SolMainnet-900\":\"0.000000\",\"Token-SolMainnet-900\":\"4124326.000000\"}},total_balance:\"8723436.100000\"",
       "url": "https://superstate.com/assets/fwdi",
       "locator": "public FWDI asset page, embedded page payload, balances.total_balance_by_label",
-      "accessedAt": "2026-09-17T15:23:00Z",
+      "accessedAt": "2026-09-24T14:24:18Z",
       "status": "contradicted-corrected",
-      "note": "RESOLVES the dossier open question about the 0.1, and CORRECTS one number. The labelled on-chain positions sum to 4,124,326.0 + 3,156,493.1 + 0.1 = 7,280,819.2, exactly the API circulating_supply, while getTokenSupply on the mint returned 7,280,819.100000 at slot 447827016 the same day: the 0.1 is not a display artefact. (Reading of 2026-09-17: a register position for which no token was ever minted. Superseded 2026-09-23 by the chain: the seed is minted and sits in the Kamino reserve vault, already inside Defi_Kamino, so the labels double-count it; see the rpc claims of 2026-09-23.) Reproduced on 2026-09-17, a day after the dossier first measured it, and the same +0.1 holds on GLXY (api 13,399.282876 vs chain 13,399.182876) while EXOD and HSDT match exactly. CORRECTION: total_balance is 8,723,436.100000, not the 8,732,937.10 the dossier recorded as FWDI total_supply — the dossier figure is arithmetically impossible against its own same-day components (7,280,819.20 tokenized + 1,442,616.90 book-entry = 8,723,436.10). Note also that the page renders its Solana row as 7,280,819.10 (the chain figure) while its own embedded labels sum to 7,280,819.20, so the asset page disagrees with itself as well as with the API."
+      "note": "Re-read 2026-09-24T14:24:18Z: the whole quote, through total_balance:\"8723436.100000\", is still verbatim in the page's embedded payload (a curl of the served HTML), unchanged balances; the payload now also carries a second by_label object in USD terms. The watcher cannot confirm it because its HTML reader drops embedded script payloads (see the locator of the underlyingCustodian claim on this URL), so it reports this quote lost although the source has not changed. RESOLVES the dossier open question about the 0.1, and CORRECTS one number. The labelled on-chain positions sum to 4,124,326.0 + 3,156,493.1 + 0.1 = 7,280,819.2, exactly the API circulating_supply, while getTokenSupply on the mint returned 7,280,819.100000 at slot 447827016 the same day: the 0.1 is not a display artefact. (Reading of 2026-09-17: a register position for which no token was ever minted. Superseded 2026-09-23 by the chain: the seed is minted and sits in the Kamino reserve vault, already inside Defi_Kamino, so the labels double-count it; see the rpc claims of 2026-09-23.) Reproduced on 2026-09-17, a day after the dossier first measured it, and the same +0.1 holds on GLXY (api 13,399.282876 vs chain 13,399.182876) while EXOD and HSDT match exactly. CORRECTION: total_balance is 8,723,436.100000, not the 8,732,937.10 the dossier recorded as FWDI total_supply — the dossier figure is arithmetically impossible against its own same-day components (7,280,819.20 tokenized + 1,442,616.90 book-entry = 8,723,436.10). Note also that the page renders its Solana row as 7,280,819.10 (the chain figure) while its own embedded labels sum to 7,280,819.20, so the asset page disagrees with itself as well as with the API."
     },
     {
       "field": "securityInterest.exists",
@@ -1314,12 +1314,12 @@
     },
     {
       "field": "corporateActions",
-      "quote": "equity_info.current_split_multiplier.multiplier: \"1\"",
+      "quote": "\"cusip\":\"349862409\" … \"current_split_multiplier\":{\"multiplier\":\"1\"}",
       "url": "https://api.superstate.com/v2/instruments",
-      "locator": "json path $.FWDI.equity_info.current_split_multiplier.multiplier",
-      "accessedAt": "2026-09-17T15:12:40Z",
+      "locator": "json path $.FWDI.cusip and $.FWDI.equity_info.current_split_multiplier.multiplier",
+      "accessedAt": "2026-09-24T14:23:13Z",
       "status": "confirmed",
-      "note": "Published off-chain and matched on-chain: scaledUiAmountConfig.multiplier \"1\", newMultiplier \"1\", newMultiplierEffectiveTimestamp 0 on the FWDI mint (slot 447827103). No split has ever been applied, so the mechanism is untested."
+      "note": "RE-QUOTED 2026-09-24T14:23:13Z, source unchanged: FWDI's split multiplier is still \"1\". The previous quote was a path: value summary; now verbatim JSON anchored to FWDI's CUSIP. Published off-chain and matched on-chain: scaledUiAmountConfig.multiplier \"1\", newMultiplier \"1\", newMultiplierEffectiveTimestamp 0 on the FWDI mint (slot 447827103). No split has ever been applied, so the mechanism is untested."
     },
     {
       "field": "pricing.referenceMarket",
@@ -1620,21 +1620,21 @@
     },
     {
       "field": "products[2]",
-      "quote": "features.is_token_enabled_any_chain: false, features.is_trade_enabled_any_chain: false, features.updated_at: \"2026-05-13T16:15:08.556132Z\"",
+      "quote": "\"cusip\":\"30209R106\" … \"is_token_enabled_any_chain\":false,\"is_trade_enabled_any_chain\":false … \"updated_at\":\"2026-05-13T16:15:08.556132Z\"",
       "url": "https://api.superstate.com/v2/instruments",
-      "locator": "json path $.EXOD.features",
-      "accessedAt": "2026-09-17T15:12:40Z",
+      "locator": "json path $.EXOD: cusip, then features.is_token_enabled_any_chain / is_trade_enabled_any_chain / updated_at",
+      "accessedAt": "2026-09-24T14:23:13Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION: the dossier listed EXOD among \"Live equities (2026-09-16)\" and flagged only HSDT as non-operational. The API shows EXOD with BOTH is_token_enabled_any_chain and is_trade_enabled_any_chain false, last updated 2026-05-13 — so it was already disabled on the dossier’s own observation date. Its mint holds 60.000000 tokens (chain and API agree). products[2] now marks EXOD token/trade-disabled; FWDI and GLXY are the only two instruments with both flags true."
+      "note": "RE-QUOTED 2026-09-24T14:23:13Z, source unchanged: EXOD is still neither token- nor trade-enabled, last updated 2026-05-13. The previous quote was a path: value summary; now verbatim JSON anchored to EXOD's CUSIP. CORRECTION: the dossier listed EXOD among \"Live equities (2026-09-16)\" and flagged only HSDT as non-operational. The API shows EXOD with BOTH is_token_enabled_any_chain and is_trade_enabled_any_chain false, last updated 2026-05-13 — so it was already disabled on the dossier’s own observation date. Its mint holds 60.000000 tokens (chain and API agree). products[2] now marks EXOD token/trade-disabled; FWDI and GLXY are the only two instruments with both flags true."
     },
     {
       "field": "chains",
-      "quote": "deploy_status_by_chain.by_chain[\"900\"].token_address: \"7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9\" (FWDI); $.SBET.deploy_status_by_chain.by_chain[\"1\"] and [\"59144\"]: \"0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51\"",
+      "quote": "\"token_address\":\"7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9\" … \"token_address\":\"0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51\" … \"token_address\":\"0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51\"",
       "url": "https://api.superstate.com/v2/instruments",
-      "locator": "json path $.FWDI.deploy_status_by_chain and $.SBET.deploy_status_by_chain",
-      "accessedAt": "2026-09-17T15:12:40Z",
+      "locator": "json paths $.FWDI.deploy_status_by_chain.by_chain[\"900\"].token_address, $.SBET.deploy_status_by_chain.by_chain[\"1\"].token_address and $.SBET.deploy_status_by_chain.by_chain[\"59144\"].token_address (chain ids 900 = Solana, 1 = Ethereum, 59144 = Linea)",
+      "accessedAt": "2026-09-24T14:23:13Z",
       "status": "confirmed",
-      "note": "Three chains confirmed from the API’s own chain ids: 900 = Solana (FWDI, GLXY, EXOD, HSDT all deployed there), 1 = Ethereum and 59144 = Linea (SBET on both, same address). Matches the dossier’s chains list exactly."
+      "note": "RE-QUOTED 2026-09-24T14:23:13Z, source unchanged: same FWDI Solana address and the same SBET address on chains 1 and 59144. The previous quote was a path: value summary; the three token addresses are now quoted verbatim (the chain ids are object keys too short to anchor a fragment, so they are in the locator). Three chains confirmed from the API’s own chain ids: 900 = Solana (FWDI, GLXY, EXOD, HSDT all deployed there), 1 = Ethereum and 59144 = Linea (SBET on both, same address). Matches the dossier’s chains list exactly."
     },
     {
       "field": "keyGovernance.rebase",

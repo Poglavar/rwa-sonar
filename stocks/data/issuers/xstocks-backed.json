@@ -1589,12 +1589,12 @@
     },
     {
       "field": "custodyVerification.endpoint",
-      "quote": "Get proof of reserves for all assets.",
-      "url": "https://api.xstocks.fi/api/v2/public/proof-of-reserves",
-      "locator": "public v2 API; response fields symbol, timestamp, sharesHeld, circulatingSupply and holdings.provider/quantity/symbol",
-      "accessedAt": "2026-09-20T01:27:00Z",
+      "quote": "Get proof of reserves for all assets. Endpoint: GET /public/proof-of-reserves",
+      "url": "https://docs.xstocks.fi/apis/openapi/proof-of-reserves/list_public_proof_of_reserves.md",
+      "locator": "xStocks API Reference (v2), 'List Proof of Reserves' (Markdown export of the docs page); the endpoint itself is https://api.xstocks.fi/api/v2/public/proof-of-reserves, response fields nodes.symbol, timestamp, sharesHeld, circulatingSupply and holdings.provider/quantity/symbol",
+      "accessedAt": "2026-09-24T14:21:24Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION: a documented public REST endpoint now exists. On 2026-09-20 it returned 826 symbol-keyed rows for 828 current exact-mint registry products, while its pagination metadata incorrectly reported 926 total nodes. FGDLx and NWGx were absent. The response is machine-readable issuer data with custody-provider-level quantities, not an independently signed or exact-mint attestation."
+      "note": "URL CORRECTED 2026-09-24T14:21:24Z: the quoted sentence is the endpoint's description in the issuer's API reference, never part of the endpoint's JSON response that was cited, so the watcher could not find it there. The claim now cites the reference page, where it was re-read verbatim together with the endpoint path. Dated reading of the endpoint the same minute: HTTP 200, page metadata totalNodes 1122 over 12 pages of 100 (926 reported on 2026-09-20), nodes timestamped 2026-09-24T14:05Z with holdings.provider \"Alpaca\". CORRECTION: a documented public REST endpoint now exists. On 2026-09-20 it returned 826 symbol-keyed rows for 828 current exact-mint registry products, while its pagination metadata incorrectly reported 926 total nodes. FGDLx and NWGx were absent. The response is machine-readable issuer data with custody-provider-level quantities, not an independently signed or exact-mint attestation."
     },
     {
       "field": "redemption.fees",

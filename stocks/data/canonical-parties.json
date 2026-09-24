@@ -531,7 +531,7 @@
     "jurisdiction": "United States",
     "identifier": "",
     "website": "https://www.fincen.gov",
-    "note": "Money-services-business registration only. Trek Labs, Inc. holds MSB 31000329581307 / NMLS 2665675 plus state money-transmitter licences; Backpack's own US disclosures page contains zero occurrences of 'broker-dealer', 'FINRA' or 'SEC'."
+    "note": "Money-services-business registration only. Trek Labs, Inc. holds MSB 31000339714338 (31000329581307 until 2026-09-18) / NMLS 2665675 plus state money-transmitter licences; Backpack's own US disclosures page contains zero occurrences of 'broker-dealer', 'FINRA' or 'SEC'."
   },
   {
     "name": "FMA Liechtenstein",
@@ -593,7 +593,7 @@
     "name": "Trek Labs",
     "type": "parent",
     "jurisdiction": "British Virgin Islands / Delaware / UAE / Australia",
-    "identifier": "FinCEN MSB 31000329581307 (Trek Labs, Inc.)",
+    "identifier": "FinCEN MSB 31000339714338 (Trek Labs, Inc.; 31000329581307 until 2026-09-18)",
     "website": "https://backpack.exchange",
     "note": "The Backpack group operator: Trek Labs Ltd runs Backpack Exchange, Trek Labs, Inc. (Delaware) is the FinCEN MSB, Trek Labs Ltd FZE holds the VARA licence, Trek Labs Australia Pty Ltd is an AUSTRAC DCE.",
     "alsoRoles": [

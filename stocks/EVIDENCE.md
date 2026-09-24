@@ -16,7 +16,7 @@ change shows only as a diff of numbers, with no event and no evidence attached.
 
 | Table | One row per | Key columns |
 |---|---|---|
-| `source` | URL we rely on | `id`, `url`, `kind` (pdf, html, api, onchain), `title`, `issuer_slug`, `first_seen_at`, `last_checked_at`, `last_changed_at`, `check_every` (interval), `archive_url` (Wayback), `status` (ok, changed, gone, blocked), `content_hash`, `error` |
+| `source` | URL we rely on | `id`, `url`, `kind` (pdf, html, api, onchain), `title`, `issuer_slug`, `first_seen_at`, `last_checked_at`, `last_changed_at`, `check_every` (interval), `archive_url` (Wayback), `status` (ok, changed, gone, blocked, reachable-unverified), `content_hash`, `error` |
 | `source_version` | fetch that produced new content | `source_id`, `fetched_at`, `content_hash`, `bytes`, `text_path` (normalised text on disk, gitignored), `raw_path`, `diff_summary`, `diff_severity`, `diff_method` (none, quote-lost, keyword, llm) |
 | `claim` | one fact we assert | `id`, `subject_type` (issuer, token), `subject_id`, `field` (dotted path, e.g. `redemption.rails`), `value` (the structured value), `quote` (the exact words from the source), `source_id`, `locator` (page, section, anchor, on-chain account+field), `recorded_at`, `last_checked_at`, `last_confirmed_at`, `status` (confirmed, changed, source-gone, unverified), `method` (manual, extracted, onchain) |
 | `change_event` | detected change | `id`, `detected_at`, `kind` (see §3), `subject_type`, `subject_id`, `field`, `before`, `after`, `severity` (info, caution, warning, critical), `evidence` (source_version ids, tx signatures, snapshot dates), `summary`, `acknowledged_at` |
@@ -171,6 +171,37 @@ its source is marked `changed` (it is not marked false), a change event is raise
   and added to. It writes `.last-source-watch-stats-only-blocked.json` (scoped like `--only`/`--limit`),
   never the full-run heartbeat. With `--no-db` it measures what a fallback change buys without
   re-fetching the other ~500 sources. Measured 2026-09-23: blocked sources went from 41 to 14.
+- **A refusal nothing quotes is `reachable-unverified`** (2026-09-24, `quotelessRefusal` in
+  `lib/watch.mjs`, db/2026-09-24-sonar-source-reachable.sql). A homepage in a `website` field, a
+  listing in a what-if's `searched` trail, or a Dropbox folder cited as "the series" has no quote to
+  check. Its citation needs only that the host still answers at that address. When such a source
+  is refused or renders nothing but the host answered with an HTTP status, it is
+  `reachable-unverified`, not `blocked`. A 404/410 still makes it `gone`. With no HTTP answer at
+  all (timeout, expired certificate) it stays `blocked`. As soon as a quote relies on the source,
+  the same refusal is `blocked` again.
+- **Solscan transaction pages are read from the chain** (2026-09-24). `solscan.io/tx/<sig>`
+  answers scripts with a 403 and has no Wayback captures. Its companion is Solana RPC
+  `getTransaction` (jsonParsed, finalized, through `SOLANA_RPC_URL`; the keyed URL is never logged
+  or stored). `solanaTxText` in `lib/companions.mjs` renders it in a fixed order: identity,
+  verbatim program logs, decoded instructions, token balance changes. Quotes on these claims quote
+  that rendering, with `…` between fragments. They do not quote Solscan's UI wording.
+- **A WordPress page published empty is read, not called a JavaScript shell** (2026-09-24,
+  `emptyPublishedPage`). Remora's 2025 Whitepaper, Terms, Privacy and KYC pages are theme markup
+  around an empty `page-content` div. The emptiness is what the dossier cites.
+- **Four reader fixes** (2026-09-24, found while re-quoting lost quotes):
+  1. A body labelled `application/octet-stream` that is valid UTF-8 is read as text
+     (`looksLikeText`). Securitize serves its DRS broker instructions `.md` that way.
+  2. A `contradicted-corrected` claim whose note says `SUPERSEDED`, with a confirmed successor on
+     the same field and URL, leaves the watch, as a `changed` one already did. Its status is kept.
+  3. The quote reading keeps `<button>` text and appends inline `<script>` payloads. The hashed
+     reading has neither. Superstate's asset page ships its holdings as a SvelteKit data object.
+  4. Validators (etag, last-modified) are stored only from a 2xx body (`responseValidators`), and
+     are sent back only with that proof (`validatorStatus`). A Vercel 404 page's etag had been
+     stored, and the conditional GET was answered 304, so a dead PreStocks bundle read as `ok`.
+     A state entry from before this rule gets one unconditional GET.
+- **An incomplete TLS chain is `blocked`**, not `error`: `tls: incomplete certificate chain`.
+  www.cysec.gov.cy omits its intermediate certificate. Browsers fetch the intermediate themselves,
+  Node does not.
 
 ### 2.9 Scheduled beside the watchers (2026-09-23)
 

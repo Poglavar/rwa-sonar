@@ -53,7 +53,7 @@
     "link": "https://docs.tessera.pe/technicals/proof-of-reserve-por",
     "machineReadable": true,
     "endpoint": "https://data.chain.link/streams/tspacex-usd-smartdata-datalink ; https://data.chain.link/streams/tkalshi-usd-smartdata-datalink ; https://data.chain.link/streams/topenai--nav-streams",
-    "notes": "Materially stronger than peers, with two real caveats. (1) The feeds publish ASSET COUNTS, not dollar values - docs: \"The values these feeds publish are asset counts - Proof of Reserve - not dollar valuations of the underlying holdings\", so a feed at ratio 1.00 says nothing about what the exposure is worth. (2) The attesting auditors are not named and the attestation reports themselves are not published; docs say only that \"All auditors involved in signing off on the attestations ... will be shown on this page\" (future tense). Crucially, 1:1 here means supply matches verified units - it is NOT a security interest, because the loan is expressly unsecured."
+    "notes": "Materially stronger than peers, with two real caveats. (1) The feeds publish ASSET COUNTS, not dollar values - docs: \"The values these feeds publish are asset counts - Proof of Reserve - not dollar valuations of the underlying holdings\", so a feed at ratio 1.00 says nothing about what the exposure is worth. (2) The attesting auditors are not named and the attestation reports themselves are not published; docs say only that \"All auditors involved in signing off on the attestations ... will be shown on this page\" (future tense). Crucially, 1:1 here means supply matches verified units - it is NOT a security interest, because the loan is expressly unsecured. Update 2026-09-24: Chainlink’s machine-readable reference data directory (Arbitrum mainnet listing) carries all three streams as Data Streams entries (contractType \"verifier\", no feed contract, feedId only). It marks the tKalshi stream \"deprecating\" with shutdownDate \"September 18th, 2026\"; Chainlink’s changelog of 2026-09-16 lists it under streams scheduled for deprecation. T-SpaceX and T-OpenAI remain \"custom\". None of the three is in Chainlink’s Solana feed listing: they are signed off-chain reports that a consumer can verify on-chain (Chainlink’s shared Data Streams verifier program also runs on Solana), not feed accounts anyone can read on Solana. That is narrower than the docs’ \"readable on-chain in real time\"."
   },
   "securityInterest": {
     "exists": false,
@@ -285,6 +285,11 @@
       "title": "Accretion Labs audit report A25TES1, 19 January 2026 - the full independent audit of the Token Program and Referral Program, 30 findings with none critical or high and 17 fixed pre-deployment",
       "url": "https://cdn.tesseralab.co/tessera/2025-accretion-tessera-token-and-referral-audit-A25TES1.pdf",
       "type": "verification-report"
+    },
+    {
+      "title": "Chainlink reference data directory - Arbitrum mainnet feeds and Data Streams (machine-readable entries for the tSpaceX, tKalshi and T-OpenAI streams)",
+      "url": "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-arbitrum-1.json",
+      "type": "por"
     }
   ],
   "keyGovernance": {
@@ -746,7 +751,8 @@
     "https://docs.tessera.pe/features/tessera-dashboard",
     "https://docs.tessera.pe/technicals/supported-wallets-and-chains",
     "https://cdn.tesseralab.co/tessera/2025-accretion-tessera-token-and-referral-audit-A25TES1.pdf",
-    "https://api.mainnet-beta.solana.com (getTokenSupply on all 3 mints and getSignaturesForAddress on the freeze authority, 2026-09-18, slots 448072618-448073142)"
+    "https://api.mainnet-beta.solana.com (getTokenSupply on all 3 mints and getSignaturesForAddress on the freeze authority, 2026-09-18, slots 448072618-448073142)",
+    "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-arbitrum-1.json"
   ],
   "claims": [
     {
@@ -1484,6 +1490,36 @@
       "accessedAt": "2026-09-23T09:00:00Z",
       "status": "contradicted-corrected",
       "note": "SpaceX's jurisdiction was recorded as \"Delaware, USA\"; the company reincorporated from Delaware to Texas on 2024-02-14 (IPO prospectus, 424B4 filed 2026-06-12)."
+    },
+    {
+      "field": "custodyVerification.endpoint",
+      "quote": "\"assetName\": \"Tessera tKalshi\", … \"clicProductName\": \"tKalshi-AUM/USD-SmartData-AssetsUnderManagement-DS-Premium-Global-009\", \"deliveryChannelCode\": \"DS\", \"feedCategory\": \"deprecating\", … \"serviceLevel\": \"Datalink\", \"shutdownDate\": \"September 18th, 2026\" }, \"ens\": null, \"feedCategory\": \"deprecating\", \"feedId\": \"0x0009603f65839fa1bec1ffe794d83dccb24f2c427df31688228cc26f3deef1f9\",",
+      "url": "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-arbitrum-1.json",
+      "locator": "entry \"tKalshi/NAV-SmartData-AUM-NetAssetValue-mainnet-production\" (contractType verifier, Arbitrum mainnet listing). The data.chain.link page slug is the entry’s docs baseAsset-quoteAsset-attributeType-serviceLevel, lower-cased (tkalshi-usd-smartdata-datalink, the page this dossier cites); the 2026-04-11 Wayback capture of that page (https://web.archive.org/web/20260411015117/https://data.chain.link/streams/tkalshi-usd-smartdata-datalink, read 2026-09-24T14:15:52Z) carries the same feedId and slug",
+      "accessedAt": "2026-09-24T14:15:00Z",
+      "status": "confirmed",
+      "method": "machine-readable directory entry",
+      "note": "Chainlink’s own directory marks the tKalshi stream as deprecating with a shutdown date of 18 September 2026, six days before this read, while the entry still says status \"live\". The April 2026 capture of the stream page showed feedCategory \"custom\", so the deprecation is recent. The data.chain.link page itself answers scripted clients with a Vercel challenge, so this directory entry is the machine-readable citation for the same stream."
+    },
+    {
+      "field": "custodyVerification.endpoint",
+      "quote": "\"assetName\": \"Tessera T-OpenAI Reserves\", … \"attributeType\": \"NAV\", \"baseAsset\": \"TOPENAI\", \"baseAssetClic\": \"TOPENAI_CR\", \"clicProductName\": \"TOPENAI-NAV-SmartData-PoR-NetAssetValue-DS-Premium-Global-009\", \"dataProvider\": \"the-network-firm\", \"deliveryChannelCode\": \"DS\", \"feedCategory\": \"custom\", … \"productType\": \"SmartData\", \"productTypeCode\": \"POR\", \"schema\": \"v9\", \"serviceLevel\": \"Streams\" }, \"ens\": null, \"feedCategory\": \"custom\", \"feedId\": \"0x0009aea6c85b4a29f0e1d0742bc91882a9a054ed725a74bc19d53f556268c637\",",
+      "url": "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-arbitrum-1.json",
+      "locator": "entry \"TOPENAI-NAV-SmartData-PoR-NetAssetValue-mainnet-production\" (contractType verifier, Arbitrum mainnet listing). The data.chain.link page slug is the entry’s docs baseAsset-quoteAsset-attributeType-serviceLevel, lower-cased; T-OpenAI has no quoteAsset, hence the double hyphen in topenai--nav-streams, the page this dossier cites. No Wayback capture of that page exists, so the match rests on the slug rule and the unique TOPENAI entry",
+      "accessedAt": "2026-09-24T14:15:00Z",
+      "status": "confirmed",
+      "method": "machine-readable directory entry",
+      "note": "Not deprecating (feedCategory \"custom\"). Labelled NAV but coded proof of reserve (productTypeCode \"POR\", assetName \"Tessera T-OpenAI Reserves\"), with the-network-firm named as data provider — the only one of the three Tessera streams that names one."
+    },
+    {
+      "field": "custodyVerification.endpoint",
+      "quote": "\"assetName\": \"Tessera tSpaceX\", … \"clicProductName\": \"tSpaceX-AUM/USD-SmartData-AssetsUnderManagement-DS-Premium-Global-009\", \"deliveryChannelCode\": \"DS\", \"feedCategory\": \"custom\", … \"serviceLevel\": \"Datalink\" }, \"ens\": null, \"feedCategory\": \"custom\", \"feedId\": \"0x00094fe414821180a6feed61a1d8a8ee95971e4dd97bb0a354da96cdbbe0daff\",",
+      "url": "https://reference-data-directory.vercel.app/feeds-ethereum-mainnet-arbitrum-1.json",
+      "locator": "entry \"tSpaceX/NAV-SmartData-AUM-NetAssetValue-mainnet-production\" (contractType verifier, Arbitrum mainnet listing). The data.chain.link page slug is the entry’s docs baseAsset-quoteAsset-attributeType-serviceLevel, lower-cased (tspacex-usd-smartdata-datalink); the 2026-04-11 Wayback capture of that page carries the same feedId",
+      "accessedAt": "2026-09-24T14:15:00Z",
+      "status": "confirmed",
+      "method": "machine-readable directory entry",
+      "note": "Not deprecating (feedCategory \"custom\")."
     }
   ],
   "whatIf": [

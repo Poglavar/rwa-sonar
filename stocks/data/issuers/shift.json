@@ -1494,8 +1494,17 @@
       "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPX3L",
       "locator": "the SPX3L record returned by Jupiter's token search",
       "accessedAt": "2026-09-17T15:39:38Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:04:04Z): the quoted run was live market data (holder count, FDV, market cap, price, price block, 24h stats) and every one of those numbers has moved since 2026-09-17; the record's structure is unchanged and it still describes an untraded, concentrated token. A quote of numbers that change every block cannot stay verbatim (and the watcher compares a keys-sorted rendering of the JSON, so a multi-key run in response order is never found), so the stable part of the same record is now quoted in a new pricing.arbitrageable claim on the same URL. Earlier note: Today's reading on the issuer's largest Series is materially worse than the dossier's: the record carries no liquidity field at all and reports \"organicScore\":0,\"organicScoreLabel\":\"low\",\"audit\":{\"topHoldersPercentage\":99.86317013721552,\"devMints\":10}, market cap now USD 815,536 against the USD 3.26M the dossier recorded across all eight mints, and stats24h.volumeChange -100, i.e. no 24h volume at all. The token is still Jupiter-verified and tagged stocks/shift/rwa."
+    },
+    {
+      "field": "pricing.arbitrageable",
+      "quote": "\"organicScore\":0,\"organicScoreLabel\":\"low\"",
+      "url": "https://lite-api.jup.ag/tokens/v2/search?query=SPX3L",
+      "locator": "the SPX3L record (mint 12y35E6btjazuaSjjwq99MobbycbkFsFvm8s5QpaSHFT) returned by Jupiter's token search, organicScore / organicScoreLabel keys",
+      "accessedAt": "2026-09-24T14:04:04Z",
       "status": "confirmed",
-      "note": "Today's reading on the issuer's largest Series is materially worse than the dossier's: the record carries no liquidity field at all and reports \"organicScore\":0,\"organicScoreLabel\":\"low\",\"audit\":{\"topHoldersPercentage\":99.86317013721552,\"devMints\":10}, market cap now USD 815,536 against the USD 3.26M the dossier recorded across all eight mints, and stats24h.volumeChange -100, i.e. no 24h volume at all. The token is still Jupiter-verified and tagged stocks/shift/rwa."
+      "note": "Jupiter's own classification of the token's trading as non-organic. Dated reading of the live numbers in the same record at 2026-09-24T14:04:04Z: holderCount 234 (238 on 2026-09-17), mcap = fdv USD 848,441 (815,536), usdPrice 292.32, circSupply = totalSupply 2,902.47, audit.topHoldersPercentage 99.86, stats24h one buy of USD 4.98 by one trader, stats6h.volumeChange -100; still isVerified true and tagged verified/stocks/shift/rwa/token-2022. Substance unchanged from the 2026-09-17 reading: there is no liquid secondary market in which the price can be arbitraged against the reference index."
     },
     {
       "field": "keyGovernance.mint",

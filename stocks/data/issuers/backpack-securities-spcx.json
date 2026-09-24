@@ -1,6 +1,18 @@
 {
   "issuer": "Backpack Securities (marketing name). The token issuer of record is Trek Nexus Markets Ltd (BVI) as bare trustee; Backpack Exchange is Trek Labs Ltd.; the introducing broker is Backpack Securities Global Limited (New Zealand); the sole recognised tokenholder/beneficiary is Trek Forge Ltd (BVI).",
   "status": "live",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://brokercheck.finra.org/firm/summary/134284",
+      "verificationUrl": "https://api.brokercheck.finra.org/search/firm/134284",
+      "reason": "BrokerCheck's firm summary page is rendered in the browser and gives a fetcher no text; the page loads the firm record from FINRA's own BrokerCheck API at this URL, which carries the same registered firm name."
+    },
+    {
+      "sourceUrl": "https://brokercheck.finra.org/firm/summary/317194",
+      "verificationUrl": "https://api.brokercheck.finra.org/search/firm/317194",
+      "reason": "BrokerCheck's firm summary page is rendered in the browser and gives a fetcher no text; the page loads the firm record from FINRA's own BrokerCheck API at this URL, which carries the same registered firm name."
+    }
+  ],
   "products": [
     "SPCX — tokenized SpaceX (Space Exploration Technologies Corp.) equity on Solana, listed 2026-06-12 via Sunrise",
     "Tokenized Securities Issued by Backpack — 56 exact Solana stock/ETF mints had both deposits and withdrawals enabled in Backpack's asset API on 2026-09-20. The API contains 1,159 stock-address records in total, but 1,103 were disabled and must not be presented as currently available.",
@@ -10,7 +22,7 @@
   "issuingEntity": "Trek Nexus Markets Ltd, a British Virgin Islands business company (or one or more of its affiliates), acting solely as bare trustee under a declaration of trust dated 2026-06-06 (the 'Instrument', unpublished). Full entity map from Schedule A of the User Agreement: token issuer/bare trustee Trek Nexus Markets Ltd (BVI); sole registered Tokenholder and beneficiary AND asset-tokenization services provider Trek Forge Ltd (BVI); brokerage services / introducing broker for non-US customers Backpack Securities Global Limited (New Zealand); platform operator 'Backpack Exchange' Trek Labs Ltd; US-resident services Trek Labs, Inc. (Delaware), registered as a Money Services Business with FinCEN; UAE Trek Labs Ltd FZE (VARA-licensed, DWTC Free Zone); Australia/EEA/UK Trek Labs Australia Pty Ltd (AUSTRAC DCE); margin and borrow-lending 3-102-939537 Sociedad de Responsabilidad Limitada (Costa Rica).",
   "entityJurisdiction": "British Virgin Islands (token issuer and the recognised beneficiary); New Zealand (Backpack Securities Global Limited, introducing broker for non-US customers); United States (RQD Clearing, LLC and Atomic Vaults Securities, LLC — the only SEC-registered brokers anywhere in the chain, both third parties; and Trek Labs, Inc., Delaware, a FinCEN MSB). ADDED 2026-09-18: Anjouan (Union of the Comoros) — the live SPCX page's geo-dependent footer names Trek Brokerage Services Limited, 'a company licensed by the Anjouan Offshore Finance Authority', as Intermediary Broker for some regions, so an offshore affiliate sits in the brokerage chain alongside the US firms. The New Zealand leg is now confirmed on the register rather than asserted: Backpack Securities Global Limited is NZ company 9406953, NZBN 9429053463876, incorporated 25 Feb 2026, registered office 145 Ardmore Street, Wanaka — and it was named TREK LABS BROKERAGE SERVICES LIMITED from 19 Feb 2026 to 29 May 2026, i.e. renamed twelve days before the Issuer T&C's 2026-06-10 effective date. Incorporation is not licensing: the NZ Financial Service Providers Register could not be read (Incapsula block), so its FSP registration is unverified either way.",
   "governingLaw": "British Virgin Islands law governs the Issuer Terms and Conditions, and 'all transactions contemplated herein are deemed to occur in the British Virgin Islands' (cl. 2.1). New York law (UCC Article 8, incl. s.8-110(e)) governs the separate OFF-CHAIN security entitlement held in a Backpack Securities account. BVI Electronic Transactions Act 2001 is invoked for electronic assignment of beneficial interests.",
-  "regulatoryStatus": "The token side is unregulated and says so: 'The Company and the Tokens are not registered with, endorsed, or approved by the British Virgin Islands Financial Services Commission or any other regulatory authority', and the issuer asserts the Tokens 'do not constitute securities, certificates representing investments, depositary receipts, notes, collective investment scheme units, rights or interests in investments or other regulated investments as defined under the Securities and Investment Business Act (SIBA)'. The Risk Disclosure adds that Tokens 'are not designed or marketed as an investment product' and that nothing 'shall constitute an offer of securities or an investment, or be deemed to create an investment contract in any jurisdiction'. The distribution basis is Regulation S: the Asset Tokenization ToS states the Tokens 'have not been registered under the U.S. Securities Act of 1933 ... [and] may not be offered or sold in the United States or to US persons'. Regulated status sits one layer down, in the custody chain: RQD Clearing, LLC (Clearing Broker, CRD 134284 / SEC 8-66826) and Atomic Vaults Securities, LLC (Intermediary Broker, CRD 317194 / SEC 8-70868, formerly Olympus Mons Securities, LLC — note Backpack's docs spell it 'Atomic Vault' singular), both SEC-registered broker-dealers and FINRA & SIPC members. VERIFIED NEGATIVE: FINRA BrokerCheck firm search and SEC IAPD return zero records for 'Backpack', 'Backpack Securities', 'Trek Labs', 'Trek Nexus' and 'Trek Forge'; there is no CRD number, Form BD or SEC registration for any Backpack or Trek entity. SEC EDGAR full-text search returns no Backpack/Trek filings (the six hits for 'Backpack Securities' are unrelated third parties) and no Form D, Reg A or registration statement for SPCX. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation serving 'non-U.S. customers'. The widely repeated press description of SPCX as issued by 'a regulated U.S. broker-dealer' is therefore not supported by any primary document. Backpack Securities is NOT available to users in the United States, the United Kingdom, the United Arab Emirates or Japan, and is not offered on Backpack EU; cl. 4.1(b) prohibits transferring the token to or for the benefit of any U.S. person. Mark Wetjen (former CFTC Acting Chairman) was appointed President of 'Backpack US' around 2026-03-05, which signals a US expansion effort but is not itself a registration. STRONGEST NEGATIVE: Backpack's own 'US Licenses, Registrations, and Regulatory Disclosures' page, stated as current 'As of September 2026', discloses only money transmission — FinCEN MSB registration 31000329581307 for Trek Labs, Inc., NMLS ID 2665675, plus state money-transmitter licences (Delaware 042857, DC MTR2665675, Iowa 2025-0047 and others) — and contains zero occurrences of 'broker-dealer', 'FINRA', 'SEC' or 'Securities and Exchange'. That is the page a US broker-dealer registration would appear on. Separately, the Brokerage ToS says Backpack Securities Global Limited 'acts solely in its capacities as custodian of Stocks and as a Securities Intermediary'. Sector-wide regulator position: the SEC Division of Corporation Finance staff statement on tokenized securities (2026-01-28) distinguishes securities tokenized by or on behalf of the issuer from those tokenized by unaffiliated third parties, and holds that 'the format in which a security is issued or the methods by which holders are recorded (e.g., onchain vs. offchain) does not affect application of the federal securities laws'. SPCX is squarely third-party: SpaceX's own final prospectus (424B4, 2026-06-12, CIK 0001181412) contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the issuer of the underlying has neither endorsed nor acknowledged these tokens. MATERIAL QUALIFICATION 2026-09-18: even the one regulated layer is not the layer every user gets. The live SPCX product page footer states that in some regions brokerage services are provided through Trek Brokerage Services Limited, licensed by the Anjouan Offshore Finance Authority, as Intermediary Broker — a Backpack affiliate under Comoros supervision rather than the third-party SEC-registered Atomic Vaults Securities, LLC that the support pages tell holders to check on BrokerCheck. The Anjouan licence itself is UNVERIFIED: no reachable public AOFA register was found on 2026-09-18. Separately, the SEC engagement is now documented rather than inferred: a Crypto Task Force meeting memo records that on 2026-04-21 staff met representatives of Trek Labs, Inc. and Barbour, Griffith & Rogers — Can Sun (co-founder), Mark Wetjen (President of the Americas) and Keaghan Ames (BGR Group) — with an agenda covering CFTC DCM/DCO licensing and 'Securities Law Considerations and Potential SEC Oversight'. A Task Force meeting is a meeting, not a registration.",
+  "regulatoryStatus": "The token side is unregulated and says so: 'The Company and the Tokens are not registered with, endorsed, or approved by the British Virgin Islands Financial Services Commission or any other regulatory authority', and the issuer asserts the Tokens 'do not constitute securities, certificates representing investments, depositary receipts, notes, collective investment scheme units, rights or interests in investments or other regulated investments as defined under the Securities and Investment Business Act (SIBA)'. The Risk Disclosure adds that Tokens 'are not designed or marketed as an investment product' and that nothing 'shall constitute an offer of securities or an investment, or be deemed to create an investment contract in any jurisdiction'. The distribution basis is Regulation S: the Asset Tokenization ToS states the Tokens 'have not been registered under the U.S. Securities Act of 1933 ... [and] may not be offered or sold in the United States or to US persons'. Regulated status sits one layer down, in the custody chain: RQD Clearing, LLC (Clearing Broker, CRD 134284 / SEC 8-66826) and Atomic Vaults Securities, LLC (Intermediary Broker, CRD 317194 / SEC 8-70868, formerly Olympus Mons Securities, LLC — note Backpack's docs spell it 'Atomic Vault' singular), both SEC-registered broker-dealers and FINRA & SIPC members. VERIFIED NEGATIVE: FINRA BrokerCheck firm search and SEC IAPD return zero records for 'Backpack', 'Backpack Securities', 'Trek Labs', 'Trek Nexus' and 'Trek Forge'; there is no CRD number, Form BD or SEC registration for any Backpack or Trek entity. SEC EDGAR full-text search returns no Backpack/Trek filings (the six hits for 'Backpack Securities' are unrelated third parties) and no Form D, Reg A or registration statement for SPCX. The consumer-facing introducing broker, Backpack Securities Global Limited, is a New Zealand corporation serving 'non-U.S. customers'. The widely repeated press description of SPCX as issued by 'a regulated U.S. broker-dealer' is therefore not supported by any primary document. Backpack Securities is NOT available to users in the United States, the United Kingdom, the United Arab Emirates or Japan, and is not offered on Backpack EU; cl. 4.1(b) prohibits transferring the token to or for the benefit of any U.S. person. Mark Wetjen (former CFTC Acting Chairman) was appointed President of 'Backpack US' around 2026-03-05, which signals a US expansion effort but is not itself a registration. STRONGEST NEGATIVE: Backpack's own 'US Licenses, Registrations, and Regulatory Disclosures' page, stated as current 'As of September 2026', discloses only money transmission — FinCEN MSB registration 31000339714338 for Trek Labs, Inc. (the page printed 31000329581307 until at least 2026-09-18T11:40Z and 31000339714338 from 2026-09-22T16:48Z on — a new registration number under the same 'As of September 2026' heading), NMLS ID 2665675, plus state money-transmitter licences (Delaware 042857, DC MTR2665675, Iowa 2025-0047 and others) — and contains zero occurrences of 'broker-dealer', 'FINRA', 'SEC' or 'Securities and Exchange'. That is the page a US broker-dealer registration would appear on. Separately, the Brokerage ToS says Backpack Securities Global Limited 'acts solely in its capacities as custodian of Stocks and as a Securities Intermediary'. Sector-wide regulator position: the SEC Division of Corporation Finance staff statement on tokenized securities (2026-01-28) distinguishes securities tokenized by or on behalf of the issuer from those tokenized by unaffiliated third parties, and holds that 'the format in which a security is issued or the methods by which holders are recorded (e.g., onchain vs. offchain) does not affect application of the federal securities laws'. SPCX is squarely third-party: SpaceX's own final prospectus (424B4, 2026-06-12, CIK 0001181412) contains zero occurrences of 'tokeniz', 'Solana' or 'Backpack', so the issuer of the underlying has neither endorsed nor acknowledged these tokens. MATERIAL QUALIFICATION 2026-09-18: even the one regulated layer is not the layer every user gets. The live SPCX product page footer states that in some regions brokerage services are provided through Trek Brokerage Services Limited, licensed by the Anjouan Offshore Finance Authority, as Intermediary Broker — a Backpack affiliate under Comoros supervision rather than the third-party SEC-registered Atomic Vaults Securities, LLC that the support pages tell holders to check on BrokerCheck. The Anjouan licence itself is UNVERIFIED: no reachable public AOFA register was found on 2026-09-18. Separately, the SEC engagement is now documented rather than inferred: a Crypto Task Force meeting memo records that on 2026-04-21 staff met representatives of Trek Labs, Inc. and Barbour, Griffith & Rogers — Can Sun (co-founder), Mark Wetjen (President of the Americas) and Keaghan Ames (BGR Group) — with an agenda covering CFTC DCM/DCO licensing and 'Securities Law Considerations and Potential SEC Oversight'. A Task Force meeting is a meeting, not a registration.",
   "legalForm": "spv-claim-redeemable",
   "holderClaim": "The token is, in the issuer's own words, 'a non-negotiable digital record evidencing a pro rata beneficial entitlement (if any)' as beneficiary of a BVI bare trust over a pooled holding of the referenced shares — with no entitlement to any specific identifiable share. Crucially, the trustee recognises only Trek Forge Ltd (a Backpack affiliate) as Tokenholder and sole beneficiary; a person holding the token in their own wallet 'becomes the on-chain holder of those Tokens for blockchain transfer purposes only' and has no redemption, distribution, instruction or enforcement right against the trust unless and until a 'Direct Redemption Contingency' occurs (Backpack insolvency, cessation, >90 days of suspended redemptions, court order, etc.) and the trustee expressly registers them. In practice a holder realises value by depositing the token back into a KYC'd Backpack Exchange account, which burns it and credits an off-chain UCC Article 8 security entitlement.",
   "underlyingCustodian": "Real SpaceX shares are held through regulated US brokerage infrastructure in an OMNIBUS account at RQD Clearing, LLC (Clearing Broker; SEC-registered, FINRA & SIPC member, CRD 134284 / SEC 8-66826), with Atomic Vaults Securities, LLC as Intermediary Broker (CRD 317194 / SEC 8-70868). Under the Issuer T&C the Underlying Assets are held by Trek Nexus Markets Ltd 'as legal owner or holder of record and as bare trustee', and the trustee 'may hold Underlying Assets and proceeds in omnibus or commingled accounts' (commingled only within the same Approved Asset pool) while simultaneously stating it 'does not act as a commercial custodian or administrator' and may appoint unnamed regulated custodians. NO custodian for the tokenized pool is named in any document, and how the BVI bare trust's legal title sits alongside the RQD/Atomic Vaults account chain is undocumented. SIPC: the Brokerage ToS states that stocks are held in the Omnibus Account and 'only the Omnibus Account will receive SIPC coverage', which 'may therefore be shared among all Users and may be insufficient'; and expressly 'The Tokens are not insured or guaranteed by SIPC, any deposit insurance scheme, or any governmental agency.' CORRECTED 2026-09-18: the Intermediary Broker is REGION-DEPENDENT and is not necessarily the SEC-registered firm the support pages name. The live product page carries a geo-dependent footer reading 'Brokerage services in your region are provided through Trek Brokerage Services Limited, a company licensed by the Anjouan Offshore Finance Authority, acting as Intermediary Broker pursuant to the Backpack Securities Brokerage Services Terms of Service.' The Brokerage ToS contemplates exactly that — 'Intermediary Broker' is defined as 'any Affiliate of Backpack Exchange that may act as an intermediary in the Brokerage Chain, as displayed on the Platform to certain Users from time to time' — but note what changes: Atomic Vaults Securities, LLC is a THIRD-PARTY SEC-registered broker-dealer holders are told to verify on BrokerCheck, while Trek Brokerage Services Limited is a Backpack AFFILIATE supervised in Anjouan (Comoros), and no reachable public Anjouan register exists to test the licence. Only the Clearing Broker is named in the binding terms ('RQD* Clearing, LLC'); the intermediary slot is filled by the Platform at its discretion.",
@@ -257,7 +269,7 @@
       "type": "regulatory"
     },
     {
-      "title": "Backpack Support — US Licenses, Registrations and Regulatory Disclosures / States Where We Operate (Trek Labs, Inc.; FinCEN MSB 31000329581307; NMLS 2665675; state money-transmitter licences; no broker-dealer, FINRA or SEC registration disclosed)",
+      "title": "Backpack Support — US Licenses, Registrations and Regulatory Disclosures / States Where We Operate (Trek Labs, Inc.; FinCEN MSB 31000339714338, 31000329581307 until 2026-09-18; NMLS 2665675; state money-transmitter licences; no broker-dealer, FINRA or SEC registration disclosed)",
       "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
       "type": "regulatory"
     },
@@ -516,7 +528,7 @@
         "name": "FinCEN",
         "role": "regulator",
         "jurisdiction": "United States",
-        "identifier": "MSB 31000329581307; NMLS 2665675",
+        "identifier": "MSB 31000339714338 (31000329581307 until 2026-09-18); NMLS 2665675",
         "note": "The only US registration in the group: money transmission by Trek Labs, Inc. Backpack’s own US disclosures page, current ‘As of September 2026’, contains zero occurrences of ‘broker-dealer’, ‘FINRA’ or ‘SEC’.",
         "source": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate"
       },
@@ -930,12 +942,12 @@
   "claims": [
     {
       "field": "status",
-      "quote": "{\"symbol\":\"SPCX.US_USDC\",\"marketType\":\"SPOT\",\"orderBookState\":\"Open\"} and {\"symbol\":\"SPCX.US_USDC_PERP\",\"marketType\":\"PERP\",\"orderBookState\":\"Open\"}",
+      "quote": "\"orderBookState\":\"Open\",\"positionLimitWeight\":null,\"quoteSymbol\":\"USDC\",\"rwaMarketType\":\"STOCK\",\"symbol\":\"SPCX.US_USDC\" … \"orderBookState\":\"Open\",\"positionLimitWeight\":\"20\",\"quoteSymbol\":\"USDC\",\"rwaMarketType\":\"STOCK\",\"symbol\":\"SPCX.US_USDC_PERP\"",
       "url": "https://api.backpack.exchange/api/v1/markets",
-      "locator": "JSON array, elements with symbol SPCX.US_USDC and SPCX.US_USDC_PERP, key orderBookState",
-      "accessedAt": "2026-09-17T15:17:58Z",
+      "locator": "JSON array, elements with symbol SPCX.US_USDC (marketType SPOT) and SPCX.US_USDC_PERP (marketType PERP), key orderBookState and the keys that follow it",
+      "accessedAt": "2026-09-24T14:16:54Z",
       "status": "confirmed",
-      "note": "Both books read Open on 2026-09-17; spot created 2026-06-22T10:24:38, perp 2026-09-02T01:00:34. The mint’s supply also moved between reads (43,248.128967 on 2026-09-16 to 43,249.150131 on 2026-09-17), so minting is live."
+      "note": "RE-QUOTED 2026-09-24T14:16:54Z, source unchanged: both SPCX books still read orderBookState Open. The previous quote was a reconstructed object ({symbol, marketType, orderBookState}), not a run the response contains, so it could never be found verbatim; now quoted as the two contiguous runs that end each element. New since the first read: each element carries rwaMarketType \"STOCK\". Both books read Open on 2026-09-17; spot created 2026-06-22T10:24:38, perp 2026-09-02T01:00:34. The mint’s supply also moved between reads (43,248.128967 on 2026-09-16 to 43,249.150131 on 2026-09-17), so minting is live."
     },
     {
       "field": "issuingEntity",
@@ -1040,26 +1052,35 @@
       "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
       "locator": "page body, opening paragraph under heading 'Trek Labs, Inc.'",
       "accessedAt": "2026-09-17T15:21:20Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:14:52Z): the FinCEN registration number printed for Trek Labs, Inc. changed from 31000329581307 to 31000339714338. The watcher's stored readings date the change: the old number is on the page at 2026-09-17T15:25:45Z and 2026-09-18T11:40:04Z, the new one from 2026-09-22T16:48:04Z on. The rest of the sentence, including the 'As of September 2026' heading, is unchanged. Recorded as a new regulatoryStatus claim on the same URL. Earlier note: Re-verified 2026-09-17 on the live page: zero occurrences of \"broker-dealer\", \"FINRA\", \"SEC\" or \"Securities and Exchange\" in the whole document; the only registrations disclosed are the FinCEN MSB, NMLS ID 2665675 and state money-transmitter licences."
+    },
+    {
+      "field": "regulatoryStatus",
+      "quote": "Trek Labs, Inc. As of September 2026 Trek Labs, Inc. is registered as a Money Services Business with the Financial Crimes Enforcement Network (\"FinCEN\"), which is a bureau of the U.S. Department of the Treasury. The FinCEN registration number for Trek Labs, Inc. is 31000339714338.",
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "locator": "page body, opening paragraph under heading 'Trek Labs, Inc.'",
+      "accessedAt": "2026-09-24T14:14:52Z",
       "status": "confirmed",
-      "note": "Re-verified 2026-09-17 on the live page: zero occurrences of \"broker-dealer\", \"FINRA\", \"SEC\" or \"Securities and Exchange\" in the whole document; the only registrations disclosed are the FinCEN MSB, NMLS ID 2665675 and state money-transmitter licences."
+      "note": "Same registration type, new number. FinCEN assigns a new MSB registration number to each registration filing, so a new number most likely means Trek Labs, Inc. re-registered or renewed; not checked against the FinCEN MSB registrant search. Nothing else on the page changed in substance: still only money transmission (FinCEN MSB, NMLS ID 2665675, state money-transmitter licences) and no broker-dealer, FINRA or SEC registration."
     },
     {
       "field": "regulatoryStatus",
       "quote": "RQD* CLEARING, LLC",
       "url": "https://brokercheck.finra.org/firm/summary/134284",
       "locator": "api.brokercheck.finra.org/search/firm?query=RQD Clearing — hits.total 1, firm_name, firm_source_id 134284, firm_bd_sec_number 66826",
-      "accessedAt": "2026-09-17T15:20:58Z",
+      "accessedAt": "2026-09-24T14:16:36Z",
       "status": "confirmed",
-      "note": "Note the registered name carries an asterisk: \"RQD* CLEARING, LLC\". Backpack writes \"RQD Clearing, LLC\"."
+      "note": "Re-read 2026-09-24T14:16:36Z in the firm record served by https://api.brokercheck.finra.org/search/firm/134284 (declared in quoteVerificationSources, because the summary page itself is browser-rendered and was never readable by the watcher): firmName unchanged, bcScope ACTIVE, firmStatus Approved. Note the registered name carries an asterisk: \"RQD* CLEARING, LLC\". Backpack writes \"RQD Clearing, LLC\"."
     },
     {
       "field": "regulatoryStatus",
       "quote": "ATOMIC VAULTS SECURITIES, LLC",
       "url": "https://brokercheck.finra.org/firm/summary/317194",
       "locator": "api.brokercheck.finra.org/search/firm?query=Atomic Vaults Securities — hits.total 1, firm_name, firm_source_id 317194, firm_bd_sec_number 70868",
-      "accessedAt": "2026-09-17T15:20:58Z",
+      "accessedAt": "2026-09-24T14:16:37Z",
       "status": "confirmed",
-      "note": "Confirms the plural spelling. The same endpoint returned hits.total 0 for \"Backpack Securities\" and 0 for \"Trek Labs\" on 2026-09-17, re-verifying the dossier’s negative."
+      "note": "Re-read 2026-09-24T14:16:37Z in the firm record served by https://api.brokercheck.finra.org/search/firm/317194 (declared in quoteVerificationSources, because the summary page itself is browser-rendered and was never readable by the watcher): firmName unchanged, bcScope ACTIVE, firmStatus Approved. Confirms the plural spelling. The same endpoint returned hits.total 0 for \"Backpack Securities\" and 0 for \"Trek Labs\" on 2026-09-17, re-verifying the dossier’s negative."
     },
     {
       "field": "regulatoryStatus",
@@ -1225,11 +1246,11 @@
     {
       "field": "custodyVerification.agent",
       "quote": "Because Backpack’s reserves are verified daily by a third party in real time (Proof of Reserves), any non-standard wallet operation requires additional security and operational resources.",
-      "url": "https://support.backpack.exchange/backpack-securities/faqs",
-      "locator": "mistaken-deposit article, section \"Special case: you may request manual retrieval assistance\" (retrieved via https://support.backpack.exchange/llms-full.txt)",
-      "accessedAt": "2026-09-17T15:17:58Z",
+      "url": "https://support.backpack.exchange/exchange/deposit-and-withdraw/crypto/deposit/unsupported-asset-deposits-and-manual-retrieval-policy",
+      "locator": "Unsupported Asset Deposits & Manual Retrieval Policy, the manual-retrieval paragraph",
+      "accessedAt": "2026-09-24T14:14:50Z",
       "status": "confirmed",
-      "note": "Re-verified: this is the ONLY Proof-of-Reserves reference in Backpack’s entire support corpus and it sits in an article about mistakenly deposited crypto, covering exchange crypto reserves. It says nothing about the SPCX share pool. custodyVerification.agent stays empty."
+      "note": "URL CORRECTED 2026-09-24T14:14:50Z: this sentence has never been on the Backpack Securities FAQs page cited before (absent from every stored reading of it since 2026-09-17); it is in the exchange's Unsupported Asset Deposits & Manual Retrieval Policy article, where it was re-read verbatim, and the claim now cites that article. The sentence itself is unchanged. Re-verified: this is the ONLY Proof-of-Reserves reference in Backpack’s entire support corpus and it sits in an article about mistakenly deposited crypto, covering exchange crypto reserves. It says nothing about the SPCX share pool. custodyVerification.agent stays empty."
     },
     {
       "field": "custodyVerification.frequency",
@@ -1308,11 +1329,12 @@
     },
     {
       "field": "redemption.eligibility",
-      "quote": "To convert between tokenized securities (onchain) and a security entitlement (traditional brokerage), you need: 1. A Backpack Exchange account with completed KYC 2. A Solana wallet",
+      "quote": "To convert between tokenized securities (onchain) and a security entitlement (traditional brokerage), you need: … A Backpack Exchange account with completed KYC … A Solana wallet",
       "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities/conversion-flow",
-      "locator": "section 'Before You Start' (retrieved via https://support.backpack.exchange/llms-full.txt)",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "section 'Before You Start', the sentence and its two list items",
+      "accessedAt": "2026-09-24T14:14:51Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:14:51Z, source unchanged: same two requirements. The previous quote carried the Markdown list numbers \"1.\" and \"2.\" from llms-full.txt, which the page renders as list markup rather than text, so the page never contained them; now quoted as the sentence and the two items."
     },
     {
       "field": "redemption.rails",
@@ -1372,11 +1394,12 @@
     },
     {
       "field": "redemption.minimum",
-      "quote": "\"minimumDeposit\": \"0.004\", \"minimumWithdrawal\": \"0.008\", \"withdrawalFee\": \"0.004\", \"nativeDecimals\": 6",
+      "quote": "\"contractAddress\":\"SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb\",\"depositEnabled\":true,\"displayName\":\"SpaceX\",\"maximumWithdrawal\":null,\"minimumDeposit\":\"0.004\",\"minimumWithdrawal\":\"0.008\",\"nativeDecimals\":6,\"withdrawEnabled\":true,\"withdrawalFee\":\"0.004\"",
       "url": "https://api.backpack.exchange/api/v1/assets",
-      "locator": "JSON array, element with symbol SPCX.US, tokens[0] (blockchain Solana, contractAddress SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb)",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "JSON array, element with symbol SPCX.US, tokens[0] (blockchain Solana), keys in served (alphabetical) order",
+      "accessedAt": "2026-09-24T14:16:54Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:16:54Z, source unchanged: minimum deposit 0.004, minimum withdrawal 0.008 and withdrawal fee 0.004 SPCX.US, 6 native decimals, deposits and withdrawals enabled. The previous quote listed withdrawalFee before nativeDecimals, which is not the served order, so it could never be found verbatim; the whole tokens[0] object from the contract address on is now quoted, which also ties the parameters to the SPCX mint."
     },
     {
       "field": "redemption.minimum",
@@ -1420,11 +1443,12 @@
     },
     {
       "field": "transferRestrictions.usPersonsExcluded",
-      "quote": "Backpack Securities is available to eligible users only. It isn't available in the United States, the United Kingdom, the United Arab Emirates, or Japan, and isn't offered on Backpack EU.",
+      "quote": "Backpack Securities isn't available in the United States, the United Kingdom, the United Arab Emirates, or Japan, and isn't offered on Backpack EU.",
       "url": "https://support.backpack.exchange/backpack-securities/eligibility-and-access",
-      "locator": "overview hint box, also repeated on the Tokenized Securities index page (retrieved via https://support.backpack.exchange/llms-full.txt)",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "section 'Supported Regions'",
+      "accessedAt": "2026-09-24T14:14:51Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:14:51Z: the previous words are the info hint on the Backpack Securities index page (https://support.backpack.exchange/backpack-securities, still verbatim there in llms-full.txt on 2026-09-24), not on this page, which has never carried them in any stored reading since 2026-09-17. This page's own sentence says the same: the same four countries plus Backpack EU are excluded. No change in substance."
     },
     {
       "field": "transferRestrictions.mechanism",
@@ -1488,11 +1512,12 @@
     },
     {
       "field": "voting",
-      "quote": "Supported by the brokerage infrastructure (stock splits, mergers, certain spinoffs); reflected in balances is still being worked on",
+      "quote": "Shareholder voting for certain securities is supported by the underlying brokerage infrastructure and is still being worked on — it isn't enabled yet.",
       "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions",
-      "locator": "structure table, row 'Corporate actions' (retrieved via https://support.backpack.exchange/llms-full.txt)",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "section 'Voting rights' (the status table on the same page lists 'Voting rights' as 'Still being worked on')",
+      "accessedAt": "2026-09-24T14:14:51Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:14:51Z: the previous quote was not verbatim on this page in any stored reading since 2026-09-17 (it condensed the corporate-actions table row of the Tokenized Securities page and this page's 'still being worked on' status), and it was about corporate actions rather than voting. Replaced with this page's own voting sentence, which has been on the page unchanged since at least 2026-09-17. Substance unchanged: brokerage-side voting is not enabled."
     },
     {
       "field": "corporateActions",
@@ -1517,8 +1542,17 @@
       "url": "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
       "locator": "whole response",
       "accessedAt": "2026-09-17T15:17:58Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:16:55Z): the quoted response was a 24h ticker (last price, high, low, volume, trades) and every number in it has moved since 2026-09-17, as a ticker's must. The stable identity of the response is now quoted in a new pricing.referenceMarket claim on the same URL, with the current numbers in its note. Earlier note: Read 2026-09-17 during US pre-market: the exchange book itself was extremely thin over the window (8 trades, 0.55 shares, $85 notional), which is why the Nasdaq print rather than this book anchors the price."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "\"symbol\":\"SPCX.US_USDC\"",
+      "url": "https://api.backpack.exchange/api/v1/ticker?symbol=SPCX.US_USDC",
+      "locator": "whole response (a single 24h ticker object)",
+      "accessedAt": "2026-09-24T14:16:55Z",
       "status": "confirmed",
-      "note": "Read 2026-09-17 during US pre-market: the exchange book itself was extremely thin over the window (8 trades, 0.55 shares, $85 notional), which is why the Nasdaq print rather than this book anchors the price."
+      "note": "Dated reading 2026-09-24T14:16:55Z (US regular session): firstPrice 152.51, high 152.82, low 147.77, lastPrice 147.77, volume 22.06 SPCX.US, quoteVolume 3,305.81 USDC, 8 trades over the 24h window. Still a very thin book (eight trades, about USD 3.3k notional), so the Nasdaq print rather than this book anchors the price; unchanged in substance from the 2026-09-17 reading (8 trades, 0.55 shares, USD 85)."
     },
     {
       "field": "pricing.referenceMarket",
@@ -1565,11 +1599,12 @@
     },
     {
       "field": "products[0]",
-      "quote": "\"displayName\": \"SpaceX\", \"symbol\": \"SPCX.US\", \"contractAddress\": \"SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb\", \"blockchain\": \"Solana\"",
+      "quote": "\"displayName\":\"SpaceX\",\"symbol\":\"SPCX.US\",\"tokens\":[{\"blockchain\":\"Solana\",\"contractAddress\":\"SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb\"",
       "url": "https://api.backpack.exchange/api/v1/assets",
-      "locator": "JSON array, element with symbol SPCX.US",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "JSON array, element with symbol SPCX.US (keys served in alphabetical order)",
+      "accessedAt": "2026-09-24T14:16:53Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:16:53Z, source unchanged: same display name, symbol, chain and contract address. The previous quote put contractAddress before blockchain, an order this API has not served in any stored response (it serves keys alphabetically), so it could never be found verbatim; now quoted as the contiguous run the response actually contains."
     },
     {
       "field": "products[1]",
@@ -1582,20 +1617,21 @@
     },
     {
       "field": "products[2]",
-      "quote": "Real security entitlements governed under New York law (UCC Article 8), supported by established brokerage, clearing, custody, and transfer infrastructure, with real ownership rights including cash dividends, corporate actions, brokerage transfers, and applicable tax treaty benefits.",
+      "quote": "You own real U.S. stocks and ETFs, held as \"security entitlements\" under New York UCC Article 8 — the same private property interest that applies to stock holdings across the U.S. brokerage industry",
       "url": "https://support.backpack.exchange/backpack-securities/real-ownership-and-legal-framework",
-      "locator": "section heading 'Traditional Securities on Backpack' (retrieved via https://support.backpack.exchange/llms-full.txt)",
-      "accessedAt": "2026-09-17T15:17:58Z",
-      "status": "confirmed"
+      "locator": "opening section of the page",
+      "accessedAt": "2026-09-24T14:24:37Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:24:37Z: the previous words (\"Real security entitlements governed under New York law (UCC Article 8) … with real ownership rights including cash dividends, corporate actions, brokerage transfers, and applicable tax treaty benefits.\") are the 'Traditional Securities on Backpack' heading text of the Tokenized Securities page (https://support.backpack.exchange/backpack-securities/tokenized-securities, still verbatim there on 2026-09-24T14:14:50Z), not of this page. This page's own statement of the same product is quoted instead. Note the two pages still disagree: the Tokenized Securities page lists cash dividends and tax-treaty benefits as ownership rights, while this page and the Your Holdings page say cash dividend payouts and corporate actions reflected in balances are still being worked on."
     },
     {
       "field": "products[3]",
-      "quote": "{\"symbol\":\"SPCX.US_USDC_PERP\",\"marketType\":\"PERP\",\"orderBookState\":\"Open\",\"createdAt\":\"2026-09-02T01:00:34.355671\"}",
+      "quote": "\"createdAt\":\"2026-09-02T01:00:34.355671\" … \"marketType\":\"PERP\" … \"orderBookState\":\"Open\" … \"rwaMarketType\":\"STOCK\",\"symbol\":\"SPCX.US_USDC_PERP\"",
       "url": "https://api.backpack.exchange/api/v1/markets",
-      "locator": "JSON array, element with symbol SPCX.US_USDC_PERP",
-      "accessedAt": "2026-09-17T15:17:58Z",
+      "locator": "JSON array, element with symbol SPCX.US_USDC_PERP (fundingInterval 3600000, openInterestLimit \"280000\" on 2026-09-24)",
+      "accessedAt": "2026-09-24T14:16:54Z",
       "status": "confirmed",
-      "note": "Support docs: \"Stock Perpetuals are derivative contracts and do not provide ownership of the underlying stock.\""
+      "note": "RE-QUOTED 2026-09-24T14:16:54Z, source unchanged: same creation time, market type and state. The previous quote was a reconstructed object with the keys out of served order; now quoted as fragments in served order. Support docs: \"Stock Perpetuals are derivative contracts and do not provide ownership of the underlying stock.\""
     },
     {
       "field": "chains",
@@ -1650,12 +1686,12 @@
     },
     {
       "field": "parties.distributors",
-      "quote": "{\"symbol\":\"SPCX.US_USDC\",\"marketType\":\"SPOT\",\"orderBookState\":\"Open\",\"createdAt\":\"2026-06-22T10:24:38.310743\"}",
+      "quote": "\"createdAt\":\"2026-06-22T10:24:38.310743\" … \"marketType\":\"SPOT\" … \"orderBookState\":\"Open\",\"positionLimitWeight\":null,\"quoteSymbol\":\"USDC\",\"rwaMarketType\":\"STOCK\",\"symbol\":\"SPCX.US_USDC\"",
       "url": "https://api.backpack.exchange/api/v1/markets",
       "locator": "JSON array, element with symbol SPCX.US_USDC",
-      "accessedAt": "2026-09-17T15:17:58Z",
+      "accessedAt": "2026-09-24T14:16:55Z",
       "status": "confirmed",
-      "note": "Establishes Backpack Exchange as the primary two-way venue. Sunrise, Raydium, Meteora, Orca and Jupiter rest on the learn article and the CoinGecko ticker list already cited in each entry; those were not re-fetched today."
+      "note": "RE-QUOTED 2026-09-24T14:16:55Z, source unchanged: same spot book, created 2026-06-22, still Open. The previous quote was a reconstructed object with the keys out of served order; now quoted as fragments in served order. Establishes Backpack Exchange as the primary two-way venue. Sunrise, Raydium, Meteora, Orca and Jupiter rest on the learn article and the CoinGecko ticker list already cited in each entry; those were not re-fetched today."
     },
     {
       "field": "parties.regulators",
@@ -1663,8 +1699,17 @@
       "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
       "locator": "page body under heading 'Trek Labs, Inc.', stated 'As of September 2026'",
       "accessedAt": "2026-09-17T15:21:20Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:14:52Z): the page now prints 31000339714338 as Trek Labs, Inc.'s FinCEN registration number (old number last seen 2026-09-18T11:40:04Z, new one first seen 2026-09-22T16:48:04Z). parties.regulators identifier updated; new claim on the same URL. Earlier note: FinCEN is the only US registration in the group. FINRA and the SEC appear in the dossier only as verifiers of the two third-party brokers and as the author of the Corp Fin tokenization statement; VARA rests on stocks/findings.md and was not re-verified today."
+    },
+    {
+      "field": "parties.regulators",
+      "quote": "The FinCEN registration number for Trek Labs, Inc. is 31000339714338.",
+      "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+      "locator": "page body under heading 'Trek Labs, Inc.', stated 'As of September 2026'",
+      "accessedAt": "2026-09-24T14:14:52Z",
       "status": "confirmed",
-      "note": "FinCEN is the only US registration in the group. FINRA and the SEC appear in the dossier only as verifiers of the two third-party brokers and as the author of the Corp Fin tokenization statement; VARA rests on stocks/findings.md and was not re-verified today."
+      "note": "FinCEN is still the only US registration in the group; the number changed, the regulator and the scope (money transmission) did not."
     },
     {
       "field": "parties.parents",

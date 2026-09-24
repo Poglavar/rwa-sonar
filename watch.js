@@ -57,15 +57,18 @@
     /** `sonar.source.kind` — the CHECK constraint's values, in the order the tiles read. */
     const SOURCE_KINDS = ['pdf', 'html', 'api', 'onchain'];
 
-    /** `sonar.source.status` — all six, including the two the watcher added to EVIDENCE.md §1. */
-    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'error'];
+    /**
+     * `sonar.source.status` — all seven: EVIDENCE.md §1's four, the watcher's `new` and `error`, and
+     * `reachable-unverified` (db/2026-09-24-sonar-source-reachable.sql).
+     */
+    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'reachable-unverified', 'error'];
 
     /**
      * Which colour band a source status belongs in. `changed` is not a fault — it is the watcher
      * doing its job — so it reads as caution, while `gone` (nothing left to read) is the worst.
      */
     const SOURCE_STATUS_TONE = {
-        new: 'info', ok: 'good', changed: 'caution', gone: 'critical', blocked: 'warning', error: 'warning'
+        new: 'info', ok: 'good', changed: 'caution', gone: 'critical', blocked: 'warning', 'reachable-unverified': 'info', error: 'warning'
     };
 
     /** What each source status means, so a tile is never a bare number. */
@@ -75,6 +78,7 @@
         changed: 'the text changed since we last read it',
         gone: '404 or replaced; nothing left to re-read',
         blocked: 'the host blocks our fetch (403, bot wall, paywall)',
+        'reachable-unverified': 'the host answers but blocks our fetch; no quote relies on this page',
         error: 'the fetch failed for another reason'
     };
 

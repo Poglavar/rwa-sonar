@@ -1,6 +1,13 @@
 {
   "issuer": "Securitize Corp. (NYSE: SECZ) — the securities issuer is the listed company itself (Delaware corporation, SEC CIK 0002094496), which is also its own tokenization platform, its own SEC-registered DIGITAL transfer agent (Securitize Transfer Agent, LLC) and the operator of the broker-dealer/ATS that gates access. Vertical integration is the defining feature of the tokenization layer — the platform that mints, the venue that gates access, the whitelist, the control book and every on-chain authority are all one corporate group. It does NOT extend to the register of record: the S-1 and the 424B3 Description of Securities say \"The Transfer Agent for the Securitize Common Stock is Continental Stock Transfer & Trust Company\", and Securitize's own tokenization instructions say the same with the operational detail attached (\"DRS & DWAC #: 7808\"). So the register of record for the common stock sits with an independent third party — carried through from the CEPT SPAC, whose transfer agent and trustee Continental was. Who records a TOKENIZED position is not published: Securitize calls itself \"the exclusive digital transfer agent for tokenized securities issued on Securitize's platform\", but no filing, term or Securitize page says whether Continental's register then shows the token holder, a Securitize entity or nominee (with the token ledger as a sub-register), or both (openQuestions, 2026-09-23). For shares on Continental's book that is a materially better position than this dossier asserted until 2026-09-18, and it puts SECZ alongside Superstate (independent Recordkeeping Transfer Agent) and Bullish (Equiniti, third party until Q1 2027) rather than apart from them.",
   "status": "live",
+  "quoteVerificationSources": [
+    {
+      "sourceUrl": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
+      "verificationUrl": "https://stocks.securitize.io/drs/brokers/general_instructions.md",
+      "reason": "The tokenize-instructions page is rendered in the browser from this static Markdown file (the SECZ-specific transfer-agent line is filled into its [[STOCK]] / [[TRANSFER_AGENT]] placeholders from https://stocks.securitize.io/drs/transfer_agents.json); every other sentence of the rendered page is verbatim in the file."
+    }
+  ],
   "products": [
     "Tokenized SECZ — 'a natively tokenized version of our common stock', enabled on the Closing Date of the business combination (2026-07-01) and live from the NYSE listing (2026-07-02), issued on Solana and Avalanche. 'Tokenized SECZ is not a separate share class.'",
     "Solana deployment — Token-2022 mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED, created 2026-06-29, supply 148,998 tokens across 117 token accounts on 2026-09-16. 'Trading of Tokenized SECZ on Solana is now enabled via on-chain liquidity provision partners.'",
@@ -892,12 +899,12 @@
     },
     {
       "field": "issuingEntity",
-      "quote": "\"name\":\"Securitize Transfer Agent, LLC\",\"tickers\":[],\"exchanges\":[],\"ein\":\"000000000\",\"lei\":null,\"description\":\"\",\"website\":\"\",\"investorWebsite\":\"\",\"category\":\"\",\"fiscalYearEnd\":\"1231\",\"stateOfIncorporation\":\"DE\"",
+      "quote": "\"name\":\"Securitize Transfer Agent, LLC\" … \"stateOfIncorporation\":\"DE\"",
       "url": "https://data.sec.gov/submissions/CIK0001782266.json",
       "locator": "data.sec.gov submissions for CIK 0001782266, json path $.name",
-      "accessedAt": "2026-09-17T15:12:58Z",
+      "accessedAt": "2026-09-24T14:22:00Z",
       "status": "confirmed",
-      "note": "Registration verified rather than asserted: 20 TA filings all under File No. 084-06638, from TA-1 2019-07-22 to TA-1/A 2026-08-27 (newer than any filing the dossier lists) plus annual TA-2s, and $.formerNames shows the entity was previously \"Securitize LLC\"."
+      "note": "RE-QUOTED 2026-09-24T14:22:00Z, source unchanged: same name, EIN 000000000 and Delaware incorporation. The previous quote was a contiguous run of keys in served order, which the watcher's keys-sorted rendering of the JSON cannot match; the name and state of incorporation are now quoted as two fragments in an order valid in both. Registration verified rather than asserted: 20 TA filings all under File No. 084-06638, from TA-1 2019-07-22 to TA-1/A 2026-08-27 (newer than any filing the dossier lists) plus annual TA-2s, and $.formerNames shows the entity was previously \"Securitize LLC\"."
     },
     {
       "field": "entityJurisdiction",
@@ -1395,12 +1402,12 @@
     },
     {
       "field": "vocabulary.thirdPartyAttestations.value",
-      "quote": "\"name\": \"Securitize Corp.\", \"symbol\": \"SECZ\", \"description\": \"Securitize, the world’s leader in tokenizing real-world assets is bringing the world onchain.\", \"image\": \"https://metadata.securitize.io/secz_logo.png\"",
+      "quote": "\"description\": \"Securitize, the world’s leader in tokenizing real-world assets is bringing the world onchain.\", \"image\": \"https://metadata.securitize.io/secz_logo.png\"",
       "url": "https://metadata.securitize.io/secz.json",
-      "locator": "metadata.securitize.io/secz.json, whole document",
-      "accessedAt": "2026-09-17T15:13:14Z",
+      "locator": "metadata.securitize.io/secz.json, whole document: four keys, name \"Securitize Corp.\", symbol \"SECZ\", description, image",
+      "accessedAt": "2026-09-24T14:22:59Z",
       "status": "confirmed",
-      "note": "\"no\": this four-key file is the entirety of what the token points at — no CUSIP/ISIN, no register link, no supply, no attestation — and the mint’s additionalMetadata array is empty with its update authority on the Securitize side. Re-read in full 2026-09-17; unchanged."
+      "note": "RE-QUOTED 2026-09-24T14:22:59Z, source unchanged: the file still holds exactly the same four keys and values. The previous quote ran name, symbol, description and image in served order, which the watcher's keys-sorted rendering reorders (description, image, name, symbol); the description and image pair is adjacent in both and is quoted now. \"no\": this four-key file is the entirety of what the token points at — no CUSIP/ISIN, no register link, no supply, no attestation — and the mint’s additionalMetadata array is empty with its update authority on the Securitize side. Re-read in full 2026-09-17; unchanged."
     },
     {
       "field": "vocabulary.aiReady.value",
@@ -1458,12 +1465,12 @@
     },
     {
       "field": "parties.transferAgents",
-      "quote": "\"name\":\"Securitize Transfer Agent, LLC\",\"tickers\":[],\"exchanges\":[],\"ein\":\"000000000\",\"lei\":null,\"description\":\"\",\"website\":\"\",\"investorWebsite\":\"\",\"category\":\"\",\"fiscalYearEnd\":\"1231\",\"stateOfIncorporation\":\"DE\"",
+      "quote": "\"name\":\"Securitize Transfer Agent, LLC\" … \"stateOfIncorporation\":\"DE\"",
       "url": "https://data.sec.gov/submissions/CIK0001782266.json",
       "locator": "data.sec.gov submissions for CIK 0001782266, json path $.name (20 TA filings, all File No. 084-06638)",
-      "accessedAt": "2026-09-17T15:12:58Z",
+      "accessedAt": "2026-09-24T14:22:00Z",
       "status": "confirmed",
-      "note": "Registration and file number verified from EDGAR rather than from the issuer’s assertion; affiliation established by the press release, which lists it among the entities through which \"Securitize operates\" in the U.S. One transfer agent only — an EDGAR TA-form company search for \"securitize\" returns this single registrant, unlike Bullish, which has two."
+      "note": "RE-QUOTED 2026-09-24T14:22:00Z, source unchanged (same reason as the issuingEntity claim on this URL: a served-order key run cannot match the keys-sorted rendering the watcher checks). Registration and file number verified from EDGAR rather than from the issuer’s assertion; affiliation established by the press release, which lists it among the entities through which \"Securitize operates\" in the U.S. One transfer agent only — an EDGAR TA-form company search for \"securitize\" returns this single registrant, unlike Bullish, which has two."
     },
     {
       "field": "parties.custodians",
@@ -1586,10 +1593,10 @@
       "field": "custodyVerification.agent",
       "quote": "The transfer agent for Securitize Corp is Continental Stock Transfer (DRS & DWAC #: 7808).",
       "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
-      "locator": "stocks.securitize.io tokenize instructions for SECZ, step 3 \"The Broker Sends the Request\" (client-rendered page, read in a headed browser)",
-      "accessedAt": "2026-09-18T11:55:00Z",
+      "locator": "stocks.securitize.io tokenize instructions for SECZ, step 3 \"The Broker Sends the Request\"; client-rendered, read from document.body.innerText in a headed Chrome (agent-browser 0.31.1) captured 2026-09-18T11:55:00Z and re-read the same way 2026-09-24T14:22:37Z (quote found with watch.mjs quoteFound on the rendered text). The sentence is assembled in the browser: general_instructions.md line \"The transfer agent for **[[STOCK]]** is **[[TRANSFER_AGENT]][[TRANSFER_AGENT_DRS_DWAC]]**.\" filled from https://stocks.securitize.io/drs/transfer_agents.json (CONTINENTAL_STOCK: name \"Continental Stock Transfer\", drsDwac \"(DRS & DWAC #: 7808)\")",
+      "accessedAt": "2026-09-24T14:22:37Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION. custodyVerification.agent named only \"Securitize Transfer Agent, LLC ... an affiliate of the issuer, not an independent party\". There are two agents: Continental Stock Transfer & Trust Company for the common stock (File No. 084-00034, CIK 0000024179, DRS & DWAC #7808) and Securitize Transfer Agent, LLC as the group's digital transfer agent (File No. 084-06638, CIK 0001782266; whether it keeps a Tokenized SECZ sub-register is not published — re-examined 2026-09-23). The issuer's own page confirms the first with the operational number attached, which is stronger than a filing mention because it is the route a holder actually uses."
+      "note": "Re-read 2026-09-24T14:22:37Z in the rendered page, verbatim. No single fetchable document contains the assembled sentence, so the watcher, which checks it against the declared static source, cannot confirm it; this re-read is browser-only. CORRECTION. custodyVerification.agent named only \"Securitize Transfer Agent, LLC ... an affiliate of the issuer, not an independent party\". There are two agents: Continental Stock Transfer & Trust Company for the common stock (File No. 084-00034, CIK 0000024179, DRS & DWAC #7808) and Securitize Transfer Agent, LLC as the group's digital transfer agent (File No. 084-06638, CIK 0001782266; whether it keeps a Tokenized SECZ sub-register is not published — re-examined 2026-09-23). The issuer's own page confirms the first with the operational number attached, which is stronger than a filing mention because it is the route a holder actually uses."
     },
     {
       "field": "custodyVerification.agent",
@@ -1614,9 +1621,9 @@
       "quote": "To move shares to your own name at the transfer agent, you will need to request your broker to transfer them through the Direct Registration System (DRS) or Deposit and Withdrawal at Custodian (DWAC) method.",
       "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
       "locator": "stocks.securitize.io tokenize instructions for SECZ, step 2 \"Requesting Direct Registration\"",
-      "accessedAt": "2026-09-18T11:55:00Z",
+      "accessedAt": "2026-09-24T14:22:37Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION. redemption.rails said the switch \"is an internal book movement rather than a coordination between two agents — mechanically simpler than the Superstate peer's DRS route\". The published inbound leg IS a DRS/DWAC route, to Continental, with the holder registered on Continental's ledger before any token is issued: \"Once the transfer is verified, the transfer agent records you as the registered owner of the shares\" and \"Once your shares are registered directly on the transfer agent's shareholder ledger, they can be converted into tokenized form\". The outbound leg remains entirely unpublished, so \"un-auditable from outside\" still holds for de-tokenization."
+      "note": "Re-read 2026-09-24T14:22:37Z: verbatim in the page rendered in a headed Chrome (agent-browser 0.31.1, document.body.innerText) and in the static source file https://stocks.securitize.io/drs/brokers/general_instructions.md (read 2026-09-24T14:21:59Z), which the dossier now declares in quoteVerificationSources so the watcher can check it. CORRECTION. redemption.rails said the switch \"is an internal book movement rather than a coordination between two agents — mechanically simpler than the Superstate peer's DRS route\". The published inbound leg IS a DRS/DWAC route, to Continental, with the holder registered on Continental's ledger before any token is issued: \"Once the transfer is verified, the transfer agent records you as the registered owner of the shares\" and \"Once your shares are registered directly on the transfer agent's shareholder ledger, they can be converted into tokenized form\". The outbound leg remains entirely unpublished, so \"un-auditable from outside\" still holds for de-tokenization."
     },
     {
       "field": "bankruptcyRemote",
@@ -1638,9 +1645,9 @@
       "quote": "Once the transfer is verified, the transfer agent records you as the registered owner of the shares.",
       "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1",
       "locator": "stocks.securitize.io tokenize instructions for SECZ, step 4 \"Transfer Agent Creates Your Account\"",
-      "accessedAt": "2026-09-18T11:55:00Z",
+      "accessedAt": "2026-09-24T14:22:37Z",
       "status": "confirmed",
-      "note": "Answers what the dossier called \"the central unresolved question for this issuer\": whether a tokenized holder is a registered holder of record in their own name or a customer of the broker-dealer. The published route registers the holder directly, before tokenization, and issues \"an account statement or confirmation showing your name, account number, and the number of shares you hold\". Broker-dealer onboarding still gates ATS access and the whitelist still gates the wallet; neither changes who the registered owner is."
+      "note": "Re-read 2026-09-24T14:22:37Z: verbatim in the page rendered in a headed Chrome (agent-browser 0.31.1, document.body.innerText) and in the static source file https://stocks.securitize.io/drs/brokers/general_instructions.md (read 2026-09-24T14:21:59Z), which the dossier now declares in quoteVerificationSources so the watcher can check it. Answers what the dossier called \"the central unresolved question for this issuer\": whether a tokenized holder is a registered holder of record in their own name or a customer of the broker-dealer. The published route registers the holder directly, before tokenization, and issues \"an account statement or confirmation showing your name, account number, and the number of shares you hold\". Broker-dealer onboarding still gates ATS access and the whitelist still gates the wallet; neither changes who the registered owner is."
     },
     {
       "field": "vocabulary.forcedTransfers.value",

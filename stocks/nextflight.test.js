@@ -119,6 +119,10 @@ describe('htmlDocumentText leaves server-rendered pages alone', () => {
 
     test('flight text is only preferred when it says more than the markup', () => {
         const html = page(['0:["$","p",null,{"children":"x"}]\n'], '<p>A longer body text</p>');
-        expect(htmlDocumentText(html)).toEqual({ text: 'A longer body text', quoteText: 'A longer body text', via: 'html' });
+        const read = htmlDocumentText(html);
+        expect(read.text).toBe('A longer body text');
+        expect(read.via).toBe('html');
+        // The quote reading appends inline script payloads (lib/watch.mjs INLINE_SCRIPT) after the body.
+        expect(read.quoteText.split('\n')[0]).toBe('A longer body text');
     });
 });

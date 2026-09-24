@@ -1110,6 +1110,16 @@
       "note": "VERIFIED 2026-09-23 as far as the page goes. The old claim (status unverified, quote null) could not find the names in the served HTML, the flight payload or the 40 client chunks read on 2026-09-18; they are rendered client-side, and the headed-browser render shows the sunset letter signed by Alvin Hsia as CEO and Emily Hsia as CTO. Scope: the page gives them as CEO and CTO of Ventuals signing the wind-down letter; it does not say they are directors or officers (dignatarios) of VNTL Markets S.A., which the footer names only as the site operator. The Panama registry was not readable: registro-publico.gob.pa and rp.gob.pa refused the connection from here, and Panadata (a Registro Público aggregator) lists VNTL MARKETS S.A. but shows its directors only to subscribers. Because the names exist only in the rendered DOM, the document watcher (which reads served HTML) will report this quote as lost once; that is expected, not a change."
     },
     {
+      "field": "issuingEntity",
+      "quote": "w=[{name:\"Alvin Hsia\",title:\"CEO\",signature:\"Alvin Hsia\",signatureFontClass:p().className,signatureSizeClass:\"text-[55px] md:text-[62px]\"},{name:\"Emily Hsia\",title:\"CTO\",signature:\"Emily Hsia\" … children:\"Ventuals is sunsetting\"",
+      "url": "https://app.ventuals.com/_next/static/chunks/6116.b2a153fa3e5f6acf.js",
+      "locator": "the client-side JavaScript chunk that renders https://app.ventuals.com/sunset: the signatories array (name, title, signature) and, later in the same chunk, the letter heading. Found by fetching every lazy chunk listed in the page’s webpack runtime (webpack-7a9b1df3562cbf30.js, 237 chunks) and searching for the signatories’ names; the chunk URL is content-hashed, so a redeploy of app.ventuals.com will make it 404 and the watcher will report it gone",
+      "accessedAt": "2026-09-24T14:21:23Z",
+      "status": "confirmed",
+      "method": "served JavaScript source of the cited page",
+      "note": "Machine-checkable companion to the rendered-page claim above. The sunset page builds its SIGNED block from this array, so the document watcher can check the same two names and titles in the served code, where the page’s own HTML has no text without a browser. Same scope limit as the claim above: CEO and CTO of Ventuals signing the wind-down letter, not directors of VNTL Markets S.A."
+    },
+    {
       "field": "entityJurisdiction",
       "quote": "You acknowledge and agree that irrevocable liability is incurred and that title is transferred with respect to all Perps and any other transaction related to digital assets or the exchange of digital assets and that all activities and effects of such activities occur solely within the Republic of Panama and not in any other jurisdiction",
       "url": "https://ventuals.com/terms",

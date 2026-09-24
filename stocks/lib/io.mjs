@@ -44,7 +44,9 @@ export async function readJson(path, fallback = undefined) {
  */
 export async function writeJson(path, value, indent = 2) {
     await mkdir(dirname(path), { recursive: true });
-    const tmp = `${path}.tmp`;
+    // Per-process tmp name: two runs writing the same file (two watcher runs sharing a day's
+    // checkpoint) must not rename each other's tmp away mid-write (ENOENT, 2026-09-24).
+    const tmp = `${path}.${process.pid}.tmp`;
     await writeFile(tmp, `${JSON.stringify(value, null, indent)}\n`, 'utf8');
     await rename(tmp, path);
     return path;

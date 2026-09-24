@@ -21,6 +21,8 @@ const CSS = readFileSync(join(__dirname, 'watch.css'), 'utf8');
 const JS = readFileSync(join(__dirname, 'watch.js'), 'utf8');
 const EVIDENCE_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-evidence.sql'), 'utf8');
 const CLAIM_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-claims.sql'), 'utf8');
+// The source status check as it stands now: 2026-09-24 re-declares it with `reachable-unverified`.
+const SOURCE_STATUS_DDL = readFileSync(join(__dirname, 'db', '2026-09-24-sonar-source-reachable.sql'), 'utf8');
 
 test('watch intro uses a small intrinsic patrol illustration and preserves monitoring details', () => {
     expect(HTML).toContain('patrol-v1-256.webp');
@@ -94,8 +96,8 @@ describe('the five vocabularies this page holds a copy of', () => {
         // exist, and so would vanish from the totals without anything reporting it.
         expect(W.SOURCE_KINDS).toEqual(checkValues(EVIDENCE_DDL, 'source_kind_check'));
         expect(W.SOURCE_STATUSES.slice().sort())
-            .toEqual(checkValues(EVIDENCE_DDL, 'source_status_check').slice().sort());
-        expect(W.SOURCE_STATUSES).toHaveLength(6);
+            .toEqual(checkValues(SOURCE_STATUS_DDL, 'source_status_check').slice().sort());
+        expect(W.SOURCE_STATUSES).toHaveLength(7);
     });
 
     test('CHANGE_KINDS and SEVERITIES are exactly the change_event CHECK constraints', () => {
@@ -294,7 +296,7 @@ describe('the source tiles', () => {
         expect(totals.byKind.map((tile) => [tile.key, tile.count]))
             .toEqual([['pdf', 1], ['html', 4], ['api', 1], ['onchain', 0]]);
         expect(totals.byStatus.map((tile) => [tile.key, tile.count]))
-            .toEqual([['new', 0], ['ok', 3], ['changed', 1], ['gone', 1], ['blocked', 1], ['error', 0]]);
+            .toEqual([['new', 0], ['ok', 3], ['changed', 1], ['gone', 1], ['blocked', 1], ['reachable-unverified', 0], ['error', 0]]);
         expect(totals.total).toBe(6);
     });
 

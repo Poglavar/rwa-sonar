@@ -21,6 +21,7 @@ import { wrapTransaction } from './lib/db-load.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
 import { companionFor, companionNote, companionText, wantsCompanion } from './lib/companions.mjs';
+import { DEFAULT_RPC, rpcCall } from './lib/solana-rpc.mjs';
 import { archiveTodayTimemapUrl, parseTimemapNewest } from './lib/archive-today.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { hostOf, isDocumentWatchable, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
@@ -30,10 +31,10 @@ import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     apiAnswerIsDocument, binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
     challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
-    looksLikePdf, normaliseByKind, normaliseLines,
+    looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
-    quoteVerdicts, readProvenance, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    quoteVerdicts, quotelessRefusal, readProvenance, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
 } from './lib/watch.mjs';
 import {
@@ -52,7 +53,8 @@ const RAW_DIR = join(HERE, 'data', 'raw');
 // The evidence tables, then the read-provenance columns on them (read_via, capture_at).
 const DDL_FILES = [
     join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
-    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql')
+    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'),
+    join(REPO, 'db', '2026-09-24-sonar-source-reachable.sql')
 ];
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
 let runStatsFile = STATS_FILE;
@@ -101,7 +103,7 @@ OPTIONS
   --archive          Push every NEW version — and any source with no archive yet — to the
                      Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
-  --ddl              Apply ${DDL_FILES.map((f) => `db/${f.split('/').pop()}`).join(' and ')} before loading. Idempotent.
+  --ddl              Apply ${DDL_FILES.map((f) => `db/${f.split('/').pop()}`).join(', ')} before loading. Idempotent.
   --no-db            Do everything except the Postgres load (files and checkpoint only).
   --pace=<ms>        Minimum gap between two requests to the SAME host (default ${HOST_PACE_MS}).
   --help             This text.
@@ -130,15 +132,22 @@ WHAT A RUN DOES
   on sonar.source and sonar.source_version, with http_status still the live refusal — an archived
   capture is never reported as a live read.
 
+  A page with a same-publisher machine-readable companion (lib/companions.mjs) is read from it
+  when the live page refuses us or renders nothing: npm's registry, crates.io's API, Builder.io
+  content for securitize.io, and — for a Solscan transaction page — the chain itself, through
+  Solana RPC getTransaction (SOLANA_RPC_URL from .env; the URL is never logged or stored).
+
   Quotes are checked against the text BEFORE the churn filter (a price alone on its line is churn
   for the hash, but may be the quoted words); a stored copy is re-read from its raw file for that.
   A blocked source's quotes are "not checkable", never lost.
 
   Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
   the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
-  or 429 after backoff — recorded with the reason and not retried forever) · error (5xx, timeout,
-  reset). A run with ANY error does not report success and exits non-zero; gone and blocked are
-  recorded findings, not failures.
+  or 429 after backoff — recorded with the reason and not retried forever) · reachable-unverified
+  (the same refusal on a source NO dossier quote relies on — a homepage, a listing, a folder: the
+  host answered, which is all such a citation needs; content not read) · error (5xx, timeout,
+  reset). A run with ANY error does not report success and exits non-zero; gone, blocked and
+  reachable-unverified are recorded findings, not failures.
 
 FILES
   stocks/data/sources.json                          input registry (extract-sources.mjs)
@@ -372,6 +381,11 @@ async function pruneVersions(id) {
  */
 /** archive.org S3-style keys from .env (ARCHIVE_ORG_ACCESS_KEY / ARCHIVE_ORG_SECRET_KEY); set in main(). */
 let archiveAuth = null;
+// The Solana RPC a `solana-tx` companion (a Solscan transaction page) is read through: SOLANA_RPC_URL
+// from .env, else the public endpoint. The URL may carry an API key, so it is never logged, never
+// written to a checkpoint and scrubbed from any error text (`scrubRpc`).
+let solanaRpc = DEFAULT_RPC;
+const scrubRpc = (text) => String(text).split(solanaRpc).join('<solana-rpc>');
 const SPN_POLL_MS = 5000;
 const SPN_WAIT_MS = 90_000;
 /** SPN says "wait for a minute" when the account's active-session cap is hit; do that, a few times. */
@@ -510,7 +524,8 @@ async function bytesToText(buffer, contentType, url) {
             kind, text: normaliseByKind('pdf', pdfText), quoteText: normaliseByKind('pdf', pdfText, { keepChurn: true }), via: 'pdf', binary: false
         };
     }
-    if (isTextual(contentType) || !contentType) {
+    // Labelled bytes but really UTF-8 text (a Markdown file served as octet-stream): read it.
+    if (isTextual(contentType) || !contentType || looksLikeText(buffer)) {
         if (kind === 'html') {
             const read = htmlDocumentText(buffer.toString('utf8'));
             return { kind, text: read.text, quoteText: read.quoteText, via: read.via, binary: false };
@@ -568,8 +583,8 @@ async function watchOne(source, prev, options) {
         bytes: res.buffer.length || null,
         textChars: null,
         contentHash: prev?.contentHash ?? null,
-        etag: res.headers.etag ?? prev?.etag ?? null,
-        lastModified: res.headers['last-modified'] ?? prev?.lastModified ?? null,
+        // Validators only from a 2xx body (or a 304 confirming them): lib/watch.mjs `responseValidators`.
+        ...responseValidators({ httpStatus: res.httpStatus, headers: res.headers, prev }),
         rawPath: null,
         textPath: null,
         archiveUrl: prev?.archiveUrl ?? null,
@@ -694,6 +709,7 @@ async function watchOne(source, prev, options) {
  */
 async function readFromCompanion(source, prev, result, companion, { timeoutMs }) {
     const liveReason = result.reason;
+    if (companion.rpc) return readFromRpcCompanion(source, prev, result, companion);
     const res = await fetchWithBackoff(companion.url, { etag: null, lastModified: null }, timeoutMs);
     const fail = (why) => {
         result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
@@ -728,6 +744,39 @@ async function readFromCompanion(source, prev, result, companion, { timeoutMs })
     result.reason = `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: companion.url })}`;
     result.error = null;
     return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * A companion that is a JSON-RPC call rather than a URL (a Solscan transaction page -> Solana RPC
+ * `getTransaction`). Same verdicts and provenance as `readFromCompanion`; the raw copy kept on disk
+ * is the RPC answer, and `companionUrl` is the key-free descriptor, never the RPC URL.
+ */
+async function readFromRpcCompanion(source, prev, result, companion) {
+    const liveReason = result.reason;
+    let answer;
+    let raw;
+    try {
+        answer = await rpcCall(companion.rpc.method, companion.rpc.params, { rpc: solanaRpc, timeoutMs: TIMEOUT_MS });
+        raw = companionText(companion.reader, answer);
+    } catch (err) {
+        const why = scrubRpc(err.message);
+        result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
+        result.error = result.reason;
+        logWarn(`companion: no read for ${source.url} — ${why}`);
+        return null;
+    }
+    const body = Buffer.from(`${JSON.stringify(answer)}\n`, 'utf8');
+    const text = normaliseLines(raw);
+    const quoteText = normaliseLines(raw, { keepChurn: true });
+    const hash = sha256Hex(text);
+    const same = prev?.contentHash === hash;
+    Object.assign(result, {
+        via: 'api', rawKind: 'api', companionReader: companion.reader, companionUrl: companion.url, resolvedUrl: companion.url,
+        liveReason, contentType: 'application/json', bytes: body.length, textChars: text.length, contentHash: hash,
+        status: same ? 'ok' : 'changed', error: null,
+        reason: `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: companion.url })}`
+    });
+    return { result, text, quoteText, raw: body, previousTextPath: prev?.textPath ?? null };
 }
 
 /** The capture a previous run read this source from (`{timestamp, original}`), or null. */
@@ -1282,6 +1331,13 @@ async function main() {
         }
     }
 
+    {
+        const env = await readEnvFile(join(REPO, '.env'));
+        const configured = process.env.SOLANA_RPC_URL || env.SOLANA_RPC_URL;
+        if (configured) solanaRpc = configured;
+        log(`solana rpc for transaction companions: ${configured ? 'SOLANA_RPC_URL from .env' : 'public endpoint'}`);
+    }
+
     const registry = await readJson(SOURCES_FILE, null);
     if (!registry?.items?.length) {
         throw new Error(`${SOURCES_FILE} is missing or empty — run \`node stocks/extract-sources.mjs --run\` first`);
@@ -1369,6 +1425,17 @@ async function main() {
         const storedQuoteText = text === null && result.status === 'ok'
             ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0 })
             : null;
+        // A refusal on a source no quote relies on is reachability evidence, not a blocked
+        // finding (lib/watch.mjs `quotelessRefusal`). After the stored-copy review, which can
+        // itself turn a 304 over a JavaScript shell into `blocked`.
+        const settled = quotelessRefusal({
+            status: result.status, httpStatus: result.httpStatus, reason: result.reason, quotesRegistered: registered.length
+        });
+        if (settled) {
+            result.status = settled.status;
+            result.reason = settled.reason;
+            result.error = null;
+        }
 
         if (result.status === 'changed') {
             // The raw bytes only exist in memory, so the version files are written here, before
@@ -1446,7 +1513,9 @@ async function main() {
         log(`[${progress(done, ordered.length, startedMs)}] ${mark} ${result.url}${detail}`);
 
         checkpoint[source.url] = result;
-        await writeJson(checkpointFile, checkpoint);
+        // Re-read before writing: a concurrent `--only=<issuer>` run shares today's checkpoint, and
+        // writing our start-of-run copy back would drop every entry it wrote meanwhile.
+        await writeJson(checkpointFile, { ...(await readJson(checkpointFile, {})), [source.url]: result });
     }
 
     // State for the next run: what we now know per URL.
@@ -1461,6 +1530,7 @@ async function main() {
             contentHash: result.contentHash,
             etag: result.etag,
             lastModified: result.lastModified,
+            validatorStatus: result.validatorStatus ?? null,
             firstSeenAt: prev?.firstSeenAt ?? result.fetchedAt,
             lastCheckedAt: result.fetchedAt,
             lastChangedAt: result.status === 'changed' ? result.fetchedAt : (prev?.lastChangedAt ?? null),
@@ -1483,7 +1553,9 @@ async function main() {
             quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
         };
     }
-    await writeJson(STATE_FILE, { ...previous, ...state });
+    // Merged into the state file as it is NOW, not as it was when this run started, so a concurrent
+    // run's entries for other sources survive (same reason as the checkpoint write above).
+    await writeJson(STATE_FILE, { ...(await readJson(STATE_FILE, {})), ...state });
 
     const rows = buildRows(results, previous);
     const byStatus = {};
@@ -1526,6 +1598,11 @@ async function main() {
     if (gone.length) {
         logWarn(`${gone.length} cited URL(s) are gone — a finding about our dossiers, not a run failure:`);
         for (const r of gone) logWarn(`    ${r.reason} ${r.url} (${r.issuer ?? 'shared'}; cited in ${r.foundIn.length} place(s))`);
+    }
+    const unverified = results.filter((r) => r.status === 'reachable-unverified');
+    if (unverified.length) {
+        log(`watch-sources: ${unverified.length} source(s) reachable-unverified — the host refused or rendered nothing, but no quote relies on them:`);
+        for (const r of unverified) log(`    ${r.url} (${r.issuer ?? 'shared'}; ${r.foundIn.slice(0, 2).join(', ')})`);
     }
     const blocked = results.filter((r) => r.status === 'blocked');
     if (blocked.length) {

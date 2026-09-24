@@ -4,8 +4,8 @@
   "quoteVerificationSources": [
     {
       "sourceUrl": "https://prestocks.com/faq",
-      "verificationUrl": "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
-      "reason": "The reader-facing FAQ keeps accordion answers in its official page bundle; the served HTML contains only the headings."
+      "verificationUrl": "https://prestocks.com/_next/static/chunks/app/faq/page-d984255e63e260a7.js",
+      "reason": "The reader-facing FAQ keeps accordion answers in its official page bundle; the served HTML contains only the headings. The bundle name carries a build hash that changes on every site deploy: page-eda8c20836ef75f8.js answered HTTP 404 on 2026-09-24 and the FAQ page served at 2026-09-24T14:19Z loads page-d984255e63e260a7.js instead."
     }
   ],
   "products": [
@@ -257,8 +257,8 @@
       "type": "terms"
     },
     {
-      "title": "PreStocks FAQ page bundle — the only machine-readable copy of all 17 FAQ answers, including the arbitrage claim, because prestocks.com/faq renders them client-side",
-      "url": "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
+      "title": "PreStocks FAQ page bundle — the only machine-readable copy of all 17 FAQ answers, including the arbitrage claim, because prestocks.com/faq renders them client-side (bundle name updated 2026-09-24: the earlier page-eda8c20836ef75f8.js now answers HTTP 404)",
+      "url": "https://prestocks.com/_next/static/chunks/app/faq/page-d984255e63e260a7.js",
       "type": "docs"
     },
     {
@@ -692,7 +692,7 @@
     "https://www.theblock.co/post/401088/anthropic-openai-tokenized-prestocks-plunge",
     "https://prestocks.notion.site/terms-of-service",
     "https://prestocks.notion.site/privacy-policy",
-    "https://prestocks.com/_next/static/chunks/app/faq/page-eda8c20836ef75f8.js",
+    "https://prestocks.com/_next/static/chunks/app/faq/page-d984255e63e260a7.js",
     "https://support.claude.com/en/articles/13704655-unauthorized-anthropic-stock-sales-and-investment-scams"
   ],
   "claims": [
@@ -767,10 +767,11 @@
     {
       "field": "regulatoryStatus",
       "quote": "PreStocks is not a broker-dealer, investment advisor, exchange operator, transfer agent, custodian, virtual asset service provider, or similar regulated entity.",
-      "url": "https://prestocks.com/faq",
-      "locator": "site-wide footer disclaimer",
-      "accessedAt": "2026-09-17T15:13:20Z",
-      "status": "confirmed"
+      "url": "https://prestocks.com/products",
+      "locator": "site-wide footer disclaimer (served HTML; the same footer is on /faq, /ecosystem and the home page)",
+      "accessedAt": "2026-09-24T14:39:20Z",
+      "status": "confirmed",
+      "note": "URL CHANGED 2026-09-24T14:39:20Z, words unchanged: the footer is still verbatim on every page. It was cited on /faq, but the dossier declares /faq's FAQ answers to be checked against the FAQ page bundle (quoteVerificationSources), which carries the accordion answers and not the site-wide footer, so the watcher could never find it there. Now cited on /products, whose served HTML the watcher reads directly."
     },
     {
       "field": "regulatoryStatus",
@@ -1142,8 +1143,17 @@
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element 8 (SPACEX), contiguous keys contract_address through supply",
       "accessedAt": "2026-09-17T15:14:09Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:18:15Z): the quoted run was the SPACEX element's live mark, token price, valuations and supply, all of which move daily. The issuer still publishes its own mark beside the token price with no source cited; the stable part (the element's contract address and the key names of the two prices) is now quoted in a new pricing.referenceMarket claim on the same URL, with the numbers in its note. Earlier note: The mark is issuer-published with no source cited. Re-measured 2026-09-17: SPACEX tokenPrice sat 21.6% below markPrice (153.93 vs 120.64; the dossier recorded ~21% on 2026-09-16), while ANTHROPIC had converged to -1.0% (1008.86 vs 998.64) from the -4.7% the dossier recorded, and NEURALINK was +11.3% above mark."
+    },
+    {
+      "field": "pricing.referenceMarket",
+      "quote": "\"contract_address\":\"PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh\" … \"markPrice\": … \"markValuation\": … \"tokenPrice\":",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element for SPACEX: contract_address, then the markPrice / markValuation / tokenPrice keys of the same element",
+      "accessedAt": "2026-09-24T14:18:15Z",
       "status": "confirmed",
-      "note": "The mark is issuer-published with no source cited. Re-measured 2026-09-17: SPACEX tokenPrice sat 21.6% below markPrice (153.93 vs 120.64; the dossier recorded ~21% on 2026-09-16), while ANTHROPIC had converged to -1.0% (1008.86 vs 998.64) from the -4.7% the dossier recorded, and NEURALINK was +11.3% above mark."
+      "note": "Dated reading 2026-09-24T14:18:15Z: SPACEX markPrice 147.51 against tokenPrice 115.83, i.e. the token 21.5% below the issuer's own mark (21.6% on 2026-09-17), supply 43,712.53. Still no source for the mark anywhere in the response. Substance unchanged."
     },
     {
       "field": "pricing.referenceMarket",
@@ -1200,67 +1210,75 @@
     },
     {
       "field": "products[0]",
-      "quote": "\"name\":\"Anduril PreStocks\",\"symbol\":\"ANDURIL\"",
+      "quote": "\"name\":\"Anduril PreStocks\" … \"symbol\":\"ANDURIL\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol ANDURIL, contiguous keys name and symbol; its contract_address is PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[1]",
-      "quote": "\"name\":\"Anthropic PreStocks\",\"symbol\":\"ANTHROPIC\"",
+      "quote": "\"name\":\"Anthropic PreStocks\" … \"symbol\":\"ANTHROPIC\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol ANTHROPIC, contiguous keys name and symbol; its contract_address is Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[2]",
-      "quote": "\"name\":\"Figure AI PreStocks\",\"symbol\":\"FIGUREAI\"",
+      "quote": "\"name\":\"Figure AI PreStocks\" … \"symbol\":\"FIGUREAI\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol FIGUREAI, contiguous keys name and symbol; its contract_address is PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[3]",
-      "quote": "\"name\":\"Kalshi PreStocks\",\"symbol\":\"KALSHI\"",
+      "quote": "\"name\":\"Kalshi PreStocks\" … \"symbol\":\"KALSHI\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol KALSHI, contiguous keys name and symbol; its contract_address is PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[4]",
-      "quote": "\"name\":\"Neuralink PreStocks\",\"symbol\":\"NEURALINK\"",
+      "quote": "\"name\":\"Neuralink PreStocks\" … \"symbol\":\"NEURALINK\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol NEURALINK, contiguous keys name and symbol; its contract_address is PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[5]",
-      "quote": "\"name\":\"OpenAI PreStocks\",\"symbol\":\"OPENAI\"",
+      "quote": "\"name\":\"OpenAI PreStocks\" … \"symbol\":\"OPENAI\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol OPENAI, contiguous keys name and symbol; its contract_address is PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[6]",
-      "quote": "\"name\":\"Polymarket PreStocks\",\"symbol\":\"POLYMARKET\"",
+      "quote": "\"name\":\"Polymarket PreStocks\" … \"symbol\":\"POLYMARKET\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol POLYMARKET, contiguous keys name and symbol; its contract_address is Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[7]",
-      "quote": "\"name\":\"SpaceX PreStocks\",\"symbol\":\"SPACEX\"",
+      "quote": "\"name\":\"SpaceX PreStocks\" … \"symbol\":\"SPACEX\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array element with symbol SPACEX, contiguous keys name and symbol; its contract_address is PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "accessedAt": "2026-09-24T14:18:15Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: the same product is served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both."
     },
     {
       "field": "products[8]",
@@ -1282,12 +1300,12 @@
     },
     {
       "field": "parties.securitiesIssuers",
-      "quote": "\"name\":\"Anduril PreStocks\",\"symbol\":\"ANDURIL\"",
+      "quote": "\"name\":\"Anduril PreStocks\" … \"symbol\":\"ANDURIL\"",
       "url": "https://prestocks.com/api/prestocks",
       "locator": "JSON array, contiguous keys name and symbol on each of the 8 elements",
-      "accessedAt": "2026-09-17T15:14:09Z",
+      "accessedAt": "2026-09-24T14:18:15Z",
       "status": "confirmed",
-      "note": "The eight referenced companies are established by the issuer’s own product list. None participates; see the Anthropic and OpenAI statements reported by CoinDesk."
+      "note": "RE-QUOTED 2026-09-24T14:18:15Z, source unchanged: all eight products are still served under the same name, symbol and contract address. The API serves name and symbol as adjacent keys, but the watcher compares a keys-sorted rendering of the JSON in which other keys fall between them, so the adjacent pair could never be found; they are now quoted as two fragments, in an order valid in both. The eight referenced companies are established by the issuer’s own product list. None participates; see the Anthropic and OpenAI statements reported by CoinDesk."
     },
     {
       "field": "parties.distributors",
@@ -1300,11 +1318,12 @@
     },
     {
       "field": "parties.distributors",
-      "quote": "All (71)Trading (38)Wallet (16)Analytics (15)Launchpad (5)Misc (4)Research (4)Bot (4)Leverage (3)Index (3)Liquidity (2)Bridge (2)Chain (1)",
+      "quote": "Jupiter Trading Wallet … Meteora Liquidity … Raydium Liquidity",
       "url": "https://prestocks.com/ecosystem",
-      "locator": "category filter bar above the integration grid; 'Raydium  Liquidity' and 'Jupiter  TradingWallet' entries in that grid",
-      "accessedAt": "2026-09-17T15:14:09Z",
-      "status": "confirmed"
+      "locator": "integration grid, the Jupiter, Meteora and Raydium entries with their category tags",
+      "accessedAt": "2026-09-24T14:19:14Z",
+      "status": "confirmed",
+      "note": "RE-QUOTED 2026-09-24T14:19:14Z, source unchanged. The previous quote is the category filter bar, which the page draws in the browser: it is absent from the served HTML (and from every watcher reading since 2026-09-18) but still reads exactly \"All (71)Trading (38)Wallet (16)Analytics (15)Launchpad (5)Misc (4)Research (4)Bot (4)Leverage (3)Index (3)Liquidity (2)Bridge (2)Chain (1)\" in document.body.innerText in a headed Chrome (agent-browser 0.31.1) at 2026-09-24T14:19:06Z. The grid entries the claim relies on are in the served HTML and are quoted instead, so the watcher can check them."
     },
     {
       "field": "parties.audience",
@@ -1472,8 +1491,17 @@
       "url": "https://prestocks.com/api/prestocks",
       "locator": "NEURALINK element; the same version has \"markPrice\": 156.04273552066672 against \"tokenPrice\": 121.90156443141935 for SPACEX and \"markPrice\": 973.6727427668569 against \"tokenPrice\": 1085.0685724561256 for OPENAI (stored text stocks/data/sources/31c37b3909d0/2026-09-18T11-42-19Z.txt)",
       "accessedAt": "2026-09-18T11:52:00Z",
+      "status": "changed",
+      "note": "CHANGED AT THE SOURCE (re-read 2026-09-24T14:18:15Z): the quoted NEURALINK element was a 2026-09-18 price reading; its mark, token price and supply have all moved. The two-sided dislocation it evidenced still holds. The element's identity is re-quoted in a new pricing.notes claim on the same URL, with the 2026-09-24 numbers in its note. Earlier note: Records the correction to the dossier's one-sided reading of the dislocation. Measured off the stored 2026-09-18T11:42:19Z version so the numbers are reproducible from disk: NEURALINK +14.8% and OPENAI +11.4% above the issuer's own mark, SPACEX -21.9% below it, the other five within a few per cent. The figures move minute to minute — a live read eight minutes later gave +13.3%, +10.8% and -21.6% — so they are a snapshot; the finding is the two-sidedness, which held across every read today."
+    },
+    {
+      "field": "pricing.notes",
+      "quote": "\"contract_address\":\"PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S\" … \"markPrice\": … \"tokenPrice\":",
+      "url": "https://prestocks.com/api/prestocks",
+      "locator": "JSON array element for NEURALINK (name \"Neuralink PreStocks\"): its contract_address, then the markPrice and tokenPrice keys of the same element",
+      "accessedAt": "2026-09-24T14:18:15Z",
       "status": "confirmed",
-      "note": "Records the correction to the dossier's one-sided reading of the dislocation. Measured off the stored 2026-09-18T11:42:19Z version so the numbers are reproducible from disk: NEURALINK +14.8% and OPENAI +11.4% above the issuer's own mark, SPACEX -21.9% below it, the other five within a few per cent. The figures move minute to minute — a live read eight minutes later gave +13.3%, +10.8% and -21.6% — so they are a snapshot; the finding is the two-sidedness, which held across every read today."
+      "note": "Dated reading 2026-09-24T14:18:15Z, token price against the issuer's own mark: NEURALINK 428.66 vs 336.55 (+27.4%; +14.8% on 2026-09-18), OPENAI 1376.08 vs 1022.80 (+34.5%; +11.4%), SPACEX 115.83 vs 147.51 (-21.5%; -21.9%), ANDURIL +2.4%, POLYMARKET +2.0%, ANTHROPIC -0.8%, KALSHI -2.2%, FIGUREAI -5.1%. The dislocation is still two-sided and the premiums on NEURALINK and OPENAI have widened. Substance unchanged: the mark does not bind the token price in either direction."
     },
     {
       "field": "parties.securitiesIssuers",
