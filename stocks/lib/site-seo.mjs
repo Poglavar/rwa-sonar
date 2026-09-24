@@ -30,7 +30,7 @@ export const SITE_IMAGE = {
 /** Search engines cut a meta description near here; og:description may run longer. */
 export const META_DESCRIPTION_MAX = 160;
 /** Cache-busting stamp for site-contact.css. Bump when it changes. */
-export const CONTACT_CSS_VERSION = '20260924f';
+export const CONTACT_CSS_VERSION = '20260924g';
 
 /** `text` cut to `max` characters at a word boundary with an ellipsis; whitespace collapsed. */
 export function clampText(text, max = META_DESCRIPTION_MAX) {

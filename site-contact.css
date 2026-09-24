@@ -90,7 +90,23 @@ body > .site-contact {
 
 /* Inside a page's own footer the block is part of that footer: no second full-width band. */
 .site-contact.site-contact-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
     max-width: none;
-    margin: 16px 0 0;
-    padding: 14px 0 0;
+    margin: 10px 0 0;
+    padding: 0;
+    border-top: 0;
+    font-size: inherit;
+}
+
+.site-contact.site-contact-inner .site-contact-title {
+    margin: 0;
+}
+
+/* In a footer laid out as a row (editorial pages), the contact line takes a full row of its own. */
+footer > .site-contact-inner {
+    flex-basis: 100%;
+    width: 100%;
 }

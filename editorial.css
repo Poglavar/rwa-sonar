@@ -70,7 +70,7 @@ section { padding: 78px 0; border-top: 1px solid var(--line); }
 .next-reading { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 70px; }
 .next-reading a { color: inherit; display: flex; flex-direction: column; gap: 24px; padding: 25px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); text-decoration: none; }
 .next-reading span { color: var(--muted); font-size: .75rem; }.next-reading strong { color: var(--violet-dark); }
-.editorial-footer { display: flex; justify-content: space-between; gap: 24px; padding: 28px 0 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }.editorial-footer p { margin: 0; }
+.editorial-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; padding: 28px 0 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }.editorial-footer p { margin: 0; }
 
 /* Learning hub and article pages. */
 .learn-hero h1 { max-width: 13ch; }.learn-kicker { max-width: 720px; margin-top: 22px; color: var(--muted); font-size: 1.05rem; }

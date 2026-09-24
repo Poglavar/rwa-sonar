@@ -45,6 +45,19 @@ describe('versioned nginx config', () => {
         expect(site).not.toMatch(/try_files \$uri \$uri\/ \/index\.html/);
     });
 
+    test('every response type states its cache lifetime (no browser guessing from Last-Modified)', () => {
+        const block = (re) => { const m = site.match(re); expect(m).toBeTruthy(); return site.slice(m.index, site.indexOf('\n    }', m.index)); };
+        // Pages revalidate on every load; cards are pages too.
+        expect(block(/location \/ \{/)).toMatch(/Cache-Control "no-cache"/);
+        expect(block(/location \/cards\/ \{/)).toMatch(/Cache-Control "no-cache"/);
+        // CSS/JS: long only when the URL carries a ?v= stamp.
+        expect(site).toMatch(/map \$arg_v \$rwasonar_asset_cache \{\s*""\s+"no-cache";\s*default\s+"public, max-age=31536000, immutable";/);
+        expect(block(/location ~\* \\\.\(css\|js\|mjs\)\$ \{/)).toMatch(/Cache-Control \$rwasonar_asset_cache/);
+        // The page preview images replaced in place keep their hour even though a regex image rule exists.
+        expect(site).toMatch(/location \^~ \/og\/ \{/);
+        expect(block(/location ~\* \\\.\(png\|jpe\?g/)).toMatch(/max-age=86400/);
+    });
+
     test('every location that sets add_header re-includes the security headers', () => {
         const blocks = site.split(/\n\s*location\b/).slice(1);
         for (const block of blocks) {
