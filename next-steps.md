@@ -46,11 +46,11 @@ Open work only, as of 24 September 2026 (evening). Effort: **S** = under half a 
     yet. The widest card (QQQx) is 389 bytes under the 104 KiB card budget, so anything new on the
     cards needs a trim or a budget decision. Backpack and Ondo dossiers could carry the
     "priced from token trading" finding too (**you** decide).
-10. **Dismiss the past false document changes** — S. After the deploy, run
-    `node stocks/dismiss-unreadable-events.mjs --run --apply` on the server (dry run: 118 events —
-    95 RPC info pages, 10 region blocks, 5 script-only pages, 6 Drive viewer baselines, 2 other),
-    then rebuild the review queue and change journal. `--include-reader-fixed` would dismiss 60
-    more whose quote is in the stored bytes; not applied.
+10. **Older false "quote lost" events** — **you** decide, S. The 118 events raised from unreadable
+    reads were dismissed on 24 Sep (false-alarm resolutions, nothing deleted). 60 more quote-lost
+    events had the quote in the stored bytes and were missed by an older reader;
+    `node stocks/dismiss-unreadable-events.mjs --run --apply --include-reader-fixed` would dismiss
+    them too. 52 older events have no stored copy left to judge.
 11. **Rebuild the change journal with the FinCEN renewal** — S. The resolution
     `backpack-trek-labs-fincen-renewal-2026-09-22` is recorded, but on prod the lost FinCEN quotes
     are events 904 and 905 (19 Sep) and the resolution says `detectedOn: 2026-09-22`, so it does not
