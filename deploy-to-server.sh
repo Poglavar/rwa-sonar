@@ -228,6 +228,8 @@ check_public "templates/" "${PUBLIC_BASE_URL}/templates/"
 check_public "protocols/" 'Protocol and market dossiers'
 check_public "stocks.html?view=compare&compare=AAPL" 'id="comparisonView"'
 check_public "stocks.html?view=assets&search=AAPL" 'id="globalSearch"'
+check_public "stocks-events.json" '"events"'
+check_public "" 'id="latestEvents"'
 
 PUBLIC_API_CHECK="$(mktemp)"
 if ! curl -fsS -o "$PUBLIC_API_CHECK" "${PUBLIC_BASE_URL}/api/tokens?limit=1" \

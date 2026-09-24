@@ -16,7 +16,7 @@ function issuerHref(slug) {
  * is the slug or a `<issuer>-` prefix of it; null when none is, so no link points at a page that
  * does not exist (one did, on watch.html, 2026-09-23).
  */
-function canonicalIssuer(slug, issuerNames) {
+export function canonicalIssuer(slug, issuerNames) {
     const raw = text(slug);
     if (raw === null) return null;
     const known = issuerNames instanceof Map ? [...issuerNames.keys()] : Object.keys(issuerNames ?? {});

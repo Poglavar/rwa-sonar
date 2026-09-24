@@ -2,6 +2,7 @@
 // and the pitch's built-state slide), so their static HTML never says "Loading…" or carries a number
 // typed weeks ago. Pure: the builder (stocks/build-static-snapshot.mjs) does the file I/O.
 import counts from './catalogue-counts.js';
+import eventsView from './events-view.js';
 import fmt from './fmt.js';
 
 const { escapeHtml, fmtDate, fmtNumber } = fmt;
@@ -36,12 +37,17 @@ function requireDate(value, label) {
     return value;
 }
 
+/** How many of the newest events the landing page's box carries before any script runs. */
+export const LANDING_EVENT_ROWS = 8;
+
 /** Shapes the counts from the built files; throws rather than writing a guessed number. */
-export function snapshotFacts({ tokens, issuers, templates, health, defi }) {
+export function snapshotFacts({ tokens, issuers, templates, health, defi, events }) {
     const tokenRows = tokens?.tokens;
     if (!Array.isArray(tokenRows)) throw new Error('static snapshot: stocks-tokens.json has no tokens[]');
     if (!Array.isArray(issuers?.issuers)) throw new Error('static snapshot: stocks-issuers.json has no issuers[]');
+    if (!Array.isArray(events?.events)) throw new Error('static snapshot: stocks-events.json has no events[] (run stocks/build-events.mjs first)');
     return {
+        events,
         tokenCount: tokenRows.length,
         builtAt: requireDate(tokens.builtAt, 'stocks-tokens.json builtAt'),
         programmes: issuerProgrammeSummary(issuers.issuers),
@@ -78,10 +84,28 @@ export function pitchProofHtml(facts) {
         + `<article><strong>${escapeHtml(fmtNumber(defi))}</strong><span>assets with confirmed DeFi use in the ${escapeHtml(fmtDate(facts.defiFetchedAt))} composability snapshot</span></article>`;
 }
 
+/**
+ * The newest events as the landing box's list items, written with dates rather than "2 h ago" (a
+ * static page cannot know when it is read); latest-events.js turns them relative and adds the rest.
+ */
+export function landingEventsHtml(facts) {
+    const rows = eventsView.listEvents(facts.events, LANDING_EVENT_ROWS);
+    if (rows.length === 0) return '<li class="event-row event-empty">No events recorded in the last 30 days.</li>';
+    return rows.map((event) => eventsView.eventRowHtml(event)).join('');
+}
+
+/** "Updated hourly · newest <time>" under the landing box, from the feed's newest event. */
+export function landingEventsUpdatedHtml(facts) {
+    return eventsView.updatedLineHtml(facts.events);
+}
+
 /** Applies every region to its page. Returns { path: html } for the pages in STATIC_SNAPSHOT_PAGES. */
 export function renderStaticSnapshots(pages, facts) {
+    let landing = replaceMarkedRegion(pages['index.html'], 'landing', landingSnapshotHtml(facts));
+    landing = replaceMarkedRegion(landing, 'events', landingEventsHtml(facts));
+    landing = replaceMarkedRegion(landing, 'events-updated', landingEventsUpdatedHtml(facts));
     return {
-        'index.html': replaceMarkedRegion(pages['index.html'], 'landing', landingSnapshotHtml(facts)),
+        'index.html': landing,
         'pitch/index.html': replaceMarkedRegion(pages['pitch/index.html'], 'pitch-proof', pitchProofHtml(facts))
     };
 }

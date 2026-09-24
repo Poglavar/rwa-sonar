@@ -8,8 +8,10 @@ import { SITE_PAGES } from './lib/site-pages.mjs';
 
 const SITE_PAGE_PATHS = SITE_PAGES.map((page) => page.file ?? page.path ?? page);
 import {
-    STATIC_SNAPSHOT_PAGES, landingSnapshotHtml, pitchProofHtml, renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
+    LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, landingEventsHtml, landingEventsUpdatedHtml, landingSnapshotHtml, pitchProofHtml,
+    renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
 } from './lib/static-snapshot.mjs';
+import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -26,7 +28,14 @@ const FILES = {
     issuers: { issuers: ISSUERS },
     templates: { templates: [{}, {}, {}] },
     health: { rules: Array.from({ length: 11 }, () => ({})) },
-    defi: { fetchedAt: '2026-09-21T00:00:00Z', counts: { withAnyConfirmedUse: 125 } }
+    defi: { fetchedAt: '2026-09-21T00:00:00Z', counts: { withAnyConfirmedUse: 125 } },
+    events: {
+        asOf: '2026-09-24T14:07:04Z',
+        events: Array.from({ length: 12 }, (_, i) => ({
+            id: `e${i}`, at: i === 0 ? '2026-09-24T12:29:11Z' : `2026-09-${String(23 - i).padStart(2, '0')}`, category: i % 2 ? 'terms' : 'market',
+            severity: 'warning', source: i % 2 ? 'change journal' : 'catalogue', href: './watch.html', title: `Event <${i}>`
+        }))
+    }
 };
 
 describe('issuer programme counts', () => {
@@ -82,6 +91,33 @@ describe('static snapshot regions', () => {
         expect(pages['pitch/index.html']).toMatch(/<!-- snapshot:pitch-proof:start --><article><strong data-live-token-count>[\d,]+</);
         const rendered = renderStaticSnapshots(pages, facts);
         expect(rendered['index.html']).toContain('<span id="snapshotTokens">1,195</span>');
+    });
+
+    test('the landing events box carries the newest rows with dates, never an age the page cannot know', () => {
+        const html = landingEventsHtml(facts);
+        expect(html.match(/<li class="event-row"/g)).toHaveLength(LANDING_EVENT_ROWS);
+        expect(html).toContain('<time datetime="2026-09-24T12:29:11Z" title="2026-09-24T12:29:11Z" data-at="2026-09-24T12:29:11Z">24 Sep, 12:29 UTC</time>');
+        expect(html).toContain('<time datetime="2026-09-22" title="2026-09-22" data-at="2026-09-22">22 Sep</time>');
+        expect(html).toContain('Event &lt;0&gt;');
+        expect(html).not.toMatch(/ ago</);
+        expect(landingEventsUpdatedHtml(facts)).toBe('Updated hourly · newest <time datetime="2026-09-24T12:29:11Z" title="2026-09-24T12:29:11Z" data-at="2026-09-24T12:29:11Z">24 Sep, 12:29 UTC</time>');
+        expect(landingEventsHtml(snapshotFacts({ ...FILES, events: { events: [] } }))).toContain('No events recorded in the last 30 days.');
+        expect(() => snapshotFacts({ ...FILES, events: undefined })).toThrow('stocks-events.json');
+        const rendered = renderStaticSnapshots({ 'index.html': readFileSync(join(ROOT, 'index.html'), 'utf8'), 'pitch/index.html': readFileSync(join(ROOT, 'pitch/index.html'), 'utf8') }, facts);
+        expect(rendered['index.html']).toMatch(/<!-- snapshot:events:start --><li class="event-row" data-category="market"/);
+        expect(rendered['index.html']).toContain('<!-- snapshot:events-updated:start -->Updated hourly · newest <time');
+    });
+
+    test('the committed landing page carries built event rows, and the feed is built before the snapshot and published', () => {
+        const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+        expect(html).toMatch(/<ul id="latestEventsList" class="latest-events-list"><!-- snapshot:events:start --><li class="event-row"/);
+        const surfaces = RELEASE_BUILD_STAGES.surfaces;
+        expect(surfaces.indexOf('stocks/build-events.mjs')).toBeGreaterThan(-1);
+        expect(surfaces.indexOf('stocks/build-events.mjs')).toBeLessThan(surfaces.indexOf('stocks/build-static-snapshot.mjs'));
+        expect(RELEASE_ARTIFACTS).toContain('stocks-events.json');
+        const refresh = readFileSync(join(ROOT, 'stocks/refresh-on-server.sh'), 'utf8');
+        expect(refresh.indexOf('node stocks/fetch-mint-created.mjs --run')).toBeGreaterThan(-1);
+        expect(refresh.indexOf('node stocks/fetch-mint-created.mjs --run')).toBeLessThan(refresh.indexOf('complete release surfaces'));
     });
 
     test('runs after the other release surfaces, and the scheduled refresh publishes every rewritten page', () => {

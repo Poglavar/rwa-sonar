@@ -5,7 +5,7 @@
 import { readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { log, logError, parseArgs, readJson } from './lib/io.mjs';
-import { STATIC_SNAPSHOT_PAGES, renderStaticSnapshots, snapshotFacts } from './lib/static-snapshot.mjs';
+import { LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, renderStaticSnapshots, snapshotFacts } from './lib/static-snapshot.mjs';
 
 const REPO_ROOT = join(import.meta.dirname, '..');
 
@@ -17,7 +17,7 @@ USAGE
 
 INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks-legal-templates.json, stocks-health.json,
-  stocks/data/defi-usage.json
+  stocks/data/defi-usage.json, stocks-events.json (the landing page's latest-events box)
 
 OUTPUTS (rewritten in place, only between their snapshot markers)
   ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
@@ -27,12 +27,12 @@ async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (!flags.run || flags.help) return usage();
     const root = flags.root ?? REPO_ROOT;
-    const [tokens, issuers, templates, health, defi] = await Promise.all([
+    const [tokens, issuers, templates, health, defi, events] = await Promise.all([
         readJson(join(root, 'stocks-tokens.json')), readJson(join(root, 'stocks-issuers.json')),
         readJson(join(root, 'stocks-legal-templates.json')), readJson(join(root, 'stocks-health.json')),
-        readJson(join(root, 'stocks/data/defi-usage.json'))
+        readJson(join(root, 'stocks/data/defi-usage.json')), readJson(join(root, 'stocks-events.json'))
     ]);
-    const facts = snapshotFacts({ tokens, issuers, templates, health, defi });
+    const facts = snapshotFacts({ tokens, issuers, templates, health, defi, events });
     const pages = {};
     for (const page of STATIC_SNAPSHOT_PAGES) pages[page] = await readFile(join(root, page), 'utf8');
     const rendered = renderStaticSnapshots(pages, facts);
@@ -43,6 +43,7 @@ async function main() {
         await writeFile(temporary, rendered[page]);
         await rename(temporary, target);
     }
-    log(`static snapshot: ${facts.tokenCount} tokens, ${facts.programmes.withTokens}/${facts.programmes.total} programmes with tokens, built ${facts.builtAt} → ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
+    log(`static snapshot: ${facts.tokenCount} tokens, ${facts.programmes.withTokens}/${facts.programmes.total} programmes with tokens, built ${facts.builtAt}, `
+        + `${Math.min(facts.events.events.length, LANDING_EVENT_ROWS)} newest event(s) → ${STATIC_SNAPSHOT_PAGES.join(', ')}`);
 }
 if (import.meta.filename === process.argv[1]) main().catch((error) => { logError(error.stack ?? String(error)); process.exit(1); });

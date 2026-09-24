@@ -7,6 +7,7 @@ import { cors } from 'hono/cors';
 
 import { ApiError } from './lib/query.js';
 import { log, logError } from './lib/log.js';
+import eventRoutes from './routes/events.js';
 import evidenceRoutes from './routes/evidence.js';
 import facetRoutes from './routes/facets.js';
 import healthRoutes from './routes/health.js';
@@ -39,6 +40,7 @@ export const ROUTES = [
     'GET /api/issuers/:slug/claims',
     'GET /api/sources?issuer=&kind=&status=',
     'GET /api/changes?kind=&severity=&issuer=&since=&limit=',
+    'GET /api/events?limit=',
     'GET /api/rules',
     'GET|POST /api/review/resolutions (Bearer editor token)',
     'GET /api/failure-modes',
@@ -116,6 +118,7 @@ app.route('/api', historyRoutes);
 app.route('/api', reviewRoutes);
 // Before the issuer routes: /issuers/:slug/claims must not be shadowed by /issuers/:slug.
 app.route('/api', evidenceRoutes);
+app.route('/api', eventRoutes);
 // Same reason: /issuers/:slug/what-if and /issuers/:slug/chain go before /issuers/:slug.
 app.route('/api', whatIfRoutes);
 app.route('/api', litigationRoutes);

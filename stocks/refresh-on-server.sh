@@ -71,7 +71,11 @@ step "identity chain"; node stocks/fetch-onchain.mjs --run --in=stocks/data/mint
 step "mint identities (final)"; node stocks/build-mint-identities.mjs --run
 # The free tier is 10,000 calls/month. 250 ticker calls + at most one coin-list call per day is
 # 7,530 calls in a 30-day month / 7,781 in a 31-day month, leaving room for retries and manual use.
-# Oldest/unseen-first selection rotates through the full universe in roughly two days.
+# The 250 are split in two tiers (fetch-venues --priority-coins, default 40 %): 100 coins are
+# refreshed every day (saved watches, then the busiest by exchange volume and DEX liquidity) and 150
+# rotate oldest/unseen first through the rest. With 1,169 mapped coins (2026-09-24) that is 1,069
+# tail coins, each refreshed about every 7.1 days. The run logs "coingecko tiers:" with the live
+# numbers and venues.json records them in source.coingecko.tiers; cards date exchange data by cexFetchedAt.
 if [ "$(date -u +%H)" = "00" ]; then
     soft "coingecko venues (daily, quota-capped)" node stocks/fetch-venues.mjs --run --only-cex --coin-limit=250
 fi
@@ -124,6 +128,10 @@ step "collector status"; node stocks/build-collector-status.mjs --run
 # free; a --only list here would have to be edited every time one is added).
 step "db";         node stocks/load-db.mjs --run --ddl
 step "evidence review queue"; node stocks/build-review-queue.mjs --run
+# When the newest first-seen mints were created (a bounded getSignaturesForAddress pass, cached for
+# good), so the latest-events feed says "created" or leaves out old tokens the catalogue only just
+# found. A failed pass only leaves those rows worded "first seen".
+soft "mint creation times" node stocks/fetch-mint-created.mjs --run --budget=30
 # Rebuild the public legal surfaces after the database-backed queue exists, so every P0 item is
 # visibly propagated to inherited conclusions and token cards in the same refresh.
 step "complete release surfaces"; node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url="$BASE_URL"

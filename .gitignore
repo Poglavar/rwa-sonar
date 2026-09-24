@@ -72,3 +72,7 @@ stocks/data/sources-state.json
 # The DeFi footprint scan (1.4 MB, server state); only its candidates are published, via stocks-defi-new.json.
 /stocks/data/defi-footprint.json
 
+
+# Creation times of recently first-seen mints (stocks/fetch-mint-created.mjs): a server-side cache
+# of chain facts that never change, rebuilt on demand; the latest-events feed reads it.
+stocks/data/mint-created.json

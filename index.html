@@ -31,7 +31,7 @@
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="./app-shell.css?v=20260924u" />
-    <link rel="stylesheet" href="landing.css?v=20260924u" />
+    <link rel="stylesheet" href="landing.css?v=20260924w" />
     <link rel="stylesheet" href="funnel-figure.css?v=20260924u" />
     <link rel="stylesheet" href="motion.css?v=20260924u" />
     <script src="./clarity.js?v=20260924a" defer></script>
@@ -82,6 +82,21 @@
                             autocomplete="off"><button type="submit">Search</button></div>
                 </form>
             </article>
+
+            <!-- The newest noteworthy events (stocks-events.json, written in at build time by
+                 stocks/build-static-snapshot.mjs so the box is never empty); latest-events.js swaps in
+                 the live feed from /api/events and scrolls it slowly when motion is allowed. -->
+            <section id="latestEvents" class="latest-events" aria-labelledby="latestEventsTitle">
+                <div class="latest-events-head">
+                    <h2 id="latestEventsTitle"><span class="live-dot" aria-hidden="true"></span>Latest events</h2>
+                    <button type="button" id="latestEventsToggle" class="latest-events-toggle" aria-pressed="false" aria-controls="latestEventsList">Pause</button>
+                </div>
+                <div class="latest-events-viewport" id="latestEventsViewport">
+                    <ul id="latestEventsList" class="latest-events-list"><!-- snapshot:events:start --><li class="event-row" data-category="terms" data-severity="info"><span class="event-meta"><time datetime="2026-09-22T16:47:12Z" title="2026-09-22T16:47:12Z" data-at="2026-09-22T16:47:12Z">22 Sep, 16:47 UTC</time><span class="event-tag">Terms</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/tessera.html">Tessera corrects its docs: T-Tokens have no Transfer Hook</a></li><li class="event-row" data-category="terms" data-severity="info"><span class="event-meta"><time datetime="2026-09-22T16:43:50Z" title="2026-09-22T16:43:50Z" data-at="2026-09-22T16:43:50Z">22 Sep, 16:43 UTC</time><span class="event-tag">Terms</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/xstocks-backed.html">Backed lists Optimism as a tenth xStocks chain</a></li><li class="event-row" data-category="catalogue" data-severity="info"><span class="event-meta"><time datetime="2026-09-20T10:28:13Z" title="2026-09-20T10:28:13Z" data-at="2026-09-20T10:28:13Z">20 Sep, 10:28 UTC</time><span class="event-tag">Catalogue</span><span class="event-source">catalogue</span></span><a class="event-title" href="./issuers/backpack-securities.html">Backpack Securities: 3 new tokens first seen (FWDI, USO, BB)</a></li><li class="event-row" data-category="keys" data-severity="warning"><span class="event-meta"><time datetime="2026-09-19" title="2026-09-19" data-at="2026-09-19">19 Sep</time><span class="event-tag">Keys</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/prestocks.html">PreStocks doubled its on-chain transfer fee</a></li><li class="event-row" data-category="terms" data-severity="warning"><span class="event-meta"><time datetime="2026-09-19" title="2026-09-19" data-at="2026-09-19">19 Sep</time><span class="event-tag">Terms</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/remora-markets.html">Remora&#39;s token-metadata bucket disappeared</a></li><li class="event-row" data-category="terms" data-severity="warning"><span class="event-meta"><time datetime="2026-09-19" title="2026-09-19" data-at="2026-09-19">19 Sep</time><span class="event-tag">Terms</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/shift.html">Shift removed its markets page</a></li><li class="event-row" data-category="terms" data-severity="caution"><span class="event-meta"><time datetime="2026-09-19" title="2026-09-19" data-at="2026-09-19">19 Sep</time><span class="event-tag">Terms</span><span class="event-source">change journal</span></span><a class="event-title" href="./issuers/ondo-global-markets.html">Ondo removed its disclosures index; the cited Sales Terms remain available</a></li><li class="event-row" data-category="catalogue" data-severity="info"><span class="event-meta"><time datetime="2026-09-18T00:19:20Z" title="2026-09-18T00:19:20Z" data-at="2026-09-18T00:19:20Z">18 Sep, 00:19 UTC</time><span class="event-tag">Catalogue</span><span class="event-source">catalogue</span></span><a class="event-title" href="./issuers/backpack-securities.html">Backpack Securities: 3 new tokens first seen (CYPH, RUM, WULF)</a></li><!-- snapshot:events:end --></ul>
+                </div>
+                <p class="latest-events-foot"><span id="latestEventsUpdated"><!-- snapshot:events-updated:start -->Updated hourly · newest <time datetime="2026-09-22T16:47:12Z" title="2026-09-22T16:47:12Z" data-at="2026-09-22T16:47:12Z">22 Sep, 16:47 UTC</time><!-- snapshot:events-updated:end --></span>
+                    <a href="./watch.html">All changes →</a></p>
+            </section>
         </section>
 
         <!-- The newest real trades from /api/trades/recent, filled by landing.js after the page has
@@ -304,6 +319,8 @@
     <script src="stocks/lib/funnel-layout.js?v=20260923r"></script>
     <script src="funnel-figure.js?v=20260924s"></script>
     <script src="landing.js?v=20260924a"></script>
+    <script src="stocks/lib/events-view.js?v=20260924a" defer></script>
+    <script src="latest-events.js?v=20260924c" defer></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 </html>

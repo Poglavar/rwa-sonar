@@ -17,7 +17,9 @@ export const RELEASE_ARTIFACTS = [
     // DeFi additions feed (New in DeFi strip) and the curated program registry it attributes with.
     'stocks-defi-new.json', 'stocks/data/defi-program-registry.json',
     // Redemption, creation, what-if and relationship diagrams (stocks/build-schematics.mjs).
-    'stocks-schematics.json'
+    'stocks-schematics.json',
+    // The home page's latest-events feed and the /api/events fallback (stocks/build-events.mjs).
+    'stocks-events.json'
 ];
 
 // Release construction has explicit phases because the review queue reads the database, while
@@ -40,6 +42,9 @@ export const RELEASE_BUILD_STAGES = {
         // Exits reads protocols/index.json; tracking reads the after-hours output; weekly reads the
         // snapshot, changes, journal and database state, so all three come after the dossiers.
         'stocks/build-exits.mjs', 'stocks/build-tracking.mjs', 'stocks/build-weekly.mjs',
+        // Reads the journal, the DeFi feed, the snapshots and the watcher rows; the snapshot step
+        // below writes its newest rows into index.html, so it must come first.
+        'stocks/build-events.mjs',
         // Last: reads the finished catalogue, templates and health. index.html and pitch/index.html
         // are ordinary site files, not manifest families; refresh-on-server.sh installs them itself.
         'stocks/build-static-snapshot.mjs',

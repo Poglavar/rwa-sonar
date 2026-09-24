@@ -1,0 +1,243 @@
+{
+  "asOf": "2026-09-24T02:42:57Z",
+  "windowDays": 30,
+  "newestEventAt": "2026-09-22T16:47:12Z",
+  "methodology": "Noteworthy changes to the tokenized stocks RWA Sonar tracks, newest first, over the last 30 days: new tokens, key, pause and fee changes, splits, issuer document changes rated material by a model, lending and vault support added or removed, court filings, and market moves large enough to matter. Routine supply moves, daily multiplier updates, DEX pool churn and our own research maintenance are left out. Every time is the source's own event or observation time; a date without a time means the source records only the day.",
+  "inputs": {
+    "tokens": "2026-09-23T11:58:24Z",
+    "issuers": "2026-09-23T11:58:24Z",
+    "changeJournal": "2026-09-23T15:39:38Z",
+    "defiScanner": "2026-09-24T02:42:57Z",
+    "dailySnapshots": "2026-09-20T10:45:34Z",
+    "recordsBeginOn": "2026-09-16",
+    "watcherRows": 181,
+    "creationTimesKnown": 15
+  },
+  "counts": {
+    "total": 10,
+    "byCategory": {
+      "catalogue": 3,
+      "keys": 1,
+      "terms": 6
+    },
+    "bySource": {
+      "catalogue": 3,
+      "change journal": 7
+    }
+  },
+  "excluded": {
+    "DeFi scanner: DEX pool listing churn": 47,
+    "DeFi scanner: unconfirmed holdings under review": 203,
+    "catalogue: existing tokens newly catalogued (created long before first sight)": 15,
+    "catalogue: founding cohort (first seen the day records began)": 441,
+    "catalogue: health got better": 6,
+    "catalogue: health got worse": 47,
+    "catalogue: liquidity drops on pools under $100k": 4,
+    "catalogue: pool liquidity more than doubled": 9,
+    "catalogue: scaled-ui multiplier moved": 8,
+    "catalogue: snapshot additions (shown from first-seen times)": 742,
+    "catalogue: unchecked tokens catalogued in the same batch as an older one": 718,
+    "catalogue: venue spread crossed 5 %": 1,
+    "document watcher: no valid model assessment yet": 92,
+    "journal: baseline research from the day records began": 9,
+    "journal: catalogue additions (shown from token first-seen times)": 6,
+    "journal: document moved with its content intact": 2,
+    "journal: protocol listing changes (shown from the DeFi scanner)": 6,
+    "review: reported by its change journal entry": 8,
+    "review: resolved as a false alarm or our own re-read, not an external change": 81
+  },
+  "events": [
+    {
+      "id": "journal-tessera-docs-drop-transfer-hook-claim-2026-09-22",
+      "at": "2026-09-22T16:47:12Z",
+      "kind": "documentation-corrected",
+      "category": "terms",
+      "title": "Tessera corrects its docs: T-Tokens have no Transfer Hook",
+      "subject": {
+        "type": "issuer",
+        "id": "tessera",
+        "name": "Tessera"
+      },
+      "severity": "info",
+      "href": "./issuers/tessera.html",
+      "source": "change journal",
+      "keys": [
+        "doc|docs.tessera.pe/technicals/on-chain-programs",
+        "doc|docs.tessera.pe/llms-full.txt"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-xstocks-optimism-chain-added-2026-09-22",
+      "at": "2026-09-22T16:43:50Z",
+      "kind": "chain-added",
+      "category": "terms",
+      "title": "Backed lists Optimism as a tenth xStocks chain",
+      "subject": {
+        "type": "issuer",
+        "id": "xstocks-backed",
+        "name": "Kraken xStocks"
+      },
+      "severity": "info",
+      "href": "./issuers/xstocks-backed.html",
+      "source": "change journal",
+      "keys": [
+        "doc|assets.backed.fi/legal-documentation"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "catalogue-backpack-securities-2026-09-20",
+      "at": "2026-09-20T10:28:13Z",
+      "kind": "tokens-first-seen",
+      "category": "catalogue",
+      "title": "Backpack Securities: 3 new tokens first seen (FWDI, USO, BB)",
+      "subject": {
+        "type": "issuer",
+        "id": "backpack-securities",
+        "name": "Backpack Securities"
+      },
+      "severity": "info",
+      "href": "./issuers/backpack-securities.html",
+      "source": "catalogue",
+      "keys": [
+        "catalogue|backpack-securities|2026-09-20"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-prestocks-transfer-fee-100bps-2026-09-19",
+      "at": "2026-09-19",
+      "kind": "fee-change",
+      "category": "keys",
+      "title": "PreStocks doubled its on-chain transfer fee",
+      "subject": {
+        "type": "issuer",
+        "id": "prestocks",
+        "name": "PreStocks"
+      },
+      "severity": "warning",
+      "href": "./issuers/prestocks.html",
+      "source": "change journal",
+      "keys": [
+        "fee|prestocks",
+        "doc|explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-remora-token-metadata-bucket-removed-2026-09-19",
+      "at": "2026-09-19",
+      "kind": "metadata-removed",
+      "category": "terms",
+      "title": "Remora's token-metadata bucket disappeared",
+      "subject": {
+        "type": "issuer",
+        "id": "remora-markets",
+        "name": "Remora Markets"
+      },
+      "severity": "warning",
+      "href": "./issuers/remora-markets.html",
+      "source": "change journal",
+      "keys": [
+        "doc|remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-shift-markets-page-removed-2026-09-19",
+      "at": "2026-09-19",
+      "kind": "product-page-removed",
+      "category": "terms",
+      "title": "Shift removed its markets page",
+      "subject": {
+        "type": "issuer",
+        "id": "shift",
+        "name": "Shift leveraged tokens"
+      },
+      "severity": "warning",
+      "href": "./issuers/shift.html",
+      "source": "change journal",
+      "keys": [
+        "doc|shiftrwa.xyz/sitemap.xml"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-ondo-disclosures-index-replaced-2026-09-19",
+      "at": "2026-09-19",
+      "kind": "document-moved",
+      "category": "terms",
+      "title": "Ondo removed its disclosures index; the cited Sales Terms remain available",
+      "subject": {
+        "type": "issuer",
+        "id": "ondo-global-markets",
+        "name": "Ondo Global Markets"
+      },
+      "severity": "caution",
+      "href": "./issuers/ondo-global-markets.html",
+      "source": "change journal",
+      "keys": [
+        "doc|cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "catalogue-backpack-securities-2026-09-18",
+      "at": "2026-09-18T00:19:20Z",
+      "kind": "tokens-first-seen",
+      "category": "catalogue",
+      "title": "Backpack Securities: 3 new tokens first seen (CYPH, RUM, WULF)",
+      "subject": {
+        "type": "issuer",
+        "id": "backpack-securities",
+        "name": "Backpack Securities"
+      },
+      "severity": "info",
+      "href": "./issuers/backpack-securities.html",
+      "source": "catalogue",
+      "keys": [
+        "catalogue|backpack-securities|2026-09-18"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "journal-remora-proof-of-reserves-site-removed",
+      "at": "2026-09-17T15:20:31Z",
+      "kind": "document-removed",
+      "category": "terms",
+      "title": "Remora's proof-of-reserves page disappeared with the programme",
+      "subject": {
+        "type": "issuer",
+        "id": "remora-markets",
+        "name": "Remora Markets"
+      },
+      "severity": "warning",
+      "href": "./issuers/remora-markets.html",
+      "source": "change journal",
+      "keys": [
+        "doc|solanacompass.com/projects/remora-markets"
+      ],
+      "origin": "file"
+    },
+    {
+      "id": "catalogue-backpack-securities-2026-09-17",
+      "at": "2026-09-17T09:50:27Z",
+      "kind": "tokens-first-seen",
+      "category": "catalogue",
+      "title": "Backpack Securities: 3 new tokens first seen (AMD, LUV, XYZ)",
+      "subject": {
+        "type": "issuer",
+        "id": "backpack-securities",
+        "name": "Backpack Securities"
+      },
+      "severity": "info",
+      "href": "./issuers/backpack-securities.html",
+      "source": "catalogue",
+      "keys": [
+        "catalogue|backpack-securities|2026-09-17"
+      ],
+      "origin": "file"
+    }
+  ]
+}

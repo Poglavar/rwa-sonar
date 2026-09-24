@@ -516,6 +516,16 @@ describeDb('the API against the real sonar schema', () => {
         }
     });
 
+    test('/api/events runs the shared watcher query and answers live, newest first, within its limit', async () => {
+        const { status, body } = await get('/api/events?limit=10');
+        expect(status).toBe(200);
+        expect(body.live).toBe(true);
+        expect(body.events.length).toBeLessThanOrEqual(10);
+        const times = body.events.map((e) => Date.parse(e.at.length === 10 ? `${e.at}T00:00:00Z` : e.at));
+        expect(times).toEqual([...times].sort((a, b) => b - a));
+        for (const event of body.events) expect(['catalogue', 'terms', 'keys', 'defi', 'market', 'legal']).toContain(event.category);
+    });
+
     test('/api/rules serves the health rule ids with their labels and thresholds', async () => {
         const { status, body } = await get('/api/rules');
         expect(status).toBe(200);
