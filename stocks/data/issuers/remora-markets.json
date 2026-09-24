@@ -63,7 +63,7 @@
   "pricing": {
     "referenceMarket": "platform-mark",
     "arbitrageable": null,
-    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. Third-party valuations disagree THREE ways for the same platform within a day, across more than two orders of magnitude: CoinGecko's 'Remora Markets Tokenized rStocks' category reports a ~$138.9M aggregate market cap, RWA.xyz reports $1.87M distributed asset value, and DefiLlama reports $479,846. Nor is any one of them self-consistent: DefiLlama's own daily series records $0 on 42 days between 2026-07-02 and 2026-09-10 before returning to $479,846. Treat all third-party valuation figures for these tokens as unreliable."
+    "notes": "Minting was priced at 'the current price on traditional exchanges' per the platform's own How It Works page — a platform mark, with no named oracle. Arbitrage depended entirely on the platform's mint/redeem window being open to the arbitrageur, which required an account; that window is now closed. The wind-down exit liquidity was priced off the prior Friday's market close, i.e. a stale mark. Third-party valuations disagree THREE ways for the same platform within a day, across more than two orders of magnitude: CoinGecko's 'Remora Markets Tokenized rStocks' category reports a ~$138.9M aggregate market cap, RWA.xyz reported $1.87M distributed asset value on 17 September 2026 ($2.13M on 24 September), and DefiLlama reports $479,846. Nor is any one of them self-consistent: DefiLlama's own daily series records $0 on 42 days between 2026-07-02 and 2026-09-10 before returning to $479,846. Treat all third-party valuation figures for these tokens as unreliable."
   },
   "venues": [
     "Jupiter (aggregator; note the rTokens no longer carry Jupiter's 'stocks'/'rwa'/'equities' tags as of 2026-09-16 — only 'community-assist'/'token-2022'/'unknown')",
@@ -1109,12 +1109,12 @@
     },
     {
       "field": "redemption.rails",
-      "quote": "BCw9nG8H tvl=4.07; 2RaMGbhE tvl=5.91; FxonDihq tvl=1.83; 3KzWDJcd tvl=1.66 (TSLAr, sum 13.47, 24h volume 0 on all four)",
+      "quote": "\"id\": \"2RaMGbhE1AGfziBoSaxbKcZKySGPzyMsCVQysSj9aRw2\" … \"symbol\": \"USDC\" … \"name\": \"Tesla rStock\" … \"symbol\": \"TSLAr\" … \"type\": \"Concentrated\"",
       "url": "https://api-v3.raydium.io/pools/info/mint?mint1=FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe&poolType=all&poolSortField=default&sortType=desc&pageSize=20&page=1",
-      "locator": "data.data[].id / .tvl / .day.volume, read 2026-09-18",
-      "accessedAt": "2026-09-18T11:45:09Z",
+      "locator": "data.data[] entry with id 2RaMGbhE1AGfziBoSaxbKcZKySGPzyMsCVQysSj9aRw2: mintA.symbol, mintB.name/.symbol, type (keys as the watcher sorts them); pool figures in data.data[].tvl / .day.volume",
+      "accessedAt": "2026-09-24T01:45:22Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION: the rails sentence described the Manifest/Jupiter/Titan pool in the present tense. Measured 2026-09-18 the DEX rail carries $13.47 of TSLAr depth across four pools, $0.30 on GLDr and $1,040.51 on NVDAr, with no trades in 24 hours except $370.99 on NVDAr/USDC — and Jupiter will not route to it at all. Rewritten in the past tense with the present state stated. The quote is a transcription of the four pool ids with their tvl and 24h volume fields rather than a sentence, because the source is a JSON API."
+      "note": "CORRECTION: the rails sentence described the Manifest/Jupiter/Titan pool in the present tense. Measured 2026-09-18 the DEX rail carries $13.47 of TSLAr depth across four pools, $0.30 on GLDr and $1,040.51 on NVDAr, with no trades in 24 hours except $370.99 on NVDAr/USDC — and Jupiter will not route to it at all. Rewritten in the past tense with the present state stated. RE-QUOTED 2026-09-24: the earlier quote was a transcription of the four pools' tvl figures, which move with every price tick and so read as lost on the next watcher run. The quote is now the stable identity of the residual USDC/TSLAr Raydium CLMM pool (its id, its two mints and its type), which is what the rails sentence relies on; the figures are recorded here as a reading, not quoted. Read 2026-09-24T01:45:22Z: count 4, all Concentrated, tvl BCw9nG8H (TSLAx/TSLAr) 4.20, 2RaMGbhE (USDC/TSLAr) 5.91, FxonDihq (TSLAx/TSLAr) 1.88, 3KzWDJcd (TSLAx/TSLAr) 1.71 (sum 13.70), 24h volume 0 on all four. The rails text ('double-digit dollars') still holds."
     },
     {
       "field": "pricing.notes",
@@ -1127,12 +1127,12 @@
     },
     {
       "field": "pricing.notes",
-      "quote": "Distributed Asset Value $1.87M",
+      "quote": "Tokenized Real-World Assets Distributed Asset Value … Remora Markets RWA League Table",
       "url": "https://app.rwa.xyz/platforms/remora-markets",
-      "locator": "page text as stored by the watcher, stocks/data/sources/73cffe0c3896/2026-09-17T15-36-33Z.txt (verified with watch.mjs quoteFound)",
-      "accessedAt": "2026-09-18T11:45:09Z",
+      "locator": "platform header block ('Remora Markets BETA', 'Tokenized Real-World Assets', 'Distributed Asset Value' tile) and the 'Remora Markets RWA League Table' heading; figures as served in the fetched HTML (verified with watch.mjs quoteFound on a plain fetch of 2026-09-24T01:46:08Z)",
+      "accessedAt": "2026-09-24T01:46:08Z",
       "status": "contradicted-corrected",
-      "note": "CORRECTION: the dossier recorded RWA.xyz's distributed asset value as $1.99M (in pricing.notes and in incidents[4]). The page text the watcher stored on 2026-09-17 says $1.87M, and $1.87M is also the figure the earlier what-if pass read. The $1.99M number appears nowhere in the stored text; the closest figure in it is the \"$1.9M\" in the RWA League Table row for Solana. Both places corrected to $1.87M. The holder, RWA-count, transfer-volume and active-address numbers are login-gated in that text, so they still rest on a single browser read and are not re-verifiable from disk."
+      "note": "CORRECTION: the dossier recorded RWA.xyz's distributed asset value as $1.99M (in pricing.notes and in incidents[4]). The page text the watcher stored on 2026-09-17 says $1.87M, and $1.87M is also the figure the earlier what-if pass read. The $1.99M number appears nowhere in the stored text; the closest figure in it is the \"$1.9M\" in the RWA League Table row for Solana. Both places corrected to $1.87M. The holder, RWA-count, transfer-volume and active-address numbers are login-gated in that text, so they still rest on a single browser read and are not re-verifiable from disk. RE-QUOTED 2026-09-24: the figure itself moves daily (the watcher stored $2.13M on 2026-09-23), so the quote is now the page's stable labels, which establish that RWA.xyz tracks this platform and publishes a distributed-asset-value figure for it; the figure is recorded as a reading. Read 2026-09-24T01:46:08Z: \"Distributed Asset Value $2.13M\", \"▲ + 10.93 % from 30d ago\", RWA Count 6, Holders 3,623, Monthly Transfer Volume $8,417.96, Monthly Active Addresses 86 (these four are now in the served HTML). The $1.87M in pricing.notes is the 2026-09-17/18 reading the three-way comparison was made on; the spread it describes (~$138.9M vs ~$2M vs ~$0.48M) is unchanged in order of magnitude."
     },
     {
       "field": "keyGovernance.evidence",

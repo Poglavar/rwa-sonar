@@ -686,10 +686,10 @@
       "expiryDate": "2026-09-11",
       "status": "valid",
       "onchain": false,
-      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AEjezs2DAmU5pV46gQCsN-k/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-10_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "statement": "Ankura, as Verification Agent under the Sales Terms dated 2025-07-17, reviewed and confirmed the amounts, valuations and calculations of the collateral as of 8:00pm ET on 2026-09-10, based solely on issuer-submitted data and read-only access to the collateral accounts. Daily since 2025-10-01.",
       "quote": "Ankura Trust Company, LLC, in its capacity as Verification Agent under the Sales Terms of Ondo",
-      "accessedAt": "2026-09-17T15:23:27Z"
+      "accessedAt": "2026-09-24T01:51:47Z"
     },
     {
       "assetName": "Ondo Stocks",
@@ -699,10 +699,10 @@
       "expiryDate": "2026-09-11",
       "status": "valid",
       "onchain": false,
-      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AEjezs2DAmU5pV46gQCsN-k/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-10_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "statement": "Asset-to-Obligation Ratio 108.02%: total assets $1,229,196,568.57 against total liabilities $1,137,983,260.72, of which Ondo Stocks outstanding market value $1,037,858,343.08 (10,450,205.93 tokens) and USDY $79,664,349.93. Pooled across products, not per mint.",
       "quote": "Asset-to-Obligation Ratio                                                        108.02%",
-      "accessedAt": "2026-09-17T15:23:27Z"
+      "accessedAt": "2026-09-24T01:51:47Z"
     },
     {
       "assetName": "Ondo Stocks",
@@ -712,10 +712,10 @@
       "expiryDate": "2026-09-11",
       "status": "valid",
       "onchain": false,
-      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "link": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AEjezs2DAmU5pV46gQCsN-k/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-10_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "statement": "The daily report itemises holdings by location: long market value of positions, USD at BitGo / SVB / Coinbase, Alpaca trading and clearing accounts, Ondo Stocks in the BitGo custodian wallet, Anchorage, USDC at BitGo/Circle/Coinbase/Bridge/PSM, BSC-USDT and SOL-USDC at PSM, and funds in transit.",
       "quote": "Ondo Stocks in Custodian Wallet - BitGo",
-      "accessedAt": "2026-09-17T15:23:27Z"
+      "accessedAt": "2026-09-24T01:51:47Z"
     },
     {
       "assetName": "Ondo Stocks",
@@ -1305,9 +1305,9 @@
     {
       "field": "underlyingCustodian",
       "quote": "USD in Trading Account - Alpaca                                    $    38,703,535.23",
-      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/ACPgkS13mCGLGXty4QPGcag/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-15_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "locator": "'Daily Report - Ondo Stocks - 2026-09-15_20_00_ET - Ankura Attestation.pdf', section A 'Summary'",
-      "accessedAt": "2026-09-17T15:23:27Z",
+      "accessedAt": "2026-09-24T01:53:24Z",
       "status": "confirmed",
       "note": "The 2026-09-15 report itemises holding locations: BitGo, SVB, Coinbase, Alpaca trading and clearing accounts, Anchorage ('Ondo Stocks for OIP'), Circle, a Bridge Account and 'PSM'. New since the dossier: a PathUSD balance at the Bridge Account."
     },
@@ -1323,9 +1323,9 @@
     {
       "field": "collateral.ratio",
       "quote": "Asset-to-Obligation Ratio                                                        108.72%",
-      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/ACPgkS13mCGLGXty4QPGcag/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-15_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "locator": "'Daily Report - Ondo Stocks - 2026-09-15_20_00_ET - Ankura Attestation.pdf', section A 'Summary'",
-      "accessedAt": "2026-09-17T15:23:27Z",
+      "accessedAt": "2026-09-24T01:53:24Z",
       "status": "confirmed",
       "note": "Total Assets $1,257,853,141.27 against Total Liabilities $1,156,926,839.49, pooled across Ondo Stocks, USDon and USDY."
     },
@@ -1384,9 +1384,9 @@
     {
       "field": "custodyVerification.agent",
       "quote": "Ankura Trust Company, LLC, in its capacity as Verification Agent under the Sales Terms of Ondo",
-      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/ACPgkS13mCGLGXty4QPGcag/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-15_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "locator": "'Daily Report - Ondo Stocks - 2026-09-15_20_00_ET - Ankura Attestation.pdf', section B 'Verification Agent Attestation'",
-      "accessedAt": "2026-09-17T15:23:27Z",
+      "accessedAt": "2026-09-24T01:53:24Z",
       "status": "confirmed",
       "note": "The report is a two-column PDF, so only one printed line can be quoted verbatim; the sentence continues 'Global Markets (BVI) Limited as Issuer dated as of July 17, 2025 ... has reviewed and confirmed ... based solely on account data and reports submitted by Issuer or otherwise independently accessed by the Verification Agent through read-only access to the Collateral Accounts.'"
     },

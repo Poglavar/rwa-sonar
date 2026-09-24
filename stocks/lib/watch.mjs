@@ -402,6 +402,34 @@ export function driveDownloadUrl(url) {
     return `https://drive.google.com/uc?export=download&id=${id}`;
 }
 
+/**
+ * A Dropbox shared FILE link (`/scl/fi/<id>/<name>`, or a file inside a shared folder,
+ * `/scl/fo/<id>/<key>/<path>/<name.ext>`) with `dl=0` serves Dropbox's JavaScript previewer,
+ * which the watcher can only record as `blocked`; the same link with `dl=1` answers with the
+ * file's bytes (measured 2026-09-24 on Ankura's Ondo daily reports: `application/binary`, the
+ * PDF). The dossier keeps citing the `dl=0` link a reader opens; only the fetch moves.
+ *
+ * A shared FOLDER link (`/scl/fo/<id>/<key>` with no file path) is not rewritten: its `dl=1` is a
+ * zip of the whole folder (31 MB for the Ondo daily reports), which is not a document. Cite the
+ * individual file instead.
+ */
+export function dropboxDownloadUrl(url) {
+    let u;
+    try {
+        u = new URL(String(url));
+    } catch {
+        return null;
+    }
+    const host = u.hostname.toLowerCase();
+    if (host !== 'www.dropbox.com' && host !== 'dropbox.com') return null;
+    const segments = u.pathname.split('/').filter(Boolean);
+    const isFile = (segments[0] === 'scl' && segments[1] === 'fi' && segments.length >= 4)
+        || (segments[0] === 'scl' && segments[1] === 'fo' && segments.length >= 5 && /\.[A-Za-z0-9]{2,5}$/.test(segments[segments.length - 1]));
+    if (!isFile) return null;
+    u.searchParams.set('dl', '1');
+    return u.toString();
+}
+
 /** Content types we can turn into text. Everything else is bytes we can only watch as bytes. */
 const TEXTUAL = /(^text\/)|html|xml|json|javascript|csv|plain|urlencoded/i;
 

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-23T11:58:23Z",
-  "count": 576,
+  "generatedAt": "2026-09-24T02:07:17Z",
+  "count": 608,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -51,6 +51,24 @@
         "superstate-opening-bell:whatIf[sanctioned].searched[7]",
         "superstate-opening-bell:whatIf[tokens-seized].searched[6]",
         "superstate-opening-bell:whatIf[venue-insolvency].searched[7]"
+      ]
+    },
+    {
+      "url": "https://1275722710-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FvEZgAuuCGOpJUFqcgO0l%2Fuploads%2FJ95lon9ZHRudkOV7rjWz%2FSuperstate-Allowlist-May-2025-OffsideLabs.pdf?alt=media&token=80b51ea7-8624-4ec1-af08-87aa7dabfc44",
+      "kind": "pdf",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:whatIf[authority-key-compromised].searched[11]",
+      "foundIn": [
+        "superstate-opening-bell:whatIf[authority-key-compromised].searched[11]"
+      ]
+    },
+    {
+      "url": "https://1275722710-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FvEZgAuuCGOpJUFqcgO0l%2Fuploads%2Fv0ktODEvUrKfIVnyeNkN%2FSuperstat%20audit%20report%20by%20Certora.pdf?alt=media&token=4d2af22c-57cc-4c0d-a11e-6867a48049e7",
+      "kind": "pdf",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:whatIf[authority-key-compromised].searched[12]",
+      "foundIn": [
+        "superstate-opening-bell:whatIf[authority-key-compromised].searched[12]"
       ]
     },
     {
@@ -190,9 +208,9 @@
       "url": "https://api-v3.raydium.io/pools/info/mint?mint1=FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe&poolType=all&poolSortField=default&sortType=desc&pageSize=20&page=1",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[66].url",
+      "title": "remora-markets:claims[67].url",
       "foundIn": [
-        "remora-markets:claims[66].url"
+        "remora-markets:claims[67].url"
       ]
     },
     {
@@ -283,9 +301,9 @@
       "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Step%20Labs%20LLC",
       "kind": "api",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[72].note",
+      "title": "remora-markets:claims[73].note",
       "foundIn": [
-        "remora-markets:claims[72].note",
+        "remora-markets:claims[73].note",
         "remora-markets:whatIf[dispute-forum].searched[4]"
       ]
     },
@@ -295,7 +313,7 @@
       "issuer": "remora-markets",
       "title": "DefiLlama protocol series — the third and lowest of the three disagreeing valuations ($479,846) and the only one whose own history records $0 for 42 days of the last quarter",
       "foundIn": [
-        "remora-markets:claims[67].url",
+        "remora-markets:claims[68].url",
         "remora-markets:documents[12].url",
         "remora-markets:sources[18]",
         "remora-markets:whatIf[price-source-fails].searched[4]"
@@ -388,7 +406,7 @@
         "remora-markets:claims[61].sources[0]",
         "remora-markets:claims[62].url",
         "remora-markets:claims[63].url",
-        "remora-markets:claims[69].url",
+        "remora-markets:claims[70].url",
         "remora-markets:whatIf[account-frozen]",
         "remora-markets:whatIf[authority-key-compromised]",
         "remora-markets:whatIf[company-acquired]",
@@ -403,6 +421,7 @@
         "remora-markets:whatIf[tokens-seized]",
         "republic-mirror:claims[90].sources[1]",
         "republic-mirror:claims[90].url",
+        "securitize-secz:authorityFactsSource",
         "securitize-secz:claims[12].sources[1]",
         "securitize-secz:claims[71].url",
         "securitize-secz:whatIf[account-frozen].searched[11]",
@@ -484,6 +503,7 @@
         "xstocks-backed:claims[103].url",
         "xstocks-backed:claims[109].sources[2]",
         "xstocks-backed:claims[112].url",
+        "xstocks-backed:claims[122].url",
         "xstocks-backed:claims[66].url",
         "xstocks-backed:claims[70].url",
         "xstocks-backed:claims[71].url",
@@ -566,6 +586,7 @@
         "superstate-opening-bell:whatIf[price-source-fails].searched[7]",
         "superstate-opening-bell:whatIf[rebase-error]",
         "superstate-opening-bell:whatIf[rebase-error].searched[5]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[4]",
         "superstate-opening-bell:whatIf[venue-delists].searched[8]"
       ]
     },
@@ -660,7 +681,7 @@
       "issuer": "remora-markets",
       "title": "RWA.xyz platform page (live residual metrics)",
       "foundIn": [
-        "remora-markets:claims[68].url",
+        "remora-markets:claims[69].url",
         "remora-markets:documents[9].url",
         "remora-markets:incidents[4].quoteNote",
         "remora-markets:incidents[4].source",
@@ -681,8 +702,9 @@
       "url": "https://app.ventuals.com/",
       "kind": "html",
       "issuer": "ventuals",
-      "title": "ventuals:sources[6]",
+      "title": "ventuals:claims[63].locator",
       "foundIn": [
+        "ventuals:claims[63].locator",
         "ventuals:sources[6]"
       ]
     },
@@ -1059,6 +1081,10 @@
         "xstocks-backed:claims[110].url",
         "xstocks-backed:claims[116].url",
         "xstocks-backed:claims[11].url",
+        "xstocks-backed:claims[123].url",
+        "xstocks-backed:claims[124].url",
+        "xstocks-backed:claims[125].url",
+        "xstocks-backed:claims[126].url",
         "xstocks-backed:claims[12].url",
         "xstocks-backed:claims[13].url",
         "xstocks-backed:claims[14].url",
@@ -1974,6 +2000,17 @@
       ]
     },
     {
+      "url": "https://developers.fireblocks.com/reference/interact-with-solana-programs",
+      "kind": "html",
+      "issuer": "bullish-blsh",
+      "title": "bullish-blsh:findings[12].evidence",
+      "foundIn": [
+        "bullish-blsh:findings[12].evidence",
+        "securitize-secz:findings[13].evidence",
+        "tessera:findings[13].evidence"
+      ]
+    },
+    {
       "url": "https://docs-v2-git-prod-ondo-docs.vercel.app/pdf/GM-Solana-FEYO-09-08-2025.pdf",
       "kind": "pdf",
       "issuer": "ondo-global-markets",
@@ -2668,18 +2705,25 @@
         "tessera:whatIf[backing-shortfall].searched[3]",
         "tessera:whatIf[chain-outage].searched[3]",
         "tessera:whatIf[change-jurisdiction].searched[3]",
+        "tessera:whatIf[collateral-lent].searched[10]",
         "tessera:whatIf[collateral-lent].searched[3]",
         "tessera:whatIf[company-acquired].searched[3]",
         "tessera:whatIf[company-bankrupt].searched[3]",
         "tessera:whatIf[company-delisted].searched[3]",
+        "tessera:whatIf[company-delisted].searched[7]",
         "tessera:whatIf[corporate-action-mirroring].searched[3]",
+        "tessera:whatIf[corporate-action-mirroring].searched[8]",
         "tessera:whatIf[court-order].searched[3]",
+        "tessera:whatIf[court-order].searched[8]",
+        "tessera:whatIf[custodian-insolvency].searched[10]",
         "tessera:whatIf[custodian-insolvency].searched[3]",
         "tessera:whatIf[death-inheritance].searched[3]",
+        "tessera:whatIf[death-inheritance].searched[8]",
         "tessera:whatIf[defrauded].searched[3]",
         "tessera:whatIf[dispute-forum].searched[3]",
         "tessera:whatIf[dividend-missing].searched[3]",
         "tessera:whatIf[issuer-change-of-control].searched[3]",
+        "tessera:whatIf[issuer-insolvency].searched[10]",
         "tessera:whatIf[issuer-insolvency].searched[3]",
         "tessera:whatIf[issuer-wind-down].searched[3]",
         "tessera:whatIf[keys-stolen].searched[3]",
@@ -2688,9 +2732,11 @@
         "tessera:whatIf[price-source-fails].searched[3]",
         "tessera:whatIf[program-bug].searched[3]",
         "tessera:whatIf[provider-fails].searched[3]",
+        "tessera:whatIf[provider-fails].searched[8]",
         "tessera:whatIf[rebase-error].searched[3]",
         "tessera:whatIf[redemption-refused].searched[3]",
         "tessera:whatIf[regulator-action].searched[3]",
+        "tessera:whatIf[regulator-action].searched[9]",
         "tessera:whatIf[sanctioned].searched[3]",
         "tessera:whatIf[security-agent-fails].searched[3]",
         "tessera:whatIf[tax-withholding].searched[3]",
@@ -2699,7 +2745,18 @@
         "tessera:whatIf[transfer-agent-fails].searched[3]",
         "tessera:whatIf[venue-delists].searched[3]",
         "tessera:whatIf[venue-insolvency].searched[3]",
+        "tessera:whatIf[venue-insolvency].searched[8]",
         "tessera:whatIf[voting-rights].searched[3]"
+      ]
+    },
+    {
+      "url": "https://docs.tessera.pe/llms.txt",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "tessera:whatIf[issuer-insolvency].searched[10]",
+      "foundIn": [
+        "tessera:whatIf[issuer-insolvency].searched[10]",
+        "tessera:whatIf[provider-fails].searched[8]"
       ]
     },
     {
@@ -2729,6 +2786,8 @@
         "tessera:parties.audience[1].source",
         "tessera:quoteVerificationSources[0].sourceUrl",
         "tessera:sources[2]",
+        "tessera:whatIf[company-bankrupt]",
+        "tessera:whatIf[company-bankrupt].searched[8]",
         "tessera:whatIf[dividend-missing]",
         "tessera:whatIf[security-agent-fails]",
         "tessera:whatIf[voting-rights]"
@@ -3297,6 +3356,10 @@
       "title": "xstocks-backed:claims[0].url",
       "foundIn": [
         "xstocks-backed:claims[0].url",
+        "xstocks-backed:claims[118].sources[3]",
+        "xstocks-backed:claims[119].sources[3]",
+        "xstocks-backed:claims[120].sources[3]",
+        "xstocks-backed:claims[121].sources[3]",
         "xstocks-backed:redemption.operationalEvidence.url",
         "xstocks-backed:sources[5]"
       ]
@@ -3582,17 +3645,41 @@
       "title": "republic-mirror:claims[11].url",
       "foundIn": [
         "republic-mirror:claims[11].url",
-        "republic-mirror:sources[3]"
+        "republic-mirror:sources[3]",
+        "republic-mirror:whatIf[authority-key-compromised].searched[9]",
+        "republic-mirror:whatIf[issuer-change-of-control].searched[9]",
+        "republic-mirror:whatIf[sanctioned].searched[13]"
+      ]
+    },
+    {
+      "url": "https://efts.sec.gov/LATEST/search-index?q=%22SHIFT%20DAO%20LLC%22",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:whatIf[collateral-lent].searched[16]",
+      "foundIn": [
+        "shift:whatIf[collateral-lent].searched[16]",
+        "shift:whatIf[issuer-change-of-control].searched[15]"
       ]
     },
     {
       "url": "https://efts.sec.gov/LATEST/search-index?q=%22Step%20Labs%20LLC%22",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[72].note",
+      "title": "remora-markets:claims[73].note",
       "foundIn": [
-        "remora-markets:claims[72].note",
+        "remora-markets:claims[73].note",
         "remora-markets:whatIf[dispute-forum].searched[4]"
+      ]
+    },
+    {
+      "url": "https://efts.sec.gov/LATEST/search-index?q=%22Tessera%20Works%22",
+      "kind": "html",
+      "issuer": "tessera",
+      "title": "tessera:whatIf[custodian-insolvency].searched[11]",
+      "foundIn": [
+        "tessera:whatIf[custodian-insolvency].searched[11]",
+        "tessera:whatIf[issuer-insolvency].searched[11]",
+        "tessera:whatIf[regulator-action].searched[10]"
       ]
     },
     {
@@ -4248,7 +4335,8 @@
       "issuer": "remora-markets",
       "title": "remora-markets:claims[65].url",
       "foundIn": [
-        "remora-markets:claims[65].url"
+        "remora-markets:claims[65].url",
+        "remora-markets:claims[66].url"
       ]
     },
     {
@@ -5200,10 +5288,10 @@
       "url": "https://remoramarkets.xyz/legal-documentation/terms-of-use",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[73].note",
+      "title": "remora-markets:claims[74].note",
       "foundIn": [
-        "remora-markets:claims[73].note",
-        "remora-markets:claims[73].quote",
+        "remora-markets:claims[74].note",
+        "remora-markets:claims[74].quote",
         "remora-markets:whatIf[dispute-forum].searched[2]",
         "remora-markets:whatIf[keys-stolen].searched[2]",
         "remora-markets:whatIf[terms-changed].searched[2]"
@@ -5259,6 +5347,7 @@
         "republic-mirror:whatIf[rebase-error].searched[4]",
         "republic-mirror:whatIf[regulator-action]",
         "republic-mirror:whatIf[regulator-action].searched[0]",
+        "republic-mirror:whatIf[sanctioned].searched[11]",
         "republic-mirror:whatIf[sanctioned].searched[5]",
         "republic-mirror:whatIf[tax-withholding].searched[5]",
         "republic-mirror:whatIf[tokens-seized].searched[4]",
@@ -5273,6 +5362,7 @@
       "foundIn": [
         "republic-mirror:documents[12].url",
         "republic-mirror:sources[22]",
+        "republic-mirror:whatIf[chain-outage].searched[10]",
         "republic-mirror:whatIf[chain-outage].searched[6]",
         "republic-mirror:whatIf[provider-fails].searched[5]"
       ]
@@ -5362,6 +5452,7 @@
       "foundIn": [
         "republic-mirror:claims[97].url",
         "republic-mirror:documents[13].url",
+        "republic-mirror:openQuestions[13]",
         "republic-mirror:parties.custodians[1].source",
         "republic-mirror:sources[23]",
         "republic-mirror:whatIf[account-frozen].searched[3]",
@@ -5505,14 +5596,17 @@
         "republic-mirror:findings[8].evidence",
         "republic-mirror:findings[9].evidence",
         "republic-mirror:incidents[1].source",
+        "republic-mirror:pricing.notes",
         "republic-mirror:sources[18]",
         "republic-mirror:whatIf[account-frozen].searched[1]",
         "republic-mirror:whatIf[attestation-wrong]",
         "republic-mirror:whatIf[attestation-wrong].searched[0]",
         "republic-mirror:whatIf[authority-key-compromised].searched[0]",
+        "republic-mirror:whatIf[authority-key-compromised].searched[8]",
         "republic-mirror:whatIf[backing-shortfall]",
         "republic-mirror:whatIf[backing-shortfall].searched[0]",
         "republic-mirror:whatIf[chain-outage].searched[1]",
+        "republic-mirror:whatIf[chain-outage].searched[8]",
         "republic-mirror:whatIf[change-jurisdiction]",
         "republic-mirror:whatIf[change-jurisdiction].searched[0]",
         "republic-mirror:whatIf[collateral-lent]",
@@ -5522,20 +5616,24 @@
         "republic-mirror:whatIf[company-bankrupt]",
         "republic-mirror:whatIf[company-bankrupt].searched[0]",
         "republic-mirror:whatIf[company-delisted].searched[0]",
+        "republic-mirror:whatIf[company-delisted].searched[6]",
         "republic-mirror:whatIf[corporate-action-mirroring]",
         "republic-mirror:whatIf[corporate-action-mirroring].searched[0]",
         "republic-mirror:whatIf[court-order].searched[1]",
         "republic-mirror:whatIf[custodian-insolvency].searched[1]",
         "republic-mirror:whatIf[death-inheritance]",
         "republic-mirror:whatIf[death-inheritance].searched[0]",
+        "republic-mirror:whatIf[death-inheritance].searched[8]",
         "republic-mirror:whatIf[defrauded].searched[2]",
         "republic-mirror:whatIf[dispute-forum].searched[1]",
         "republic-mirror:whatIf[dividend-missing]",
         "republic-mirror:whatIf[dividend-missing].searched[0]",
         "republic-mirror:whatIf[issuer-change-of-control].searched[0]",
+        "republic-mirror:whatIf[issuer-change-of-control].searched[8]",
         "republic-mirror:whatIf[issuer-insolvency]",
         "republic-mirror:whatIf[issuer-insolvency].searched[0]",
         "republic-mirror:whatIf[issuer-wind-down].searched[0]",
+        "republic-mirror:whatIf[issuer-wind-down].searched[8]",
         "republic-mirror:whatIf[keys-stolen].searched[2]",
         "republic-mirror:whatIf[law-changes].searched[1]",
         "republic-mirror:whatIf[liquidity-event]",
@@ -5546,16 +5644,19 @@
         "republic-mirror:whatIf[provider-fails]",
         "republic-mirror:whatIf[provider-fails].searched[0]",
         "republic-mirror:whatIf[rebase-error].searched[0]",
+        "republic-mirror:whatIf[rebase-error].searched[7]",
         "republic-mirror:whatIf[redemption-refused]",
         "republic-mirror:whatIf[redemption-refused].searched[0]",
         "republic-mirror:whatIf[regulator-action].searched[1]",
         "republic-mirror:whatIf[sanctioned].searched[2]",
+        "republic-mirror:whatIf[sanctioned].searched[9]",
         "republic-mirror:whatIf[security-agent-fails]",
         "republic-mirror:whatIf[security-agent-fails].searched[0]",
         "republic-mirror:whatIf[tax-withholding]",
         "republic-mirror:whatIf[tax-withholding].searched[0]",
         "republic-mirror:whatIf[terms-changed].searched[1]",
         "republic-mirror:whatIf[tokens-seized].searched[0]",
+        "republic-mirror:whatIf[tokens-seized].searched[8]",
         "republic-mirror:whatIf[transfer-agent-fails].searched[1]",
         "republic-mirror:whatIf[venue-delists]",
         "republic-mirror:whatIf[venue-delists].searched[0]",
@@ -5580,12 +5681,14 @@
         "republic-mirror:whatIf[attestation-wrong].searched[4]",
         "republic-mirror:whatIf[authority-key-compromised].searched[3]",
         "republic-mirror:whatIf[chain-outage].searched[4]",
+        "republic-mirror:whatIf[chain-outage].searched[9]",
         "republic-mirror:whatIf[change-jurisdiction].searched[3]",
         "republic-mirror:whatIf[corporate-action-mirroring].searched[3]",
         "republic-mirror:whatIf[court-order]",
         "republic-mirror:whatIf[court-order].searched[0]",
         "republic-mirror:whatIf[custodian-insolvency].searched[3]",
         "republic-mirror:whatIf[death-inheritance].searched[3]",
+        "republic-mirror:whatIf[death-inheritance].searched[9]",
         "republic-mirror:whatIf[defrauded]",
         "republic-mirror:whatIf[defrauded].searched[0]",
         "republic-mirror:whatIf[dispute-forum]",
@@ -5593,17 +5696,20 @@
         "republic-mirror:whatIf[issuer-change-of-control].searched[3]",
         "republic-mirror:whatIf[issuer-insolvency].searched[5]",
         "republic-mirror:whatIf[issuer-wind-down].searched[3]",
+        "republic-mirror:whatIf[issuer-wind-down].searched[9]",
         "republic-mirror:whatIf[keys-stolen].searched[1]",
         "republic-mirror:whatIf[program-bug].searched[3]",
         "republic-mirror:whatIf[provider-fails].searched[1]",
         "republic-mirror:whatIf[rebase-error].searched[3]",
         "republic-mirror:whatIf[redemption-refused].searched[3]",
+        "republic-mirror:whatIf[sanctioned].searched[10]",
         "republic-mirror:whatIf[sanctioned].searched[1]",
         "republic-mirror:whatIf[security-agent-fails].searched[3]",
         "republic-mirror:whatIf[tax-withholding].searched[3]",
         "republic-mirror:whatIf[terms-changed]",
         "republic-mirror:whatIf[terms-changed].searched[0]",
         "republic-mirror:whatIf[tokens-seized].searched[3]",
+        "republic-mirror:whatIf[tokens-seized].searched[9]",
         "republic-mirror:whatIf[transfer-agent-fails]",
         "republic-mirror:whatIf[transfer-agent-fails].searched[0]",
         "republic-mirror:whatIf[venue-delists].searched[2]",
@@ -6019,6 +6125,16 @@
       ]
     },
     {
+      "url": "https://securitize.io/investments/stocks",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[81].url",
+      "foundIn": [
+        "securitize-secz:claims[81].url",
+        "securitize-secz:whatIf[transfer-agent-fails].searched[17]"
+      ]
+    },
+    {
       "url": "https://shift-rwa.vercel.app/",
       "kind": "html",
       "issuer": "shift",
@@ -6035,7 +6151,9 @@
       "foundIn": [
         "shift:claims[23].note",
         "shift:custodyVerification.notes",
-        "shift:quoteVerificationSources[0].verificationUrl"
+        "shift:quoteVerificationSources[0].verificationUrl",
+        "shift:whatIf[company-bankrupt].locator",
+        "shift:whatIf[company-bankrupt].searched[13]"
       ]
     },
     {
@@ -6064,6 +6182,7 @@
         "shift:quoteVerificationSources[0].sourceUrl",
         "shift:whatIf[change-jurisdiction].searched[8]",
         "shift:whatIf[company-bankrupt]",
+        "shift:whatIf[company-bankrupt].searched[13]",
         "shift:whatIf[law-changes].searched[12]"
       ]
     },
@@ -6236,6 +6355,15 @@
       ]
     },
     {
+      "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/operating-agreements.md",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:whatIf[liquidity-event].searched[16]",
+      "foundIn": [
+        "shift:whatIf[liquidity-event].searched[16]"
+      ]
+    },
+    {
       "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/risk-disclosure",
       "kind": "html",
       "issuer": "shift",
@@ -6266,6 +6394,8 @@
         "shift:whatIf[keys-stolen]",
         "shift:whatIf[law-changes]",
         "shift:whatIf[regulator-action]",
+        "shift:whatIf[tax-withholding]",
+        "shift:whatIf[tax-withholding].searched[14]",
         "shift:whatIf[tokens-seized]",
         "shift:whatIf[venue-delists]"
       ]
@@ -6384,6 +6514,25 @@
       ]
     },
     {
+      "url": "https://shiftrwa.gitbook.io/shift_education/llms-full.txt",
+      "kind": "html",
+      "issuer": "shift",
+      "title": "shift:whatIf[authority-key-compromised].searched[13]",
+      "foundIn": [
+        "shift:whatIf[authority-key-compromised].searched[13]",
+        "shift:whatIf[collateral-lent].searched[15]",
+        "shift:whatIf[company-acquired].searched[12]",
+        "shift:whatIf[company-bankrupt].searched[14]",
+        "shift:whatIf[court-order].searched[15]",
+        "shift:whatIf[death-inheritance].searched[14]",
+        "shift:whatIf[issuer-change-of-control].searched[14]",
+        "shift:whatIf[liquidity-event].searched[15]",
+        "shift:whatIf[rebase-error].searched[13]",
+        "shift:whatIf[tax-withholding].searched[15]",
+        "shift:whatIf[venue-insolvency].searched[13]"
+      ]
+    },
+    {
       "url": "https://shiftrwa.gitbook.io/shift_education/llms.txt",
       "kind": "html",
       "issuer": "shift",
@@ -6392,41 +6541,52 @@
         "shift:sources[0]",
         "shift:whatIf[account-frozen].searched[7]",
         "shift:whatIf[attestation-wrong].searched[7]",
+        "shift:whatIf[authority-key-compromised].searched[13]",
         "shift:whatIf[authority-key-compromised].searched[7]",
         "shift:whatIf[backing-shortfall].searched[7]",
         "shift:whatIf[chain-outage].searched[7]",
         "shift:whatIf[change-jurisdiction].searched[7]",
+        "shift:whatIf[collateral-lent].searched[15]",
         "shift:whatIf[collateral-lent].searched[7]",
+        "shift:whatIf[company-acquired].searched[12]",
         "shift:whatIf[company-acquired].searched[7]",
+        "shift:whatIf[company-bankrupt].searched[14]",
         "shift:whatIf[company-bankrupt].searched[7]",
         "shift:whatIf[company-delisted].searched[7]",
         "shift:whatIf[corporate-action-mirroring].searched[7]",
+        "shift:whatIf[court-order].searched[15]",
         "shift:whatIf[court-order].searched[7]",
         "shift:whatIf[custodian-insolvency].searched[7]",
+        "shift:whatIf[death-inheritance].searched[14]",
         "shift:whatIf[death-inheritance].searched[7]",
         "shift:whatIf[defrauded].searched[7]",
         "shift:whatIf[dispute-forum].searched[7]",
         "shift:whatIf[dividend-missing].searched[7]",
+        "shift:whatIf[issuer-change-of-control].searched[14]",
         "shift:whatIf[issuer-change-of-control].searched[7]",
         "shift:whatIf[issuer-insolvency].searched[7]",
         "shift:whatIf[issuer-wind-down].searched[7]",
         "shift:whatIf[keys-stolen].searched[7]",
         "shift:whatIf[law-changes].searched[7]",
+        "shift:whatIf[liquidity-event].searched[15]",
         "shift:whatIf[liquidity-event].searched[7]",
         "shift:whatIf[price-source-fails].searched[7]",
         "shift:whatIf[program-bug].searched[7]",
         "shift:whatIf[provider-fails].searched[7]",
+        "shift:whatIf[rebase-error].searched[13]",
         "shift:whatIf[rebase-error].searched[7]",
         "shift:whatIf[redemption-refused].searched[7]",
         "shift:whatIf[regulator-action].searched[7]",
         "shift:whatIf[sanctioned].searched[7]",
         "shift:whatIf[security-agent-fails].searched[7]",
+        "shift:whatIf[tax-withholding].searched[15]",
         "shift:whatIf[tax-withholding].searched[7]",
         "shift:whatIf[terms-changed].searched[10]",
         "shift:whatIf[terms-changed].searched[7]",
         "shift:whatIf[tokens-seized].searched[7]",
         "shift:whatIf[transfer-agent-fails].searched[7]",
         "shift:whatIf[venue-delists].searched[7]",
+        "shift:whatIf[venue-insolvency].searched[13]",
         "shift:whatIf[venue-insolvency].searched[7]",
         "shift:whatIf[voting-rights].searched[7]"
       ]
@@ -6815,6 +6975,160 @@
       ]
     },
     {
+      "url": "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[120].sources[0]",
+      "foundIn": [
+        "xstocks-backed:claims[120].sources[0]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/37731wweg63JbDqpNof1afDCWrRhpLdNNu7n7aZFWi38Yu65xxjTqnyqPeKdBS5xkUk6XerMKovw4JB9Cw8xSk6d",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[119].sources[1]",
+      "foundIn": [
+        "xstocks-backed:claims[119].sources[1]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[1].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/3B4rRFxwSjwgAkDoqXR1xQ9DvKUctU72Jr1MRfRPDRAzywHViLxcU5U4dyEaM5MHzjCQFVoxCMwsbJAdqCXmsCsJ",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[119].sources[2]",
+      "foundIn": [
+        "xstocks-backed:claims[119].sources[2]",
+        "xstocks-backed:claims[119].url",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[2].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/3WswG7He4Bmk9th4jkTNWGJmAX4gM2Dm3RPaBnoNykY4mWiwaCdpLc2N7ByJFwVLG24uoHUXYxqV54LRZncr3yWH",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[120].sources[1]",
+      "foundIn": [
+        "xstocks-backed:claims[120].sources[1]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[1].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/3mLEX1pFMRUu16mGSGv7vv7RpHZLEv3a31rdZ6sfzfH5akwuL1UinRsKyXFoeDUR1VowbZprwHGNiz6ohZGWeKGa",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[120].sources[2]",
+      "foundIn": [
+        "xstocks-backed:claims[120].sources[2]",
+        "xstocks-backed:claims[120].url",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[2].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/3tHUGWpffuL188xnWvmEmosMaWUPsdUviVCud8DpPHiH6k2YcgfwBEiKK5KYBMdoTcTTvwoKVCnCHr3Ra3RHmLa7",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[121].sources[0]",
+      "foundIn": [
+        "xstocks-backed:claims[121].sources[0]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/3vBCgS7u2T3kcRtjeDq1ehrxLnLTAEhv5NtXHLJBonP6pm86L8h612a7o12v22Ki9Vrx5NNuvYYdVpgy5HitHJnd",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[112].url",
+      "foundIn": [
+        "ondo-global-markets:claims[112].url",
+        "ondo-global-markets:redemption.successfulRedemptionEvidence.accepted[2].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/4S7FQynjmz8UjFScKUwGZydCABoKXMgVEu5UAMLNDg9oXEWHGfSymcxuG6VzeunzECh5srhh4gLwpQXWKhJYwZM4",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[118].sources[2]",
+      "foundIn": [
+        "xstocks-backed:claims[118].sources[2]",
+        "xstocks-backed:claims[118].url",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[2].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/4nijamBaz73JPMUtHd59kgi2cZR7acsLqeoeDdM37mFToVQG7ANAbJyBZkp6ohKYLCwZGKB5DTewvhbhKg4xy1dQ",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[119].sources[0]",
+      "foundIn": [
+        "xstocks-backed:claims[119].sources[0]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[1].legs[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/4swTUXWHmPuKWxqZ2eQvP7HTZM5YoXbRfzQXDLaYRRNHaJrmKyvYPmFbnfTrWHowinsg4tKTT1qgCx1zXV32Q6Fz",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[118].sources[1]",
+      "foundIn": [
+        "xstocks-backed:claims[118].sources[1]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[1].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/4wK2ovdzfwt71u2cJ1DxMCixDw6bNhHNV8aiC4V5dGPyj2rDwa1je9sfPYd4J91AJmCnBps3kkrcqRUBxJxhHMAN",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[110].url",
+      "foundIn": [
+        "ondo-global-markets:claims[110].url",
+        "ondo-global-markets:redemption.successfulRedemptionEvidence.accepted[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/57KucYswQ5RiEpFNg36gDU7yKHxEbw7pUTR4CKAwWKjifLC4Cvj1EiDzMtzog4tb4DjjgzAMJ6xAEE2auo9f54hF",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[121].sources[1]",
+      "foundIn": [
+        "xstocks-backed:claims[121].sources[1]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[1].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/5N7G8mixRr46YvFenHpnEB6aazhqHXLAUadZQEsVDsae8Yytg6b17RiZcm5MpQnM16RwSDAiFtDUCCJWdwXeffKM",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[121].sources[2]",
+      "foundIn": [
+        "xstocks-backed:claims[121].sources[2]",
+        "xstocks-backed:claims[121].url",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[3].legs[2].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/5faxco4LTvwoj2LewBmfJb2H3Zwk62RBiE8VP9rDgarugKHACjUsUGX8eNqsAZznzSP6etrNFr9iotpG7DtSdPNe",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:claims[118].sources[0]",
+      "foundIn": [
+        "xstocks-backed:claims[118].sources[0]",
+        "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[0].legs[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/5iqALBsbJy5Jf39nmeTY34pPCrtXfu3kWwoNoygDkUSNfmxCPUhdaeKaNPQY7xQTQig5CqYgcGBYPD3DDAK3fgJV",
+      "kind": "html",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[111].url",
+      "foundIn": [
+        "ondo-global-markets:claims[111].url",
+        "ondo-global-markets:redemption.successfulRedemptionEvidence.accepted[1].url"
+      ]
+    },
+    {
       "url": "https://stocks.securitize.io/",
       "kind": "html",
       "issuer": "securitize-secz",
@@ -6860,6 +7174,17 @@
         "securitize-secz:whatIf[venue-delists].searched[9]",
         "securitize-secz:whatIf[venue-insolvency].searched[9]",
         "securitize-secz:whatIf[voting-rights].searched[9]"
+      ]
+    },
+    {
+      "url": "https://stocks.securitize.io/drs/brokers/general_instructions.md",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[80].url",
+      "foundIn": [
+        "securitize-secz:claims[80].url",
+        "securitize-secz:openQuestions[2]",
+        "securitize-secz:whatIf[transfer-agent-fails].searched[15]"
       ]
     },
     {
@@ -7043,9 +7368,36 @@
         "superstate-opening-bell:whatIf[issuer-wind-down].searched[6]",
         "superstate-opening-bell:whatIf[redemption-refused].searched[7]",
         "superstate-opening-bell:whatIf[sanctioned].searched[5]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[3]",
         "superstate-opening-bell:whatIf[transfer-agent-fails].searched[7]",
         "superstate-opening-bell:whatIf[venue-delists].searched[7]",
         "superstate-opening-bell:whatIf[venue-insolvency].searched[8]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/newsroom/superstates-tokenized-equities-amms-lending-defi",
+      "kind": "html",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:whatIf[collateral-lent].searched[11]",
+      "foundIn": [
+        "superstate-opening-bell:whatIf[collateral-lent].searched[11]",
+        "superstate-opening-bell:whatIf[death-inheritance].searched[12]",
+        "superstate-opening-bell:whatIf[keys-stolen].searched[10]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[9]",
+        "superstate-opening-bell:whatIf[venue-insolvency].searched[11]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/newsroom/superstates-tokenized-equities-amms-lending-defi/__data.json",
+      "kind": "api",
+      "issuer": "superstate-opening-bell",
+      "title": "superstate-opening-bell:whatIf[collateral-lent].searched[11]",
+      "foundIn": [
+        "superstate-opening-bell:whatIf[collateral-lent].searched[11]",
+        "superstate-opening-bell:whatIf[death-inheritance].searched[12]",
+        "superstate-opening-bell:whatIf[keys-stolen].searched[10]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[9]",
+        "superstate-opening-bell:whatIf[venue-insolvency].searched[11]"
       ]
     },
     {
@@ -7086,9 +7438,9 @@
         "superstate-opening-bell:whatIf[law-changes]",
         "superstate-opening-bell:whatIf[price-source-fails]",
         "superstate-opening-bell:whatIf[program-bug]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[1]",
         "superstate-opening-bell:whatIf[terms-changed]",
-        "superstate-opening-bell:whatIf[terms-changed].searched[5]",
-        "superstate-opening-bell:whatIf[venue-insolvency]"
+        "superstate-opening-bell:whatIf[terms-changed].searched[5]"
       ]
     },
     {
@@ -7469,7 +7821,16 @@
       "issuer": "tessera",
       "title": "tessera:sources[20]",
       "foundIn": [
-        "tessera:sources[20]"
+        "tessera:sources[20]",
+        "tessera:whatIf[collateral-lent].searched[10]",
+        "tessera:whatIf[company-bankrupt].searched[9]",
+        "tessera:whatIf[company-delisted].searched[7]",
+        "tessera:whatIf[corporate-action-mirroring].searched[8]",
+        "tessera:whatIf[court-order].searched[8]",
+        "tessera:whatIf[custodian-insolvency].searched[10]",
+        "tessera:whatIf[death-inheritance].searched[8]",
+        "tessera:whatIf[regulator-action].searched[9]",
+        "tessera:whatIf[venue-insolvency].searched[8]"
       ]
     },
     {
@@ -7576,12 +7937,12 @@
         "tessera:whatIf[chain-outage]",
         "tessera:whatIf[change-jurisdiction]",
         "tessera:whatIf[company-acquired]",
-        "tessera:whatIf[company-bankrupt]",
         "tessera:whatIf[death-inheritance]",
         "tessera:whatIf[defrauded]",
         "tessera:whatIf[dispute-forum]",
         "tessera:whatIf[issuer-change-of-control]",
         "tessera:whatIf[issuer-insolvency]",
+        "tessera:whatIf[issuer-insolvency].searched[9]",
         "tessera:whatIf[issuer-wind-down]",
         "tessera:whatIf[keys-stolen]",
         "tessera:whatIf[law-changes]",
@@ -7589,6 +7950,7 @@
         "tessera:whatIf[price-source-fails]",
         "tessera:whatIf[program-bug]",
         "tessera:whatIf[provider-fails]",
+        "tessera:whatIf[provider-fails].searched[7]",
         "tessera:whatIf[redemption-refused]",
         "tessera:whatIf[regulator-action]",
         "tessera:whatIf[sanctioned]",
@@ -7985,9 +8347,9 @@
       "url": "https://web.archive.org/cdx/search/cdx?url=remoramarkets.xyz&matchType=domain&output=json",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[73].note",
+      "title": "remora-markets:claims[74].note",
       "foundIn": [
-        "remora-markets:claims[73].note",
+        "remora-markets:claims[74].note",
         "remora-markets:whatIf[dispute-forum].searched[2]",
         "remora-markets:whatIf[issuer-wind-down].searched[8]",
         "remora-markets:whatIf[keys-stolen].searched[2]",
@@ -8249,7 +8611,7 @@
       "issuer": "remora-markets",
       "title": "Sitemap, remoramarkets.xyz (2026) — lists Privacy Policy, Terms of Use, Disclaimer and Service Providers (lastmod 2026-01-16); only the Privacy Policy was archived with content — archived",
       "foundIn": [
-        "remora-markets:claims[73].url",
+        "remora-markets:claims[74].url",
         "remora-markets:documents[14].url",
         "remora-markets:findings[3].quoteNote",
         "remora-markets:whatIf[dispute-forum].searched[1]",
@@ -8263,13 +8625,13 @@
       "issuer": "remora-markets",
       "title": "Privacy Policy, remoramarkets.xyz (2026) — names Step Labs LLC as \"Remora Markets\"; US non-targeting statement; no governing law — archived",
       "foundIn": [
-        "remora-markets:claims[71].url",
-        "remora-markets:claims[73].note",
-        "remora-markets:claims[74].url",
-        "remora-markets:claims[76].url",
+        "remora-markets:claims[72].url",
+        "remora-markets:claims[74].note",
+        "remora-markets:claims[75].url",
         "remora-markets:claims[77].url",
         "remora-markets:claims[78].url",
         "remora-markets:claims[79].url",
+        "remora-markets:claims[80].url",
         "remora-markets:documents[13].url",
         "remora-markets:findings[2].quoteNote",
         "remora-markets:findings[3].quoteNote",
@@ -8287,9 +8649,9 @@
       "url": "https://web.archive.org/web/20260203024338/https://remoramarkets.xyz/legal-documentation/privacy-policy",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[72].url",
+      "title": "remora-markets:claims[73].url",
       "foundIn": [
-        "remora-markets:claims[72].url"
+        "remora-markets:claims[73].url"
       ]
     },
     {
@@ -8316,9 +8678,9 @@
       "url": "https://web.archive.org/web/20260228082518/https://remoramarkets.xyz/about",
       "kind": "html",
       "issuer": "remora-markets",
-      "title": "remora-markets:claims[80].url",
+      "title": "remora-markets:claims[81].url",
       "foundIn": [
-        "remora-markets:claims[80].url",
+        "remora-markets:claims[81].url",
         "remora-markets:incidents[5].source",
         "remora-markets:sources[25]"
       ]
@@ -8329,8 +8691,8 @@
       "issuer": "remora-markets",
       "title": "Region-block page, remoramarkets.xyz (2026) — \"not available in your region due to regulatory requirements\"; the Disclaimer and Service Providers captures redirect here — archived",
       "foundIn": [
-        "remora-markets:claims[75].url",
-        "remora-markets:claims[77].note",
+        "remora-markets:claims[76].url",
+        "remora-markets:claims[78].note",
         "remora-markets:documents[15].url"
       ]
     },
@@ -8999,7 +9361,7 @@
         "superstate-opening-bell:whatIf[redemption-refused].searched[8]",
         "superstate-opening-bell:whatIf[regulator-action].searched[10]",
         "superstate-opening-bell:whatIf[sanctioned].searched[9]",
-        "superstate-opening-bell:whatIf[tax-withholding].searched[7]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[10]",
         "superstate-opening-bell:whatIf[terms-changed].searched[6]",
         "superstate-opening-bell:whatIf[tokens-seized].searched[8]",
         "superstate-opening-bell:whatIf[transfer-agent-fails].searched[10]",
@@ -9231,18 +9593,34 @@
       ]
     },
     {
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/ACPgkS13mCGLGXty4QPGcag/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-15_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:claims[21].url",
+      "foundIn": [
+        "ondo-global-markets:claims[21].url",
+        "ondo-global-markets:claims[23].url",
+        "ondo-global-markets:claims[30].url"
+      ]
+    },
+    {
+      "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AEjezs2DAmU5pV46gQCsN-k/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-10_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
+      "kind": "pdf",
+      "issuer": "ondo-global-markets",
+      "title": "ondo-global-markets:attestations[0].link",
+      "foundIn": [
+        "ondo-global-markets:attestations[0].link",
+        "ondo-global-markets:attestations[1].link",
+        "ondo-global-markets:attestations[2].link"
+      ]
+    },
+    {
       "url": "https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0",
       "kind": "html",
       "issuer": "ondo-global-markets",
       "title": "Ankura Trust Company daily verification reports — 'PUBLIC - Ondo Stocks Daily Reports' (245 PDFs, 2025-10-01 to 2026-09-10)",
       "foundIn": [
-        "ondo-global-markets:attestations[0].link",
-        "ondo-global-markets:attestations[1].link",
-        "ondo-global-markets:attestations[2].link",
-        "ondo-global-markets:claims[21].url",
-        "ondo-global-markets:claims[23].url",
         "ondo-global-markets:claims[27].url",
-        "ondo-global-markets:claims[30].url",
         "ondo-global-markets:custodyVerification.link",
         "ondo-global-markets:documents[7].url",
         "ondo-global-markets:parties.verificationAgents[0].source",
@@ -9765,7 +10143,17 @@
         "superstate-opening-bell:whatIf[company-delisted].searched[6]",
         "superstate-opening-bell:whatIf[law-changes].searched[9]",
         "superstate-opening-bell:whatIf[price-source-fails].searched[9]",
-        "superstate-opening-bell:whatIf[regulator-action]"
+        "superstate-opening-bell:whatIf[regulator-action]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[6]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1782266/000190359626000325/primary_doc.xml",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[84].note",
+      "foundIn": [
+        "securitize-secz:claims[84].note"
       ]
     },
     {
@@ -9786,7 +10174,8 @@
         "republic-mirror:whatIf[issuer-change-of-control].searched[5]",
         "republic-mirror:whatIf[issuer-insolvency].searched[4]",
         "republic-mirror:whatIf[issuer-wind-down].searched[6]",
-        "republic-mirror:whatIf[provider-fails].searched[2]"
+        "republic-mirror:whatIf[provider-fails].searched[2]",
+        "republic-mirror:whatIf[sanctioned].searched[12]"
       ]
     },
     {
@@ -9858,6 +10247,7 @@
         "superstate-opening-bell:whatIf[provider-fails]",
         "superstate-opening-bell:whatIf[redemption-refused]",
         "superstate-opening-bell:whatIf[sanctioned]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[0]",
         "superstate-opening-bell:whatIf[transfer-agent-fails]",
         "superstate-opening-bell:whatIf[voting-rights]"
       ]
@@ -10161,6 +10551,15 @@
       ]
     },
     {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026065825/ea0264119-11.htm",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[83].url",
+      "foundIn": [
+        "securitize-secz:claims[83].url"
+      ]
+    },
+    {
       "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026076444/ea0297239-8k_securitize.htm",
       "kind": "html",
       "issuer": "securitize-secz",
@@ -10238,6 +10637,7 @@
         "securitize-secz:claims[77].sources[0]",
         "securitize-secz:claims[77].url",
         "securitize-secz:claims[7].url",
+        "securitize-secz:claims[82].url",
         "securitize-secz:claims[8].url",
         "securitize-secz:custodyVerification.link",
         "securitize-secz:documents[0].url",
@@ -10405,6 +10805,15 @@
       ]
     },
     {
+      "url": "https://www.sec.gov/Archives/edgar/data/24179/000002417926000005/primary_doc.xml",
+      "kind": "html",
+      "issuer": "securitize-secz",
+      "title": "securitize-secz:claims[84].url",
+      "foundIn": [
+        "securitize-secz:claims[84].url"
+      ]
+    },
+    {
       "url": "https://www.sec.gov/Archives/edgar/data/38264/000168316825009068/forward_i10k-093025.htm",
       "kind": "html",
       "issuer": "superstate-opening-bell",
@@ -10427,6 +10836,7 @@
         "superstate-opening-bell:whatIf[company-bankrupt]",
         "superstate-opening-bell:whatIf[price-source-fails].searched[8]",
         "superstate-opening-bell:whatIf[program-bug].searched[7]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[5]",
         "superstate-opening-bell:whatIf[venue-delists]"
       ]
     },
@@ -10527,15 +10937,22 @@
       "title": "Superstate letter to the SEC Crypto Task Force, 2025-06-17, 'Digital Transfer Agent -- Moving Securities and Markets from Analog to Digital' — the only place the token-loss reconstitution mechanism is described (§II.f: the digital transfer agent burns the original tokens and credits new ones once lost access and identity are confirmed, modelled on UCC 8-405 at its footnote 38), and the only place Superstate states its own view that Securities Investor Protection Act protections 'should attach' — but only to a broker holding on the investor's behalf (footnote 36, citing 15 U.S.C. 78aaa), i.e. never to a self-custodied holder",
       "foundIn": [
         "superstate-opening-bell:documents[15].url",
+        "superstate-opening-bell:whatIf[authority-key-compromised].searched[13]",
+        "superstate-opening-bell:whatIf[change-jurisdiction].searched[10]",
+        "superstate-opening-bell:whatIf[collateral-lent].searched[12]",
+        "superstate-opening-bell:whatIf[company-acquired].searched[10]",
+        "superstate-opening-bell:whatIf[company-delisted].searched[10]",
         "superstate-opening-bell:whatIf[court-order].searched[7]",
         "superstate-opening-bell:whatIf[custodian-insolvency].searched[5]",
         "superstate-opening-bell:whatIf[death-inheritance].searched[6]",
         "superstate-opening-bell:whatIf[keys-stolen].searched[5]",
         "superstate-opening-bell:whatIf[law-changes].searched[7]",
         "superstate-opening-bell:whatIf[provider-fails].searched[7]",
+        "superstate-opening-bell:whatIf[rebase-error].searched[11]",
         "superstate-opening-bell:whatIf[regulator-action].searched[7]",
         "superstate-opening-bell:whatIf[sanctioned].searched[6]",
-        "superstate-opening-bell:whatIf[tax-withholding].searched[6]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[7]",
+        "superstate-opening-bell:whatIf[venue-insolvency]",
         "superstate-opening-bell:whatIf[venue-insolvency].searched[6]",
         "superstate-opening-bell:whatIf[voting-rights].searched[6]"
       ]
@@ -10548,8 +10965,10 @@
       "foundIn": [
         "superstate-opening-bell:documents[16].url",
         "superstate-opening-bell:whatIf[chain-outage].searched[6]",
+        "superstate-opening-bell:whatIf[keys-stolen].searched[11]",
         "superstate-opening-bell:whatIf[law-changes].searched[8]",
         "superstate-opening-bell:whatIf[regulator-action].searched[8]",
+        "superstate-opening-bell:whatIf[tax-withholding].searched[8]",
         "superstate-opening-bell:whatIf[transfer-agent-fails].searched[9]"
       ]
     },

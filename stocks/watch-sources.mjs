@@ -29,7 +29,7 @@ import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
     apiAnswerIsDocument, binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
+    challengeInBody, conditionalHeaders, decideOutcome, isJsOnlyRead, driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlDocumentText, isTextual, jsOnlyShell,
     looksLikePdf, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
@@ -115,10 +115,11 @@ WHAT A RUN DOES
   sorted. Churn lines (bare dates, counters, cookie banners) are dropped before hashing, or every
   page with a clock on it would report a change every day.
 
-  Two hosts serve a viewer instead of the document, and the fetch is rewritten for them while the
+  Three hosts serve a viewer instead of the document, and the fetch is rewritten for them while the
   registered URL stays the one the dossier cites: a \`*.notion.site\` page is read through Notion's
-  public loadPageChunk API (lib/notion.mjs) and kept as its recordMap, and a
-  \`drive.google.com/file/d/<id>\` link is fetched as \`uc?export=download\` and comes back a PDF.
+  public loadPageChunk API (lib/notion.mjs) and kept as its recordMap, a
+  \`drive.google.com/file/d/<id>\` link is fetched as \`uc?export=download\` and comes back a PDF,
+  and a Dropbox shared FILE link is fetched with \`dl=1\` (a folder link is not: that is a zip).
 
   A Next.js page rendered in the browser (an empty body, its words in \`self.__next_f\` flight
   payloads) is read from those payloads when the markup alone yields a short text.
@@ -539,8 +540,9 @@ async function watchOne(source, prev, options) {
     const conditional = companionFor(source.url) ? { etag: null, lastModified: null } : conditionalHeaders(prev, { normalizerUpgrade });
 
     // A Google Drive file link serves its own JavaScript viewer, never the file; the bytes are at
-    // `uc?export=download`. The SOURCE keeps the URL the dossier cites — only the fetch moves.
-    const download = driveDownloadUrl(source.url);
+    // `uc?export=download`; a Dropbox file link likewise serves its previewer until asked for
+    // `dl=1`. The SOURCE keeps the URL the dossier cites — only the fetch moves.
+    const download = driveDownloadUrl(source.url) ?? dropboxDownloadUrl(source.url);
     const res = await fetchWithBackoff(download ?? source.url, conditional, timeoutMs);
     // The bot-wall test reads the BODY only; a vendor header is an annotation on a status that
     // already refused us, never evidence on its own (see lib/watch.mjs).
@@ -1309,7 +1311,7 @@ async function main() {
     // A Google Drive file link is registered as `html` (that is what the viewer page is) but
     // downloads a PDF, so those sources need poppler too — and a missing binary must be a loud
     // failure now rather than a per-source `error` 200 fetches in.
-    if (sources.some((s) => s.kind === 'pdf' || driveDownloadUrl(s.url))) await assertPdftotext();
+    if (sources.some((s) => s.kind === 'pdf' || driveDownloadUrl(s.url) || dropboxDownloadUrl(s.url))) await assertPdftotext();
 
     const previous = await readJson(STATE_FILE, {});
     const quoteRegistry = await loadQuoteRegistry();

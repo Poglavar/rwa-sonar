@@ -23,7 +23,7 @@ import { kindFromContentType } from './lib/sources.mjs';
 import {
     KEYWORDS, binaryMarker, blockVendor, buildChangeEventSql, buildSourceSql, buildVersionSql,
     DEFAULT_USER_AGENT, archiveRefusal, conditionalHeaders, isJsOnlyRead, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
-    driveDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
+    driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     jsOnlyShell, jsonToText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
@@ -774,6 +774,20 @@ describe('documents behind a viewer, measured 2026-09-18', () => {
         expect(driveDownloadUrl('https://assets.backed.fi/legal-documentation')).toBeNull();
         expect(driveDownloadUrl('not a url')).toBeNull();
         expect(driveDownloadUrl(null)).toBeNull();
+    });
+
+    it('fetches a Dropbox shared FILE link with dl=1, never a shared folder (its dl=1 is a zip)', () => {
+        // Ankura's 2026-09-15 Ondo daily report, as the Ondo dossier cites it (measured 2026-09-24:
+        // dl=0 is the JavaScript previewer, dl=1 is the PDF).
+        const file = 'https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/ACPgkS13mCGLGXty4QPGcag/2026/09%20September/Daily%20Report%20-%20Ondo%20Stocks%20-%202026-09-15_20_00_ET%20-%20Ankura%20Attestation.pdf?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0';
+        expect(dropboxDownloadUrl(file)).toBe(file.replace('&dl=0', '&dl=1'));
+        expect(dropboxDownloadUrl('https://www.dropbox.com/scl/fi/abc123/report.pdf?rlkey=k&dl=0'))
+            .toBe('https://www.dropbox.com/scl/fi/abc123/report.pdf?rlkey=k&dl=1');
+        // The folder itself and a subfolder: a listing, whose download is a zip of everything.
+        expect(dropboxDownloadUrl('https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AJxJak0F90kcwkADSN3DCD4?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0')).toBeNull();
+        expect(dropboxDownloadUrl('https://www.dropbox.com/scl/fo/jzkrw308mrhsasauqrjqq/AOWfmMwQLmV_E6BQpnV5xw8/2026/09%20September?rlkey=nik1v5slekrzx5fbi0zan5sk3&dl=0')).toBeNull();
+        expect(dropboxDownloadUrl('https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view')).toBeNull();
+        expect(dropboxDownloadUrl('not a url')).toBeNull();
     });
 
     it('trusts the bytes over a content-type that says octet-stream', () => {
