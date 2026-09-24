@@ -51,23 +51,19 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     better citation (individual Dropbox file links instead of a 31 MB folder zip).
 13. **Confirm tonight's jobs** — S. The Wayback-toolbar fix (no chrome-only changes in the next watcher
     runs) and the first traffic-monitor offload at 04:40 UTC (~2 GB, check the alerts entry stays green).
-14. **Server disk, remaining options** — **you**, S. At 89% (14 GB free) after today's cleanup. Left:
-    traffic-monitor offload (running nightly from 24 Sep), and the zet-tocnost restore comments that
-    still name the archived 8-Sep backup tables (restoring now means `pg_restore` from the Hetzner box
-    first — see `hbox-crypt:db-archives/prod-retired-tables-2026-09-23`).
 
 ## Make it feel alive
 
-15. **Dolphin cut-outs swimming across the night scene** — M. Needs new transparent art. Highest
+14. **Dolphin cut-outs swimming across the night scene** — M. Needs new transparent art. Highest
     visual impact, highest cost.
 
 ## After the hackathon
 
-16. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+15. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-17. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+16. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-18. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+17. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
