@@ -58,10 +58,14 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
 12. **Rebuild the change journal with the FinCEN renewal** — S. The resolution
     `backpack-trek-labs-fincen-renewal-2026-09-22` is recorded; the next pipeline run writes the
     entry, and watcher event 164 should be acknowledged in the database.
+13. **Market events keep their first-seen time** — S. The daily snapshot is rewritten on every
+    6-hourly refresh, so a same-day market event (e.g. "IONQ: pool liquidity fell 76 %") takes the
+    latest rewrite's time and floats back to the top of the latest-events box as new. Record the
+    day's first observation of a crossing and use that time.
 
 ## After the hackathon
 
-13. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
+14. **Daily/weekly summary shorts** — postponed (24 Sep), M, 2–3 days. A sub-minute video built from the events feed:
     issuer changes, token terms changes, key/fee/pause changes, lending support added or dropped,
     and large market moves, naming the three biggest ("…of which A +10 %, B +15 %, C +22 %"); nothing
     said when nothing passed the bar. *Rules:* only reviewed journal entries, on-chain facts and
@@ -73,11 +77,11 @@ Open work only, as of 24 September 2026. Effort: **S** = under half a day, **M**
     collector (Kamino, Jupiter Lend, Nest, Loopscale), and an ElevenLabs plan sized for ~15–20k
     characters a month (or captions only). *Start:* a weekly short plus a text-only daily post;
     go daily video only if engagement justifies it.
-14. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
+15. **One pilot workflow** — **you**, L. Interview protocol-risk teams, wallets and exchanges; pick one
     recurring job (for example monitoring eligible collateral) with a success measure before building
     paid features.
-15. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
+16. **Minimal documented API for that pilot** — M. Pagination, evidence states, timestamps, versioning
     and one export with provenance. Clarify data and document rights.
-16. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
+17. **Measure value and upkeep** — M. Task success, return visits, useful versus noisy alerts, time
     from an external change to a reviewed answer, review cost per template. Keep editorial
     independence explicit if issuers become customers.
