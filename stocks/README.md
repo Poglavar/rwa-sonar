@@ -1049,8 +1049,8 @@ rule's `inputs` and the health file deliberately drops them.
   `builtAt` appears in the card's `<time datetime>` and its JSON record. Two builds from the
   same inputs are byte-identical apart from that stamp. A test pins this, and it is easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: 96 KiB is the normal raw-HTML target and produces a warning when crossed; 112 KiB is the
-  hard limit that fails the build. These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
+- **Size**: 112 KiB is the normal raw-HTML target and produces a warning when crossed; 128 KiB is the
+  hard limit that fails the build (both raised on 24 Sep 2026 as observed content grew; see `stocks/lib/cards.mjs`). These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
   payload is duplicated inside every HTML page; that leaves room without dropping an analytical section.
 - **The published record** (`cards/<slug>.json`, linked from the HTML with
   `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,
@@ -1869,7 +1869,7 @@ Two things worth knowing before changing them:
   the chip; anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
 - **A card has a target and a hard ceiling, and the chips cost real bytes.** `CARD_BYTE_TARGET` is
-  96 KiB; `CARD_BYTE_LIMIT` is 112 KiB. The target warns, while only the ceiling blocks publication.
+  112 KiB; `CARD_BYTE_LIMIT` is 128 KiB. The target warns, while only the ceiling blocks publication.
   The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the separate JSON
   record carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served

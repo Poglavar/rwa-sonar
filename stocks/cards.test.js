@@ -1031,8 +1031,8 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'}; target ${CARD_BYTE_TARGET}, limit ${CARD_BYTE_LIMIT}`);
         expect(fixture).toBeLessThan(CARD_BYTE_TARGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
-        expect(CARD_BYTE_TARGET).toBe(104 * 1024);
-        expect(CARD_BYTE_LIMIT).toBe(112 * 1024);
+        expect(CARD_BYTE_TARGET).toBe(112 * 1024);
+        expect(CARD_BYTE_LIMIT).toBe(128 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {

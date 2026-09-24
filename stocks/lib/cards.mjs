@@ -188,8 +188,11 @@ export const OG_DESCRIPTION_MAX = 200;
 // stop publication. Compressed wire size is reported separately by build-cards.mjs.
 // Raised from 96 KiB on 2026-09-24: the redemption-feed row, the DeFi route rows and the diagram
 // hook put the widest card (SPYx) at 100,181 B. Each addition is card content, not duplication.
-export const CARD_BYTE_TARGET = 104 * 1024;
-export const CARD_BYTE_LIMIT = 112 * 1024;
+// Raised again the same evening (target 104 → 112, limit 112 → 128 KiB): with the server's observed
+// redemptions, the theme switch and the closed-market section, SPYx, NVDAx and QQQx built at
+// 112.7–113.1 KiB (27 kB gzipped). Diffed against the local build, the growth is observed content.
+export const CARD_BYTE_TARGET = 112 * 1024;
+export const CARD_BYTE_LIMIT = 128 * 1024;
 
 /**
  * The change judge's material verdicts on a card (stocks/EVIDENCE.md §2.3): how many days back from
