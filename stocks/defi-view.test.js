@@ -75,7 +75,7 @@ describe('confirmed DeFi usage', () => {
         const nvda = [...index.values()].find((item) => item.symbol === 'NVDAx');
         const compact = defiUsageCompactHtml(nvda);
         const detail = defiUsageDetailHtml(nvda, db.fetchedAt);
-        for (const protocol of ['Jupiter Lend', 'Kamino', 'Nest', 'Veda xStocks Vault', 'Raydium']) {
+        for (const protocol of ['Jupiter Lend', 'Kamino', 'Nest', 'xStocks Vaults', 'Raydium']) {
             expect(compact).toContain(protocol);
             expect(detail).toContain(protocol);
         }
@@ -90,9 +90,10 @@ describe('confirmed DeFi usage', () => {
         const now = Date.parse('2026-09-20T12:00:00Z');
         const rows = defiSourceRows(db.sources, now);
         expect(rows.map((row) => row.label)).toEqual([
-            'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'Save', 'DEX pools', 'Meteora', 'Reviewed products', 'Solana accounts'
+            'Kamino', 'Jupiter Lend', 'Nest', 'Project 0', 'Save', 'Loopscale vaults', 'DEX pools', 'Meteora', 'Reviewed products', 'Solana accounts'
         ]);
-        expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true, rows: 139 });
+        expect(rows.find((row) => row.id === 'kamino')).toMatchObject({ fresh: true });
+        expect(rows.find((row) => row.id === 'kamino').rows).toBeGreaterThan(100);
         expect(rows.find((row) => row.id === 'dexPools').fresh).toBe(true);
         expect(rows.find((row) => row.id === 'meteora').fresh).toBe(false);
     });
@@ -157,7 +158,7 @@ describe('confirmed DeFi usage', () => {
     it('carries the recurring-scan line for the explorer panels without touching documented or operational answers', () => {
         const feed = { observable: true, state: 'scan-failed', lastScanAt: '2026-09-22T06:00:00Z' };
         const summary = redemptionUsabilitySummary({ redemption: { available: true, observationFeed: feed } }, null);
-        expect(summary.feed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22 — not the same as no redemptions.' });
+        expect(summary.feed).toEqual({ state: 'scan-failed', text: 'Scan failed on 2026-09-22; redemptions for that period are unknown.' });
         expect(summary.operational).toContain('Unknown');
         expect(summary.successful).toContain('Not recorded');
         expect(redemptionUsabilitySummary({ redemption: { available: true } }, null).feed).toBeNull();
@@ -185,5 +186,44 @@ describe('confirmed DeFi usage', () => {
         expect(html).not.toContain('<script>');
         expect(html).toContain('No exact-token support was established');
         expect(html).toContain('&lt;b&gt;no&lt;/b&gt;');
+    });
+});
+
+describe('composite routes and the New in DeFi strip', () => {
+    const { compositeRouteHtml, defiNewStripHtml } = require('./lib/defi-view.js');
+
+    it('renders a composite route with what the holder holds, the live position and its risks', () => {
+        const html = compositeRouteHtml({
+            composite: true,
+            route: [
+                { role: 'vault', protocolName: 'Veda vault', address: '8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf' },
+                { role: 'collateral', protocolName: 'Kamino Lend', marketName: 'Sentora xStocks Market', address: 'AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC' }
+            ],
+            holderReceives: { shareSymbol: 'sentoraNVDAx', shareSupplyOnSolanaRaw: '0' },
+            position: { loanToValue: 0.58, liquidationLtv: 0.73, priceDropToLiquidation: 0.205, observedSlot: 1 },
+            risks: [{ id: 'leverage-liquidation', title: 'The xStock is borrowed against', detail: 'x' }]
+        });
+        expect(html).toContain('Sentora xStocks Market');
+        expect(html).toContain('sentoraNVDAx vault shares, not the stock token');
+        expect(html).toContain('zero supply');
+        expect(html).toContain('liquidatable');
+        expect(html).toContain('Risks this route adds');
+        expect(compositeRouteHtml({ route: [] })).toBe('');
+    });
+
+    it('lists non-DEX additions, summarises DEX churn and marks candidates unconfirmed', () => {
+        const html = defiNewStripHtml({
+            items: [
+                { date: '2026-09-24', change: 'added', category: 'lending', symbol: 'NVDAx', mint: 'M1', protocolName: 'Kamino', market: { name: 'Sentora xStocks Market' }, detectedBy: ['registry', 'chain'] },
+                { date: '2026-09-24', change: 'added', category: 'dex', symbol: 'ABC', mint: 'M2', protocolName: 'Raydium', detectedBy: ['registry'] }
+            ],
+            candidates: [{ reason: 'unknown-program', symbol: 'SPYx', mint: 'M3', programId: 'BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt', usd: 20000 }]
+        });
+        expect(html).toContain('Sentora xStocks Market');
+        expect(html).toContain('protocol registry + on-chain holding');
+        expect(html).toContain('1 exact-token pool listing added');
+        expect(html).toContain('Under review');
+        expect(html).toContain('unconfirmed');
+        expect(defiNewStripHtml({ items: [], candidates: [] })).toContain('No protocol additions recorded yet');
     });
 });

@@ -6,7 +6,9 @@ import { fetchJson, log, logWarn, sleep } from './io.mjs';
 
 export const DEFAULT_RPC = 'https://api.mainnet-beta.solana.com';
 export const MAX_ACCOUNTS_PER_REQUEST = 100;
-export const BACKOFF_MS = [1000, 2000, 4000];
+// Alchemy's free tier throttles per second across every job sharing the key; 7 s of patience was not
+// enough on 2026-09-24 while the trade collector ran, 31 s is.
+export const BACKOFF_MS = [1000, 2000, 4000, 8000, 16000];
 
 export function chunk(items, size = MAX_ACCOUNTS_PER_REQUEST) {
     if (size < 1) throw new Error(`chunk size must be >= 1, got ${size}`);
@@ -31,7 +33,8 @@ async function rpcRequest(method, params, { rpc = DEFAULT_RPC, timeoutMs = 60000
             timeoutMs
         });
 
-        const retryable = res.status === 429 || res.status >= 500;
+        // Alchemy also reports compute-unit throttling as a JSON-RPC error with code 429.
+        const retryable = res.status === 429 || res.status >= 500 || res.json?.error?.code === 429;
         if (retryable && attempt < BACKOFF_MS.length) {
             const wait = BACKOFF_MS[attempt];
             logWarn(`RPC HTTP ${res.status}; backing off ${wait} ms (attempt ${attempt + 1}/${BACKOFF_MS.length})`);
@@ -50,6 +53,15 @@ async function rpcRequest(method, params, { rpc = DEFAULT_RPC, timeoutMs = 60000
         return { result: res.json.result, bodyPreview: res.bodyPreview };
     }
     throw new Error('unreachable: backoff ladder exhausted without a verdict');
+}
+
+/**
+ * Any JSON-RPC method through the same retry ladder, returning `result`. For the footprint scanner's
+ * getTokenLargestAccounts / getSignaturesForAddress / getTransaction reads.
+ */
+export async function rpcCall(method, params, options = {}) {
+    const { result } = await rpcRequest(method, params, options);
+    return result;
 }
 
 /**

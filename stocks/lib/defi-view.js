@@ -148,6 +148,7 @@
         nest: ['Nest', 'versioned deployment manifest'],
         project0: ['Project 0', 'live collateral-bank registry'],
         save: ['Save', 'official lending reserve registry'],
+        loopscaleVaults: ['Loopscale vaults', 'lending-vault collateral terms'],
         dexPools: ['DEX pools', 'exact-token market discovery'],
         meteora: ['Meteora', 'direct pool verification'],
         curated: ['Reviewed products', 'asset-specific manual review'],
@@ -485,6 +486,7 @@
                 `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
                 `${marketNames.length ? `<p class="defi-metrics">Markets: ${escapeHtml(marketNames.join(', '))}</p>` : ''}` +
                 `${capabilities ? `<ul class="defi-capabilities">${capabilities}</ul>` : ''}` +
+                compositeRouteHtml(entry) +
                 `<p class="defi-proof"><strong>What was actually checked:</strong> ${escapeHtml(proofSteps)}${accounts ? ` · ${accounts}` : ''}</p>` +
                 `${entry.accessNote ? `<p class="defi-access"><strong>Access:</strong> ${escapeHtml(entry.accessNote)}</p>` : ''}` +
                 `<p class="defi-links"><a href="./protocols/${encodeURIComponent(protocolDossierSlug(item, entry, index))}.html">Open RWA Sonar dossier →</a>${useUrl ? `<a href="${escapeHtml(useUrl)}" target="_blank" rel="noopener noreferrer">Open market / product ↗</a>` : ''}` +
@@ -494,6 +496,93 @@
         return `<section class="detail-section defi-usage-detail"><h4>Exact-token protocol support <span class="detail-count">${integrations.length}</span></h4>` +
             `<p class="detail-note">Observed for this exact token address${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
             `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
+    }
+
+
+    const ROUTE_ROLE_LABELS = {
+        'deposit-interface': 'Deposit', vault: 'Vault', bridge: 'Bridge', 'vault-manager': 'Vault manager', strategy: 'Strategy', collateral: 'Collateral',
+        borrow: 'Borrow', yield: 'Yield', conversion: 'Back into the stock'
+    };
+
+    /**
+     * A composite product (vault → strategy → lending market → …) as an ordered route: each leg names
+     * the protocol, its program and the exact account, then what the holder actually holds, the live
+     * leverage position when it was decoded, and the risks the route adds.
+     */
+    function compositeRouteHtml(entry) {
+        if (!entry?.composite || !Array.isArray(entry.route) || entry.route.length === 0) return '';
+        const account = (address) => typeof address !== 'string' ? ''
+            : /^0x[0-9a-fA-F]{40}$/.test(address)
+                ? `<a href="https://explorer.inkonchain.com/address/${escapeHtml(address)}" target="_blank" rel="noopener noreferrer"><code>${escapeHtml(`${address.slice(0, 6)}…${address.slice(-4)}`)}</code> ↗</a>`
+                : /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)
+                    ? `<a href="https://solscan.io/account/${escapeHtml(address)}" target="_blank" rel="noopener noreferrer"><code>${escapeHtml(mintSuffix(address))}</code> ↗</a>` : '';
+        const legs = entry.route.map((leg) => `<li><strong>${escapeHtml(ROUTE_ROLE_LABELS[leg.role] || humanizeSlug(leg.role))}</strong>` +
+            `<span>${escapeHtml(leg.protocolName || leg.protocolId || '')}${leg.marketName ? ` · ${escapeHtml(leg.marketName)}` : ''}${leg.assetSymbol ? ` · ${escapeHtml(leg.assetSymbol)}` : ''}</span>` +
+            `${account(leg.address)}${leg.detail ? `<small>${escapeHtml(leg.detail)}</small>` : ''}</li>`).join('');
+        const holder = entry.holderReceives || {};
+        const supply = holder.shareSupplyOnSolanaRaw;
+        const holderText = [
+            holder.shareSymbol ? `You receive ${holder.shareSymbol} vault shares${holder.shareChain && holder.shareChain !== 'solana' ? ` on ${holder.shareChain === 'ink' ? 'Ink' : holder.shareChain}` : ''}, not the stock token.` : (holder.instrument || ''),
+            holder.legalNature || '',
+            supply === '0' ? 'The Solana share mint had zero supply when read, so share balances are not held as Solana tokens.' : '',
+            holder.fees || ''
+        ].filter(Boolean).join(' ');
+        const p = entry.position;
+        const pctText = (value) => isNum(value) ? fmtPct(value * 100) : 'unknown';
+        const position = p && isNum(p.loanToValue)
+            ? `<p class="defi-route-position"><strong>Live strategy position:</strong> ${escapeHtml(pctText(p.loanToValue))} loan-to-value against a ${escapeHtml(pctText(p.liquidationLtv))} liquidation threshold` +
+                `${isNum(p.priceDropToLiquidation) ? ` — a ${escapeHtml(pctText(p.priceDropToLiquidation))} fall in the stock price would make it liquidatable` : ''}` +
+                `${isNum(p.depositedValueUsd) ? ` · ${escapeHtml(fmtMoney(p.depositedValueUsd))} collateral` : ''}${isNum(p.debtUsd) ? `, ${escapeHtml(fmtMoney(p.debtUsd))} ${escapeHtml(p.debtSymbol || 'debt')}` : ''}` +
+                `${isNum(p.debtBorrowApy) && isNum(p.yieldVaultApy) ? ` · borrow ${escapeHtml(pctText(p.debtBorrowApy))} vs vault yield ${escapeHtml(pctText(p.yieldVaultApy))}` : ''}.` +
+                ` <small>Decoded from the Kamino obligation at slot ${escapeHtml(String(p.observedSlot ?? 'unknown'))}; values as of its last refresh.</small></p>`
+            : '';
+        const risks = (Array.isArray(entry.risks) ? entry.risks : []).map((risk) =>
+            `<li><strong>${escapeHtml(risk.title || humanizeSlug(risk.id))}</strong> ${escapeHtml(risk.detail || '')}</li>`).join('');
+        return `<div class="defi-route"><p class="defi-route-label">Composite route — your token passes through ${entry.route.length} steps</p>` +
+            `<ol class="defi-route-legs">${legs}</ol>` +
+            `${holderText ? `<p class="defi-route-holder"><strong>What you hold:</strong> ${escapeHtml(holderText)}</p>` : ''}` +
+            position +
+            `${risks ? `<details class="defi-route-risks"><summary>Risks this route adds</summary><ul>${risks}</ul></details>` : ''}</div>`;
+    }
+
+    const NEW_CHANGE_LABELS = { added: 'Added', removed: 'Removed', candidate: 'Under review' };
+    const DETECTED_LABELS = { registry: 'protocol registry', chain: 'on-chain holding' };
+
+    /**
+     * The "New in DeFi" strip: protocol additions and removals for exact tokens, newest first, with
+     * DEX pool churn summarised rather than listed, and current review candidates marked as
+     * unconfirmed. `feed` is stocks-defi-new.json.
+     */
+    function defiNewStripHtml(feed, { limit = 8 } = {}) {
+        const items = Array.isArray(feed?.items) ? feed.items : [];
+        const main = items.filter((row) => row.category !== 'dex' && row.change !== 'candidate');
+        const dex = items.filter((row) => row.category === 'dex');
+        // Non-DEX candidates first (a lending/vault/structured use is rarer and matters more), then by value.
+        const candidates = (Array.isArray(feed?.candidates) ? feed.candidates : []).slice()
+            .sort((a, b) => ((a.category === 'dex') - (b.category === 'dex')) || ((b.usd ?? 0) - (a.usd ?? 0)));
+        if (main.length === 0 && dex.length === 0 && candidates.length === 0) {
+            return dataStateHtml('none-source-listed', 'No protocol additions recorded yet',
+                'Protocol support is compared day by day; the first stored day is a baseline, not a list of additions.', []);
+        }
+        const tokenLink = (row) => {
+            const slug = row.cardSlug || cardSlug(row.symbol, row.mint);
+            return `<a href="./cards/${encodeURIComponent(slug)}.html">${escapeHtml(row.symbol || mintSuffix(row.mint))}</a>`;
+        };
+        const rows = main.slice(0, limit).map((row) => `<li class="defi-new-${escapeHtml(row.change)}">` +
+            `<span class="defi-new-badge">${escapeHtml(NEW_CHANGE_LABELS[row.change] || row.change)}</span>` +
+            `<span class="defi-new-what">${tokenLink(row)} ${row.change === 'removed' ? 'left' : 'on'} <strong>${escapeHtml(row.protocolName || row.protocolId || 'protocol')}</strong>` +
+            `${row.market?.name ? ` · ${escapeHtml(row.market.name)}` : ''}${row.category ? ` <small>${escapeHtml(humanizeSlug(row.category))}</small>` : ''}</span>` +
+            `<small class="defi-new-meta">${escapeHtml(row.date)} · seen in ${escapeHtml((row.detectedBy || []).map((id) => DETECTED_LABELS[id] || id).join(' + '))}</small></li>`).join('');
+        const dexAdded = dex.filter((row) => row.change === 'added').length;
+        const dexRemoved = dex.filter((row) => row.change === 'removed').length;
+        const dexLine = dex.length ? `<p class="defi-new-dex">DEX pools: ${fmtNumber(dexAdded)} exact-token pool listing${dexAdded === 1 ? '' : 's'} added, ${fmtNumber(dexRemoved)} removed over the same days (pool discovery churns; see each token's report).</p>` : '';
+        const candidateRows = candidates.slice(0, 4).map((row) => `<li class="defi-new-candidate"><span class="defi-new-badge">Under review</span>` +
+            `<span class="defi-new-what">${tokenLink(row)} held by <strong>${escapeHtml(row.protocolName || (row.programId ? `program ${mintSuffix(row.programId)}` : 'an unresolved program'))}</strong>` +
+            `${row.market?.name ? ` · ${escapeHtml(row.market.name)}` : ''}${isNum(row.usd) ? ` <small>${escapeHtml(fmtMoney(row.usd))}</small>` : ''}</span>` +
+            `<small class="defi-new-meta">${escapeHtml(row.reason === 'unlisted-integration' ? 'known protocol, use not yet in a collected registry' : 'program not yet attributed')} · unconfirmed</small></li>`).join('');
+        const candidateLine = candidates.length > 4 ? `<p class="defi-new-dex">${fmtNumber(candidates.length)} on-chain holdings are under review in total (programs holding a tracked stock that no collected registry explains) — see the <a href="./review.html">evidence review queue</a>.</p>` : '';
+        return `<ul class="defi-new-list">${rows}${candidateRows}</ul>${dexLine}${candidateLine}` +
+            `<p class="defi-new-note">${escapeHtml(feed?.methodology || '')}</p>`;
     }
 
     const COMPOSABILITY_SCENARIOS = [
@@ -570,6 +659,8 @@
         productDecisionProfile,
         defiCustodyHtml,
         defiUsageDetailHtml,
+        compositeRouteHtml,
+        defiNewStripHtml,
         COMPOSABILITY_SCENARIOS,
         composabilityTemplateRows,
         composabilityScenarioHtml,

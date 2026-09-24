@@ -2,13 +2,19 @@
 // A human sees "token"; the exact Solana mint address remains the identity/evidence key.
 
 import fmt from './fmt.js';
+import { FOOTPRINT_EVENT_KINDS } from './defi-footprint.mjs';
 
+// Registry kinds come from the daily exact-token registry comparison; the defi-integration-* kinds
+// come from the on-chain footprint comparison (lib/defi-footprint.mjs diffFootprints).
 export const DEFI_CHANGE_KINDS = [
     { id: 'token-added', label: 'Token added to protocol', severity: 'info' },
     { id: 'token-removed', label: 'Token removed from protocol', severity: 'warning' },
     { id: 'ltv-changed', label: 'Maximum LTV changed', severity: 'caution' },
     { id: 'market-inactive', label: 'Market became inactive', severity: 'warning' },
-    { id: 'collateral-value-drop', label: 'Collateral value fell sharply', severity: 'caution' }
+    { id: 'collateral-value-drop', label: 'Collateral value fell sharply', severity: 'caution' },
+    { id: 'market-added', label: 'New market for token in protocol', severity: 'info' },
+    { id: 'market-removed', label: 'Market for token left protocol', severity: 'warning' },
+    ...FOOTPRINT_EVENT_KINDS
 ];
 
 export const COLLATERAL_DROP_PCT = 25;
@@ -62,10 +68,24 @@ export function snapshotDefiIntegration(asset, integration) {
         maxOracleStalenessSeconds: numberOrNull(metrics.maxOracleStalenessSeconds),
         oracleProviders: stringList(metrics.oracleProviders),
         collateralValueUsd: integration?.category === 'lending' ? numberOrNull(metrics.sizeUsd) : null,
+        // Non-DEX market/vault/bank addresses, so a protocol adding a NEW market for a token it
+        // already lists (e.g. Kamino's Sentora xStocks Market) is an event too. DEX pools churn
+        // daily and are deliberately excluded.
+        markets: integration?.category === 'dex' ? null : marketIdentities(integration),
         corroborationStatus: textOrNull(integration?.corroboration?.status),
         corroboratedAccounts: numberOrNull(integration?.corroboration?.verifiedCount),
         publishedAccounts: numberOrNull(integration?.corroboration?.accountCount)
     };
+}
+
+function marketIdentities(integration) {
+    const out = new Map();
+    for (const market of Array.isArray(integration?.markets) ? integration.markets : []) {
+        const key = textOrNull(market?.marketAddress) ?? textOrNull(market?.vaultAddress) ?? textOrNull(market?.bankAddress)
+            ?? textOrNull(market?.collateralConfig) ?? textOrNull(market?.loanAddress);
+        if (key && !out.has(key)) out.set(key, textOrNull(market?.name));
+    }
+    return [...out.entries()].sort(([a], [b]) => compareText(a, b)).map(([address, name]) => ({ address, name }));
 }
 
 /** Flatten the current per-token usage document into deterministic protocol rows. */
@@ -175,6 +195,24 @@ export function diffDefiSnapshots(previous, current, {
             continue;
         }
 
+        // Snapshots written before market identities were recorded carry no `markets`: no event.
+        if (Array.isArray(before.markets) && Array.isArray(after.markets)) {
+            const oldMarkets = new Map(before.markets.map((m) => [m.address, m]));
+            const newMarkets = new Map(after.markets.map((m) => [m.address, m]));
+            for (const [address, market] of newMarkets) {
+                if (oldMarkets.has(address)) continue;
+                events.push(event('market-added', after, null, market,
+                    `${after.symbol ?? after.mint} gained a new ${after.protocolName ?? after.protocolId} market: ${market.name ?? address}.`,
+                    { market }));
+            }
+            for (const [address, market] of oldMarkets) {
+                if (newMarkets.has(address)) continue;
+                events.push(event('market-removed', after, market, null,
+                    `${after.symbol ?? after.mint} no longer appears in the ${after.protocolName ?? after.protocolId} market ${market.name ?? address}.`,
+                    { market }));
+            }
+        }
+
         const oldLtv = ltvRange(before);
         const newLtv = ltvRange(after);
         if (oldLtv && newLtv && !sameLtv(oldLtv, newLtv)) {
@@ -226,7 +264,12 @@ export function formatDefiNoticeLines(diff, maxDetails = 6) {
         'token-removed': ['token removed from a protocol', 'tokens removed from protocols'],
         'ltv-changed': ['maximum LTV change', 'maximum LTV changes'],
         'market-inactive': ['market became inactive', 'markets became inactive'],
-        'collateral-value-drop': ['sharp collateral-value drop', 'sharp collateral-value drops']
+        'collateral-value-drop': ['sharp collateral-value drop', 'sharp collateral-value drops'],
+        'market-added': ['new protocol market for a token', 'new protocol markets for tokens'],
+        'market-removed': ['protocol market dropped for a token', 'protocol markets dropped for tokens'],
+        'defi-integration-added': ['protocol newly holding a token on-chain', 'protocols newly holding tokens on-chain'],
+        'defi-integration-candidate': ['unknown program holding a token (review)', 'unknown programs holding tokens (review)'],
+        'defi-integration-removed': ['protocol no longer holding a visible balance', 'protocols no longer holding visible balances']
     };
     const countText = DEFI_CHANGE_KINDS
         .map(({ id }) => [diff.counts?.[id] ?? 0, id])
@@ -244,4 +287,83 @@ export function formatDefiNoticeLines(diff, maxDetails = 6) {
     }
     lines.push('Evidence: https://rwasonar.com/monitor.html#defiChangesSection');
     return lines;
+}
+
+/**
+ * Merge the on-chain footprint diff into the registry diff for the same day, so the journal,
+ * monitor and morning digest carry both. Counts cover every declared kind.
+ */
+export function mergeFootprintDiff(registryDiff, footprintDiff) {
+    const base = registryDiff ?? { from: footprintDiff?.from ?? null, to: footprintDiff?.to ?? null, counts: {}, events: [] };
+    const events = [...(base.events ?? []), ...(footprintDiff?.events ?? [])];
+    const counts = Object.fromEntries(DEFI_CHANGE_KINDS.map(({ id }) => [id, events.filter((event) => event.kind === id).length]));
+    return { ...base, counts, events, footprint: footprintDiff ? { from: footprintDiff.from, to: footprintDiff.to, unreadMints: footprintDiff.unreadMints } : null };
+}
+
+const FEED_CHANGE = {
+    'token-added': 'added',
+    'market-added': 'added',
+    'market-removed': 'removed',
+    'defi-integration-added': 'added',
+    'token-removed': 'removed',
+    'defi-integration-removed': 'removed',
+    'defi-integration-candidate': 'candidate'
+};
+const CATEGORY_WEIGHT = { 'yield-vault': 0, lending: 1, perps: 2, structured: 3, 'vault-strategy': 4, dex: 6 };
+
+/**
+ * The "New in DeFi" feed: every protocol addition / removal / candidate across the given daily
+ * diffs, newest first, one row per (date, token, protocol, change) — a registry observation and an
+ * on-chain observation of the same addition on the same day become one row with both sources.
+ * Non-DEX integrations sort before DEX pools on the same day because they are rarer and carry
+ * custody consequences; DEX pool churn stays in the feed but is grouped by the page.
+ */
+export function buildDefiNewFeed(diffs, { maxDays = 30, slugs = new Map() } = {}) {
+    const rows = new Map();
+    const dates = (Array.isArray(diffs) ? diffs : []).map((diff) => diff?.to).filter(Boolean).sort();
+    const cutoff = dates.length ? dates[Math.max(0, dates.length - maxDays)] : null;
+    for (const diff of Array.isArray(diffs) ? diffs : []) {
+        if (!diff?.to || (cutoff && diff.to < cutoff)) continue;
+        for (const event of diff.events ?? []) {
+            const change = FEED_CHANGE[event.kind];
+            if (!change || !event.mint) continue;
+            const detectedBy = event.detectedBy === 'chain' ? 'chain' : 'registry';
+            const key = `${diff.to}|${event.mint}|${event.protocolId ?? event.programId}|${event.market?.address ?? ''}|${change}`;
+            const existing = rows.get(key);
+            if (existing) {
+                if (!existing.detectedBy.includes(detectedBy)) existing.detectedBy.push(detectedBy);
+                continue;
+            }
+            rows.set(key, {
+                date: diff.to,
+                change,
+                kind: event.kind,
+                severity: event.severity ?? 'info',
+                detectedBy: [detectedBy],
+                mint: event.mint,
+                symbol: event.symbol ?? null,
+                issuer: event.issuer ?? null,
+                cardSlug: event.cardSlug ?? slugs.get(event.mint) ?? null,
+                protocolId: event.protocolId ?? null,
+                protocolName: event.protocolName ?? event.protocolId ?? event.programId ?? null,
+                programId: event.programId ?? null,
+                category: event.category ?? null,
+                market: event.market ?? null,
+                summary: event.summary ?? null
+            });
+        }
+    }
+    const items = [...rows.values()].sort((a, b) => b.date.localeCompare(a.date)
+        || (CATEGORY_WEIGHT[a.category] ?? 5) - (CATEGORY_WEIGHT[b.category] ?? 5)
+        || ['added', 'candidate', 'removed'].indexOf(a.change) - ['added', 'candidate', 'removed'].indexOf(b.change)
+        || String(a.symbol).localeCompare(String(b.symbol)));
+    const count = (change, dex) => items.filter((row) => row.change === change && (dex ? row.category === 'dex' : row.category !== 'dex')).length;
+    return {
+        days: dates.filter((date) => !cutoff || date >= cutoff),
+        counts: {
+            added: count('added', false), removed: count('removed', false), candidates: count('candidate', false) + count('candidate', true),
+            dexPoolsAdded: count('added', true), dexPoolsRemoved: count('removed', true)
+        },
+        items
+    };
 }

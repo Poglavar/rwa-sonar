@@ -1,36 +1,45 @@
 {
-  "fetchedAt": "2026-09-23T10:50:39Z",
+  "fetchedAt": "2026-09-24T01:08:49Z",
   "methodology": "Only an exact mint in a live protocol registry, an observed on-chain pool, or a hand-reviewed asset-specific live product is included. Generic Token-2022 compatibility and issuer ecosystem claims are excluded.",
   "sources": {
     "kamino": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "url": "https://api.kamino.finance/markets/collateral-reserves",
-      "rows": 139
+      "rows": 140,
+      "markets": {
+        "url": "https://api.kamino.finance/v2/kamino-market",
+        "count": 43,
+        "reserves": 260,
+        "stockReserves": 16
+      },
+      "reservesDecoded": 16,
+      "decodedAt": "2026-09-24T01:07:26Z",
+      "slot": 449874680
     },
     "jupiterLend": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "url": "https://api.jup.ag/lend/v1/borrow/vaults",
       "rows": 80
     },
     "nest": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "schema": "nest-public-deployment-v1",
       "rows": 25
     },
     "project0": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "url": "https://ai.0.xyz/v1/banks",
-      "cachedAt": 1790160564000,
+      "cachedAt": 1790211970000,
       "rows": 145
     },
     "save": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "url": "https://api.save.finance/v1/reserves?scope=all",
       "rows": 753
     },
     "loopscale": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "programId": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
       "method": "top-20 holder owners from holders.json checked for a Loopscale program owner; Loan accounts decoded from the published IDL",
       "holdersFetchedAt": "2026-09-20T08:19:40Z",
@@ -39,9 +48,14 @@
       "loopscaleAccounts": 1,
       "loans": 1,
       "positions": 1,
-      "rpcCalls": 40,
-      "slot": 449681248,
+      "rpcCalls": 41,
+      "slot": 449874987,
       "error": null
+    },
+    "loopscaleVaults": {
+      "fetchedAt": "2026-09-24T01:08:49Z",
+      "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+      "rows": 45
     },
     "dexPools": {
       "fetchedAt": "2026-09-20T08:52:13Z",
@@ -92,15 +106,15 @@
       "source": "dlmm.datapi.meteora.ag, damm-v2.datapi.meteora.ag, dbc.datapi.meteora.ag (per-address routes) and legacy damm-api.meteora.ag/pools for DAMM v1 — all keyless"
     },
     "curated": {
-      "reviewedAt": "2026-09-19",
-      "version": 1
+      "reviewedAt": "2026-09-24",
+      "version": 2
     },
     "solanaRpc": {
-      "fetchedAt": "2026-09-23T10:50:39Z",
+      "fetchedAt": "2026-09-24T01:08:49Z",
       "host": "solana-mainnet.g.alchemy.com",
-      "accountsRequested": 193,
-      "accountsVerified": 193,
-      "slot": 449681281,
+      "accountsRequested": 210,
+      "accountsVerified": 210,
+      "slot": 449875023,
       "error": null
     }
   },
@@ -111,8 +125,8 @@
     "withYieldVault": 3,
     "withDexPool": 121,
     "withNoneConfirmed": 1057,
-    "integrations": 163,
-    "accountExistenceChecked": 160,
+    "integrations": 168,
+    "accountExistenceChecked": 168,
     "withAccountExistenceChecked": 126
   },
   "items": [
@@ -187,7 +201,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -372,7 +386,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -506,12 +520,27 @@
               "reserveAddress": "4v8hN3DgJ86qH1KBr9PCKSgi3t8F1MJc7n6Wzsbw1C6g",
               "debtReserveAddresses": [
                 "BnYNV7TdhwASUab7mQCRhzHvasjp8o8xmmvVtKnPe3Zi"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.45,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 1 collateral reserve read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "4v8hN3DgJ86qH1KBr9PCKSgi3t8F1MJc7n6Wzsbw1C6g"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -539,7 +568,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -570,7 +599,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": false,
             "activityBasis": []
@@ -650,7 +680,8 @@
             "maxLtvMin": 0.2,
             "maxLtvMax": 0.2,
             "liquidationLtvMin": 0.4,
-            "liquidationLtvMax": 0.4
+            "liquidationLtvMax": 0.4,
+            "debtAgainstCollateralUsd": 1513.732542
           },
           "markets": [
             {
@@ -661,18 +692,54 @@
               "collateralAmountRaw": "13391402983",
               "collateralTokens": 13391.402983,
               "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-              "principalDueRaw": "1513442034",
+              "principalDueRaw": "1513732542",
               "ledgerCount": 1,
               "loanStartTime": "2026-08-16T15:33:45Z",
-              "ledgerEndTime": "2026-09-23T17:59:41Z"
+              "ledgerEndTime": "2026-09-24T18:00:58Z",
+              "ledgerApyPct": 7,
+              "configuration": {
+                "marketInformation": "DTzzuGFVZN8nmCS9HZubnM4vogqR8c4Rs5mChpLVjuCb",
+                "marketAuthority": "Hb681PyyDgUmixkX2UVhDFnzHe3DSwvLTxQkRGbuP33K",
+                "principalMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                "oracleAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+                "oracleType": 19,
+                "maxPriceAgeSeconds": 65535,
+                "maxUncertaintyPct": 5,
+                "maxLtvPct": 20,
+                "liquidationLtvPct": 40,
+                "collateralAllocationCapPct": null,
+                "marketBorrowCapRaw": null,
+                "strategy": "3dwhqaSbEmuXnjVV21yrVSMNeACpsWdh1BGCk18oWWR5",
+                "lender": "Hb681PyyDgUmixkX2UVhDFnzHe3DSwvLTxQkRGbuP33K",
+                "originationsEnabled": true,
+                "apyPctByDuration": [
+                  7,
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              }
+            },
+            {
+              "name": "USDC RWA (lends USDC)",
+              "vaultAddress": "Hb681PyyDgUmixkX2UVhDFnzHe3DSwvLTxQkRGbuP33K",
+              "strategyAddress": "3dwhqaSbEmuXnjVV21yrVSMNeACpsWdh1BGCk18oWWR5",
+              "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "debtSymbol": "USDC",
+              "lentAgainstCollateral": 1513.732542,
+              "lenderApyPct": 7,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
             }
           ],
           "decoding": {
             "decoder": "stocks/lib/loopscale.mjs decodeLoan()",
-            "idl": "https://github.com/LoopscaleLabs/loopscale-pricing-adapters/blob/cd0d4692ee/src/contracts/loopscale.json",
-            "slot": 449681248,
-            "observedAt": "2026-09-23T10:50:39Z",
-            "scope": "Loan account collateral and ledger records (position state), not a market-wide configuration."
+            "idl": "https://solscan.io/account/8jaPDEbzjkgJT8qTgMwCxbVUZt3p2MoMsCovyNyuNShD",
+            "slot": 449874987,
+            "observedAt": "2026-09-24T01:08:49Z",
+            "scope": "Loan account collateral and ledger records, plus the MarketInformation asset entry (oracle, maximum price age, LTV, liquidation threshold, allocation cap) and the lender strategy terms each loan is checked against."
           },
           "evidence": [
             {
@@ -689,6 +756,11 @@
               "type": "program-upgrade-authority",
               "url": "https://solscan.io/account/C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk",
               "note": "Upgrade authority (observed 2026-09-23): The ProgramData account 8KbXd8ATqDQQTozYv2TsCzHUDoiRyWe4DmzHdmJLgdNj names DwBXwJDZ4Av4miT62sEssWJUinkzwkmPPB4Fg3fKEfft as upgrade authority. That address is a system-owned account with no data, and it is vault index 0 of Squads v4 multisig C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk: SHA-256 of the seeds [\"multisig\", C4aw…, \"vault\", 0] with bump 255 reproduces DwBXwJ… byte for byte. The address is off the ed25519 curve, so no private key exists for it and only the Squads program can sign for it. In none of the 209 transactions examined does it appear as a transaction signer (every transaction that ever wrote the ProgramData, plus 40 spread across its 1,613-signature history). Every one of the 135 program upgrades (133 succeeded, 2 failed) ran as an inner BPF Upgradeable Loader Upgrade under a Squads VaultTransactionExecute, executed by four different members. The multisig account (finalized slot 449684389) decodes to threshold 4, a 24-hour time lock (86,400 s) and no separate config authority, so membership and threshold changes also pass through the multisig. It has nine members: six with full initiate/vote/execute rights, one vote-only and two initiate-only, which makes it 4-of-7 voters. The latest upgrade (5KexwF…, 2026-08-18) collected four approvals (LoTy38…, bs1PuR…, 4NJCNi…, A35RFX…), the last at 2026-08-17T20:47Z, and executed 24 h 07 min later. The first upgrade (2025-02-27) executed about two minutes after its proposal was created, so the time lock was not yet in force at launch. When it was added was not traced. Membership has changed: 26Es6M… and 4PvYpg… executed upgrades up to 2025-12-22 and 2026-05-14, and neither is a current member. Twice the authority sat with a single keypair, B8yKMPzag6PJ8EhGAWqCbWpTiRc64yBuSbfXA9kHmUi3, the deployer: for 48 s at deployment and for 45 min on 2025-12-22, when the multisig handed it over and the keypair handed it back. No upgrade happened during either window. The members' beneficial identities are not published on-chain."
+            },
+            {
+              "type": "protocol-api",
+              "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+              "note": "1 Loopscale lending vault accept this exact mint as collateral; 1,514 of stablecoin principal currently lent against it."
             }
           ],
           "capabilities": [
@@ -711,11 +783,20 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 1,
-            "verifiedCount": 1,
+            "accountCount": 2,
+            "verifiedCount": 2,
             "accounts": [
+              {
+                "address": "Hb681PyyDgUmixkX2UVhDFnzHe3DSwvLTxQkRGbuP33K",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              },
               {
                 "address": "HUyo5aYaNQvodYmy8TmjnpcxQCk3PVsbyTJUyjmAihFx",
                 "role": "loan-account",
@@ -730,16 +811,17 @@
           },
           "evidenceTier": "account-existence-checked",
           "proof": {
-            "sourceStatus": "onchain-position",
+            "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 1,
-            "existingAccountCount": 1,
+            "accountCount": 2,
+            "existingAccountCount": 2,
             "configurationDecoded": true,
-            "observedAt": "2026-09-23T10:50:39Z",
+            "observedAt": "2026-09-24T01:08:49Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
-              "positions"
+              "positions",
+              "debtAgainstCollateralUsd"
             ]
           }
         }
@@ -883,15 +965,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 31878923.53331963,
+            "sizeUsd": 30159189.30144974,
             "maxLtvMin": 0.25,
             "maxLtvMax": 0.25,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
-            "collateralBackingDebtUsd": 27129994.20514,
-            "debtAgainstCollateralUsd": 4748929.32817963
+            "collateralBackingDebtUsd": 25409768.65,
+            "debtAgainstCollateralUsd": 4749420.65144974
           },
           "markets": [
             {
@@ -900,12 +982,27 @@
               "reserveAddress": "2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn",
               "debtReserveAddresses": [
                 "BnYNV7TdhwASUab7mQCRhzHvasjp8o8xmmvVtKnPe3Zi"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.25,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 1 collateral reserve read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "2ZdH2K1J6WHGvfjfjX73VbcSh1cGUeTjFfNkYQXpcEHn"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -933,7 +1030,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -964,7 +1061,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -1108,7 +1206,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1212,7 +1310,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1352,7 +1450,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1465,7 +1563,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1569,7 +1667,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1682,7 +1780,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1786,7 +1884,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -1899,7 +1997,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2072,7 +2170,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -2167,7 +2265,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2352,7 +2450,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2456,7 +2554,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2686,7 +2784,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2790,7 +2888,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2894,7 +2992,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -2998,7 +3096,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3108,7 +3206,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -3203,7 +3301,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3505,7 +3603,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3609,7 +3707,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3785,7 +3883,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -3889,7 +3987,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4038,7 +4136,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4160,7 +4258,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4279,7 +4377,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4374,7 +4472,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4481,7 +4579,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -4609,7 +4707,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4794,7 +4892,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -4898,7 +4996,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5002,7 +5100,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5106,7 +5204,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5255,7 +5353,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5359,7 +5457,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5463,7 +5561,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5573,7 +5671,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -5668,7 +5766,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -5778,7 +5876,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -5873,7 +5971,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6004,7 +6102,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6108,7 +6206,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6230,7 +6328,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6334,7 +6432,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6447,7 +6545,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6551,7 +6649,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6655,7 +6753,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6759,7 +6857,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6863,7 +6961,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -6967,7 +7065,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7071,7 +7169,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7175,7 +7273,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7279,7 +7377,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7392,7 +7490,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7496,7 +7594,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7600,7 +7698,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7704,7 +7802,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7808,7 +7906,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -7912,7 +8010,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8022,7 +8120,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8117,7 +8215,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8221,7 +8319,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8331,7 +8429,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8426,7 +8524,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8536,7 +8634,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -8631,7 +8729,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8735,7 +8833,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8839,7 +8937,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -8943,7 +9041,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9053,7 +9151,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -9148,7 +9246,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9261,7 +9359,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9383,7 +9481,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9496,7 +9594,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -9645,7 +9743,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10001,7 +10099,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10177,7 +10275,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10299,7 +10397,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10427,7 +10525,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -10522,7 +10620,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -10878,7 +10976,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11025,15 +11123,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 477683.630860091,
+            "sizeUsd": 457604.603172378,
             "maxLtvMin": 0.5,
             "maxLtvMax": 0.5,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 1,
-            "collateralBackingDebtUsd": 342097.227778188,
-            "debtAgainstCollateralUsd": 135586.403081903
+            "collateralBackingDebtUsd": 327800.143972968,
+            "debtAgainstCollateralUsd": 129804.45919941
           },
           "markets": [
             {
@@ -11042,12 +11140,27 @@
               "reserveAddress": "3gJZGXg9h4HgG14q91sFwgNCPbWPWLu7dshd6iHDdaPr",
               "debtReserveAddresses": [
                 "8trJaNUfkP9pNgrwzByfsuwVtZ5TmZpq568UkCpjFWbi"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.5,
+              "liquidationLtv": 0.65,
+              "liquidationBonusBps": "200-500"
             }
           ],
           "debtCategories": [
             "Stablecoin assets"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 1 collateral reserve read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "3gJZGXg9h4HgG14q91sFwgNCPbWPWLu7dshd6iHDdaPr"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -11075,7 +11188,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11106,7 +11219,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -11172,7 +11286,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11318,7 +11432,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11413,7 +11527,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -11546,7 +11660,7 @@
         "Kamino",
         "Nest",
         "Raydium",
-        "Veda xStocks Vault"
+        "xStocks Vaults (Kraken · Veda · Sentora · Kamino)"
       ],
       "actions": [
         "borrow",
@@ -11574,15 +11688,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2788597.8324794704,
+            "sizeUsd": 2970039.6734833317,
             "maxLtvMin": 0.7,
             "maxLtvMax": 0.7,
             "liquidationLtvMin": 0.72,
-            "liquidationLtvMax": 0.72,
+            "liquidationLtvMax": 0.78,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2305039.717352447,
-            "debtAgainstCollateralUsd": 483558.1151270238
+            "collateralBackingDebtUsd": 2286006.5907493928,
+            "debtAgainstCollateralUsd": 484538.42449997494
           },
           "markets": [
             {
@@ -11593,7 +11707,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.7,
+              "liquidationLtv": 0.72,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -11602,18 +11721,52 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.7,
+              "liquidationLtv": 0.72,
+              "liquidationBonusBps": "500-1000"
+            },
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+              "curated": true,
+              "sizeUsd": 199494.65823396452,
+              "source": "market-reserve-list",
+              "reserveStatus": "active",
+              "maxLtv": 0.7,
+              "liquidationLtv": 0.78,
+              "liquidationBonusBps": 1000
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 3 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
+              "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
+              "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
               "note": "2 live registry rows match this exact collateral mint."
+            },
+            {
+              "type": "protocol-api",
+              "url": "https://api.kamino.finance/v2/kamino-market",
+              "note": "1 reserve with a positive LTV for this exact mint in Sentora xStocks Market (per-market reserve list; not in the cross-market collateral registry)."
             }
           ],
           "capabilities": [
@@ -11636,13 +11789,22 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 2,
-            "verifiedCount": 2,
+            "accountCount": 4,
+            "verifiedCount": 4,
             "accounts": [
               {
                 "address": "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
+              {
+                "address": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
                 "role": "collateral-reserve",
                 "exists": true,
                 "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
@@ -11658,6 +11820,15 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
               }
             ]
           },
@@ -11665,9 +11836,10 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 2,
-            "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -11692,16 +11864,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1721823.4004457318,
-            "positions": 903,
+            "sizeUsd": 1702472.4464828898,
+            "positions": 904,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
             "liquidationLtvMin": 0.85,
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1721823.4004457318,
-            "withdrawableUsd": 1615517.7105557711,
+            "supplyUsd": 1702472.4464828898,
+            "withdrawableUsd": 1597336.9973002844,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -11757,7 +11929,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -11866,7 +12038,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -11906,38 +12078,250 @@
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
           "protocolId": "veda",
-          "protocolName": "Veda xStocks Vault",
+          "protocolName": "xStocks Vaults (Kraken · Veda · Sentora · Kamino)",
           "category": "yield-vault",
           "status": "live",
           "actions": [
             "deposit",
             "earn-yield"
           ],
-          "summary": "Deposit the xStock into a self-custodial Veda vault through Kraken Pro. Sentora manages the strategy, which posts the xStock to Kamino, borrows stablecoins and returns yield in the deposited xStock.",
-          "accessNote": "Available only to eligible Kraken clients; geographic restrictions apply and deallocation has a three-day processing window.",
-          "interface": "Kraken Pro",
+          "summary": "Deposit the xStock through Kraken into a Veda BoringVault on Ink, curated by Sentora. The xStock is bridged to Solana with Chainlink CCIP, posted as collateral in a dedicated Kamino market, PYUSD is borrowed against it and deposited into a Kamino Earn vault, and rewards are swapped back into the xStock. The holder receives an ERC-20 vault share on Ink, not the xStock.",
+          "accessNote": "Kraken clients in the EEA and rest of world only (not the US, UK, Canada, Australia or UAE per Kraken); unregulated product provided by Payward Wallet, LLC; withdrawals take up to three days; 25% performance fee per Kraken (the on-chain accountants are set to 33.33%, unreconciled).",
+          "interface": "Kraken (xStocks Vaults)",
           "curator": "Sentora",
           "underlyingProtocols": [
+            "Veda",
+            "Chainlink CCIP",
             "Kamino"
           ],
-          "networkPath": "Kraken embedded wallet on Ink → Veda vault → Solana Kamino market",
+          "networkPath": "Kraken (Privy embedded wallet on Ink) → xStock wrapped (wSPYx/wQQQx/wNVDAx) → Veda BoringVault on Ink (ERC-20 share) → Chainlink CCIP to Solana → vault manager program (Manage) → Sentora position-manager → Kamino Sentora xStocks Market (xStock collateral, PYUSD debt) → Kamino Earn “Sentora PYUSD” vault → rewards swapped back into the xStock",
+          "composite": true,
+          "announcedAt": "2026-09-14",
+          "holderReceives": {
+            "instrument": "An ERC-20 Veda BoringVault share on Ink (sentoraSPYx / sentoraQQQx / sentoraNVDAx, “Advanced Strategies <ticker>”), held in a Privy-powered embedded wallet Kraken creates for the user.",
+            "legalNature": "A pro-rata claim on the vault's net assets under the vault contracts and Kraken/Veda terms — not the xStock, not the issuer's tracker certificate and not a share of the company. While deposited, the xStock sits on Solana as Kamino collateral owned by the strategy program's address; losses from liquidation are shared across vault users.",
+            "note": "Solana-side share mints for the same vaults exist with zero supply (read 2026-09-24); the live share balances are on Ink.",
+            "fees": "Kraken: 25% performance fee on vault earnings, no allocation/deallocation fees. On-chain AccountantWithRateProviders on Ink: performanceFee 3333 bps, platformFee 0 — discrepancy not reconciled.",
+            "withdrawal": "Kraken: up to 3 days. The Ink BoringOnChainQueue for wSPYx is configured with 1-hour maturity; the 3 days reflects the Solana unwind and bridge, i.e. an operational, not contractual, delay.",
+            "shareSymbol": "sentoraQQQx",
+            "shareChain": "ink",
+            "shareAddress": "0x6D33D2142a5b0b52856a6902eb6F6203B2232a5b",
+            "solanaShareMint": "DVcfh6hmRwpQoLQGDkd9cfXUkRfxS7HQnV1DPSC9n1nq",
+            "shareSupplyOnSolanaRaw": "0"
+          },
+          "route": [
+            {
+              "step": 1,
+              "role": "deposit-interface",
+              "protocolId": "kraken",
+              "protocolName": "Kraken xStocks Vaults (Privy embedded wallet on Ink)",
+              "detail": "Kraken sends the xStock to the user's embedded wallet on Ink and wraps it for vault accounting (wSPYx/wQQQx/wNVDAx)."
+            },
+            {
+              "step": 2,
+              "role": "vault",
+              "chain": "ink",
+              "protocolId": "veda",
+              "protocolName": "Veda BoringVault on Ink (ERC-20 share)",
+              "address": "0x6D33D2142a5b0b52856a6902eb6F6203B2232a5b",
+              "detail": "One BoringVault per asset, with a LayerZero teller and an accountant whose share-rate moves at most ±0.5% per update (6-hour minimum delay)."
+            },
+            {
+              "step": 3,
+              "role": "bridge",
+              "protocolId": "chainlink-ccip",
+              "protocolName": "Chainlink CCIP (Ink → Solana)",
+              "programId": "F2ZYgyh8YDG6rHo9F1T8Aw4WoTyy8eYN3GgM2LaPKcZN",
+              "detail": "Sentora bridges the xStock to Solana; on Solana the CCIP OffRamp calls a lock/release token pool that releases the xStock."
+            },
+            {
+              "step": 4,
+              "role": "vault-manager",
+              "protocolId": "veda",
+              "protocolName": "Vault manager program on Solana (BoringVault-SVM style)",
+              "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+              "address": "7cbdiA1QodKkZ23jTcQ3WhWeiEMzsfZk9Bimw6aFT5to",
+              "detail": "Its instruction is `manage` (same discriminator as Veda's boring_vault_svm); a strategist key (GGPhD3aw…) moves the xStock to the strategy. Deployer attribution (Veda or Sentora) is not verified."
+            },
+            {
+              "step": 5,
+              "role": "strategy",
+              "protocolId": "sentora",
+              "protocolName": "Strategy program (position-manager)",
+              "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+              "address": "8tRwmexXaSStiSK29sixkCbDJciqA8DGgLKrW2JEw2QC",
+              "detail": "Owns the Kamino obligation; an executor key (B4sygjEB…) triggers deposits, borrows and yield deployment. Upgradeable by the same authority as the manager program (EhQ1TTTY…)."
+            },
+            {
+              "step": 6,
+              "role": "collateral",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "marketName": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+              "address": "HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+              "detail": "The xStock is posted as collateral in a curated Kamino market; Kamino liquidators can seize it if the position's LTV reaches the liquidation threshold."
+            },
+            {
+              "step": 7,
+              "role": "borrow",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "reserveAddress": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+              "assetMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "assetSymbol": "PYUSD",
+              "detail": "PYUSD is borrowed against the xStock at a variable rate."
+            },
+            {
+              "step": 8,
+              "role": "yield",
+              "protocolId": "kamino-earn",
+              "protocolName": "Kamino Earn vault “Sentora PYUSD”",
+              "programId": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+              "address": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+              "detail": "Borrowed PYUSD is deposited into a Sentora-curated Kamino Earn vault (5% performance fee) and its shares are staked in Kamino Farms; the vault lends PYUSD on to Kamino reserves (Maple, JLP, Figure, main, AUTO markets and this same Sentora xStocks Market)."
+            },
+            {
+              "step": 9,
+              "role": "conversion",
+              "protocolId": "sentora",
+              "protocolName": "Rewards back into the xStock",
+              "detail": "Per Kraken and Veda, rewards are swapped back into the xStock and re-deployed. The swap route was not decoded."
+            }
+          ],
+          "risks": [
+            {
+              "id": "leverage-liquidation",
+              "title": "The xStock is borrowed against",
+              "detail": "The strategy keeps each position a few points below the market's maximum LTV. If the stock falls (including while the US market is closed and the oracle keeps updating) or PYUSD debt grows, Kamino liquidators can seize the xStock with a liquidation bonus; per Kraken, resulting losses are shared proportionally across vault users. The live position and the price fall that would make it liquidatable are recorded on every collection run."
+            },
+            {
+              "id": "marketing-vs-mechanics",
+              "title": "“Not leverage” vs a leveraged strategy",
+              "detail": "Kraken's product page says “Not a swap. Not leverage.”, while its support article lists leverage and liquidation risk and the chain shows xStock collateral with PYUSD debt at 58–69% LTV."
+            },
+            {
+              "id": "rate-spread",
+              "title": "Yield depends on a spread",
+              "detail": "Returns come from the Kamino Earn vault's PYUSD yield (part of it farm rewards) exceeding the PYUSD borrow rate. If the borrow rate rises above the vault yield the strategy loses money."
+            },
+            {
+              "id": "circular-liquidity",
+              "title": "Circular PYUSD liquidity",
+              "detail": "The Sentora PYUSD Earn vault allocates part of its PYUSD to the same Sentora xStocks Market reserve the strategy borrows from, so a run on the Earn vault and on that reserve are linked."
+            },
+            {
+              "id": "cross-chain",
+              "title": "Two chains and a bridge",
+              "detail": "The share lives on Ink, the collateral on Solana; the position depends on Chainlink CCIP, a lock/release token pool and the operators who move assets between them. The three-day withdrawal window is the unwind and bridge time, not a contract rule."
+            },
+            {
+              "id": "operator-keys",
+              "title": "Operator keys and upgradeable programs",
+              "detail": "A strategist key moves assets on Solana, an executor key manages the Kamino position, and both Solana programs are upgradeable by one authority (EhQ1TTTY…) whose owner is not publicly attributed."
+            },
+            {
+              "id": "holder-claim",
+              "title": "The holder no longer holds the xStock",
+              "detail": "While deposited, the xStock is Kamino collateral owned by the strategy program's address; the holder owns an Ink vault share. Issuer redemption of the xStock requires leaving the vault first."
+            },
+            {
+              "id": "fee-discrepancy",
+              "title": "Fee disclosed ≠ fee configured",
+              "detail": "Kraken discloses a 25% performance fee; the vault accountants on Ink are configured at 3333 bps (33.33%)."
+            }
+          ],
+          "position": {
+            "obligation": "HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+            "owner": "8tRwmexXaSStiSK29sixkCbDJciqA8DGgLKrW2JEw2QC",
+            "observedSlot": 449874682,
+            "observedAt": "2026-09-24T01:07:27Z",
+            "obligationLastUpdateSlot": 449828397,
+            "collateralSymbol": "QQQx",
+            "collateralTokens": 268.302997,
+            "collateralUnit": "Kamino reserve collateral tokens (≈ underlying xStock units; exchange rate not applied)",
+            "depositedValueUsd": 199488.86272714607,
+            "debtSymbol": "PYUSD",
+            "debtUsd": 135646.119803603,
+            "loanToValue": 0.67996838494756,
+            "maxLtv": 0.7,
+            "liquidationLtv": 0.78,
+            "priceDropToLiquidation": 0.12824566032364115,
+            "debtBorrowApy": 0.00689388959432069,
+            "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+            "yieldVaultApy": 0.03471561827771219,
+            "yieldVaultApy7d": 0.056987375139919194,
+            "valuesAsOf": "Kamino stores USD values at the obligation's last refresh (obligationLastUpdateSlot), not at observedSlot."
+          },
           "links": {
             "use": "https://www.kraken.com/pro/tokenized-equities/vaults",
             "protocol": "https://www.veda.tech/ecosystem/xstocks"
           },
-          "metrics": null,
+          "metrics": {
+            "sizeUsd": 199488.86272714607,
+            "debtAgainstCollateralUsd": 135646.119803603,
+            "maxLtvMin": 0.7,
+            "maxLtvMax": 0.7,
+            "liquidationLtvMin": 0.78,
+            "liquidationLtvMax": 0.78,
+            "positionLtv": 0.67996838494756,
+            "priceDropToLiquidation": 0.12824566032364115,
+            "oracleProviders": [
+              "scope"
+            ]
+          },
+          "markets": [
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+              "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "debtSymbol": "PYUSD",
+              "obligationAddress": "HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+              "vaultStateAddress": "7cbdiA1QodKkZ23jTcQ3WhWeiEMzsfZk9Bimw6aFT5to",
+              "shareMint": "DVcfh6hmRwpQoLQGDkd9cfXUkRfxS7HQnV1DPSC9n1nq"
+            }
+          ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:27Z",
+            "slot": 449874682,
+            "scope": "The strategy's Kamino obligation (collateral, debt, LTV, liquidation value) and the collateral reserve's risk configuration, read from the chain; vault share accounting on the holder side is not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null
+          },
           "evidence": [
             {
               "type": "official-product-page",
+              "url": "https://x.com/kamino/status/2099502364986425673",
+              "accessedAt": "2026-09-24",
+              "note": "Kamino's announcement (post id timestamp 2026-09-14T14:15:45Z): SPYx, QQQx and NVDAx vaults on Kraken powered by Kamino, Veda and Sentora; the vault posts the xStock as Kamino collateral, borrows stablecoins and converts yield back into the xStock; Chainlink CCIP and Data Streams named."
+            },
+            {
+              "type": "official-product-page",
               "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
-              "accessedAt": "2026-09-19",
-              "note": "Veda names exactly three supported assets: SPYx, QQQx and NVDAx, with Veda on Solana, Sentora as risk manager and Kamino as the lending market."
+              "accessedAt": "2026-09-24",
+              "note": "“Each xStock maps 1:1 to its own Veda BoringVault deployed on Ink, Kraken's L2 chain. From there, Sentora, as the curator, bridges the xStocks to Solana using Chainlink data streams and CCIP and deploys them as collateral in Kamino markets…”"
             },
             {
               "type": "official-product-page",
               "url": "https://support.kraken.com/articles/xstocks-vaults",
-              "accessedAt": "2026-09-19",
-              "note": "Kraken documents the deposit, self-custodial embedded wallet, wrapped vault accounting and three-day withdrawal window."
+              "accessedAt": "2026-09-24",
+              "note": "Deposit to the embedded wallet on Ink, wrapping for vault accounting, Sentora as risk manager, 3-day withdrawal, 25% performance fee, liquidation/leverage/cross-chain risks; article dated 2026-09-11."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://explorer.inkonchain.com/address/0xBeB4a79e150564857488E6142D26787A78d54a66",
+              "accessedAt": "2026-09-24",
+              "note": "Ink BoringVault contracts (verified source) for sentoraNVDAx / sentoraSPYx / sentoraQQQx: supplies 745.42 / 696.45 / 271.91 on 2026-09-24, matching the Solana collateral (731.6 / 685.9 / 268.3); accountants performanceFee 3333 bps."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "accessedAt": "2026-09-24",
+              "note": "Found by the on-chain footprint scan: the Kamino lending-market authority FTmExFvq… holding NVDAx/SPYx/QQQx derives from the “Sentora xStocks Market” 8BNUWRSi…, which Kamino's cross-market collateral registry does not list. Its three strategy obligations are owned by addresses of program BSE8uppf…, which receives the xStock from program 9TWFuaFP… (manage)."
             }
           ],
           "capabilities": [
@@ -11959,23 +12343,72 @@
             }
           ],
           "corroboration": {
-            "status": "not-addressable",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 0,
-            "verifiedCount": 0,
-            "accounts": []
+            "accountCount": 5,
+            "verifiedCount": 5,
+            "accounts": [
+              {
+                "address": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
+              },
+              {
+                "address": "HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+                "role": "obligation",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 24165120,
+                "space": 3344
+              },
+              {
+                "address": "DVcfh6hmRwpQoLQGDkd9cfXUkRfxS7HQnV1DPSC9n1nq",
+                "role": "vault-share-mint",
+                "exists": true,
+                "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+                "executable": false,
+                "lamports": 4711920,
+                "space": 421
+              },
+              {
+                "address": "7cbdiA1QodKkZ23jTcQ3WhWeiEMzsfZk9Bimw6aFT5to",
+                "role": "vault-state",
+                "exists": true,
+                "owner": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+                "executable": false,
+                "lamports": 4454400,
+                "space": 512
+              }
+            ]
           },
-          "evidenceTier": "reviewed-official-product",
+          "evidenceTier": "account-existence-checked",
           "proof": {
             "sourceStatus": "named-product-page",
-            "accountExistence": "not-addressable",
-            "accountCount": 0,
-            "existingAccountCount": 0,
-            "configurationDecoded": false,
+            "accountExistence": "checked",
+            "accountCount": 5,
+            "existingAccountCount": 5,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:27Z",
             "readOnlyExecutionSimulated": false,
-            "activityObserved": false,
-            "activityBasis": []
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
           }
         },
         {
@@ -12036,7 +12469,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12428,7 +12861,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12541,7 +12974,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -12806,15 +13239,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3108517.162488447,
+            "sizeUsd": 3031448.7017939417,
             "maxLtvMin": 0.6,
             "maxLtvMax": 0.6,
             "liquidationLtvMin": 0.7,
             "liquidationLtvMax": 0.7,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2182821.937465907,
-            "debtAgainstCollateralUsd": 925695.22502254
+            "collateralBackingDebtUsd": 2106618.028583882,
+            "debtAgainstCollateralUsd": 924830.6732100598
           },
           "markets": [
             {
@@ -12826,7 +13259,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.6,
+              "liquidationLtv": 0.7,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -12835,13 +13273,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.6,
+              "liquidationLtv": 0.7,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "4wg6rEkGgHaEuxMduP46C1xFZ24Lnp5YgdNkZAHxFzsN",
+              "4wg6rEkGgHaEuxMduP46C1xFZ24Lnp5YgdNkZAHxFzsN"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -12869,7 +13323,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -12900,7 +13354,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -12969,7 +13424,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -13064,7 +13519,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13272,10 +13727,11 @@
       "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
       "symbol": "TSLAx",
       "issuer": "xstocks-backed",
-      "confirmedUseCount": 4,
+      "confirmedUseCount": 5,
       "protocols": [
         "Jupiter Lend",
         "Kamino",
+        "Loopscale",
         "Nest",
         "Raydium"
       ],
@@ -13303,15 +13759,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3278941.591361967,
+            "sizeUsd": 3302758.2979995557,
             "maxLtvMin": 0.55,
             "maxLtvMax": 0.55,
             "liquidationLtvMin": 0.65,
             "liquidationLtvMax": 0.65,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2387090.351844057,
-            "debtAgainstCollateralUsd": 891851.2395179097
+            "collateralBackingDebtUsd": 2401892.60140195,
+            "debtAgainstCollateralUsd": 900865.6965976057
           },
           "markets": [
             {
@@ -13322,7 +13778,12 @@
                 "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.55,
+              "liquidationLtv": 0.65,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -13331,13 +13792,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.55,
+              "liquidationLtv": 0.65,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
+              "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -13365,7 +13842,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -13396,7 +13873,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -13421,16 +13899,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1597238.9738641598,
-            "positions": 1138,
+            "sizeUsd": 1593179.6424780665,
+            "positions": 1139,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
             "liquidationLtvMin": 0.75,
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1597238.9738641598,
-            "withdrawableUsd": 1512860.7560846163,
+            "supplyUsd": 1593179.6424780665,
+            "withdrawableUsd": 1509012.6727249217,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -13486,7 +13964,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -13595,7 +14073,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -13690,7 +14168,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -13718,6 +14196,118 @@
             "activityBasis": [
               "volume24Usd",
               "txns24"
+            ]
+          }
+        },
+        {
+          "id": "loopscale:collateral",
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "category": "lending",
+          "status": "live",
+          "actions": [
+            "collateral",
+            "borrow"
+          ],
+          "summary": "Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).",
+          "accessNote": "Issuer eligibility and the protocol’s geographic restrictions apply; direct issuer redemption remains KYC-gated.",
+          "links": {
+            "use": "https://app.loopscale.com/",
+            "protocol": "https://docs.loopscale.com/"
+          },
+          "metrics": {
+            "debtAgainstCollateralUsd": 30461.176945,
+            "positions": null
+          },
+          "markets": [
+            {
+              "name": "USDG Orca (lends USDG)",
+              "vaultAddress": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+              "strategyAddress": "9yMxtyqpK9UpxGqatDCSeeMckVx9HNVv5h7n5MQewgFC",
+              "debtMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+              "debtSymbol": "USDG",
+              "lentAgainstCollateral": 0,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            },
+            {
+              "name": "USDC Orca (lends USDC)",
+              "vaultAddress": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+              "strategyAddress": "2ZyJ7uT1dsyxGkYjUTn1gbERuA692CM7ATkcFNGeUA9G",
+              "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "debtSymbol": "USDC",
+              "lentAgainstCollateral": 30461.176945,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            }
+          ],
+          "evidence": [
+            {
+              "type": "protocol-api",
+              "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+              "note": "2 Loopscale lending vaults accept this exact mint as collateral; 30,461 of stablecoin principal currently lent against it."
+            }
+          ],
+          "capabilities": [
+            {
+              "action": "borrow",
+              "label": "Borrow against",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "Borrowing is limited by configured collateral and liquidation parameters."
+            },
+            {
+              "action": "collateral",
+              "label": "Use as collateral",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "The protocol can retain and liquidate posted collateral under its market rules."
+            }
+          ],
+          "corroboration": {
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
+            "rpcUrl": "solana-mainnet.g.alchemy.com",
+            "accountCount": 2,
+            "verifiedCount": 2,
+            "accounts": [
+              {
+                "address": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              },
+              {
+                "address": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              }
+            ]
+          },
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
             ]
           }
         }
@@ -13830,7 +14420,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14321,7 +14911,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -14857,7 +15447,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15096,7 +15686,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -15252,15 +15842,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 4555071.291725755,
+            "sizeUsd": 4493818.529588605,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 3935746.6854481595,
-            "debtAgainstCollateralUsd": 619324.606277595
+            "collateralBackingDebtUsd": 3865314.278187962,
+            "debtAgainstCollateralUsd": 628504.2514006429
           },
           "markets": [
             {
@@ -15272,7 +15862,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -15281,13 +15876,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "Cwy2WJoswCMyfPtWTrmiaDLXC3phz3qwr1TaT4kaSAyD",
+              "Cwy2WJoswCMyfPtWTrmiaDLXC3phz3qwr1TaT4kaSAyD"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -15315,7 +15926,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -15346,7 +15957,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -15412,7 +16024,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16011,7 +16623,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16736,7 +17348,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -16939,7 +17551,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17129,8 +17741,9 @@
       "mint": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
       "symbol": "METAx",
       "issuer": "xstocks-backed",
-      "confirmedUseCount": 2,
+      "confirmedUseCount": 3,
       "protocols": [
+        "Kamino",
         "Nest",
         "Raydium"
       ],
@@ -17141,6 +17754,123 @@
         "swap"
       ],
       "integrations": [
+        {
+          "id": "kamino:collateral",
+          "protocolId": "kamino",
+          "protocolName": "Kamino",
+          "category": "lending",
+          "status": "live",
+          "actions": [
+            "collateral",
+            "borrow"
+          ],
+          "summary": "Post this exact mint as collateral in a configured Kamino market and borrow an eligible debt asset against it.",
+          "accessNote": "Issuer eligibility and the protocol’s geographic restrictions apply; direct issuer redemption remains KYC-gated.",
+          "links": {
+            "use": "https://kamino.com/borrow",
+            "protocol": "https://kamino.com/docs/"
+          },
+          "metrics": {
+            "sizeUsd": 0.746392318152202,
+            "maxLtvMin": 0.35,
+            "maxLtvMax": 0.35,
+            "liquidationLtvMin": 0.45,
+            "liquidationLtvMax": 0.45,
+            "borrowFactorMin": null,
+            "borrowFactorMax": null,
+            "collateralBackingDebtUsd": null,
+            "debtAgainstCollateralUsd": null
+          },
+          "markets": [
+            {
+              "name": "xStocks Market",
+              "marketAddress": "5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua",
+              "reserveAddress": "AJPrye7NZGex2rUZhRwiAPJYxai1Ptb7DNWR3yYjtk3G",
+              "curated": false,
+              "sizeUsd": 0.746392318152202,
+              "source": "market-reserve-list",
+              "reserveStatus": "hidden",
+              "maxLtv": 0.35,
+              "liquidationLtv": 0.45,
+              "liquidationBonusBps": "500-1000"
+            }
+          ],
+          "debtCategories": [],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 1 collateral reserve read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "AJPrye7NZGex2rUZhRwiAPJYxai1Ptb7DNWR3yYjtk3G"
+            ]
+          },
+          "evidence": [
+            {
+              "type": "protocol-api",
+              "url": "https://api.kamino.finance/v2/kamino-market",
+              "note": "1 reserve with a positive LTV for this exact mint in xStocks Market (per-market reserve list; not in the cross-market collateral registry)."
+            }
+          ],
+          "capabilities": [
+            {
+              "action": "borrow",
+              "label": "Borrow against",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "Borrowing is limited by configured collateral and liquidation parameters."
+            },
+            {
+              "action": "collateral",
+              "label": "Use as collateral",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "The protocol can retain and liquidate posted collateral under its market rules."
+            }
+          ],
+          "corroboration": {
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
+            "rpcUrl": "solana-mainnet.g.alchemy.com",
+            "accountCount": 2,
+            "verifiedCount": 2,
+            "accounts": [
+              {
+                "address": "AJPrye7NZGex2rUZhRwiAPJYxai1Ptb7DNWR3yYjtk3G",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
+              {
+                "address": "5wJeMrUYECGq41fxRESKALVcHnNX26TAWy4W98yULsua",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
+              }
+            ]
+          },
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": false,
+            "activityBasis": []
+          }
+        },
         {
           "id": "nest:collateral",
           "protocolId": "nest",
@@ -17202,7 +17932,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -17297,7 +18027,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17410,7 +18140,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17514,7 +18244,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17636,7 +18366,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17785,7 +18515,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -17924,15 +18654,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 456179.7469109727,
+            "sizeUsd": 454706.0791014143,
             "maxLtvMin": 0.4,
             "maxLtvMax": 0.4,
             "liquidationLtvMin": 0.5,
             "liquidationLtvMax": 0.5,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 343957.09954299097,
-            "debtAgainstCollateralUsd": 112222.64736798168
+            "collateralBackingDebtUsd": 340996.79652356263,
+            "debtAgainstCollateralUsd": 113709.28257785169
           },
           "markets": [
             {
@@ -17944,7 +18674,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.4,
+              "liquidationLtv": 0.5,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -17953,13 +18688,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.4,
+              "liquidationLtv": 0.5,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "CKJbqakbPGyhziowm19LPYz636UszuezfkitmpRtcLSH",
+              "CKJbqakbPGyhziowm19LPYz636UszuezfkitmpRtcLSH"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -17987,7 +18738,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -18018,7 +18769,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -18087,7 +18839,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -18182,7 +18934,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -18318,13 +19070,14 @@
       "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
       "symbol": "NVDAx",
       "issuer": "xstocks-backed",
-      "confirmedUseCount": 5,
+      "confirmedUseCount": 6,
       "protocols": [
         "Jupiter Lend",
         "Kamino",
+        "Loopscale",
         "Nest",
         "Raydium",
-        "Veda xStocks Vault"
+        "xStocks Vaults (Kraken · Veda · Sentora · Kamino)"
       ],
       "actions": [
         "borrow",
@@ -18352,15 +19105,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 2320021.2279419573,
+            "sizeUsd": 2476153.68672257,
             "maxLtvMin": 0.55,
-            "maxLtvMax": 0.55,
+            "maxLtvMax": 0.62,
             "liquidationLtvMin": 0.65,
-            "liquidationLtvMax": 0.65,
+            "liquidationLtvMax": 0.73,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 1790544.07699263,
-            "debtAgainstCollateralUsd": 529477.1509493274
+            "collateralBackingDebtUsd": 1746437.4725323878,
+            "debtAgainstCollateralUsd": 522743.07576899586
           },
           "markets": [
             {
@@ -18371,7 +19124,12 @@
                 "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.55,
+              "liquidationLtv": 0.65,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -18380,18 +19138,52 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.55,
+              "liquidationLtv": 0.65,
+              "liquidationBonusBps": "500-1000"
+            },
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+              "curated": true,
+              "sizeUsd": 206973.13842118613,
+              "source": "market-reserve-list",
+              "reserveStatus": "active",
+              "maxLtv": 0.62,
+              "liquidationLtv": 0.73,
+              "liquidationBonusBps": 1000
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 3 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+              "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
+              "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
               "note": "2 live registry rows match this exact collateral mint."
+            },
+            {
+              "type": "protocol-api",
+              "url": "https://api.kamino.finance/v2/kamino-market",
+              "note": "1 reserve with a positive LTV for this exact mint in Sentora xStocks Market (per-market reserve list; not in the cross-market collateral registry)."
             }
           ],
           "capabilities": [
@@ -18414,11 +19206,20 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 2,
-            "verifiedCount": 2,
+            "accountCount": 4,
+            "verifiedCount": 4,
             "accounts": [
+              {
+                "address": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
               {
                 "address": "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "role": "collateral-reserve",
@@ -18436,6 +19237,15 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
               }
             ]
           },
@@ -18443,9 +19253,10 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 2,
-            "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -18470,7 +19281,7 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 1461209.5037926473,
+            "sizeUsd": 1361671.23772127,
             "positions": 1268,
             "maxLtvMin": 0.65,
             "maxLtvMax": 0.65,
@@ -18478,8 +19289,8 @@
             "liquidationLtvMax": 0.75,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 1461209.5037926473,
-            "withdrawableUsd": 1380677.972866206,
+            "supplyUsd": 1361671.23772127,
+            "withdrawableUsd": 1286248.8562099126,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -18535,7 +19346,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -18644,7 +19455,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -18684,38 +19495,250 @@
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
           "protocolId": "veda",
-          "protocolName": "Veda xStocks Vault",
+          "protocolName": "xStocks Vaults (Kraken · Veda · Sentora · Kamino)",
           "category": "yield-vault",
           "status": "live",
           "actions": [
             "deposit",
             "earn-yield"
           ],
-          "summary": "Deposit the xStock into a self-custodial Veda vault through Kraken Pro. Sentora manages the strategy, which posts the xStock to Kamino, borrows stablecoins and returns yield in the deposited xStock.",
-          "accessNote": "Available only to eligible Kraken clients; geographic restrictions apply and deallocation has a three-day processing window.",
-          "interface": "Kraken Pro",
+          "summary": "Deposit the xStock through Kraken into a Veda BoringVault on Ink, curated by Sentora. The xStock is bridged to Solana with Chainlink CCIP, posted as collateral in a dedicated Kamino market, PYUSD is borrowed against it and deposited into a Kamino Earn vault, and rewards are swapped back into the xStock. The holder receives an ERC-20 vault share on Ink, not the xStock.",
+          "accessNote": "Kraken clients in the EEA and rest of world only (not the US, UK, Canada, Australia or UAE per Kraken); unregulated product provided by Payward Wallet, LLC; withdrawals take up to three days; 25% performance fee per Kraken (the on-chain accountants are set to 33.33%, unreconciled).",
+          "interface": "Kraken (xStocks Vaults)",
           "curator": "Sentora",
           "underlyingProtocols": [
+            "Veda",
+            "Chainlink CCIP",
             "Kamino"
           ],
-          "networkPath": "Kraken embedded wallet on Ink → Veda vault → Solana Kamino market",
+          "networkPath": "Kraken (Privy embedded wallet on Ink) → xStock wrapped (wSPYx/wQQQx/wNVDAx) → Veda BoringVault on Ink (ERC-20 share) → Chainlink CCIP to Solana → vault manager program (Manage) → Sentora position-manager → Kamino Sentora xStocks Market (xStock collateral, PYUSD debt) → Kamino Earn “Sentora PYUSD” vault → rewards swapped back into the xStock",
+          "composite": true,
+          "announcedAt": "2026-09-14",
+          "holderReceives": {
+            "instrument": "An ERC-20 Veda BoringVault share on Ink (sentoraSPYx / sentoraQQQx / sentoraNVDAx, “Advanced Strategies <ticker>”), held in a Privy-powered embedded wallet Kraken creates for the user.",
+            "legalNature": "A pro-rata claim on the vault's net assets under the vault contracts and Kraken/Veda terms — not the xStock, not the issuer's tracker certificate and not a share of the company. While deposited, the xStock sits on Solana as Kamino collateral owned by the strategy program's address; losses from liquidation are shared across vault users.",
+            "note": "Solana-side share mints for the same vaults exist with zero supply (read 2026-09-24); the live share balances are on Ink.",
+            "fees": "Kraken: 25% performance fee on vault earnings, no allocation/deallocation fees. On-chain AccountantWithRateProviders on Ink: performanceFee 3333 bps, platformFee 0 — discrepancy not reconciled.",
+            "withdrawal": "Kraken: up to 3 days. The Ink BoringOnChainQueue for wSPYx is configured with 1-hour maturity; the 3 days reflects the Solana unwind and bridge, i.e. an operational, not contractual, delay.",
+            "shareSymbol": "sentoraNVDAx",
+            "shareChain": "ink",
+            "shareAddress": "0xBeB4a79e150564857488E6142D26787A78d54a66",
+            "solanaShareMint": "BYW6N3VjFXsHW9D4mTjR2HZ3sKtKCbxrrcMdzf7C7c5F",
+            "shareSupplyOnSolanaRaw": "0"
+          },
+          "route": [
+            {
+              "step": 1,
+              "role": "deposit-interface",
+              "protocolId": "kraken",
+              "protocolName": "Kraken xStocks Vaults (Privy embedded wallet on Ink)",
+              "detail": "Kraken sends the xStock to the user's embedded wallet on Ink and wraps it for vault accounting (wSPYx/wQQQx/wNVDAx)."
+            },
+            {
+              "step": 2,
+              "role": "vault",
+              "chain": "ink",
+              "protocolId": "veda",
+              "protocolName": "Veda BoringVault on Ink (ERC-20 share)",
+              "address": "0xBeB4a79e150564857488E6142D26787A78d54a66",
+              "detail": "One BoringVault per asset, with a LayerZero teller and an accountant whose share-rate moves at most ±0.5% per update (6-hour minimum delay)."
+            },
+            {
+              "step": 3,
+              "role": "bridge",
+              "protocolId": "chainlink-ccip",
+              "protocolName": "Chainlink CCIP (Ink → Solana)",
+              "programId": "F2ZYgyh8YDG6rHo9F1T8Aw4WoTyy8eYN3GgM2LaPKcZN",
+              "detail": "Sentora bridges the xStock to Solana; on Solana the CCIP OffRamp calls a lock/release token pool that releases the xStock."
+            },
+            {
+              "step": 4,
+              "role": "vault-manager",
+              "protocolId": "veda",
+              "protocolName": "Vault manager program on Solana (BoringVault-SVM style)",
+              "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+              "address": "8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf",
+              "detail": "Its instruction is `manage` (same discriminator as Veda's boring_vault_svm); a strategist key (GGPhD3aw…) moves the xStock to the strategy. Deployer attribution (Veda or Sentora) is not verified."
+            },
+            {
+              "step": 5,
+              "role": "strategy",
+              "protocolId": "sentora",
+              "protocolName": "Strategy program (position-manager)",
+              "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+              "address": "FTeDtYDsHotvxdLBqpAccPsYrtU5VDfjZjrZUENC1fpD",
+              "detail": "Owns the Kamino obligation; an executor key (B4sygjEB…) triggers deposits, borrows and yield deployment. Upgradeable by the same authority as the manager program (EhQ1TTTY…)."
+            },
+            {
+              "step": 6,
+              "role": "collateral",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "marketName": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+              "address": "AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+              "detail": "The xStock is posted as collateral in a curated Kamino market; Kamino liquidators can seize it if the position's LTV reaches the liquidation threshold."
+            },
+            {
+              "step": 7,
+              "role": "borrow",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "reserveAddress": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+              "assetMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "assetSymbol": "PYUSD",
+              "detail": "PYUSD is borrowed against the xStock at a variable rate."
+            },
+            {
+              "step": 8,
+              "role": "yield",
+              "protocolId": "kamino-earn",
+              "protocolName": "Kamino Earn vault “Sentora PYUSD”",
+              "programId": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+              "address": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+              "detail": "Borrowed PYUSD is deposited into a Sentora-curated Kamino Earn vault (5% performance fee) and its shares are staked in Kamino Farms; the vault lends PYUSD on to Kamino reserves (Maple, JLP, Figure, main, AUTO markets and this same Sentora xStocks Market)."
+            },
+            {
+              "step": 9,
+              "role": "conversion",
+              "protocolId": "sentora",
+              "protocolName": "Rewards back into the xStock",
+              "detail": "Per Kraken and Veda, rewards are swapped back into the xStock and re-deployed. The swap route was not decoded."
+            }
+          ],
+          "risks": [
+            {
+              "id": "leverage-liquidation",
+              "title": "The xStock is borrowed against",
+              "detail": "The strategy keeps each position a few points below the market's maximum LTV. If the stock falls (including while the US market is closed and the oracle keeps updating) or PYUSD debt grows, Kamino liquidators can seize the xStock with a liquidation bonus; per Kraken, resulting losses are shared proportionally across vault users. The live position and the price fall that would make it liquidatable are recorded on every collection run."
+            },
+            {
+              "id": "marketing-vs-mechanics",
+              "title": "“Not leverage” vs a leveraged strategy",
+              "detail": "Kraken's product page says “Not a swap. Not leverage.”, while its support article lists leverage and liquidation risk and the chain shows xStock collateral with PYUSD debt at 58–69% LTV."
+            },
+            {
+              "id": "rate-spread",
+              "title": "Yield depends on a spread",
+              "detail": "Returns come from the Kamino Earn vault's PYUSD yield (part of it farm rewards) exceeding the PYUSD borrow rate. If the borrow rate rises above the vault yield the strategy loses money."
+            },
+            {
+              "id": "circular-liquidity",
+              "title": "Circular PYUSD liquidity",
+              "detail": "The Sentora PYUSD Earn vault allocates part of its PYUSD to the same Sentora xStocks Market reserve the strategy borrows from, so a run on the Earn vault and on that reserve are linked."
+            },
+            {
+              "id": "cross-chain",
+              "title": "Two chains and a bridge",
+              "detail": "The share lives on Ink, the collateral on Solana; the position depends on Chainlink CCIP, a lock/release token pool and the operators who move assets between them. The three-day withdrawal window is the unwind and bridge time, not a contract rule."
+            },
+            {
+              "id": "operator-keys",
+              "title": "Operator keys and upgradeable programs",
+              "detail": "A strategist key moves assets on Solana, an executor key manages the Kamino position, and both Solana programs are upgradeable by one authority (EhQ1TTTY…) whose owner is not publicly attributed."
+            },
+            {
+              "id": "holder-claim",
+              "title": "The holder no longer holds the xStock",
+              "detail": "While deposited, the xStock is Kamino collateral owned by the strategy program's address; the holder owns an Ink vault share. Issuer redemption of the xStock requires leaving the vault first."
+            },
+            {
+              "id": "fee-discrepancy",
+              "title": "Fee disclosed ≠ fee configured",
+              "detail": "Kraken discloses a 25% performance fee; the vault accountants on Ink are configured at 3333 bps (33.33%)."
+            }
+          ],
+          "position": {
+            "obligation": "AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+            "owner": "FTeDtYDsHotvxdLBqpAccPsYrtU5VDfjZjrZUENC1fpD",
+            "observedSlot": 449874682,
+            "observedAt": "2026-09-24T01:07:27Z",
+            "obligationLastUpdateSlot": 449766548,
+            "collateralSymbol": "NVDAx",
+            "collateralTokens": 731.570323,
+            "collateralUnit": "Kamino reserve collateral tokens (≈ underlying xStock units; exchange rate not applied)",
+            "depositedValueUsd": 164315.41379820858,
+            "debtSymbol": "PYUSD",
+            "debtUsd": 95302.92623172211,
+            "loanToValue": 0.5799999161902188,
+            "maxLtv": 0.62,
+            "liquidationLtv": 0.73,
+            "priceDropToLiquidation": 0.20547956686271385,
+            "debtBorrowApy": 0.00689388959432069,
+            "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+            "yieldVaultApy": 0.03471561827771219,
+            "yieldVaultApy7d": 0.056987375139919194,
+            "valuesAsOf": "Kamino stores USD values at the obligation's last refresh (obligationLastUpdateSlot), not at observedSlot."
+          },
           "links": {
             "use": "https://www.kraken.com/pro/tokenized-equities/vaults",
             "protocol": "https://www.veda.tech/ecosystem/xstocks"
           },
-          "metrics": null,
+          "metrics": {
+            "sizeUsd": 164315.41379820858,
+            "debtAgainstCollateralUsd": 95302.92623172211,
+            "maxLtvMin": 0.62,
+            "maxLtvMax": 0.62,
+            "liquidationLtvMin": 0.73,
+            "liquidationLtvMax": 0.73,
+            "positionLtv": 0.5799999161902188,
+            "priceDropToLiquidation": 0.20547956686271385,
+            "oracleProviders": [
+              "scope"
+            ]
+          },
+          "markets": [
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+              "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "debtSymbol": "PYUSD",
+              "obligationAddress": "AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+              "vaultStateAddress": "8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf",
+              "shareMint": "BYW6N3VjFXsHW9D4mTjR2HZ3sKtKCbxrrcMdzf7C7c5F"
+            }
+          ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:27Z",
+            "slot": 449874682,
+            "scope": "The strategy's Kamino obligation (collateral, debt, LTV, liquidation value) and the collateral reserve's risk configuration, read from the chain; vault share accounting on the holder side is not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null
+          },
           "evidence": [
             {
               "type": "official-product-page",
+              "url": "https://x.com/kamino/status/2099502364986425673",
+              "accessedAt": "2026-09-24",
+              "note": "Kamino's announcement (post id timestamp 2026-09-14T14:15:45Z): SPYx, QQQx and NVDAx vaults on Kraken powered by Kamino, Veda and Sentora; the vault posts the xStock as Kamino collateral, borrows stablecoins and converts yield back into the xStock; Chainlink CCIP and Data Streams named."
+            },
+            {
+              "type": "official-product-page",
               "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
-              "accessedAt": "2026-09-19",
-              "note": "Veda names exactly three supported assets: SPYx, QQQx and NVDAx, with Veda on Solana, Sentora as risk manager and Kamino as the lending market."
+              "accessedAt": "2026-09-24",
+              "note": "“Each xStock maps 1:1 to its own Veda BoringVault deployed on Ink, Kraken's L2 chain. From there, Sentora, as the curator, bridges the xStocks to Solana using Chainlink data streams and CCIP and deploys them as collateral in Kamino markets…”"
             },
             {
               "type": "official-product-page",
               "url": "https://support.kraken.com/articles/xstocks-vaults",
-              "accessedAt": "2026-09-19",
-              "note": "Kraken documents the deposit, self-custodial embedded wallet, wrapped vault accounting and three-day withdrawal window."
+              "accessedAt": "2026-09-24",
+              "note": "Deposit to the embedded wallet on Ink, wrapping for vault accounting, Sentora as risk manager, 3-day withdrawal, 25% performance fee, liquidation/leverage/cross-chain risks; article dated 2026-09-11."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://explorer.inkonchain.com/address/0xBeB4a79e150564857488E6142D26787A78d54a66",
+              "accessedAt": "2026-09-24",
+              "note": "Ink BoringVault contracts (verified source) for sentoraNVDAx / sentoraSPYx / sentoraQQQx: supplies 745.42 / 696.45 / 271.91 on 2026-09-24, matching the Solana collateral (731.6 / 685.9 / 268.3); accountants performanceFee 3333 bps."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "accessedAt": "2026-09-24",
+              "note": "Found by the on-chain footprint scan: the Kamino lending-market authority FTmExFvq… holding NVDAx/SPYx/QQQx derives from the “Sentora xStocks Market” 8BNUWRSi…, which Kamino's cross-market collateral registry does not list. Its three strategy obligations are owned by addresses of program BSE8uppf…, which receives the xStock from program 9TWFuaFP… (manage)."
             }
           ],
           "capabilities": [
@@ -18737,23 +19760,72 @@
             }
           ],
           "corroboration": {
-            "status": "not-addressable",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 0,
-            "verifiedCount": 0,
-            "accounts": []
+            "accountCount": 5,
+            "verifiedCount": 5,
+            "accounts": [
+              {
+                "address": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
+              },
+              {
+                "address": "AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+                "role": "obligation",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 24165120,
+                "space": 3344
+              },
+              {
+                "address": "BYW6N3VjFXsHW9D4mTjR2HZ3sKtKCbxrrcMdzf7C7c5F",
+                "role": "vault-share-mint",
+                "exists": true,
+                "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+                "executable": false,
+                "lamports": 4725840,
+                "space": 423
+              },
+              {
+                "address": "8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf",
+                "role": "vault-state",
+                "exists": true,
+                "owner": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+                "executable": false,
+                "lamports": 4454400,
+                "space": 512
+              }
+            ]
           },
-          "evidenceTier": "reviewed-official-product",
+          "evidenceTier": "account-existence-checked",
           "proof": {
             "sourceStatus": "named-product-page",
-            "accountExistence": "not-addressable",
-            "accountCount": 0,
-            "existingAccountCount": 0,
-            "configurationDecoded": false,
+            "accountExistence": "checked",
+            "accountCount": 5,
+            "existingAccountCount": 5,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:27Z",
             "readOnlyExecutionSimulated": false,
-            "activityObserved": false,
-            "activityBasis": []
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
           }
         },
         {
@@ -18814,7 +19886,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -18842,6 +19914,118 @@
             "activityBasis": [
               "volume24Usd",
               "txns24"
+            ]
+          }
+        },
+        {
+          "id": "loopscale:collateral",
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "category": "lending",
+          "status": "live",
+          "actions": [
+            "collateral",
+            "borrow"
+          ],
+          "summary": "Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).",
+          "accessNote": "Issuer eligibility and the protocol’s geographic restrictions apply; direct issuer redemption remains KYC-gated.",
+          "links": {
+            "use": "https://app.loopscale.com/",
+            "protocol": "https://docs.loopscale.com/"
+          },
+          "metrics": {
+            "debtAgainstCollateralUsd": 21337.692372,
+            "positions": null
+          },
+          "markets": [
+            {
+              "name": "USDG Orca (lends USDG)",
+              "vaultAddress": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+              "strategyAddress": "9yMxtyqpK9UpxGqatDCSeeMckVx9HNVv5h7n5MQewgFC",
+              "debtMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+              "debtSymbol": "USDG",
+              "lentAgainstCollateral": 0,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            },
+            {
+              "name": "USDC Orca (lends USDC)",
+              "vaultAddress": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+              "strategyAddress": "2ZyJ7uT1dsyxGkYjUTn1gbERuA692CM7ATkcFNGeUA9G",
+              "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "debtSymbol": "USDC",
+              "lentAgainstCollateral": 21337.692372,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            }
+          ],
+          "evidence": [
+            {
+              "type": "protocol-api",
+              "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+              "note": "2 Loopscale lending vaults accept this exact mint as collateral; 21,338 of stablecoin principal currently lent against it."
+            }
+          ],
+          "capabilities": [
+            {
+              "action": "borrow",
+              "label": "Borrow against",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "Borrowing is limited by configured collateral and liquidation parameters."
+            },
+            {
+              "action": "collateral",
+              "label": "Use as collateral",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "The protocol can retain and liquidate posted collateral under its market rules."
+            }
+          ],
+          "corroboration": {
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
+            "rpcUrl": "solana-mainnet.g.alchemy.com",
+            "accountCount": 2,
+            "verifiedCount": 2,
+            "accounts": [
+              {
+                "address": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              },
+              {
+                "address": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              }
+            ]
+          },
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
             ]
           }
         }
@@ -19053,7 +20237,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19382,7 +20566,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19486,7 +20670,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19599,7 +20783,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -19883,7 +21067,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20140,7 +21324,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20469,7 +21653,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -20591,7 +21775,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21001,7 +22185,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21186,7 +22370,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21317,7 +22501,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21354,13 +22538,14 @@
       "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
       "symbol": "SPYx",
       "issuer": "xstocks-backed",
-      "confirmedUseCount": 5,
+      "confirmedUseCount": 6,
       "protocols": [
         "Jupiter Lend",
         "Kamino",
+        "Loopscale",
         "Nest",
         "Raydium",
-        "Veda xStocks Vault"
+        "xStocks Vaults (Kraken · Veda · Sentora · Kamino)"
       ],
       "actions": [
         "borrow",
@@ -21388,15 +22573,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 3348719.382493826,
-            "maxLtvMin": 0.73,
+            "sizeUsd": 4161548.8369728983,
+            "maxLtvMin": 0.72,
             "maxLtvMax": 0.73,
             "liquidationLtvMin": 0.75,
-            "liquidationLtvMax": 0.75,
+            "liquidationLtvMax": 0.79,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 2296672.2559255483,
-            "debtAgainstCollateralUsd": 1052047.1265682778
+            "collateralBackingDebtUsd": 2278864.5179586713,
+            "debtAgainstCollateralUsd": 1051888.2422157938
           },
           "markets": [
             {
@@ -21407,7 +22592,12 @@
                 "2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB",
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.73,
+              "liquidationLtv": 0.75,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -21416,18 +22606,52 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.73,
+              "liquidationLtv": 0.75,
+              "liquidationBonusBps": "500-1000"
+            },
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+              "curated": true,
+              "sizeUsd": 830796.0767984333,
+              "source": "market-reserve-list",
+              "reserveStatus": "active",
+              "maxLtv": 0.72,
+              "liquidationLtv": 0.79,
+              "liquidationBonusBps": 1000
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 3 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d",
+              "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d",
+              "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
               "url": "https://api.kamino.finance/markets/collateral-reserves",
               "note": "2 live registry rows match this exact collateral mint."
+            },
+            {
+              "type": "protocol-api",
+              "url": "https://api.kamino.finance/v2/kamino-market",
+              "note": "1 reserve with a positive LTV for this exact mint in Sentora xStocks Market (per-market reserve list; not in the cross-market collateral registry)."
             }
           ],
           "capabilities": [
@@ -21450,11 +22674,20 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 2,
-            "verifiedCount": 2,
+            "accountCount": 4,
+            "verifiedCount": 4,
             "accounts": [
+              {
+                "address": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
               {
                 "address": "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d",
                 "role": "collateral-reserve",
@@ -21472,6 +22705,15 @@
                 "executable": false,
                 "lamports": 33352320,
                 "space": 4664
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
               }
             ]
           },
@@ -21479,9 +22721,10 @@
           "proof": {
             "sourceStatus": "exact-token-registry",
             "accountExistence": "checked",
-            "accountCount": 2,
-            "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "accountCount": 4,
+            "existingAccountCount": 4,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -21506,16 +22749,16 @@
             "protocol": "https://developers.jup.ag/docs/lend/"
           },
           "metrics": {
-            "sizeUsd": 13827486.552929943,
-            "positions": 3909,
+            "sizeUsd": 13608112.876853682,
+            "positions": 3910,
             "maxLtvMin": 0.75,
             "maxLtvMax": 0.75,
             "liquidationLtvMin": 0.85,
             "liquidationLtvMax": 0.85,
             "liquidationPenaltyMin": 0.03,
             "liquidationPenaltyMax": 0.03,
-            "supplyUsd": 13827486.552929943,
-            "withdrawableUsd": 4373319.58468376,
+            "supplyUsd": 13608112.876853682,
+            "withdrawableUsd": 4227449.0809065,
             "oracleProviders": [
               "chainlinkDataStreams"
             ]
@@ -21571,7 +22814,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 3,
             "verifiedCount": 3,
@@ -21680,7 +22923,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -21720,38 +22963,250 @@
         {
           "id": "veda-sentora-kraken-xstocks-vaults",
           "protocolId": "veda",
-          "protocolName": "Veda xStocks Vault",
+          "protocolName": "xStocks Vaults (Kraken · Veda · Sentora · Kamino)",
           "category": "yield-vault",
           "status": "live",
           "actions": [
             "deposit",
             "earn-yield"
           ],
-          "summary": "Deposit the xStock into a self-custodial Veda vault through Kraken Pro. Sentora manages the strategy, which posts the xStock to Kamino, borrows stablecoins and returns yield in the deposited xStock.",
-          "accessNote": "Available only to eligible Kraken clients; geographic restrictions apply and deallocation has a three-day processing window.",
-          "interface": "Kraken Pro",
+          "summary": "Deposit the xStock through Kraken into a Veda BoringVault on Ink, curated by Sentora. The xStock is bridged to Solana with Chainlink CCIP, posted as collateral in a dedicated Kamino market, PYUSD is borrowed against it and deposited into a Kamino Earn vault, and rewards are swapped back into the xStock. The holder receives an ERC-20 vault share on Ink, not the xStock.",
+          "accessNote": "Kraken clients in the EEA and rest of world only (not the US, UK, Canada, Australia or UAE per Kraken); unregulated product provided by Payward Wallet, LLC; withdrawals take up to three days; 25% performance fee per Kraken (the on-chain accountants are set to 33.33%, unreconciled).",
+          "interface": "Kraken (xStocks Vaults)",
           "curator": "Sentora",
           "underlyingProtocols": [
+            "Veda",
+            "Chainlink CCIP",
             "Kamino"
           ],
-          "networkPath": "Kraken embedded wallet on Ink → Veda vault → Solana Kamino market",
+          "networkPath": "Kraken (Privy embedded wallet on Ink) → xStock wrapped (wSPYx/wQQQx/wNVDAx) → Veda BoringVault on Ink (ERC-20 share) → Chainlink CCIP to Solana → vault manager program (Manage) → Sentora position-manager → Kamino Sentora xStocks Market (xStock collateral, PYUSD debt) → Kamino Earn “Sentora PYUSD” vault → rewards swapped back into the xStock",
+          "composite": true,
+          "announcedAt": "2026-09-14",
+          "holderReceives": {
+            "instrument": "An ERC-20 Veda BoringVault share on Ink (sentoraSPYx / sentoraQQQx / sentoraNVDAx, “Advanced Strategies <ticker>”), held in a Privy-powered embedded wallet Kraken creates for the user.",
+            "legalNature": "A pro-rata claim on the vault's net assets under the vault contracts and Kraken/Veda terms — not the xStock, not the issuer's tracker certificate and not a share of the company. While deposited, the xStock sits on Solana as Kamino collateral owned by the strategy program's address; losses from liquidation are shared across vault users.",
+            "note": "Solana-side share mints for the same vaults exist with zero supply (read 2026-09-24); the live share balances are on Ink.",
+            "fees": "Kraken: 25% performance fee on vault earnings, no allocation/deallocation fees. On-chain AccountantWithRateProviders on Ink: performanceFee 3333 bps, platformFee 0 — discrepancy not reconciled.",
+            "withdrawal": "Kraken: up to 3 days. The Ink BoringOnChainQueue for wSPYx is configured with 1-hour maturity; the 3 days reflects the Solana unwind and bridge, i.e. an operational, not contractual, delay.",
+            "shareSymbol": "sentoraSPYx",
+            "shareChain": "ink",
+            "shareAddress": "0x83b890Ca44fb0355CDF5606617ccA0FE21Ddb16A",
+            "solanaShareMint": "jkRru3tFY1eScFd1dkvHo6rmfviTjYfTHLPgSpqSJT7",
+            "shareSupplyOnSolanaRaw": "0"
+          },
+          "route": [
+            {
+              "step": 1,
+              "role": "deposit-interface",
+              "protocolId": "kraken",
+              "protocolName": "Kraken xStocks Vaults (Privy embedded wallet on Ink)",
+              "detail": "Kraken sends the xStock to the user's embedded wallet on Ink and wraps it for vault accounting (wSPYx/wQQQx/wNVDAx)."
+            },
+            {
+              "step": 2,
+              "role": "vault",
+              "chain": "ink",
+              "protocolId": "veda",
+              "protocolName": "Veda BoringVault on Ink (ERC-20 share)",
+              "address": "0x83b890Ca44fb0355CDF5606617ccA0FE21Ddb16A",
+              "detail": "One BoringVault per asset, with a LayerZero teller and an accountant whose share-rate moves at most ±0.5% per update (6-hour minimum delay)."
+            },
+            {
+              "step": 3,
+              "role": "bridge",
+              "protocolId": "chainlink-ccip",
+              "protocolName": "Chainlink CCIP (Ink → Solana)",
+              "programId": "F2ZYgyh8YDG6rHo9F1T8Aw4WoTyy8eYN3GgM2LaPKcZN",
+              "detail": "Sentora bridges the xStock to Solana; on Solana the CCIP OffRamp calls a lock/release token pool that releases the xStock."
+            },
+            {
+              "step": 4,
+              "role": "vault-manager",
+              "protocolId": "veda",
+              "protocolName": "Vault manager program on Solana (BoringVault-SVM style)",
+              "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+              "address": "8n5L6eXe9Z6koCHYyjbnawxvhHcVVLc4ugRNMQKFarB3",
+              "detail": "Its instruction is `manage` (same discriminator as Veda's boring_vault_svm); a strategist key (GGPhD3aw…) moves the xStock to the strategy. Deployer attribution (Veda or Sentora) is not verified."
+            },
+            {
+              "step": 5,
+              "role": "strategy",
+              "protocolId": "sentora",
+              "protocolName": "Strategy program (position-manager)",
+              "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+              "address": "HzJt4yX9AyCEFnKtTuJQto6nTpvyjVBZtrkY2ZzcoRyb",
+              "detail": "Owns the Kamino obligation; an executor key (B4sygjEB…) triggers deposits, borrows and yield deployment. Upgradeable by the same authority as the manager program (EhQ1TTTY…)."
+            },
+            {
+              "step": 6,
+              "role": "collateral",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "marketName": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+              "address": "DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+              "detail": "The xStock is posted as collateral in a curated Kamino market; Kamino liquidators can seize it if the position's LTV reaches the liquidation threshold."
+            },
+            {
+              "step": 7,
+              "role": "borrow",
+              "protocolId": "kamino",
+              "protocolName": "Kamino Lend",
+              "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+              "reserveAddress": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+              "assetMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "assetSymbol": "PYUSD",
+              "detail": "PYUSD is borrowed against the xStock at a variable rate."
+            },
+            {
+              "step": 8,
+              "role": "yield",
+              "protocolId": "kamino-earn",
+              "protocolName": "Kamino Earn vault “Sentora PYUSD”",
+              "programId": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+              "address": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+              "detail": "Borrowed PYUSD is deposited into a Sentora-curated Kamino Earn vault (5% performance fee) and its shares are staked in Kamino Farms; the vault lends PYUSD on to Kamino reserves (Maple, JLP, Figure, main, AUTO markets and this same Sentora xStocks Market)."
+            },
+            {
+              "step": 9,
+              "role": "conversion",
+              "protocolId": "sentora",
+              "protocolName": "Rewards back into the xStock",
+              "detail": "Per Kraken and Veda, rewards are swapped back into the xStock and re-deployed. The swap route was not decoded."
+            }
+          ],
+          "risks": [
+            {
+              "id": "leverage-liquidation",
+              "title": "The xStock is borrowed against",
+              "detail": "The strategy keeps each position a few points below the market's maximum LTV. If the stock falls (including while the US market is closed and the oracle keeps updating) or PYUSD debt grows, Kamino liquidators can seize the xStock with a liquidation bonus; per Kraken, resulting losses are shared proportionally across vault users. The live position and the price fall that would make it liquidatable are recorded on every collection run."
+            },
+            {
+              "id": "marketing-vs-mechanics",
+              "title": "“Not leverage” vs a leveraged strategy",
+              "detail": "Kraken's product page says “Not a swap. Not leverage.”, while its support article lists leverage and liquidation risk and the chain shows xStock collateral with PYUSD debt at 58–69% LTV."
+            },
+            {
+              "id": "rate-spread",
+              "title": "Yield depends on a spread",
+              "detail": "Returns come from the Kamino Earn vault's PYUSD yield (part of it farm rewards) exceeding the PYUSD borrow rate. If the borrow rate rises above the vault yield the strategy loses money."
+            },
+            {
+              "id": "circular-liquidity",
+              "title": "Circular PYUSD liquidity",
+              "detail": "The Sentora PYUSD Earn vault allocates part of its PYUSD to the same Sentora xStocks Market reserve the strategy borrows from, so a run on the Earn vault and on that reserve are linked."
+            },
+            {
+              "id": "cross-chain",
+              "title": "Two chains and a bridge",
+              "detail": "The share lives on Ink, the collateral on Solana; the position depends on Chainlink CCIP, a lock/release token pool and the operators who move assets between them. The three-day withdrawal window is the unwind and bridge time, not a contract rule."
+            },
+            {
+              "id": "operator-keys",
+              "title": "Operator keys and upgradeable programs",
+              "detail": "A strategist key moves assets on Solana, an executor key manages the Kamino position, and both Solana programs are upgradeable by one authority (EhQ1TTTY…) whose owner is not publicly attributed."
+            },
+            {
+              "id": "holder-claim",
+              "title": "The holder no longer holds the xStock",
+              "detail": "While deposited, the xStock is Kamino collateral owned by the strategy program's address; the holder owns an Ink vault share. Issuer redemption of the xStock requires leaving the vault first."
+            },
+            {
+              "id": "fee-discrepancy",
+              "title": "Fee disclosed ≠ fee configured",
+              "detail": "Kraken discloses a 25% performance fee; the vault accountants on Ink are configured at 3333 bps (33.33%)."
+            }
+          ],
+          "position": {
+            "obligation": "DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+            "owner": "HzJt4yX9AyCEFnKtTuJQto6nTpvyjVBZtrkY2ZzcoRyb",
+            "observedSlot": 449874682,
+            "observedAt": "2026-09-24T01:07:27Z",
+            "obligationLastUpdateSlot": 449829533,
+            "collateralSymbol": "SPYx",
+            "collateralTokens": 685.899412,
+            "collateralUnit": "Kamino reserve collateral tokens (≈ underlying xStock units; exchange rate not applied)",
+            "depositedValueUsd": 529484.389433876,
+            "debtSymbol": "PYUSD",
+            "debtUsd": 365351.6967062329,
+            "loanToValue": 0.6900141042814623,
+            "maxLtv": 0.72,
+            "liquidationLtv": 0.79,
+            "priceDropToLiquidation": 0.1265644249601744,
+            "debtBorrowApy": 0.00689388959432069,
+            "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+            "yieldVaultApy": 0.03471561827771219,
+            "yieldVaultApy7d": 0.056987375139919194,
+            "valuesAsOf": "Kamino stores USD values at the obligation's last refresh (obligationLastUpdateSlot), not at observedSlot."
+          },
           "links": {
             "use": "https://www.kraken.com/pro/tokenized-equities/vaults",
             "protocol": "https://www.veda.tech/ecosystem/xstocks"
           },
-          "metrics": null,
+          "metrics": {
+            "sizeUsd": 529484.389433876,
+            "debtAgainstCollateralUsd": 365351.6967062329,
+            "maxLtvMin": 0.72,
+            "maxLtvMax": 0.72,
+            "liquidationLtvMin": 0.79,
+            "liquidationLtvMax": 0.79,
+            "positionLtv": 0.6900141042814623,
+            "priceDropToLiquidation": 0.1265644249601744,
+            "oracleProviders": [
+              "scope"
+            ]
+          },
+          "markets": [
+            {
+              "name": "Sentora xStocks Market",
+              "marketAddress": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "reserveAddress": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+              "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+              "debtSymbol": "PYUSD",
+              "obligationAddress": "DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+              "vaultStateAddress": "8n5L6eXe9Z6koCHYyjbnawxvhHcVVLc4ugRNMQKFarB3",
+              "shareMint": "jkRru3tFY1eScFd1dkvHo6rmfviTjYfTHLPgSpqSJT7"
+            }
+          ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:27Z",
+            "slot": 449874682,
+            "scope": "The strategy's Kamino obligation (collateral, debt, LTV, liquidation value) and the collateral reserve's risk configuration, read from the chain; vault share accounting on the holder side is not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null
+          },
           "evidence": [
             {
               "type": "official-product-page",
+              "url": "https://x.com/kamino/status/2099502364986425673",
+              "accessedAt": "2026-09-24",
+              "note": "Kamino's announcement (post id timestamp 2026-09-14T14:15:45Z): SPYx, QQQx and NVDAx vaults on Kraken powered by Kamino, Veda and Sentora; the vault posts the xStock as Kamino collateral, borrows stablecoins and converts yield back into the xStock; Chainlink CCIP and Data Streams named."
+            },
+            {
+              "type": "official-product-page",
               "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
-              "accessedAt": "2026-09-19",
-              "note": "Veda names exactly three supported assets: SPYx, QQQx and NVDAx, with Veda on Solana, Sentora as risk manager and Kamino as the lending market."
+              "accessedAt": "2026-09-24",
+              "note": "“Each xStock maps 1:1 to its own Veda BoringVault deployed on Ink, Kraken's L2 chain. From there, Sentora, as the curator, bridges the xStocks to Solana using Chainlink data streams and CCIP and deploys them as collateral in Kamino markets…”"
             },
             {
               "type": "official-product-page",
               "url": "https://support.kraken.com/articles/xstocks-vaults",
-              "accessedAt": "2026-09-19",
-              "note": "Kraken documents the deposit, self-custodial embedded wallet, wrapped vault accounting and three-day withdrawal window."
+              "accessedAt": "2026-09-24",
+              "note": "Deposit to the embedded wallet on Ink, wrapping for vault accounting, Sentora as risk manager, 3-day withdrawal, 25% performance fee, liquidation/leverage/cross-chain risks; article dated 2026-09-11."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://explorer.inkonchain.com/address/0xBeB4a79e150564857488E6142D26787A78d54a66",
+              "accessedAt": "2026-09-24",
+              "note": "Ink BoringVault contracts (verified source) for sentoraNVDAx / sentoraSPYx / sentoraQQQx: supplies 745.42 / 696.45 / 271.91 on 2026-09-24, matching the Solana collateral (731.6 / 685.9 / 268.3); accountants performanceFee 3333 bps."
+            },
+            {
+              "type": "onchain-account",
+              "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+              "accessedAt": "2026-09-24",
+              "note": "Found by the on-chain footprint scan: the Kamino lending-market authority FTmExFvq… holding NVDAx/SPYx/QQQx derives from the “Sentora xStocks Market” 8BNUWRSi…, which Kamino's cross-market collateral registry does not list. Its three strategy obligations are owned by addresses of program BSE8uppf…, which receives the xStock from program 9TWFuaFP… (manage)."
             }
           ],
           "capabilities": [
@@ -21773,23 +23228,72 @@
             }
           ],
           "corroboration": {
-            "status": "not-addressable",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
-            "accountCount": 0,
-            "verifiedCount": 0,
-            "accounts": []
+            "accountCount": 5,
+            "verifiedCount": 5,
+            "accounts": [
+              {
+                "address": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+                "role": "collateral-reserve",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 60913920,
+                "space": 8624
+              },
+              {
+                "address": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+                "role": "lending-market",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 33352320,
+                "space": 4664
+              },
+              {
+                "address": "DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+                "role": "obligation",
+                "exists": true,
+                "owner": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+                "executable": false,
+                "lamports": 24165120,
+                "space": 3344
+              },
+              {
+                "address": "jkRru3tFY1eScFd1dkvHo6rmfviTjYfTHLPgSpqSJT7",
+                "role": "vault-share-mint",
+                "exists": true,
+                "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+                "executable": false,
+                "lamports": 4711920,
+                "space": 421
+              },
+              {
+                "address": "8n5L6eXe9Z6koCHYyjbnawxvhHcVVLc4ugRNMQKFarB3",
+                "role": "vault-state",
+                "exists": true,
+                "owner": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+                "executable": false,
+                "lamports": 4454400,
+                "space": 512
+              }
+            ]
           },
-          "evidenceTier": "reviewed-official-product",
+          "evidenceTier": "account-existence-checked",
           "proof": {
             "sourceStatus": "named-product-page",
-            "accountExistence": "not-addressable",
-            "accountCount": 0,
-            "existingAccountCount": 0,
-            "configurationDecoded": false,
+            "accountExistence": "checked",
+            "accountCount": 5,
+            "existingAccountCount": 5,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:27Z",
             "readOnlyExecutionSimulated": false,
-            "activityObserved": false,
-            "activityBasis": []
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
+            ]
           }
         },
         {
@@ -21850,7 +23354,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -21878,6 +23382,118 @@
             "activityBasis": [
               "volume24Usd",
               "txns24"
+            ]
+          }
+        },
+        {
+          "id": "loopscale:collateral",
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "category": "lending",
+          "status": "live",
+          "actions": [
+            "collateral",
+            "borrow"
+          ],
+          "summary": "Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).",
+          "accessNote": "Issuer eligibility and the protocol’s geographic restrictions apply; direct issuer redemption remains KYC-gated.",
+          "links": {
+            "use": "https://app.loopscale.com/",
+            "protocol": "https://docs.loopscale.com/"
+          },
+          "metrics": {
+            "debtAgainstCollateralUsd": 80598.42214000001,
+            "positions": null
+          },
+          "markets": [
+            {
+              "name": "USDG Orca (lends USDG)",
+              "vaultAddress": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+              "strategyAddress": "9yMxtyqpK9UpxGqatDCSeeMckVx9HNVv5h7n5MQewgFC",
+              "debtMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+              "debtSymbol": "USDG",
+              "lentAgainstCollateral": 2455.359861,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            },
+            {
+              "name": "USDC Orca (lends USDC)",
+              "vaultAddress": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+              "strategyAddress": "2ZyJ7uT1dsyxGkYjUTn1gbERuA692CM7ATkcFNGeUA9G",
+              "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "debtSymbol": "USDC",
+              "lentAgainstCollateral": 78143.062279,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            }
+          ],
+          "evidence": [
+            {
+              "type": "protocol-api",
+              "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+              "note": "2 Loopscale lending vaults accept this exact mint as collateral; 80,598 of stablecoin principal currently lent against it."
+            }
+          ],
+          "capabilities": [
+            {
+              "action": "borrow",
+              "label": "Borrow against",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "Borrowing is limited by configured collateral and liquidation parameters."
+            },
+            {
+              "action": "collateral",
+              "label": "Use as collateral",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "The protocol can retain and liquidate posted collateral under its market rules."
+            }
+          ],
+          "corroboration": {
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
+            "rpcUrl": "solana-mainnet.g.alchemy.com",
+            "accountCount": 2,
+            "verifiedCount": 2,
+            "accounts": [
+              {
+                "address": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              },
+              {
+                "address": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              }
+            ]
+          },
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
             ]
           }
         }
@@ -22188,7 +23804,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22328,7 +23944,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22495,7 +24111,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22608,7 +24224,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -22730,7 +24346,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23163,9 +24779,10 @@
       "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
       "symbol": "CRCLx",
       "issuer": "xstocks-backed",
-      "confirmedUseCount": 3,
+      "confirmedUseCount": 4,
       "protocols": [
         "Kamino",
+        "Loopscale",
         "Nest",
         "Raydium"
       ],
@@ -23193,15 +24810,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 941639.9620294195,
+            "sizeUsd": 918122.6087251267,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 774661.1616966787,
-            "debtAgainstCollateralUsd": 166978.8003327408
+            "collateralBackingDebtUsd": 751526.9499111063,
+            "debtAgainstCollateralUsd": 166595.65881402037
           },
           "markets": [
             {
@@ -23213,7 +24830,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -23222,13 +24844,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "57qagnQFuWw1seEqi6Z5JBvkm5xH5svdmq9dtqxG1rYy",
+              "57qagnQFuWw1seEqi6Z5JBvkm5xH5svdmq9dtqxG1rYy"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -23256,7 +24894,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -23287,7 +24925,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -23356,7 +24995,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -23451,7 +25090,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23479,6 +25118,118 @@
             "activityBasis": [
               "volume24Usd",
               "txns24"
+            ]
+          }
+        },
+        {
+          "id": "loopscale:collateral",
+          "protocolId": "loopscale",
+          "protocolName": "Loopscale",
+          "category": "lending",
+          "status": "live",
+          "actions": [
+            "collateral",
+            "borrow"
+          ],
+          "summary": "Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).",
+          "accessNote": "Issuer eligibility and the protocol’s geographic restrictions apply; direct issuer redemption remains KYC-gated.",
+          "links": {
+            "use": "https://app.loopscale.com/",
+            "protocol": "https://docs.loopscale.com/"
+          },
+          "metrics": {
+            "debtAgainstCollateralUsd": 3977.4177280000004,
+            "positions": null
+          },
+          "markets": [
+            {
+              "name": "USDG Orca (lends USDG)",
+              "vaultAddress": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+              "strategyAddress": "9yMxtyqpK9UpxGqatDCSeeMckVx9HNVv5h7n5MQewgFC",
+              "debtMint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+              "debtSymbol": "USDG",
+              "lentAgainstCollateral": 993.763381,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            },
+            {
+              "name": "USDC Orca (lends USDC)",
+              "vaultAddress": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+              "strategyAddress": "2ZyJ7uT1dsyxGkYjUTn1gbERuA692CM7ATkcFNGeUA9G",
+              "debtMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "debtSymbol": "USDC",
+              "lentAgainstCollateral": 2983.654347,
+              "lenderApyPct": 2,
+              "depositsEnabled": true,
+              "paused": false,
+              "source": "lending-vault-registry"
+            }
+          ],
+          "evidence": [
+            {
+              "type": "protocol-api",
+              "url": "https://tars.loopscale.com/v1/markets/lending_vaults/info",
+              "note": "2 Loopscale lending vaults accept this exact mint as collateral; 3,977 of stablecoin principal currently lent against it."
+            }
+          ],
+          "capabilities": [
+            {
+              "action": "borrow",
+              "label": "Borrow against",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "Borrowing is limited by configured collateral and liquidation parameters."
+            },
+            {
+              "action": "collateral",
+              "label": "Use as collateral",
+              "status": "confirmed",
+              "custody": "protocol",
+              "enforcement": "smart-contract",
+              "consequence": "The protocol can retain and liquidate posted collateral under its market rules."
+            }
+          ],
+          "corroboration": {
+            "status": "confirmed",
+            "checkedAt": "2026-09-24T01:08:49Z",
+            "rpcUrl": "solana-mainnet.g.alchemy.com",
+            "accountCount": 2,
+            "verifiedCount": 2,
+            "accounts": [
+              {
+                "address": "31vgw6Bvg7AtiQb8RJmdYohvVVASQ9zGmGu33AhYe6pH",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              },
+              {
+                "address": "3Poc8EoDyTdtLXf4AUQf3dHvaxUJNb1wspRkizrbe5jR",
+                "role": "borrow-vault",
+                "exists": true,
+                "owner": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+                "executable": false,
+                "lamports": 2018400,
+                "space": 162
+              }
+            ]
+          },
+          "evidenceTier": "account-existence-checked",
+          "proof": {
+            "sourceStatus": "exact-token-registry",
+            "accountExistence": "checked",
+            "accountCount": 2,
+            "existingAccountCount": 2,
+            "configurationDecoded": false,
+            "readOnlyExecutionSimulated": false,
+            "activityObserved": true,
+            "activityBasis": [
+              "debtAgainstCollateralUsd"
             ]
           }
         }
@@ -23591,7 +25342,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23695,7 +25446,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23808,7 +25559,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -23948,7 +25699,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -24023,15 +25774,15 @@
             "protocol": "https://kamino.com/docs/"
           },
           "metrics": {
-            "sizeUsd": 727786.0656672888,
+            "sizeUsd": 720464.8772762179,
             "maxLtvMin": 0.3,
             "maxLtvMax": 0.3,
             "liquidationLtvMin": 0.4,
             "liquidationLtvMax": 0.4,
             "borrowFactorMin": 1,
             "borrowFactorMax": 2.25,
-            "collateralBackingDebtUsd": 599813.796289514,
-            "debtAgainstCollateralUsd": 127972.2693777749
+            "collateralBackingDebtUsd": 592026.2574566313,
+            "debtAgainstCollateralUsd": 128438.61981958665
           },
           "markets": [
             {
@@ -24043,7 +25794,12 @@
                 "5iTiczqgUegqA3PpoNpotizMbY9n1sRWr3oL6igKvWuf",
                 "7B66Az3tJhAo4bLkX8PzTixQ9ZGyHkkjxfVLhF26sP5q",
                 "UvXjBuC7YZYaGB9Rn1PpBD1GySmjzunXgE8Zev9ua8d"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             },
             {
               "name": "xStocks Pool",
@@ -24052,13 +25808,29 @@
               "debtReserveAddresses": [
                 "97zoywd8mPZsGTg8q1wdD2Wgkdrs2tqusp1Qqcxbyj7E",
                 "F1xMZ8em6SrQkCnKQR1pzcxQieSUth35sYDQ2kK6o8tX"
-              ]
+              ],
+              "source": "collateral-registry",
+              "reserveStatus": "active",
+              "maxLtv": 0.3,
+              "liquidationLtv": 0.4,
+              "liquidationBonusBps": "500-1000"
             }
           ],
           "debtCategories": [
             "Stablecoin assets",
             "Tokenized stocks"
           ],
+          "decoding": {
+            "observedAt": "2026-09-24T01:07:26Z",
+            "slot": 449874680,
+            "scope": "Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of 2 collateral reserves read from the chain; debt-side terms and executions are not decoded.",
+            "decoder": "stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)",
+            "idl": null,
+            "reserves": [
+              "4UBJu5Xp1aziV9frBQBhc1RnKrgXHAWHYejQytkYr8gq",
+              "4UBJu5Xp1aziV9frBQBhc1RnKrgXHAWHYejQytkYr8gq"
+            ]
+          },
           "evidence": [
             {
               "type": "protocol-api",
@@ -24086,7 +25858,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -24117,7 +25889,8 @@
             "accountExistence": "checked",
             "accountCount": 2,
             "existingAccountCount": 2,
-            "configurationDecoded": false,
+            "configurationDecoded": true,
+            "observedAt": "2026-09-24T01:07:26Z",
             "readOnlyExecutionSimulated": false,
             "activityObserved": true,
             "activityBasis": [
@@ -24183,7 +25956,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -24908,7 +26681,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25210,7 +26983,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25743,7 +27516,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -25838,7 +27611,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -25987,7 +27760,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,
@@ -26130,7 +27903,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 2,
             "verifiedCount": 2,
@@ -26402,7 +28175,7 @@
           ],
           "corroboration": {
             "status": "confirmed",
-            "checkedAt": "2026-09-23T10:50:39Z",
+            "checkedAt": "2026-09-24T01:08:49Z",
             "rpcUrl": "solana-mainnet.g.alchemy.com",
             "accountCount": 1,
             "verifiedCount": 1,

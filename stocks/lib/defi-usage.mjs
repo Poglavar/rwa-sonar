@@ -102,6 +102,9 @@ export function integrationAccountRefs(integration) {
         refs.push(accountRef(market?.collateralConfig, 'collateral-config'));
         refs.push(accountRef(market?.collateralVault, 'collateral-vault'));
         refs.push(accountRef(market?.oracleAddress, 'oracle'));
+        refs.push(accountRef(market?.obligationAddress, 'obligation'));
+        refs.push(accountRef(market?.vaultStateAddress, 'vault-state'));
+        refs.push(accountRef(market?.shareMint, 'vault-share-mint'));
         const loan = accountRef(market?.loanAddress, 'loan-account');
         if (loan && integration?.protocolId === 'loopscale') refs.push({ ...loan, expectedOwner: LOOPSCALE_PROGRAM_ID });
     }
@@ -246,16 +249,50 @@ export function dexUsage(token, venuesItem, meteoraByPair = new Map()) {
     }).sort((a, b) => byString(a.protocolId, b.protocolId));
 }
 
-/** A live Kamino registry can repeat one collateral mint by debt category and by lending market. */
-export function kaminoUsage(token, collateralRows) {
+/**
+ * Kamino, from two keyless sources joined on the exact reserve: the cross-market collateral registry
+ * (debt categories and per-debt terms) and every market's own reserve list (which also carries
+ * curated/partner markets the registry omits — e.g. the Sentora xStocks Market behind Kraken's
+ * xStocks Vaults, found by the on-chain footprint on 2026-09-24). When the reserve accounts were
+ * read and decoded (lib/kamino-accounts.mjs), their configured LTV / liquidation threshold replace
+ * the API figures and the integration records the decode.
+ */
+export function kaminoUsage(token, collateralRows, { marketReserves = [], reserveConfigs = new Map(), decodedAt = null, slot = null } = {}) {
     const rows = (Array.isArray(collateralRows) ? collateralRows : [])
         .filter((row) => row?.collateralMint === token?.mint);
-    if (rows.length === 0) return [];
-    const sizeUsd = sum(rows.map((row) => row.sizeUsd));
+    const listedReserves = new Set(rows.map((row) => row.collateralReserve));
+    const extra = (Array.isArray(marketReserves) ? marketReserves : [])
+        .filter((row) => row?.mint === token?.mint && !listedReserves.has(row.reserve))
+        .filter((row) => (num(row.maxLtv) ?? 0) > 0 || (reserveConfigs.get(row.reserve)?.maxLtvPct ?? 0) > 0);
+    if (rows.length === 0 && extra.length === 0) return [];
+    const configFor = (reserve) => {
+        const config = reserveConfigs.get(reserve) ?? null;
+        return config && config.liquidityMint === token.mint ? config : null;
+    };
     const terms = rows.flatMap((row) => Array.isArray(row.borrowReserveTerms) ? row.borrowReserveTerms : []);
-    const maxLtvs = terms.map((term) => num(term.maxLtv)).filter((value) => value !== null);
-    const liquidationLtvs = terms.map((term) => num(term.liquidationLtv)).filter((value) => value !== null);
+    const maxLtvs = [
+        ...rows.map((row) => configFor(row.collateralReserve)?.maxLtvPct ?? null).filter((v) => v !== null).map((v) => v / 100),
+        ...rows.filter((row) => !configFor(row.collateralReserve)).flatMap((row) => (row.borrowReserveTerms ?? []).map((term) => num(term.maxLtv))),
+        ...extra.map((row) => (configFor(row.reserve)?.maxLtvPct ?? null) !== null ? configFor(row.reserve).maxLtvPct / 100 : num(row.maxLtv))
+    ].filter((value) => value !== null);
+    const liquidationLtvs = [
+        ...rows.map((row) => configFor(row.collateralReserve)?.liquidationLtvPct ?? null).filter((v) => v !== null).map((v) => v / 100),
+        ...rows.filter((row) => !configFor(row.collateralReserve)).flatMap((row) => (row.borrowReserveTerms ?? []).map((term) => num(term.liquidationLtv))),
+        ...extra.map((row) => configFor(row.reserve)?.liquidationLtvPct ?? null).filter((v) => v !== null).map((v) => v / 100)
+    ].filter((value) => value !== null);
     const borrowFactors = range(terms.map((term) => term.borrowFactor));
+    const sizeUsd = sum([...rows.map((row) => row.sizeUsd), ...extra.map((row) => row.totalSupplyUsd)]);
+    const decodedReserves = [...rows.map((row) => row.collateralReserve), ...extra.map((row) => row.reserve)].filter((reserve) => configFor(reserve));
+    const marketRow = (config, extraFields) => ({
+        ...extraFields,
+        ...(config ? {
+            reserveStatus: config.status,
+            maxLtv: config.maxLtvPct / 100,
+            liquidationLtv: config.liquidationLtvPct / 100,
+            liquidationBonusBps: config.minLiquidationBonusBps === config.maxLiquidationBonusBps
+                ? config.minLiquidationBonusBps : `${config.minLiquidationBonusBps}-${config.maxLiquidationBonusBps}`
+        } : {})
+    });
     return [{
         id: 'kamino:collateral',
         protocolId: 'kamino',
@@ -282,18 +319,46 @@ export function kaminoUsage(token, collateralRows) {
             collateralBackingDebtUsd: sum(rows.map((row) => row.collateralBackingDebtUsd)),
             debtAgainstCollateralUsd: sum(rows.map((row) => row.debtAgainstCollateralUsd))
         },
-        markets: rows.map((row) => ({
-            name: row.lendingMarketName ?? row.name ?? null,
-            marketAddress: firstText(row.lendingMarket),
-            reserveAddress: firstText(row.collateralReserve),
-            debtReserveAddresses: unique([...(row.borrowReserves ?? []), ...((row.borrowReserveTerms ?? []).map((term) => term?.reserve))])
-        })),
+        markets: [
+            ...rows.map((row) => marketRow(configFor(row.collateralReserve), {
+                name: row.lendingMarketName ?? row.name ?? null,
+                marketAddress: firstText(row.lendingMarket),
+                reserveAddress: firstText(row.collateralReserve),
+                debtReserveAddresses: unique([...(row.borrowReserves ?? []), ...((row.borrowReserveTerms ?? []).map((term) => term?.reserve))]),
+                source: 'collateral-registry'
+            })),
+            ...extra.map((row) => marketRow(configFor(row.reserve), {
+                name: row.marketName ?? row.marketDescription ?? null,
+                marketAddress: firstText(row.market),
+                reserveAddress: firstText(row.reserve),
+                curated: row.curated === true,
+                sizeUsd: num(row.totalSupplyUsd),
+                source: 'market-reserve-list'
+            }))
+        ],
         debtCategories: unique(rows.map((row) => row.debtCategory)),
-        evidence: [{
-            type: 'protocol-api',
-            url: 'https://api.kamino.finance/markets/collateral-reserves',
-            note: `${rows.length} live registry row${rows.length === 1 ? '' : 's'} match this exact collateral mint.`
-        }]
+        ...(decodedReserves.length ? {
+            decoding: {
+                observedAt: decodedAt,
+                slot,
+                scope: `Reserve risk configuration (status, maximum LTV, liquidation threshold, liquidation bonus) of ${decodedReserves.length} collateral reserve${decodedReserves.length === 1 ? '' : 's'} read from the chain; debt-side terms and executions are not decoded.`,
+                decoder: 'stocks/lib/kamino-accounts.mjs (offsets verified against @kamino-finance/klend-sdk 12.0.0)',
+                idl: null,
+                reserves: decodedReserves
+            }
+        } : {}),
+        evidence: [
+            ...(rows.length ? [{
+                type: 'protocol-api',
+                url: 'https://api.kamino.finance/markets/collateral-reserves',
+                note: `${rows.length} live registry row${rows.length === 1 ? '' : 's'} match this exact collateral mint.`
+            }] : []),
+            ...(extra.length ? [{
+                type: 'protocol-api',
+                url: 'https://api.kamino.finance/v2/kamino-market',
+                note: `${extra.length} reserve${extra.length === 1 ? '' : 's'} with a positive LTV for this exact mint in ${unique(extra.map((row) => row.marketName)).join(', ')} (per-market reserve list; not in the cross-market collateral registry).`
+            }] : [])
+        ]
     }];
 }
 
@@ -515,43 +580,164 @@ export function saveUsage(token, registry) {
     }];
 }
 
-export function curatedUsage(token, curated) {
-    return (Array.isArray(curated?.integrations) ? curated.integrations : [])
-        .filter((entry) => Array.isArray(entry.mints) && entry.mints.includes(token?.mint))
-        .map((entry) => ({
-            id: entry.id,
-            protocolId: entry.protocolId,
-            protocolName: entry.protocolName,
-            category: entry.category,
-            status: entry.status,
-            actions: entry.actions,
-            summary: entry.summary,
-            accessNote: entry.accessNote ?? null,
-            interface: entry.interface ?? null,
-            curator: entry.curator ?? null,
-            underlyingProtocols: entry.underlyingProtocols ?? [],
-            networkPath: entry.networkPath ?? null,
-            links: entry.links ?? {},
-            metrics: null,
-            evidence: entry.evidence ?? []
-        }));
+/**
+ * One leg of a composite product with the per-asset addresses filled in. `$field` placeholders in a
+ * leg (e.g. "$obligation") are replaced from that asset's route record.
+ */
+function compositeLeg(leg, route) {
+    const out = {};
+    for (const [field, value] of Object.entries(leg ?? {})) {
+        out[field] = typeof value === 'string' && value.startsWith('$') ? (route?.[value.slice(1)] ?? null) : value;
+    }
+    return out;
 }
 
-export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, project0, save, loopscale = null, curated, fetchedAt }) {
+/**
+ * Hand-reviewed products. A composite product (a vault whose strategy uses another protocol, e.g.
+ * xStocks Vaults: Veda vault → Sentora strategy → Kamino market → Kamino Earn vault) keeps the
+ * whole route per asset: every leg names its protocol, program and exact account, and — when the
+ * collector decoded the live position (`observations`) — the position's collateral, debt, LTV and
+ * the price fall that would liquidate it.
+ */
+export function curatedUsage(token, curated, observations = new Map()) {
+    return (Array.isArray(curated?.integrations) ? curated.integrations : [])
+        .filter((entry) => Array.isArray(entry.mints) && entry.mints.includes(token?.mint))
+        .map((entry) => {
+            const route = entry.routes?.[token.mint] ?? null;
+            const observed = observations.get(`${entry.id}\u0000${token.mint}`) ?? null;
+            const legs = route ? (entry.legs ?? []).map((leg) => compositeLeg(leg, route)) : [];
+            const lendingLeg = legs.find((leg) => leg.role === 'collateral');
+            return {
+                id: entry.id,
+                protocolId: entry.protocolId,
+                protocolName: entry.protocolName,
+                category: entry.category,
+                status: entry.status,
+                actions: entry.actions,
+                summary: entry.summary,
+                accessNote: entry.accessNote ?? null,
+                interface: entry.interface ?? null,
+                curator: entry.curator ?? null,
+                underlyingProtocols: entry.underlyingProtocols ?? [],
+                networkPath: entry.networkPath ?? null,
+                ...(entry.composite ? {
+                    composite: true,
+                    announcedAt: entry.announcedAt ?? null,
+                    holderReceives: route?.shareSymbol
+                        ? { ...(entry.holderReceives ?? {}), shareSymbol: route.shareSymbol, shareChain: route.shareChain ?? 'solana',
+                            shareAddress: route.shareAddress ?? route.solanaShareMint ?? null, solanaShareMint: route.solanaShareMint ?? null,
+                            shareSupplyOnSolanaRaw: observed?.shareSupplyRaw ?? null }
+                        : (entry.holderReceives ?? null),
+                    route: legs,
+                    risks: entry.risks ?? [],
+                    position: observed?.position ?? null
+                } : {}),
+                links: entry.links ?? {},
+                metrics: observed?.metrics ?? null,
+                markets: route ? [{
+                    name: lendingLeg?.marketName ?? entry.protocolName,
+                    marketAddress: lendingLeg?.marketAddress ?? null,
+                    reserveAddress: lendingLeg?.reserveAddress ?? null,
+                    debtMint: route.debtMint ?? null,
+                    debtSymbol: route.debtSymbol ?? null,
+                    obligationAddress: route.obligation ?? null,
+                    vaultStateAddress: route.vault ?? null,
+                    shareMint: route.solanaShareMint ?? null
+                }] : [],
+                ...(observed?.decoding ? { decoding: observed.decoding } : {}),
+                evidence: entry.evidence ?? []
+            };
+        });
+}
+
+
+const PRINCIPAL_DECIMALS = {
+    EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { symbol: 'USDC', decimals: 6 },
+    '2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH': { symbol: 'USDG', decimals: 6 },
+    Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: { symbol: 'USDT', decimals: 6 },
+    '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo': { symbol: 'PYUSD', decimals: 6 }
+};
+
+/**
+ * Loopscale lending vaults (keyless `tars.loopscale.com/v1/markets/lending_vaults/info`): a vault
+ * whose strategy terms name this exact mint as accepted collateral is a standing lender offer. The
+ * allocation is principal currently lent against that collateral. Returned as market rows so they
+ * merge into the chain-decoded Loopscale integration when one exists.
+ */
+export function loopscaleVaultMarkets(token, vaults) {
+    const rows = [];
+    for (const entry of Array.isArray(vaults) ? vaults : []) {
+        const terms = entry?.vaultStrategy?.terms?.assetTerms?.[token?.mint];
+        if (!terms) continue;
+        const principal = PRINCIPAL_DECIMALS[entry.vault?.principalMint] ?? null;
+        const allocationRaw = num(terms.allocationInfo?.currentAllocationAmount);
+        const apys = (Array.isArray(terms.durationAndApys) ? terms.durationAndApys : []).map((pair) => num(pair?.[1])).filter((value) => value !== null);
+        rows.push({
+            name: `${entry.vaultMetadata?.name ?? 'Loopscale lending vault'} (lends ${principal?.symbol ?? 'principal'})`,
+            vaultAddress: firstText(entry.vault?.address),
+            strategyAddress: firstText(entry.vaultStrategy?.strategy?.address),
+            debtMint: entry.vault?.principalMint ?? null,
+            debtSymbol: principal?.symbol ?? null,
+            lentAgainstCollateral: allocationRaw === null || !principal ? null : allocationRaw / 10 ** principal.decimals,
+            lenderApyPct: apys.length ? Math.max(...apys) / 10_000 : null,
+            depositsEnabled: entry.vault?.depositsEnabled === true,
+            paused: entry.pause === true || entry.pause?.paused === true,
+            source: 'lending-vault-registry'
+        });
+    }
+    return rows;
+}
+
+/** Merge lending-vault offers into the Loopscale integration (or create it from them alone). */
+function withLoopscaleVaults(token, integrations, vaults) {
+    const markets = loopscaleVaultMarkets(token, vaults);
+    if (markets.length === 0) return integrations;
+    const lent = sum(markets.map((row) => row.lentAgainstCollateral));
+    const evidence = {
+        type: 'protocol-api',
+        url: 'https://tars.loopscale.com/v1/markets/lending_vaults/info',
+        note: `${markets.length} Loopscale lending vault${markets.length === 1 ? '' : 's'} accept this exact mint as collateral${lent ? `; ${Math.round(lent).toLocaleString('en-US')} of stablecoin principal currently lent against it` : ''}.`
+    };
+    const existing = integrations.find((entry) => entry.protocolId === 'loopscale');
+    if (existing) {
+        existing.markets = [...(existing.markets ?? []), ...markets];
+        existing.evidence = [...(existing.evidence ?? []), evidence];
+        existing.metrics = { ...(existing.metrics ?? {}), debtAgainstCollateralUsd: sum([existing.metrics?.debtAgainstCollateralUsd, lent]) };
+        return integrations;
+    }
+    return [...integrations, {
+        id: 'loopscale:collateral',
+        protocolId: 'loopscale',
+        protocolName: 'Loopscale',
+        category: 'lending',
+        status: (lent ?? 0) > 0 ? 'live' : 'available',
+        actions: ['collateral', 'borrow'],
+        summary: 'Borrow against this exact mint from a Loopscale lending vault whose strategy lists it as accepted collateral (fixed-rate, order-book loans).',
+        accessNote: ACCESS_BY_ISSUER[token?.issuer] ?? 'Loopscale and issuer eligibility, allowlisting and transfer restrictions apply.',
+        links: { use: 'https://app.loopscale.com/', protocol: 'https://docs.loopscale.com/' },
+        metrics: { debtAgainstCollateralUsd: lent, positions: null },
+        markets,
+        evidence: [evidence]
+    }];
+}
+
+export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest, project0, save, loopscale = null, curated, fetchedAt,
+    kaminoMarkets = null, kaminoReserveConfigs = new Map(), kaminoDecodedAt = null, kaminoSlot = null, compositeObservations = new Map(),
+    loopscaleVaults = null }) {
     const venueByMint = new Map((Array.isArray(venues?.items) ? venues.items : []).map((row) => [row.mint, row]));
     const meteoraByPair = new Map((Array.isArray(meteora?.items) ? meteora.items : []).map((row) => [row.pairAddress, row]));
     const kaminoRows = Array.isArray(kamino?.collateralReserves) ? kamino.collateralReserves : [];
     const items = (Array.isArray(tokens) ? tokens : []).map((token) => {
-        const integrations = [
-            ...kaminoUsage(token, kaminoRows),
+        const integrations = withLoopscaleVaults(token, [
+            ...kaminoUsage(token, kaminoRows, { marketReserves: kaminoMarkets?.reserves ?? [], reserveConfigs: kaminoReserveConfigs, decodedAt: kaminoDecodedAt, slot: kaminoSlot }),
             ...jupiterUsage(token, jupiter),
             ...nestUsage(token, nest),
             ...project0Usage(token, project0),
             ...saveUsage(token, save),
             ...loopscaleUsage(token, loopscale),
-            ...curatedUsage(token, curated),
+            ...curatedUsage(token, curated, compositeObservations),
             ...dexUsage(token, venueByMint.get(token.mint), meteoraByPair)
-        ];
+        ], loopscaleVaults);
         for (const integration of integrations) {
             integration.capabilities = capabilityRecords(integration.actions);
             integration.corroboration = null;
@@ -573,7 +759,12 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
         fetchedAt,
         methodology: 'Only an exact mint in a live protocol registry, an observed on-chain pool, or a hand-reviewed asset-specific live product is included. Generic Token-2022 compatibility and issuer ecosystem claims are excluded.',
         sources: {
-            kamino: { fetchedAt, url: 'https://api.kamino.finance/markets/collateral-reserves', rows: kaminoRows.length },
+            kamino: { fetchedAt, url: 'https://api.kamino.finance/markets/collateral-reserves', rows: kaminoRows.length,
+                markets: kaminoMarkets === null ? null : {
+                    url: 'https://api.kamino.finance/v2/kamino-market', count: kaminoMarkets.markets?.length ?? 0,
+                    reserves: kaminoMarkets.reserves?.length ?? 0, stockReserves: kaminoMarkets.stockReserves ?? null
+                },
+                reservesDecoded: kaminoReserveConfigs.size, decodedAt: kaminoDecodedAt, slot: kaminoSlot },
             jupiterLend: { fetchedAt, url: 'https://api.jup.ag/lend/v1/borrow/vaults', rows: Array.isArray(jupiter) ? jupiter.length : 0 },
             nest: {
                 fetchedAt,
@@ -606,6 +797,7 @@ export function buildDefiUsage({ tokens, venues, meteora, kamino, jupiter, nest,
                 slot: loopscale.slot ?? null,
                 error: loopscale.error ?? null
             },
+            loopscaleVaults: loopscaleVaults === null ? null : { fetchedAt, url: 'https://tars.loopscale.com/v1/markets/lending_vaults/info', rows: loopscaleVaults.length },
             dexPools: { fetchedAt: venues?.fetchedAt ?? null, source: venues?.source ?? null },
             meteora: { fetchedAt: meteora?.fetchedAt ?? null, source: meteora?.source ?? null },
             curated: { reviewedAt: curated?.reviewedAt ?? null, version: curated?.version ?? null }

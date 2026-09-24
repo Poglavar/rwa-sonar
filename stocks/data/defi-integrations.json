@@ -1,7 +1,7 @@
 {
-  "_comment": "Hand-reviewed live products that cannot be discovered completely from a protocol registry. Exact mints only: an issuer-level announcement never becomes an asset-level integration.",
-  "version": 1,
-  "reviewedAt": "2026-09-19",
+  "_comment": "Hand-reviewed live products that cannot be discovered completely from a protocol registry. Exact mints only: an issuer-level announcement never becomes an asset-level integration. A `composite` product is modelled as its route: `legs` (with $field placeholders filled from each asset's `routes` entry) name every protocol, program and account the holder's token passes through; fetch-defi-usage.mjs decodes the live strategy position (Kamino obligation) on every run.",
+  "version": 2,
+  "reviewedAt": "2026-09-24",
   "integrations": [
     {
       "id": "veda-sentora-kraken-xstocks-vaults",
@@ -11,16 +11,216 @@
         "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh"
       ],
       "protocolId": "veda",
-      "protocolName": "Veda xStocks Vault",
+      "protocolName": "xStocks Vaults (Kraken · Veda · Sentora · Kamino)",
       "category": "yield-vault",
+      "composite": true,
       "status": "live",
-      "actions": ["deposit", "earn-yield"],
-      "interface": "Kraken Pro",
+      "announcedAt": "2026-09-14",
+      "actions": [
+        "deposit",
+        "earn-yield"
+      ],
+      "interface": "Kraken (xStocks Vaults)",
       "curator": "Sentora",
-      "underlyingProtocols": ["Kamino"],
-      "networkPath": "Kraken embedded wallet on Ink → Veda vault → Solana Kamino market",
-      "accessNote": "Available only to eligible Kraken clients; geographic restrictions apply and deallocation has a three-day processing window.",
-      "summary": "Deposit the xStock into a self-custodial Veda vault through Kraken Pro. Sentora manages the strategy, which posts the xStock to Kamino, borrows stablecoins and returns yield in the deposited xStock.",
+      "underlyingProtocols": [
+        "Veda",
+        "Chainlink CCIP",
+        "Kamino"
+      ],
+      "networkPath": "Kraken (Privy embedded wallet on Ink) → xStock wrapped (wSPYx/wQQQx/wNVDAx) → Veda BoringVault on Ink (ERC-20 share) → Chainlink CCIP to Solana → vault manager program (Manage) → Sentora position-manager → Kamino Sentora xStocks Market (xStock collateral, PYUSD debt) → Kamino Earn “Sentora PYUSD” vault → rewards swapped back into the xStock",
+      "accessNote": "Kraken clients in the EEA and rest of world only (not the US, UK, Canada, Australia or UAE per Kraken); unregulated product provided by Payward Wallet, LLC; withdrawals take up to three days; 25% performance fee per Kraken (the on-chain accountants are set to 33.33%, unreconciled).",
+      "summary": "Deposit the xStock through Kraken into a Veda BoringVault on Ink, curated by Sentora. The xStock is bridged to Solana with Chainlink CCIP, posted as collateral in a dedicated Kamino market, PYUSD is borrowed against it and deposited into a Kamino Earn vault, and rewards are swapped back into the xStock. The holder receives an ERC-20 vault share on Ink, not the xStock.",
+      "holderReceives": {
+        "instrument": "An ERC-20 Veda BoringVault share on Ink (sentoraSPYx / sentoraQQQx / sentoraNVDAx, “Advanced Strategies <ticker>”), held in a Privy-powered embedded wallet Kraken creates for the user.",
+        "legalNature": "A pro-rata claim on the vault's net assets under the vault contracts and Kraken/Veda terms — not the xStock, not the issuer's tracker certificate and not a share of the company. While deposited, the xStock sits on Solana as Kamino collateral owned by the strategy program's address; losses from liquidation are shared across vault users.",
+        "note": "Solana-side share mints for the same vaults exist with zero supply (read 2026-09-24); the live share balances are on Ink.",
+        "fees": "Kraken: 25% performance fee on vault earnings, no allocation/deallocation fees. On-chain AccountantWithRateProviders on Ink: performanceFee 3333 bps, platformFee 0 — discrepancy not reconciled.",
+        "withdrawal": "Kraken: up to 3 days. The Ink BoringOnChainQueue for wSPYx is configured with 1-hour maturity; the 3 days reflects the Solana unwind and bridge, i.e. an operational, not contractual, delay."
+      },
+      "legs": [
+        {
+          "step": 1,
+          "role": "deposit-interface",
+          "protocolId": "kraken",
+          "protocolName": "Kraken xStocks Vaults (Privy embedded wallet on Ink)",
+          "detail": "Kraken sends the xStock to the user's embedded wallet on Ink and wraps it for vault accounting (wSPYx/wQQQx/wNVDAx)."
+        },
+        {
+          "step": 2,
+          "role": "vault",
+          "chain": "ink",
+          "protocolId": "veda",
+          "protocolName": "Veda BoringVault on Ink (ERC-20 share)",
+          "address": "$inkVault",
+          "detail": "One BoringVault per asset, with a LayerZero teller and an accountant whose share-rate moves at most ±0.5% per update (6-hour minimum delay)."
+        },
+        {
+          "step": 3,
+          "role": "bridge",
+          "protocolId": "chainlink-ccip",
+          "protocolName": "Chainlink CCIP (Ink → Solana)",
+          "programId": "F2ZYgyh8YDG6rHo9F1T8Aw4WoTyy8eYN3GgM2LaPKcZN",
+          "detail": "Sentora bridges the xStock to Solana; on Solana the CCIP OffRamp calls a lock/release token pool that releases the xStock."
+        },
+        {
+          "step": 4,
+          "role": "vault-manager",
+          "protocolId": "veda",
+          "protocolName": "Vault manager program on Solana (BoringVault-SVM style)",
+          "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+          "address": "$vault",
+          "detail": "Its instruction is `manage` (same discriminator as Veda's boring_vault_svm); a strategist key (GGPhD3aw…) moves the xStock to the strategy. Deployer attribution (Veda or Sentora) is not verified."
+        },
+        {
+          "step": 5,
+          "role": "strategy",
+          "protocolId": "sentora",
+          "protocolName": "Strategy program (position-manager)",
+          "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+          "address": "$positionAuthority",
+          "detail": "Owns the Kamino obligation; an executor key (B4sygjEB…) triggers deposits, borrows and yield deployment. Upgradeable by the same authority as the manager program (EhQ1TTTY…)."
+        },
+        {
+          "step": 6,
+          "role": "collateral",
+          "protocolId": "kamino",
+          "protocolName": "Kamino Lend",
+          "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+          "marketName": "Sentora xStocks Market",
+          "marketAddress": "$lendingMarket",
+          "reserveAddress": "$collateralReserve",
+          "address": "$obligation",
+          "detail": "The xStock is posted as collateral in a curated Kamino market; Kamino liquidators can seize it if the position's LTV reaches the liquidation threshold."
+        },
+        {
+          "step": 7,
+          "role": "borrow",
+          "protocolId": "kamino",
+          "protocolName": "Kamino Lend",
+          "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+          "reserveAddress": "$debtReserve",
+          "assetMint": "$debtMint",
+          "assetSymbol": "$debtSymbol",
+          "detail": "PYUSD is borrowed against the xStock at a variable rate."
+        },
+        {
+          "step": 8,
+          "role": "yield",
+          "protocolId": "kamino-earn",
+          "protocolName": "Kamino Earn vault “Sentora PYUSD”",
+          "programId": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+          "address": "$yieldVault",
+          "detail": "Borrowed PYUSD is deposited into a Sentora-curated Kamino Earn vault (5% performance fee) and its shares are staked in Kamino Farms; the vault lends PYUSD on to Kamino reserves (Maple, JLP, Figure, main, AUTO markets and this same Sentora xStocks Market)."
+        },
+        {
+          "step": 9,
+          "role": "conversion",
+          "protocolId": "sentora",
+          "protocolName": "Rewards back into the xStock",
+          "detail": "Per Kraken and Veda, rewards are swapped back into the xStock and re-deployed. The swap route was not decoded."
+        }
+      ],
+      "routes": {
+        "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh": {
+          "vault": "8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf",
+          "shareSymbol": "sentoraNVDAx",
+          "positionAuthority": "FTeDtYDsHotvxdLBqpAccPsYrtU5VDfjZjrZUENC1fpD",
+          "obligation": "AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+          "lendingMarket": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+          "collateralReserve": "4WqQtjQbewk7ptnXsX3E3Tf3M4pa9YiBsgAqjsJDkspH",
+          "debtReserve": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+          "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "debtSymbol": "PYUSD",
+          "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+          "solanaShareMint": "BYW6N3VjFXsHW9D4mTjR2HZ3sKtKCbxrrcMdzf7C7c5F",
+          "inkVault": "0xBeB4a79e150564857488E6142D26787A78d54a66",
+          "inkWrappedAsset": "0xa8ddb5Cd96b5222AFe198316E9A57CAA642850D5",
+          "inkAccountant": "0x6D93235dBB14CF329591FA1b3C0b68a1B49Fcce5",
+          "inkTeller": "0x9925d5d3FC9D8727E98b3df1107Cff7f17fc825E",
+          "shareChain": "ink",
+          "shareAddress": "0xBeB4a79e150564857488E6142D26787A78d54a66"
+        },
+        "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W": {
+          "vault": "8n5L6eXe9Z6koCHYyjbnawxvhHcVVLc4ugRNMQKFarB3",
+          "shareSymbol": "sentoraSPYx",
+          "positionAuthority": "HzJt4yX9AyCEFnKtTuJQto6nTpvyjVBZtrkY2ZzcoRyb",
+          "obligation": "DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+          "lendingMarket": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+          "collateralReserve": "7Yh74hEtP75acqhQ5f2FqoHQny5TYiYBPVxkwN35rCSi",
+          "debtReserve": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+          "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "debtSymbol": "PYUSD",
+          "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+          "solanaShareMint": "jkRru3tFY1eScFd1dkvHo6rmfviTjYfTHLPgSpqSJT7",
+          "inkVault": "0x83b890Ca44fb0355CDF5606617ccA0FE21Ddb16A",
+          "inkWrappedAsset": "0xE7E553Cd128F0011777323A0b44a7b96EA1CB540",
+          "inkAccountant": "0xE36E24E4F9F67257d2E5077E6968B4B499E2cE9f",
+          "inkTeller": "0x9B67a35Af38f1dAaE933F472B28800ffE5B6A652",
+          "shareChain": "ink",
+          "shareAddress": "0x83b890Ca44fb0355CDF5606617ccA0FE21Ddb16A"
+        },
+        "Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ": {
+          "vault": "7cbdiA1QodKkZ23jTcQ3WhWeiEMzsfZk9Bimw6aFT5to",
+          "shareSymbol": "sentoraQQQx",
+          "positionAuthority": "8tRwmexXaSStiSK29sixkCbDJciqA8DGgLKrW2JEw2QC",
+          "obligation": "HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+          "lendingMarket": "8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+          "collateralReserve": "w6diwHyXhRzmhRWwnz3jQPqTt35qFbBDcQP7T2VdgSm",
+          "debtReserve": "6bR98MJTH68s7eV8ssyBgfuuH5oR2bEt58P9rZPLpBrC",
+          "debtMint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+          "debtSymbol": "PYUSD",
+          "yieldVault": "A2wsxhA7pF4B2UKVfXocb6TAAP9ipfPJam6oMKgDE5BK",
+          "solanaShareMint": "DVcfh6hmRwpQoLQGDkd9cfXUkRfxS7HQnV1DPSC9n1nq",
+          "inkVault": "0x6D33D2142a5b0b52856a6902eb6F6203B2232a5b",
+          "inkWrappedAsset": "0x4C1AE29c159838fC1b224636E28E086EB69101f7",
+          "inkAccountant": "0x775AfE5B86b35A6C3d728c14Bb863A1A62DB96f9",
+          "inkTeller": "0x501e7dd62ead40D455652e5E3dd696DCa61101dE",
+          "shareChain": "ink",
+          "shareAddress": "0x6D33D2142a5b0b52856a6902eb6F6203B2232a5b"
+        }
+      },
+      "risks": [
+        {
+          "id": "leverage-liquidation",
+          "title": "The xStock is borrowed against",
+          "detail": "The strategy keeps each position a few points below the market's maximum LTV. If the stock falls (including while the US market is closed and the oracle keeps updating) or PYUSD debt grows, Kamino liquidators can seize the xStock with a liquidation bonus; per Kraken, resulting losses are shared proportionally across vault users. The live position and the price fall that would make it liquidatable are recorded on every collection run."
+        },
+        {
+          "id": "marketing-vs-mechanics",
+          "title": "“Not leverage” vs a leveraged strategy",
+          "detail": "Kraken's product page says “Not a swap. Not leverage.”, while its support article lists leverage and liquidation risk and the chain shows xStock collateral with PYUSD debt at 58–69% LTV."
+        },
+        {
+          "id": "rate-spread",
+          "title": "Yield depends on a spread",
+          "detail": "Returns come from the Kamino Earn vault's PYUSD yield (part of it farm rewards) exceeding the PYUSD borrow rate. If the borrow rate rises above the vault yield the strategy loses money."
+        },
+        {
+          "id": "circular-liquidity",
+          "title": "Circular PYUSD liquidity",
+          "detail": "The Sentora PYUSD Earn vault allocates part of its PYUSD to the same Sentora xStocks Market reserve the strategy borrows from, so a run on the Earn vault and on that reserve are linked."
+        },
+        {
+          "id": "cross-chain",
+          "title": "Two chains and a bridge",
+          "detail": "The share lives on Ink, the collateral on Solana; the position depends on Chainlink CCIP, a lock/release token pool and the operators who move assets between them. The three-day withdrawal window is the unwind and bridge time, not a contract rule."
+        },
+        {
+          "id": "operator-keys",
+          "title": "Operator keys and upgradeable programs",
+          "detail": "A strategist key moves assets on Solana, an executor key manages the Kamino position, and both Solana programs are upgradeable by one authority (EhQ1TTTY…) whose owner is not publicly attributed."
+        },
+        {
+          "id": "holder-claim",
+          "title": "The holder no longer holds the xStock",
+          "detail": "While deposited, the xStock is Kamino collateral owned by the strategy program's address; the holder owns an Ink vault share. Issuer redemption of the xStock requires leaving the vault first."
+        },
+        {
+          "id": "fee-discrepancy",
+          "title": "Fee disclosed ≠ fee configured",
+          "detail": "Kraken discloses a 25% performance fee; the vault accountants on Ink are configured at 3333 bps (33.33%)."
+        }
+      ],
       "links": {
         "use": "https://www.kraken.com/pro/tokenized-equities/vaults",
         "protocol": "https://www.veda.tech/ecosystem/xstocks"
@@ -28,17 +228,36 @@
       "evidence": [
         {
           "type": "official-product-page",
+          "url": "https://x.com/kamino/status/2099502364986425673",
+          "accessedAt": "2026-09-24",
+          "note": "Kamino's announcement (post id timestamp 2026-09-14T14:15:45Z): SPYx, QQQx and NVDAx vaults on Kraken powered by Kamino, Veda and Sentora; the vault posts the xStock as Kamino collateral, borrows stablecoins and converts yield back into the xStock; Chainlink CCIP and Data Streams named."
+        },
+        {
+          "type": "official-product-page",
           "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
-          "accessedAt": "2026-09-19",
-          "note": "Veda names exactly three supported assets: SPYx, QQQx and NVDAx, with Veda on Solana, Sentora as risk manager and Kamino as the lending market."
+          "accessedAt": "2026-09-24",
+          "note": "“Each xStock maps 1:1 to its own Veda BoringVault deployed on Ink, Kraken's L2 chain. From there, Sentora, as the curator, bridges the xStocks to Solana using Chainlink data streams and CCIP and deploys them as collateral in Kamino markets…”"
         },
         {
           "type": "official-product-page",
           "url": "https://support.kraken.com/articles/xstocks-vaults",
-          "accessedAt": "2026-09-19",
-          "note": "Kraken documents the deposit, self-custodial embedded wallet, wrapped vault accounting and three-day withdrawal window."
+          "accessedAt": "2026-09-24",
+          "note": "Deposit to the embedded wallet on Ink, wrapping for vault accounting, Sentora as risk manager, 3-day withdrawal, 25% performance fee, liquidation/leverage/cross-chain risks; article dated 2026-09-11."
+        },
+        {
+          "type": "onchain-account",
+          "url": "https://explorer.inkonchain.com/address/0xBeB4a79e150564857488E6142D26787A78d54a66",
+          "accessedAt": "2026-09-24",
+          "note": "Ink BoringVault contracts (verified source) for sentoraNVDAx / sentoraSPYx / sentoraQQQx: supplies 745.42 / 696.45 / 271.91 on 2026-09-24, matching the Solana collateral (731.6 / 685.9 / 268.3); accountants performanceFee 3333 bps."
+        },
+        {
+          "type": "onchain-account",
+          "url": "https://solscan.io/account/8BNUWRSibVasaAmhYpBCFpGgMisGKfVAf9ho3Cmf6vjr",
+          "accessedAt": "2026-09-24",
+          "note": "Found by the on-chain footprint scan: the Kamino lending-market authority FTmExFvq… holding NVDAx/SPYx/QQQx derives from the “Sentora xStocks Market” 8BNUWRSi…, which Kamino's cross-market collateral registry does not list. Its three strategy obligations are owned by addresses of program BSE8uppf…, which receives the xStock from program 9TWFuaFP… (manage)."
         }
-      ]
+      ],
+      "announcementNote": "Kamino's announcement post (x.com/kamino/status/2099502364986425673) is timestamped 2026-09-14T14:15:45Z (decoded from the post id); Kraken's support article is dated 2026-09-11. RWA Sonar first recorded the Kamino market on 2026-09-24."
     }
   ]
 }

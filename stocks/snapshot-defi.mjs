@@ -2,11 +2,16 @@
 // Freeze the current exact-token protocol integrations into one compact UTC-day snapshot.
 
 import { join } from 'node:path';
-import { isoDate, log, logError, parseArgs, readJson, writeJson } from './lib/io.mjs';
+import { isoDate, log, logError, logWarn, parseArgs, readJson, writeJson } from './lib/io.mjs';
 import { snapshotDefiUsage } from './lib/defi-changes.mjs';
+import { snapshotFootprint } from './lib/defi-footprint.mjs';
 
 const HERE = import.meta.dirname;
 const USAGE_PATH = join(HERE, 'data', 'defi-usage.json');
+const FOOTPRINT_PATH = join(HERE, 'data', 'defi-footprint.json');
+// A footprint older than this is not frozen as today's: the next comparison then runs against the
+// last genuine observation instead of repeating a stale day (a failed scan is never a snapshot).
+const FOOTPRINT_MAX_AGE_HOURS = 30;
 const HISTORY_DIR = join(HERE, 'data', 'history');
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -18,6 +23,7 @@ USAGE
 
 OUTPUT
   stocks/data/history/<date>/defi.json
+  stocks/data/history/<date>/defi-footprint.json  (only when stocks/data/defi-footprint.json is < ${FOOTPRINT_MAX_AGE_HOURS} h old)
 
 The first snapshot is a baseline and raises no changes. Re-running a date overwrites that day's
 snapshot; the next date is compared with the final state recorded for the previous day.`);
@@ -56,6 +62,19 @@ async function main() {
         items
     }, 1);
     log(`wrote ${out}: ${items.length} exact token/protocol integration(s)`);
+
+    const footprint = await readJson(FOOTPRINT_PATH, null);
+    const ageHours = footprint?.fetchedAt ? (Date.now() - Date.parse(footprint.fetchedAt)) / 3_600_000 : null;
+    if (typeof flags.from === 'string') {
+        log('footprint: --from given, footprint snapshot left untouched');
+    } else if (ageHours === null || !(ageHours <= FOOTPRINT_MAX_AGE_HOURS)) {
+        logWarn(`footprint: ${FOOTPRINT_PATH} is ${ageHours === null ? 'missing' : `${ageHours.toFixed(1)} h old`} — not frozen as ${date}`);
+    } else {
+        const footprintOut = join(HISTORY_DIR, date, 'defi-footprint.json');
+        const compact = snapshotFootprint(footprint);
+        await writeJson(footprintOut, { date, ...compact }, 0);
+        log(`wrote ${footprintOut}: ${Object.values(compact.reads).filter((read) => read[0] === 'ok').length}/${Object.keys(compact.reads).length} mint(s) read, ${compact.holdings.length} DeFi/unattributed holding(s)`);
+    }
     return 0;
 }
 

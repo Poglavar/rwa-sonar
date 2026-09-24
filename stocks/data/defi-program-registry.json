@@ -1,0 +1,993 @@
+{
+  "_comment": "Curated Solana program registry for the on-chain DeFi footprint scanner (stocks/fetch-defi-footprint.mjs). Maps a program id — or a fixed address — to the protocol it belongs to. `category` decides whether a holding is a DeFi integration (lending, dex, perps, yield-vault, vault-strategy, structured, bridge) or custody/plumbing (custody, infrastructure, aggregator), which never becomes a candidate. `usageProtocolIds` are the protocolId values defi-usage.json uses for that protocol, so a holding can be matched to a collected listing. Every program id was checked to be an executable account on mainnet (getMultipleAccounts, 2026-09-24); `verification` says how the attribution itself was established. Add a program here only with a source.",
+  "version": 1,
+  "reviewedAt": "2026-09-24",
+  "authorityDerivations": [
+    {
+      "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "protocolId": "kamino",
+      "role": "lending-market-authority",
+      "seeds": [
+        "lma",
+        "$market"
+      ],
+      "marketsFrom": "kamino-markets",
+      "note": "Kamino Lend reserve liquidity vaults are owned by the market's lending-market-authority PDA, seeds [\"lma\", lending_market]. Verified 2026-09-24: the derived PDA of xStocks Market 5wJeMr… is 2Z7zhqp1eddmHNmEqexftST6DFPWmoL4QqfgiG5uJMJx, the owner of the NVDAx/SPYx/QQQx reserve vaults, and KLend CPIs every transfer out of them."
+    }
+  ],
+  "programs": [
+    {
+      "programId": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "protocolId": "kamino",
+      "protocolName": "Kamino Lend",
+      "component": "klend",
+      "category": "lending",
+      "usageProtocolIds": [
+        "kamino"
+      ],
+      "verification": "observed-onchain + official docs",
+      "sources": [
+        {
+          "url": "https://kamino.com/docs/",
+          "note": "Kamino documentation; KLend is the lending program behind every Kamino market (observed owning every reserve and obligation read on 2026-09-24)."
+        }
+      ]
+    },
+    {
+      "programId": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+      "protocolId": "kamino-earn",
+      "protocolName": "Kamino Earn vaults",
+      "component": "kvault",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "kamino-earn"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://api.kamino.finance/kvaults/vaults",
+          "note": "Kamino's vault registry; the Sentora PYUSD vault A2wsxhA7… deposit in the xStocks Vaults strategy invokes this program."
+        }
+      ]
+    },
+    {
+      "programId": "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+      "protocolId": "kamino",
+      "protocolName": "Kamino Farms",
+      "component": "farms",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "kamino",
+        "kamino-earn"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://kamino.com/docs/",
+          "note": "Kamino reward farms; the xStocks Vaults strategy stakes its Kamino Earn shares here."
+        }
+      ]
+    },
+    {
+      "programId": "HFn8GnPADiny6XqUoWE8uRPPxb29ikn4yTuPa9MF2fWJ",
+      "protocolId": "kamino-scope",
+      "protocolName": "Kamino Scope oracle",
+      "component": "scope",
+      "category": "infrastructure",
+      "usageProtocolIds": [],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://kamino.com/docs/",
+          "note": "Scope price oracle (instruction RefreshChainlinkPrice observed 2026-09-24). Holds no user tokens; listed so it is never a candidate."
+        }
+      ]
+    },
+    {
+      "programId": "6LtLpnUFNByNXLyCoK9wA2MykKAmQNZKBdY8s47dehDc",
+      "protocolId": "kamino-liquidity",
+      "protocolName": "Kamino Liquidity (kTokens)",
+      "component": "yvaults",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "kamino-liquidity"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://kamino.com/docs/",
+          "note": "Kamino automated liquidity (kToken) vaults."
+        }
+      ]
+    },
+    {
+      "programId": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+      "protocolId": "jupiter-lend",
+      "protocolName": "Jupiter Lend (liquidity layer)",
+      "component": "liquidity",
+      "category": "lending",
+      "usageProtocolIds": [
+        "jupiter-lend"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://developers.jup.ag/docs/lend/",
+          "note": "Jupiter Lend liquidity program; observed 2026-09-24 as owner of the account holding the NVDAx/SPYx/QQQx Jupiter Lend collateral."
+        }
+      ]
+    },
+    {
+      "programId": "jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi",
+      "protocolId": "jupiter-lend",
+      "protocolName": "Jupiter Lend (vaults)",
+      "component": "vaults",
+      "category": "lending",
+      "usageProtocolIds": [
+        "jupiter-lend"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://developers.jup.ag/docs/lend/",
+          "note": "Jupiter Lend borrow vaults program."
+        }
+      ]
+    },
+    {
+      "programId": "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9",
+      "protocolId": "jupiter-lend",
+      "protocolName": "Jupiter Lend (earn)",
+      "component": "lending",
+      "category": "lending",
+      "usageProtocolIds": [
+        "jupiter-lend"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://developers.jup.ag/docs/lend/",
+          "note": "Jupiter Lend earn/lending program."
+        }
+      ]
+    },
+    {
+      "programId": "MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA",
+      "protocolId": "project0",
+      "protocolName": "Project 0 (marginfi v2)",
+      "component": "marginfi",
+      "category": "lending",
+      "usageProtocolIds": [
+        "project0"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.marginfi.com/",
+          "note": "marginfi v2 program, operated as Project 0."
+        }
+      ]
+    },
+    {
+      "programId": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+      "protocolId": "save",
+      "protocolName": "Save (Solend)",
+      "component": "lending",
+      "category": "lending",
+      "usageProtocolIds": [
+        "save"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.save.finance/",
+          "note": "Save (formerly Solend) main lending program."
+        }
+      ]
+    },
+    {
+      "programId": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+      "protocolId": "loopscale",
+      "protocolName": "Loopscale",
+      "component": "loans",
+      "category": "lending",
+      "usageProtocolIds": [
+        "loopscale"
+      ],
+      "verification": "observed-onchain + published IDL",
+      "sources": [
+        {
+          "url": "https://docs.loopscale.com/",
+          "note": "Loopscale program; Loan accounts decoded from its on-chain IDL (stocks/lib/loopscale.mjs)."
+        }
+      ]
+    },
+    {
+      "programId": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+      "protocolId": "drift",
+      "protocolName": "Drift",
+      "component": "drift-v2",
+      "category": "perps",
+      "usageProtocolIds": [
+        "drift"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.drift.trade/",
+          "note": "Drift v2 program (spot/perp markets, spot collateral)."
+        }
+      ]
+    },
+    {
+      "programId": "PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu",
+      "protocolId": "jupiter-perps",
+      "protocolName": "Jupiter Perps",
+      "component": "perps",
+      "category": "perps",
+      "usageProtocolIds": [
+        "jupiter-perps"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://dev.jup.ag/docs/perp-api",
+          "note": "Jupiter Perpetuals program."
+        }
+      ]
+    },
+    {
+      "programId": "ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD",
+      "protocolId": "zeta",
+      "protocolName": "Zeta Markets",
+      "component": "zeta",
+      "category": "perps",
+      "usageProtocolIds": [
+        "zeta"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.zeta.markets/",
+          "note": "Zeta Markets program."
+        }
+      ]
+    },
+    {
+      "programId": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+      "protocolId": "flash-trade",
+      "protocolName": "Flash Trade",
+      "component": "perps",
+      "category": "perps",
+      "usageProtocolIds": [
+        "flash-trade"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.flash.trade/",
+          "note": "Flash Trade perpetuals program."
+        }
+      ]
+    },
+    {
+      "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "protocolId": "raydium",
+      "protocolName": "Raydium CLMM",
+      "component": "clmm",
+      "category": "dex",
+      "usageProtocolIds": [
+        "raydium"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://docs.raydium.io/raydium/protocol/developers/addresses",
+          "note": "Raydium concentrated-liquidity program; observed owning pool accounts that hold xStocks (2026-09-24)."
+        }
+      ]
+    },
+    {
+      "programId": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+      "protocolId": "raydium",
+      "protocolName": "Raydium CPMM",
+      "component": "cpmm",
+      "category": "dex",
+      "usageProtocolIds": [
+        "raydium"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.raydium.io/raydium/protocol/developers/addresses",
+          "note": "Raydium constant-product (Token-2022 capable) program."
+        }
+      ]
+    },
+    {
+      "programId": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+      "protocolId": "raydium",
+      "protocolName": "Raydium AMM v4",
+      "component": "amm-v4",
+      "category": "dex",
+      "usageProtocolIds": [
+        "raydium"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.raydium.io/raydium/protocol/developers/addresses",
+          "note": "Raydium legacy AMM v4 program."
+        }
+      ]
+    },
+    {
+      "programId": "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj",
+      "protocolId": "raydium",
+      "protocolName": "Raydium LaunchLab",
+      "component": "launchlab",
+      "category": "dex",
+      "usageProtocolIds": [
+        "raydium"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.raydium.io/raydium/protocol/developers/addresses",
+          "note": "Raydium LaunchLab bonding-curve program."
+        }
+      ]
+    },
+    {
+      "programId": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+      "protocolId": "orca",
+      "protocolName": "Orca Whirlpools",
+      "component": "whirlpools",
+      "category": "dex",
+      "usageProtocolIds": [
+        "orca"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://dev.orca.so/",
+          "note": "Orca Whirlpools concentrated-liquidity program."
+        }
+      ]
+    },
+    {
+      "programId": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+      "protocolId": "meteora",
+      "protocolName": "Meteora DLMM",
+      "component": "dlmm",
+      "category": "dex",
+      "usageProtocolIds": [
+        "meteora"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.meteora.ag/",
+          "note": "Meteora dynamic liquidity market maker program."
+        }
+      ]
+    },
+    {
+      "programId": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "protocolId": "meteora",
+      "protocolName": "Meteora DAMM v2",
+      "component": "damm-v2",
+      "category": "dex",
+      "usageProtocolIds": [
+        "meteora"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.meteora.ag/",
+          "note": "Meteora dynamic AMM v2 (cp-amm) program."
+        }
+      ]
+    },
+    {
+      "programId": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+      "protocolId": "meteora",
+      "protocolName": "Meteora DAMM v1",
+      "component": "damm-v1",
+      "category": "dex",
+      "usageProtocolIds": [
+        "meteora"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.meteora.ag/",
+          "note": "Meteora dynamic AMM v1 pools program."
+        }
+      ]
+    },
+    {
+      "programId": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+      "protocolId": "meteora",
+      "protocolName": "Meteora dynamic vaults",
+      "component": "vault",
+      "category": "dex",
+      "usageProtocolIds": [
+        "meteora"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.meteora.ag/",
+          "note": "Meteora dynamic vault program backing DAMM v1 pools."
+        }
+      ]
+    },
+    {
+      "programId": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
+      "protocolId": "meteora",
+      "protocolName": "Meteora DBC",
+      "component": "dbc",
+      "category": "dex",
+      "usageProtocolIds": [
+        "meteora"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.meteora.ag/",
+          "note": "Meteora dynamic bonding curve program."
+        }
+      ]
+    },
+    {
+      "programId": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+      "protocolId": "phoenix",
+      "protocolName": "Phoenix",
+      "component": "orderbook",
+      "category": "dex",
+      "usageProtocolIds": [
+        "phoenix"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://github.com/Ellipsis-Labs/phoenix-v1",
+          "note": "Phoenix central limit order book program."
+        }
+      ]
+    },
+    {
+      "programId": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+      "protocolId": "openbook",
+      "protocolName": "OpenBook v2",
+      "component": "orderbook",
+      "category": "dex",
+      "usageProtocolIds": [
+        "openbook"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://github.com/openbook-dex/openbook-v2",
+          "note": "OpenBook v2 order book program."
+        }
+      ]
+    },
+    {
+      "programId": "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX",
+      "protocolId": "openbook",
+      "protocolName": "OpenBook v1 (Serum)",
+      "component": "orderbook-v1",
+      "category": "dex",
+      "usageProtocolIds": [
+        "openbook"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://github.com/openbook-dex/program",
+          "note": "OpenBook v1 (Serum fork) program."
+        }
+      ]
+    },
+    {
+      "programId": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+      "protocolId": "manifest",
+      "protocolName": "Manifest",
+      "component": "orderbook",
+      "category": "dex",
+      "usageProtocolIds": [
+        "manifest"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://github.com/CKS-Systems/manifest",
+          "note": "Manifest order book program."
+        }
+      ]
+    },
+    {
+      "programId": "2wT8Yq49kHgDzXuPxZSaeLaH1qbmGXtEyPy64bL7aD3c",
+      "protocolId": "lifinity",
+      "protocolName": "Lifinity v2",
+      "component": "amm",
+      "category": "dex",
+      "usageProtocolIds": [
+        "lifinity"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.lifinity.io/",
+          "note": "Lifinity v2 oracle-based AMM program."
+        }
+      ]
+    },
+    {
+      "programId": "swapNyd8XiQwJ6ianp9snpu4brUqFxadzvHebnAXjJZ",
+      "protocolId": "stabble",
+      "protocolName": "Stabble",
+      "component": "stable-swap",
+      "category": "dex",
+      "usageProtocolIds": [
+        "stabble"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.stabble.org/",
+          "note": "Stabble stable-swap program."
+        }
+      ]
+    },
+    {
+      "programId": "FLUXubRmkEi2q6K3Y9kBPg9248ggaZVsoSFhtJHSrm1X",
+      "protocolId": "fluxbeam",
+      "protocolName": "FluxBeam",
+      "component": "amm",
+      "category": "dex",
+      "usageProtocolIds": [
+        "fluxbeam"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.fluxbeam.xyz/",
+          "note": "FluxBeam Token-2022 AMM program."
+        }
+      ]
+    },
+    {
+      "programId": "ExponentnaRg3CQbW6dqQNZKXp7gtZ9DGMp1cwC4HAS7",
+      "protocolId": "exponent",
+      "protocolName": "Exponent",
+      "component": "core",
+      "category": "structured",
+      "usageProtocolIds": [
+        "exponent"
+      ],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.exponent.finance/",
+          "note": "Exponent yield-stripping (PT/YT) program."
+        }
+      ]
+    },
+    {
+      "programId": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "protocolId": "jupiter-aggregator",
+      "protocolName": "Jupiter aggregator",
+      "component": "v6",
+      "category": "aggregator",
+      "usageProtocolIds": [],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://dev.jup.ag/",
+          "note": "Routing only; transient balances, never an integration."
+        }
+      ]
+    },
+    {
+      "programId": "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+      "protocolId": "squads",
+      "protocolName": "Squads v4 multisig",
+      "component": "multisig",
+      "category": "custody",
+      "usageProtocolIds": [],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.squads.so/",
+          "note": "Multisig custody — a treasury, not a DeFi use."
+        }
+      ]
+    },
+    {
+      "programId": "SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu",
+      "protocolId": "squads",
+      "protocolName": "Squads v3 multisig",
+      "component": "multisig-v3",
+      "category": "custody",
+      "usageProtocolIds": [],
+      "verification": "documented",
+      "sources": [
+        {
+          "url": "https://docs.squads.so/",
+          "note": "Multisig custody — a treasury, not a DeFi use."
+        }
+      ]
+    },
+    {
+      "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — vault manager program on Solana (BoringVault-SVM style)",
+      "component": "boring-vault",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
+          "note": "Holds the xStocks Vaults' Solana vault states and zero-supply share mints (the live ERC-20 shares are Veda BoringVaults on Ink); its `manage` instruction (same discriminator as Veda's boring_vault_svm) moves the bridged xStock to the strategy. Deployer (Veda or Sentora) not verified. Program shares upgrade authority EhQ1TTTYprrdfH5EdDqo5kTabw6p9QmAf8FhYpaocEbz with the strategy program."
+        }
+      ]
+    },
+    {
+      "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — strategy program (position-manager)",
+      "component": "position-manager",
+      "category": "vault-strategy",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "verification": "observed-onchain",
+      "sources": [
+        {
+          "url": "https://www.veda.tech/blog/veda-powers-krakens-push-into-xstocks-yield-with-sentora",
+          "note": "Anchor program named position-manager: owns the Kamino obligations in the Sentora xStocks Market, borrows PYUSD, deposits it into the Sentora PYUSD Kamino Earn vault and stakes the shares (instructions Borrow, TransferAssetsToYield, AssembleVault, StakeShares observed 2026-09-24); executor signer B4sygjEBGiGvXrVh8thi5Ws77sUxJKxzT9AfRcyNByrA."
+        }
+      ]
+    },
+    {
+      "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "protocolId": "token-2022",
+      "protocolName": "Token-2022 (token account owned by a token-program account)",
+      "component": "spl-token-2022",
+      "category": "infrastructure",
+      "usageProtocolIds": [],
+      "verification": "protocol constant",
+      "sources": [
+        {
+          "url": "https://spl.solana.com/token-2022",
+          "note": "Observed 2026-09-24: several Backpack-issued stock token accounts are owned by their own address (a Token-2022 account). Only a permanent delegate can move such a balance; it is issuer/escrow plumbing, not a DeFi use."
+        }
+      ]
+    },
+    {
+      "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "protocolId": "spl-token",
+      "protocolName": "SPL Token (token account owned by a token-program account)",
+      "component": "spl-token",
+      "category": "infrastructure",
+      "usageProtocolIds": [],
+      "verification": "protocol constant",
+      "sources": [
+        {
+          "url": "https://spl.solana.com/token",
+          "note": "Plumbing, never an integration."
+        }
+      ]
+    },
+    {
+      "programId": "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u",
+      "protocolId": "okx-dex-router",
+      "protocolName": "OKX DEX Router",
+      "component": "router",
+      "category": "aggregator",
+      "usageProtocolIds": [],
+      "verification": "on-chain Anchor IDL (metadata name \"OKX: DEX Router\", read 2026-09-24)",
+      "sources": [
+        {
+          "url": "https://solscan.io/account/proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u",
+          "note": "Router: an inflow it calls identifies the depositor, not the owner of the receiving account."
+        }
+      ]
+    },
+    {
+      "programId": "tRADeQ3SJVHnFXv1rpwZzVt5HE6DWDu4J6cH34Md6ZA",
+      "protocolId": "trade-executor",
+      "protocolName": "trade_executor (intent executor)",
+      "component": "intents",
+      "category": "aggregator",
+      "usageProtocolIds": [],
+      "verification": "on-chain Anchor IDL (name trade_executor; create_intent/execute_intent, read 2026-09-24)",
+      "sources": [
+        {
+          "url": "https://solscan.io/account/tRADeQ3SJVHnFXv1rpwZzVt5HE6DWDu4J6cH34Md6ZA",
+          "note": "Escrows swap intents until executed; transient, not an integration."
+        }
+      ]
+    },
+    {
+      "programId": "j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X",
+      "protocolId": "jupiter-limit-order",
+      "protocolName": "Jupiter Limit Order v2",
+      "component": "limit-order",
+      "category": "aggregator",
+      "usageProtocolIds": [],
+      "verification": "on-chain Anchor IDL (name limit_order_2, read 2026-09-24)",
+      "sources": [
+        {
+          "url": "https://dev.jup.ag/docs/trigger-api",
+          "note": "Escrowed user limit orders; a trading convenience, not a protocol listing."
+        }
+      ]
+    },
+    {
+      "programId": "HxbLPNuQD7KKDVQoSQgY1cLMLrsaoseT65Xoczh7zHQW",
+      "protocolId": "nest",
+      "protocolName": "Nest (nest_core)",
+      "component": "core",
+      "category": "lending",
+      "usageProtocolIds": [
+        "nest"
+      ],
+      "verification": "on-chain Anchor IDL (name nest_core) + Nest mainnet manifest programs",
+      "sources": [
+        {
+          "url": "https://docs.nestusd.com/deployments/mainnet.json",
+          "note": "Nest collateral vaults; the manifest's collateral list is collected in defi-usage."
+        }
+      ]
+    },
+    {
+      "programId": "EwwEjYvZ1CU3kVFNobn3nHtn8JVLuymLtaeZ2KF2fAav",
+      "protocolId": "nest",
+      "protocolName": "Nest (vaults)",
+      "component": "vaults",
+      "category": "lending",
+      "usageProtocolIds": [
+        "nest"
+      ],
+      "verification": "Nest mainnet manifest programs",
+      "sources": [
+        {
+          "url": "https://docs.nestusd.com/deployments/mainnet.json",
+          "note": "Listed as nestVaults in the manifest."
+        }
+      ]
+    },
+    {
+      "programId": "XP1BRLn8eCYSygrd8er5P4GKdzqKbC3DLoSsS5UYVZy",
+      "protocolId": "exponent",
+      "protocolName": "Exponent (market/vault program)",
+      "component": "yield-stripping",
+      "category": "structured",
+      "usageProtocolIds": [
+        "exponent"
+      ],
+      "verification": "observed-onchain (transactions route WrapperBuyYt through XPC1MM…; Scope-priced)",
+      "sources": [
+        {
+          "url": "https://docs.exponent.finance/",
+          "note": "Observed 2026-09-24 holding ~$1.18M of STRCx: an Exponent yield-stripping market on the Strategy preferred-stock token, which no collected registry lists."
+        }
+      ]
+    },
+    {
+      "programId": "XPC1MM4dYACDfykNuXYZ5una2DsMDWL24CrYubCvarC",
+      "protocolId": "exponent",
+      "protocolName": "Exponent (router)",
+      "component": "router",
+      "category": "structured",
+      "usageProtocolIds": [
+        "exponent"
+      ],
+      "verification": "observed-onchain (instruction WrapperBuyYt, 2026-09-24)",
+      "sources": [
+        {
+          "url": "https://docs.exponent.finance/",
+          "note": "Exponent wrapper/router program seen buying YT against XP1BRL… markets."
+        }
+      ]
+    },
+    {
+      "programId": "FL3X2pRsQ9zHENpZSKDRREtccwJuei8yg9fwDu9UN69Q",
+      "protocolId": "lulo",
+      "protocolName": "Lulo",
+      "component": "lending-router",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "lulo"
+      ],
+      "verification": "reported by coverage audit 2026-09-24 (executable-checked)",
+      "sources": [
+        {
+          "url": "https://docs.lulo.fi/",
+          "note": "No tokenized-stock use found."
+        }
+      ]
+    },
+    {
+      "programId": "CarrotwivhMpDnm27EHmRLeQ683Z1PufuqEmBZvD282s",
+      "protocolId": "carrot",
+      "protocolName": "Carrot",
+      "component": "vaults",
+      "category": "yield-vault",
+      "usageProtocolIds": [
+        "carrot"
+      ],
+      "verification": "reported by coverage audit 2026-09-24 (executable-checked)",
+      "sources": [
+        {
+          "url": "https://docs.deficarrot.com/",
+          "note": "No tokenized-stock use found."
+        }
+      ]
+    },
+    {
+      "programId": "EtrnLzgbS7nMMy5fbD42kXiUzGg8XQzJ972Xtk1cjWih",
+      "protocolId": "phoenix-perps",
+      "protocolName": "Phoenix Eternal perps",
+      "component": "perps",
+      "category": "perps",
+      "usageProtocolIds": [
+        "phoenix-perps"
+      ],
+      "verification": "reported by coverage audit 2026-09-24 (Ellipsis constants)",
+      "sources": [
+        {
+          "url": "https://perp-api.phoenix.trade/v1/view/exchange/markets",
+          "note": "Equity perps are synthetic (no stock mint held)."
+        }
+      ]
+    },
+    {
+      "programId": "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+      "protocolId": "manifest",
+      "protocolName": "Manifest (wrapper)",
+      "component": "wrapper",
+      "category": "dex",
+      "usageProtocolIds": [
+        "manifest"
+      ],
+      "verification": "reported by coverage audit 2026-09-24",
+      "sources": [
+        {
+          "url": "https://github.com/CKS-Systems/manifest",
+          "note": "Manifest wrapper program."
+        }
+      ]
+    },
+    {
+      "programId": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
+      "protocolId": "titan",
+      "protocolName": "Titan aggregator",
+      "component": "router",
+      "category": "aggregator",
+      "usageProtocolIds": [],
+      "verification": "reported by coverage audit 2026-09-24",
+      "sources": [
+        {
+          "url": "https://titandex.io/",
+          "note": "Routing only."
+        }
+      ]
+    },
+    {
+      "programId": "offqSMQWgQud6WJz694LRzkeN5kMYpCHTpXQr3Rkcjm",
+      "protocolId": "chainlink-ccip",
+      "protocolName": "Chainlink CCIP OffRamp",
+      "component": "offramp",
+      "category": "bridge",
+      "usageProtocolIds": [
+        "chainlink-ccip"
+      ],
+      "verification": "observed-onchain by coverage audit 2026-09-24",
+      "sources": [
+        {
+          "url": "https://docs.chain.link/ccip",
+          "note": "Delivers bridged xStocks (e.g. from Ink for xStocks Vaults)."
+        }
+      ]
+    },
+    {
+      "programId": "F2ZYgyh8YDG6rHo9F1T8Aw4WoTyy8eYN3GgM2LaPKcZN",
+      "protocolId": "chainlink-ccip",
+      "protocolName": "CCIP token pool (xStocks)",
+      "component": "token-pool",
+      "category": "bridge",
+      "usageProtocolIds": [
+        "chainlink-ccip"
+      ],
+      "verification": "observed-onchain by coverage audit 2026-09-24 (CcipReceive releases SPYx)",
+      "sources": [
+        {
+          "url": "https://docs.chain.link/ccip",
+          "note": "Lock/release pool used for xStocks bridged between Solana and Ink."
+        }
+      ]
+    }
+  ],
+  "knownAddresses": [
+    {
+      "address": "FWVtnHZMGZoq1USVT6KpW1p8Fa2c3sHryazLmKTbxAYE",
+      "programId": "9TWFuaFP1pvx698ANRpiGBHqi6zrTFBQoXwqaAmfd5Jp",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — NVDAx vault authority",
+      "category": "yield-vault",
+      "role": "vault-authority",
+      "label": "Advanced Strategies NVDAx vault",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "sources": [
+        {
+          "url": "https://solscan.io/account/8CdShk8ckXPWUoxRHBXVJxE1zKHBkkg7exKfvyCCM6Rf",
+          "note": "Owner of the vault's NVDAx token account Dpcx7HYz…; its transfers are signed by program 9TWFua… (Manage)."
+        }
+      ]
+    },
+    {
+      "address": "FTeDtYDsHotvxdLBqpAccPsYrtU5VDfjZjrZUENC1fpD",
+      "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — NVDAx strategy position",
+      "category": "vault-strategy",
+      "role": "position-authority",
+      "label": "NVDAx position (Kamino obligation AcVJAGBq…)",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "sources": [
+        {
+          "url": "https://solscan.io/account/AcVJAGBqFnyjCf2qd6Nbdihjs7WtMjgx66AoTx4LafDC",
+          "note": "Owner of the Kamino obligation in the Sentora xStocks Market (decoded 2026-09-24)."
+        }
+      ]
+    },
+    {
+      "address": "HzJt4yX9AyCEFnKtTuJQto6nTpvyjVBZtrkY2ZzcoRyb",
+      "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — SPYx strategy position",
+      "category": "vault-strategy",
+      "role": "position-authority",
+      "label": "SPYx position (Kamino obligation DHz1e8J9…)",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "sources": [
+        {
+          "url": "https://solscan.io/account/DHz1e8J968xFgnMsYAkm2XnVvZWppjU6kFwP8oX2juuP",
+          "note": "Owner of the Kamino obligation in the Sentora xStocks Market (decoded 2026-09-24)."
+        }
+      ]
+    },
+    {
+      "address": "8tRwmexXaSStiSK29sixkCbDJciqA8DGgLKrW2JEw2QC",
+      "programId": "BSE8uppfb56cX75LmPZyJLySy7c3JLornP92tF6dmmXt",
+      "protocolId": "veda",
+      "protocolName": "xStocks Vaults — QQQx strategy position",
+      "category": "vault-strategy",
+      "role": "position-authority",
+      "label": "QQQx position (Kamino obligation HYT5jkX3…)",
+      "usageProtocolIds": [
+        "veda"
+      ],
+      "sources": [
+        {
+          "url": "https://solscan.io/account/HYT5jkX3t8KkCGAaJgZXWRgc2c5DQcB8VKmnFaT4da8f",
+          "note": "Owner of the Kamino obligation in the Sentora xStocks Market (decoded 2026-09-24)."
+        }
+      ]
+    }
+  ]
+}
