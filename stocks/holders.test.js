@@ -412,8 +412,9 @@ describe('mintAuthorityAddresses', () => {
 describe('buildOwnerLabels / labelOwner', () => {
     const labels = buildOwnerLabels(ONCHAIN_ITEMS);
 
-    test('the static map holds only the cited Superstate burn address', () => {
-        expect(Object.keys(KNOWN_OWNERS)).toEqual([SUPERSTATE_BURN_ADDRESS]);
+    test('the static map holds only cited addresses: the Superstate burn address and the xStocks issuer inventory', () => {
+        expect(Object.keys(KNOWN_OWNERS)).toEqual([SUPERSTATE_BURN_ADDRESS, '9U76mo3WuP28s4kYJ9CMH1CiQh6Ph3r5Zg5awZM5vMQd']);
+        expect(KNOWN_OWNERS['9U76mo3WuP28s4kYJ9CMH1CiQh6Ph3r5Zg5awZM5vMQd']).toBe('issuer-inventory');
         expect(KNOWN_OWNERS[SUPERSTATE_BURN_ADDRESS]).toBe(BURN_ADDRESS);
         expect(labelOwner(SUPERSTATE_BURN_ADDRESS, labels)).toBe(BURN_ADDRESS);
     });
@@ -448,7 +449,7 @@ describe('buildOwnerLabels / labelOwner', () => {
         expect(labelOwner(XSTOCKS_DELEGATE, extensionOnly)).toBe(ISSUER_AUTHORITY);
         expect(ONCHAIN_AUTHORITY_FIELDS).toEqual(['mintAuthority', 'freezeAuthority', 'permanentDelegateAddress', 'metadataUpdateAuthority']);
         // A boolean flag is not an address and must not become a label.
-        expect(buildOwnerLabels([{ permanentDelegate: true, pausable: true }]).size).toBe(1);
+        expect(buildOwnerLabels([{ permanentDelegate: true, pausable: true }]).size).toBe(2);
     });
 
     test('a Token-2022 EXTENSION authority off the live mint account labels S7vYFF…', () => {
@@ -471,20 +472,20 @@ describe('buildOwnerLabels / labelOwner', () => {
     });
 
     test('a malformed extraAuthorities list is ignored, not crashed on', () => {
-        expect(buildOwnerLabels(ONCHAIN_ITEMS, null).size).toBe(6);
-        expect(buildOwnerLabels(ONCHAIN_ITEMS, [null, '', 42]).size).toBe(6);
+        expect(buildOwnerLabels(ONCHAIN_ITEMS, null).size).toBe(7);
+        expect(buildOwnerLabels(ONCHAIN_ITEMS, [null, '', 42]).size).toBe(7);
     });
 
     test('null authorities do not become labels', () => {
         expect(labels.has('null')).toBe(false);
         expect(labelOwner(null, labels)).toBeNull();
         // AAPLx + FWDI + HSDT authorities = 5 distinct keys (Superstate freeze is shared), + burn.
-        expect(labels.size).toBe(6);
+        expect(labels.size).toBe(7);
     });
 
     test('an empty or malformed onchain list still yields the static map', () => {
         expect(buildOwnerLabels(null).get(SUPERSTATE_BURN_ADDRESS)).toBe(BURN_ADDRESS);
-        expect(buildOwnerLabels([null, {}, { mintAuthority: 42 }]).size).toBe(1);
+        expect(buildOwnerLabels([null, {}, { mintAuthority: 42 }]).size).toBe(2);
     });
 });
 

@@ -153,6 +153,7 @@ export function mintAuthorityAddresses(account) {
 
 export const ISSUER_AUTHORITY = 'issuer-authority';
 export const BURN_ADDRESS = 'burn-address';
+export const ISSUER_INVENTORY = 'issuer-inventory';
 
 /**
  * Addresses this repo can NAME, with the file that names them. Deliberately tiny: an owner is only
@@ -169,7 +170,11 @@ export const KNOWN_OWNERS = {
     // address (shared, all equities)", source api.superstate.com/v2/instruments), by
     // `burnAddressSolana` on every Superstate instrument in data/sponsor-apis.json, and by
     // findings.md ("shared burn address 2u8YwJ…").
-    '2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E': BURN_ADDRESS
+    '2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E': BURN_ADDRESS,
+    // xStocks issuer inventory: stocked only from the treasury S7vYFF…, and excluded from the
+    // issuer's own circulating figure (data/issuers/xstocks-backed.json finding, 2026-09-24).
+    // A top-20 position in 174 xStocks mints is the issuer's own stock, not an independent holder.
+    '9U76mo3WuP28s4kYJ9CMH1CiQh6Ph3r5Zg5awZM5vMQd': ISSUER_INVENTORY
 };
 
 /**

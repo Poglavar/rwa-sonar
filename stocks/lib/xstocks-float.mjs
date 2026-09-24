@@ -25,7 +25,12 @@ export const XSTOCKS_ISSUER_WALLETS = [
     { address: 'JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs', role: 'freeze-pause-vault',
         basis: 'Squads v4 vault holding the freeze and pause authority on all xStocks mints.' },
     { address: '5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq', role: 'permanent-delegate-vault',
-        basis: 'Squads v4 vault holding the permanent-delegate and transfer-hook authority on all xStocks mints.' }
+        basis: 'Squads v4 vault holding the permanent-delegate and transfer-hook authority on all xStocks mints.' },
+    // Added 2026-09-24 from the xStocks dossier finding: stocked only by treasury transfers, and the
+    // issuer's own proof-of-reserves "circulating" figure excludes its balances (95 of 97 zero-
+    // circulating mints have supply = treasury + this wallet). Operator not identified.
+    { address: '9U76mo3WuP28s4kYJ9CMH1CiQh6Ph3r5Zg5awZM5vMQd', role: 'issuer-inventory',
+        basis: 'Stocked only by transfers from the treasury; sells xStocks against USDC in two-party order-tagged swaps; its balances are excluded from the issuer\'s own circulating figure.' }
 ];
 
 export const TOKEN_2022 = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
