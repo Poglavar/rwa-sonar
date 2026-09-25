@@ -1,5 +1,5 @@
 // Writes the current catalogue counts into marked regions of hand-authored pages (the landing hero,
-// its float finding and redemption line, and the pitch's powers, flows, sources and built-state
+// its float finding and redemption line, and the pitch's powers heading, sources and built-state
 // numbers), so their static HTML never says "Loading…" or carries a number typed weeks ago that the
 // page it links to contradicts. Pure: the builder (stocks/build-static-snapshot.mjs) does the file I/O.
 import counts from './catalogue-counts.js';
@@ -106,7 +106,6 @@ export function snapshotFacts({ tokens, issuers, templates, health, defi, events
         float: floatFacts(flows),
         flowDay: latestCoveredDay(flows, FLOW_ISSUER),
         powers: {
-            counts: powerMap?.counts ?? null,
             programmes: Array.isArray(powerMap?.issuers) ? powerMap.issuers.length : null,
             powers: Array.isArray(powerMap?.powers) ? powerMap.powers.length : null
         },
@@ -187,29 +186,18 @@ export function landingRedemptionsHtml(facts) {
     return escapeHtml(`On ${fmtDate(day.date)} the scan saw ${flowCounts(day)}.`);
 }
 
-const POWER_KIND_PHRASES = [['single-key', 'held by one key'], ['multisig', 'by a multisig'], ['program', 'by a program'],
-    ['none', 'not installed'], ['unknown', 'unknown']];
-
 function requirePowers(facts) {
     const p = facts.powers ?? {};
     const programmes = p.programmes;
     const powers = p.powers;
-    if (!(programmes > 0) || !(powers > 0) || !p.counts) throw new Error('static snapshot: stocks-power-map.json has no power map (run stocks/build-power-map.mjs)');
-    const counts = POWER_KIND_PHRASES.map(([kind]) => requireCount(p.counts[kind], `power map ${kind} count`));
-    return { programmes, powers, counts };
+    if (!(programmes > 0) || !(powers > 0)) throw new Error('static snapshot: stocks-power-map.json has no power map (run stocks/build-power-map.mjs)');
+    return { programmes, powers };
 }
 
 /** "12 programmes × 7 powers." — the pitch's powers heading. */
 export function pitchPowersHeadHtml(facts) {
     const p = requirePowers(facts);
     return escapeHtml(`${fmtNumber(p.programmes)} programmes × ${fmtNumber(p.powers)} powers.`);
-}
-
-/** The cell counts powers.html prints in its summary line, in the same order. */
-export function pitchPowersHtml(facts) {
-    const p = requirePowers(facts);
-    const parts = POWER_KIND_PHRASES.map(([, phrase], i) => `${fmtNumber(p.counts[i])} ${phrase}`);
-    return escapeHtml(`${fmtNumber(p.programmes * p.powers)} cells: ${parts.join(', ')}.`);
 }
 
 /** The scheduled-jobs chip for the document watcher: the cited-source registry's size. */
@@ -242,7 +230,6 @@ export function renderStaticSnapshots(pages, facts) {
     landing = replaceMarkedRegion(landing, 'redemptions', landingRedemptionsHtml(facts));
     let pitch = replaceMarkedRegion(pages['pitch/index.html'], 'pitch-proof', pitchProofHtml(facts));
     pitch = replaceMarkedRegion(pitch, 'pitch-powers-head', pitchPowersHeadHtml(facts));
-    pitch = replaceMarkedRegion(pitch, 'pitch-powers', pitchPowersHtml(facts));
     pitch = replaceMarkedRegion(pitch, 'pitch-sources', pitchSourcesHtml(facts));
     return { 'index.html': landing, 'pitch/index.html': pitch };
 }

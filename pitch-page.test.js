@@ -31,8 +31,9 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('AAPLon');
         expect(html).toContain('very challenging to achieve');
         expect(html).toContain('can reconstitute');
+        expect(html).toContain('Power to move or burn holder tokens: in the case of xStocks a 2-of-3 multisig with no time lock, never used so far.');
         // The float, flows, powers and source figures are build-time regions (stocks/static-snapshot.test.js).
-        for (const region of ['pitch-proof', 'pitch-powers', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
+        for (const region of ['pitch-proof', 'pitch-powers-head', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
         expect(html).toContain('PreStocks transfer fee 0.50%');
         for (const step of ['Every real-world asset.', 'Deeper into the law.', 'A dolphin for every integration.']) expect(html).toContain(step);
         expect(html).toContain('Open source under the MIT licence');

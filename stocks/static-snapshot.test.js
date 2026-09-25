@@ -9,7 +9,7 @@ import { SITE_PAGES } from './lib/site-pages.mjs';
 const SITE_PAGE_PATHS = SITE_PAGES.map((page) => page.file ?? page.path ?? page);
 import {
     LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, landingEventsHtml, landingEventsUpdatedHtml, landingFloatHtml, landingRedemptionsHtml,
-    landingSnapshotHtml, pitchPowersHeadHtml, pitchPowersHtml, pitchProofHtml, pitchSourcesHtml,
+    landingSnapshotHtml, pitchPowersHeadHtml, pitchProofHtml, pitchSourcesHtml,
     renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
 } from './lib/static-snapshot.mjs';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
@@ -123,10 +123,9 @@ describe('static snapshot regions', () => {
         expect(landingRedemptionsHtml(uncovered)).toBe('No Ondo day in the current window has been read by the scan yet.');
     });
 
-    test('the pitch powers line is the power map’s own cell counts', () => {
+    test('the pitch powers heading is the power map’s own size', () => {
         expect(pitchPowersHeadHtml(facts)).toBe('12 programmes × 7 powers.');
-        expect(pitchPowersHtml(facts)).toBe('84 cells: 26 held by one key, 16 by a multisig, 8 by a program, 18 not installed, 16 unknown.');
-        expect(() => pitchPowersHtml(snapshotFacts({ ...FILES, powerMap: { powers: [], issuers: [], counts: {} } }))).toThrow('power map');
+        expect(() => pitchPowersHeadHtml(snapshotFacts({ ...FILES, powerMap: { powers: [], issuers: [], counts: {} } }))).toThrow('power map');
     });
 
     test('the source count is the cited-source registry the watcher reads, named for what it counts', () => {
@@ -138,16 +137,18 @@ describe('static snapshot regions', () => {
         const landing = readFileSync(join(ROOT, 'index.html'), 'utf8');
         const pitch = readFileSync(join(ROOT, 'pitch/index.html'), 'utf8');
         for (const name of ['float-finding', 'redemptions']) expect(landing).toContain(`<!-- snapshot:${name}:start -->`);
-        for (const name of ['pitch-powers-head', 'pitch-powers', 'pitch-sources']) expect(pitch).toContain(`<!-- snapshot:${name}:start -->`);
-        // The flows-and-float box left the deck on 25 Sep 2026 (owner's edit); flows.html keeps the figures.
+        for (const name of ['pitch-powers-head', 'pitch-sources']) expect(pitch).toContain(`<!-- snapshot:${name}:start -->`);
+        // The flows-and-float box and the powers cell counts left the deck on 25 Sep 2026 (owner's
+        // edits); flows.html and powers.html keep the figures.
         expect(pitch).not.toContain('snapshot:pitch-flows');
+        expect(pitch).not.toContain('snapshot:pitch-powers:start');
         // No hand-typed copy of the figures the regions now carry.
         expect(landing).not.toContain('81.0%');
         expect(pitch).not.toContain('81.0%');
         expect(pitch).not.toContain('576 cited sources');
         const rendered = renderStaticSnapshots({ 'index.html': landing, 'pitch/index.html': pitch }, facts);
         expect(rendered['index.html']).toContain('<!-- snapshot:float-finding:start --><p class="finding-kicker">Float · read on chain, 24 Sep 2026</p>');
-        expect(rendered['pitch/index.html']).toContain('<!-- snapshot:pitch-powers:start -->84 cells: 26 held by one key');
+        expect(rendered['pitch/index.html']).toContain('<!-- snapshot:pitch-powers-head:start -->12 programmes × 7 powers.<!-- snapshot:pitch-powers-head:end -->');
         expect(rendered['pitch/index.html']).toContain('<!-- snapshot:pitch-sources:start -->Daily: 621 cited source URLs re-read<!-- snapshot:pitch-sources:end -->');
     });
 
