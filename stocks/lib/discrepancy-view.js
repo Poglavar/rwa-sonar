@@ -144,14 +144,35 @@
                 String(value).toLowerCase().includes(String(filters.asset).toLowerCase()))));
     }
 
-    function discrepancyDirectoryHtml(rows) {
+    /** The id a directory row carries, so #discrepancy-<id> opens it. */
+    function discrepancyAnchor(row) {
+        return row?.id ? `discrepancy-${String(row.id).replace(/[^A-Za-z0-9_-]/g, '-')}` : null;
+    }
+
+    /**
+     * The directory as a fold list (app-shell.css): each record is one closed row (line 1: first
+     * observed, severity, status and title; line 2: whose it is and why it matters) that opens to
+     * both sides, their sources and the dossier links. Links live in the opened part only.
+     * `openIds` keeps rows the reader opened open across a re-render; `targetId` (an anchor, as
+     * discrepancyAnchor makes it) opens and marks the row a URL names.
+     */
+    function discrepancyDirectoryHtml(rows, { openIds = null, targetId = null } = {}) {
         const list = Array.isArray(rows) ? rows : [];
         if (!list.length) return '<div class="comparison-empty"><strong>No discrepancy matches these filters.</strong><p>Clear a filter to return to the current source-backed record.</p></div>';
-        return list.map((row) => `<article class="reality-card discrepancy-${escapeHtml(row.severity)}">`
-            + `<header><div><span class="sev-chip ${severityClass(row.severity)}">${escapeHtml(row.severity)}</span>`
-            + `<span class="reality-status reality-status-${escapeHtml(row.status)}">${escapeHtml(row.status)}</span></div>`
-            + discrepancyOwnerLink(row) + '</header>'
-            + `<h3>${escapeHtml(row.title || 'Published claim differs from observed reality')}</h3>`
+        return '<ul class="fold-list reality-list">' + list.map((row) => {
+            const anchor = discrepancyAnchor(row);
+            const target = anchor !== null && anchor === targetId;
+            const open = target || (anchor !== null && openIds instanceof Set && openIds.has(anchor));
+            const owner = row.kind === 'protocol' ? `${row.protocolName}${row.symbol ? ` · ${row.symbol}` : ''}` : row.issuerName;
+            const consequence = [owner, row.impact || row.reality?.text].filter(Boolean).join(' · ');
+            return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="fold-row fold-${escapeHtml(row.severity)} reality-row discrepancy-${escapeHtml(row.severity)}${target ? ' fold-target' : ''}">`
+            + `<details${open ? ' open' : ''}><summary><span class="fold-line1">${escapeHtml(row.observedAt ? fmtDate(row.observedAt) : 'date not recorded')} · `
+            + `<span class="sev-chip ${severityClass(row.severity)}">${escapeHtml(row.severity)}</span> `
+            + `<span class="reality-status reality-status-${escapeHtml(row.status)}">${escapeHtml(row.status)}</span> `
+            + `<strong class="fold-title">${escapeHtml(row.title || 'Published claim differs from observed reality')}</strong></span>`
+            + (consequence ? `<span class="fold-line2">${escapeHtml(consequence)}</span>` : '') + '</summary>'
+            + '<div class="fold-body">'
+            + `<p class="reality-owner">${discrepancyOwnerLink(row)}</p>`
             + `<p class="reality-meta">${escapeHtml(row.holderImpact)} holder impact · ${escapeHtml(row.scope)} · ${fmtNumber(row.affectedCount)} current token${row.affectedCount === 1 ? '' : 's'} affected${row.observedAt ? ` · first observed ${escapeHtml(fmtDate(row.observedAt))}` : ''}</p>`
             + discrepancyProvenanceHtml(row)
             + '<div class="discrepancy-sides">'
@@ -161,7 +182,8 @@
             + (row.resolutionCondition ? `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>` : '')
             + `<footer>${row.kind === 'protocol'
                 ? (row.href ? `<a href="${escapeHtml(row.href)}">Open protocol dossier →</a>` : '')
-                : `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a>`}<a href="./watch.html">See external changes →</a></footer></article>`).join('');
+                : `<a href="${escapeHtml(issuerDossierHref(row.issuerSlug))}">Open issuer dossier →</a>`}<a href="./watch.html">See external changes →</a></footer></div></details></li>`;
+        }).join('') + '</ul>';
     }
 
     /** The header link: the issuer for an issuer finding, the protocol dossier for a protocol one. */
@@ -201,18 +223,22 @@
             + '</section>';
     }
 
+    /** One discrepancy in an issuer panel, as a fold row: observed date, severity and title, then why it matters. */
     function discrepancyItemHtml(row) {
         const severity = discrepancySeverity(row?.severity);
-        return `<article class="discrepancy-item discrepancy-${severity}">`
-            + `<header><span class="sev-chip ${severityClass(severity)}">${escapeHtml(severity)}</span>`
-            + `<h5>${escapeHtml(row?.title || 'Published claim differs from observed reality')}</h5></header>`
-            + '<div class="discrepancy-sides">'
+        const consequence = row?.impact || row?.reality?.text || '';
+        return `<li class="fold-row fold-${severity} discrepancy-item discrepancy-${severity}"><details><summary>`
+            + `<span class="fold-line1">${escapeHtml(row?.observedAt ? fmtDate(row.observedAt) : 'date not recorded')} · `
+            + `<span class="sev-chip ${severityClass(severity)}">${escapeHtml(severity)}</span> `
+            + `<strong class="fold-title">${escapeHtml(row?.title || 'Published claim differs from observed reality')}</strong></span>`
+            + (consequence ? `<span class="fold-line2">${escapeHtml(consequence)}</span>` : '') + '</summary>'
+            + '<div class="fold-body"><div class="discrepancy-sides">'
             + discrepancySideHtml('Published claim', row?.claim, 'claim')
             + discrepancySideHtml('Observed reality', row?.reality, 'reality')
             + '</div>'
             + (row?.impact ? `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>` : '')
             + (row?.observedAt ? `<p class="discrepancy-observed">Observed ${escapeHtml(fmtDate(row.observedAt))}</p>` : '')
-            + '</article>';
+            + '</div></details></li>';
     }
 
     function discrepanciesHtml(issuer) {
@@ -222,7 +248,7 @@
             + `<strong>${rows.length} documented discrepanc${rows.length === 1 ? 'y' : 'ies'}</strong></summary>`
             + '<p class="discrepancy-note">We keep both sides visible. “Published claim” is what a document, page or API says; '
             + '“observed reality” is the stronger or later evidence we found. Each side links to its own source.</p>'
-            + `<div class="discrepancy-list">${rows.map(discrepancyItemHtml).join('')}</div></details>`;
+            + `<ul class="fold-list discrepancy-list">${rows.map(discrepancyItemHtml).join('')}</ul></details>`;
     }
 
     function discrepancyCalloutHtml(issuer) {
@@ -243,6 +269,7 @@
         protocolDiscrepancyRecords,
         protocolNamesFromUsage,
         filterDiscrepancyRows,
+        discrepancyAnchor,
         discrepancyDirectoryHtml,
         discrepancyProvenanceHtml,
         discrepancySourceHtml,

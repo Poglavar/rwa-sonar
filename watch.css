@@ -71,14 +71,11 @@ body {
     color: var(--sev-warning);
 }
 
+/* Saved watches are fold rows (app-shell.css): the list holds one ul.fold-list. */
 .wat-saved-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 10px;
     margin-top: 12px;
 }
 
-.wat-saved-card,
 .wat-shared-watch {
     padding: 12px;
     border: 1px solid var(--panel-border);
@@ -86,7 +83,6 @@ body {
     background: var(--page-bg);
 }
 
-.wat-saved-card h3,
 .wat-shared-watch h3 {
     margin: 0 0 4px;
     font-size: 0.95rem;
@@ -572,7 +568,8 @@ body {
 }
 /* Open, the body says the same thing in full (Consequence, or the model's reading): no repeat. */
 .wat-row > details[open] .wat-row-line2 { display: none; }
-.wat-row > details[open] .wat-row-line1 { -webkit-line-clamp: unset; }
+/* Open, line 1 is ordinary text again: an unclamped -webkit-box drops the spaces between its parts. */
+.wat-row > details[open] .wat-row-line1 { display: block; }
 .wat-row-body {
     padding: 4px 14px 12px 30px;
     border-top: 1px solid var(--panel-border);
@@ -823,28 +820,13 @@ a.wat-fresh-name {
 
 /* --- claim rows ------------------------------------------------------- */
 
-.wat-claims {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.wat-claim {
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    background: var(--card-bg);
-    padding: 10px 14px;
-}
-
+/* Claims are fold rows (app-shell.css): checked, status and field closed; quote and source open. */
 .wat-claim-head {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 8px;
-    margin: 0;
+    margin: 8px 0 0;
     font-size: 0.84rem;
 }
 

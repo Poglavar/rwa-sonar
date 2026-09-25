@@ -124,3 +124,24 @@ describe('controlValue', () => {
         expect(controlValue(null)).toBeNull();
     });
 });
+
+describe('fold detail lists', () => {
+    const { foldDetailList } = require('./lib/panel-markup.js');
+
+    it('prints each growing item as one closed row: two summary lines, then the full item', () => {
+        const html = foldDetailList('Findings', [{ n: 1 }, null, { n: 2 }], (item) => ({
+            tone: item.n === 1 ? 'critical' : 'nonsense',
+            line1: `line one ${item.n}`, line2: item.n === 1 ? 'the consequence' : '', body: `<a href="#x">evidence ${item.n}</a>`
+        }));
+        expect(html).toContain('<h4>Findings <span class="detail-count">3</span></h4><ul class="fold-list detail-fold-list">');
+        expect(html).toContain('<li class="fold-row fold-critical"><details><summary><span class="fold-line1">line one 1</span>'
+            + '<span class="fold-line2">the consequence</span></summary><div class="fold-body"><a href="#x">evidence 1</a></div></details></li>');
+        // An unknown tone draws no tone class, and an empty second line is left out rather than printed blank.
+        expect(html).toContain('<li class="fold-row"><details><summary><span class="fold-line1">line one 2</span></summary>');
+        expect(html.match(/<li /g)).toHaveLength(2);
+    });
+
+    it('says so when nothing is recorded', () => {
+        expect(foldDetailList('Findings', [], () => ({}))).toBe('<section class="detail-section"><h4>Findings</h4><p class="detail-empty">None recorded.</p></section>');
+    });
+});

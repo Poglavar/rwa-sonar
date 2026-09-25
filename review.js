@@ -54,16 +54,41 @@
             `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value || 'unknown')}</dd></div>`).join('')}</dl>`;
     }
 
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const PRIORITY_TONES = { P0: 'critical', P1: 'caution', P2: 'info' };
+
+    /** "23 Sep 2026" from an ISO date or instant (UTC calendar day); null when there is none. */
+    function shortDate(value) {
+        const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value ?? ''));
+        if (!match || !MONTHS[Number(match[2]) - 1]) return null;
+        return `${Number(match[3])} ${MONTHS[Number(match[2]) - 1]} ${match[1]}`;
+    }
+
+    /** The id a row carries, so #review-<id> opens it. */
+    function itemAnchor(entry) {
+        return entry?.id ? `review-${String(entry.id).replace(/[^A-Za-z0-9_-]/g, '-')}` : null;
+    }
+
+    // One row per item: line 1 is when, how serious and what; line 2 whose programme and what it
+    // could change. The full item (evidence states, diff, next step, links, editor form) opens below;
+    // links live in the opened part, so a click on the row only toggles.
     function itemHtml(entry, options = {}) {
         const href = safeUrl(entry.href);
         const source = safeUrl(entry.sourceUrl);
         const observed = entry.observedAt ? `<time datetime="${escapeHtml(entry.observedAt)}">${escapeHtml(entry.observedAt.slice(0, 10))}</time>` : 'No check date';
         const affected = Array.isArray(entry.affectedConclusions) && entry.affectedConclusions.length
             ? `<p class="review-affected"><strong>Affected conclusions:</strong> ${escapeHtml(entry.affectedConclusions.join(' · '))}</p>` : '';
-        return `<li class="review-item" data-priority="${escapeHtml(entry.priority)}">` +
-            `<span class="review-priority">${escapeHtml(entry.priority)}</span><div class="review-copy">` +
+        const anchor = itemAnchor(entry);
+        const tone = PRIORITY_TONES[entry.priority];
+        const consequence = [entry.issuerName, entry.claimImpact || entry.detail].filter(Boolean).join(' · ');
+        return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="fold-row review-item${tone ? ` fold-${tone}` : ''}${options.target ? ' fold-target' : ''}" data-priority="${escapeHtml(entry.priority)}">` +
+            `<details${options.open || options.target ? ' open' : ''}><summary>` +
+            `<span class="fold-line1">${escapeHtml(shortDate(entry.observedAt) ?? 'No check date')} · <span class="review-priority">${escapeHtml(entry.priority)}</span> ` +
+            `<strong class="fold-title">${escapeHtml(entry.title)}</strong></span>` +
+            `${consequence ? `<span class="fold-line2">${escapeHtml(consequence)}</span>` : ''}</summary>` +
+            `<div class="fold-body review-body"><div class="review-copy">` +
             `<div class="review-tags"><span>${escapeHtml(entry.area)}</span><span>${escapeHtml(ISSUE_LABELS[entry.issue] ?? entry.issue)}</span></div>` +
-            `<h3>${escapeHtml(entry.title)}</h3><p>${escapeHtml(entry.detail)}</p>` +
+            `<p>${escapeHtml(entry.detail)}</p>` +
             `${entry.claimImpact ? `<p class="review-impact"><strong>Claim impact:</strong> ${escapeHtml(entry.claimImpact)}</p>` : ''}` +
             affected +
             evidenceStateHtml(entry) +
@@ -72,7 +97,7 @@
             `${entry.resolutionCriteria ? `<p class="review-resolution"><strong>Resolution criteria:</strong> ${escapeHtml(entry.resolutionCriteria)}</p>` : ''}</div>` +
             `<div class="review-meta"><strong>${escapeHtml(entry.issuerName)}</strong>${observed}` +
             `${href ? `<a href="${escapeHtml(href)}">Open dossier →</a>` : ''}${source ? `<a href="${escapeHtml(source)}" rel="noreferrer">Open source ↗</a>` : ''}</div>` +
-            `${options.editor ? resolutionFormHtml(entry, options.history ?? []) : ''}</li>`;
+            `${options.editor ? resolutionFormHtml(entry, options.history ?? []) : ''}</div></details></li>`;
     }
 
     function summaryHtml(summary) {
@@ -87,6 +112,7 @@
         let token = sessionStorage.getItem('rwa-review-token') || '';
         let reviewer = sessionStorage.getItem('rwa-reviewer') || '';
         let history = [];
+        let targetShown = false;
         const api = typeof globalThis !== 'undefined' ? globalThis.__rwaApi : null;
         const apiUrl = (path) => api ? api.apiUrl(path, null, api.apiBase()) : path;
         try {
@@ -119,7 +145,18 @@
                     if (!byItem.has(row.itemId)) byItem.set(row.itemId, []);
                     byItem.get(row.itemId).push(row);
                 }
-                document.getElementById('reviewQueue').innerHTML = visible.map((entry) => itemHtml(entry, { editor, history: byItem.get(entry.id) ?? [] })).join('');
+                const queue = document.getElementById('reviewQueue');
+                // A filter keystroke or a recorded decision re-renders the list; rows the reader opened stay open.
+                const opened = new Set([...queue.querySelectorAll('li.fold-row > details[open]')].map((details) => details.parentElement.id));
+                // The row a #review-<id> link names opens (and scrolls into view) once; later renders keep the reader's choice.
+                const target = targetShown ? '' : location.hash.slice(1);
+                queue.innerHTML = visible.map((entry) => itemHtml(entry, {
+                    editor, history: byItem.get(entry.id) ?? [], open: opened.has(itemAnchor(entry)), target: target !== '' && target === itemAnchor(entry)
+                })).join('');
+                if (target && !targetShown) {
+                    const row = document.getElementById(target);
+                    if (row) { targetShown = true; row.scrollIntoView({ block: 'center' }); }
+                }
                 if (editor) {
                     document.querySelectorAll('.resolution-form').forEach((form) => {
                         form.elements.reviewer.value = reviewer;
@@ -170,5 +207,5 @@
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
         else boot();
     }
-    return { PRIORITIES, AREAS, ISSUE_LABELS, escapeHtml, safeUrl, matches, itemHtml, evidenceStateHtml, resolutionFormHtml, summaryHtml };
+    return { PRIORITIES, AREAS, ISSUE_LABELS, escapeHtml, safeUrl, matches, shortDate, itemAnchor, itemHtml, evidenceStateHtml, resolutionFormHtml, summaryHtml };
 }));

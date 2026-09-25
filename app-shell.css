@@ -442,3 +442,57 @@ body.app-page {
     .rights-detail td:last-child { grid-column: 1 / -1; }
     .rights-detail .rights-chip { white-space: normal; }
 }
+
+/* Fold rows: a list that grows over time (changes, findings, review items, discrepancies) shows each
+   item as one compact row — at most two lines of "when, how serious, what" and one line of
+   consequence — that opens to the full item on click. Links live in the opened part, so a click on
+   the row only toggles. Markup: ul.fold-list > li.fold-row[.fold-<tone>] > details > summary >
+   span.fold-line1 (+ strong.fold-title) + span.fold-line2, then div.fold-body. First used on
+   watch.html (its wat-row classes follow the same rules). */
+.fold-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.fold-row {
+    border: 1px solid var(--rwa-line);
+    border-left: 4px solid var(--rwa-line);
+    border-radius: 10px;
+    background: var(--rwa-panel);
+    min-width: 0;
+}
+.fold-row.fold-critical, .fold-row.fold-warning { border-left-color: var(--rwa-red); }
+.fold-row.fold-caution { border-left-color: var(--rwa-amber); }
+.fold-row.fold-good { border-left-color: var(--rwa-green); }
+.fold-row.fold-info { border-left-color: var(--rwa-cobalt); }
+.fold-row.fold-target { outline: 2px solid var(--rwa-cobalt); outline-offset: 2px; }
+.fold-row > details > summary {
+    position: relative;
+    display: grid;
+    gap: 3px;
+    padding: 8px 12px 8px 30px;
+    list-style: none;
+    cursor: pointer;
+}
+.fold-row > details > summary::-webkit-details-marker { display: none; }
+.fold-row > details > summary::before {
+    content: "▸";
+    position: absolute;
+    left: 12px;
+    top: 9px;
+    color: var(--rwa-muted);
+    transition: transform 0.15s ease;
+}
+.fold-row > details[open] > summary::before { transform: rotate(90deg); }
+.fold-row > details > summary:hover .fold-title { color: var(--rwa-cobalt); }
+.fold-row > details > summary:focus-visible { outline: var(--rwa-focus); outline-offset: 2px; border-radius: 8px; }
+.fold-line1, .fold-line2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}
+.fold-line1 { -webkit-line-clamp: 2; color: var(--rwa-muted); font-size: 0.82rem; }
+.fold-title { color: var(--rwa-ink); font-weight: 700; }
+.fold-line2 { -webkit-line-clamp: 1; color: var(--rwa-ink); font-size: 0.84rem; }
+.fold-row > details[open] .fold-line2 { display: none; }
+/* Open, line 1 is ordinary text again: an unclamped -webkit-box drops the spaces between its parts. */
+.fold-row > details[open] .fold-line1 { display: block; }
+.fold-body { padding: 4px 14px 12px 30px; border-top: 1px solid var(--rwa-line); min-width: 0; overflow-wrap: anywhere; }

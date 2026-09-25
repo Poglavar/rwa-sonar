@@ -6,11 +6,12 @@ import fmt from './fmt.js';
 import siteNav from './site-nav.js';
 import flowDiagram from './flow-diagram.js';
 import protocolProof from './protocol-proof.js';
+import { foldAnchor, foldListHtml, foldWhen } from './fold-rows.mjs';
 import {
     breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
 
-const { escapeHtml, isSafeUrl } = fmt;
+const { escapeHtml, isSafeUrl, humanizeSlug } = fmt;
 const text = (v, empty = 'Not performed / not established') => escapeHtml(v === null || v === undefined || v === '' ? empty : String(v));
 const money = (v) => Number.isFinite(v) ? `$${v.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'Not reported';
 const pct = (v) => Number.isFinite(v) ? `${(v * 100).toFixed(2).replace(/\.00$/, '')}%` : 'Not reported';
@@ -62,10 +63,55 @@ function wholeNumber(value) {
     return Number.isFinite(value) ? value.toLocaleString('en-US', { maximumFractionDigits: 8 }) : 'Not established';
 }
 
-/** A market's recorded exit dependencies as list items: the statement, then its consequence. */
+/** Cited sources as list items: the label linked, the locator and when it was read. */
+function citedSourcesHtml(sources) {
+    return (Array.isArray(sources) ? sources : []).map((source) => `<li>${safeLink(source?.url, source?.label ?? 'Source')}`
+        + `${source?.locator ? ` · <small>${text(source.locator)}</small>` : ''}${source?.accessedAt ? ` · checked ${text(source.accessedAt)}` : ''}</li>`).join('');
+}
+
+/**
+ * A market's recorded exit dependencies as fold rows (one compact row each, app-shell.css .fold-*):
+ * the kind and date closed with the consequence on line two; the statement, the consequence and the
+ * evidence open. Rendered twice on a dossier (beside the market and under lender exit), so the rows
+ * carry no id — a second copy would duplicate it.
+ */
 function exitDependenciesHtml(market) {
-    return (market?.lenderExitDependencies ?? []).map((d) => `<li>${text(d?.statement)}`
-        + `${d?.consequence ? ` <em>${text(d.consequence)}</em>` : ''}</li>`).join('');
+    return foldListHtml((market?.lenderExitDependencies ?? []).map((d) => {
+        const evidence = citedSourcesHtml(d?.evidence);
+        return {
+            when: foldWhen(d?.observedAt),
+            title: d?.kind ? humanizeSlug(d.kind) : 'Exit dependency',
+            line2: d?.consequence ?? d?.statement ?? null,
+            body: `<p>${text(d?.statement)}</p>${d?.consequence ? `<p><em>${text(d.consequence)}</em></p>` : ''}`
+                + `${evidence ? `<ul>${evidence}</ul>` : ''}`
+        };
+    }));
+}
+
+/**
+ * The protocol's documentation-vs-chain findings for one market as fold rows: date, severity and
+ * title closed with why it matters on line two; both sides, their sources and what resolves it open.
+ */
+function marketDiscrepanciesHtml(market) {
+    return foldListHtml((market?.discrepancies ?? []).map((d) => {
+        const side = (label, value) => {
+            const sources = citedSourcesHtml(value?.sources);
+            return value?.text || sources ? `<h5>${escapeHtml(label)}</h5><p>${text(value?.text, 'Not recorded.')}</p>${sources ? `<ul>${sources}</ul>` : ''}` : '';
+        };
+        return {
+            id: foldAnchor('discrepancy', d?.id),
+            tone: d?.severity ?? 'info',
+            when: foldWhen(d?.observedAt),
+            chip: d?.severity ?? 'info',
+            title: d?.title ?? 'Documented discrepancy',
+            line2: d?.impact ?? null,
+            body: `<p><strong>${text(d?.severity, 'info')} · ${text(d?.title)}</strong>${d?.observedAt ? ` <small>(observed ${text(d.observedAt)})</small>` : ''}</p>`
+                + `${d?.classification ? `<p><strong>Scope:</strong> ${text(d.classification)}</p>` : ''}`
+                + side('Published claim', d?.claim) + side('Observed reality', d?.reality)
+                + `${d?.impact ? `<p><strong>Why it matters:</strong> ${text(d.impact)}</p>` : ''}`
+                + `${d?.resolutionCondition ? `<p><strong>What resolves it:</strong> ${text(d.resolutionCondition)}</p>` : ''}`
+        };
+    }));
 }
 
 function marketVerificationHtml(market) {
@@ -76,10 +122,9 @@ function marketVerificationHtml(market) {
     // Where the protocol's own documentation and the chain disagree, and what a lender needs from
     // someone else before it can exit (e.g. an issuer thaw): both recorded per market in
     // protocol-market-research.json and shown here beside the decoded configuration.
-    const discrepancies = (market?.discrepancies ?? []).map((d) => `<li><strong>${text(d?.severity, 'info')} · ${text(d?.title)}</strong>`
-        + `${d?.impact ? ` — ${text(d.impact)}` : ''}${d?.observedAt ? ` <small>(observed ${text(d.observedAt)})</small>` : ''}</li>`).join('');
+    const discrepancies = marketDiscrepanciesHtml(market);
     const dependencies = exitDependenciesHtml(market);
-    return `<article class="verified-market"><p class="eyebrow">Configuration decoded · ${text(market?.observedAt, 'time unrecorded')}</p><h3>${text(market?.routeLabel, 'Verified market route')}</h3><p>This is one collateral-to-debt route. Other markets for the token are not included.</p><dl class="terms"><dt>Market</dt><dd><code>${text(market?.marketAddress)}</code></dd><dt>Collateral reserve</dt><dd><code>${text(market?.collateralReserve)}</code></dd><dt>Debt reserve</dt><dd><code>${text(market?.debtReserve)}</code></dd><dt>Debt asset</dt><dd>${text(market?.debtSymbol)} · <code>${text(market?.debtMint)}</code></dd><dt>Reserve status</dt><dd>${text(config.reserveStatus)} (SDK code ${text(config.reserveStatusCode)})</dd><dt>Expected programme owner</dt><dd><code>${text(market?.expectedProgramOwner)}</code></dd><dt>Observed programme owner</dt><dd><code>${text(market?.observedProgramOwner)}</code> · ${market?.programOwnerMatches === true ? 'matches official mainnet programme ID' : 'match not established'}</dd><dt>Maximum LTV</dt><dd>${Number.isFinite(config.maxLtvPct) ? `${config.maxLtvPct}%` : 'Not established'}</dd><dt>Liquidation threshold</dt><dd>${Number.isFinite(config.liquidationLtvPct) ? `${config.liquidationLtvPct}%` : 'Not established'}</dd><dt>Liquidation bonus range</dt><dd>${Number.isFinite(config.minLiquidationBonusBps) && Number.isFinite(config.maxLiquidationBonusBps) ? `${config.minLiquidationBonusBps / 100}%–${config.maxLiquidationBonusBps / 100}%` : 'Not established'}</dd><dt>Collateral deposit cap</dt><dd>${wholeNumber(config.collateralDepositLimitTokens)} ${text(market?.collateralSymbol)}</dd><dt>Debt borrow cap</dt><dd>${wholeNumber(config.debtBorrowLimitTokens)} ${text(market?.debtSymbol)}</dd><dt>Oracle</dt><dd>${text(config.oracleProvider)} feed <code>${text(config.oraclePriceFeed)}</code> · price chain ${text((config.oraclePriceChain ?? []).join(' → '))} · TWAP chain ${text((config.oracleTwapChain ?? []).join(' → '))} · maximum age ${text(config.maxPriceAgeSeconds)}s</dd><dt>On-chain observation</dt><dd>confirmed slot ${text(market?.rpcSlot)} · reserve last updated at slot ${text(market?.reserveLastUpdateSlot)}</dd><dt>Decoder</dt><dd>${text(market?.decodedWith)}</dd><dt>Read-only execution simulation</dt><dd>${text(execution.status)} — ${text(execution.reason)}</dd></dl>${discrepancies ? `<h4>Documentation vs chain</h4><ul>${discrepancies}</ul>` : ''}${dependencies ? `<h4>What a lender's exit depends on</h4><ul>${dependencies}</ul>` : ''}<h4>Sources</h4><ul>${sources}</ul><h4>Limits</h4><ul>${limits}</ul></article>`;
+    return `<article class="verified-market"><p class="eyebrow">Configuration decoded · ${text(market?.observedAt, 'time unrecorded')}</p><h3>${text(market?.routeLabel, 'Verified market route')}</h3><p>This is one collateral-to-debt route. Other markets for the token are not included.</p><dl class="terms"><dt>Market</dt><dd><code>${text(market?.marketAddress)}</code></dd><dt>Collateral reserve</dt><dd><code>${text(market?.collateralReserve)}</code></dd><dt>Debt reserve</dt><dd><code>${text(market?.debtReserve)}</code></dd><dt>Debt asset</dt><dd>${text(market?.debtSymbol)} · <code>${text(market?.debtMint)}</code></dd><dt>Reserve status</dt><dd>${text(config.reserveStatus)} (SDK code ${text(config.reserveStatusCode)})</dd><dt>Expected programme owner</dt><dd><code>${text(market?.expectedProgramOwner)}</code></dd><dt>Observed programme owner</dt><dd><code>${text(market?.observedProgramOwner)}</code> · ${market?.programOwnerMatches === true ? 'matches official mainnet programme ID' : 'match not established'}</dd><dt>Maximum LTV</dt><dd>${Number.isFinite(config.maxLtvPct) ? `${config.maxLtvPct}%` : 'Not established'}</dd><dt>Liquidation threshold</dt><dd>${Number.isFinite(config.liquidationLtvPct) ? `${config.liquidationLtvPct}%` : 'Not established'}</dd><dt>Liquidation bonus range</dt><dd>${Number.isFinite(config.minLiquidationBonusBps) && Number.isFinite(config.maxLiquidationBonusBps) ? `${config.minLiquidationBonusBps / 100}%–${config.maxLiquidationBonusBps / 100}%` : 'Not established'}</dd><dt>Collateral deposit cap</dt><dd>${wholeNumber(config.collateralDepositLimitTokens)} ${text(market?.collateralSymbol)}</dd><dt>Debt borrow cap</dt><dd>${wholeNumber(config.debtBorrowLimitTokens)} ${text(market?.debtSymbol)}</dd><dt>Oracle</dt><dd>${text(config.oracleProvider)} feed <code>${text(config.oraclePriceFeed)}</code> · price chain ${text((config.oraclePriceChain ?? []).join(' → '))} · TWAP chain ${text((config.oracleTwapChain ?? []).join(' → '))} · maximum age ${text(config.maxPriceAgeSeconds)}s</dd><dt>On-chain observation</dt><dd>confirmed slot ${text(market?.rpcSlot)} · reserve last updated at slot ${text(market?.reserveLastUpdateSlot)}</dd><dt>Decoder</dt><dd>${text(market?.decodedWith)}</dd><dt>Read-only execution simulation</dt><dd>${text(execution.status)} — ${text(execution.reason)}</dd></dl>${discrepancies ? `<h4>Documentation vs chain</h4>${discrepancies}` : ''}${dependencies ? `<h4>What a lender's exit depends on</h4>${dependencies}` : ''}<h4>Sources</h4><ul>${sources}</ul><h4>Limits</h4><ul>${limits}</ul></article>`;
 }
 
 function terms(metrics = {}) {
@@ -155,7 +200,7 @@ ${compositeHtml(i)}
 <section><h2>Recorded parameters</h2><dl class="terms">${terms(i.metrics ?? {})}</dl><h3>Markets and configured addresses</h3><ul>${markets}</ul></section>
 ${verifiedMarkets ? `<section><h2>Decoded market route</h2>${verifiedMarkets}<p class="note">A decoded active configuration is stronger evidence than a registry listing. It is still not proof that a particular borrow transaction succeeded.</p></section>` : ''}
 <section><h2>Custody and default outcomes</h2><div class="scenarios">${scenario('Borrower default / seizure', dossier.outcomes?.borrowerDefault)}${scenario('Protocol hack custody', dossier.outcomes?.protocolHack)}${scenario('Access or key loss', dossier.outcomes?.accessLoss)}</div><p class="note">These conclusions come from the issuer and control recipe${dossier.templateId ? ` from <a href="../templates/${encodeURIComponent(dossier.templateId)}.html">the matched legal template</a>` : '; no matched reviewed template exists'}. They are not protocol simulation results.</p></section>
-${schematicsHtml(dossier, schematics)}<section><h2>Lender exit after receiving the token</h2><p><strong>${text(dossier.lenderExit.label)}</strong> — ${text(dossier.lenderExit.reason)}</p>${(dossier.marketVerifications ?? []).map(exitDependenciesHtml).join('') ? `<p><strong>Market-specific dependencies:</strong></p><ul>${(dossier.marketVerifications ?? []).map(exitDependenciesHtml).join('')}</ul>` : ''}<dl><dt>Observed DEX liquidity</dt><dd>${money(dossier.lenderExit.routes.observedDexLiquidityUsd)}</dd><dt>Issuer redemption established</dt><dd>${dossier.lenderExit.routes.issuerRedemption ? 'yes' : 'no / not established'}</dd><dt>Key limit</dt><dd>Possession of the token does not itself establish eligibility, issuer recognition, redemption access, or enough executable market liquidity.</dd></dl></section>
+${schematicsHtml(dossier, schematics)}<section><h2>Lender exit after receiving the token</h2><p><strong>${text(dossier.lenderExit.label)}</strong> — ${text(dossier.lenderExit.reason)}</p>${(dossier.marketVerifications ?? []).map(exitDependenciesHtml).join('') ? `<p><strong>Market-specific dependencies:</strong></p>${(dossier.marketVerifications ?? []).map(exitDependenciesHtml).join('')}` : ''}<dl><dt>Observed DEX liquidity</dt><dd>${money(dossier.lenderExit.routes.observedDexLiquidityUsd)}</dd><dt>Issuer redemption established</dt><dd>${dossier.lenderExit.routes.issuerRedemption ? 'yes' : 'no / not established'}</dd><dt>Key limit</dt><dd>Possession of the token does not itself establish eligibility, issuer recognition, redemption access, or enough executable market liquidity.</dd></dl></section>
 </main>${contactFooterHtml('../')}</body></html>`;
 }
 

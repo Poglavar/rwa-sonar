@@ -41,6 +41,33 @@ describe('claims-versus-reality directory', () => {
         expect(html).toContain('Open issuer dossier');
     });
 
+    it('lists each record as one compact row: observed date, severity, status and title, then whose and why', () => {
+        const row = { ...rows[0], id: 'scope/1', impact: 'The price stays inside the issuer trust boundary.' };
+        const html = discrepancyDirectoryHtml([row]);
+        expect(html.startsWith('<ul class="fold-list reality-list"><li id="discrepancy-scope-1" class="fold-row fold-')).toBe(true);
+        const summary = html.slice(html.indexOf('<summary>'), html.indexOf('</summary>'));
+        expect(summary).toMatch(/<span class="fold-line1">\d{1,2} \w{3} \d{4} · <span class="sev-chip [^"]*">\w+<\/span> <span class="reality-status[^"]*">open<\/span> <strong class="fold-title">/);
+        expect(summary).toContain(`<span class="fold-line2">${row.issuerName} · The price stays inside the issuer trust boundary.</span>`);
+        // Links live in the opened body, so a click on the row only toggles it.
+        expect(summary).not.toContain('<a ');
+        expect(html.slice(html.indexOf('</summary>'))).toContain('Open issuer dossier');
+        expect(html.endsWith('</footer></div></details></li></ul>')).toBe(true);
+    });
+
+    it('opens the row a URL names and the rows the reader had open, and only those', () => {
+        const a = { ...rows[0], id: 'a' };
+        const b = { ...rows[0], id: 'b' };
+        const closed = discrepancyDirectoryHtml([a, b]);
+        expect(closed.match(/<details open>/g)).toBeNull();
+        const targeted = discrepancyDirectoryHtml([a, b], { targetId: 'discrepancy-b' });
+        expect(targeted.match(/<details open>/g)).toHaveLength(1);
+        expect(targeted).toContain('<li id="discrepancy-b" class="fold-row');
+        expect(targeted).toMatch(/id="discrepancy-b" class="[^"]* fold-target"><details open>/);
+        const kept = discrepancyDirectoryHtml([a, b], { openIds: new Set(['discrepancy-a']) });
+        expect(kept).toMatch(/id="discrepancy-a" class="[^"]*"><details open>/);
+        expect(kept.match(/<details open>/g)).toHaveLength(1);
+    });
+
     it('escapes hostile discrepancy prose and refuses unsafe source URLs', () => {
         const html = discrepancyDirectoryHtml([{
             issuerSlug: 'issuer', issuerName: '<img src=x>', severity: 'warning', holderImpact: 'high',
@@ -84,6 +111,16 @@ describe('claim-versus-reality discrepancies', () => {
         expect(html).toContain('https://example.com/docs');
         expect(html).toContain('https://example.com/code');
         expect(html).toContain('Why it matters');
+    });
+
+    it('shows each discrepancy in the issuer panel as a compact row that opens to both sides', () => {
+        const html = S.discrepanciesHtml(fixture);
+        expect(html).toContain('<ul class="fold-list discrepancy-list"><li class="fold-row fold-warning discrepancy-item discrepancy-warning"><details><summary>');
+        const summary = html.slice(html.indexOf('<details><summary>'), html.indexOf('</summary>', html.indexOf('<details><summary>')));
+        expect(summary).toContain('<span class="fold-line1">20 Sep 2026 · <span class="sev-chip');
+        expect(summary).toContain('<strong class="fold-title">The published scope is broader than the implementation</strong>');
+        expect(summary).toContain('<span class="fold-line2">The reference price remains inside the issuer trust boundary.</span>');
+        expect(summary).not.toContain('<a ');
     });
 
     it('escapes prose and refuses unsafe source URLs', () => {

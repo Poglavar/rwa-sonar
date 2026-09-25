@@ -27,6 +27,33 @@ describe('protocol dossiers', () => {
   expect(html).toContain('16,000,000');
   expect(html).toContain('still not proof that a particular borrow transaction succeeded');
  });
+ test('docs-vs-chain findings and exit dependencies are compact fold rows with both sides and sources in the opened body', () => {
+  const row = researchedRows.find(r => r.marketVerifications.some(m => (m.discrepancies ?? []).length > 0));
+  expect(row).toBeDefined();
+  const html = renderProtocolDossier(row);
+  const rowOf = (id) => { const start = html.indexOf(`<li id="${id}" class="fold-row`); if (start < 0) return null; const rest = html.slice(start); const next = rest.indexOf('class="fold-row', rest.indexOf('>')); const one = next < 0 ? rest : rest.slice(0, next);
+   return { tag: one.slice(0, one.indexOf('>') + 1), summary: one.match(/<summary>([\s\S]*?)<\/summary>/)[1], body: one.slice(one.indexOf('<div class="fold-body">')) }; };
+  const finding = row.marketVerifications.flatMap(m => m.discrepancies ?? []).find(d => d.id === 'loopscale-upgrade-multisig-threshold');
+  const folded = rowOf('discrepancy-loopscale-upgrade-multisig-threshold');
+  expect(folded).not.toBeNull();
+  expect(folded.tag).toBe('<li id="discrepancy-loopscale-upgrade-multisig-threshold" class="fold-row fold-info">');
+  expect(folded.summary).toContain('23 Sep 2026');
+  expect(folded.summary).toContain('<b class="fold-chip">info</b>');
+  expect(folded.summary).toContain('3-of-5 multisig');
+  expect(folded.summary).toContain('<span class="fold-line2">The chain is stricter than the docs');
+  expect(folded.summary).not.toContain('<a ');
+  expect(folded.body).toContain('Published claim');
+  expect(folded.body).toContain('Observed reality');
+  expect(folded.body).toContain('href="https://docs.loopscale.com/partners/curators/security"');
+  expect(folded.body).toContain('href="https://solscan.io/account/C4awuufiuL8DNT5wMDP27HneKKqbgynrsbCa4XYGSuPk"');
+  expect(folded.body).toContain('What resolves it');
+  expect(folded.body).toContain(finding.classification);
+  // The lender-exit dependency: one row per appearance, the long statement only when opened.
+  const dependency = row.marketVerifications.flatMap(m => m.lenderExitDependencies ?? [])[0];
+  expect(html).toContain('<strong class="fold-title">Issuer action required</strong>');
+  expect(html.split(`<span class="fold-line2">${dependency.consequence.slice(0, 40)}`).length - 1).toBe(2);
+  expect(html).toContain('href="https://solscan.io/token/5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED"');
+ });
  test('joins issuer redemption into the lender-exit analysis instead of discarding it', () => { const row = rows.find(r => r.integration.category === 'lending' && r.issuer === 'xstocks-backed'); expect(row).toBeDefined(); expect(row.lenderExit.routes.issuerRedemption).toBe(true); });
  test('index groups the routes by protocol and keeps every token dossier reachable', () => { const html = renderProtocolIndex(rows); expect(html).toContain(`./${rows[0].slug}.html`); expect(html).toContain('exact-token integration'); expect((html.match(/<article>/g) ?? []).length).toBeLessThan(rows.length); });
 });

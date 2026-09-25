@@ -166,10 +166,9 @@ h1 {
 /* The change judge's material verdicts (stocks/lib/cards.mjs materialChangesHtml): a model's reading, so caution-toned, never warning. */
 .model-changes { margin: 0 0 10px; padding: 11px 13px; border: 1px dashed var(--caution); border-radius: 6px; background: var(--caution-bg); color: var(--page-text); font-size: .82rem; }
 .model-changes > strong { color: var(--caution); }
-.model-changes ul { margin: 6px 0; padding-left: 18px; }
-.model-changes li { margin: 3px 0; overflow-wrap: anywhere; }
-.model-changes li q { display: block; color: var(--muted-text); }
-.model-changes p { margin: 0; color: var(--muted-text); font-size: .74rem; }
+.model-changes > .fold-list { margin: 6px 0; }
+.model-changes .fold-body q { display: block; color: var(--muted-text); }
+.model-changes > p { margin: 0; color: var(--muted-text); font-size: .74rem; }
 
 .discrepancy-banner {
     display: grid;
@@ -191,38 +190,10 @@ h1 {
 
 .discrepancy-banner > b { font-size: 0.78rem; }
 
-.discrepancy-list { display: grid; gap: 12px; }
-
-.discrepancy-item {
-    min-width: 0;
-    /* Claim and reality prose quotes whole base58 addresses and URLs; unbroken they widened a
-       375 px phone page to 494 px (SECZ). */
-    overflow-wrap: anywhere;
-    padding: 13px;
-    border: 1px solid var(--panel-border);
-    border-left: 4px solid var(--unknown);
-    border-radius: 8px;
-    background: var(--sunken-bg);
-}
-
-.discrepancy-item.discrepancy-caution { border-left-color: var(--caution); }
-.discrepancy-item.discrepancy-warning,
-.discrepancy-item.discrepancy-critical { border-left-color: var(--warning); }
-
-.discrepancy-item > header {
-    display: flex;
-    gap: 9px;
-    align-items: baseline;
-    margin-bottom: 10px;
-}
-
-.discrepancy-item > header b {
-    color: var(--warning);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-}
-
-.discrepancy-item > header h3 { margin: 0; font-size: 1rem; }
+/* Discrepancies are fold rows (app-shell.css .fold-*): severity and title, then why it matters;
+   opened, the scope and both sides. Claim and reality prose quotes whole base58 addresses and
+   URLs; unbroken they widened a 375 px phone page to 494 px (SECZ) — .fold-body wraps anywhere. */
+.discrepancy-list .fold-body > :first-child { margin-top: 8px; }
 
 .discrepancy-sides {
     display: grid;
@@ -397,6 +368,31 @@ h1 {
     border-left-color: var(--unknown);
 }
 
+/* --- fold rows (app-shell.css .fold-*): the severity chip and the card's own row details -------- */
+
+/* The chip's colour repeats the row's tone; the word carries the meaning. */
+.fold-chip {
+    display: inline-block;
+    padding: 0 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    vertical-align: 1px;
+}
+.fold-critical .fold-chip, .fold-warning .fold-chip { color: var(--warning); }
+.fold-caution .fold-chip { color: var(--caution); }
+.fold-good .fold-chip { color: var(--good); }
+.fold-info .fold-chip { color: var(--accent); }
+.fold-line1 .cm-l { vertical-align: 1px; font-size: 0.72rem; }
+.fold-body p { margin: 6px 0 0; }
+.fold-body small { display: block; margin-top: 4px; color: var(--muted-text); }
+/* Without JavaScript a row a link targets is at least marked; card.js also opens it. */
+.fold-row:target { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Opened, app-shell.css unclamps line 1 but leaves it a -webkit-box, whose children become flex items and lose the spaces between date, chip and title; a block keeps them. */
+.fold-row > details[open] .fold-line1 { display: block; }
+
 /* --- status chips ----------------------------------------------------------------------- */
 
 .c-good,
@@ -444,32 +440,9 @@ h1 {
 
 /* --- When the market is closed: one row per lending market ------------------------------ */
 
-.cm-list {
-    list-style: none;
+/* Each lender is a fold row: label, name and liquidation threshold, then its borrower sentence. */
+.fold-list.cm-list {
     margin: 0.5rem 0 0.75rem;
-    padding: 0;
-}
-
-.cm-list > li {
-    padding: 0.55rem 0;
-    border-top: 1px solid var(--panel-border);
-}
-
-.cm-list > li p {
-    margin: 0.25rem 0;
-}
-
-.cm-list > li i {
-    font-style: normal;
-    font-size: 0.85rem;
-    color: var(--muted-text);
-    white-space: nowrap;
-}
-
-.cm-list > li small {
-    display: block;
-    color: var(--muted-text);
-    overflow-wrap: anywhere;
 }
 
 /* The label: the words carry the meaning, the colour only repeats it. */
@@ -501,13 +474,8 @@ h1 {
     color: var(--warning);
 }
 
-.cm-f {
+.fold-list.cm-f {
     margin: 0.5rem 0;
-    padding-left: 1.1rem;
-}
-
-.cm-f li {
-    margin: 0.2rem 0;
 }
 
 .cm-src {
@@ -526,16 +494,8 @@ h1 {
     margin: 0.75rem 0 0.25rem;
 }
 
-.pyth-lenders {
-    list-style: none;
+.fold-list.pyth-lenders {
     margin: 0 0 0.75rem;
-    padding: 0;
-}
-
-.pyth-lenders > li {
-    padding: 0.45rem 0;
-    border-top: 1px solid var(--panel-border);
-    overflow-wrap: anywhere;
 }
 
 .pyth-src {

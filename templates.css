@@ -69,7 +69,7 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .two-col article { padding: 1rem; background: var(--panel-2); border-radius: .7rem; }.two-col article h3 { margin-top: 0; }
 .facts { display: grid; grid-template-columns: minmax(10rem, .35fr) 1fr; gap: .55rem 1rem; }.facts dt { color: var(--muted); }.facts dd { margin: 0; overflow-wrap: anywhere; }
 .precedence { display: grid; gap: .6rem; padding: 0; list-style: none; }.precedence li { display: grid; grid-template-columns: 2rem 1fr; gap: .75rem; padding: .75rem; border: 1px solid var(--line); border-radius: .65rem; }.precedence li > span { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: var(--rwa-on-accent); font-weight: 900; }.precedence p { margin: .15rem 0 0; color: var(--muted); }
-.conflict-list { padding-left: 1.2rem; }.conflict-list li { margin-bottom: 1rem; }.archive { margin-left: .45rem; }
+.archive { margin-left: .45rem; }
 .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: .82rem; } th, td { padding: .6rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } th { color: var(--muted); } td small { display: block; color: var(--muted); }
 .muted, .unknown { color: var(--muted); } footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
 
@@ -92,12 +92,20 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .template-link-list span, .document-list span { color: var(--muted); font-size: .78rem; }
 .document-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line); }
 .issuer-conflicts { border-left: .3rem solid var(--bad); }
-.issuer-conflict-grid { display: grid; gap: .7rem; }
-.issuer-conflict-grid article { padding: .9rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--panel-2); }
-.issuer-conflict-grid article > span { color: var(--bad); font-size: .68rem; font-weight: 800; text-transform: uppercase; }
-.issuer-conflict-grid h3 { margin: .2rem 0 .7rem; }
-.issuer-conflict-grid article > div { padding: .6rem; background: var(--panel); }
-.issuer-conflict-grid article p { margin: .25rem 0; }
+/* Discrepancies and recorded source changes are fold rows (app-shell.css .fold-*): one compact row
+   each that opens to the full item. The chip's colour repeats the row's tone (also used by the
+   weekly digest, which loads this file). Without JavaScript a row a link targets is marked. */
+.fold-chip { display: inline-block; padding: 0 .45rem; border: 1px solid currentColor; border-radius: 999px; font-size: .72rem; font-weight: 700; white-space: nowrap; vertical-align: 1px; }
+.fold-critical .fold-chip, .fold-warning .fold-chip { color: var(--bad); }
+.fold-caution .fold-chip { color: var(--warn); }
+.fold-good .fold-chip { color: var(--rwa-green); }
+.fold-info .fold-chip { color: var(--accent); }
+.fold-row:target { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Opened, app-shell.css unclamps line 1 but leaves it a -webkit-box, whose children become flex items and lose the spaces between date, chip and title; a block keeps them. */
+.fold-row > details[open] .fold-line1 { display: block; }
+.fold-body p { margin: .35rem 0; }
+.issuer-conflict-list .fold-body > div { margin: .45rem 0; padding: .6rem; border-radius: .5rem; background: var(--panel-2); }
+.issuer-conflict-list .fold-body > div p { margin: .25rem 0 0; }
 /* Issuer dossier "What if…" block: one chip per answer status, then the two links to the answers. */
 .whatif-counts { display: flex; flex-wrap: wrap; gap: .45rem; margin: .8rem 0; padding: 0; list-style: none; }
 .whatif-counts li { padding: .35rem .6rem; border: 1px solid var(--line); border-left: .22rem solid var(--muted); border-radius: .45rem; background: var(--panel-2); font-size: .84rem; }

@@ -1416,12 +1416,15 @@ describe('model-assessed material changes on a card', () => {
         expect(later).toContain('A redemption fee now applies to every holder.');
     });
 
-    it('costs well under a kilobyte, so the widest card stays inside its hard limit', () => {
+    // Each change is a fold row, so its reading appears twice (the closed row's second line and the
+    // opened body) and each row links to its diff: the two longest rows measured 1.7 kB (2026-09-25),
+    // against the 150 kB limit and a widest card of about 111 kB.
+    it('costs under two kilobytes, so the widest card stays inside its hard limit', () => {
         const long = 'x '.repeat(400);
         const items = [1, 2, 3].map((n) => row({ id: String(n), judgmentId: String(n), summary: long, assessmentSummary: long }));
         const bare = Buffer.byteLength(renderCard(cardFor('QQQx'), { version: 'v' }), 'utf8');
         const withBlock = Buffer.byteLength(renderCard(cardFor('QQQx', BUILT_AT, exportOf(...items)), { version: 'v' }), 'utf8');
-        expect(withBlock - bare).toBeLessThan(1024);
+        expect(withBlock - bare).toBeLessThan(2048);
         expect(withBlock).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
     });
 });
@@ -1449,7 +1452,7 @@ describe('the "When the market is closed" section on a card', () => {
         expect(labels.find((l) => l[0] === 'loopscale')[1]).toMatch(/^stale since \d{1,2} \w{3} 2026$/);
         expect(section).toContain('<span class="cm-l cm-frozen">frozen at close</span>');
         expect(section).toContain('<span class="cm-l cm-token">24/7 token price</span>');
-        expect(section).toContain('<i>liquidation at 65 % LTV</i>');
+        expect(section).toContain('<strong class="fold-title">Kamino xStocks Pool</strong> · liquidation at 65 % LTV');
         expect(section).toContain('a thin weekend sell-off can liquidate you');
         expect(section).toContain('<dt>Exposure at the Monday gap</dt><dd>not measured</dd>');
         // The weekend premium survives only as the weekend move in the 24/7 lender's own price.
@@ -1461,8 +1464,9 @@ describe('the "When the market is closed" section on a card', () => {
     it('shows the findings its lenders carry, each with its source', () => {
         const section = sectionOf(renderCard(cardFor('QQQx'), { baseUrl: null, version: 'v' }));
         expect(section).toContain('Collateral price suspended around a corporate action');
-        expect(section).toContain('Lending market prices the collateral from the token&#39;s own trading</a>: Nest');
-        expect(section).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">Collateral price suspended around a corporate action<\/a>: Kamino and Jupiter Lend, about 44 h from 19 Sep 2026/);
+        expect(section).toContain('<strong class="fold-title">Lending market prices the collateral from the token&#39;s own trading</strong> · Nest');
+        expect(section).toContain('<strong class="fold-title">Collateral price suspended around a corporate action</strong> · Kamino and Jupiter Lend, about 44 h from 19 Sep 2026');
+        expect(section).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">Source<\/a>/);
     });
 
     it('a token no lender takes says so in one line; an unbuilt file is not called "no lender"', () => {
@@ -1555,7 +1559,7 @@ describe('no internal key reaches a reader', () => {
         }] };
         const block = visible(renderCard(cardFor('AAPLx', BUILT_AT, materialChanges), { version: 'v' }))
             .split('Recent material changes')[1].split('A model')[0].replace(/\s+/g, ' ');
-        expect(block).toContain('19 Sep 2026 · warning · Kraken xStocks: the words we quoted for “third party attestation” are no longer in the source');
+        expect(block).toContain('19 Sep 2026 · warning Kraken xStocks: the words we quoted for “third party attestation” are no longer in the source');
         expect(block).toContain('Kraken xStocks (a listed source): 9 lines added, 2 removed · mentions fee');
         for (const key of ['xstocks-backed', 'vocabulary.', 'claims[', 'sources[', '2026-09-19']) expect(block).not.toContain(key);
     });
@@ -1598,9 +1602,11 @@ describe('the largest unresolved risk, in a sentence a holder can read', () => {
 
     it('leads with a documented claim-vs-reality conflict, then a priority-zero review', () => {
         const fgdl = cardFor('FGDLx');
-        expect(riskOf(fgdl)).toMatchObject({ value: fgdl.discrepancies[0].title, href: '#discrepancies' });
+        expect(riskOf(fgdl)).toMatchObject({ value: fgdl.discrepancies[0].title, href: `#discrepancy-${fgdl.discrepancies[0].id}` });
         const p0 = [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }];
-        expect(riskOf({ ...fgdl, underReview: p0 }).href).toBe('#discrepancies');
+        expect(riskOf({ ...fgdl, underReview: p0 }).href).toBe(`#discrepancy-${fgdl.discrepancies[0].id}`);
+        // A discrepancy without an id still lands on the section.
+        expect(riskOf({ ...fgdl, discrepancies: [{ ...fgdl.discrepancies[0], id: null }] }).href).toBe('#discrepancies');
         const review = { ...without(fgdl, 'discrepancy'), underReview: p0 };
         expect(riskOf(review).value).toBe('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
     });
@@ -2002,5 +2008,140 @@ describe('the health split on a card: this token and its programme', () => {
         expect(html).toContain('this token not measured');
         expect(html).toContain('No market could be measured');
         expect(html).not.toContain('<p class="banner banner-good"><strong>This token</strong>');
+    });
+});
+
+// --- Fold rows: lists that grow over time are one compact row per item -------------------------
+
+describe('growing lists on a card are compact rows that open to the full item', () => {
+    const { escapeHtml } = require('./lib/fmt.js');
+    /** Every <li class="fold-row…"> in `html`, split into its summary and its opened body. */
+    const foldRows = (html) => html.split(/(?=<li(?: id="[^"]*")? class="fold-row)/).slice(1).map((part) => part.slice(3)).map((part) => ({
+        open: part.slice(0, part.indexOf('>')),
+        summary: part.slice(part.indexOf('<summary>'), part.indexOf('</summary>')),
+        body: part.slice(part.indexOf('<div class="fold-body">'))
+    }));
+    const sectionOf = (html, id, next) => html.slice(html.indexOf(`<section id="${id}">`), html.indexOf(`<section id="${next}">`));
+
+    it('shows each discrepancy as one row: severity and title, why it matters, then both sides when opened', () => {
+        const card = cardFor('FGDLx');
+        const row = card.discrepancies[0];
+        const html = renderCard(card, { version: 'v' });
+        const section = html.slice(html.indexOf('<section id="discrepancies">'), html.indexOf('<section id="own">'));
+        const rows = foldRows(section);
+        expect(rows).toHaveLength(card.discrepancies.length);
+        expect(rows[0].open).toBe(` id="discrepancy-${row.id}" class="fold-row fold-${row.severity}"`);
+        expect(rows[0].summary).toContain(`<b class="fold-chip">${row.severity}</b> <strong class="fold-title">${escapeHtml(row.title)}</strong>`);
+        expect(rows[0].summary).toContain(`<span class="fold-line2">${escapeHtml(row.impact)}</span>`);
+        // A click on the row only toggles: no link in the summary, every source in the opened body.
+        expect(rows[0].summary).not.toContain('<a ');
+        for (const words of ['Published claim', 'Observed reality', 'Why it matters', 'What resolves it', 'xStocks proof-of-reserves API']) {
+            expect(rows[0].body).toContain(words);
+        }
+    });
+
+    it('points the largest-risk line at the exact discrepancy row it names', () => {
+        const card = cardFor('FGDLx');
+        const risk = assetDecisionFacts(card).find((fact) => fact.id === 'risk');
+        expect(risk.href).toBe(`#discrepancy-${card.discrepancies[0].id}`);
+        expect(renderCard(card, { version: 'v' })).toContain(`<li id="discrepancy-${card.discrepancies[0].id}"`);
+    });
+
+    it('shows each lender of the closed-market section as one row: label, name and threshold, then its sentence', () => {
+        const card = cardFor('NVDAx');
+        const section = sectionOf(renderCard(card, { version: 'v' }), 'closed-market', 'pyth');
+        const lenders = section.slice(section.indexOf('<ul class="fold-list cm-list">'), section.indexOf('<dl class="kv">'));
+        const rows = foldRows(lenders);
+        expect(rows).toHaveLength(card.closedMarket.lenders.length);
+        const nest = rows.find((row) => row.summary.includes('Nest xStock markets'));
+        expect(nest.open).toContain('class="fold-row fold-caution"');
+        expect(nest.summary).toContain('<span class="cm-l cm-token">24/7 token price</span> <strong class="fold-title">Nest xStock markets</strong> · liquidation at 60 % LTV');
+        expect(nest.summary).toContain('<span class="fold-line2">Valued at the token&#39;s own 24/7 price');
+        expect(nest.body).toContain('Freezes (30 d): not watched');
+        const stale = rows.find((row) => row.summary.includes('Loopscale'));
+        expect(stale.open).toContain('fold-warning');
+    });
+
+    it('shows each closed-market finding as one row whose body carries the full statement and the source', () => {
+        const card = cardFor('QQQx');
+        const section = sectionOf(renderCard(card, { version: 'v' }), 'closed-market', 'pyth');
+        const findings = foldRows(section.slice(section.indexOf('<ul class="fold-list cm-f">')));
+        expect(findings.length).toBe(card.closedMarket.findings.length);
+        const suspended = findings.find((row) => row.summary.includes('Collateral price suspended around a corporate action'));
+        const record = card.closedMarket.findings.find((f) => f.name === 'Collateral price suspended around a corporate action');
+        expect(suspended.summary).not.toContain('<a ');
+        expect(suspended.summary).toContain(`<strong class="fold-title">${escapeHtml(record.name)}</strong> · ${escapeHtml(record.short)}</span>`);
+        expect(suspended.summary).toContain(`<span class="fold-line2">${escapeHtml(record.statement)}</span>`);
+        expect(suspended.body).toContain(`<p>${escapeHtml(record.statement)}</p>`);
+        expect(suspended.body).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">/);
+    });
+
+    it('shows each lender\'s Pyth feed as one row; the stale Loopscale account is flagged and its links sit in the body', () => {
+        const card = cardFor('NVDAx');
+        const rows = foldRows(sectionOf(renderCard(card, { version: 'v' }), 'pyth', 'depth'));
+        expect(rows).toHaveLength(card.pyth.lenders.length);
+        const loopscale = rows.find((row) => row.summary.includes('Loopscale'));
+        expect(loopscale.summary).not.toContain('<a ');
+        expect(loopscale.summary).not.toContain('<time');
+        expect(loopscale.body).toContain('https://solscan.io/account/');
+        const jupiter = rows.find((row) => row.summary.includes('Jupiter Lend'));
+        expect(jupiter.summary).toContain('<span class="fold-line2">prices it from Chainlink Data Streams; no Pyth feed.</span>');
+    });
+
+    it('shows each material change as one row: date, the model\'s severity, the change, then its reading and the diff link', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = cardFor('NVDAx', BUILT_AT, { asOf: '2026-09-23T12:00:00Z', items: [{
+            id: '139', detectedAt: '2026-09-22T16:47:12Z', kind: 'legal-term', severity: 'caution',
+            summary: `${token.issuer}:sources[6]: +1 -1 line(s) · keywords: fee`, subjectType: 'source', subjectId: 'abc',
+            issuerSlug: token.issuer, judgmentId: '52', representative: true, material: true,
+            assessmentSeverity: 'caution', assessmentSummary: 'A redemption fee now applies to every holder.'
+        }] });
+        const html = renderCard(card, { version: 'v' });
+        const block = html.slice(html.indexOf('<div class="model-changes">'));
+        const [row] = foldRows(block);
+        expect(row.open).toBe(' id="material-139" class="fold-row fold-caution"');
+        expect(row.summary).toContain('22 Sep 2026 · <b class="fold-chip">caution</b>');
+        expect(row.summary).toContain('<span class="fold-line2">A redemption fee now applies to every holder.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('<q>A redemption fee now applies to every holder.</q>');
+        expect(row.body).toContain('href="../watch.html?material=true#change-139"');
+    });
+});
+
+describe('card.js opens the fold row a link targets', () => {
+    const vm = require('node:vm');
+    /** Runs card.js against a minimal fake page whose URL targets `hash`; returns the fake elements. */
+    function load(hash) {
+        const classes = (initial) => {
+            const set = new Set(initial);
+            return { contains: (c) => set.has(c), add: (c) => set.add(c), remove: (c) => set.delete(c), has: (c) => set.has(c) };
+        };
+        const disclosure = { open: false };
+        const rowDetails = { open: false };
+        const row = { classList: classes(['fold-row']), closest: () => disclosure, querySelector: (sel) => (sel === 'details' ? rowDetails : null) };
+        const stale = { classList: classes(['fold-row', 'fold-target']) };
+        const nav = { addEventListener: () => {} };
+        const document = {
+            getElementById: (id) => (id === 'discrepancy-x' ? row : null),
+            querySelector: (sel) => (sel === '.card-local-nav' ? nav : null),
+            querySelectorAll: (sel) => (sel === '.fold-target' ? [stale] : [])
+        };
+        const context = { document, location: { hash }, window: { addEventListener: () => {} }, Date, isFinite };
+        vm.runInNewContext(fs.readFileSync(path.join(REPO_ROOT, 'card.js'), 'utf8'), context);
+        return { disclosure, rowDetails, row, stale };
+    }
+
+    it('opens the targeted row and its enclosing disclosure, and moves the mark to it', () => {
+        const { disclosure, rowDetails, row, stale } = load('#discrepancy-x');
+        expect(disclosure.open).toBe(true);
+        expect(rowDetails.open).toBe(true);
+        expect(row.classList.has('fold-target')).toBe(true);
+        expect(stale.classList.has('fold-target')).toBe(false);
+    });
+
+    it('leaves every row closed when the URL targets none', () => {
+        const { rowDetails, row } = load('#nothing-here');
+        expect(rowDetails.open).toBe(false);
+        expect(row.classList.has('fold-target')).toBe(false);
     });
 });

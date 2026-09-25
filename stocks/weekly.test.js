@@ -231,6 +231,65 @@ describe('page', () => {
     });
 });
 
+/** One fold row's parts: its opening tag, its summary (the two closed lines) and its opened body. */
+function foldRow(html, id) {
+    const start = html.indexOf(`<li id="${id}" class="fold-row`);
+    if (start < 0) return null;
+    const rest = html.slice(start);
+    const next = rest.indexOf('class="fold-row', rest.indexOf('>'));
+    const row = next < 0 ? rest : rest.slice(0, next);
+    return { tag: row.slice(0, row.indexOf('>') + 1), summary: row.match(/<summary>([\s\S]*?)<\/summary>/)[1],
+        body: row.slice(row.indexOf('<div class="fold-body">')) };
+}
+
+describe('growing lists are compact fold rows', () => {
+    const digest = buildWeek(W39, W38, '2026-09-23T11:58:24Z', inputs({
+        issuers: [{ slug: 'xstocks-backed', name: 'Kraken xStocks', status: 'live', discrepancies: [{ id: 'por gap', title: 'Reserves <cover> fewer tokens', severity: 'warning',
+            observedAt: '2026-09-22', impact: 'Two tokens have no published reserve figure.' }] }],
+        journal: [{ id: 'j1', date: '2026-09-22', category: 'actor-change', severity: 'caution', title: 'Docs corrected', href: './issuers/tessera.html', issuer: 'tessera',
+            whyItMatters: 'Redemption wording changed.', assets: [{ mint: 'm1', symbol: 'AAPLx', href: './cards/AAPLx.html' }] }],
+        material: [{ id: '2056', detectedAt: '2026-09-22T10:00:00Z', material: true, assessmentSeverity: 'warning',
+            assessmentSummary: 'Redemption now needs issuer consent.', summary: 'Terms changed', issuerSlug: 'xstocks-backed' }]
+    }));
+    const html = renderWeekPage(digest);
+
+    test('a material change is one row: date, severity and change closed; the reading and its link open', () => {
+        const row = foldRow(html, 'material-2056');
+        expect(row).not.toBeNull();
+        expect(row.tag).toBe('<li id="material-2056" class="fold-row fold-warning">');
+        expect(row.summary).toContain('<strong class="fold-title">Terms changed</strong>');
+        expect(row.summary).toContain('22 Sep 2026');
+        expect(row.summary).toContain('<span class="fold-line2">Redemption now needs issuer consent.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('model assessment · warning');
+        expect(row.body).toContain('<q>Redemption now needs issuer consent.</q>');
+        expect(row.body).toContain('href="../watch.html?material=true#change-2056"');
+        expect(row.body).toContain('href="../issuers/xstocks-backed.html"');
+    });
+
+    test('a journal change is one row whose links (the change, its tokens) live in the opened body', () => {
+        const row = foldRow(html, 'journal-j1');
+        expect(row).not.toBeNull();
+        expect(row.tag).toBe('<li id="journal-j1" class="fold-row fold-caution">');
+        expect(row.summary).toContain('<strong class="fold-title">Docs corrected</strong>');
+        expect(row.summary).toContain('<span class="fold-line2">Redemption wording changed.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('href="../issuers/tessera.html"');
+        expect(row.body).toContain('href="../cards/AAPLx.html"');
+        expect(row.body).toContain('actor-change · caution');
+    });
+
+    test('a new discrepancy is one row with its consequence on line two and the issuer link in the body', () => {
+        const row = foldRow(html, 'discrepancy-por-gap');
+        expect(row).not.toBeNull();
+        expect(row.tag).toBe('<li id="discrepancy-por-gap" class="fold-row fold-warning">');
+        expect(row.summary).toContain('<strong class="fold-title">Reserves &lt;cover&gt; fewer tokens</strong>');
+        expect(row.summary).toContain('<span class="fold-line2">Two tokens have no published reserve figure.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('href="../issuers/xstocks-backed.html"');
+    });
+});
+
 describe('database read', () => {
     test('every part is bounded by the data instant and a missing table becomes null', () => {
         const sql = weeklyDbSql({ since: '2026-09-14T00:00:00Z', asOf: '2026-09-23T21:49:40Z', tables: { judgment: false, event: true, trade: true } });

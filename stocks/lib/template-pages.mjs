@@ -6,6 +6,7 @@ import siteNav from './site-nav.js';
 import {
     breadcrumbLd, contactStylesheet, insertContact, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
+import { foldListHtml, foldWhen } from './fold-rows.mjs';
 
 const { escapeHtml, isSafeUrl, humanizeSlug, cardSlug, fmtDate } = fmt;
 const DASH = '—';
@@ -148,9 +149,17 @@ function sourceHtml(template) {
         `<td>${source.claimCount}</td></tr>`).join('');
     const precedence = template.sourceAuthority.precedence.map((level) => `<li>` +
         `<span>${level.rank}</span><div><strong>${esc(level.label)}</strong><p>${esc(level.rule)}</p></div></li>`).join('');
-    const changeRows = changes.length ? `<ul class="conflict-list">${changes.map((claim) => `<li>` +
-        `<strong>${esc(claim.field)} · ${esc(claim.status)}</strong>${paragraph(claim.note, 'The external source change is recorded in the underlying claim.')}` +
-        `${link(claim.url)}</li>`).join('')}</ul>` : '<p>No unresolved external source change is currently recorded for this template.</p>';
+    // One compact row per recorded change (the list grows as the watcher sees sources move): when,
+    // what kind and which field, then the note; opened, the note and the source.
+    const changeRows = changes.length ? foldListHtml(changes.map((claim) => ({
+        tone: /gone/.test(claim.status ?? '') ? 'warning' : 'caution',
+        when: foldWhen(claim.accessedAt),
+        chip: claim.status,
+        title: claim.field ?? DASH,
+        line2: claim.note,
+        body: `${paragraph(claim.note, 'The external source change is recorded in the underlying claim.')}`
+            + `<p>${link(claim.url) || 'No source URL recorded.'}${claim.accessedAt ? ` · checked ${esc(fmtDate(claim.accessedAt))}` : ''}</p>`
+    })), { className: 'conflict-list' }) : '<p>No unresolved external source change is currently recorded for this template.</p>';
     return `<p class="method-rule">${esc(template.sourceAuthority.rule)}</p>` +
         `<ol class="precedence">${precedence}</ol>` +
         `<h3>Recorded external source changes</h3>${changeRows}` +

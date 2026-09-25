@@ -237,6 +237,9 @@
     };
 
     /** Which colour band a claim status reads in. Only `changed`/`source-gone` are faults. */
+    /** The tones a fold row (app-shell.css) draws as its left border. */
+    const FOLD_TONES = new Set(['critical', 'warning', 'caution', 'good', 'info']);
+
     const CLAIM_STATUS_TONE = {
         confirmed: 'good',
         changed: 'warning',
@@ -1203,18 +1206,28 @@
             els.savedWatchList.innerHTML = '<p class="wat-empty">No focused watches are stored in this browser yet.</p>';
             return;
         }
-        els.savedWatchList.innerHTML = state.focusedWatches.map(({ watch, credential }) => {
+        // One fold row per watch (app-shell.css): when it was last checked, what the check found and
+        // the watch's name, then its target (or, for an unnamed watch whose name IS the target, the status). The share link, delete button and the Telegram control
+        // (watch-delivery.js appends it to the [data-watch-id] element) open below.
+        els.savedWatchList.innerHTML = `<ul class="fold-list wat-saved-rows">${state.focusedWatches.map(({ watch, credential }) => {
             const changes = Array.isArray(watch.changes) ? watch.changes : [];
             const status = watch.baselineRecorded
                 ? changes.length ? `${changes.length} material change${changes.length === 1 ? '' : 's'} in the latest daily check.` : 'No material change in the latest daily check.'
                 : 'The first daily baseline is pending.';
+            const found = !watch.baselineRecorded ? chip('baseline pending', 'info', status)
+                : changes.length ? chip(`${fmtNumber(changes.length)} change${changes.length === 1 ? '' : 's'}`, 'caution', status)
+                    : chip('no change', 'good', status);
+            const tone = !watch.baselineRecorded ? 'info' : changes.length ? 'caution' : 'good';
             const share = credential.readKey ? focusedShareUrl(watch.watchId, credential.readKey) : null;
-            return `<article class="wat-saved-card" data-watch-id="${escapeHtml(watch.watchId)}">
-                <h3>${escapeHtml(watch.title || watchTargetLabel(watch))}</h3>
+            return `<li class="fold-row fold-${tone} wat-saved-card"><details><summary>
+                <span class="fold-line1">checked ${timeCell(watch.lastCheckedAt)} · ${found}
+                    <strong class="fold-title">${escapeHtml(watch.title || watchTargetLabel(watch))}</strong></span>
+                <span class="fold-line2">${escapeHtml(watch.title ? watchTargetLabel(watch) : status)}</span>
+                </summary><div class="fold-body" data-watch-id="${escapeHtml(watch.watchId)}">
                 <p>${escapeHtml(watchTargetLabel(watch))}</p><p>${escapeHtml(status)}</p>
                 <div class="wat-saved-actions">${share ? `<a data-copy-share href="${escapeHtml(share)}">Copy read-only link</a>` : ''}
-                    <button type="button" class="button" data-delete-watch>Delete watch</button></div></article>`;
-        }).join('');
+                    <button type="button" class="button" data-delete-watch>Delete watch</button></div></div></details></li>`;
+        }).join('')}</ul>`;
     }
 
     function renderSharedWatch(watch) {
@@ -1668,10 +1681,14 @@
             ? `<p class="wat-claim-quote wat-muted">No quote: ${escapeHtml(CLAIM_STATUS_BLURBS[row.status] ?? 'see the note')}</p>`
             : `<blockquote class="wat-claim-quote"${row.quote.truncated ? ` title="${escapeHtml(row.quote.full)}"` : ''}>${escapeHtml(row.quote.text)}</blockquote>`;
         const note = row.note.empty ? '' : `<p class="wat-claim-note">${cut(row.note)}</p>`;
-        return `<li class="wat-claim">
-            <p class="wat-claim-head"><code class="wat-field">${escapeHtml(row.field)}</code>
-                ${chip(row.statusLabel, row.tone, CLAIM_STATUS_BLURBS[row.status] ?? '')}
-                ${chip(row.method, 'info', 'how the claim was read')}
+        // One fold row per claim: when it was last checked, its status and the field path, then the
+        // value it records. The method, quote, note and the source with its dates open below.
+        return `<li class="fold-row${FOLD_TONES.has(row.tone) ? ` fold-${row.tone}` : ''} wat-claim"><details><summary>
+            <span class="fold-line1">checked ${timeCell(row.lastCheckedAt)} · ${chip(row.statusLabel, row.tone, CLAIM_STATUS_BLURBS[row.status] ?? '')}
+                <strong class="fold-title"><code class="wat-field">${escapeHtml(row.field)}</code></strong></span>
+            ${row.value.empty ? '' : `<span class="fold-line2">${escapeHtml(row.value.text)}</span>`}
+            </summary><div class="fold-body">
+            <p class="wat-claim-head">${chip(row.method, 'info', 'how the claim was read')}
                 <span class="wat-claim-value">${cut(row.value)}</span></p>
             ${quote}
             ${note}
@@ -1679,6 +1696,7 @@
                 ${str(row.citedAs) === null ? '' : `· cited as <code>${escapeHtml(row.citedAs)}</code>`}
                 · accessed ${timeCell(row.accessedAt)} · recorded ${timeCell(row.recordedAt)}
                 · last checked ${timeCell(row.lastCheckedAt)}</p>
+            </div></details>
         </li>`;
     }
 

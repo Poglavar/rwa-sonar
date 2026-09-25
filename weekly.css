@@ -27,6 +27,15 @@
 .wk-list p { margin: .3rem 0; }
 .wk-list q { display: block; margin: .3rem 0; color: var(--text); font-style: italic; }
 .wk-compact > li { padding: .35rem .6rem; font-size: .88rem; }
+/* Material changes, journal changes and discrepancies are fold rows (app-shell.css .fold-*): one
+   compact row each that opens to the full item. The section rules above for nested <details> would
+   bold both closed lines and space the row out, so the rows opt out of them here. */
+.wk-fold { margin: .5rem 0; }
+.wk-detail .fold-row > details { margin: 0; }
+.wk-detail .fold-row > details > summary { font-weight: 400; }
+.wk-fold .fold-body p { margin: .3rem 0; }
+.wk-fold .fold-body q { display: block; margin: .3rem 0; color: var(--text); font-style: italic; }
+.fold-row:target { outline: 2px solid var(--rwa-cobalt); outline-offset: 2px; }
 .wk-sources { display: grid; gap: .2rem; padding-left: 1.1rem; font-size: .85rem; }
 .wk-page .template-card h2 a { text-decoration: none; }
 

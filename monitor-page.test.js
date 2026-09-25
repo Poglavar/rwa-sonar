@@ -1171,3 +1171,45 @@ describe('monitor layout and wording', () => {
         }
     });
 });
+
+describe('DeFi changes and curated events are compact rows that open on click', () => {
+    const summaryOf = (html) => html.slice(html.indexOf('<summary>'), html.indexOf('</summary>'));
+    const bodyOf = (html) => html.slice(html.indexOf('<div class="fold-body">'));
+
+    test('a DeFi change: when, severity, token and protocol, then the explanation; links only in the body', () => {
+        const html = M.defiChangeRow({
+            kind: 'token-removed', severity: 'warning', mint: 'MINT_A', symbol: 'AAPLx', cardSlug: 'AAPLx',
+            protocolName: 'Kamino', before: 'live', after: null, summary: "AAPLx no longer appears in Kamino's registry."
+        }, '2026-09-24');
+        expect(html).toMatch(/^<li class="fold-row fold-warning mon-defi-change[^"]*">\s*<details><summary>/);
+        const summary = summaryOf(html);
+        expect(summary).toMatch(/<span class="fold-line1">24 Sep 2026 · <span class="mon-defi-severity[^"]*">warning<\/span>\s*<strong class="fold-title">AAPLx · Kamino<\/strong><\/span>/);
+        expect(summary).toContain('<span class="fold-line2">AAPLx no longer appears in Kamino&#39;s registry.</span>');
+        expect(summary).not.toContain('<a ');
+        const body = bodyOf(html);
+        expect(body).toContain('href="./cards/AAPLx.html"');
+        expect(body).toContain('Registry observation live → —');
+        expect(body).toContain('<code>MINT_A</code>');
+    });
+
+    test('a curated event: date, kind and issuer, then the summary; the kind note and source open below', () => {
+        const html = M.eventRow({ date: '2026-09-16', kind: 'pause', issuer: 'ondo-global-markets', summary: 'Mints paused.', source: 'Ondo asset API' },
+            'Trading or transfers paused by the issuer');
+        expect(html).toMatch(/^<li class="fold-row fold-caution mon-event">\s*<details><summary>/);
+        const summary = summaryOf(html);
+        expect(summary).toContain('<time datetime="2026-09-16">16 Sep 2026</time> · <span class="mon-event-kind" title="Trading or transfers paused by the issuer">pause</span>');
+        expect(summary).toContain('<strong class="fold-title">ondo-global-markets</strong>');
+        expect(summary).toContain('<span class="fold-line2">Mints paused.</span>');
+        const body = bodyOf(html);
+        expect(body).toContain('Trading or transfers paused by the issuer');
+        expect(body).toContain('Ondo asset API');
+    });
+
+    test('the page lists both as fold lists', () => {
+        const { readFileSync } = require('node:fs');
+        const { join } = require('node:path');
+        const source = readFileSync(join(__dirname, 'monitor.js'), 'utf8');
+        expect(source.match(/<ul class="fold-list mon-defi-list">/g)).toHaveLength(2);
+        expect(readFileSync(join(__dirname, 'monitor.html'), 'utf8')).toContain('<ul id="eventList" class="fold-list mon-events">');
+    });
+});

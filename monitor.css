@@ -740,30 +740,14 @@
     font-variant-numeric: tabular-nums;
 }
 
-.mon-defi-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 8px;
-}
-
-.mon-defi-change {
-    padding: 10px 12px;
-    border: 1px solid var(--panel-border);
-    border-left: 4px solid var(--accent);
-    border-radius: 8px;
-    background: var(--sunken-bg);
-}
-
-.mon-defi-change-caution { border-left-color: var(--sev-caution); }
-.mon-defi-change-warning { border-left-color: var(--sev-critical); }
-
+/* Each change is a fold row (app-shell.css): one closed line of when, severity, token and protocol,
+   one of explanation; the card link, before → after and exact token address open below. */
 .mon-defi-change-head {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 7px;
+    margin: 8px 0 0;
 }
 
 .mon-defi-token { font-weight: 700; }
@@ -801,31 +785,7 @@
 
 /* --- events ----------------------------------------------------------- */
 
-.mon-events {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 10px;
-}
-
-.mon-event {
-    border: 1px solid var(--panel-border);
-    border-left-width: 3px;
-    border-left-color: var(--sev-caution);
-    border-radius: 10px;
-    background: var(--card-bg);
-    padding: 10px 12px;
-}
-
-.mon-event-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px;
-    margin: 0 0 4px;
-}
-
+/* Each event is a fold row (app-shell.css): date, kind and issuer closed; summary and source open. */
 .mon-event-kind {
     padding: 1px 8px;
     border: 1px solid var(--sev-caution);
@@ -838,15 +798,10 @@
     cursor: help;
 }
 
-.mon-event-head time {
-    font-size: 0.78rem;
+.mon-event-kind-note {
+    margin: 8px 0 4px;
     color: var(--muted-text);
-    font-variant-numeric: tabular-nums;
-}
-
-.mon-event-issuer {
-    font-size: 0.82rem;
-    font-weight: 600;
+    font-size: 0.76rem;
 }
 
 .mon-event-summary {

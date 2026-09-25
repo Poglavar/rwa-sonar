@@ -10,8 +10,9 @@ import siteNav from './site-nav.js';
 import {
     SITE_IMAGE, breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
+import { foldAnchor, foldListHtml, foldWhen } from './fold-rows.mjs';
 
-const { escapeHtml, fmtDate, fmtDateTime, fmtNumber, cardSlug } = fmt;
+const { escapeHtml, fmtDate, fmtDateTime, fmtNumber, cardSlug, humanizeSlug } = fmt;
 
 const DAY_MS = 86400000;
 export const WEEK_MS = 7 * DAY_MS;
@@ -328,7 +329,7 @@ export function weekDiscrepancies(issuers, week) {
         for (const row of Array.isArray(issuer?.discrepancies) ? issuer.discrepancies : []) {
             if (!inWeek(row?.observedAt, week)) continue;
             out.push({ issuer: issuer.slug, issuerName: str(issuer.name) ?? issuer.slug, id: str(row.id),
-                title: str(row.title), severity: str(row.severity), observedAt: row.observedAt });
+                title: str(row.title), severity: str(row.severity), observedAt: row.observedAt, impact: str(row.impact) });
         }
     }
     return out.sort((a, b) => byText(b.observedAt, a.observedAt) || byText(a.issuer, b.issuer));
@@ -682,6 +683,11 @@ function issuerLink(slug, issuerNames, displayName = null) {
     return `<a href="../issuers/${encodeURIComponent(page)}.html">${escapeHtml(name)}</a>`;
 }
 
+/** The issuer's display name as plain text, for a fold row's closed line (links live in its body). */
+function issuerName(slug, issuerNames, displayName = null) {
+    return str(displayName) ?? str(issuerNames?.[issuerPageSlug(slug, issuerNames) ?? '']) ?? str(slug);
+}
+
 /** A journal href is written relative to the site root (`./issuers/x.html`); these pages sit one level down. */
 function rootHref(href) {
     const value = str(href);
@@ -702,10 +708,21 @@ function materialSection(digest) {
     } else if (rows.length === 0) {
         body = '<p>No change detected this week was read as material by the change judge.</p>';
     } else {
-        body = `<ul class="wk-list">${rows.map((row) => `<li><span class="claim-kind">model assessment${row.assessmentSeverity ? ` · ${escapeHtml(row.assessmentSeverity)}` : ''}</span> `
-            + `${time(row.detectedAt)}${row.issuerSlug ? ` · ${issuerLink(row.issuerSlug, digest.issuerNames)}` : ''}`
-            + `<p>${escapeHtml(row.change ?? row.kind ?? '')}</p><q>${escapeHtml(row.assessment)}</q> `
-            + `<a href="../watch.html?material=true#change-${encodeURIComponent(row.id)}">The diff and the reading →</a></li>`).join('')}</ul>`;
+        // One row per change: date, severity and what changed closed, the model's reading on line
+        // two; the full reading and the links (issuer, diff) open.
+        body = foldListHtml(rows.map((row) => ({
+            id: foldAnchor('material', row.id),
+            tone: row.assessmentSeverity,
+            when: foldWhen(row.detectedAt),
+            chip: row.assessmentSeverity ?? 'model assessment',
+            title: row.change ?? row.kind ?? '',
+            meta: row.issuerSlug ? issuerName(row.issuerSlug, digest.issuerNames) : null,
+            line2: row.assessment,
+            body: `<p><span class="claim-kind">model assessment${row.assessmentSeverity ? ` · ${escapeHtml(row.assessmentSeverity)}` : ''}</span> `
+                + `${time(row.detectedAt)}${row.issuerSlug ? ` · ${issuerLink(row.issuerSlug, digest.issuerNames)}` : ''}</p>`
+                + `<p>${escapeHtml(row.change ?? row.kind ?? '')}</p><q>${escapeHtml(row.assessment)}</q> `
+                + `<a href="../watch.html?material=true#change-${encodeURIComponent(row.id)}">The diff and the reading →</a>`
+        })), { className: 'wk-fold' });
     }
     const note = '<p class="muted">A language model\'s reading of each detected document or on-chain diff. It is not a legal conclusion. The diff it read is on the change feed.</p>';
     return section('material', 'Material changes (model assessment)', note + body, rows === null ? 'n/a' : String(rows.length));
@@ -714,7 +731,7 @@ function materialSection(digest) {
 function journalSection(digest) {
     const rows = digest.journal;
     const body = rows.length === 0 ? '<p>The public change journal recorded nothing first observed this week.</p>'
-        : `<ul class="wk-list">${rows.map((item) => {
+        : foldListHtml(rows.map((item) => {
             const assets = Array.isArray(item.assets) ? item.assets : [];
             const protocol = item.category === 'protocol-change' ? str(item.actor) : null;
             const assetLinks = assets.length === 0 ? '' : `<details><summary>${escapeHtml(plural(assets.length, 'token'))}</summary><ul class="asset-chips">${listCap(assets, (asset) => {
@@ -724,10 +741,20 @@ function journalSection(digest) {
                 return `<li>${card}${page ? ` <a href="../protocols/${encodeURIComponent(page)}.html">${escapeHtml(protocol)} dossier</a>` : ''}</li>`;
             }, item.issuer ? `see ${issuerLink(item.issuer, digest.issuerNames)}` : '')}</ul></details>`;
             const href = rootHref(item.href);
-            return `<li><span class="claim-kind">${escapeHtml(item.category ?? '')} · ${escapeHtml(item.severity ?? '')}</span> ${time(item.date)}`
-                + `<p><strong>${href ? `<a href="${escapeHtml(href)}">${escapeHtml(item.title ?? item.id)}</a>` : escapeHtml(item.title ?? item.id)}</strong></p>`
-                + `${str(item.whyItMatters) ? `<p class="muted">${escapeHtml(item.whyItMatters)}</p>` : ''}${assetLinks}</li>`;
-        }).join('')}</ul>`;
+            // One row per change; the linked title, why it matters and the tokens open.
+            return {
+                id: foldAnchor('journal', item.id),
+                tone: item.severity,
+                when: foldWhen(item.date),
+                chip: item.severity,
+                title: item.title ?? item.id ?? '',
+                meta: str(item.category) === null ? null : humanizeSlug(item.category),
+                line2: item.whyItMatters,
+                body: `<p><span class="claim-kind">${escapeHtml(item.category ?? '')} · ${escapeHtml(item.severity ?? '')}</span> ${time(item.date)}</p>`
+                    + `<p><strong>${href ? `<a href="${escapeHtml(href)}">${escapeHtml(item.title ?? item.id)}</a>` : escapeHtml(item.title ?? item.id)}</strong></p>`
+                    + `${str(item.whyItMatters) ? `<p class="muted">${escapeHtml(item.whyItMatters)}</p>` : ''}${assetLinks}`
+            };
+        }), { className: 'wk-fold' });
     return section('journal', 'Issuer, venue and protocol changes', body
         + '<p class="muted">From the public change journal: changes by issuers, venues, protocols and sources, and catalogue membership changes. RWA Sonar\'s own editorial corrections are excluded.</p>', String(rows.length));
 }
@@ -787,8 +814,18 @@ function statusSection(digest) {
 
 function evidenceSection(digest) {
     const disc = digest.discrepancies.length === 0 ? '<p>No new claim-versus-reality discrepancy was recorded this week.</p>'
-        : `<ul class="wk-list">${digest.discrepancies.map((row) => `<li><span class="claim-kind">${escapeHtml(row.severity ?? '')}</span> ${time(row.observedAt)} · `
-            + `${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}<p>${escapeHtml(row.title ?? row.id ?? '')}</p></li>`).join('')}</ul>`;
+        : foldListHtml(digest.discrepancies.map((row) => ({
+            id: foldAnchor('discrepancy', row.id),
+            tone: row.severity,
+            when: foldWhen(row.observedAt),
+            chip: row.severity,
+            title: row.title ?? row.id ?? '',
+            meta: issuerName(row.issuer, digest.issuerNames, row.issuerName),
+            line2: row.impact,
+            body: `<p><span class="claim-kind">${escapeHtml(row.severity ?? '')}</span> ${time(row.observedAt)} · `
+                + `${issuerLink(row.issuer, digest.issuerNames, row.issuerName)}</p><p>${escapeHtml(row.title ?? row.id ?? '')}</p>`
+                + `${row.impact ? `<p class="muted">${escapeHtml(row.impact)}</p>` : ''}`
+        })), { className: 'wk-fold' });
     const events = digest.events;
     const eventBody = events === null ? '<p class="unknown">Watcher change events (sonar.change_event) could not be read for this build.</p>'
         : events.total === 0 ? '<p>The source and chain watchers raised no change event this week.</p>'

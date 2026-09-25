@@ -209,3 +209,44 @@ describe('issuer page schematics', () => {
         expect(html).not.toContain('id="what-happens"');
     });
 });
+
+describe('growing lists on issuer and template pages are compact rows that open to the full item', () => {
+    const { escapeHtml } = require('./lib/fmt.js');
+    const rowsOf = (html) => html.split(/(?=<li(?: id="[^"]*")? class="fold-row)/).slice(1).map((part) => ({
+        open: part.slice(3, part.indexOf('>')),
+        summary: part.slice(part.indexOf('<summary>'), part.indexOf('</summary>')),
+        body: part.slice(part.indexOf('<div class="fold-body">'))
+    }));
+
+    it('shows each issuer discrepancy as one row: severity and title, why it matters, then both sides and the sources', () => {
+        const issuer = issuers.issuers.find((row) => row.slug === 'xstocks-backed');
+        const html = renderIssuerPage({ issuer, tokens: tokens.tokens.filter((row) => row.issuer === issuer.slug), templates: templates.templates, builtAt: issuers.builtAt },
+            { baseUrl: 'https://rwasonar.com', version: 'test' });
+        const section = html.slice(html.indexOf('<section class="issuer-conflicts" id="discrepancies">'), html.indexOf('</section>', html.indexOf('issuer-conflicts')));
+        const rows = rowsOf(section);
+        expect(rows).toHaveLength(issuer.discrepancies.length);
+        const d = issuer.discrepancies[0];
+        expect(rows[0].open).toBe(` id="discrepancy-${d.id}" class="fold-row fold-${d.severity}"`);
+        expect(rows[0].summary).toContain(`<b class="fold-chip">${d.severity}</b> <strong class="fold-title">${escapeHtml(d.title)}</strong>`);
+        expect(rows[0].summary).toContain(`<span class="fold-line2">${escapeHtml(d.impact)}</span>`);
+        expect(rows[0].summary).not.toContain('<a ');
+        for (const words of ['Published claim', 'Observed reality', 'Why it matters:', 'What resolves it:', escapeHtml(d.claim.text)]) {
+            expect(rows[0].body).toContain(words);
+        }
+        expect(rows[0].body).toMatch(/<a href="https:[^"]+" target="_blank"/);
+    });
+
+    it('shows each recorded external source change of a template as one row', () => {
+        const base = templates.templates.find((row) => row.issuer.slug === 'xstocks-backed');
+        const template = { ...base, sourceAuthority: { ...base.sourceAuthority, changes: [
+            { field: 'redemption.fee', status: 'changed', note: 'The fee schedule now names a 0.5% redemption fee.', url: 'https://example.com/terms', accessedAt: '2026-09-20T10:00:00Z' }
+        ] } };
+        const html = renderTemplatePage(template, { baseUrl: 'https://rwasonar.com', version: 'test' });
+        const [row] = rowsOf(html.slice(html.indexOf('<h3>Recorded external source changes</h3>')));
+        expect(row.open).toBe(' class="fold-row fold-caution"');
+        expect(row.summary).toContain('20 Sep 2026 · <b class="fold-chip">changed</b> <strong class="fold-title">redemption.fee</strong>');
+        expect(row.summary).toContain('<span class="fold-line2">The fee schedule now names a 0.5% redemption fee.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('href="https://example.com/terms"');
+    });
+});

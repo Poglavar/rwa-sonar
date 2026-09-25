@@ -969,3 +969,23 @@ describe('the buyer table on the compare view', () => {
         expect(block).not.toContain('!important');
     });
 });
+
+describe('growing lists on stocks.html are compact rows that open on click', () => {
+    const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+    const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+
+    test('the issuer panel lists attestations and findings as fold rows led by date, status or severity, and name', () => {
+        expect(source).toContain("sections.push(foldDetailList('Attestations', issuer.attestations, (att) => {");
+        expect(source).toContain("sections.push(foldDetailList('Findings', issuer.findings, (finding) => {");
+        expect(source).not.toMatch(/detailList\('(?:Attestations|Findings)'/);
+        expect(source).toContain('line1: `${escapeHtml(fmtDate(finding.observedAt))} · ${sev} <strong class="fold-title">${name}</strong>`');
+        expect(source).toContain('line1: `${escapeHtml(fmtDate(att.attestationDate))} · ${status} <strong class="fold-title">${name}</strong>`');
+    });
+
+    test('Claims vs reality keeps opened rows open across a filter change and opens the row a link names', () => {
+        expect(source).toContain("els.discrepancyGrid.querySelectorAll('li.fold-row > details[open]')");
+        expect(source).toContain('discrepancyDirectoryHtml(rows, { openIds, targetId })');
+        expect(html).toMatch(/stocks\/lib\/discrepancy-view\.js\?v=20260925a"/);
+        expect(html).toMatch(/stocks\/lib\/panel-markup\.js\?v=20260925a"/);
+    });
+});

@@ -30,6 +30,7 @@ import { marketIdOf } from './closed-market.mjs';
 import { equitySymbolForTicker } from './pyth.mjs';
 import { PYTH_SHARDS, feedPageUrl, freshestReading, premiumOverPyth, tokenStockGap } from './pyth-onchain.mjs';
 import { breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags } from './site-seo.mjs';
+import { foldAnchor, foldListHtml, foldPlain, foldWhen } from './fold-rows.mjs';
 
 const { protocolProofModel } = protocolProof;
 const { pairLegLabel } = activityRowsLib;
@@ -1435,20 +1436,35 @@ function discrepancySideHtml(label, side, kind) {
         + `<p>${text(side?.text)}</p>${discrepancySourcesHtml(side?.sources)}</article>`;
 }
 
+/** The fragment id of one discrepancy's row, so a link (the largest-risk line) can open exactly it. */
+export function discrepancyAnchor(row) {
+    return foldAnchor('discrepancy', row?.id);
+}
+
+/**
+ * One compact row per discrepancy (the list grows as issuers and protocols are checked): severity
+ * and title, then why it matters; opened, the scope, both sides with their sources, what resolves
+ * it and when it was observed.
+ */
 export function discrepanciesBody(card) {
     if (!Array.isArray(card?.discrepancies) || card.discrepancies.length === 0) {
         return '<p class="note">No current claim-versus-observed-reality discrepancy has been documented for this issuer.</p>';
     }
-    return `<div class="discrepancy-list">${card.discrepancies.map((row) => `<article class="discrepancy-item discrepancy-${escapeHtml(row.severity)}">`
-            + `<header><b>${escapeHtml(row.severity)}</b><h3>${text(row.title)}</h3></header>`
-            + `<p class="discrepancy-observed">Scope: ${escapeHtml(row.classification ?? 'issuer programme')}</p>`
+    return foldListHtml(card.discrepancies.map((row) => ({
+        id: discrepancyAnchor(row),
+        tone: row.severity,
+        when: foldWhen(row.observedAt),
+        chip: row.severity,
+        title: row.title ?? DASH,
+        line2: row.impact ?? row.reality?.text ?? null,
+        body: `<p class="discrepancy-observed">Scope: ${escapeHtml(row.classification ?? 'issuer programme')}</p>`
             + `<div class="discrepancy-sides">${discrepancySideHtml('Published claim', row.claim, 'claim')}`
             + `${discrepancySideHtml('Observed reality', row.reality, 'reality')}</div>`
             + `${row.impact === null ? '' : `<p class="discrepancy-impact"><strong>Why it matters</strong>${escapeHtml(row.impact)}</p>`}`
             + `${row.resolutionCondition === null ? '' : `<p class="discrepancy-impact"><strong>What resolves it</strong>${escapeHtml(row.resolutionCondition)}</p>`}`
             + `${row.observedAt === null ? '' : `<p class="discrepancy-observed">Observed ${shortTime(row.observedAt)}</p>`}`
             + `${row.href ? `<p><a href="${escapeHtml(row.href)}">Open the ${escapeHtml(row.protocol ?? 'protocol')} dossier</a></p>` : ''}`
-            + '</article>').join('')}</div>`;
+    })), { className: 'discrepancy-list' });
 }
 
 /** camelCase key -> "camel case", for the rule-input pairs. */
@@ -1704,18 +1720,27 @@ function closedMarketBody(card) {
             + 'Nest and Loopscale checked; Project 0 and Save list no stock token).</p>';
     }
     const V = closedMarketView;
-    // Byte-capped: one line per lender for the label and threshold, its sentence, and one line for
-    // freezes and the Monday gap. The per-market sources are in the linked data file.
-    const lenders = c.lenders.map((l) => {
+    // Byte-capped: one row per lender — the label, name and threshold, then its sentence on the
+    // second line; opened, the sentence in full and one line for freezes and the Monday gap. The
+    // per-market sources are in the linked data file.
+    const lenders = foldListHtml(c.lenders.map((l) => {
         const freezes = V.freezeText(l.freezes, l.protocolId);
         const gaps = V.gapsText(l.mondayGaps, 2);
         const meta = [freezes === null ? null : `Freezes (30 d): ${freezes}`, gaps === null ? null : `Monday gap: ${gaps}`].filter(Boolean);
-        return `<li><b>${escapeHtml(l.displayName ?? DASH)}</b> <span class="cm-l ${V.labelClass(l.labelKind)}">${escapeHtml(l.label ?? DASH)}</span>`
-            + `${l.liquidationLtvPct === null ? '' : ` <i>liquidation at ${escapeHtml(fmtNumber(l.liquidationLtvPct))} % LTV</i>`}`
-            + `${l.hidden ? ' <small>(reserve hidden in the app)</small>' : ''}`
-            + `${l.sentence === null ? '' : `<p>${escapeHtml(l.sentence)}</p>`}`
-            + `${meta.length ? `<small>${escapeHtml(meta.join(' · '))}</small>` : ''}</li>`;
-    }).join('');
+        return {
+            // The row's edge repeats what the label says: a stale price blocks exits; a 24/7 or
+            // signed-quote price can liquidate while the stock market is shut.
+            tone: l.labelKind === 'stale' ? 'warning' : (l.labelKind === 'token-24x7' || l.labelKind === 'signed-quote') ? 'caution' : null,
+            chipHtml: `<span class="cm-l ${V.labelClass(l.labelKind)}">${escapeHtml(l.label ?? DASH)}</span>`,
+            title: l.displayName ?? DASH,
+            meta: [l.liquidationLtvPct === null ? null : `liquidation at ${fmtNumber(l.liquidationLtvPct)} % LTV`,
+                l.hidden ? 'reserve hidden in the app' : null].filter(Boolean).join(' · ') || null,
+            line2: l.sentence,
+            body: `${l.sentence === null ? '' : `<p>${escapeHtml(l.sentence)}</p>`}`
+                + `${meta.length ? `<small>${escapeHtml(meta.join(' · '))}</small>` : ''}`
+                + `${l.hidden ? '<small>The reserve is hidden in the lender’s app.</small>' : ''}`
+        };
+    }), { className: 'cm-list' });
     const weekend = V.weekendMoveText(c.weekendMove);
     const rows = kv([
         ['Solana depth, sale to USDC', escapeHtml(V.depthText(c.depth))],
@@ -1725,13 +1750,20 @@ function closedMarketBody(card) {
         ['Exposure at the Monday gap', 'not measured']
     ]);
     // A finding's severity is its own word (info / caution / warning / critical), not a health status.
-    const severity = (sev) => `<b class="c-${['info', 'caution', 'warning', 'critical'].includes(sev) ? sev : 'unknown'}">${escapeHtml(sev ?? 'finding')}</b>`;
-    const findings = c.findings.length === 0 ? '' : `<ul class="cm-f">${c.findings.map((f) => `<li>${severity(f.severity)} `
-        + `${f.sourceUrl === null ? escapeHtml(f.name ?? f.schema ?? '') : link(f.sourceUrl, f.name ?? f.schema ?? '')}`
-        + `${f.short === null ? '' : `: ${escapeHtml(f.short)}`}</li>`).join('')}</ul>`;
+    // One row each: severity, name and who it concerns, then the statement; opened, the statement in
+    // full and its source.
+    const findings = foldListHtml(c.findings.map((f) => ({
+        tone: f.severity,
+        chip: f.severity ?? 'finding',
+        title: f.name ?? f.schema ?? '',
+        meta: f.short,
+        line2: f.statement,
+        body: `${f.statement === null ? '' : `<p>${escapeHtml(f.statement)}</p>`}`
+            + `<p class="cm-src">${f.sourceUrl === null ? 'No source recorded.' : link(f.sourceUrl, 'Source')}</p>`
+    })), { className: 'cm-f' });
     const n = c.lenders.length;
     return `<p class="cm-lead">${n === 1 ? 'One lending market takes' : `${n} lending markets take`} it; the price each uses while the US market is closed:</p>`
-        + `<ul class="cm-list">${lenders}</ul>${rows}${findings}`
+        + `${lenders}${rows}${findings}`
         + `<p class="cm-src">Read on-chain ${escapeHtml(fmtDate(c.researchedAt))}; freezes: our lending watcher; gaps: Kamino; depth: Jupiter. `
         + '<a href="../stocks-closed-market.json">Data, sources</a> · <a href="#pyth">Which Pyth feed each lender reads</a></p>';
 }
@@ -2037,8 +2069,20 @@ function pythLenderHtml(l) {
 
 function pythBody(card) {
     const p = card.pyth;
+    // One row per lender: its name, then the sentence (without the name) on the second line; opened,
+    // the sentence with its account links and timestamps. A stale price account is flagged.
     const lenders = p.lenders.length === 0 ? ''
-        : `<p class="pyth-lead">What each lender that takes it reads from Pyth:</p><ul class="pyth-lenders">${p.lenders.map((l) => `<li>${pythLenderHtml(l)}</li>`).join('')}</ul>`;
+        : '<p class="pyth-lead">What each lender that takes it reads from Pyth:</p>' + foldListHtml(p.lenders.map((l) => {
+            const sentence = pythLenderHtml(l);
+            const stale = l.uses === 'push' && l.ageAtCheckS !== null && l.maxAgeS !== null && l.ageAtCheckS > l.maxAgeS;
+            return {
+                tone: stale ? 'warning' : null,
+                chip: stale ? 'stale' : null,
+                title: l.name ?? DASH,
+                line2Html: foldPlain(sentence.replace(/^<b>[^<]*<\/b>:?\s*/, '')),
+                body: `<p>${sentence}</p>`
+            };
+        }), { className: 'pyth-lenders' });
     if (p.feeds.length === 0) {
         const line = !p.checked ? 'Not checked yet: this token is newer than our last read of Pyth’s feed lists.'
             : p.tokenFeedsChecked ? 'Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).'
@@ -2802,7 +2846,9 @@ export function largestRisk(card) {
     const discrepancy = (Array.isArray(card?.discrepancies) ? card.discrepancies : []).slice()
         .sort((a, b) => (RISK_RANK[b?.severity] ?? 0) - (RISK_RANK[a?.severity] ?? 0))[0] ?? null;
     if (discrepancy !== null && typeof discrepancy.title === 'string' && discrepancy.title !== '') {
-        return { value: discrepancy.title, href: '#discrepancies', link: 'Inspect claim vs reality' };
+        // The row itself, which card.js opens; the section when the record has no id.
+        const anchor = discrepancyAnchor(discrepancy);
+        return { value: discrepancy.title, href: anchor === null ? '#discrepancies' : `#${anchor}`, link: 'Inspect claim vs reality' };
     }
     const review = Array.isArray(card?.underReview) ? card.underReview.length : 0;
     if (review > 0) {
@@ -2979,10 +3025,19 @@ export function materialChangesHtml(card) {
     const block = card.materialChanges;
     if (block === null || block === undefined || block.items.length === 0) return '';
     const href = `../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(card.issuer?.slug ?? '')}&amp;material=true`;
-    const items = block.items.map((item) => `<li><span>${escapeHtml(fmtDate(item.detectedAt))}`
-        + `${item.assessmentSeverity ? ` · ${escapeHtml(item.assessmentSeverity)}` : ''} · ${escapeHtml(item.change ?? '')}</span>`
-        + `<q>${escapeHtml(item.assessment ?? '')}</q></li>`).join('');
-    return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong><ul>${items}</ul>`
+    // One row per change: date, the model's severity and the change, then its reading; opened, the
+    // reading in full and the link to that change's diff on the feed.
+    const items = foldListHtml(block.items.map((item) => ({
+        id: foldAnchor('material', item.id),
+        tone: item.assessmentSeverity,
+        when: foldWhen(item.detectedAt),
+        chip: item.assessmentSeverity,
+        title: item.change ?? '',
+        line2: item.assessment,
+        body: `<q>${escapeHtml(item.assessment ?? '')}</q>`
+            + `${item.id === null ? '' : ` <a href="../watch.html?material=true#change-${encodeURIComponent(item.id)}">Diff →</a>`}`
+    })));
+    return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong>${items}`
         + `<p>A model's reading of each document diff. It is not a legal conclusion. <a href="${href}">`
         + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
 }

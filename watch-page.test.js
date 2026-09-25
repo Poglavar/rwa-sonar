@@ -964,6 +964,28 @@ describe('changes and journal entries are compact rows that open on click', () =
     });
 });
 
+describe('saved watches and claims are compact rows that open on click', () => {
+    test('a saved watch is one row: checked, what the check found, its name; then its target', () => {
+        expect(JS).toContain('<ul class="fold-list wat-saved-rows">');
+        expect(JS).toMatch(/<li class="fold-row fold-\$\{tone\} wat-saved-card"><details><summary>\s*<span class="fold-line1">checked \$\{timeCell\(watch\.lastCheckedAt\)\} · \$\{found\}\s*<strong class="fold-title">/);
+        expect(JS).toContain('<span class="fold-line2">${escapeHtml(watch.title ? watchTargetLabel(watch) : status)}</span>');
+        // The share link, the delete button and the Telegram control (appended to [data-watch-id])
+        // live in the opened body, so a click on the row only toggles it.
+        expect(JS).toMatch(/<div class="fold-body" data-watch-id="\$\{escapeHtml\(watch\.watchId\)\}">[\s\S]*?data-copy-share[\s\S]*?data-delete-watch[\s\S]*?<\/div><\/details><\/li>/);
+        expect(JS).not.toContain('<article class="wat-saved-card"');
+    });
+
+    test('a claim is one row: checked, status and field path; then the value it records', () => {
+        expect(JS).toMatch(/<li class="fold-row\$\{FOLD_TONES\.has\(row\.tone\) \? ` fold-\$\{row\.tone\}` : ''\} wat-claim"><details><summary>\s*<span class="fold-line1">checked \$\{timeCell\(row\.lastCheckedAt\)\}/);
+        expect(JS).toContain('<strong class="fold-title"><code class="wat-field">${escapeHtml(row.field)}</code></strong>');
+        expect(JS).toContain('<span class="fold-line2">${escapeHtml(row.value.text)}</span>');
+        expect(HTML).toContain('<ul id="claimList" class="fold-list wat-claims">');
+        // The old card box would double the fold row's own border and padding.
+        expect(CSS).not.toMatch(/\.wat-claim \{/);
+        expect(CSS).not.toMatch(/\.wat-saved-card,\s*\.wat-shared-watch \{|\.wat-saved-card \{/);
+    });
+});
+
 describe('the journal row leads with one short date', () => {
     test('effective, else event, else first observed; the full times stay in the opened row', () => {
         expect(W.journalShortDate({ effectiveAt: '2026-09-26', eventAt: '2026-09-01', firstObservedAt: '2026-09-24T18:07:00Z' })).toBe('26 Sep 2026');

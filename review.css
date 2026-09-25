@@ -11,12 +11,11 @@
 .review-filters label { color: var(--muted); font-size: .7rem; font-weight: 780; text-transform: uppercase; letter-spacing: .07em; }
 .review-filters select, .review-filters input { width: 100%; min-height: 43px; margin-top: 6px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: inherit; text-transform: none; letter-spacing: 0; }
 .review-search { grid-column: 1 / -1; }
-.review-queue { display: grid; gap: 10px; padding: 0; list-style: none; }
-.review-item { display: grid; grid-template-columns: 60px minmax(0, 1fr) 180px; gap: 20px; padding: 22px; overflow-wrap: anywhere; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.review-priority { display: grid; place-items: center; width: 46px; height: 31px; border-radius: 6px; background: var(--violet-soft); color: var(--violet-dark); font-size: .72rem; font-weight: 900; }
+/* The queue is a fold list (app-shell.css): one closed row per item, the full item in .review-body. */
+.review-body { display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 12px 20px; padding-top: 12px; }
+.review-priority { display: inline-block; padding: 0 6px; border-radius: 5px; background: var(--violet-soft); color: var(--violet-dark); font-size: .7rem; font-weight: 900; }
 .review-item[data-priority="P0"] .review-priority { background: color-mix(in srgb, var(--red) 18%, var(--panel)); color: var(--red); }
 .review-item[data-priority="P1"] .review-priority { background: color-mix(in srgb, var(--amber) 18%, var(--panel)); color: var(--amber); }
-.review-copy h3 { margin: 0 0 7px; font-size: 1rem; }
 .review-copy p { margin: 7px 0 0; color: var(--muted); font-size: .82rem; }
 .review-copy .review-action { color: var(--ink); }
 .review-affected { color: var(--ink); }
@@ -43,19 +42,18 @@
 .review-diff div { padding: 10px; border-radius: 8px; background: var(--page); font-size: .76rem; overflow-wrap: anywhere; }
 .review-diff strong { display: block; margin-bottom: 4px; color: var(--muted); font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; }
 .review-impact { padding-left: 10px; border-left: 3px solid var(--amber); }
-.resolution-form { grid-column: 2 / -1; display: grid; grid-template-columns: 160px 160px minmax(220px, 1fr) auto; gap: 8px; align-items: end; margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.resolution-form { grid-column: 1 / -1; display: grid; grid-template-columns: 160px 160px minmax(220px, 1fr) auto; gap: 8px; align-items: end; margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
 .resolution-form label { color: var(--muted); font-size: .65rem; font-weight: 760; text-transform: uppercase; letter-spacing: .05em; }
 .resolution-form textarea { min-height: 64px; resize: vertical; }
-.resolution-history { grid-column: 2 / -1; margin: 0; padding-left: 18px; color: var(--muted); font-size: .72rem; }
+.resolution-history { grid-column: 1 / -1; margin: 0; padding-left: 18px; color: var(--muted); font-size: .72rem; }
 .resolution-history strong { color: var(--ink); }
 @media (max-width: 800px) {
     .review-summary, .review-filters { grid-template-columns: repeat(2, 1fr); }
-    .review-item { grid-template-columns: 48px minmax(0, 1fr); }.review-meta { grid-column: 2; align-items: flex-start; text-align: left; }
+    .review-body { grid-template-columns: minmax(0, 1fr); }.review-meta { align-items: flex-start; text-align: left; }
     .editor-panel, .editor-panel form { grid-template-columns: 1fr; }
-    .resolution-form { grid-column: 2; grid-template-columns: 1fr 1fr; }
+    .resolution-form { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 520px) {
     .review-summary, .review-filters { grid-template-columns: 1fr; }.review-search { grid-column: auto; }
-    .review-item { grid-template-columns: minmax(0, 1fr); }.review-meta, .resolution-form, .resolution-history { grid-column: auto; }.review-priority { width: 42px; }
     .review-diff, .review-state, .resolution-form { grid-template-columns: minmax(0, 1fr); }
 }

@@ -731,10 +731,9 @@ section {
 .discrepancy-panel > summary span { font-weight: 800; }
 .discrepancy-panel > summary strong { font-size: .75rem; }
 .discrepancy-note { margin: 0; padding: 0 13px 12px; color: var(--muted-text); font-size: .78rem; line-height: 1.45; }
-.discrepancy-list { display: grid; gap: 10px; padding: 0 12px 12px; }
-.discrepancy-item { border: 1px solid var(--panel-border); border-left: 4px solid var(--sev-warning); border-radius: 7px; background: var(--card-bg); overflow: hidden; }
-.discrepancy-item > header { display: flex; align-items: center; gap: 8px; padding: 10px 11px; }
-.discrepancy-item h5 { margin: 0; font-size: .9rem; }
+/* Discrepancies (panel and directory) are fold rows (app-shell.css); the sides open in .fold-body. */
+.discrepancy-panel .discrepancy-list { padding: 0 12px 12px; }
+.fold-row .discrepancy-sides { margin-top: 10px; }
 .discrepancy-sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--panel-border); border-bottom: 1px solid var(--panel-border); }
 .discrepancy-side { min-width: 0; padding: 11px; }
 .discrepancy-side + .discrepancy-side { border-left: 1px solid var(--panel-border); }
@@ -754,18 +753,11 @@ section {
 .reality-filters label { color: var(--muted-text); font-size: .68rem; font-weight: 780; letter-spacing: .04em; text-transform: uppercase; }
 .reality-filters :is(select, input) { width: 100%; margin-top: 4px; padding: 9px 10px; border: 1px solid var(--control-border); border-radius: 7px; background: var(--control-bg); color: var(--control-text); font: inherit; font-size: .82rem; text-transform: none; }
 .reality-count { margin: 8px 0 12px; color: var(--muted-text); font-size: .78rem; }
-.reality-grid { display: grid; gap: 14px; }
-.reality-card { overflow: clip; border: 1px solid var(--panel-border); border-left: 5px solid var(--sev-caution); border-radius: 11px; background: var(--card-bg); }
-.reality-card.discrepancy-warning, .reality-card.discrepancy-critical { border-left-color: var(--sev-critical); }
-.reality-card > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px 0; }
-.reality-card > header div { display: flex; gap: 6px; }
-.reality-card > header > a { font-size: .78rem; font-weight: 780; }
-.reality-card > h3 { margin: 8px 15px 4px; font-family: Georgia, "Times New Roman", serif; font-size: 1.2rem; line-height: 1.28; }
-.reality-card .discrepancy-sides { margin-top: 12px; }
-.reality-meta { margin: 0 15px 12px; color: var(--muted-text); font-size: .72rem; }
+.reality-owner { margin: 8px 0 2px; font-size: .78rem; font-weight: 780; }
+.reality-meta { margin: 0 0 10px; color: var(--muted-text); font-size: .72rem; }
 .reality-status { padding: 2px 6px; border: 1px solid var(--panel-border); border-radius: 999px; color: var(--muted-text); font-size: .62rem; font-weight: 800; text-transform: uppercase; }
 .reality-status-resolved { border-color: var(--up); color: var(--up); }
-.reality-card > footer { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 10px 12px 12px; border-top: 1px solid var(--panel-border); font-size: .74rem; font-weight: 740; }
+.reality-row footer { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 10px 12px 12px; border-top: 1px solid var(--panel-border); font-size: .74rem; font-weight: 740; }
 
 @media (max-width: 680px) {
     .discrepancy-sides { grid-template-columns: 1fr; }
@@ -1498,6 +1490,13 @@ section {
     font-size: 0.84rem;
     line-height: 1.5;
     overflow-wrap: anywhere;
+}
+
+/* Findings and attestations in the issuer panel are fold rows (app-shell.css); the opened item reads
+   at the size the plain detail list uses. */
+.detail-fold-list .fold-body {
+    font-size: 0.84rem;
+    line-height: 1.5;
 }
 
 .item-head {

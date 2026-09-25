@@ -106,7 +106,7 @@ const {
 } = searchResults;
 const {
     badge, controlValue, detailList, detailSection, freezeExercisedClass, freezeExercisedLabel,
-    keyGovernanceSummary, linkHtml, metric, personalListHtml, redemptionAnswer, redemptionAnswerHtml,
+    keyGovernanceSummary, linkHtml, metric, personalListHtml, foldDetailList, redemptionAnswer, redemptionAnswerHtml,
     verificationBarHtml
 } = panelMarkup;
 
@@ -196,6 +196,7 @@ if (typeof document !== 'undefined') {
             comparisonFilters: new Set(),
             discrepancies: [],
             discrepancyFilters: { issuer: '', asset: '', impact: '', status: '' },
+            discrepancyTargetShown: false,
             savedItems: { tickers: [], issuers: [] },
             journal: [],
             journalVisit: null,
@@ -901,7 +902,17 @@ if (typeof document !== 'undefined') {
         function renderDiscrepancyDirectory() {
             if (!els.discrepancyGrid) return;
             const rows = filterDiscrepancyRows(state.discrepancies, state.discrepancyFilters);
-            els.discrepancyGrid.innerHTML = discrepancyDirectoryHtml(rows);
+            // A filter change re-renders the rows; the ones the reader opened stay open, and the row a
+            // #discrepancy-<id> link names opens (and scrolls into view) the first time it is shown.
+            const openIds = new Set([...els.discrepancyGrid.querySelectorAll('li.fold-row > details[open]')]
+                .map((details) => details.parentElement.id));
+            const targetId = state.discrepancyTargetShown ? null : window.location.hash.slice(1) || null;
+            els.discrepancyGrid.innerHTML = discrepancyDirectoryHtml(rows, { openIds, targetId });
+            const target = targetId ? document.getElementById(targetId) : null;
+            if (target && els.discrepancyGrid.contains(target)) {
+                state.discrepancyTargetShown = true;
+                target.scrollIntoView({ block: 'center' });
+            }
             if (els.discrepancyCount) {
                 const open = rows.filter((row) => row.status === 'open').length;
                 els.discrepancyCount.textContent = `${fmtNumber(rows.length)} record${rows.length === 1 ? '' : 's'} shown · ${fmtNumber(open)} open`;
@@ -1920,27 +1931,37 @@ if (typeof document !== 'undefined') {
 
             sections.push(detailList('Open questions', issuer.openQuestions, (q) => escapeHtml(q)));
 
-            sections.push(detailList('Attestations', issuer.attestations, (att) => {
+            // Attestations and findings grow with the research, so each is one closed row (date, status or
+            // severity, name; then its statement) that opens to the full item with its evidence link.
+            sections.push(foldDetailList('Attestations', issuer.attestations, (att) => {
                 const name = escapeHtml(labelForSchema(att.schema, state.attestationTypes));
                 const status = att.status ? `<span class="att-status att-status-${escapeHtml(String(att.status).toLowerCase())}">${escapeHtml(att.status)}</span>` : '';
                 const link = isSafeUrl(att.link)
                     ? ` <a href="${escapeHtml(att.link)}" target="_blank" rel="noopener noreferrer">evidence</a>`
                     : '';
-                return `<div class="item-head"><strong>${name}</strong> ${status}</div>` +
-                    `<div class="item-meta">${escapeHtml(att.attestor || DASH)} · ${escapeHtml(fmtDate(att.attestationDate))}` +
-                    `${att.onchain ? ' · on-chain' : ''}${link}</div>` +
-                    (att.statement ? `<div class="item-body">${escapeHtml(att.statement)}</div>` : '');
+                return {
+                    tone: String(att.status).toLowerCase() === 'expired' ? 'caution' : null,
+                    line1: `${escapeHtml(fmtDate(att.attestationDate))} · ${status} <strong class="fold-title">${name}</strong>`,
+                    line2: escapeHtml(att.statement || att.attestor || ''),
+                    body: `<div class="item-meta">${escapeHtml(att.attestor || DASH)} · ${escapeHtml(fmtDate(att.attestationDate))}` +
+                        `${att.onchain ? ' · on-chain' : ''}${link}</div>` +
+                        (att.statement ? `<div class="item-body">${escapeHtml(att.statement)}</div>` : '')
+                };
             }));
 
-            sections.push(detailList('Findings', issuer.findings, (finding) => {
+            sections.push(foldDetailList('Findings', issuer.findings, (finding) => {
                 const name = escapeHtml(labelForSchema(finding.schema, state.findingTypes));
                 const sev = `<span class="sev-chip ${severityClass(finding.severity)}">${escapeHtml(finding.severity || 'unknown')}</span>`;
                 const evidence = isSafeUrl(finding.evidence)
                     ? ` <a href="${escapeHtml(finding.evidence)}" target="_blank" rel="noopener noreferrer">evidence</a>`
                     : finding.evidence ? ` <code>${escapeHtml(finding.evidence)}</code>` : '';
-                return `<div class="item-head">${sev} <strong>${name}</strong></div>` +
-                    (finding.statement ? `<div class="item-body">${escapeHtml(finding.statement)}</div>` : '') +
-                    `<div class="item-meta">${escapeHtml(finding.observer || DASH)} · ${escapeHtml(fmtDate(finding.observedAt))}${evidence}</div>`;
+                return {
+                    tone: finding.severity,
+                    line1: `${escapeHtml(fmtDate(finding.observedAt))} · ${sev} <strong class="fold-title">${name}</strong>`,
+                    line2: escapeHtml(finding.statement || ''),
+                    body: (finding.statement ? `<div class="item-body">${escapeHtml(finding.statement)}</div>` : '') +
+                        `<div class="item-meta">${escapeHtml(finding.observer || DASH)} · ${escapeHtml(fmtDate(finding.observedAt))}${evidence}</div>`
+                };
             }));
 
             sections.push(detailList('Sources', issuer.sources, (src) =>

@@ -1,7 +1,7 @@
 /*
  * Small markup builders for the issuer cards and the issuer and token detail panels on stocks.html:
  * control badges, metric rows, the verification bar, the key-governance summary, detail sections
- * and lists, safe external links, the scoped redemption answer, a control flag's wording and the
+ * and lists (plain, or fold rows for the lists that grow), safe external links, the scoped redemption answer, a control flag's wording and the
  * saved-items list. They were inner functions of stocks.js's page closure that touched no page
  * state, so they moved here verbatim (next-steps.md F11). Pure: no DOM, no fetch, no clock.
  * UMD like the other stocks/lib/*.js files: the browser loads it as a classic script before
@@ -106,6 +106,32 @@
             `<ul class="detail-list">${rendered}</ul></section>`;
     }
 
+    const FOLD_TONES = new Set(['critical', 'warning', 'caution', 'good', 'info']);
+
+    /**
+     * A detail-panel list that grows over time (findings, attestations) as a fold list
+     * (app-shell.css): each item is one closed row that opens to the full item. `row(item)` returns
+     * { tone, line1, line2, body } where line1, line2 and body are ALREADY-ESCAPED HTML; line 1 is
+     * when, how serious and what, line 2 one plain line, and links belong in the body only.
+     */
+    function foldDetailList(title, items, row) {
+        if (!Array.isArray(items) || !items.length) {
+            return `<section class="detail-section"><h4>${escapeHtml(title)}</h4>` +
+                `<p class="detail-empty">None recorded.</p></section>`;
+        }
+        const rendered = items
+            .filter((item) => item !== null && item !== undefined && item !== '')
+            .map((item) => {
+                const { tone = null, line1 = '', line2 = '', body = '' } = row(item) ?? {};
+                return `<li class="fold-row${FOLD_TONES.has(tone) ? ` fold-${tone}` : ''}"><details><summary>` +
+                    `<span class="fold-line1">${line1}</span>${line2 ? `<span class="fold-line2">${line2}</span>` : ''}` +
+                    `</summary><div class="fold-body">${body}</div></details></li>`;
+            })
+            .join('');
+        return `<section class="detail-section"><h4>${escapeHtml(title)} <span class="detail-count">${items.length}</span></h4>` +
+            `<ul class="fold-list detail-fold-list">${rendered}</ul></section>`;
+    }
+
     /** A control flag: an address counts as "on" exactly as MODEL §3.3 reads it. */
     function controlValue(value) {
         if (value === true) return 'yes';
@@ -131,6 +157,7 @@
         redemptionAnswer,
         linkHtml,
         detailList,
+        foldDetailList,
         controlValue,
         personalListHtml
     };

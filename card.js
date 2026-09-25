@@ -1,8 +1,9 @@
 /*
  * The only script a generated card loads (stocks/build-cards.mjs renders everything else at build
- * time, so a card is complete with JavaScript off). Two jobs, both additive: turn every absolute
- * <time> into "… (3 h ago)", which cannot be baked in without making two builds differ, and put a
- * copy button behind the mint address. Nothing here is needed to read the page.
+ * time, so a card is complete with JavaScript off). Its jobs are all additive: turn every absolute
+ * <time> into "… (3 h ago)", which cannot be baked in without making two builds differ, put a
+ * copy button behind the mint address, draw the history chart, and open what a deep link targets.
+ * Nothing here is needed to read the page.
  */
 
 (function () {
@@ -78,13 +79,24 @@
         });
     }
 
-    /** A deep link into a collapsed disclosure must reveal its target before scrolling to it. */
+    /**
+     * A deep link into a collapsed disclosure must reveal its target before scrolling to it. A fold
+     * row (one item of a growing list: a discrepancy, a finding, a change) that a link targets also
+     * opens itself and is marked, so the reader lands on the item in full.
+     */
     function revealHashTarget() {
         if (!location.hash) return;
         var target = document.getElementById(location.hash.slice(1));
         if (!target) return;
         var disclosure = target.closest('details');
         if (disclosure) disclosure.open = true;
+        var marked = document.querySelectorAll('.fold-target');
+        for (var i = 0; i < marked.length; i += 1) marked[i].classList.remove('fold-target');
+        if (target.classList.contains('fold-row')) {
+            var row = target.querySelector('details');
+            if (row) row.open = true;
+            target.classList.add('fold-target');
+        }
     }
 
     function wireLocalNav() {

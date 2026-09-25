@@ -996,6 +996,54 @@
         return days !== null && days > 0 ? days : NEW_MINTS_WINDOW_DAYS;
     }
 
+    /**
+     * One DeFi protocol change as a fold row (app-shell.css): line 1 is when (the day it was
+     * observed), how serious and which token on which protocol; line 2 the plain explanation. The
+     * card link, the before → after detail and the exact token address open below, so a click on
+     * the row only toggles.
+     */
+    function defiChangeRow(change, observedOn = null) {
+        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
+        const href = cardHref(change.symbol, change.mint, change.cardSlug);
+        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
+        const severity = ['info', 'caution', 'warning'].includes(change.severity) ? change.severity : 'info';
+        const protocol = escapeHtml(change.protocolName ?? change.protocolId ?? DASH);
+        const summary = str(change.summary);
+        return `<li class="fold-row fold-${escapeHtml(severity)} mon-defi-change mon-defi-change-${escapeHtml(severity)}">
+            <details><summary>
+            <span class="fold-line1">${escapeHtml(fmtDate(observedOn))} · <span class="mon-defi-severity mon-defi-severity-${escapeHtml(severity)}">${escapeHtml(severity)}</span>
+                <strong class="fold-title">${symbol} · ${protocol}</strong></span>
+            ${summary === null ? '' : `<span class="fold-line2">${escapeHtml(summary)}</span>`}
+            </summary><div class="fold-body">
+            <p class="mon-defi-change-head"><span class="mon-defi-token">${link}</span>
+                <span class="mon-defi-protocol">${protocol}</span></p>
+            <p class="mon-defi-summary">${escapeHtml(summary ?? '')}</p>
+            <p class="mon-defi-evidence">${escapeHtml(defiChangeDetail(change))} · exact token
+                <code>${escapeHtml(change.mint ?? DASH)}</code></p>
+            </div></details>
+        </li>`;
+    }
+
+    /**
+     * One curated event as a fold row: line 1 is the date, the kind (its description as the chip's
+     * tooltip) and the issuer; line 2 the summary, clamped. The full summary and its source open below.
+     */
+    function eventRow(event, kindNote = DEFAULT_EVENT_KIND) {
+        const kind = typeof event.kind === 'string' ? event.kind : '';
+        const summary = str(event.summary);
+        return `<li class="fold-row fold-caution mon-event">
+            <details><summary>
+            <span class="fold-line1"><time datetime="${escapeHtml(event.date ?? '')}">${escapeHtml(fmtDate(event.date))}</time> · <span class="mon-event-kind" title="${escapeHtml(kindNote)}">${escapeHtml(kind || DASH)}</span>
+                <strong class="fold-title">${escapeHtml(event.issuer ?? DASH)}</strong></span>
+            ${summary === null ? '' : `<span class="fold-line2">${escapeHtml(summary)}</span>`}
+            </summary><div class="fold-body">
+            <p class="mon-event-kind-note">${escapeHtml(kindNote)}</p>
+            <p class="mon-event-summary">${escapeHtml(summary ?? '')}</p>
+            <p class="mon-event-source">${escapeHtml(event.source ?? '')}</p>
+            </div></details>
+        </li>`;
+    }
+
     const api = {
         STATUSES,
         STATUS_RANK,
@@ -1048,7 +1096,9 @@
         dayCounts,
         meteoraRows,
         curveSummary,
-        sortEvents
+        sortEvents,
+        defiChangeRow,
+        eventRow
     };
 
     // -----------------------------------------------------------------------
@@ -1345,23 +1395,6 @@
         }).join('');
     }
 
-    function defiChangeRow(change) {
-        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
-        const href = cardHref(change.symbol, change.mint, change.cardSlug);
-        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
-        const severity = ['info', 'caution', 'warning'].includes(change.severity) ? change.severity : 'info';
-        return `<li class="mon-defi-change mon-defi-change-${escapeHtml(severity)}">
-            <div class="mon-defi-change-head">
-                <span class="mon-defi-token">${link}</span>
-                <span class="mon-defi-protocol">${escapeHtml(change.protocolName ?? change.protocolId ?? DASH)}</span>
-                <span class="mon-defi-severity mon-defi-severity-${escapeHtml(severity)}">${escapeHtml(severity)}</span>
-            </div>
-            <p class="mon-defi-summary">${escapeHtml(change.summary ?? '')}</p>
-            <p class="mon-defi-evidence">${escapeHtml(defiChangeDetail(change))} · exact token
-                <code>${escapeHtml(change.mint ?? DASH)}</code></p>
-        </li>`;
-    }
-
     function renderDefiChanges() {
         const view = defiChangeView(state.defiChanges, state.defiKind);
         els.defiChangeRange.textContent = view.baseline
@@ -1383,13 +1416,15 @@
                 : 'No changes match this filter.'}</p>`;
             return;
         }
+        // Every event in the pair was observed on the later day.
+        const row = (change) => defiChangeRow(change, view.to);
         els.defiChangeGroups.innerHTML = view.groups.map((group) => {
             const rows = splitDisplayRows(group.items);
             return `<section class="mon-group mon-defi-group">
                 <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
-                <ul class="mon-defi-list">${rows.visible.map(defiChangeRow).join('')}</ul>
+                <ul class="fold-list mon-defi-list">${rows.visible.map(row).join('')}</ul>
                 ${rows.hidden.length === 0 ? '' : `<details class="mon-group-more"><summary>Show ${escapeHtml(fmtNumber(rows.hidden.length))} more exact integration change${rows.hidden.length === 1 ? '' : 's'}</summary>
-                    <ul class="mon-defi-list">${rows.hidden.map(defiChangeRow).join('')}</ul></details>`}
+                    <ul class="fold-list mon-defi-list">${rows.hidden.map(row).join('')}</ul></details>`}
             </section>`;
         }).join('');
     }
@@ -1400,19 +1435,8 @@
             els.eventList.innerHTML = '<p class="mon-empty">No curated events.</p>';
             return;
         }
-        els.eventList.innerHTML = events.map((event) => {
-            const kind = typeof event.kind === 'string' ? event.kind : '';
-            const kindNote = state.changes?.eventKinds?.[kind] ?? DEFAULT_EVENT_KIND;
-            return `<li class="mon-event">
-                <div class="mon-event-head">
-                    <span class="mon-event-kind" title="${escapeHtml(kindNote)}">${escapeHtml(kind || DASH)}</span>
-                    <time datetime="${escapeHtml(event.date ?? '')}">${escapeHtml(fmtDate(event.date))}</time>
-                    <span class="mon-event-issuer">${escapeHtml(event.issuer ?? DASH)}</span>
-                </div>
-                <p class="mon-event-summary">${escapeHtml(event.summary ?? '')}</p>
-                <p class="mon-event-source">${escapeHtml(event.source ?? '')}</p>
-            </li>`;
-        }).join('');
+        els.eventList.innerHTML = events.map((event) =>
+            eventRow(event, state.changes?.eventKinds?.[event.kind] ?? DEFAULT_EVENT_KIND)).join('');
     }
 
     function renderMeteora() {

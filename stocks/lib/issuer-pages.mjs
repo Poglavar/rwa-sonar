@@ -7,6 +7,7 @@ import flowDiagram from './flow-diagram.js';
 import holderRightsLib from './holder-rights.js';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution, summarizeAuthorityAttribution } from './authority-attribution.mjs';
+import { foldAnchor, foldListHtml, foldWhen } from './fold-rows.mjs';
 import {
     breadcrumbLd, contactFooterHtml, contactStylesheet, insertContact, ldGraph, organizationLd, reportLd, seoHeadTags, webPageLd
 } from './site-seo.mjs';
@@ -57,20 +58,31 @@ function dataContext(issuer, builtAt) {
     </div>`;
 }
 
+/**
+ * Published claim ≠ observed reality: one compact row per discrepancy (the list grows as the
+ * programme is checked) — severity and title, then why it matters; opened, the scope, both sides,
+ * what resolves it and the sources. `#discrepancies` lands on the section, `#discrepancy-<id>` on a row.
+ */
 function discrepancyHtml(rows) {
     if (!Array.isArray(rows) || rows.length === 0) return '';
-    return `<section class="issuer-conflicts"><h2>Published claim ≠ observed reality</h2>
-        <p>These are conflicts between what the issuer publishes and what we observed. Edits to RWA Sonar’s own research are not listed here.</p>
-        <div class="issuer-conflict-grid">${rows.map((row) => `<article>
-            <span>${esc(row.severity || 'caution')}</span><h3>${esc(row.title, 'Documented discrepancy')}</h3>
-            <p><strong>Scope:</strong> ${esc(row.classification, Array.isArray(row.affectedMints) && row.affectedMints.length ? 'named token addresses' : 'issuer programme')}</p>
+    const items = rows.map((row) => ({
+        id: foldAnchor('discrepancy', row.id),
+        tone: row.severity || 'caution',
+        when: foldWhen(row.observedAt),
+        chip: row.severity || 'caution',
+        title: row.title || 'Documented discrepancy',
+        line2: row.impact || row.reality?.text || null,
+        body: `<p><strong>Scope:</strong> ${esc(row.classification, Array.isArray(row.affectedMints) && row.affectedMints.length ? 'named token addresses' : 'issuer programme')}</p>
             <div><strong>Published claim</strong><p>${esc(row.claim?.text, 'Not recorded.')}</p></div>
             <div><strong>Observed reality</strong><p>${esc(row.reality?.text, 'Not recorded.')}</p></div>
             ${row.impact ? `<p><strong>Why it matters:</strong> ${esc(row.impact)}</p>` : ''}
             ${row.resolutionCondition ? `<p><strong>What resolves it:</strong> ${esc(row.resolutionCondition)}</p>` : ''}
             <nav>${[...(row.claim?.sources || []), ...(row.reality?.sources || [])].slice(0, 4)
-                .map((source) => safeLink(source?.url, source?.label || source?.type || 'source ↗')).filter(Boolean).join(' · ')}</nav>
-        </article>`).join('')}</div></section>`;
+                .map((source) => safeLink(source?.url, source?.label || source?.type || 'source ↗')).filter(Boolean).join(' · ')}</nav>`
+    }));
+    return `<section class="issuer-conflicts" id="discrepancies"><h2>Published claim ≠ observed reality</h2>
+        <p>These are conflicts between what the issuer publishes and what we observed. Edits to RWA Sonar’s own research are not listed here.</p>
+        ${foldListHtml(items, { className: 'issuer-conflict-list' })}</section>`;
 }
 
 function fact(label, value) {
