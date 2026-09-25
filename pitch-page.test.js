@@ -23,7 +23,10 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
         expect(html).toContain('href="../stocks.html?view=compare&compare=AAPL"');
         expect(html).toContain('Stocklana main track');
-        expect(html).toContain('25 Sep 2026, 4:00pm ET');
+        expect(html).toContain('answers essential questions: what rights the holder has, in which jurisdiction,');
+        // The cover carries no hackathon deadlines (removed 25 Sep 2026 at the owner's request).
+        expect(html).not.toContain('4:00pm ET');
+        expect(html).not.toContain('World\'s Fair: 12 Oct');
         expect(html).toContain('AAPLx');
         expect(html).toContain('AAPLon');
         expect(html).toContain('very challenging to achieve');
