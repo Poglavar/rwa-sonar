@@ -161,7 +161,7 @@ export function premiumOverPyth(usdPrice, usdPriceReadAt, stock, pythReadAt, { m
  * account on every shard, in getMultipleAccounts requests of at most 100 keys. More requests than
  * `maxRequests` is an error, never a silent truncation.
  */
-export function planAccountReads(feeds, { shards = PYTH_SHARDS, maxRequests = 8 } = {}) {
+export function planAccountReads(feeds, { shards = PYTH_SHARDS, maxRequests = 32 } = {}) {
     const slots = [];
     for (const feed of Array.isArray(feeds) ? feeds : []) {
         for (const shard of shards) slots.push({ feedId: feed.id, shard, address: priceFeedAddress(feed.id, shard) });

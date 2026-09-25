@@ -136,6 +136,13 @@ describe('one bounded read and the file it writes', () => {
         expect(() => planAccountReads(many, { maxRequests: 2 })).toThrow(/cap/);
     });
 
+    test('the default cap fits the full catalogue (about 790 feeds on the server, 25 Sep 2026)', () => {
+        const catalogue = Array.from({ length: 790 }, (_, i) => ({ id: i.toString(16).padStart(64, '0'), symbol: `X${i}`, kind: 'stock' }));
+        expect(planAccountReads(catalogue).requests).toHaveLength(16);
+        const runaway = Array.from({ length: 1700 }, (_, i) => ({ id: i.toString(16).padStart(64, '0'), symbol: `X${i}`, kind: 'stock' }));
+        expect(() => planAccountReads(runaway)).toThrow(/cap of 32/);
+    });
+
     test('writes the chain clock as readAt and each account with its own publish time', () => {
         const plan = planAccountReads(feeds, { maxRequests: 1 });
         const out = buildPythOnchain({

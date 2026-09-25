@@ -24,7 +24,9 @@ const DEFAULT_OUT = join(HERE, 'data', 'pyth-onchain.json');
 const RAW_DIR = join(HERE, 'data', 'raw');
 // Keyless. The tokenized-stock feeds (Crypto.AAPLX/USD, Crypto.AAPLON/USD, …) are in the crypto list.
 const CRYPTO_FEEDS_URL = 'https://hermes.pyth.network/v2/price_feeds?asset_type=crypto';
-const DEFAULT_MAX_REQUESTS = 8;
+// The full catalogue matched about 790 feeds on the server (25 Sep 2026): two shards each, so 16
+// requests. 32 leaves room for growth and still stops a runaway feed list.
+const DEFAULT_MAX_REQUESTS = 32;
 
 function usage() {
     console.log(`fetch-pyth-onchain.mjs — Pyth prices for every tokenized stock, read from Solana without a key
