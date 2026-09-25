@@ -15,10 +15,10 @@ describe('web-native pitch deck', () => {
             'The token is mysterious.',
             'Same stock reference.',
             'Ask what happens if it breaks.',
-            'It re-reads every source on a schedule.',
+            'We re-read every source every day.',
             'What Solana reveals about each token',
             'Research you can use today',
-            'Pilot users who need to rely on tokenized-stock evidence.'
+            'Built to see below the surface.'
         ]) expect(html).toContain(heading);
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
         expect(html).toContain('href="../stocks.html?view=compare&compare=AAPL"');
@@ -32,9 +32,9 @@ describe('web-native pitch deck', () => {
         expect(html).toContain('very challenging to achieve');
         expect(html).toContain('can reconstitute');
         // The float, flows, powers and source figures are build-time regions (stocks/static-snapshot.test.js).
-        for (const region of ['pitch-proof', 'pitch-powers', 'pitch-flows', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
+        for (const region of ['pitch-proof', 'pitch-powers', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
         expect(html).toContain('PreStocks transfer fee 0.50%');
-        expect(html).toContain('Stocklana main track first');
+        for (const step of ['Every real-world asset.', 'Deeper into the law.', 'A dolphin for every integration.']) expect(html).toContain(step);
         expect(html).toContain('Open source under the MIT licence');
         // Team facts are the owner's (supplied 24 Sep 2026); no placeholder is left on the public slide.
         expect(html).toContain('Built by <strong>Poglavar Svemira</strong>, a one-person team');
@@ -42,7 +42,6 @@ describe('web-native pitch deck', () => {
         expect(html).not.toContain('Owner to add');
         expect(html).toContain('https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
-        expect(html).toContain('Follow @RWASonar');
         expect(html).toContain('href="https://x.com/RWASonar"');
         expect(html).not.toContain('Colosseum · 2026');
         expect(html).not.toContain('The token is an exact address, not a brand label.');
@@ -50,15 +49,17 @@ describe('web-native pitch deck', () => {
         expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
-    test('describes the product directly and keeps coverage and review qualifications', () => {
+    test('describes the product directly, without the small print the owner removed on 25 Sep 2026', () => {
         for (const oldCopy of ['The token is not.', 'not a mock-up', 'not missing research',
             'Monitoring is not the same', 'not exhaustive market claims']) {
             expect(html).not.toContain(oldCopy);
         }
-        expect(html).toContain('Other tokens may exist outside it.');
-        expect(js).toContain('Other tokens may exist outside our coverage.');
-        expect(html).toContain('only when an analyst records a review');
-        expect(html).toContain('Actual lending requires its own evidence beyond a registry listing');
+        for (const smallPrint of ['Other tokens may exist outside', 'only when an analyst records a review',
+            'Actual lending requires its own evidence', 'A day not read is missing', 'Flows and float - read on chain']) {
+            expect(html).not.toContain(smallPrint);
+        }
+        expect(js).not.toContain('Other tokens may exist outside');
+        expect(js).not.toContain('liveSnapshot');
     });
 
     test('uses the wide night-watch scene on the existing cover, with text outside the image', () => {
@@ -98,7 +99,7 @@ describe('web-native pitch deck', () => {
         const resolve = value => value.replace(/var\((--[\w-]+)\)/g, (_, name) => resolve(vars[name]));
         const card = declarations('.dimension-grid article');
         const background = resolve(card.background);
-        for (const selector of ['.dimension-grid p', '.dimension-grid small', '.dimension-grid article > span']) {
+        for (const selector of ['.dimension-grid p', '.dimension-grid article > span']) {
             const foreground = resolve(declarations(selector).color);
             // Normal-size text minimum: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
             expect(contrast(foreground, background)).toBeGreaterThanOrEqual(4.5);

@@ -187,23 +187,6 @@ export function landingRedemptionsHtml(facts) {
     return escapeHtml(`On ${fmtDate(day.date)} the scan saw ${flowCounts(day)}.`);
 }
 
-/** The pitch's flows-and-float example: the newest covered Ondo day, then the float share. */
-export function pitchFlowsHtml(facts) {
-    const f = requireFloat(facts);
-    const day = facts.flowDay;
-    const headline = day === null ? 'Ondo flows: no covered day yet'
-        : `${fmtNumber(day.redeemed.count)} Ondo redemptions${day.created ? `, ${fmtNumber(day.created.count)} creations` : ''}`;
-    const when = day === null ? NO_FLOW_DAY
-        : day.created && day.created.hours !== day.redeemed.hours
-            ? `On ${fmtDate(day.date)}: redemptions over ${hours(day.redeemed.hours)} covered hours, creations over ${hours(day.created.hours)}.`
-            : `On ${fmtDate(day.date)}, in the ${hours(day.redeemed.hours)} hours the scan read.`;
-    return '<span class="change-label">Flows and float - read on chain</span>'
-        + `<p><strong>${escapeHtml(headline)}</strong></p>`
-        + `<small>${escapeHtml(when)} Redeemed xStocks return to issuer wallets: on ${escapeHtml(fmtDate(f.readAt))} those wallets held `
-        + `${escapeHtml(fmtPct(f.sharePct))} of priced xStocks supply (${escapeHtml(fmtMoney(f.inventoryUsd))} of ${escapeHtml(fmtMoney(f.supplyUsd))}), `
-        + 'including an inventory wallet the issuer excludes from its circulating figure.</small>';
-}
-
 const POWER_KIND_PHRASES = [['single-key', 'held by one key'], ['multisig', 'by a multisig'], ['program', 'by a program'],
     ['none', 'not installed'], ['unknown', 'unknown']];
 
@@ -260,7 +243,6 @@ export function renderStaticSnapshots(pages, facts) {
     let pitch = replaceMarkedRegion(pages['pitch/index.html'], 'pitch-proof', pitchProofHtml(facts));
     pitch = replaceMarkedRegion(pitch, 'pitch-powers-head', pitchPowersHeadHtml(facts));
     pitch = replaceMarkedRegion(pitch, 'pitch-powers', pitchPowersHtml(facts));
-    pitch = replaceMarkedRegion(pitch, 'pitch-flows', pitchFlowsHtml(facts));
     pitch = replaceMarkedRegion(pitch, 'pitch-sources', pitchSourcesHtml(facts));
     return { 'index.html': landing, 'pitch/index.html': pitch };
 }

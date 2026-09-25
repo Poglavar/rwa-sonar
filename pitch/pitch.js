@@ -98,8 +98,6 @@
             document.querySelectorAll('[data-live-token-count]').forEach((element) => {
                 element.textContent = new Intl.NumberFormat('en-US').format(count);
             });
-            const date = data.latestBuildAt ? new Date(data.latestBuildAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
-            document.getElementById('liveSnapshot').textContent = `${date ? `Live catalogue · ${date}. ` : ''}Token addresses attributed to issuers and observed on chain. Other tokens may exist outside our coverage.`;
         } catch (_) {
             // The conservative static value remains visible when the API is offline.
         }

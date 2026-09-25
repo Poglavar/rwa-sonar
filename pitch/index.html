@@ -32,10 +32,10 @@
     <!-- seo:head:end -->
     <meta name="theme-color" content="#172033" />
     <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
-    <link rel="stylesheet" href="./pitch.css?v=20260925a" />
+    <link rel="stylesheet" href="./pitch.css?v=20260925b" />
     <link rel="stylesheet" href="../motion.css?v=20260924u" />
     <script src="../clarity.js?v=20260924a" defer></script>
-    <script src="./pitch.js?v=20260922d" defer></script>
+    <script src="./pitch.js?v=20260925a" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#slide-1">Skip to deck</a>
@@ -68,7 +68,7 @@
             <li><a href="#slide-3"><span>03</span> Monitoring</a></li>
             <li><a href="#slide-4"><span>04</span> Why Solana</a></li>
             <li><a href="#slide-5"><span>05</span> Built</a></li>
-            <li><a href="#slide-6"><span>06</span> Team &amp; ask</a></li>
+            <li><a href="#slide-6"><span>06</span> Team &amp; next</a></li>
         </ol>
     </nav>
 
@@ -110,7 +110,8 @@
                     <p class="kicker">The product answer</p>
                     <h2>Ask what happens if it breaks.</h2>
                     <p class="section-lede">Failure scenarios answered for each issuer from its own documents, marked
-                        documented, inferred, litigated or unknown. Beside them, who holds each on-chain power.</p>
+                        documented, inferred, litigated or unknown. Beside the legal side we also research who holds
+                        each of the on-chain powers.</p>
                 </div>
                 <div class="scenario-list">
                     <article><span>Keys stolen</span><div><strong>xStocks: nothing comes back as of right.</strong><p>Documented. The only replacement route is a Swiss court cancellation the issuer itself calls "very challenging to achieve".</p></div></article>
@@ -124,20 +125,18 @@
         <section id="slide-3" class="slide slide-paper" data-title="Monitoring" tabindex="-1">
             <div class="slide-inner">
                 <p class="kicker">Monitoring</p>
-                <h2>It re-reads every source on a schedule.</h2>
+                <h2>We re-read every source every day.</h2>
                 <div class="monitor-timeline">
                     <article><strong>Hourly</strong><span>Keys and extensions</span><p>Every catalogued mint's authorities, extensions, rebase multiplier and supply, with the slot as evidence.</p></article>
                     <article><strong>Daily</strong><span>Every cited document</span><p>Re-read, diffed, quotes re-checked word for word. If a page cannot be read, we use the publisher's API or a Wayback capture.</p></article>
-                    <article><strong>Daily</strong><span>Redemptions on chain</span><p>Ondo burns, xStocks de-activations, Superstate conversions. A day not read is missing, never zero.</p></article>
-                    <article><strong>Daily</strong><span>Model assessment</span><p>A model reads each changed document. Its verdict is shown next to the diff and never decides what is shown. The legal review date moves only when an analyst records a review.</p></article>
+                    <article><strong>Daily</strong><span>Redemptions on chain</span><p>Ondo burns, xStocks de-activations, Superstate conversions.</p></article>
+                    <article><strong>Daily</strong><span>Model assessment</span><p>A model reads each changed document. Its verdict is shown next to the diff.</p></article>
                 </div>
                 <div class="change-example">
                     <span class="change-label">Observed on Solana - 19 Sep 2026</span>
                     <p><s>PreStocks transfer fee 0.50%</s><strong>Transfer fee 1.00%</strong></p>
                     <small>All eight mints changed from 50 bps to 100 bps at fee epoch 1039; evidence is the programme authority account observed at Solana slot 448348634. On 24 Sep seven of them scheduled 3.00%, uncapped, from fee epoch 1043 (about 26 Sep 2026).</small>
                 </div>
-                <!-- Written by stocks/build-static-snapshot.mjs from stocks-flows.json (the numbers flows.html shows). -->
-                <div class="change-example"><!-- snapshot:pitch-flows:start --><span class="change-label">Flows and float - read on chain</span><p><strong>250 Ondo redemptions, 437 creations</strong></p><small>On 23 Sep 2026, in the 20.9 hours the scan read. Redeemed xStocks return to issuer wallets: on 24 Sep 2026 those wallets held 81.8% of priced xStocks supply ($2.23B of $2.73B), including an inventory wallet the issuer excludes from its circulating figure.</small><!-- snapshot:pitch-flows:end --></div>
             </div>
             <p class="slide-number">03</p>
         </section>
@@ -147,13 +146,13 @@
                 <p class="kicker">Why Solana, and what is new here</p>
                 <h2>What Solana reveals about each token</h2>
                 <p class="section-lede">Token-2022 puts the issuer's powers in the mint account. RWA Sonar reads them for
-                    every exact address and sets them beside what the documents promise. RWA.xyz and DefiLlama measure the
+                    every exact address and presents them beside what the documents promise. RWA.xyz and DefiLlama measure the
                     size of the market. RWA Sonar does L2BEAT-style trust analysis and extends it past the contract to custody and law.</p>
                 <div class="dimension-grid">
-                    <article><span>01</span><h3>Identity</h3><p>Exact Token-2022 mint joined to issuer registries and reviewed sources.</p><small>Issuer attribution is separate from market coverage</small></article>
-                    <article><span>02</span><h3>Controls</h3><p>Mint, freeze, pause, clawback, allowlist, transfer fee and rebasing, traced to the key or multisig that holds each.</p><small>Holding a power does not mean the issuer may use it</small></article>
-                    <article><span>03</span><h3>Docs vs chain</h3><p>Loopscale's docs call a key a co-signer that "cannot initiate actions on its own"; on chain it signs refinances alone.</p><small>Discrepancies keep both sides cited</small></article>
-                    <article><span>04</span><h3>DeFi proof</h3><p>Protocol listing, account existence, decoded configuration and simulation are separate states.</p><small>Actual lending requires its own evidence beyond a registry listing</small></article>
+                    <article><span>01</span><h3>Identity</h3><p>Exact Token-2022 mint joined to issuer registries and reviewed sources.</p></article>
+                    <article><span>02</span><h3>Controls</h3><p>Mint, freeze, pause, clawback, allowlist, transfer fee and rebasing, traced to the key or multisig that holds each.</p></article>
+                    <article><span>03</span><h3>Docs vs chain</h3><p>Loopscale's docs call a key a co-signer that "cannot initiate actions on its own"; on chain it signs refinances alone.</p></article>
+                    <article><span>04</span><h3>DeFi proof</h3><p>Protocol listing, account existence, decoded configuration and simulation are separate states.</p></article>
                 </div>
                 <p class="pyth-line"><strong>Pyth in the product.</strong> Cards read Pyth stock prices straight from Pyth's accounts on Solana, keyless, with Pyth's own publish times. The market-hours schedules in Pyth's feed list set the session for premiums and the closed-market view. Our lending watcher shows the Pyth price accounts Loopscale reads stopped being updated on 26 Aug 2026 (TSLA on 11 Sep), so those loans cannot roll or be liquidated, while other Pyth accounts for the same stocks on Solana are live. Nest values xStock collateral from Pyth Lazer 24/7 token feeds.</p>
             </div>
@@ -175,33 +174,33 @@
                 <div class="proof-strip">
                     <span>Hourly: chain watch</span><span>Hourly: trade collector</span><span>Hourly: Telegram watch digests</span><span><!-- snapshot:pitch-sources:start -->Daily: 621 cited source URLs re-read<!-- snapshot:pitch-sources:end --></span><span>Daily: redemption observer</span><span>Daily: model change judge</span><span>Daily: case-law watch</span><span>Every 6 h: public build</span>
                 </div>
-                <p id="liveSnapshot" class="snapshot-note">Live catalogue count loads from the public API. Each count records a dated observation within our coverage. Other tokens may exist outside it.</p>
             </div>
             <p class="slide-number">05</p>
         </section>
 
-        <section id="slide-6" class="slide slide-close" data-title="Team & ask" tabindex="-1">
+        <section id="slide-6" class="slide slide-close" data-title="Team & next" tabindex="-1">
             <div class="slide-inner close-grid">
                 <div>
-                    <p class="kicker">Team and ask</p>
-                    <h2>Pilot users who need to rely on tokenized-stock evidence.</h2>
-                    <p class="section-lede">Built for holders, risk teams, protocols and issuers who need
-                        a defensible answer before they buy, integrate or accept a token as collateral. Professional
-                        monitoring and API revenue are hypotheses to validate with pilots.</p>
-                    <p class="section-lede team-line">Built by <strong>Poglavar Svemira</strong>, a one-person team: research, legal analysis, on-chain data pipelines and the site. Contact: <a href="https://x.com/poglavars" target="_blank" rel="noopener noreferrer">@poglavars</a> on X, <a href="https://t.me/svemirsky" target="_blank" rel="noopener noreferrer">@svemirsky</a> on Telegram, <a href="mailto:poglavar.svemira@gmail.com">poglavar.svemira@gmail.com</a>, <a href="https://github.com/Poglavar" target="_blank" rel="noopener noreferrer">github.com/Poglavar</a>.</p>
+                    <p class="kicker">Team and what's next</p>
+                    <h2>Built to see below the surface.</h2>
+                    <p class="section-lede">We built RWA Sonar for ourselves and for everyday holders: to uncover and
+                        understand the risks hidden deep in how each token is structured.</p>
+                    <p class="section-lede team-line">Built by <strong>Poglavar Svemira</strong>, a one-person team: research, legal analysis, on-chain data pipelines and the site. Open source under the MIT licence. Contact: <a href="https://x.com/poglavars" target="_blank" rel="noopener noreferrer">@poglavars</a> on X, <a href="https://t.me/svemirsky" target="_blank" rel="noopener noreferrer">@svemirsky</a> on Telegram, <a href="mailto:poglavar.svemira@gmail.com">poglavar.svemira@gmail.com</a>, <a href="https://github.com/Poglavar" target="_blank" rel="noopener noreferrer">github.com/Poglavar</a>.</p>
                 </div>
-                <div class="ask-card">
-                    <p>Submission package</p>
-                    <ul>
-                        <li>Stocklana main track first; sponsor bounties only where eligibility is clear</li>
-                        <li>Reviewed source branch: github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair</li>
-                        <li>Open source under the MIT licence</li>
-                        <li>Next milestone: five comprehension tests and one pilot integrator</li>
-                    </ul>
+                <div class="ask-card next-card">
+                    <figure class="next-art"><img src="../images/dolphin-detectives/survey-team-v2-768.webp"
+                        srcset="../images/dolphin-detectives/survey-team-v2-768.webp 768w, ../images/dolphin-detectives/survey-team-v2.webp 1536w"
+                        sizes="(max-width: 900px) 90vw, 440px" width="1536" height="1024" loading="lazy" decoding="async"
+                        alt="Three small dolphins with headlamps survey the underwater part of an iceberg in daylight."></figure>
+                    <p>What's next</p>
+                    <ol class="next-steps">
+                        <li><strong>Every real-world asset.</strong> Bonds, funds, credit and real estate, not just stocks.</li>
+                        <li><strong>Deeper into the law.</strong> The legal frameworks of each jurisdiction issuers use: Jersey, the BVI, Liechtenstein, the US and more.</li>
+                        <li><strong>A dolphin for every integration.</strong> A dedicated watcher on each token's every DeFi integration, so the risk picture stays current.</li>
+                    </ol>
                     <div class="close-actions">
                         <a data-product-link href="../stocks.html?view=compare&compare=AAPL">Run the AAPL demo</a>
-                        <a class="secondary" href="https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair">Reviewed source</a>
-                        <a class="secondary" href="https://x.com/RWASonar" target="_blank" rel="me noopener noreferrer">Follow @RWASonar</a>
+                        <a class="secondary" href="https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair">Source code</a>
                     </div>
                 </div>
             </div>

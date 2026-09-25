@@ -9,7 +9,7 @@ import { SITE_PAGES } from './lib/site-pages.mjs';
 const SITE_PAGE_PATHS = SITE_PAGES.map((page) => page.file ?? page.path ?? page);
 import {
     LANDING_EVENT_ROWS, STATIC_SNAPSHOT_PAGES, landingEventsHtml, landingEventsUpdatedHtml, landingFloatHtml, landingRedemptionsHtml,
-    landingSnapshotHtml, pitchFlowsHtml, pitchPowersHeadHtml, pitchPowersHtml, pitchProofHtml, pitchSourcesHtml,
+    landingSnapshotHtml, pitchPowersHeadHtml, pitchPowersHtml, pitchProofHtml, pitchSourcesHtml,
     renderStaticSnapshots, replaceMarkedRegion, snapshotFacts
 } from './lib/static-snapshot.mjs';
 import { RELEASE_ARTIFACTS } from './lib/release-manifest.mjs';
@@ -117,15 +117,10 @@ describe('static snapshot regions', () => {
 
     test('redemption counts are the newest Ondo day the scan covered, with its covered hours', () => {
         expect(landingRedemptionsHtml(facts)).toBe('On 23 Sep 2026 the scan saw 250 Ondo redemptions and 437 creations in the 20.9 hours it read.');
-        const pitch = pitchFlowsHtml(facts);
-        expect(pitch).toContain('<p><strong>250 Ondo redemptions, 437 creations</strong></p>');
-        expect(pitch).toContain('On 23 Sep 2026, in the 20.9 hours the scan read.');
-        expect(pitch).toContain('on 24 Sep 2026 those wallets held 81.8% of priced xStocks supply ($2.23B of $2.73B)');
         // A window with no covered Ondo day says so rather than printing a zero.
         const uncovered = snapshotFacts({ ...FILES, flows: { ...FILES.flows, flows: { issuers: [{ slug: 'ondo-global-markets', days: [
             { date: '2026-09-24', created: { coveredHours: 0, count: null }, redeemed: { coveredHours: 0, count: null } }] }] } } });
         expect(landingRedemptionsHtml(uncovered)).toBe('No Ondo day in the current window has been read by the scan yet.');
-        expect(pitchFlowsHtml(uncovered)).not.toMatch(/\b0 Ondo/);
     });
 
     test('the pitch powers line is the power map’s own cell counts', () => {
@@ -143,7 +138,9 @@ describe('static snapshot regions', () => {
         const landing = readFileSync(join(ROOT, 'index.html'), 'utf8');
         const pitch = readFileSync(join(ROOT, 'pitch/index.html'), 'utf8');
         for (const name of ['float-finding', 'redemptions']) expect(landing).toContain(`<!-- snapshot:${name}:start -->`);
-        for (const name of ['pitch-powers-head', 'pitch-powers', 'pitch-flows', 'pitch-sources']) expect(pitch).toContain(`<!-- snapshot:${name}:start -->`);
+        for (const name of ['pitch-powers-head', 'pitch-powers', 'pitch-sources']) expect(pitch).toContain(`<!-- snapshot:${name}:start -->`);
+        // The flows-and-float box left the deck on 25 Sep 2026 (owner's edit); flows.html keeps the figures.
+        expect(pitch).not.toContain('snapshot:pitch-flows');
         // No hand-typed copy of the figures the regions now carry.
         expect(landing).not.toContain('81.0%');
         expect(pitch).not.toContain('81.0%');
