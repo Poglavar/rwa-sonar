@@ -496,6 +496,37 @@
         return `<ol class="wm-board">${items}</ol>`;
     }
 
+    /** "A", "A and B", "A, B and C"; more than three become a count, so the sentence stays one line. */
+    function nameList(names) {
+        if (names.length > 3) return `${names.length} issuers`;
+        return names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
+    }
+
+    /**
+     * The page's one-sentence answer, read off the scoreboard rather than typed: which issuers have
+     * the most documented answers (quoted from the issuer's or a regulator's own document) and which
+     * the fewest, out of every catalogue question. The scoreboard is always over the whole catalogue,
+     * so the sentence does not move when a filter narrows the matrix. Empty when there is no board.
+     */
+    function headlineText(board) {
+        const rows = (Array.isArray(board) ? board : []).filter((row) => Number.isFinite(row?.counts?.documented));
+        if (rows.length === 0) return '';
+        const total = rows[0].total;
+        const scenarios = `${total} failure scenario${total === 1 ? '' : 's'}`;
+        const counts = rows.map((row) => row.counts.documented);
+        const most = Math.max(...counts);
+        const least = Math.min(...counts);
+        const named = (n) => rows.filter((row) => row.counts.documented === n).map((row) => row.name ?? row.short);
+        const verb = (names) => (names.length === 1 ? 'has' : 'have');
+        if (most === least) {
+            return `${rows.length === 1 ? named(most)[0] : 'Every issuer'} has documented answers to ${most} of the ${scenarios}.`;
+        }
+        const top = named(most);
+        const bottom = named(least);
+        return `${nameList(top)} ${verb(top)} documented answers to ${most} of the ${scenarios}; `
+            + `${nameList(bottom)} ${verb(bottom)} ${least === 0 ? 'none' : least}.`;
+    }
+
     /**
      * Start delays (ms) for the one-time row-by-row reveal of `count` rows: `stepMs` apart, but
      * squeezed so the last row starts by `maxMs` however many rows there are — the whole reveal
@@ -537,6 +568,7 @@
         buildScoreboard,
         scoreboardCountsText,
         scoreboardHtml,
+        headlineText,
         revealDelays
     };
 
@@ -677,10 +709,14 @@
             if (state.reveal === 'waiting') startRevealOnView();
         }
         if (els.colKey) els.colKey.innerHTML = columnKeyHtml(state.matrix.columns);
+        const board = buildScoreboard({ modes: state.modes, issuers: state.issuers, answers: state.answers });
+        if (els.headline) {
+            const headline = headlineText(board);
+            els.headline.textContent = headline;
+            els.headline.hidden = headline === '';
+        }
         if (els.board) {
-            els.board.innerHTML = scoreboardHtml(buildScoreboard({
-                modes: state.modes, issuers: state.issuers, answers: state.answers
-            }), urlExtras());
+            els.board.innerHTML = scoreboardHtml(board, urlExtras());
             for (const link of els.board.querySelectorAll('[data-board-issuer]')) {
                 const on = state.filters.issuer.includes(link.getAttribute('data-board-issuer'));
                 if (on) link.setAttribute('aria-current', 'true');
@@ -817,6 +853,7 @@
 
     async function boot() {
         els.status = document.getElementById('status');
+        els.headline = document.getElementById('headline');
         els.scope = document.getElementById('scope');
         els.counts = document.getElementById('counts');
         els.shown = document.getElementById('shown');

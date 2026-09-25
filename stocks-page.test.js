@@ -912,3 +912,31 @@ describe('the trust-chain section on the issuer panel', () => {
         }
     });
 });
+
+describe('the buyer table on the compare view', () => {
+    const { readFileSync } = require('node:fs');
+
+    it('is given the bundle’s read times, so every number on it says when it was read', () => {
+        const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+        expect(source).toContain('sameStockComparisonHtml(group, models, { sources: bundle?.sources ?? null })');
+    });
+
+    it('scrolls inside its own frame and stacks each question over the wrappers on a phone, in theme colours', () => {
+        const css = readFileSync(join(__dirname, 'stocks.css'), 'utf8');
+        const block = css.slice(css.indexOf('/* Buyer table'), css.indexOf('/* End buyer table */'));
+        expect(block.length).toBeGreaterThan(200);
+        expect(block).toMatch(/\.buyer-wrap \{[^}]*overflow-x: auto/);
+        // The rights strip's visually hidden labels are absolutely positioned: without a containing
+        // block inside the scroller they escape its clip and widen the page (SPCX at 375 px: 510 px).
+        expect(block).toMatch(/\.buyer-wrap \{[^}]*position: relative/);
+        // Phones: the question spans the row and the wrapper answers sit side by side under it.
+        expect(block).toMatch(/@media \(max-width: 640px\)[\s\S]*\.buyer-grid tr \{[^}]*grid-template-columns: repeat\(var\(--buyer-cols\b/);
+        expect(block).toMatch(/\.buyer-grid tbody th \{[^}]*grid-column: 1 \/ -1/);
+        // The sideways-scroll hint shows on phones, and on wide screens only past five wrappers.
+        expect(block).toMatch(/\.buyer-hint \{ display: none; \}/);
+        expect(block).toMatch(/@media \(max-width: 640px\)[\s\S]*\.buyer-hint \{ display: block; \}/);
+        expect(block).not.toMatch(/#[0-9a-fA-F]{3}/);
+        expect(block).not.toMatch(/\brgba?\(/);
+        expect(block).not.toContain('!important');
+    });
+});

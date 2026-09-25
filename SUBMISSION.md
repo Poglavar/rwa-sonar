@@ -40,7 +40,7 @@ description ≤ 5,000 characters (Markdown), up to 3 sponsor tracks, a linked So
 Don't trust the ticker, inspect the token. For anyone buying, lending against or integrating a tokenized stock on Solana: what each token legally gives you, who can freeze, move or burn it, how to exit or borrow, and what changed, with a source for every claim.
 ```
 
-### Full description (4,970 of 5,000 characters)
+### Full description (4,988 of 5,000 characters)
 
 ````markdown
 ## RWA Sonar: tokenized stocks on Solana, explained
@@ -66,20 +66,20 @@ RWA Sonar answers, for every exact token address, from the chain and the issuer'
 Token-2022 puts the issuer's powers in the mint: permanent delegate, freeze, pause, transfer fee, scaled-UI multiplier. On Solana anyone can check, hourly, whether a mint allows more than the prospectus says. RWA Sonar decodes these per mint, resolves Squads multisigs and time locks, reads mints, burns and redemptions from transactions, and checks exact-mint support at Kamino, Jupiter Lend, Loopscale, Nest and DEX pools.
 
 ### Pyth
-Pyth's market-hours schedules set the session for premiums and the closed-market view; Pyth prices are the reference where our feeds are entitled. The hourly lending watcher decodes the publish time of the Pyth price accounts lenders read (PriceUpdateV2) against each market's maximum age, which is how it found Loopscale's stale ones, and our research maps which Pyth feed each market prices from: equity, 24/7 token (Crypto.<T>X/USD) or none.
+Cards read live Pyth prices on Solana without a key, from Pyth's own price accounts (PriceUpdateV2, Pyth's publish times): the stock's feed and, where it exists, the token's 24/7 feed, for the premium and the weekend gap. Pyth's market-hours schedules set the session for premiums and the closed-market view. The lending watcher checks the Pyth accounts lenders read against each market's maximum age: the ones Loopscale reads stopped updating on 26 Aug, while other Pyth accounts for the same stocks are live.
 
 ### What the evidence shows (dated)
 - PreStocks raised its transfer fee from 0.50% to 1.00% on all eight tokens (19 Sep), then on 24 Sep scheduled 3.00% on seven, uncapped, from Solana epoch 1043 (about 26 Sep). Our hourly chain watcher flagged it the same day, before it takes effect.
 - xStocks' power to move or burn holders' tokens sits with a 2-of-3 Squads vault with no time lock. In 1,845 transactions (10 Jun 2025 to 23 Sep 2026) it was never used.
 - On 24 Sep, about 82% of priced xStocks supply ($2.23B of $2.73B) sat in issuer-attributed wallets. The public float is at most about $0.5B.
-- The Pyth price accounts Loopscale reads for xStock collateral have not updated since 26 Aug (TSLA since 11 Sep). Nine loans ($3,911) are past due and can neither roll over nor be liquidated.
+- Loopscale's xStock prices have not updated since 26 Aug (TSLA since 11 Sep): nine loans ($3,911) are past due and can neither roll over nor be liquidated.
 - Our lending watcher measured the freezes around corporate actions: Kamino held QQQx for 44 hours and METAx for 65 (18 to 21 Sep), Jupiter Lend QQQx for 43. Nobody could borrow, withdraw against debt or be liquidated.
 
 ### Coverage
 1,404 token addresses from 9 live issuer programmes (12 reviewed, including two wound down); 9 reviewed legal and technology templates; 11 health checks. Missing data stays "unknown" and never counts as a pass. Structural research, not legal advice.
 
 ### How it's built
-Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher that keeps every version; a case-law watcher; a redemption observer; a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history; the static site rebuilds every 6 hours. Sources: Solana RPC, Jupiter, Pyth, CoinGecko, issuer APIs.
+Node.js jobs on one server: hourly chain, trade and lending watchers; a daily document watcher keeping every version; case-law and redemption watchers; a model-assisted change review (batched, costs recorded, never decides what is published). PostgreSQL holds the history; the static site rebuilds every 6 hours. Sources: Solana RPC, Jupiter, Pyth, CoinGecko, issuer APIs.
 
 ### Business model and next steps
 The public site stays free. Revenue hypothesis: paid alerts and an API for lenders, wallets and risk teams (exact-mint change feeds, collateral screens). No revenue yet; next: one pilot integrator and more lending markets.

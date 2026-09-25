@@ -1,7 +1,8 @@
 /*
- * The same-stock comparison: one model per wrapper, the rows that genuinely differ, the
- * comparison markup with its concept guides, the decision filters, and the checks that a
- * prebuilt comparison bundle belongs to the loaded catalogue.
+ * The same-stock comparison: one model per wrapper, the buyer table at the top of the view
+ * (buyerRows / buyerTableHtml), the rows that genuinely differ, the comparison markup with its
+ * concept guides, the decision filters, and the checks that a prebuilt comparison bundle belongs
+ * to the loaded catalogue.
  *
  * Moved verbatim out of stocks.js (next-steps.md F11). Pure: no DOM, no fetch; the clock only as a
  * default `now` a caller can override. UMD like the
@@ -15,14 +16,48 @@
 })(this, function (defiView, discovery, fmt, evidenceView, issuerLabels, holderRightsLib) {
     const { aggregateComposabilityTemplates, lenderOutcomeModel, productDecisionProfile, redemptionUsabilitySummary } = defiView;
     const { laypersonVerdict, legalReviewStatus } = discovery;
-    const { cardSlug, escapeHtml, fmtMoney, humanizeSlug, isNum, mintSuffix } = fmt;
+    const { cardSlug, escapeHtml, fmtDateTime, fmtMoney, fmtPrice, fmtSignedPct, humanizeSlug, isNum, mintSuffix } = fmt;
     const { provenanceHtml, provenanceSummary } = evidenceView;
     const { issuerDossierHref } = issuerLabels;
-    const { holderRightsRows, holderRightsStripHtml } = holderRightsLib;
+    const { holderRightsHeadline, holderRightsRows, holderRightsStripHtml } = holderRightsLib;
 
-    function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability, nowMs = Date.now()) {
+    /**
+     * "Jersey (Channel Islands)" -> "Jersey", "British Virgin Islands (…)" -> "BVI": the place an
+     * issuer is incorporated, short enough for a table cell. Null when the dossier says it is unknown.
+     */
+    function shortJurisdiction(value) {
+        const text = typeof value === 'string' ? value.trim() : '';
+        if (!text || /^(unknown|not |undisclosed)/i.test(text)) return null;
+        const head = text.split(/[(.;,]| - /)[0].trim()
+            .replace(/^Republic of the /i, '')
+            .replace(/\s+(LLC|corporation|business company|limited)$/i, '').trim();
+        if (head === 'British Virgin Islands') return 'BVI';
+        return head && head.length <= 28 ? head : null;
+    }
+
+    /**
+     * Who holds the freeze, pause and move-or-burn ("take") powers, from one stocks-power-map.json
+     * issuer row: `{freeze, pause, take}` each `{kind, threshold, timelockSeconds}`. The bundle
+     * builder passes these in; the page's no-bundle path has none and shows the powers without holders.
+     */
+    function buyerPowers(powerMapRow) {
+        const cells = Array.isArray(powerMapRow?.cells) ? powerMapRow.cells : [];
+        const pick = (id) => {
+            const cell = cells.find((row) => row?.power === id);
+            if (!cell) return null;
+            return {
+                kind: typeof cell.kind === 'string' ? cell.kind : 'unknown',
+                threshold: typeof cell.signerThreshold === 'string' ? cell.signerThreshold : null,
+                timelockSeconds: isNum(cell.timelock?.seconds) ? cell.timelock.seconds : null
+            };
+        };
+        return { freeze: pick('freeze'), pause: pick('pause'), take: pick('moveBurn') };
+    }
+
+    function sameStockComparisonModels(group, issuersBySlug, defiByMint, composability, nowMs = Date.now(), { powersByIssuer = null } = {}) {
         const issuerMap = issuersBySlug instanceof Map ? issuersBySlug : new Map();
         const usageMap = defiByMint instanceof Map ? defiByMint : new Map();
+        const powersMap = powersByIssuer instanceof Map ? powersByIssuer : new Map();
         return (Array.isArray(group?.rows) ? group.rows : []).map((row) => {
             const issuer = issuerMap.get(row.issuer) ?? {};
             const tokens = Array.isArray(row.tokens) ? row.tokens : [];
@@ -59,9 +94,233 @@
                 provenance: provenanceSummary(issuer),
                 provenanceHtml: provenanceHtml(issuer, { compact: true }),
                 liquidityUsd,
-                volume24Usd
+                volume24Usd,
+                // The issuer facts the buyer table needs, small enough to ship in every bundle.
+                buyer: {
+                    claimRung: isNum(grades.claimRung) ? grades.claimRung : null,
+                    claimLabel: typeof grades.claimLabel === 'string' ? grades.claimLabel : null,
+                    legalForm: typeof issuer.legalForm === 'string' ? issuer.legalForm : null,
+                    jurisdiction: shortJurisdiction(issuer.entityJurisdiction),
+                    usPersonsExcluded: issuer.transferRestrictions?.usPersonsExcluded === true
+                },
+                powers: powersMap.get(row.issuer) ?? null
             };
         });
+    }
+
+    const DEBT_NOTE_FORMS = new Set(['tracker-certificate', 'structured-note', 'debt-note']);
+
+    /** "Secured debt note tracking the share (Jersey)": the claim-depth rung and legal form in plain words. */
+    function ownWords(buyer) {
+        const rung = buyer?.claimRung;
+        const note = DEBT_NOTE_FORMS.has(buyer?.legalForm);
+        const words = rung === 4 ? 'The registered share itself'
+            : note && rung === 2 ? 'Secured debt note tracking the share'
+                : note && rung === 1 ? 'Unsecured debt note tracking the share'
+                    : rung === 3 ? 'Beneficial interest in pooled shares'
+                        : rung === 0 ? 'Price exposure only, no claim on shares'
+                            : buyer?.claimLabel ? buyer.claimLabel.charAt(0).toUpperCase() + buyer.claimLabel.slice(1)
+                                : 'Not established';
+        // A registered share is the company's own; the wrapper's home only matters for a claim on it.
+        return rung !== 4 && buyer?.jurisdiction ? `${words} (${buyer.jurisdiction})` : words;
+    }
+
+    function installed(value) {
+        return value === true || (typeof value === 'string' && value.trim() !== '');
+    }
+
+    function joinWords(words) {
+        return words.length <= 1 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`;
+    }
+
+    /** "2-of-4 multisig", "one key (any 1 of 9)", "issuer program": who can use one power. */
+    function holderText(holder) {
+        if (!holder) return null;
+        const [, m, n] = /^(\d+) of (\d+)/.exec(holder.threshold ?? '') ?? [];
+        if (holder.kind === 'multisig') return m ? `${m}-of-${n} multisig` : 'multisig';
+        if (holder.kind === 'single-key') return m ? `one key (any ${m} of ${n})` : 'one key';
+        if (holder.kind === 'program') return 'issuer program';
+        return 'holder not established';
+    }
+
+    function timelockText(seconds) {
+        if (!isNum(seconds)) return null;
+        if (seconds === 0) return 'no time lock';
+        return seconds < 3600 ? `${Math.round(seconds / 60)} min time lock` : `${Math.round(seconds / 360) / 10} h time lock`;
+    }
+
+    /** Freeze, pause and take ("move or burn your tokens"), from the tokens' on-chain settings and the power map. */
+    function powersCell(model) {
+        const controls = model.tokens.map((token) => token?.control).filter((control) => control && typeof control === 'object');
+        if (!controls.length) return { text: 'Not read', note: null, tone: 'muted' };
+        const has = {
+            freeze: controls.some((control) => installed(control.freezeAuthority)),
+            pause: controls.some((control) => control.pausable === true),
+            take: controls.some((control) => installed(control.permanentDelegate) || control.clawback === true)
+        };
+        const powers = ['freeze', 'pause', 'take'].filter((id) => has[id]);
+        if (!powers.length) return { text: 'No', note: 'No freeze, pause or take power installed', tone: 'good' };
+        const text = has.take ? `Yes: ${joinWords(powers)}` : `Yes: ${joinWords(powers)}; cannot take`;
+        if (!model.powers) return { text, note: null, tone: 'caution' };
+        // Powers held the same way are named once: "Freeze and pause: 2-of-4 multisig".
+        const locks = new Set(powers.map((id) => timelockText(model.powers[id]?.timelockSeconds)));
+        const oneLock = locks.size === 1 ? [...locks][0] : null;
+        const groups = new Map();
+        for (const id of powers) {
+            const holder = holderText(model.powers[id]) ?? 'holder not established';
+            const lock = oneLock === null ? timelockText(model.powers[id]?.timelockSeconds) : null;
+            const key = lock ? `${holder}, ${lock}` : holder;
+            groups.set(key, [...(groups.get(key) ?? []), id]);
+        }
+        const parts = [...groups].map(([holder, ids]) => `${joinWords(ids)}: ${holder}`);
+        if (oneLock) parts.push(oneLock);
+        const note = parts.join(' · ');
+        return { text, note: note.charAt(0).toUpperCase() + note.slice(1), tone: 'caution' };
+    }
+
+    function priceCell(model) {
+        const token = model.tokens[0] ?? {};
+        const price = token.market?.usdPrice;
+        const premium = token.reference?.premiumPct;
+        const prefix = model.tokens.length > 1 ? `${token.symbol}: ` : '';
+        const note = isNum(price) ? `${prefix}${fmtPrice(price)} on Jupiter` : null;
+        if (isNum(premium)) {
+            return { text: `${fmtSignedPct(premium)} vs ${token.underlyingTicker ?? 'the share'}`, note, tone: Math.abs(premium) >= 2 ? 'caution' : null };
+        }
+        return { text: note ? 'Premium not measured' : 'Not measured', note, tone: 'muted' };
+    }
+
+    function sumOf(values) {
+        const list = values.filter(isNum);
+        return list.length ? list.reduce((sum, value) => sum + value, 0) : null;
+    }
+
+    function liquidityCell(model) {
+        const dexPairs = sumOf(model.tokens.map((token) => token?.activity?.dexPairs));
+        const cexMarkets = sumOf(model.tokens.map((token) => token?.activity?.cexMarkets));
+        // Named by source: DexScreener lists fewer pools than Jupiter's liquidity aggregates, so a
+        // "0 pools" beside a Jupiter liquidity figure is not a contradiction once each is attributed.
+        const venues = [
+            dexPairs === null ? null : `DexScreener: ${dexPairs} pool${dexPairs === 1 ? '' : 's'}`,
+            cexMarkets === null ? null : `CoinGecko: ${cexMarkets} exchange market${cexMarkets === 1 ? '' : 's'}`
+        ].filter(Boolean);
+        const note = venues.length ? venues.join(' · ') : null;
+        if (!isNum(model.liquidityUsd) && !isNum(model.volume24Usd)) return { text: 'Not measured', note, tone: 'muted' };
+        const liquidity = isNum(model.liquidityUsd) ? `${fmtMoney(model.liquidityUsd)} liquidity` : 'Liquidity not measured';
+        const volume = isNum(model.volume24Usd) ? `${fmtMoney(model.volume24Usd)} traded 24 h` : 'volume not measured';
+        return { text: `${liquidity} · ${volume}`, note, tone: null };
+    }
+
+    /** "$5,000" from "USD 5,000 per transaction…" / "$1" from "$1.00 USD…"; null when no amount is stated. */
+    function firstMoney(text) {
+        const match = /(?:US\$|USD\s?|\$)\s?(\d[\d,]*(?:\.\d+)?)/.exec(String(text ?? ''));
+        if (!match) return null;
+        const value = Number(match[1].replace(/,/g, ''));
+        return Number.isFinite(value) ? `$${value.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : null;
+    }
+
+    function redeemCell(model) {
+        const usability = model.redemptionUsability ?? {};
+        if (usability.directRedemption !== true) {
+            return { text: usability.directRedemption === false ? 'No' : 'Not established', note: 'Exit by selling the token', tone: 'caution' };
+        }
+        const field = (id) => (Array.isArray(usability.fields) ? usability.fields : []).find((row) => row.id === id) ?? null;
+        const who = [field('kyc')?.value === true ? 'KYC’d' : null, model.buyer?.usPersonsExcluded ? 'non-US' : null].filter(Boolean);
+        // A term counts only where it covers this exact token (a TSLAx fee is not an AAPLx fee).
+        const minimum = field('minimum')?.applicable === true ? firstMoney(field('minimum').value) : null;
+        const feeMatch = field('fees')?.applicable === true ? /up to (\d+(?:\.\d+)?)\s?%/i.exec(String(field('fees').value ?? '')) : null;
+        const note = [minimum ? `Min ${minimum}` : null, feeMatch ? `fee up to ${feeMatch[1]}%` : null].filter(Boolean).join(' · ');
+        return { text: who.length ? `Yes: ${who.join(' ')} holders` : 'Yes', note: note || null, tone: null };
+    }
+
+    function borrowCell(model) {
+        const reads = model.tokens.map((token) => token?.closedMarket);
+        const lenders = [];
+        for (const list of reads.filter(Array.isArray)) {
+            for (const lender of list) {
+                const line = `${lender?.protocolName}: ${lender?.label}`;
+                if (lender?.protocolName && lender?.label && !lenders.includes(line)) lenders.push(line);
+            }
+        }
+        if (lenders.length) return { text: lenders.join(' · '), note: null, tone: null };
+        // Only a closed-market file that was read can say no lender takes the token.
+        if (reads.some((read) => !Array.isArray(read))) return { text: 'Not checked here', note: null, tone: 'muted' };
+        return { text: 'No lender we track takes it', note: null, tone: 'muted' };
+    }
+
+    function feePct(bps) {
+        return `${(bps / 100).toFixed(2)}%`;
+    }
+
+    function feeCell(model) {
+        const control = model.tokens.map((token) => token?.control).find((row) => row && (isNum(row.transferFeeBps) || isNum(row.transferFeeScheduled?.bps)));
+        if (!control) return { text: 'None', note: null, tone: null };
+        const now = isNum(control.transferFeeBps) ? `${feePct(control.transferFeeBps)} now` : 'fee in effect not read';
+        const next = isNum(control.transferFeeScheduled?.bps) ? `; ${feePct(control.transferFeeScheduled.bps)} scheduled` : '';
+        return { text: `${now}${next}`, note: null, tone: 'caution' };
+    }
+
+    function tokenCardHref(token, section = '') {
+        return `./cards/${encodeURIComponent(token?.cardSlug || cardSlug(token?.symbol, token?.mint))}.html${section ? `#${section}` : ''}`;
+    }
+
+    /**
+     * The buyer table's rows: what a buyer compares first, one short cell per wrapper, each linking
+     * to the card section with the detail. Pure data; buyerTableHtml renders it. A transfer-fee row
+     * appears only when some wrapper charges or has scheduled a fee.
+     */
+    function buyerRows(models) {
+        const columns = Array.isArray(models) ? models.filter((model) => Array.isArray(model?.tokens)) : [];
+        const charges = columns.some((model) => model.tokens.some((token) => {
+            const control = token?.control ?? {};
+            return (isNum(control.transferFeeBps) && control.transferFeeBps > 0) || (isNum(control.transferFeeScheduled?.bps) && control.transferFeeScheduled.bps > 0);
+        }));
+        const rows = [
+            ['own', 'What you own', 'The legal claim, with the issuer’s home in brackets.', 'own',
+                (model) => ({ text: ownWords(model.buyer), note: null, tone: null })],
+            ['powers', 'Can the issuer freeze or take your tokens?', 'From the token’s on-chain settings; who holds each key.', 'control', powersCell],
+            ['rights', 'Shareholder rights', '✓ yours · ◐ passed through · ◌ at the issuer’s discretion · ✕ no · ? not stated', 'holder-rights',
+                (model) => ({ text: holderRightsHeadline(model.rights), note: null, tone: null, rights: model.rights ?? [] })],
+            ['price', 'Price vs the stock', 'Premium or discount against the share’s reference price.', 'reference', priceCell],
+            ['liquidity', 'Liquidity and where to trade', 'DEX liquidity (Jupiter, all pools) and 24 h volume.', 'depth', liquidityCell],
+            ['redeem', 'Redeem with the issuer', 'Who may, and the minimum and fee where set for this token.', 'own', redeemCell],
+            ['borrow', 'Borrow against it when the market is closed', 'The price each lender uses while the US market is shut.', 'closed-market', borrowCell],
+            ...(charges ? [['fee', 'Transfer fee', 'Charged on-chain on every transfer.', 'control', feeCell]] : [])
+        ];
+        return rows.map(([id, label, help, section, cell]) => ({
+            id, label, help,
+            cells: columns.map((model) => ({ ...cell(model), href: tokenCardHref(model.tokens[0], section) }))
+        }));
+    }
+
+    /** The buyer table, above the Decision summary: no disclosure to open, and it scrolls on its own on a phone. */
+    function buyerTableHtml(models, { sources = null } = {}) {
+        const columns = Array.isArray(models) ? models.filter((model) => Array.isArray(model?.tokens) && model.tokens.length) : [];
+        if (!columns.length) return '';
+        const rows = buyerRows(columns);
+        const header = columns.map((model) => `<th scope="col"><span class="buyer-tokens">${model.tokens.map((token) =>
+            `<a href="${escapeHtml(tokenCardHref(token))}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</a>`).join(' · ')}</span>`
+            + `<a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a></th>`).join('');
+        const cellHtml = (cell) => {
+            const tone = cell.tone ? ` class="buyer-${escapeHtml(cell.tone)}"` : '';
+            if (cell.rights) return `<td${tone}>${holderRightsStripHtml(cell.rights, { href: cell.href })}</td>`;
+            return `<td${tone}><a class="buyer-link" href="${escapeHtml(cell.href)}">${escapeHtml(cell.text)}</a>`
+                + `${cell.note ? `<small>${escapeHtml(cell.note)}</small>` : ''}</td>`;
+        };
+        const body = rows.map((row) => `<tr data-row="${escapeHtml(row.id)}"><th scope="row"><strong>${escapeHtml(row.label)}</strong><small>${escapeHtml(row.help)}</small></th>`
+            + row.cells.map(cellHtml).join('') + '</tr>').join('');
+        const read = [
+            sources?.marketFetchedAt ? `Market read ${fmtDateTime(sources.marketFetchedAt)}` : null,
+            sources?.referencePricesFetchedAt ? `premium read ${fmtDateTime(sources.referencePricesFetchedAt)}` : null,
+            sources?.closedMarketAt ? `lenders read ${fmtDateTime(sources.closedMarketAt)}` : null
+        ].filter(Boolean).join(' · ');
+        return `<section class="buyer-table" aria-labelledby="buyerTableTitle"><header><h2 id="buyerTableTitle">Before you buy</h2>`
+            + `<small>${columns.length === 1 ? 'The facts a buyer checks first.' : 'The facts that differ most, side by side.'} Each answer links to the card with the detail.${read ? ` ${escapeHtml(read)}.` : ''}</small>`
+            // Two wrappers fit a phone; more scroll inside the frame, and past five on any screen.
+            + (columns.length > 2 ? `<small class="buyer-hint${columns.length > 5 ? ' buyer-hint-wide' : ''}">Scroll the table sideways to see all ${columns.length} wrappers.</small>` : '')
+            + '</header>'
+            + `<div class="buyer-wrap" tabindex="0" role="region" aria-label="Buyer facts for each wrapper">`
+            + `<table class="buyer-grid" style="--buyer-cols:${columns.length}"><thead><tr><td></td>${header}</tr></thead><tbody>${body}</tbody></table></div></section>`;
     }
 
     const CONCEPT_GUIDES = {
@@ -110,7 +369,7 @@
         })).filter((row) => new Set(row.values.map((entry) => entry.value)).size > 1);
     }
 
-    function sameStockComparisonHtml(group, models) {
+    function sameStockComparisonHtml(group, models, { sources = null } = {}) {
         const columns = Array.isArray(models) ? models : [];
         if (!group || columns.length === 0) return '';
         const outcome = (entry, status) => `<span class="comparison-verdict comparison-verdict-${escapeHtml(status)}">${escapeHtml(entry?.headline ?? 'Unknown')}</span>` +
@@ -155,7 +414,8 @@
         const renderDifference = (row) => `<article><div><h3>${escapeHtml(row.label)}</h3>${conceptHelpHtml(row.concept)}</div>${renderDifferenceValues(row)}</article>`;
         const differenceHtml = !standalone && differences.length > 1
             ? `<details class="comparison-differences"><summary>What actually differs · ${differences.length - 1} more difference${differences.length === 2 ? '' : 's'}</summary>${differences.slice(1).map(renderDifference).join('')}</details>` : '';
-        return `<div class="comparison-summary"><span>${columns.length} issuer structure${standalone ? '' : 's'} · exact-token support and legal outcomes shown separately</span></div>` +
+        return buyerTableHtml(columns, { sources }) +
+            `<div class="comparison-summary"><span>${columns.length} issuer structure${standalone ? '' : 's'} · exact-token support and legal outcomes shown separately</span></div>` +
             `<div class="comparison-decision"><span>${standalone ? 'Standalone answer' : 'Decision summary'}</span><strong>${escapeHtml(decision)}</strong>${!standalone && differences.length ? renderDifferenceValues(differences[0]) : ''}${!standalone && ownerships.size === 1 ? `<details class="comparison-shared-claim"><summary>Shared legal claim</summary><p>${escapeHtml(columns[0].verdict.ownership)}</p></details>` : ''}<small>${standalone ? 'This report remains useful without a competing wrapper.' : 'No universally “best” product is implied.'} Eligibility and intended use still matter.</small></div>` +
             differenceHtml + `<details class="comparison-research"${standalone ? ' open' : ''}><summary>Ownership and exit for ${standalone ? 'this wrapper' : 'each wrapper'}</summary><div class="comparison-product-grid">${productCards}</div></details>` +
             `<details class="comparison-research"><summary>Explore custody, default and evidence questions</summary><div class="comparison-question-list">${questionCards}</div></details>` +
@@ -220,6 +480,10 @@
 
     return {
         sameStockComparisonModels,
+        shortJurisdiction,
+        buyerPowers,
+        buyerRows,
+        buyerTableHtml,
         CONCEPT_GUIDES,
         conceptHelpHtml,
         conceptGuideRowHtml,

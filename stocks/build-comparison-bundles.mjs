@@ -8,13 +8,20 @@ import { buildComparisonBundles, comparisonBundleIndex } from './lib/comparison-
 
 const ROOT = join(import.meta.dirname, '..');
 export async function buildComparisonFiles({ root = ROOT, outDir = join(root, 'comparisons') } = {}) {
-    const [issuerDb, tokenDb, defiUsage, composability, reviewQueue] = await Promise.all([
+    // The buyer table reads the closed-market lenders (build-closed-market.mjs) and the key holders
+    // (build-power-map.mjs); both run earlier in the release (lib/release-manifest.mjs). A missing
+    // file leaves those cells "not checked", never "no lender".
+    const [issuerDb, tokenDb, defiUsage, composability, reviewQueue, closedMarket, powerMap] = await Promise.all([
         readJson(join(root, 'stocks-issuers.json')), readJson(join(root, 'stocks-tokens.json')),
         readJson(join(root, 'stocks/data/defi-usage.json'), null),
         readJson(join(root, 'stocks/data/composability-templates.json'), null),
-        readJson(join(root, 'stocks-review-queue.json'), null)
+        readJson(join(root, 'stocks-review-queue.json'), null),
+        readJson(join(root, 'stocks-closed-market.json'), null),
+        readJson(join(root, 'stocks-power-map.json'), null)
     ]);
-    const bundles = buildComparisonBundles({ issuerDb, tokenDb, defiUsage, composability, reviewQueue });
+    if (!closedMarket) log('stocks-closed-market.json not built: the lender cells will say "not checked here"');
+    if (!powerMap) log('stocks-power-map.json not built: the powers cells will not name key holders');
+    const bundles = buildComparisonBundles({ issuerDb, tokenDb, defiUsage, composability, reviewQueue, closedMarket, powerMap });
     const index = comparisonBundleIndex(bundles);
     await mkdir(outDir, { recursive: true });
     for (const [position, bundle] of bundles.entries()) await writeJson(join(outDir, index.groups[position].path), bundle, 0);

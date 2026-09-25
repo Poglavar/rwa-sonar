@@ -10,6 +10,17 @@
 
 .pm-title { margin: 0 0 14px; font-size: clamp(1.45rem, 3.2vw, 2.1rem); line-height: 1.12; letter-spacing: -.03em; }
 
+/* The page's answer in one sentence, then the collapsed method: on a phone the grid starts on the
+   first screen instead of after a screenful of explanation. */
+.pm-answer { margin: 0 0 10px; font-size: clamp(1.05rem, 2.1vw, 1.3rem); font-weight: 650; line-height: 1.4; letter-spacing: -.01em; color: var(--page-text); }
+.pm-how { margin: 0 0 4px; }
+.pm-how > summary { display: flex; align-items: center; gap: 6px; min-height: 44px; width: max-content; list-style: none; cursor: pointer; color: var(--link-color); font-size: 0.9rem; font-weight: 650; }
+.pm-how > summary::-webkit-details-marker { display: none; }
+.pm-how > summary::before { content: "▸"; }
+.pm-how[open] > summary::before { content: "▾"; }
+.pm-how[open] > summary { margin-bottom: 8px; }
+.pm-how-h { margin: 18px 0 8px; font-size: 1rem; }
+
 /* Holder kind -> colour. `color` carries it, so the border, tint and swatch all follow. */
 .pm-k-single-key { color: var(--sev-critical); }
 .pm-k-multisig { color: var(--wi-inferred); }

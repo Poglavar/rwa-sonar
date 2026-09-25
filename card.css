@@ -498,6 +498,34 @@ h1 {
     color: var(--muted-text);
 }
 
+/* --- Pyth on this token: the feeds, the prices read on Solana, each lender's Pyth feed --------- */
+
+/* Feed symbols and account addresses are long unbroken runs; let them wrap at 320 px. */
+#pyth .kv dd {
+    overflow-wrap: anywhere;
+}
+
+.pyth-lead {
+    margin: 0.75rem 0 0.25rem;
+}
+
+.pyth-lenders {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0;
+}
+
+.pyth-lenders > li {
+    padding: 0.45rem 0;
+    border-top: 1px solid var(--panel-border);
+    overflow-wrap: anywhere;
+}
+
+.pyth-src {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
 /* --- sections --------------------------------------------------------------------------- */
 
 section {

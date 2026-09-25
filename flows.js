@@ -198,7 +198,7 @@
     function sourcesText(value) {
         const names = { settlement: 'stablecoin leg', 'dex-tape': 'DEX tape', 'daily-snapshot': 'day snapshot', 'same-day-catalogue': 'same-day catalogue' };
         const entries = Object.entries(value?.sources ?? {});
-        return entries.length ? entries.map(([k, n]) => `${names[k] ?? k} ${n}`).join(', ') : DASH;
+        return entries.length ? entries.map(([k, n]) => `${names[k] ?? k.replace(/[-_]+/g, ' ')} ${n}`).join(', ') : DASH;
     }
 
     /** The accessible table view of one issuer's days (newest first, read days only plus missing ones marked). */
@@ -277,8 +277,44 @@
         return `<div class="fl-scroll"><table class="fl-table"><thead><tr><th scope="col">Token</th><th scope="col">Raw supply</th><th scope="col">Issuer inventory</th><th scope="col">Outside issuer wallets</th><th scope="col">Inventory share</th><th scope="col">Float value</th><th scope="col">Float change since previous day</th><th scope="col">Issuer-reported circulating, all chains</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }
 
+    /**
+     * The price source in words. The data records provenance as "<file> <field> (<provider>)"
+     * (stocks-tokens.json market.usdPrice (Jupiter)); a reader needs only the provider. A source
+     * with no provider in brackets that still looks like a file or a field path is called what it is.
+     */
+    function priceSourceText(source) {
+        const text = typeof source === 'string' ? source.trim() : '';
+        const provider = /\(([^()]+)\)\s*$/.exec(text)?.[1]?.trim();
+        if (provider) return `${provider} prices`;
+        if (text === '' || /\.json\b|\w\.\w*[A-Z]/.test(text)) return 'catalogue prices';
+        return text;
+    }
+
+    /** A wallet's role slug in words: "freeze-pause-vault" -> "freeze and pause vault". */
+    const WALLET_ROLES = {
+        'freeze-pause-vault': 'freeze and pause vault',
+        'permanent-delegate-vault': 'permanent-delegate vault'
+    };
+    function walletRole(role) {
+        const slug = typeof role === 'string' ? role.trim() : '';
+        return WALLET_ROLES[slug] ?? slug.replace(/[-_]+/g, ' ');
+    }
+
+    /**
+     * Where the dossier cites a wallet, as the dossier sections in words rather than the field
+     * paths the builder recorded: "keyGovernance.evidence", "claims[70].quote" -> "key governance, claims".
+     */
+    function dossierSections(paths) {
+        const sections = [];
+        for (const path of Array.isArray(paths) ? paths : []) {
+            const head = String(path).split(/[.[]/)[0].replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().trim();
+            if (head !== '' && !sections.includes(head)) sections.push(head);
+        }
+        return sections;
+    }
+
     function floatSectionHtml(float, width) {
-        if (!float) return '<p class="fl-missing">The float has not been read yet (stocks/fetch-xstocks-float.mjs).</p>';
+        if (!float) return '<p class="fl-missing">The float has not been read yet.</p>';
         const t = float.totals ?? {};
         const tiles = [
             ['Raw supply value', fmtMoney(t.supplyUsd)],
@@ -286,11 +322,14 @@
             ['Outside issuer wallets (float, upper bound)', fmtMoney(t.floatUsd)],
             ['Median inventory share, all mints', fmtPct(float.medianInventorySharePct)]
         ].map(([k, v]) => `<div><small>${esc(k)}</small><strong>${esc(v)}</strong></div>`).join('');
-        const wallets = (float.wallets ?? []).map((w) => `<li><code title="${esc(w.address)}">${esc(w.address.slice(0, 6))}…${esc(w.address.slice(-4))}</code> <strong>${esc(w.role)}</strong> — ${esc(w.basis)} <small>${esc(fmtNumber(w.xstockAccountsWithBalance))} xStock balance(s) at the read; cited ${esc(fmtNumber(w.dossierCitations))}× in the dossier (${esc((w.dossierPaths ?? []).slice(0, 2).join(', '))})</small></li>`).join('');
+        const wallets = (float.wallets ?? []).map((w) => {
+            const sections = dossierSections(w.dossierPaths);
+            return `<li><code title="${esc(w.address)}">${esc(w.address.slice(0, 6))}…${esc(w.address.slice(-4))}</code> <strong>${esc(walletRole(w.role))}</strong> — ${esc(w.basis)} <small>${esc(fmtNumber(w.xstockAccountsWithBalance))} xStock balance(s) at the read; cited ${esc(fmtNumber(w.dossierCitations))}× in the dossier${sections.length ? `: ${esc(sections.join(', '))}` : ''}</small></li>`;
+        }).join('');
         const conflicts = float.porConflicts?.length
             ? `<p class="fl-finding"><strong>The float is an upper bound.</strong> For ${esc(fmtNumber(float.porConflicts.length))} of ${esc(fmtNumber(float.porCompared))} tokens the issuer's own all-chain circulating supply (proof-of-reserves feed) is smaller than what sits outside the issuer-attributed wallets on Solana alone. Tokens in wallets our research has not attributed (issuer-side, exchange or not-yet-activated inventory) count as float here. Where the issuer-reported column exists, it is the tighter figure.</p>` : '';
         return `<div class="fl-tiles">${tiles}</div>`
-            + `<p class="fl-meta">Read ${esc(fmtDateTime(float.readAt))}${float.slots ? ` (slots ${esc(String(float.slots.min))}–${esc(String(float.slots.max))})` : ''}. Dollar values use ${esc(float.priceSource)} observed ${esc(fmtDateTime(float.priceObservedAt))}: ${esc(fmtNumber(float.pricedMints))} of ${esc(fmtNumber(float.mints))} mints have a price; ${esc(fmtNumber(float.unpricedWithFloat))} unpriced mints with a public float are left out, so the totals are lower bounds. Previous-day baseline: ${esc(float.previousReadAt ? fmtDateTime(float.previousReadAt) : 'none yet (first read)')}.</p>`
+            + `<p class="fl-meta">Read ${esc(fmtDateTime(float.readAt))}${float.slots ? ` (slots ${esc(String(float.slots.min))}–${esc(String(float.slots.max))})` : ''}. Dollar values use ${esc(priceSourceText(float.priceSource))} observed ${esc(fmtDateTime(float.priceObservedAt))}: ${esc(fmtNumber(float.pricedMints))} of ${esc(fmtNumber(float.mints))} mints have a price; ${esc(fmtNumber(float.unpricedWithFloat))} unpriced mints with a public float are left out, so the totals are lower bounds. Previous-day baseline: ${esc(float.previousReadAt ? fmtDateTime(float.previousReadAt) : 'none yet (first read)')}.</p>`
             + `<h3>Largest xStocks by public float</h3><p class="fl-meta">Bar = share of each token's supply value: <span class="fl-swatch fl-float"></span> outside issuer wallets (public float, upper bound), <span class="fl-swatch fl-inv"></span> issuer inventory.</p>`
             + `${conflicts}<div class="fl-chart">${floatChartSvg(float, { width })}</div>`
             + `<details class="fl-details"><summary>Table: top ${esc(String(float.top?.length ?? 0))} by float value</summary>${floatTableHtml(float)}<p class="fl-meta">Issuer-reported circulating supply comes from ${esc(float.por?.source ?? DASH)} (all chains, read ${esc(fmtDateTime(float.por?.fetchedAt))}); our figure is Solana only, so where it is larger (▼) the difference sits in wallets we have not attributed.</p></details>`
@@ -340,7 +379,7 @@
             + (notObs ? `<h3>Not observable on-chain</h3><ul class="fl-what">${notObs}</ul>` : '');
     }
 
-    const api = { coverageState, sideLabel, dayReadout, flowScale, flowMetric, flowChartSvg, flowTableHtml, issuerHtml, floatChartSvg, floatTableHtml, floatSectionHtml, flowsSectionHtml, leadHtml, contextHtml };
+    const api = { coverageState, sideLabel, dayReadout, flowScale, flowMetric, flowChartSvg, flowTableHtml, issuerHtml, floatChartSvg, floatTableHtml, floatSectionHtml, flowsSectionHtml, leadHtml, contextHtml, priceSourceText, walletRole, dossierSections };
     if (typeof document === 'undefined') return api;
 
     // --- DOM ------------------------------------------------------------------------------------
@@ -360,7 +399,8 @@
         } catch (err) {
             status.hidden = false;
             status.classList.add('status-error');
-            status.textContent = `Could not load stocks-flows.json: ${err.message}`;
+            status.textContent = `Could not load the flows data: ${err.message}`;
+            console.error(`[${new Date().toISOString()}] ./stocks-flows.json did not load: ${err.message}`);
             return;
         }
         $('context').innerHTML = contextHtml(data);

@@ -84,3 +84,6 @@ stocks/data/event-first-seen.json
 # stocks/fetch-solana-depth.mjs): ignored so a deploy's git clean never erases the weeks they build up.
 /stocks/data/lender-price-gaps.json
 /stocks/data/solana-depth.json
+# Pyth prices read from Solana's push-oracle accounts every refresh (stocks/fetch-pyth-onchain.mjs):
+# runtime state that changes each run; the cards carry what they show in their own .json records.
+/stocks/data/pyth-onchain.json

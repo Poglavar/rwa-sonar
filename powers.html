@@ -37,7 +37,7 @@
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260924r" />
-    <link rel="stylesheet" href="powers.css?v=20260924u" />
+    <link rel="stylesheet" href="powers.css?v=20260925w" />
     <link rel="stylesheet" href="funnel-figure.css?v=20260924y" />
     <link rel="stylesheet" href="app-shell.css?v=20260925b" />
     <link rel="stylesheet" href="motion.css?v=20260924u" />
@@ -48,25 +48,28 @@
     <header class="app-header"><a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a><nav class="app-nav" aria-label="Site navigation"><a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a><a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a><details class="app-nav-menu"><summary aria-current="page">Research</summary><div><a class="nav-compact-only" href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a id="nav-graph" href="./graph.html">Trust map</a><a aria-current="page" href="./powers.html">Who holds the keys</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a><a id="nav-templates" href="./templates/">Legal templates</a><a href="./issuers/">Issuer dossiers</a><a href="./exits.html">Exit routes</a><a href="./flows.html">Flows &amp; float</a><a href="./tracking.html">Premium &amp; concentration</a><a href="./economics.html">Fees &amp; incentives</a><a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-live" href="./live.html">Live trades</a><a id="nav-review" href="./review.html">Review queue</a><a href="./weekly/latest.html">This week</a><a href="./assets.html">All RWAs</a><a href="./pitch/">Pitch</a><a href="https://github.com/Poglavar/rwa-sonar">Code</a><button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button></div></details><button class="theme-switch" type="button" aria-label="Theme: Auto (follows your device)" title="Theme: Auto (follows your device)"><svg class="theme-icon" aria-hidden="true" focusable="false"><use class="theme-icon-auto" href="./images/theme-icons.svg?v=20260924y#auto"/><use class="theme-icon-light" href="./images/theme-icons.svg?v=20260924y#light"/><use class="theme-icon-dark" href="./images/theme-icons.svg?v=20260924y#dark"/></svg></button></nav></header>
 
     <h1 class="pm-title">Who can freeze, move or change your tokens</h1>
-    <p class="method-note">A tokenized stock sits in your wallet, but the issuer usually keeps
-        powers over it: to mint more, to freeze your account, to move or burn your balance, to
-        pause every transfer, to restate what your balance displays, to charge a fee on each
-        transfer, or to change the program that does all of this. This page checks the same seven
-        powers for every programme and says <strong>who holds each one</strong>: a single key
-        anyone with the key file can use, a multisig that needs several signers, a program
-        controlled in practice by whoever holds its upgrade key, nobody (the power is not installed), or
-        <strong>unknown</strong> when the research has not established it. Holding a power does not
-        mean the issuer is allowed to use it; what the documents allow is in each issuer's dossier. Tap a cell
-        for the exact addresses and the evidence.</p>
+    <!-- The answer first, counted by powers.js (headlineText) from the power map: never typed here. -->
+    <p id="headline" class="pm-answer" hidden></p>
 
-    <div class="data-line evidence-context"><span><small>Coverage</small><strong id="summary">&hellip;</strong></span><span><small>Sources</small><strong id="sources">&hellip;</strong></span></div>
+    <!-- The method, the colour key and the coverage line, collapsed so the grid starts on the first screen. -->
+    <details class="pm-how">
+        <summary>How to read this</summary>
+        <p class="method-note">A tokenized stock sits in your wallet, but the issuer usually keeps
+            powers over it: to mint more, to freeze your account, to move or burn your balance, to
+            pause every transfer, to restate what your balance displays, to charge a fee on each
+            transfer, or to change the program that does all of this. This page checks the same seven
+            powers for every programme and says <strong>who holds each one</strong>: a single key
+            anyone with the key file can use, a multisig that needs several signers, a program
+            controlled in practice by whoever holds its upgrade key, nobody (the power is not installed), or
+            <strong>unknown</strong> when the research has not established it. Holding a power does not
+            mean the issuer is allowed to use it; what the documents allow is in each issuer's dossier. Tap a cell
+            for the exact addresses and the evidence.</p>
+        <h2 id="legendHeading" class="pm-how-h">What the colours mean</h2>
+        <ul id="legend" class="pm-legend" aria-labelledby="legendHeading"></ul>
+        <div class="data-line evidence-context"><span><small>Coverage</small><strong id="summary">&hellip;</strong></span><span><small>Sources</small><strong id="sources">&hellip;</strong></span></div>
+    </details>
 
     <p id="status" class="status" hidden></p>
-
-    <section aria-labelledby="legendHeading">
-        <h2 id="legendHeading">What the colours mean</h2>
-        <ul id="legend" class="pm-legend"></ul>
-    </section>
 
     <section aria-labelledby="gridHeading">
         <h2 id="gridHeading">Programmes and powers</h2>
@@ -100,7 +103,7 @@
 <!-- seo:contact:end --></footer>
 
     <script src="stocks/lib/fmt.js?v=20260924a"></script>
-    <script src="powers.js?v=20260925a"></script>
+    <script src="powers.js?v=20260925w"></script>
     <script src="stocks/lib/sort-values.js?v=20260923r"></script>
     <script src="stocks/lib/catalogue-counts.js?v=20260923b"></script>
     <script src="stocks/lib/issuer-labels.js?v=20260923r"></script>

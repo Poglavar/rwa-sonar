@@ -29,6 +29,7 @@ node stocks/build-mint-identities.mjs --run # npm run stocks:mint-identities →
 node stocks/fetch-onchain.mjs --run --in=stocks/data/mint-identities.json --out=stocks/data/identity-onchain.json # npm run stocks:identity-onchain
 node stocks/build-mint-identities.mjs --run # rebuild with full chain observations
 node stocks/fetch-reference-prices.mjs --run # npm run stocks:prices    → data/reference-prices.json
+node stocks/fetch-pyth-onchain.mjs --run     # npm run stocks:pyth-onchain → data/pyth-onchain.json (gitignored)
 npm run stocks:all                          # complete identity-aware pipeline, in order
 ```
 
@@ -342,6 +343,23 @@ of the day; `ok`/`not-entitled` are final, `error` entries are re-probed next ru
 code non-zero. `--force` re-probes everything. On 2026-09-16 only **3 of 244** matched feeds were
 entitled (TSLA, QQQ and VOO), covering 5 tokens. Prices themselves are never cached.
 
+### `data/pyth-onchain.json` — Pyth prices read from Solana, no key (gitignored)
+
+`stocks/fetch-pyth-onchain.mjs` reads the Pyth push-oracle accounts (program `pythWSnsw…`, PDA
+`[shard u16 LE, feed id]`, PriceUpdateV2 owned by the Pyth Solana Receiver) for every stock feed in
+`reference-prices.json` and every token's own `Crypto.<SYMBOL>/USD` feed from the keyless crypto
+feed list (exact symbol AND an issuer-naming description, so `Crypto.AMC/USD` "A MEME COIN" is not
+the AMC stock token's feed), on shards 0 and 1, with the Clock sysvar, in one bounded pass
+(`--max-requests`, default 8 × 100 keys; `--limit=<n>` for a small batch). Each account keeps its
+price, confidence and Pyth's own `publishTime`; `readAt` is the chain clock. Read 2026-09-24 23:58
+UTC: of 244 stock feeds, 41 had an account on shard 0 or 1, and 16 had been published within the
+hour — 15 on **shard 1** (AAPL, AMD, AMZN, CRWV, GOOGL, INTC, META, MSFT, MSTR, MU, NVDA, QQQ, SNDK,
+SPY, TSLA, each seconds before the read) and GLXY on shard 0. The **shard-0** accounts of the other
+feeds were 35 h to 141 days old (SPY/NVDA/CRCL last published 26 Aug 15:54:46 UTC and TSLA/QQQ
+11 Sep 23:59:59 UTC: the accounts Loopscale reads). Of the 28 xStocks/Ondo token feeds, 17 xStocks
+feeds had a shard-0 account, published 35 h to 12 d before the read; no Ondo token feed had one. Hermes serves the same prices
+only with a key (HTTP 401 without). The cards' "Pyth on this token" block reads this file.
+
 ### `data/manual-mints.json`
 
 Hand-maintained seed, merged into the universe with `listedOnJupiter: false`. Currently empty. For
@@ -461,6 +479,7 @@ stocks/
   fetch-onchain.mjs     → data/onchain.json
   fetch-sponsor-apis.mjs → data/sponsor-apis.json
   fetch-reference-prices.mjs → data/reference-prices.json
+  fetch-pyth-onchain.mjs → data/pyth-onchain.json (lib/pyth-onchain.mjs, pyth-onchain.test.js)
   classify.test.js      jest unit tests for lib/classify.mjs
   universe.test.js      jest unit tests for lib/universe.mjs (carry-over, first/last seen, gaps)
   pyth.test.js          jest unit tests for lib/pyth.mjs and lib/env.mjs
@@ -1049,8 +1068,9 @@ rule's `inputs` and the health file deliberately drops them.
   `builtAt` appears in the card's `<time datetime>` and its JSON record. Two builds from the
   same inputs are byte-identical apart from that stamp. A test pins this, and it is easy to check by hand
   with `diff <(sed 's/builtAt[^,]*//' …)`.
-- **Size**: 112 KiB is the normal raw-HTML target and produces a warning when crossed; 128 KiB is the
-  hard limit that fails the build (both raised on 24 Sep 2026 as observed content grew; see `stocks/lib/cards.mjs`). These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
+- **Size**: 128 KiB is the normal raw-HTML target and produces a warning when crossed; 150 KiB is the
+  hard limit that fails the build (raised on 24 Sep 2026 as observed content grew, and again on 25 Sep 2026 for
+  the "Pyth on this token" block, with the owner's approval; see `stocks/lib/cards.mjs`). These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
   payload is duplicated inside every HTML page; that leaves room without dropping an analytical section.
 - **The published record** (`cards/<slug>.json`, linked from the HTML with
   `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,
@@ -1869,7 +1889,7 @@ Two things worth knowing before changing them:
   the chip; anchored to the chip it ran off the left edge at 360 px, measured at −19 px on the
   panel and −116 px on a card.
 - **A card has a target and a hard ceiling, and the chips cost real bytes.** `CARD_BYTE_TARGET` is
-  112 KiB; `CARD_BYTE_LIMIT` is 128 KiB. The target warns, while only the ceiling blocks publication.
+  128 KiB; `CARD_BYTE_LIMIT` is 150 KiB. The target warns, while only the ceiling blocks publication.
   The summary's `title` no longer
   repeats the quote the popover shows one tap away (−5.5 kB on the widest card), the separate JSON
   record carries the evidence **summary** only (−9.3 kB; the claims are rendered above it and served

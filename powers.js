@@ -172,6 +172,27 @@
             + `${n('none')} not installed · ${n('unknown')} unknown`;
     }
 
+    /** The programmes in which one key alone holds `powerId` (the cell's kind is single-key). */
+    function singleKeyProgrammes(map, powerId) {
+        return (Array.isArray(map?.issuers) ? map.issuers : [])
+            .filter((row) => (row.cells ?? []).some((cell) => cell.power === powerId && cell.kind === 'single-key'));
+    }
+
+    /**
+     * The page's one-sentence answer, counted from the map rather than typed: in how many
+     * programmes one key alone can freeze a holder's tokens, and in how many it can move or burn
+     * them — the two powers that act on a balance without the holder. Unknown, multisig and
+     * program holders are never counted as one key. Empty when the map holds no programmes.
+     */
+    function headlineText(map) {
+        const total = Array.isArray(map?.issuers) ? map.issuers.length : 0;
+        if (total === 0) return '';
+        const freeze = singleKeyProgrammes(map, 'freeze').length;
+        const moveBurn = singleKeyProgrammes(map, 'moveBurn').length;
+        return `In ${freeze} of ${total} programme${total === 1 ? '' : 's'} one key can freeze your tokens; `
+            + `in ${moveBurn}, one key can move or burn them.`;
+    }
+
     /** Where each input came from and when it was observed, for the data line. */
     function sourcesText(map) {
         const s = map?.sources ?? {};
@@ -279,7 +300,7 @@
     const api = {
         DATA_PATH, KIND_LABEL, KIND_MEANING, KINDS,
         thresholdShort, timelockShort, cellWords, usageBadge, dossierHref, whatifHref, explorerHref,
-        cellHtml, rowHtml, gridHtml, legendHtml, summaryText, sourcesText, detailHtml, findCell
+        cellHtml, rowHtml, gridHtml, legendHtml, summaryText, headlineText, sourcesText, detailHtml, findCell
     };
 
     // -----------------------------------------------------------------------
@@ -321,6 +342,7 @@
 
     async function boot() {
         els.status = document.getElementById('status');
+        els.headline = document.getElementById('headline');
         els.summary = document.getElementById('summary');
         els.sources = document.getElementById('sources');
         els.legend = document.getElementById('legend');
@@ -346,6 +368,9 @@
             setStatus(`${err.message}. We show nothing instead of a partial map.`, true);
             return;
         }
+        const headline = headlineText(map);
+        els.headline.textContent = headline;
+        els.headline.hidden = headline === '';
         els.summary.textContent = summaryText(map);
         els.sources.textContent = sourcesText(map);
         els.grid.style.setProperty('--pm-cols', String((map.powers ?? []).length));

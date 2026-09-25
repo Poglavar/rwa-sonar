@@ -14,6 +14,7 @@
     "stocks:onchain": "node stocks/fetch-onchain.mjs --run",
     "stocks:sponsors": "node stocks/fetch-sponsor-apis.mjs --run",
     "stocks:prices": "node stocks/fetch-reference-prices.mjs --run",
+    "stocks:pyth-onchain": "node stocks/fetch-pyth-onchain.mjs --run",
     "stocks:venues": "node stocks/fetch-venues.mjs --run --only-dex",
     "stocks:meteora": "node stocks/fetch-meteora.mjs --run",
     "stocks:defi": "node stocks/fetch-defi-usage.mjs --run",

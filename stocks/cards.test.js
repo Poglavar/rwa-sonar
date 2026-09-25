@@ -56,6 +56,35 @@ const composabilityDb = read('stocks', 'data', 'composability-templates.json');
 const composability = indexComposabilityTemplates(composabilityDb.templates);
 const defiUsageDb = read('stocks', 'data', 'defi-usage.json');
 const defiUsage = new Map(defiUsageDb.items.map((row) => [row.mint, row]));
+const oraclePricing = read('stocks', 'data', 'protocol-market-research.json').oraclePricing;
+const referenceDb = read('stocks', 'data', 'reference-prices.json');
+const referenceItems = new Map(referenceDb.items.map((row) => [row.mint, row]));
+
+/**
+ * What stocks/fetch-pyth-onchain.mjs would write, built from a REAL read (fixtures/pyth-onchain:
+ * the Clock sysvar and the shard-0/1 accounts of eleven feeds, 2026-09-25 00:01 UTC) through the
+ * same lib, with the token → feed map made the way the collector makes it.
+ */
+const pythOnchainLib = require('./lib/pyth-onchain.mjs');
+const PYTH_FIXTURE = read('stocks', 'fixtures', 'pyth-onchain', 'accounts.sample.json');
+const PYTH_CRYPTO = pythOnchainLib.indexTokenFeeds(read('stocks', 'fixtures', 'pyth-onchain', 'crypto-feeds.sample.json').body);
+const PYTH_ONCHAIN = (() => {
+    const bySymbol = new Map(PYTH_FIXTURE.feeds.map((f) => [f.symbol, f.id]));
+    const feeds = [...bySymbol].map(([symbol, id]) => ({
+        id, symbol, kind: symbol.startsWith('Crypto.') ? 'token' : 'stock', schedule: PYTH_CRYPTO.get(symbol)?.attributes.schedule ?? null
+    }));
+    const ids = new Set(feeds.map((f) => f.id));
+    const tokens = referenceDb.items.map((item) => ({
+        mint: item.mint, symbol: item.symbol,
+        stockFeedId: ids.has(item.pythFeedId) ? item.pythFeedId : null,
+        tokenFeedId: pythOnchainLib.tokenFeedFor(item, PYTH_CRYPTO)?.id ?? null
+    })).filter((t) => t.stockFeedId !== null || t.tokenFeedId !== null);
+    const plan = pythOnchainLib.planAccountReads(feeds);
+    return pythOnchainLib.buildPythOnchain({
+        feeds, plan, accounts: plan.requests.flat().map((address) => PYTH_FIXTURE.accounts[address] ?? null),
+        slots: [PYTH_FIXTURE.slot], tokens, inputs: {}
+    });
+})();
 
 /**
  * Each issuer's dossier `whatIf[]`, resolved exactly the way build-cards.mjs resolves it: the file
@@ -130,7 +159,11 @@ function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverr
         archives: null,
         composabilityTemplate: composabilityTemplateFor(token, composability),
         defiUsageItem: defiUsage.get(token.mint) ?? null,
-        schematics: SCHEMATICS.issuers[token.issuer] ?? null
+        schematics: SCHEMATICS.issuers[token.issuer] ?? null,
+        referenceItem: referenceItems.get(token.mint) ?? null,
+        pythOnchain: PYTH_ONCHAIN,
+        oraclePricing,
+        priceReadAt: tokenDb.sources?.universe?.fetchedAt ?? null
     });
 }
 
@@ -1035,8 +1068,8 @@ describe('evidence chips on a card', () => {
             + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'}; target ${CARD_BYTE_TARGET}, limit ${CARD_BYTE_LIMIT}`);
         expect(fixture).toBeLessThan(CARD_BYTE_TARGET);
         if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
-        expect(CARD_BYTE_TARGET).toBe(112 * 1024);
-        expect(CARD_BYTE_LIMIT).toBe(128 * 1024);
+        expect(CARD_BYTE_TARGET).toBe(128 * 1024);
+        expect(CARD_BYTE_LIMIT).toBe(150 * 1024);
     });
 
     it('every issuer-derived card field path is one the dossiers can actually carry', () => {
@@ -1675,5 +1708,117 @@ describe('ISO instants inside generated prose', () => {
         const html = renderCard(card, { version: 'v' });
         expect(html).toContain('The program was last upgraded 17 Jun 2026 20:57 UTC, slot 427147035.');
         expect(html).not.toContain('2026-06-17T20:57:58Z');
+    });
+});
+
+describe('the "Pyth on this token" block', () => {
+    const html = (symbol, card = cardFor(symbol)) => renderCard(card, { baseUrl: null, version: 'v' });
+    const blockOf = (page) => page.slice(page.indexOf('<section id="pyth">'), page.indexOf('<section id="depth">'));
+    const visible = (fragment) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const readAt = PYTH_ONCHAIN.readAt;
+
+    it('sits in Markets right after "When the market is closed", which points to it', () => {
+        const page = html('AAPLx');
+        expect(page.indexOf('<section id="pyth"><h2>Pyth on this token</h2>')).toBeGreaterThan(page.indexOf('<section id="closed-market">'));
+        expect(page.indexOf('<section id="pyth">')).toBeLessThan(page.indexOf('<section id="depth">'));
+        expect(blockOf(page).length).toBeGreaterThan(200);
+        expect(page.slice(page.indexOf('<section id="closed-market">'), page.indexOf('<section id="pyth">'))).toContain('href="#pyth"');
+    });
+
+    it('AAPLx: both feeds linked to their Pyth pages, the stock price read on Solana with Pyth\'s publish time', () => {
+        const card = cardFor('AAPLx');
+        const block = blockOf(html('AAPLx', card));
+        expect(block).toContain('<a href="https://app.pyth.com/explore/Equity.US.AAPL%2FUSD" rel="nofollow noopener">Equity.US.AAPL/USD</a>');
+        expect(block).toContain('<a href="https://app.pyth.com/explore/Crypto.AAPLX%2FUSD" rel="nofollow noopener">Crypto.AAPLX/USD</a>');
+        expect(block).toContain('<code>49f6b6…5688</code> the stock');
+        expect(block).toContain('<code>978e6c…8675</code> this token, 24/7');
+        expect(block).toContain(`Prices read from Solana at slot ${PYTH_FIXTURE.slot}, <time datetime="${readAt}">`);
+        expect(card.pyth.stock).toMatchObject({ shard: 1, account: 'D9uk39pqZMcnmtPP9WeC8cREUpKZmyXLga9mSQ79SphW' });
+        expect(card.pyth.stock.ageSeconds).toBeLessThan(60);
+        expect(block).toContain(`<time datetime="${card.pyth.stock.publishedAt}">`);
+        expect(block).toMatch(/<dt>US market \(Pyth schedule\)<\/dt><dd>closed at <time datetime="2026-09-25T00:01:00Z">/);
+        // The token price on Solana is 12 days older than the stock's: shown, dated, and not compared.
+        expect(card.pyth.token.publishedAt).toBe('2026-09-12T12:18:29Z');
+        expect(card.pyth.gap).toMatchObject({ comparable: false, pct: null, reason: 'token-older' });
+        expect(visible(block)).toContain('Token vs stock on Pyth not compared: the token price on Solana was published 12 d before the stock’s');
+    });
+
+    it('AAPLx: what each lender reads from Pyth, with the Lazer feed ids from the on-chain research', () => {
+        const text = visible(blockOf(html('AAPLx')));
+        expect(text).toContain('Nest xStock markets values it at Pyth Lazer Crypto.AAPLX/USD (feed 1792), the token’s own 24/7 price, less its confidence interval.');
+        expect(text).toContain('Kamino xStocks Pool prices it from Chainlink Data Streams; Pyth Lazer is the check: Chainlink and Crypto.AAPLX/USD (feed 1792) must agree within 5 %, and a Chainlink report more than 5 % from Equity.US.AAPL/USD (feed 922) is rejected.');
+        expect(text).toMatch(/Loopscale[^.]*: not researched yet\./);
+    });
+
+    it('SPYx: the Loopscale account stopped being updated — dated, aged against its 900 s maximum, never "Pyth failed"', () => {
+        const card = cardFor('SPYx');
+        const block = blockOf(html('SPYx', card));
+        const loopscale = card.pyth.lenders.find((l) => l.protocolId === 'loopscale');
+        expect(loopscale).toMatchObject({
+            account: '9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy', maxAgeS: 900, lastPublishedAt: '2026-08-26T15:54:46Z'
+        });
+        // The same feed's other shard, read in the same pass, was current.
+        expect(loopscale.sameFeedLive).toMatchObject({ shard: 1, account: 'CRDaGwcVnKdRNRtx6fjHtvrBgKM5U55AhbqBWhtPMDA' });
+        expect(block).toContain('The Pyth price account Loopscale reads stopped being updated on <time datetime="2026-08-26T15:54:46Z">');
+        expect(visible(block)).toMatch(/29 d old at our lending watcher’s last check, .*24 Sep 2026 18:51 UTC.*, against Loopscale’s 900 s maximum\./);
+        // A market whose research records no band of its own is not given one.
+        expect(visible(block)).toContain('Kamino Sentora xStocks Market prices it from Chainlink Data Streams; Pyth Lazer is the check: Chainlink and Crypto.SPYX/USD (feed 1843) must agree, and a Chainlink report too far from Equity.US.SPY/USD (feed 1398) is rejected.');
+        expect(block).toContain('href="https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy"');
+        expect(visible(block)).toContain('Pyth’s shard-1 account for the same feed');
+        expect(visible(block)).not.toMatch(/Pyth (failed|is down|broke|stopped working)/i);
+        expect(visible(block)).toContain('Jupiter Lend xStock vaults prices it from Chainlink Data Streams; no Pyth feed.');
+    });
+
+    it('AAPLon: the Ondo token feed is listed, and a feed with no Solana account says so instead of showing a price', () => {
+        const card = cardFor('AAPLon');
+        const block = blockOf(html('AAPLon', card));
+        expect(card.pyth.feeds.map((f) => [f.role, f.symbol])).toEqual([['stock', 'Equity.US.AAPL/USD'], ['token', 'Crypto.AAPLON/USD']]);
+        expect(card.pyth.token).toBeNull();
+        expect(visible(block)).toContain('Token on Pyth (Solana) no Pyth price account for Crypto.AAPLON/USD on Solana (shards 0 and 1 read');
+    });
+
+    it('STRCx: the Raydium gate is not a Pyth feed; the Pyth reference check keeps the band its research records', () => {
+        const text = visible(blockOf(html('STRCx')));
+        expect(text).toContain('Kamino STRCx Pool prices it from Chainlink Data Streams; Pyth Lazer is the check: a Chainlink report more than 10 % from Equity.US.STRC/USD (feed 2419) is rejected.');
+    });
+
+    it('a token with no Pyth feed at all gets one line saying so', () => {
+        const card = cardFor('OPENAI');
+        const block = blockOf(html('OPENAI', card));
+        expect(card.pyth.feeds).toEqual([]);
+        expect(visible(block).trim()).toBe('Pyth on this token Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).');
+    });
+
+    it('premium over the on-chain Pyth price only when the Jupiter price was read within the hour of the Pyth read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const base = { token, slug: 'AAPLx', builtAt: BUILT_AT, sources: SOURCES, referenceItem: referenceItems.get(token.mint), pythOnchain: PYTH_ONCHAIN, oraclePricing };
+        const near = buildCard({ ...base, priceReadAt: '2026-09-24T23:40:00Z' });
+        expect(near.pyth.premium).toMatchObject({ source: 'pyth-onchain', comparable: true });
+        expect(near.pyth.premium.pct).toBeCloseTo((token.market.usdPrice / near.pyth.stock.price - 1) * 100, 3);
+        expect(visible(blockOf(renderCard(near, { version: 'v' })))).toMatch(/Premium over Pyth [+-]\d+\.\d\d% over the stock’s Pyth price/);
+        const far = buildCard({ ...base, priceReadAt: '2026-09-20T10:28:13Z' });
+        expect(far.pyth.premium).toMatchObject({ comparable: false, pct: null, reason: 'read-apart' });
+        expect(visible(blockOf(renderCard(far, { version: 'v' })))).toContain('Premium over Pyth not compared: the Jupiter price was read 5 d before the Pyth read');
+    });
+
+    it('TSLAx: a key-entitled Hermes reference is the premium, named and dated without nested brackets', () => {
+        const card = cardFor('TSLAx');
+        expect(card.pyth.premium).toMatchObject({ source: 'pyth-hermes', comparable: true });
+        const block = blockOf(html('TSLAx', card));
+        expect(block).toMatch(/<dt>Premium over Pyth<\/dt><dd>[+-]\d+\.\d\d% over Pyth’s Equity\.US\.TSLA\/USD \$[\d,.]+ on Hermes, published <time datetime="2026-09-16T22:49:\d\dZ">[^<]+<\/time><\/dd>/);
+    });
+
+    it('without the on-chain read the feeds still show, and the block says the prices were not read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const card = buildCard({ token, slug: 'AAPLx', builtAt: BUILT_AT, sources: SOURCES, referenceItem: referenceItems.get(token.mint), oraclePricing });
+        expect(card.pyth.feeds.map((f) => f.symbol)).toEqual(['Equity.US.AAPL/USD']);
+        expect(visible(blockOf(renderCard(card, { version: 'v' })))).toContain('Pyth prices on Solana not read yet');
+    });
+
+    it('carries the block in the card\'s JSON record, numbers cut to six significant figures', () => {
+        const record = publicCard(cardFor('SPYx'));
+        expect(record.pyth.readAt).toBe(readAt);
+        expect(record.pyth.lenders.map((l) => l.protocolId)).toEqual(expect.arrayContaining(['kamino', 'nest', 'jupiter-lend', 'loopscale']));
+        expect(record.sources.pythOnchain).toBe(readAt);
     });
 });

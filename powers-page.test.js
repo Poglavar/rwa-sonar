@@ -153,7 +153,48 @@ describe('the detail panel', () => {
     });
 });
 
+describe('the headline answer', () => {
+    // One row per programme with just the two powers the sentence is about.
+    const programme = (slug, freeze, moveBurn) => ({ slug, name: slug, cells: [
+        cell({ power: 'freeze', kind: freeze }), cell({ power: 'moveBurn', kind: moveBurn })] });
+
+    test('counts the programmes where one key alone can freeze, and where one key alone can move or burn', () => {
+        const map = { ...MAP, issuers: [
+            programme('a', 'single-key', 'single-key'),
+            programme('b', 'single-key', 'multisig'),
+            programme('c', 'multisig', 'none'),
+            programme('d', 'unknown', 'unknown'),
+            programme('e', 'program', 'single-key'),
+            programme('f', 'single-key', 'unknown')
+        ] };
+        expect(P.headlineText(map)).toBe('In 3 of 6 programmes one key can freeze your tokens; in 2, one key can move or burn them.');
+    });
+
+    test('a multisig, a program or an unknown holder is never counted as one key, and no programmes means no sentence', () => {
+        const map = { ...MAP, issuers: [programme('a', 'multisig', 'program'), programme('b', 'unknown', 'none')] };
+        expect(P.headlineText(map)).toBe('In 0 of 2 programmes one key can freeze your tokens; in 0, one key can move or burn them.');
+        expect(P.headlineText({ issuers: [] })).toBe('');
+        expect(P.headlineText(null)).toBe('');
+    });
+});
+
 describe('the page itself', () => {
+    test('opens with the computed answer, then the grid: the method and the legend are collapsed', () => {
+        const how = /<details class="pm-how">\s*<summary>How to read this<\/summary>[\s\S]*?<\/details>/.exec(HTML);
+        expect(how).not.toBeNull();
+        // Everything the page used to explain up front is kept, inside the collapsed block.
+        for (const kept of ['class="method-note"', 'who holds each one', 'id="legend"', 'id="summary"', 'id="sources"']) {
+            expect(how[0]).toContain(kept);
+        }
+        // Between the title and the grid: only the answer, the collapsed block and the grid heading.
+        const between = HTML.slice(HTML.indexOf('</h1>'), HTML.indexOf('id="grid"')).replace(how[0], '');
+        expect(between).toContain('id="headline"');
+        expect(between).not.toMatch(/method-note|id="legend"|id="summary"/);
+        // The answer is filled from the data, never typed into the page.
+        expect(/<p id="headline"[^>]*>([^<]*)<\/p>/.exec(HTML)[1]).not.toMatch(/\d/);
+        expect(JS).toMatch(/=\s*headlineText\(map\)/);
+    });
+
     test('every element powers.js looks up by id exists in powers.html', () => {
         const ids = [...JS.matchAll(/getElementById\('([^']+)'\)/g)].map((match) => match[1]);
         expect(ids.length).toBeGreaterThan(6);

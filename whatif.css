@@ -10,6 +10,20 @@
  * list. One DOM, two readings; no second markup path to keep in step.
  */
 
+/* --- the answer and the collapsed method ------------------------------- */
+
+/* The page's answer in one sentence, then "How to read this" closed: on a phone the scenario
+   picker starts on the first screen instead of after a screenful of method. */
+.wm-answer { margin: 0 0 10px; font-size: clamp(1.05rem, 2.1vw, 1.3rem); font-weight: 650; line-height: 1.4; letter-spacing: -.01em; color: var(--page-text); }
+.wm-how { margin: 0 0 4px; }
+.wm-how > summary { display: flex; align-items: center; gap: 6px; min-height: 44px; width: max-content; list-style: none; cursor: pointer; color: var(--link-color); font-size: 0.9rem; font-weight: 650; }
+.wm-how > summary::-webkit-details-marker { display: none; }
+.wm-how > summary::before { content: "▸"; }
+.wm-how[open] > summary::before { content: "▾"; }
+.wm-how[open] > summary { margin-bottom: 8px; }
+.wm-how-h { margin: 18px 0 8px; font-size: 1rem; }
+.wm-how .section-note { max-width: 920px; }
+
 /* --- the status legend ------------------------------------------------ */
 
 .scenario-start { display: grid; grid-template-columns: minmax(180px, .35fr) 1fr; gap: 24px; }

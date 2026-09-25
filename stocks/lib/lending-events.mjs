@@ -423,6 +423,9 @@ export function decodePriceUpdateV2(input) {
         verification: level === 1 ? 'full' : 'partial',
         feedId: buf.subarray(base, base + 32).toString('hex'),
         price,
+        // The confidence interval, in the price's units (stocks/fetch-pyth-onchain.mjs shows it).
+        conf: Number(buf.readBigUInt64LE(base + 40)) * 10 ** expo,
+        expo,
         publishTs: Number(buf.readBigInt64LE(base + 52)),
         postedSlot: Number(buf.readBigUInt64LE(base + 84))
     };

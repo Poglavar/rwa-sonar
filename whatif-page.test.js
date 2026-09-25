@@ -585,6 +585,14 @@ describe('the page itself', () => {
         for (const id of new Set(ids)) expect(HTML).toContain(`id="${id}"`);
     });
 
+    test('no two elements share one handle: a second lookup into the same slot would write over the first', () => {
+        // Found in the browser on 2026-09-25: the headline and the answer dialog both went into
+        // els.answer, so the headline stayed empty and its text was written into the dialog.
+        const slots = [...JS.matchAll(/els\.(\w+) = document\.getElementById\(/g)].map((match) => match[1]);
+        expect(slots.length).toBeGreaterThan(8);
+        expect(slots.filter((slot, i) => slots.indexOf(slot) !== i)).toEqual([]);
+    });
+
     test('the page loads the scripts it needs, fmt and api-base before whatif.js, then the shared header menus', () => {
         const order = [...HTML.matchAll(/<script src="([^"?]+)/g)].map((match) => match[1]);
         expect(order).toEqual([
@@ -743,6 +751,32 @@ describe('the documented-answer scoreboard', () => {
         expect(html).toContain('viewBox="0 0 4 1"');
         expect(html).toMatch(/<rect class="wi-s-documented" x="0" y="0" width="1" height="1"><\/rect><rect class="wi-s-inferred" x="1"/);
         expect(W.scoreboardHtml([], {})).toBe('');
+    });
+
+    test('the headline answer names the issuers with the most and the fewest documented answers, from the scoreboard', () => {
+        expect(W.headlineText(board())).toBe('Kraken xStocks has documented answers to 1 of the 4 failure scenarios; '
+            + 'Ondo Global Markets and Opening Bell by Superstate have none.');
+        const row = (name, documented) => ({ name, short: name, total: 38, counts: { documented } });
+        expect(W.headlineText([row('A', 34), row('B', 34), row('C', 20), row('D', 9)]))
+            .toBe('A and B have documented answers to 34 of the 38 failure scenarios; D has 9.');
+        expect(W.headlineText([row('A', 30), row('B', 30), row('C', 30), row('D', 30), row('E', 2)]))
+            .toBe('4 issuers have documented answers to 30 of the 38 failure scenarios; E has 2.');
+        expect(W.headlineText([row('A', 5), row('B', 5)])).toBe('Every issuer has documented answers to 5 of the 38 failure scenarios.');
+        expect(W.headlineText([])).toBe('');
+    });
+
+    test('the page opens with that answer, then the picker; the method, legend and coverage are collapsed', () => {
+        const how = /<details class="wm-how">\s*<summary>How to read this<\/summary>[\s\S]*?<\/details>/.exec(HTML);
+        expect(how).not.toBeNull();
+        for (const kept of ['We never invent an outcome', 'id="scope"', 'id="statusKey"', 'sorted by how many are',
+            'All filters are stored in the URL']) {
+            expect(how[0]).toContain(kept);
+        }
+        const between = HTML.slice(HTML.indexOf('</h1>'), HTML.indexOf('class="scenario-start"')).replace(how[0], '');
+        expect(between).toContain('id="headline"');
+        expect(between).not.toMatch(/method-note|id="scope"|id="statusKey"/);
+        expect(/<p id="headline"[^>]*>([^<]*)<\/p>/.exec(HTML)[1]).not.toMatch(/\d/);
+        expect(JS).toMatch(/=\s*headlineText\(/);
     });
 
     test('the page has a place for it above the matrix', () => {

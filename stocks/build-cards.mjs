@@ -43,10 +43,12 @@ const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
 // The underlying's trading schedule per mint (Pyth feed list), so a card can say whether that
 // market was open at the snapshot instant rather than repeat the feed's read-time flag.
 const REFERENCE_PRICES_PATH = join(HERE, 'data', 'reference-prices.json');
+// Pyth prices read straight from Solana (stocks/fetch-pyth-onchain.mjs); gitignored, absent until it runs.
+const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260925cards';
+const ASSET_VERSION = '20260925pyth';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -67,6 +69,8 @@ INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
   stocks-trades.json, stocks-closed-market.json (When the market is closed), stocks/data/meteora.json,
   stocks/data/reference-prices.json (the underlying's trading schedule, for the session at build time),
+  stocks/data/pyth-onchain.json (Pyth prices read from Solana for "Pyth on this token"; absent: the
+                            block lists the feeds and says the prices were not read),
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
@@ -317,6 +321,9 @@ async function main() {
     const sourcesState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     const referenceDb = await readJson(REFERENCE_PRICES_PATH, { fetchedAt: null, items: [] });
+    const pythOnchain = await readJson(PYTH_ONCHAIN_PATH, null);
+    if (pythOnchain === null) logWarn(`no ${PYTH_ONCHAIN_PATH}: "Pyth on this token" shows the feeds without on-chain prices (run stocks/fetch-pyth-onchain.mjs --run)`);
+    else log(`pyth on-chain: ${pythOnchain.counts?.feeds ?? 0} feed(s), ${pythOnchain.counts?.feedsWithPrice ?? 0} with a price, read at ${pythOnchain.readAt} (chain clock)`);
     const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
     // xStocks public float (stocks/fetch-xstocks-float.mjs); absent on a machine that never read it.
     const floatDb = await readJson(join(HERE, 'data', 'xstocks-float.json'), null);
@@ -408,7 +415,12 @@ async function main() {
             protocolDiscrepancies,
             quoteSymbols,
             referenceSchedule: referencePrices.get(token.mint)?.schedule ?? null,
-            researchProduct: researchedOn.get(token.issuer) ?? null
+            researchProduct: researchedOn.get(token.issuer) ?? null,
+            referenceItem: referencePrices.get(token.mint) ?? null,
+            pythOnchain,
+            oraclePricing: marketResearch?.oraclePricing ?? null,
+            // When the Jupiter price on the card was read, so a premium over Pyth is drawn only between close instants.
+            priceReadAt: tokenDb.sources?.universe?.fetchedAt ?? null
         });
         const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');

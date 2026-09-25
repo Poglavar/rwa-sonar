@@ -968,7 +968,7 @@ if (typeof document !== 'undefined') {
             const affected = models.filter((model) => bundle ? bundle.reviewPendingIssuers.includes(model.issuerSlug) : state.reviewP0ByIssuer.has(model.issuerSlug));
             const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} priority-zero evidence changes. Marked legal conclusions are provisional.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
             els.comparisonView.innerHTML = reviewBanner + (models.length >= 1
-                ? sameStockComparisonHtml(group, models)
+                ? sameStockComparisonHtml(group, models, { sources: bundle?.sources ?? null })
                 : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. We never add wrappers to your selection.</p></div>') +
                 (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Fees and incentives →</a> <span>Initial programme research; it does not include every cost.</span></p>` : '') +
                 (models.length ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +

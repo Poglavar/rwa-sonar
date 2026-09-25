@@ -118,6 +118,7 @@ describe('web-native pitch deck', () => {
         const line = html.match(/<p class="pyth-line">[\s\S]*?<\/p>/)?.[0];
         expect(line).toBeTruthy();
         expect(line).toContain('market-hours schedule');
+        expect(line).toContain("Cards read Pyth stock prices straight from Pyth's accounts on Solana");
         expect(line).toContain('closed-market view');
         expect(line).toContain('the Pyth price accounts Loopscale reads stopped being updated on 26 Aug 2026 (TSLA on 11 Sep)');
         expect(line).toContain('Pyth Lazer 24/7 token feeds');

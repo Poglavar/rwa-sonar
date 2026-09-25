@@ -1070,6 +1070,48 @@ section {
     line-height: 1.4;
 }
 
+/* Buyer table: the compare view's first answer, one column per wrapper, above the Decision summary
+   (buyerTableHtml in stocks/lib/comparison-shape.js). It scrolls inside .buyer-wrap, never the page. */
+.buyer-table { margin: 0 0 14px; }
+.buyer-table > header { display: grid; gap: 3px; margin-bottom: 8px; }
+.buyer-table h2 { margin: 0; font-size: 1.05rem; }
+.buyer-table > header small { color: var(--muted-text); font-size: .74rem; line-height: 1.45; }
+.buyer-hint { display: none; }
+.buyer-table > header .buyer-hint-wide { display: block; }
+.buyer-wrap { position: relative; overflow-x: auto; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--panel-border)); border-radius: 10px; background: var(--card-bg); }
+.buyer-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.buyer-grid { width: 100%; min-width: calc(12rem + var(--buyer-cols, 2) * 11rem); border-collapse: collapse; font-size: .82rem; }
+.buyer-grid th, .buyer-grid td { padding: 9px 12px; border-top: 1px solid var(--panel-border); text-align: left; vertical-align: top; }
+.buyer-grid thead th, .buyer-grid thead td { border-top: 0; background: var(--sunken-bg); }
+.buyer-grid thead th { font-size: .95rem; }
+.buyer-grid thead .issuer-link { display: block; margin-top: 2px; color: var(--muted-text); font-size: .72rem; font-weight: 600; }
+.buyer-grid tbody th { width: 12rem; font-weight: 400; }
+.buyer-grid tbody th strong { display: block; font-size: .8rem; }
+.buyer-grid tbody th small { display: block; margin-top: 2px; color: var(--muted-text); font-size: .68rem; line-height: 1.35; }
+.buyer-link { color: inherit; font-weight: 650; text-decoration: none; }
+.buyer-link::after { content: " \2192"; color: var(--link-color); font-weight: 400; }
+.buyer-link:hover, .buyer-link:focus-visible { color: var(--link-color); text-decoration: underline; }
+.buyer-grid td small { display: block; margin-top: 3px; color: var(--muted-text); font-size: .72rem; line-height: 1.4; }
+.buyer-caution .buyer-link { color: var(--sev-caution); }
+.buyer-good .buyer-link { color: var(--up); }
+.buyer-muted .buyer-link { color: var(--muted-text); font-weight: 500; }
+.buyer-grid .rights-strip { gap: 4px 8px; }
+.buyer-grid .rights-strip ul { gap: 4px; }
+.buyer-grid .rights-chip { padding: 1px 7px; font-size: .7rem; }
+.buyer-grid .rights-more { font-size: .72rem; }
+@media (max-width: 640px) {
+    /* Each question spans the row; the wrappers' answers sit side by side under it. */
+    .buyer-grid, .buyer-grid thead, .buyer-grid tbody { display: block; }
+    .buyer-grid { min-width: calc(var(--buyer-cols, 2) * 9.5rem); }
+    .buyer-grid tr { display: grid; grid-template-columns: repeat(var(--buyer-cols, 2), minmax(0, 1fr)); }
+    .buyer-grid thead td { display: none; }
+    .buyer-grid tbody th { grid-column: 1 / -1; width: auto; padding-bottom: 4px; background: var(--sunken-bg); }
+    .buyer-grid tbody td { border-top: 0; }
+    .buyer-grid tbody td + td { border-left: 1px solid var(--panel-border); }
+    .buyer-hint { display: block; }
+}
+/* End buyer table */
+
 .evidence-kind {
     display: inline-block;
     margin-top: 3px;

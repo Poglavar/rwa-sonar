@@ -85,6 +85,11 @@ step "holders";   node stocks/fetch-holders.mjs --run
 # Issuer inventory for the xStocks public float (flows.html); a failed read keeps the previous file.
 soft "xstocks float" node stocks/fetch-xstocks-float.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
+# Pyth prices read straight from Solana's push-oracle accounts, keyless: the stock feed ids from the
+# reference prices just written, plus each xStocks/Ondo token's own feed, on shards 0 and 1, in one
+# bounded getMultipleAccounts pass (6 requests of 100 keys, with the Clock sysvar). For the cards'
+# "Pyth on this token"; a failed read keeps the previous stocks/data/pyth-onchain.json.
+soft "pyth on-chain" node stocks/fetch-pyth-onchain.mjs --run
 soft "meteora"    node stocks/fetch-meteora.mjs --run --fresh
 # What lenders do when the US market is closed (stocks/build-closed-market.mjs in the surfaces
 # phase): Kamino's keyless hourly price history for the Monday gap (16 small calls), and Jupiter

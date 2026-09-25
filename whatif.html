@@ -43,7 +43,7 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260924r" />
     <link rel="stylesheet" href="trustchain.css?v=20260924u" />
-    <link rel="stylesheet" href="whatif.css?v=20260924e" />
+    <link rel="stylesheet" href="whatif.css?v=20260925w" />
     <link rel="stylesheet" href="flow-diagram.css?v=20260924y" />
     <link rel="stylesheet" href="app-shell.css?v=20260925b" />
 </head>
@@ -53,18 +53,47 @@
     <header class="app-header"><a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a><nav class="app-nav" aria-label="Site navigation"><a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a><a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a><details class="app-nav-menu"><summary aria-current="page">Research</summary><div><a class="nav-compact-only" href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a id="nav-graph" href="./graph.html">Trust map</a><a href="./powers.html">Who holds the keys</a><a id="nav-whatif" aria-current="page" href="./whatif.html">Failure scenarios</a><a id="nav-templates" href="./templates/">Legal templates</a><a href="./issuers/">Issuer dossiers</a><a href="./exits.html">Exit routes</a><a href="./flows.html">Flows &amp; float</a><a href="./tracking.html">Premium &amp; concentration</a><a href="./economics.html">Fees &amp; incentives</a><a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-live" href="./live.html">Live trades</a><a id="nav-review" href="./review.html">Review queue</a><a href="./weekly/latest.html">This week</a><a href="./assets.html">All RWAs</a><a href="./pitch/">Pitch</a><a href="https://github.com/Poglavar/rwa-sonar">Code</a><button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button></div></details><button class="theme-switch" type="button" aria-label="Theme: Auto (follows your device)" title="Theme: Auto (follows your device)"><svg class="theme-icon" aria-hidden="true" focusable="false"><use class="theme-icon-auto" href="./images/theme-icons.svg?v=20260924y#auto"/><use class="theme-icon-light" href="./images/theme-icons.svg?v=20260924y#light"/><use class="theme-icon-dark" href="./images/theme-icons.svg?v=20260924y#dark"/></svg></button></nav></header>
 
     <h1 class="wi-title">Failure scenarios: what happens when one party or component fails</h1>
-    <p class="method-note">A grade says how a token is built. This page says what happens when one
-        of its parts fails: your keys are stolen, the custodian goes bankrupt, the company is acquired,
-        the multiplier is set wrong, or a regulator steps in. Each failure mode is put to
-        <strong>every issuer in the same words</strong>, so you can see which issuers have an answer and
-        which do not. <strong>We never invent an outcome.</strong>
-        An answer is <em>documented</em> only when the issuer's or a regulator's own document addresses the
-        case and we can quote it. It is <em>inferred</em> when the documents do not address it but
-        the structure implies the answer, and we mark it as our reading. It is <em>litigated</em> when a
-        court, tribunal or regulator decided this or a materially identical case, with the case
-        cited. It is <em>unknown</em> when we looked and the documents do not say; we then record where we
-        looked, because the gap is a finding. An empty cell means nobody has answered that question for
-        that issuer yet, and it is drawn as empty.</p>
+    <!-- The answer first, read by whatif.js (headlineText) off the documented-answer scoreboard: never typed here. -->
+    <p id="headline" class="wm-answer" hidden></p>
+
+    <!-- The method, the status key, the coverage line and how to read the scoreboard and the matrix,
+         collapsed so the scenario picker starts on the first screen. -->
+    <details class="wm-how">
+        <summary>How to read this</summary>
+        <p class="method-note">A grade says how a token is built. This page says what happens when one
+            of its parts fails: your keys are stolen, the custodian goes bankrupt, the company is acquired,
+            the multiplier is set wrong, or a regulator steps in. Each failure mode is put to
+            <strong>every issuer in the same words</strong>, so you can see which issuers have an answer and
+            which do not. <strong>We never invent an outcome.</strong>
+            An answer is <em>documented</em> only when the issuer's or a regulator's own document addresses the
+            case and we can quote it. It is <em>inferred</em> when the documents do not address it but
+            the structure implies the answer, and we mark it as our reading. It is <em>litigated</em> when a
+            court, tribunal or regulator decided this or a materially identical case, with the case
+            cited. It is <em>unknown</em> when we looked and the documents do not say; we then record where we
+            looked, because the gap is a finding. An empty cell means nobody has answered that question for
+            that issuer yet, and it is drawn as empty.</p>
+
+        <div class="data-line evidence-context"><span><small>Coverage</small><strong id="scope">&hellip;</strong></span><span><small>Basis</small><strong>Same failure questions applied across issuer programmes</strong></span><span><small>Limit</small><strong>An unanswered scenario remains visible as a research gap</strong></span></div>
+
+        <h2 id="legendHeading" class="wm-how-h">What the colours mean</h2>
+        <div id="statusKey"></div>
+
+        <h2 class="wm-how-h">The scoreboard</h2>
+        <p class="section-note">Per issuer, how its answers to all the questions split by status,
+            sorted by how many are <strong>documented</strong> (answered from the issuer's or a
+            regulator's own words). Questions nobody has answered for an issuer yet would show as a
+            faded end of its bar.</p>
+
+        <h2 class="wm-how-h">The matrix and its filters</h2>
+        <p class="section-note">The <strong>status</strong> filter keeps the questions in which at
+            least one issuer's answer has one of the statuses you picked, and marks those cells. It
+            does not hide individual cells, so every row stays complete. The
+            <strong>actor</strong> filter keeps the questions about one party (holder, custodian, token
+            program and so on), and an <strong>issuer</strong> link from a dossier keeps only that
+            programme's column. All filters are stored in the URL, so you can share a filtered view as a link.</p>
+    </details>
+
+    <p id="status" class="status" hidden></p>
 
     <section class="scenario-start" aria-labelledby="scenarioStartHeading">
         <div><p class="workspace-eyebrow">Pick a failure</p><h2 id="scenarioStartHeading">What went wrong?</h2></div>
@@ -76,21 +105,9 @@
         </nav>
     </section>
 
-    <div class="data-line evidence-context"><span><small>Coverage</small><strong id="scope">&hellip;</strong></span><span><small>Basis</small><strong>Same failure questions applied across issuer programmes</strong></span><span><small>Limit</small><strong>An unanswered scenario remains visible as a research gap</strong></span></div>
-
-    <p id="status" class="status" hidden></p>
-
-    <section id="legendSection" aria-labelledby="legendHeading">
-        <h2 id="legendHeading">What the colours mean</h2>
-        <ul id="statusKey" class="wm-key"></ul>
-    </section>
-
     <section id="scoreboardSection" aria-labelledby="scoreboardHeading">
         <h2 id="scoreboardHeading">Which issuers have documented answers</h2>
-        <p class="section-note">Per issuer, how its answers to all the questions split by status,
-            sorted by how many are <strong>documented</strong> (answered from the issuer's or a
-            regulator's own words). Questions nobody has answered for an issuer yet would show as a
-            faded end of its bar. Each bar opens that issuer's column of the matrix; the dates are when the
+        <p class="section-note">Each bar opens that issuer's column of the matrix; the dates are when the
             answers' sources were read.</p>
         <div id="scoreboard" class="wm-board-wrap"></div>
     </section>
@@ -99,12 +116,7 @@
         <h2 id="matrixHeading">The matrix <span id="shown" class="wm-range"></span></h2>
         <p class="section-note">One row per question, one column per issuer. Tap a cell to read the
             answer: the outcome, the quote it rests on, the source with its locator and
-            the date it was read. The <strong>status</strong> filter keeps the questions in which at
-            least one issuer's answer has one of the statuses you picked, and marks those cells. It
-            does not hide individual cells, so every row stays complete. The
-            <strong>actor</strong> filter keeps the questions about one party (holder, custodian, token
-            program and so on), and an <strong>issuer</strong> link from a dossier keeps only that
-            programme's column. All filters are stored in the URL, so you can share a filtered view as a link.</p>
+            the date it was read.</p>
 
         <div id="counts" class="wm-counts"></div>
 
@@ -152,7 +164,7 @@
     <script src="stocks/lib/whatif-render.js?v=20260923x"></script>
     <script src="stocks/lib/flow-diagram.js?v=20260924u"></script>
     <script src="stocks/lib/schematics.js?v=20260924s"></script>
-    <script src="whatif.js?v=20260924e"></script>
+    <script src="whatif.js?v=20260925w"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 

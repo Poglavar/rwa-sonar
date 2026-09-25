@@ -173,6 +173,53 @@ describe('float section', () => {
     });
 });
 
+// A reader sees words, not our plumbing: no data file name, no dotted field path, no script path.
+describe('visible text names no internal file, field path or slug', () => {
+    const INTERNAL = [
+        /\b[\w-]+\.(?:json|mjs|sql)\b/, // a data or script file name
+        /\bstocks\/[\w./-]+/, // a repository path
+        /\b[a-z]+[A-Z]\w*\.[a-z]/, // keyGovernance.evidence
+        /\b[a-z]+\.[a-z]+[A-Z]/, // market.usdPrice
+        /\w\[\d+\]/ // claims[77].quote
+    ];
+    /** The text a reader sees: tags, attributes, scripts, comments and the generated noscript block dropped. */
+    const visible = (html) => html.replace(/<!--[\s\S]*?-->/g, ' ').replace(/<(script|noscript|head)\b[\s\S]*?<\/\1>/g, ' ')
+        .replace(/<[^>]+>/g, ' ').replace(/&[#\w]+;/g, ' ');
+    const expectPlain = (html) => {
+        const text = visible(html);
+        for (const pattern of INTERNAL) expect(text).not.toMatch(pattern);
+    };
+
+    test('the price source is named in words: "Jupiter prices", not the file and field it was read from', () => {
+        const float = { totals: {}, priceSource: 'stocks-tokens.json market.usdPrice (Jupiter)', priceObservedAt: '2026-09-20T10:28:13Z' };
+        const html = page.floatSectionHtml(float);
+        expect(html).toContain('Dollar values use Jupiter prices observed');
+        expectPlain(html);
+    });
+
+    test('an issuer wallet says its role and where the dossier cites it in words, not as slugs and field paths', () => {
+        const float = { totals: {}, wallets: [{ address: 'S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS', role: 'freeze-pause-vault', basis: 'b',
+            dossierCitations: 3, xstockAccountsWithBalance: 0, dossierPaths: ['keyGovernance.evidence', 'authorityFacts.freeze.technicalNotes', 'claims[70].quote'] }] };
+        const html = page.floatSectionHtml(float);
+        expect(html).toContain('<strong>freeze and pause vault</strong>');
+        expect(html).toContain('cited 3× in the dossier: key governance, authority facts, claims');
+        expect(html).not.toContain('freeze-pause-vault');
+        expectPlain(html);
+        expect(page.floatSectionHtml(null)).not.toMatch(/\.mjs/);
+    });
+
+    test('the whole page, drawn from the committed data, reads without a file name or a field path', () => {
+        const data = JSON.parse(readFileSync(join(__dirname, 'stocks-flows.json'), 'utf8'));
+        expectPlain(readFileSync(join(__dirname, 'flows.html'), 'utf8'));
+        expectPlain(page.contextHtml(data) + page.leadHtml(data.float) + page.floatSectionHtml(data.float, 720)
+            + page.flowsSectionHtml(data.flows, 720) + (data.caveats ?? []).join(' '));
+    });
+
+    test('a failed load names no file either', () => {
+        expect(readFileSync(join(__dirname, 'flows.js'), 'utf8')).not.toMatch(/textContent = `Could not load stocks-flows\.json/);
+    });
+});
+
 describe('flows.html', () => {
     const html = readFileSync(join(__dirname, 'flows.html'), 'utf8');
     test('carries the site shell and loads local classic scripts only, with cache-bust stamps', () => {
