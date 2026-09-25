@@ -361,7 +361,7 @@ SPY, TSLA, each seconds before the read) and GLXY on shard 0. The **shard-0** ac
 feeds were 35 h to 141 days old (SPY/NVDA/CRCL last published 26 Aug 15:54:46 UTC and TSLA/QQQ
 11 Sep 23:59:59 UTC: the accounts Loopscale reads). Of the 28 xStocks/Ondo token feeds, 17 xStocks
 feeds had a shard-0 account, published 35 h to 12 d before the read; no Ondo token feed had one. Hermes serves the same prices
-only with a key (HTTP 401 without). The cards' "Pyth on this token" block reads this file.
+only with a key (HTTP 401 without). The cards' "Where prices come from" block reads this file.
 
 ### `data/manual-mints.json`
 
@@ -1079,7 +1079,7 @@ rule's `inputs` and the health file deliberately drops them.
   with `diff <(sed 's/builtAt[^,]*//' …)`.
 - **Size**: 128 KiB is the normal raw-HTML target and produces a warning when crossed; 150 KiB is the
   hard limit that fails the build (raised on 24 Sep 2026 as observed content grew, and again on 25 Sep 2026 for
-  the "Pyth on this token" block, with the owner's approval; see `stocks/lib/cards.mjs`). These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
+  the "Where prices come from" block, with the owner's approval; see `stocks/lib/cards.mjs`). These are our own regression thresholds; browsers and protocols impose no such limit. The build also reports gzip size. The machine-readable record is a separate file, so no JSON
   payload is duplicated inside every HTML page; that leaves room without dropping an analytical section.
 - **The published record** (`cards/<slug>.json`, linked from the HTML with
   `<link rel="alternate" type="application/json">`) is the machine-readable half: identity,

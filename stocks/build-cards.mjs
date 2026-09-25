@@ -72,7 +72,7 @@ INPUTS
   stocks-tokens.json, stocks-issuers.json, stocks/data/holders.json, stocks/data/venues.json,
   stocks-trades.json, stocks-closed-market.json (When the market is closed), stocks/data/meteora.json,
   stocks/data/reference-prices.json (the underlying's trading schedule, for the session at build time),
-  stocks/data/pyth-onchain.json (Pyth prices read from Solana for "Pyth on this token"; absent: the
+  stocks/data/pyth-onchain.json (Pyth prices read from Solana for "Where prices come from"; absent: the
                             block lists the feeds and says the prices were not read),
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
   stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
@@ -335,7 +335,7 @@ async function main() {
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     const referenceDb = await readJson(REFERENCE_PRICES_PATH, { fetchedAt: null, items: [] });
     const pythOnchain = await readJson(PYTH_ONCHAIN_PATH, null);
-    if (pythOnchain === null) logWarn(`no ${PYTH_ONCHAIN_PATH}: "Pyth on this token" shows the feeds without on-chain prices (run stocks/fetch-pyth-onchain.mjs --run)`);
+    if (pythOnchain === null) logWarn(`no ${PYTH_ONCHAIN_PATH}: "Where prices come from" shows the feeds without on-chain prices (run stocks/fetch-pyth-onchain.mjs --run)`);
     else log(`pyth on-chain: ${pythOnchain.counts?.feeds ?? 0} feed(s), ${pythOnchain.counts?.feedsWithPrice ?? 0} with a price, read at ${pythOnchain.readAt} (chain clock)`);
     const materialChanges = await readMaterialChanges(tokenDb.builtAt ?? null);
     // xStocks public float (stocks/fetch-xstocks-float.mjs); absent on a machine that never read it.

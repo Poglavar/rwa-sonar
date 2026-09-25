@@ -201,8 +201,8 @@ export const OG_DESCRIPTION_MAX = 200;
 // redemptions, the theme switch and the closed-market section, SPYx, NVDAx and QQQx built at
 // 112.7–113.1 KiB (27 kB gzipped). Diffed against the local build, the growth is observed content.
 // Raised on 2026-09-25 (target 112 → 128, limit 128 → 150 KiB), approved by the owner, who judged
-// cards fine up to 150 kB: the "Pyth on this token" block adds each token's Pyth feeds, the
-// on-chain Pyth prices with their publish times and every lender's Pyth dependency.
+// cards fine up to 150 kB: the "Where prices come from" block (then "Pyth on this token") adds each
+// token's Pyth feeds, the on-chain Pyth prices with their publish times and every lender's Pyth dependency.
 export const CARD_BYTE_TARGET = 128 * 1024;
 export const CARD_BYTE_LIMIT = 150 * 1024;
 
@@ -386,7 +386,7 @@ export function buildCard(input) {
         // (build-cards.mjs researchProducts): on every other product's card, whatever names that
         // product is labelled as its example rather than read as a fact about this token.
         researchProduct = null,
-        // "Pyth on this token": the token's stocks/data/reference-prices.json item (its stock's Pyth
+        // "Where prices come from": the token's stocks/data/reference-prices.json item (its stock's Pyth
         // feed and schedule), stocks/data/pyth-onchain.json (prices read from Solana), the lenders'
         // oracle research (protocol-market-research.json `oraclePricing`) and when the Jupiter price
         // on this card was read (universe fetchedAt), so a premium is only drawn between close instants.
@@ -1765,10 +1765,10 @@ function closedMarketBody(card) {
     return `<p class="cm-lead">${n === 1 ? 'One lending market takes' : `${n} lending markets take`} it; the price each uses while the US market is closed:</p>`
         + `${lenders}${rows}${findings}`
         + `<p class="cm-src">Read on-chain ${escapeHtml(fmtDate(c.researchedAt))}; freezes: our lending watcher; gaps: Kamino; depth: Jupiter. `
-        + '<a href="../stocks-closed-market.json">Data, sources</a> · <a href="#pyth">Which Pyth feed each lender reads</a></p>';
+        + '<a href="../stocks-closed-market.json">Data, sources</a> · <a href="#pyth">Which price each lender uses</a></p>';
 }
 
-// --- Pyth on this token -------------------------------------------------------------------------
+// --- Where prices come from: each lender's price source, and the Pyth prices RWA Sonar reads ---
 
 /** "49f6b6…5688": a Pyth feed id short enough to print; the record keeps it whole. */
 function shortFeedId(id) {
@@ -1919,7 +1919,7 @@ function pythLender(lender, mint, oraclePricing, index, readAt) {
 }
 
 /**
- * "Pyth on this token": the Pyth feeds for the token and its stock, the stock's session on Pyth's
+ * "Where prices come from": the Pyth feeds for the token and its stock, the stock's session on Pyth's
  * schedule at the instant of our Solana read, the prices read from Pyth's push-oracle accounts with
  * Pyth's own publish times, the token-vs-stock gap and the premium (each only when its instants
  * allow it), and what every lender that takes the token reads from Pyth. Pure: every instant is an
@@ -1986,13 +1986,13 @@ function solscanAccount(address, label) {
     return address === null ? escapeHtml(label) : link(`https://solscan.io/account/${address}`, label);
 }
 
-/** "$335.78 ± $0.11, published 25 Sep 2026 00:00 UTC, 6 s before our read · shard 1 account". */
+/** "$335.78 ± $0.11, published 25 Sep 2026 00:00 UTC, 6 s old when read · shard 1 account". */
 function pythReadingHtml(feed, reading, p) {
     if (!feed.read) return 'not read in the last Solana read';
     if (reading === null) {
         return `no Pyth price account for ${escapeHtml(feed.symbol)} on Solana (shards ${escapeHtml(p.shards.join(' and '))} read ${time(p.readAt)})`;
     }
-    const age = reading.ageSeconds === null ? '' : `, ${escapeHtml(humanizeDuration(reading.ageSeconds * 1000))} before our read`;
+    const age = reading.ageSeconds === null ? '' : `, ${escapeHtml(humanizeDuration(reading.ageSeconds * 1000))} old when read`;
     return `${escapeHtml(fmtPrice(reading.price))}${reading.conf === null ? '' : ` ± ${escapeHtml(fmtPrice(reading.conf))}`}, `
         + `published ${time(reading.publishedAt)}${age} · ${solscanAccount(reading.account, `shard ${reading.shard} account`)}`;
 }
@@ -2069,10 +2069,14 @@ function pythLenderHtml(l) {
 
 function pythBody(card) {
     const p = card.pyth;
-    // One row per lender: its name, then the sentence (without the name) on the second line; opened,
-    // the sentence with its account links and timestamps. A stale price account is flagged.
+    // Two parts: the price each lender (protocol) uses, which decides liquidations, then Pyth's
+    // prices for the stock and the token. The page describes the token, not us: the source line
+    // says where the prices come from and when they were read. One row per lender: its name, then the sentence (without the name) on
+    // the second line; opened, the sentence with its account links and timestamps. A stale price
+    // account is flagged.
     const lenders = p.lenders.length === 0 ? ''
-        : '<p class="pyth-lead">What each lender that takes it reads from Pyth:</p>' + foldListHtml(p.lenders.map((l) => {
+        : '<h3>What each lender uses</h3><p class="pyth-lead">The price a lending market uses decides when a loan against this token is liquidated.</p>'
+        + foldListHtml(p.lenders.map((l) => {
             const sentence = pythLenderHtml(l);
             const stale = l.uses === 'push' && l.ageAtCheckS !== null && l.maxAgeS !== null && l.ageAtCheckS > l.maxAgeS;
             return {
@@ -2083,11 +2087,12 @@ function pythBody(card) {
                 body: `<p>${sentence}</p>`
             };
         }), { className: 'pyth-lenders' });
+    const heading = '<h3>Pyth’s prices for the stock and the token</h3>';
     if (p.feeds.length === 0) {
         const line = !p.checked ? 'Not checked yet: this token is newer than our last read of Pyth’s feed lists.'
             : p.tokenFeedsChecked ? 'Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).'
                 : 'Pyth publishes no feed for its stock (Pyth’s equity feed list checked); its token feeds were not read yet.';
-        return `<p class="no">${escapeHtml(line)}</p>${lenders}`;
+        return `${lenders}${lenders ? heading : ''}<p class="no">${escapeHtml(line)}</p>`;
     }
     const stockFeed = p.feeds.find((f) => f.role === 'stock') ?? null;
     const tokenFeed = p.feeds.find((f) => f.role === 'token') ?? null;
@@ -2098,16 +2103,16 @@ function pythBody(card) {
         ['Pyth feeds', p.feeds.map(feedHtml).join(' · ')],
         ['US market (Pyth schedule)', p.session === null ? null : `${escapeHtml(SESSION_WORDS[p.session] ?? p.session)} at ${time(p.sessionAt)}`],
         ['Pyth prices on Solana', read ? null : 'not read yet (stocks/fetch-pyth-onchain.mjs)'],
-        ['Stock on Pyth (Solana)', read && stockFeed ? pythReadingHtml(stockFeed, p.stock, p) : null],
-        ['Token on Pyth (Solana)', read && tokenFeed ? pythReadingHtml(tokenFeed, p.token, p) : null],
+        ['Stock price on Pyth', read && stockFeed ? pythReadingHtml(stockFeed, p.stock, p) : null],
+        ['Token price on Pyth', read && tokenFeed ? pythReadingHtml(tokenFeed, p.token, p) : null],
         ['Token vs stock on Pyth', pythGapHtml(p)],
         ['Premium over Pyth', pythPremiumHtml(p)]
     ]);
     const source = read
         ? `<p class="pyth-src">Prices read from Solana${p.readSlot === null ? '' : ` at slot ${escapeHtml(p.readSlot)}`}, ${time(p.readAt)}: `
-            + 'Pyth’s push-oracle price accounts, no API key; publish times are Pyth’s own. Lender feeds: our on-chain oracle research.</p>'
+            + 'Pyth’s push-oracle price accounts; publish times are Pyth’s own. Lenders’ price sources: each market’s on-chain oracle settings.</p>'
         : '';
-    return `${rows}${lenders}${source}`;
+    return `${lenders}${heading}${rows}${source}`;
 }
 
 function depthBody(card) {
@@ -3148,7 +3153,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         section('reference', 'Reference & premium', referenceBody(card)) +
         `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
         section('closed-market', 'When the market is closed', closedMarketBody(card)) +
-        section('pyth', 'Pyth on this token', pythBody(card)) +
+        section('pyth', 'Where prices come from', pythBody(card)) +
         section('depth', 'Depth, volume, activity', depthBody(card)) +
         section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
 

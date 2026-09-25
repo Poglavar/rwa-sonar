@@ -483,7 +483,7 @@ h1 {
     color: var(--muted-text);
 }
 
-/* --- Pyth on this token: the feeds, the prices read on Solana, each lender's Pyth feed --------- */
+/* --- Where prices come from: each lender's price source, the Pyth prices read on Solana ---------- */
 
 /* Feed symbols and account addresses are long unbroken runs; let them wrap at 320 px. */
 #pyth .kv dd {

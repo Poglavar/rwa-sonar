@@ -1850,7 +1850,7 @@ describe('ISO instants inside generated prose', () => {
     });
 });
 
-describe('the "Pyth on this token" block', () => {
+describe('the "Where prices come from" block', () => {
     const html = (symbol, card = cardFor(symbol)) => renderCard(card, { baseUrl: null, version: 'v' });
     const blockOf = (page) => page.slice(page.indexOf('<section id="pyth">'), page.indexOf('<section id="depth">'));
     const visible = (fragment) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
@@ -1858,10 +1858,25 @@ describe('the "Pyth on this token" block', () => {
 
     it('sits in Markets right after "When the market is closed", which points to it', () => {
         const page = html('AAPLx');
-        expect(page.indexOf('<section id="pyth"><h2>Pyth on this token</h2>')).toBeGreaterThan(page.indexOf('<section id="closed-market">'));
+        expect(page.indexOf('<section id="pyth"><h2>Where prices come from</h2>')).toBeGreaterThan(page.indexOf('<section id="closed-market">'));
         expect(page.indexOf('<section id="pyth">')).toBeLessThan(page.indexOf('<section id="depth">'));
         expect(blockOf(page).length).toBeGreaterThan(200);
-        expect(page.slice(page.indexOf('<section id="closed-market">'), page.indexOf('<section id="pyth">'))).toContain('href="#pyth"');
+        expect(page.slice(page.indexOf('<section id="closed-market">'), page.indexOf('<section id="pyth">'))).toContain('<a href="#pyth">Which price each lender uses</a>');
+    });
+
+    it('puts the price each lender uses first, then Pyth\'s prices; how we read them stays in the source line', () => {
+        const block = blockOf(html('AAPLx'));
+        const lenders = block.indexOf('<h3>What each lender uses</h3>');
+        const ours = block.indexOf('<h3>Pyth’s prices for the stock and the token</h3>');
+        expect(lenders).toBeGreaterThan(0);
+        expect(ours).toBeGreaterThan(lenders);
+        // Every lender row sits under the lenders' heading; the Pyth prices we read sit under ours.
+        expect(block.indexOf('Nest xStock markets')).toBeGreaterThan(lenders);
+        expect(block.indexOf('Nest xStock markets')).toBeLessThan(ours);
+        expect(block.indexOf('<dt>Stock price on Pyth</dt>')).toBeGreaterThan(ours);
+        expect(block).toMatch(/<p class="pyth-src">Prices read from Solana[^<]*<time[^>]*>[^<]*<\/time>: Pyth’s push-oracle price accounts; publish times are Pyth’s own\./);
+        // The section describes the token, not RWA Sonar.
+        expect(visible(block)).not.toMatch(/RWA Sonar|our read|API key/);
     });
 
     it('AAPLx: both feeds linked to their Pyth pages, the stock price read on Solana with Pyth\'s publish time', () => {
@@ -1913,7 +1928,7 @@ describe('the "Pyth on this token" block', () => {
         const block = blockOf(html('AAPLon', card));
         expect(card.pyth.feeds.map((f) => [f.role, f.symbol])).toEqual([['stock', 'Equity.US.AAPL/USD'], ['token', 'Crypto.AAPLON/USD']]);
         expect(card.pyth.token).toBeNull();
-        expect(visible(block)).toContain('Token on Pyth (Solana) no Pyth price account for Crypto.AAPLON/USD on Solana (shards 0 and 1 read');
+        expect(visible(block)).toContain('Token price on Pyth no Pyth price account for Crypto.AAPLON/USD on Solana (shards 0 and 1 read');
     });
 
     it('STRCx: the Raydium gate is not a Pyth feed; the Pyth reference check keeps the band its research records', () => {
@@ -1925,7 +1940,7 @@ describe('the "Pyth on this token" block', () => {
         const card = cardFor('OPENAI');
         const block = blockOf(html('OPENAI', card));
         expect(card.pyth.feeds).toEqual([]);
-        expect(visible(block).trim()).toBe('Pyth on this token Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).');
+        expect(visible(block).trim()).toBe('Where prices come from Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).');
     });
 
     it('premium over the on-chain Pyth price only when the Jupiter price was read within the hour of the Pyth read', () => {

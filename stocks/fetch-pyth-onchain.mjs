@@ -4,7 +4,7 @@
 // PriceUpdateV2 accounts on shards 0 and 1, in ONE bounded getMultipleAccounts pass (at most
 // --max-requests requests of 100 keys) together with the Clock sysvar. Writes
 // stocks/data/pyth-onchain.json (gitignored): price, confidence and Pyth's own publish time per
-// account, and the chain clock of the read. The cards' "Pyth on this token" block reads it.
+// account, and the chain clock of the read. The cards' "Where prices come from" block reads it.
 // Decisions live in lib/pyth-onchain.mjs (tested); this file is the IO.
 
 import { join } from 'node:path';
