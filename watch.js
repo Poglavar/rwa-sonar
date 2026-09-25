@@ -185,6 +185,18 @@
         return parts.join(' · ') || `Recorded ${str(row?.date) ?? DASH}`;
     }
 
+    const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    /**
+     * The one date a journal row leads with in its collapsed line ("22 Sep 2026"): when it took
+     * effect, else when it happened, else when we first saw it. The full times stay in the opened row.
+     */
+    function journalShortDate(row) {
+        const iso = str(row?.effectiveAt) ?? str(row?.eventAt) ?? str(row?.firstObservedAt) ?? str(row?.date);
+        const m = iso === null ? null : /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+        return m === null ? DASH : `${Number(m[3])} ${SHORT_MONTHS[Number(m[2]) - 1]} ${m[1]}`;
+    }
+
     /** Compare the current public journal with the anonymous baseline kept in this browser. */
     function journalVisitSummary(rows, seenIdentities) {
         const list = Array.isArray(rows) ? rows : [];
@@ -1063,6 +1075,7 @@
         claimRows,
         filterClaimRows,
         journalRows,
+        journalShortDate,
         evidenceIsEmpty,
         describeApiFailure,
         createSequence
@@ -1448,12 +1461,19 @@
                     `<a href="${escapeHtml(source.url)}">${escapeHtml(source.label)}</a>${source.accessedAt ? ` (checked ${escapeHtml(fmtDateTime(source.accessedAt))})` : ''}`).join(' · ')}</p>`;
                 const decisionScope = `<p class="wat-journal-scope"><strong>Actor:</strong> ${escapeHtml(row.actor ?? DASH)} · <strong>Affected:</strong> ${escapeHtml(row.affectedHolders.length ? row.affectedHolders.join('; ') : 'holder class not established')}</p>`;
                 const anchor = row.id ? `journal-${row.id.replace(/[^A-Za-z0-9_-]/g, '-')}` : '';
-                return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="wat-journal-item wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
-                    <p class="wat-journal-meta">${escapeHtml(journalTimeLabel(row))} · ${isNew ? `${chip('new since your last visit', 'accent', 'This browser had not seen this public journal entry')} · ` : ''}${chip(humanizeSlug(row.kind), row.severity, row.category)} · ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}</p>
-                    <h3>${title}</h3>
+                // One row: two short lines (when, how serious, what; then the consequence) that open
+                // to the full entry. Links live in the opened part, so a click on the row only toggles.
+                const headline = row.consequence || row.impact.reason || row.summary || '';
+                const open = row.href ? `<p class="wat-row-open"><a href="${escapeHtml(row.href)}">Open ${escapeHtml(row.title)} →</a></p>` : '';
+                return `<li${anchor ? ` id="${escapeHtml(anchor)}"` : ''} class="wat-journal-item wat-row wat-journal-${escapeHtml(row.severity)}${isNew ? ' wat-journal-new' : ''}">
+                    <details><summary>
+                    <span class="wat-row-line1">${escapeHtml(journalShortDate(row))} · ${isNew ? `${chip('new', 'accent', 'This browser had not seen this public journal entry')} ` : ''}${chip(`${row.impact.key} impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)} <strong class="wat-row-title">${escapeHtml(row.title)}</strong></span>
+                    ${headline ? `<span class="wat-row-line2">${escapeHtml(headline)}</span>` : ''}
+                    </summary><div class="wat-row-body">
+                    <p class="wat-journal-meta">${escapeHtml(journalTimeLabel(row))} · ${chip(humanizeSlug(row.kind), row.severity, row.category)}</p>
                     ${row.summary ? `<p class="wat-journal-meta">${escapeHtml(row.summary)}</p>` : ''}${moved}
                     ${decisionScope}<p class="wat-journal-why"><strong>Consequence:</strong> ${escapeHtml(row.consequence || row.impact.reason)}</p>
-                    ${assets}${sources}</li>`;
+                    ${assets}${sources}${open}</div></details></li>`;
             }).join('')).join('');
         const requested = new URLSearchParams(window.location.search).get('journal');
         if (requested) {
@@ -1461,6 +1481,7 @@
             const target = document.getElementById(anchor);
             if (target) {
                 target.classList.add('wat-journal-target');
+                target.querySelector('details')?.setAttribute('open', '');
                 target.scrollIntoView({ block: 'center' });
             }
         }
@@ -1554,17 +1575,28 @@
             ? ''
             : `<details class="wat-diff"><summary>diff excerpt</summary><pre>${escapeHtml(truncate(ev.diffExcerpt, DIFF_EXCERPT_MAX).text)}</pre></details>`;
         const anchor = row.anchorId === null ? '' : ` id="${escapeHtml(row.anchorId)}"`;
-        return `<li${anchor} class="wat-change wat-change-${escapeHtml(row.severity)}${row.anchorId !== null && row.anchorId === state.targetAnchor ? ' wat-change-target' : ''}">
-            <p class="wat-change-head">${timeCell(row.detectedAt)}
+        const target = row.anchorId !== null && row.anchorId === state.targetAnchor;
+        // One row: two short lines that open to the full event. The second line is the plainest
+        // reading we have: the model's summary, else why this kind of change matters, else the
+        // watcher's own (technical) summary.
+        const headline = row.assessment?.summary || row.impact.reason || (row.summary.empty ? null : row.summary.full) || '';
+        const who = `${escapeHtml(row.subjectLabel)}${row.issuerName === null || row.issuerIsSubject ? '' : ` · ${escapeHtml(row.issuerName)}`}`;
+        return `<li${anchor} class="wat-change wat-row wat-change-${escapeHtml(row.severity)}${target ? ' wat-change-target' : ''}">
+            <details${target ? ' open' : ''}><summary>
+            <span class="wat-row-line1">${timeCell(row.detectedAt)}
                 ${chip(row.severity, row.severity, `severity: ${row.severity}`)}
-                ${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}
                 ${chip(row.kindLabel, 'info', row.kind)}
+                <strong class="wat-row-title">${who}</strong></span>
+            ${headline ? `<span class="wat-row-line2">${escapeHtml(headline)}</span>` : ''}
+            </summary><div class="wat-row-body">
+            <p class="wat-change-head">${chip(`${row.impact.key} holder impact`, row.impact.key === 'high' ? 'critical' : row.impact.key === 'medium' ? 'caution' : 'info', row.impact.label)}
                 ${subject}${issuer}</p>
             <p class="wat-impact-reason">${escapeHtml(row.impact.reason)}</p>
             <dl class="wat-change-body">${field}${moved}${summary}
                 <dt>evidence</dt><dd>${evidence}</dd>
             </dl>
             ${diff}${modelAssessmentHtml(row.assessment)}
+            </div></details>
         </li>`;
     }
 
@@ -1927,6 +1959,7 @@
         const feed = document.getElementById('feedDisclosure');
         if (feed) feed.open = true;
         row.classList.add('wat-change-target');
+        row.querySelector('details')?.setAttribute('open', '');
         if (state.targetScrolled) return;
         state.targetScrolled = true;
         row.scrollIntoView({ block: 'start' });

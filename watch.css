@@ -401,9 +401,9 @@ body {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .wat-journal-visit {
@@ -426,17 +426,16 @@ body {
 
 .wat-journal-item {
     border: 1px solid var(--panel-border);
-    border-top: 4px solid var(--accent);
-    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
     background: var(--card-bg);
-    padding: 14px 16px;
     /* Findings quote addresses and signatures: long unbroken base58 strings must wrap on phones. */
     min-width: 0;
     overflow-wrap: anywhere;
 }
 
-.wat-journal-item.wat-journal-warning { border-top-color: var(--sev-warning); }
-.wat-journal-item.wat-journal-caution { border-top-color: var(--sev-caution); }
+.wat-journal-item.wat-journal-warning { border-left-color: var(--sev-warning); }
+.wat-journal-item.wat-journal-caution { border-left-color: var(--sev-caution); }
 .wat-journal-item.wat-journal-new { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 32%, transparent); }
 .wat-journal-item.wat-journal-target { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 3px; }
 .wat-impact-heading {
@@ -519,7 +518,7 @@ body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
 }
 
 .wat-change {
@@ -527,8 +526,60 @@ body {
     border-left-width: 4px;
     border-radius: 10px;
     background: var(--card-bg);
-    padding: 10px 14px;
 }
+
+/* Journal entries and change events are one compact row each: at most two lines of "when, how
+   serious, what" and one line of consequence, opening to the full entry on click (watch.js). */
+.wat-row > details > summary {
+    position: relative;
+    display: grid;
+    gap: 3px;
+    padding: 8px 12px 8px 30px;
+    list-style: none;
+    cursor: pointer;
+}
+.wat-row > details > summary::-webkit-details-marker { display: none; }
+.wat-row > details > summary::before {
+    content: "▸";
+    position: absolute;
+    left: 12px;
+    top: 9px;
+    color: var(--muted-text);
+    transition: transform 0.15s ease;
+}
+.wat-row > details[open] > summary::before { transform: rotate(90deg); }
+.wat-row > details > summary:hover .wat-row-title { color: var(--link-color); }
+.wat-row > details > summary:focus-visible { outline: var(--rwa-focus); outline-offset: 2px; border-radius: 8px; }
+.wat-row-line1,
+.wat-row-line2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+}
+.wat-row-line1 {
+    -webkit-line-clamp: 2;
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+.wat-row-line1 .wat-chip { vertical-align: 1px; }
+.wat-row-title { color: var(--page-text); font-weight: 700; }
+.wat-row-line2 {
+    -webkit-line-clamp: 1;
+    color: var(--page-text);
+    font-size: 0.84rem;
+}
+/* Open, the body says the same thing in full (Consequence, or the model's reading): no repeat. */
+.wat-row > details[open] .wat-row-line2 { display: none; }
+.wat-row > details[open] .wat-row-line1 { -webkit-line-clamp: unset; }
+.wat-row-body {
+    padding: 4px 14px 12px 30px;
+    border-top: 1px solid var(--panel-border);
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.wat-row-open { margin: 8px 0 0; font-size: 0.84rem; }
 
 .wat-change-info {
     border-left-color: var(--sev-info);

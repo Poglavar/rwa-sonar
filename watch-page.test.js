@@ -945,3 +945,30 @@ describe('watch hero layout', () => {
         expect(rule(wide, '.watch-intro h1')).toMatch(/margin: 0 0 [.\d]+(em|px)/);
     });
 });
+
+describe('changes and journal entries are compact rows that open on click', () => {
+    test('each row is a <details> whose summary holds at most two short lines', () => {
+        // Journal entries and change events: line 1 is when, how serious and what; line 2 the consequence.
+        expect(JS.match(/<details(?:\$\{target \? ' open' : ''\})?><summary>\s*<span class="wat-row-line1">/g)).toHaveLength(2);
+        expect(JS.match(/<span class="wat-row-line2">/g)).toHaveLength(2);
+        expect(JS).toMatch(/class="wat-journal-item wat-row /);
+        expect(JS).toMatch(/class="wat-change wat-row /);
+        // A linked change or journal entry opens itself.
+        expect(JS.match(/querySelector\('details'\)\?\.setAttribute\('open', ''\)/g)).toHaveLength(2);
+    });
+
+    test('the summary lines are clamped: two lines, then one', () => {
+        expect(CSS).toMatch(/\.wat-row-line1 \{[^}]*-webkit-line-clamp: 2;/);
+        expect(CSS).toMatch(/\.wat-row-line2 \{[^}]*-webkit-line-clamp: 1;/);
+        expect(CSS).toMatch(/\.wat-row > details > summary \{[^}]*cursor: pointer;/);
+    });
+});
+
+describe('the journal row leads with one short date', () => {
+    test('effective, else event, else first observed; the full times stay in the opened row', () => {
+        expect(W.journalShortDate({ effectiveAt: '2026-09-26', eventAt: '2026-09-01', firstObservedAt: '2026-09-24T18:07:00Z' })).toBe('26 Sep 2026');
+        expect(W.journalShortDate({ eventAt: '2026-09-01', firstObservedAt: '2026-09-22' })).toBe('1 Sep 2026');
+        expect(W.journalShortDate({ firstObservedAt: '2026-09-22', reviewedAt: '2026-09-23T09:51:55Z' })).toBe('22 Sep 2026');
+        expect(W.journalShortDate({})).toBe(W.DASH ?? '—');
+    });
+});
