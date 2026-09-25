@@ -109,6 +109,17 @@ function basisSeen(snapshot, basis) {
     return (Array.isArray(snapshot?.items) ? snapshot.items : []).some((row) => row?.basis === basis);
 }
 
+/**
+ * A protocol we already covered, read a new way: the previous snapshot has rows for `protocolId`,
+ * none of them of `basis`. Those rows existed before we measured them like this (Loopscale's vault
+ * collateral lists, first read 24 Sep 2026, named loans open since August), so they are a baseline.
+ * A protocol with no earlier rows at all is still news: its first listing is an addition.
+ */
+function newBasisForKnownProtocol(snapshot, protocolId, basis) {
+    const before = (Array.isArray(snapshot?.items) ? snapshot.items : []).filter((row) => row?.protocolId === protocolId);
+    return before.length > 0 && !before.some((row) => (row?.basis ?? null) === (basis ?? null));
+}
+
 function indexRows(snapshot) {
     const rows = new Map();
     for (const row of Array.isArray(snapshot?.items) ? snapshot.items : []) {
@@ -197,7 +208,8 @@ export function diffDefiSnapshots(previous, current, {
         if (!before) {
             // The first day a measurement runs (no row of that basis the day before) records a
             // baseline: those rows existed before we could see them, so none is an addition.
-            if (after.basis === POSITION_BASIS && !basisSeen(previous, POSITION_BASIS)) {
+            if ((after.basis === POSITION_BASIS && !basisSeen(previous, POSITION_BASIS))
+                || newBasisForKnownProtocol(previous, after.protocolId, after.basis)) {
                 baselined += 1;
                 continue;
             }

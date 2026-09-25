@@ -61,6 +61,21 @@ describe('daily DeFi snapshots', () => {
         expect(row.basis).toBe('onchain-position');
     });
 
+    test('a known protocol read a new way is a baseline; a new protocol is still news (25 Sep 2026)', () => {
+        const secz = { mint: 'MINT_S', symbol: 'SECZ', protocolId: 'loopscale', protocolName: 'Loopscale', category: 'lending', status: 'live' };
+        const vault = (mint, symbol) => ({ mint, symbol, protocolId: 'loopscale', protocolName: 'Loopscale', category: 'lending', status: 'live', basis: 'exact-token-registry' });
+        const kamino = (mint, symbol) => ({ mint, symbol, protocolId: 'kamino', protocolName: 'Kamino', category: 'lending', status: 'live', basis: 'exact-token-registry' });
+        // The day we first read Loopscale's vault collateral lists: TSLAx and SPYx were listed long before.
+        const day = diffDefiSnapshots(snap('2026-09-24', [secz, kamino('MINT_N', 'NVDAx')]),
+            snap('2026-09-25', [secz, vault('MINT_T', 'TSLAx'), vault('MINT_P', 'SPYx'), kamino('MINT_N', 'NVDAx'), kamino('MINT_M', 'METAx')]));
+        expect(day.baselined).toBe(2);
+        // Kamino was already read this way, so a new Kamino row is a listing.
+        expect(day.events.map((e) => `${e.protocolId}:${e.symbol}`)).toEqual(['kamino:METAx']);
+        // A protocol seen for the first time is an addition, as SECZ at Loopscale was on 24 Sep.
+        const firstEver = diffDefiSnapshots(snap('2026-09-23', [kamino('MINT_N', 'NVDAx')]), snap('2026-09-24', [kamino('MINT_N', 'NVDAx'), secz]));
+        expect(firstEver.events.map((e) => `${e.protocolId}:${e.symbol}`)).toEqual(['loopscale:SECZ']);
+    });
+
     test('the first observation is a baseline, never hundreds of additions', () => {
         expect(diffDefiSnapshots(null, snap('2026-09-19', [row()])).events).toEqual([]);
     });
