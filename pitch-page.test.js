@@ -122,11 +122,8 @@ describe('web-native pitch deck', () => {
     test('says what Pyth data does in the product, without calling a stopped account a Pyth failure', () => {
         const line = html.match(/<p class="pyth-line">[\s\S]*?<\/p>/)?.[0];
         expect(line).toBeTruthy();
-        expect(line).toContain('market-hours schedule');
-        expect(line).toContain("Cards read Pyth stock prices straight from Pyth's accounts on Solana");
-        expect(line).toContain('closed-market view');
+        expect(line).toContain('We analyze how oracles are used in the protocols that accept tokenized stocks.');
         expect(line).toContain('the Pyth price accounts Loopscale reads stopped being updated on 26 Aug 2026 (TSLA on 11 Sep)');
-        expect(line).toContain('Pyth Lazer 24/7 token feeds');
         expect(line).not.toMatch(/Pyth (?:failed|broke|went down|outage)/i);
         expect(declarations('.pyth-line').color).toBeTruthy();
     });
