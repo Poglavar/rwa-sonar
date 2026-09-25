@@ -44,7 +44,7 @@ Redemption is split into the legal right, holder eligibility, the current offici
 
 ### Health checks
 
-Every token is checked on four dimensions — market (price tracking, pool liquidity, organic flow, failed swaps, holder concentration, venue spread), control (authority keys, trading pause, frozen accounts), legal/evidence (review state of holder-rights and backing evidence) and DeFi composability (whether a protocol could enforce a default without discretionary issuer help). Thresholds are published with each result. Status is the worst of the measured rules; "unknown" never counts as good.
+Every token is checked on four dimensions — market (price tracking, pool liquidity, organic flow, failed swaps, holder concentration, venue spread), control (authority keys, trading pause, frozen accounts), legal/evidence (review state of holder-rights and backing evidence) and DeFi composability (whether a protocol could enforce a default without discretionary issuer help). Thresholds are published with each result. Each token has a programme verdict (the issuer-wide checks) and its own verdict with passed-of-judged checks; the worst of all eleven is also published. "Unknown" never counts as good.
 
 ## How it stays current
 

@@ -1,6 +1,7 @@
 /*
  * Global search results grouped into stocks, tokens, issuers and protocols, each with the reason
- * it matched, plus the underlying-stock directory cards.
+ * it matched, plus the underlying-stock directory cards. A "stock" may be a pre-IPO company
+ * (discovery.js comparisonKey), found by its name and marked pre-IPO.
  *
  * Moved verbatim out of stocks.js (next-steps.md F11). Pure: no DOM, no fetch, no clock. UMD like the
  * other stocks/lib/*.js files: the browser loads it as a classic script before stocks.js and reads
@@ -27,7 +28,7 @@
                 : (firstSlug ? `./cards/${encodeURIComponent(firstSlug)}.html` : `./stocks.html?view=assets`);
             const isSaved = saved.has(group.ticker);
             return `<article class="underlying-card" data-underlying="${escapeHtml(group.ticker)}"><a class="underlying-card-link" href="${escapeHtml(href)}">`
-                + `<span class="underlying-card-kicker">${escapeHtml(group.ticker)}</span>`
+                + `<span class="underlying-card-kicker">${group.preIpo ? 'Pre-IPO · ' : ''}${escapeHtml(group.ticker)}</span>`
                 + `<strong>${escapeHtml(group.name || group.ticker)}</strong>`
                 + `<small>${escapeHtml(issuerNames.slice(0, 3).join(' · '))}${issuerNames.length > 3 ? ` · +${issuerNames.length - 3}` : ''}</small>`
                 + `<dl><div><dt>Wrappers</dt><dd>${escapeHtml(fmtNumber(group.issuerCount))}</dd></div>`
@@ -41,7 +42,7 @@
     function searchIntentLabels(intent) {
         const filters = intent?.filters ?? {};
         return [
-            filters.collateral && 'source-listed collateral',
+            filters.collateral && 'listed as collateral by a protocol',
             filters.redeemable && 'cash redemption',
             filters.noFreeze && 'no freeze, pause or clawback power',
             filters.autonomous && 'autonomous liquidation',
@@ -70,9 +71,17 @@
             if (includesTerms([issuer?.name, issuer?.issuingEntity, token?.issuer].filter(Boolean).join(' '))) return `Issuer identity${reasonSuffix}`;
             return intentLabels.length ? `Meets ${intentLabels.join(', ')}` : 'Related token identity';
         };
-        const stocks = underlyingGroups(raw.tokens).slice(0, limit).map((group) => ({
+        // A pre-IPO company (no listed ticker) is found by its name; its key is not a ticker. Its
+        // name and pre-IPO flag come from the whole catalogue group, not only the matched tokens.
+        const whole = new Map(underlyingGroups(tokens).map((group) => [group.ticker, group]));
+        const stocks = underlyingGroups(raw.tokens).slice(0, limit).map((matched) => {
+            const full = whole.get(matched.ticker);
+            return { ...matched, name: full?.name ?? matched.name, preIpo: full?.preIpo ?? matched.preIpo };
+        }).map((group) => ({
             record: group,
-            reason: String(group.ticker).toLowerCase() === exact
+            reason: group.preIpo && (String(group.ticker).toLowerCase() === exact || includesTerms(group.name))
+                ? `Pre-IPO company name${reasonSuffix}`
+                : String(group.ticker).toLowerCase() === exact
                 ? `Exact underlying ticker${reasonSuffix}`
                 : (includesTerms(group.name) ? `Underlying company name${reasonSuffix}` : `Contains a matching token${reasonSuffix}`)
         }));

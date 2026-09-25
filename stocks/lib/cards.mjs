@@ -14,6 +14,7 @@ import trustChainSvg from './trustchain-svg.js';
 import whatIfLib from './whatif-render.js';
 import closedMarketView from './closed-market-view.js';
 import holderRightsLib from './holder-rights.js';
+import issuerLabels from './issuer-labels.js';
 import { HEALTH_DIMENSIONS, REFERENCE_SOURCE_LABELS, evaluateHealth, topSharePctExcludingLabels } from './health.mjs';
 import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs';
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
@@ -21,6 +22,7 @@ import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
 import { timelockFrom } from './power-map.mjs';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
+import { resolutionForEvent } from './event-resolutions.mjs';
 import protocolProof from './protocol-proof.js';
 import activityRowsLib from './activity-rows.js';
 import { parseSchedule, sessionAt } from './market-hours.mjs';
@@ -212,6 +214,26 @@ export const CARD_BYTE_LIMIT = 150 * 1024;
 export const MATERIAL_CHANGE_DAYS = 30;
 export const MATERIAL_CHANGE_ROWS = 2;
 export const MATERIAL_CHANGE_TITLE = 'Recent material changes (model assessment)';
+
+/**
+ * Watcher kinds that are OUR upkeep, not the issuer changing anything: `quote-lost` (words a dossier
+ * quoted are no longer found verbatim in its source) and `document-gone` (a watched page stopped
+ * answering: moved, or blocked for our reader). A card shows one only when a review confirmed it.
+ */
+export const MAINTENANCE_CHANGE_KINDS = ['quote-lost', 'document-gone'];
+
+/**
+ * Whether a judged change event is a real change for a buyer's card. A curated resolution
+ * (stocks/data/event-resolutions.json) decides first: a public one is a change-journal entry and
+ * stays; a private one (a false alarm, our own research correction) goes. Without one, a maintenance
+ * kind stays only when a reviewer marked it `confirmed` (sonar.review_resolution, `confirmed` on the
+ * row); every other kind, a legal-term diff or an on-chain change, stays.
+ */
+export function isRealChange(row, resolutions = []) {
+    const curated = resolutionForEvent(row, resolutions);
+    if (curated !== null) return curated.public === true;
+    return !MAINTENANCE_CHANGE_KINDS.includes(row?.kind) || row?.confirmed === true;
+}
 
 const BASE58_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
@@ -409,15 +431,18 @@ export function buildCard(input) {
                 id: str(item.id), area: str(item.area), title: str(item.title), claimImpact: str(item.claimImpact)
             })),
         materialChanges: cardMaterialChanges(materialChanges?.items, token, {
-            asOf: materialChanges?.asOf ?? null, issuerName: str(issuer?.name)
+            asOf: materialChanges?.asOf ?? null, issuerName: str(issuer?.name),
+            resolutions: materialChanges?.resolutions ?? []
         }),
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            levels: verdict.levels,
             dimensions: verdict.dimensions,
             rules: verdict.rules.map((rule) => ({
                 id: rule.id,
                 label: rule.label,
+                level: rule.level,
                 dimension: rule.dimension,
                 status: rule.status,
                 value: num(rule.value),
@@ -798,7 +823,8 @@ function cexRows(cex, quoteSymbols = null) {
  * mint or on its issuer's documents, detected in the `windowDays` before `asOf` (the export's own
  * timestamp, never a clock, so a rebuild from the same export is byte-identical). One judgment reads
  * every event of one change, so a change is counted once, represented by the event the judge read
- * (else the earliest). Rows the builder did not mark `material: true` are ignored here as well.
+ * (else the earliest). Rows the builder did not mark `material: true` are ignored here as well, and
+ * so is our own upkeep (isRealChange: a lost quote or an unreachable document nobody confirmed).
  * Returns null when there is nothing to show, and the card then shows nothing.
  */
 /** A dossier field path in words: `vocabulary.thirdPartyAttestation` -> "third party attestation". */
@@ -838,7 +864,7 @@ export function humanChangeSummary(summary, { issuerSlug = null, issuerName = nu
         .replace(/ · keywords: /g, ' · mentions ');
 }
 
-export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MATERIAL_CHANGE_DAYS, issuerName = null } = {}) {
+export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MATERIAL_CHANGE_DAYS, issuerName = null, resolutions = [] } = {}) {
     if (!Array.isArray(rows) || rows.length === 0 || token === null || typeof token !== 'object') return null;
     const end = Date.parse(asOf ?? '');
     if (!Number.isFinite(end)) return null;
@@ -846,7 +872,12 @@ export function cardMaterialChanges(rows, token, { asOf = null, windowDays = MAT
     const byChange = new Map();
     for (const row of rows) {
         if (row?.material !== true || str(row.assessmentSummary) === null) continue;
-        const ours = (str(row.issuerSlug) !== null && row.issuerSlug === token.issuer)
+        if (!isRealChange(row, resolutions)) continue;
+        // Watcher rows carry the dossier's slug ("securitize-secz", "backpack-securities-spcx"); cards
+        // carry the programme's ("securitize"). A dossier slug is the programme slug plus a suffix,
+        // as canonicalIssuer (lib/change-journal.mjs) resolves it.
+        const slug = str(row.issuerSlug);
+        const ours = (slug !== null && str(token.issuer) !== null && (slug === token.issuer || slug.startsWith(`${token.issuer}-`)))
             || (row.subjectType === 'token' && row.subjectId === token.mint);
         if (!ours) continue;
         const at = Date.parse(row.detectedAt ?? '');
@@ -1061,9 +1092,11 @@ export function publicCard(card) {
         health: {
             status: card.health.status,
             worstRuleId: card.health.worstRuleId,
+            levels: card.health.levels,
             dimensions: card.health.dimensions,
             rules: card.health.rules.map((rule) => ({
                 id: rule.id,
+                level: rule.level,
                 dimension: rule.dimension,
                 status: rule.status,
                 value: rule.value,
@@ -1489,23 +1522,27 @@ export function indexEntry(card) {
 
 function whatYouOwnBody(card) {
     const o = card.ownership;
-    const rung = o.claimRung === null ? null : `rung ${o.claimRung} of 4 — ${text(o.claimLabel)}`;
+    // Both ladders in a buyer's words; the technical name and its definition stay in the title.
+    const depthWords = issuerLabels.claimDepthWords(o.claimRung);
+    const rung = depthWords === null ? null
+        : `<span title="${escapeHtml(`Claim depth: rung ${o.claimRung} of 4. ${issuerLabels.claimRungTooltip(o.claimRung)}`)}">${escapeHtml(depthWords)}</span>`;
     const restrictions = [
         o.transferRestrictions.allowlist === null ? null : `allowlist ${yesNo(o.transferRestrictions.allowlist)}`,
         o.transferRestrictions.kycToHold === null ? null : `KYC to hold ${yesNo(o.transferRestrictions.kycToHold)}`,
         o.transferRestrictions.usPersonsExcluded === null ? null : `US persons excluded ${yesNo(o.transferRestrictions.usPersonsExcluded)}`,
         o.transferRestrictions.mechanism === null ? null : `mechanism ${o.transferRestrictions.mechanism}`
     ].filter((part) => part !== null);
-    const maturity = o.maturityStage === null && o.maturityScore === null
-        ? null
-        : `${text(o.maturityStage)}${o.maturityScore === null ? '' : ` · score ${escapeHtml(String(o.maturityScore))}`}`;
+    const recordWords = issuerLabels.ledgerRecordWords(o.maturityStageNum);
+    const maturity = recordWords === null ? null
+        : `<span title="${escapeHtml(`Ledger maturity: ${o.maturityStage ?? `Level ${o.maturityStageNum}`}`
+            + `${o.maturityScore === null ? '' : `, score ${o.maturityScore}`}. ${issuerLabels.maturityLevelTooltip(o.maturityStageNum)}`)}">${escapeHtml(recordWords)}</span>`;
     const usability = card.ownership.redemptionUsability;
     const redemption = o.redemption.available === null && !usability.fields.some((field) => field.value !== null)
         ? null
         : `${yesNo(o.redemption.available)}. Holder, jurisdiction, route and fee conditions are below.`;
 
     const summary = kv([
-        ['Claim depth', rung],
+        [issuerLabels.CLAIM_DEPTH_QUESTION, rung],
         ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm)), 'legalForm'],
         ['What the holder owns', o.holderClaim === null ? null : escapeHtml(o.holderClaim), 'holderClaim'],
         ['Issuing entity', o.issuingEntity === null ? null : escapeHtml(o.issuingEntity), 'issuingEntity'],
@@ -1518,7 +1555,7 @@ function whatYouOwnBody(card) {
         ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
             ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
                 'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
-        ['Ledger maturity', maturity]
+        [issuerLabels.LEDGER_RECORD_QUESTION, maturity]
     ], card.evidence);
     const redemptionEvidenceField = {
         'eligibility-and-place': 'redemption.eligibility',
@@ -2535,6 +2572,46 @@ function composabilityBody(card) {
         + `<div class="comp-grid">${scenarios}</div>`;
 }
 
+/** "7 of 7 checks that could be run pass; 1 not measured" — judged checks only, never an unknown. */
+function levelCountWords(level) {
+    const judged = level.judged;
+    const counted = `${fmtNumber(level.passed)} of ${fmtNumber(judged)} check${judged === 1 ? ' that could be run passes' : 's that could be run pass'}`;
+    return level.unknown > 0 ? `${counted}; ${fmtNumber(level.unknown)} not measured` : counted;
+}
+
+/**
+ * The headline of "Why the health checks say …": this token's own eight checks and its programme's
+ * three issuer-wide ones (stocks/lib/health.mjs `levels`), each with its count and what holds it
+ * back, in the holder's words where ruleInWords has them. The programme banner says it is the same
+ * for every token of the issuer, so a reader does not blame this token for its issuer's evidence.
+ */
+function healthLevelsHtml(card) {
+    const levels = card.health.levels;
+    const ruleById = (id) => card.health.rules.find((rule) => rule.id === id) ?? null;
+    const heldBack = (rule) => {
+        if (rule === null) return '';
+        const words = ruleInWords(rule);
+        return ` ${escapeHtml(rule.status === 'warning' ? 'Fails' : 'Held back by')}: ${escapeHtml(rule.label)} — ${escapeHtml(words ?? '')}`;
+    };
+    const token = levels.token;
+    let tokenText;
+    if (token.judged === 0) tokenText = ' None of its eight checks could be run.';
+    else if (token.status === 'unknown') {
+        tokenText = ' No market could be measured (no price, pool, trade or venue spread), so it is not called good. '
+            + `${escapeHtml(levelCountWords(token))}.`;
+    } else tokenText = ` ${escapeHtml(levelCountWords(token))}.${heldBack(ruleById(token.worstRuleId))}`;
+    const programme = levels.programme;
+    const issuerName = card.issuer.name ?? humanizeSlug(card.issuer.slug ?? '') ?? 'issuer';
+    const programmeText = programme.judged === 0
+        ? ' None of the three issuer-wide checks could be judged.'
+        : programme.status === 'good'
+            ? ' All three issuer-wide checks that could be judged pass.'
+            : heldBack(ruleById(programme.worstRuleId));
+    return `<p class="banner banner-${escapeHtml(token.status)}"><strong>This token</strong> ${chip(token.status)}${tokenText}</p>`
+        + `<p class="banner banner-${escapeHtml(programme.status)}"><strong>Programme</strong> ${chip(programme.status)} `
+        + `Legal evidence, authority keys and DeFi enforceability — the same for every ${escapeHtml(issuerName)} token.${programmeText}</p>`;
+}
+
 function healthDimensionsHtml(card) {
     return `<div class="health-dimensions" aria-label="Health by dimension">${HEALTH_DIMENSIONS.map((dimension) => {
         const result = card.health.dimensions?.[dimension.id] ?? { status: 'unknown', worstRuleId: null };
@@ -2708,6 +2785,14 @@ function healthRisk(card) {
 }
 
 /**
+ * Priority-zero (P0) review-queue items in a buyer's words: changes in the issuer's documents that
+ * may change this card's legal answers and that we have not finished reviewing.
+ */
+function underReviewWords(count) {
+    return `${count} change${count === 1 ? '' : 's'} in the issuer’s documents may change the legal answers on this card; our review is not finished.`;
+}
+
+/**
  * "Largest unresolved risk", one sentence a buyer can act on, first match wins: a source-backed
  * claim-vs-reality conflict; a priority-zero evidence review; a power over holders' tokens that one
  * key (or a multisig with no time lock) can use; a lending market's stale or 24/7 collateral price;
@@ -2722,7 +2807,7 @@ export function largestRisk(card) {
     const review = Array.isArray(card?.underReview) ? card.underReview.length : 0;
     if (review > 0) {
         return {
-            value: `${review} priority-zero evidence change${review === 1 ? '' : 's'} may affect the inherited legal analysis.`,
+            value: underReviewWords(review),
             href: `../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer?.slug ?? '')}`,
             link: 'Open review queue'
         };
@@ -2738,6 +2823,19 @@ export function largestRisk(card) {
     return { value: 'The current checks measured no material risk; what they could not measure is unknown.', href: '#rules', link: 'Inspect the health checks' };
 }
 
+/**
+ * Protocol proof stages, strongest first (protocol-proof.js), and what each means in a buyer's words
+ * for the "What works in DeFi now?" fact. The stage names themselves are methodology vocabulary.
+ */
+const PROOF_STAGE_ORDER = ['simulated', 'decoded', 'observed-market', 'account-observed', 'source-listed'];
+const PROOF_STAGE_WORDS = {
+    simulated: 'we simulated a transaction without sending it',
+    decoded: 'we read the market’s settings on chain',
+    'observed-market': 'we saw a live market for this exact token',
+    'account-observed': 'we saw a protocol account holding the token on chain',
+    'source-listed': 'the protocol lists it in its own registry'
+};
+
 /** The five facts a holder should be able to read before opening any technical detail. */
 export function assetDecisionFacts(card) {
     const verdict = discovery.laypersonVerdict({
@@ -2752,17 +2850,14 @@ export function assetDecisionFacts(card) {
         proof: entry?.proof ?? {}, integration: entry, fetchedAt: card?.sources?.defiUsage ?? null
     }));
     const proofStages = new Set(proofModels.map((model) => model.stage));
-    const proofScope = proofStages.has('simulated') ? 'includes a read-only simulation'
-        : proofStages.has('decoded') ? 'includes configuration decoding'
-            : proofStages.has('observed-market') ? 'includes an observed exact-token market'
-                : proofStages.has('account-observed') ? 'includes an on-chain protocol account holding the token'
-                : proofStages.has('source-listed') ? 'is source-listed'
-                    : 'has no established proof stage';
+    // The strongest proof stage reached, in words; the stage's own name rides along as the fact's title.
+    const proofStage = PROOF_STAGE_ORDER.find((stage) => proofStages.has(stage)) ?? null;
+    const proofScope = proofStage === null ? 'no check beyond finding the protocol' : PROOF_STAGE_WORDS[proofStage];
     const proofAsOf = proofModels.map((model) => model.asOf).filter(Boolean).sort().at(-1) ?? null;
-    const proofDate = proofAsOf ? ` Evidence checked ${fmtDateTime(proofAsOf)}.` : ' Evidence-check time is not recorded.';
+    const proofDate = proofAsOf ? ` Checked ${fmtDateTime(proofAsOf)}.` : ' When we checked is not recorded.';
     const defi = protocols.length
-        ? `Exact-token support: ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? ` · source-described ${defiActions(actions).toLowerCase()}` : ''}. Proof ${proofScope}.${proofDate} Execution is not independently evidenced.`
-        : 'No exact-token protocol support is source-listed in the checked sources.';
+        ? `Listed for this exact token by ${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` and ${protocols.length - 3} more` : ''}${actions.length ? `, for ${defiActions(actions).toLowerCase()} (as the protocols describe it)` : ''}. Furthest we checked: ${proofScope}.${proofDate} We have not seen a real transaction succeed.`
+        : 'No protocol we checked lists this exact token in its own registry.';
     const dexPairs = Number.isFinite(card?.depth?.dexPairs) ? card.depth.dexPairs : null;
     const cexMarkets = Number.isFinite(card?.depth?.cexMarkets) ? card.depth.cexMarkets : null;
     const liquidity = Number.isFinite(card?.depth?.liquidityUsd) ? card.depth.liquidityUsd : null;
@@ -2782,7 +2877,8 @@ export function assetDecisionFacts(card) {
         { id: 'exit', label: 'How can you exit?', value: `${verdict.redemption} ${marketExit}`,
             href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
-            href: '#defi-usage', link: 'Inspect source-listed protocols' },
+            href: '#defi-usage', link: 'See which protocols list it',
+            title: protocols.length ? `Proof stage: ${proofStage ?? 'none established'}` : null },
         { id: 'risk', label: 'Largest unresolved risk', value: risk.value.charAt(0).toUpperCase() + risk.value.slice(1),
             href: risk.href, link: risk.link }
     ];
@@ -2792,7 +2888,7 @@ function assetDecisionHtml(card) {
     const rows = assetDecisionFacts(card);
     return '<section class="asset-decision" aria-label="Holder decision summary">'
         + '<p class="asset-decision-kicker">The five things to know first</p>'
-        + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}">`
+        + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}"${row.title ? ` title="${escapeHtml(row.title)}"` : ''}>`
             + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
             + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
         + `<div class="asset-rights"><small>Shareholder rights you get</small>`
@@ -2818,6 +2914,54 @@ export function priceLineHtml(card) {
         parts.push(`<a href="#depth">${escapeHtml(fmtMoney(card.depth.liquidityUsd))} DEX liquidity</a> (Jupiter, all pools)`);
     }
     return parts.length ? `<p class="price-line">${parts.join(' · ')}</p>` : '';
+}
+
+/**
+ * "Who can buy", in two separate answers, because holding and redeeming are gated differently: an
+ * xStock moves to any wallet while only KYC'd holders redeem with the issuer. `buy` comes from the
+ * transfer restrictions (the dossier's allowlist / KYC-to-hold / US-person flags, and the mint's own
+ * default-frozen state, which is an allowlist whatever the documents say) plus where a market was
+ * found; `redeem` from the redemption terms. A flag we do not hold is said to be unknown, never read
+ * as open.
+ */
+export function whoCanBuy(card) {
+    const tr = card?.ownership?.transferRestrictions ?? {};
+    const redemption = card?.ownership?.redemption ?? {};
+    const usBarred = tr.usPersonsExcluded === true;
+    const allowlisted = tr.allowlist === true || card?.control?.allowlist === true;
+    const dexPairs = isNum(card?.depth?.dexPairs) ? card.depth.dexPairs : 0;
+    const cexMarkets = isNum(card?.depth?.cexMarkets) ? card.depth.cexMarkets : 0;
+    let buy;
+    if (allowlisted) {
+        buy = `only wallets the issuer has allowlisted${tr.kycToHold === true ? ' after KYC' : ''}; an ordinary Solana wallet cannot receive it`;
+    } else if (tr.kycToHold === true) {
+        buy = 'only holders who pass the issuer’s KYC';
+    } else if (tr.allowlist === false || tr.kycToHold === false) {
+        const kyc = tr.kycToHold === false ? ', with no KYC' : '';
+        buy = dexPairs > 0 ? `anyone with a Solana wallet, on a DEX${kyc}`
+            : cexMarkets > 0 ? 'anyone with an account at an exchange that lists it (the exchange’s own checks apply)'
+                : `any Solana wallet may hold it${kyc}`;
+        if (usBarred) buy += ', though the terms bar US persons';
+        if (dexPairs === 0 && cexMarkets === 0) buy += '; we found no market that sells it';
+    } else {
+        buy = 'not established from the documents we hold';
+    }
+    const redeem = redemption.available === true
+        ? redemption.kyc === true ? `only holders who pass the issuer’s KYC${usBarred ? ' and are not US persons' : ''}`
+            : redemption.kyc === false ? `any holder${usBarred ? ' who is not a US person' : ''}`
+                : 'offered; its KYC terms are not established'
+        : redemption.available === false ? 'not offered' : 'not established';
+    return { buy, redeem };
+}
+
+function whoCanBuyHtml(card) {
+    const { buy, redeem } = whoCanBuy(card);
+    const tr = card?.ownership?.transferRestrictions ?? {};
+    const flag = (value) => value === true ? 'yes' : value === false ? 'no' : 'unknown';
+    const title = `Transfer restrictions: allowlist ${flag(tr.allowlist)} · KYC to hold ${flag(tr.kycToHold)} · `
+        + `US persons excluded ${flag(tr.usPersonsExcluded)} · redemption KYC ${flag(card?.ownership?.redemption?.kyc)}`;
+    return `<p class="who-can-buy" title="${escapeHtml(title)}"><b>Who can buy:</b> ${escapeHtml(buy)}. `
+        + `<span>Redeeming with the issuer: ${escapeHtml(redeem)}.</span> <a href="#own">Terms →</a></p>`;
 }
 
 /** An absolute UTC timestamp; card.js appends the relative age to every <time> it finds. */
@@ -2885,8 +3029,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const pageUrl = origin === null ? null : `${origin}/cards/${card.slug}.html`;
     const description = ogDescription(card);
-    const status = card.health.status;
-    const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId) ?? null;
+    const levelWord = (level) => STATUS_WORDS[level?.status] ?? STATUS_WORDS.unknown;
     const v = version ? `?v=${encodeURIComponent(version)}` : '';
     const ownImage = typeof ogImage?.path === 'string' && ogImage.path !== '';
     const imageUrl = `${origin}/${ownImage ? ogImage.path.split('/').map(encodeURIComponent).join('/') : OG_IMAGE_PATH}`;
@@ -2930,13 +3073,14 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         priceLineHtml(card) +
+        whoCanBuyHtml(card) +
         assetDecisionHtml(card) +
         `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
-        `${card.underReview.length ? `<div class="under-review-banner"><strong>Legal conclusions under review</strong><span>${card.underReview.length} priority-zero evidence change${card.underReview.length === 1 ? '' : 's'} may affect this token’s inherited analysis.</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
+        `${card.underReview.length ? `<div class="under-review-banner" title="${card.underReview.length} priority-zero (P0) item${card.underReview.length === 1 ? '' : 's'} in the evidence review queue"><strong>Legal conclusions under review</strong><span>${escapeHtml(underReviewWords(card.underReview.length))}</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         materialChangesHtml(card) +
-        `<details class="decision-health"><summary>Why the health checks say ${escapeHtml(status)}</summary>` +
-        healthDimensionsHtml(card) + `<p class="banner banner-${escapeHtml(status)}">${chip(status)} ` +
-        `${escapeHtml(worst === null ? 'no check could be measured for this token' : worst.note ?? '')}</p></details>` +
+        `<details class="decision-health"><summary>Why the health checks say: this token ${escapeHtml(levelWord(card.health.levels.token))}, ` +
+        `programme ${escapeHtml(levelWord(card.health.levels.programme))}</summary>` +
+        healthLevelsHtml(card) + healthDimensionsHtml(card) + `</details>` +
         '</header>';
 
     const siteHeader = siteNav.siteHeaderHtml('../');

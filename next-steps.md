@@ -7,14 +7,16 @@ Open work only, as of 25 September 2026 (early morning, UTC). Effort: **S** = un
 
 1. **Case-law dismissals** — **you**, S. Sign off the candidate dismissals in
    `stocks/data/caselaw-reviewed.json`. *Payoff:* the `litigated` status becomes trustworthy.
-2. **Ask who holds tokenized SECZ of record** — **you**, S. One email to Continental shareholder services
-   or Securitize IR settles which of the three recorded models is true (holder on Continental's
-   register, Securitize nominee with a token sub-register, or Securitize as co-registrar). *Payoff:* a
-   precise ownership answer for the only transfer-agent-native issuer.
-3. **Republic's binding note terms** — **you**, M. The operative Note and Risk Factors sit behind the
-   investment checkout, which is why 8 of Republic's 38 answers stay unknown. Getting the documents
-   (an account, or asking Republic) is the only route. *Payoff:* the thinnest dossier fills in.
-
+2. **Who holds tokenized SECZ of record** — **you**, waiting. Asked Continental shareholder services
+   (cstmail@continentalstock.com) on 25 Sep: which of the three recorded models applies (holder on
+   Continental's register, Securitize nominee with a token sub-register, or Securitize as
+   co-registrar), which record governs, the route back to DRS, and who sends proxies and dividends.
+   *Payoff:* a precise ownership answer for the only transfer-agent-native issuer.
+3. **Republic's binding note terms** — **you**, waiting. Asked Republic (investors@republic.co, cc
+   team@republic.co) on 25 Sep for the operative Note and Risk Factors, the payout timing and price
+   after SpaceX's June 2026 listing, the reference price after the 5-for-1 split, keepwell vs
+   guarantee, the official Solana mint, token controls and the unknown what-if cases. *Payoff:* the
+   thinnest dossier fills in (8 of 38 answers unknown).
 ## Submission (Stocklana, closes 25 Sep 20:00 UTC)
 
 4. **Submission package** — **you**, S. Ready in SUBMISSION.md: every form field, the short
@@ -45,32 +47,32 @@ Open work only, as of 25 September 2026 (early morning, UTC). Effort: **S** = un
    before judging. CySEC's own certificate expires 27 Sep 2026. Eight Backed claims stay `changed`
    from region-blocked reads until a readable copy (e.g. Wayback) is found; they show on the changes
    page and the issuer evidence, not on the cards.
-7. **Buyer-first pages, what is left** — M. Done on 25 Sep: a plain holder-relevant "largest risk"
-   and a price line on every card, and a buyer table at the top of Compare. Left: "who can buy" at
-   the top of each card; our own quote-maintenance events off the cards; new visitors land on "Find a
-   stock"; home search higher on phones; plain words for rung / ledger maturity / source-listed /
-   evidence backlog labels.
-8. **Closed-market view follow-ups** — S. Weekend depth samples accrue from the refresh's Saturday
+7. **Closed-market view follow-ups** — S. Weekend depth samples accrue from the refresh's Saturday
    and Sunday runs; exposure at the Monday gap and Jupiter Lend's Sunday re-mark are not measured
    yet. Backpack and Ondo dossiers could carry the "priced from token trading" finding too (**you**
    decide). Cards may grow to 150 KiB (owner, 25 Sep).
-9. **Health bands tell tokens apart** — M. 0 of 1,404 tokens are "good" (1,006 caution, 398
-   warning), so the badge does not separate them; the monitor now says so plainly. Calibrate the
-   bands, or rank tokens by what fails.
-10. **Speed and weight** — M. `/api/changes` takes 0.8–1 s (every other endpoint 125–350 ms): EXPLAIN
+8. **Speed and weight** — M. `/api/changes` takes 0.8–1 s (every other endpoint 125–350 ms): EXPLAIN
     and index, or precompute. Phone payloads are heavy (DeFi view 1.66 MB gzip, monitor 974 KB,
     what-if 759 KB): slimmer per-view JSON. assets.html loads logos from 12 third-party hosts:
     self-host them.
-11. **Pre-IPO tokens compared by company** — M. PreStocks and Tessera tokens have no underlying
-    ticker, so no comparison exists; grouping them by company (OpenAI: tOpenAI vs OPENAI) would make
-    fees, marks and legal form one click apart. Also the best Tessera-track angle.
-12. **Smaller polish** — S each. The live tape could hide routed bot trades by default; weekly
+9. **Smaller polish** — S each. The live tape could hide routed bot trades by default; weekly
     "Headlines" are counts, not stories; `/api/` returns 404 although the API has a route list; build
     scripts (`/stocks/*.mjs`) are served publicly (no secrets; exclude them after checking no page
     loads one); the chain watcher and power map still read a scheduled fee leg as the current one
     (the feed wording and cards handle it).
-13. **Home path in git history** — S, **you** decide. `AGENTS.md` no longer names a home directory,
+10. **Home path in git history** — S, **you** decide. `AGENTS.md` no longer names a home directory,
     but 7 older commits do. Only a history rewrite removes it; not before judging.
+
+11. **Pre-IPO watches across devices** — S. Comparisons of pre-IPO tokens (OpenAI, Kalshi, SpaceX
+    with PreStocks or Tessera) save in the browser, but the cross-device watch API matches on the
+    listed ticker, which pre-IPO tokens do not have. Needs a `company_key` column loaded by db-load.
+12. **Health follow-ups** — S. Two thresholds changed on 25 Sep because they measured the opposite
+    of their purpose: organic flow now cautions only above 25 trades per trader (deep markets are
+    mostly arbitrage), and Ondo's scheduled `unavailable_in_session` is no longer a pause (**you**
+    may veto either). Card titles and preview images still use the worst of all eleven checks.
+13. **Remaining jargon** — S. Card preview alt text ("rung 2 of 4"), the card's lower protocol
+    support section ("source-listed", protocol-proof.js), the raw "Transfer restrictions" flags row,
+    grid axes ("Level 0–4", "0 synthetic exposure").
 
 ## After the hackathon
 

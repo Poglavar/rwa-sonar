@@ -32,7 +32,8 @@ const {
     publicCard,
     renderCard,
     shortAddress,
-    truncate
+    truncate,
+    whoCanBuy
 } = require('./lib/cards.mjs');
 const evidenceLib = require('./lib/evidence.js');
 const { HEALTH_RULES } = require('./lib/health.mjs');
@@ -673,10 +674,10 @@ describe('renderCard', () => {
 
     it('does not promote source-listed DeFi support into a successful user action', () => {
         const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
-        expect(defi.value).toContain('Exact-token support:');
-        expect(defi.value).toContain('source-described');
-        expect(defi.value).toContain('Evidence checked');
-        expect(defi.value).toContain('Execution is not independently evidenced.');
+        expect(defi.value).toContain('Listed for this exact token by');
+        expect(defi.value).toContain('(as the protocols describe it)');
+        expect(defi.value).toContain('Checked');
+        expect(defi.value).toContain('We have not seen a real transaction succeed.');
         expect(defi.value).not.toContain('Confirmed with');
     });
 
@@ -1352,6 +1353,12 @@ describe('model-assessed material changes on a card', () => {
         expect(publicCard(card).materialChanges).toEqual({ basis: 'model assessment', asOf: AS_OF, windowDays: 30, count: 1, ids: ['139'] });
     });
 
+    it('matches an event filed under the dossier slug (programme slug plus a suffix), never a lookalike', () => {
+        // The watcher files Backpack's and Securitize's events under their dossier slugs.
+        expect(cardMaterialChanges([row({ issuerSlug: `${token.issuer}-spcx` })], token, { asOf: AS_OF })?.count).toBe(1);
+        expect(cardMaterialChanges([row({ issuerSlug: `${token.issuer}extra` })], token, { asOf: AS_OF })).toBeNull();
+    });
+
     it('matches an event on the token itself, whatever issuer it names', () => {
         const card = cardFor('NVDAx', BUILT_AT, exportOf(row({ issuerSlug: null, subjectType: 'token', subjectId: token.mint })));
         expect(card.materialChanges.count).toBe(1);
@@ -1364,6 +1371,34 @@ describe('model-assessed material changes on a card', () => {
         expect(block.count).toBe(1);
         expect(block.items[0].id).toBe('139');
         expect(cardMaterialChanges([row(), quoteLost], token, { asOf: AS_OF })).toEqual(block);
+    });
+
+    /**
+     * Our own quote maintenance is not the issuer changing anything: a lost quote or a document we
+     * could not fetch reaches a buyer's card only when a curated review confirms a real change, and a
+     * curated false alarm never does, whatever the model said.
+     */
+    it('keeps only real changes: our quote-maintenance events stay off the card unless confirmed', () => {
+        const url = 'https://issuer.example/terms';
+        const quoteLost = row({ id: '150', judgmentId: '60', kind: 'quote-lost', sourceUrl: url,
+            summary: `${token.issuer}: the quoted words for claim holderClaim are no longer in ${token.issuer}:claims[3].url` });
+        const gone = row({ id: '151', judgmentId: '61', kind: 'document-gone', sourceUrl: url, summary: 'document gone' });
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF })).toBeNull();
+        expect(cardMaterialChanges([gone], token, { asOf: AS_OF })).toBeNull();
+        const html = renderCard(cardFor('NVDAx', BUILT_AT, exportOf(quoteLost)), { version: 'v' });
+        expect(html).not.toContain('model-changes');
+        expect(html).not.toContain('words we quoted');
+
+        // A reviewer's `confirmed` resolution (sonar.review_resolution) lets it through.
+        expect(cardMaterialChanges([row({ ...quoteLost, confirmed: true })], token, { asOf: AS_OF }).count).toBe(1);
+        // A curated public resolution (stocks/data/event-resolutions.json) does too; a curated false alarm does not.
+        const curated = (resolution, isPublic) => [{ id: 'r1', resolution, public: isPublic, match: { kind: ['legal-term', 'quote-lost'], sourceUrl: url } }];
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF, resolutions: curated('confirmed', true) }).count).toBe(1);
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF, resolutions: curated('false-alarm', false) })).toBeNull();
+        expect(cardMaterialChanges([row({ sourceUrl: url })], token, { asOf: AS_OF, resolutions: curated('false-alarm', false) })).toBeNull();
+        // An unreviewed legal-term change is still a real change and stays; the export carries the resolutions.
+        expect(cardMaterialChanges([row({ sourceUrl: url }), quoteLost], token, { asOf: AS_OF }).items.map((item) => item.id)).toEqual(['139']);
+        expect(cardFor('NVDAx', BUILT_AT, { ...exportOf(quoteLost), resolutions: curated('confirmed', true) }).materialChanges.count).toBe(1);
     });
 
     it('names at most two, newest first, and still counts the rest', () => {
@@ -1509,6 +1544,8 @@ describe('no internal key reaches a reader', () => {
             id: '7', detectedAt: '2026-09-19T08:00:00Z', kind: 'quote-lost', severity: 'warning',
             summary: 'xstocks-backed: the quoted words for claim vocabulary.thirdPartyAttestation are no longer in xstocks-backed:claims[3].url',
             subjectType: 'source', subjectId: 'x', issuerSlug: token.issuer, judgmentId: '9', representative: true, material: true,
+            // A lost quote reaches a card only once a reviewer confirmed it as a real change.
+            confirmed: true,
             assessmentSeverity: 'warning', assessmentSummary: 'The custody page moved.'
         }, {
             id: '8', detectedAt: '2026-09-18T08:00:00Z', kind: 'legal-term', severity: 'caution',
@@ -1565,7 +1602,7 @@ describe('the largest unresolved risk, in a sentence a holder can read', () => {
         const p0 = [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }];
         expect(riskOf({ ...fgdl, underReview: p0 }).href).toBe('#discrepancies');
         const review = { ...without(fgdl, 'discrepancy'), underReview: p0 };
-        expect(riskOf(review).value).toContain('priority-zero evidence change');
+        expect(riskOf(review).value).toBe('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
     });
 
     it('then names a power over holders’ tokens that one key, or a multisig with no time lock, can use', () => {
@@ -1597,8 +1634,11 @@ describe('the largest unresolved risk, in a sentence a holder can read', () => {
     });
 
     it('falls back to the worst market check, in words', () => {
-        const card = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed', 'redemption');
-        expect(card.health.worstRuleId).toBe('organic');
+        // AAPLx's real organic inputs (about 5 % organic volume), with the rule forced to caution:
+        // since the 2026-09-25 recalibration (stocks/lib/health.mjs organicRule) a low organic share
+        // across many wallets passes, so the real AAPLx no longer fails a market check at all.
+        const real = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed', 'redemption');
+        const card = { ...real, health: { ...real.health, rules: real.health.rules.map((rule) => (rule.id === 'organic' ? { ...rule, status: 'caution' } : rule)) } };
         expect(riskOf(card).value).toBe('Most trading looks automated: Jupiter counts only about 5 % of the last day’s volume as organic (non-bot) trading.');
         const allGood = { ...card, health: { ...card.health, rules: card.health.rules.map((rule) => ({ ...rule, status: 'good' })) } };
         expect(riskOf(allGood).value).toBe('The current checks measured no material risk; what they could not measure is unknown.');
@@ -1695,6 +1735,99 @@ describe('the price line under a card’s title', () => {
         const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
         const bare = buildCard({ token: { ...token, market: {}, reference: {} }, slug: 'X', builtAt: BUILT_AT, sources: SOURCES });
         expect(lineOf(renderCard(bare, { version: 'v' }))).toBeNull();
+    });
+});
+
+/**
+ * Plain words on the buyer-facing top of a card and in "What you own" (25 Sep judge audit): no
+ * "rung", "ledger maturity", "source-listed", "proof stage" or "priority-zero" in a visible label;
+ * each technical term survives in a title attribute for the reader who wants it.
+ */
+describe('plain words at the top of a card and in "What you own"', () => {
+    const visibleText = (fragment) => fragment.replace(/<script[\s\S]*?<\/script>/g, '')
+        .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details class="decision-health">'));
+    const ownOf = (html) => html.slice(html.indexOf('<section id="own">'), html.indexOf('id="market-detail"'));
+    const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis/i;
+
+    it('says claim depth and ledger maturity as questions with "N of 4" answers, the terms kept as titles', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        const own = ownOf(html);
+        expect(visibleText(own)).toContain('How close to owning the share 2 of 4 — a secured claim on collateral');
+        expect(visibleText(own)).toContain('How far the token is the official record 2 of 4 — the chain is the official record and the token moves without anyone’s approval');
+        expect(visibleText(own)).not.toMatch(JARGON);
+        expect(own).toContain('title="Claim depth: rung 2 of 4');
+        expect(own).toContain('title="Ledger maturity: Level 2');
+    });
+
+    it('keeps the five facts and the review banner free of jargon, with the proof stage in a title', () => {
+        const card = cardFor('AAPLx');
+        const reviewed = { ...card, underReview: [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }], discrepancies: [] };
+        for (const html of [renderCard(card, { version: 'v' }), renderCard(reviewed, { version: 'v' })]) {
+            expect(visibleText(topOf(html))).not.toMatch(JARGON);
+        }
+        const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
+        expect(defi.value).toMatch(/^Listed for this exact token by /);
+        expect(defi.value).toContain('Furthest we checked: we read the market’s settings on chain.');
+        expect(defi.title).toBe('Proof stage: decoded');
+        expect(renderCard(card, { version: 'v' })).toContain('<article class="asset-decision-defi" title="Proof stage: decoded">');
+        expect(visibleText(topOf(renderCard(reviewed, { version: 'v' }))))
+            .toContain('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
+    });
+});
+
+/**
+ * "Who can buy" under the price line (24 Sep buyer walkthrough): who may hold the token and who may
+ * redeem it with the issuer are separate answers, and an allowlisted token is not buyable by an
+ * arbitrary wallet whatever the market looks like.
+ */
+describe('the "who can buy" line at the top of a card', () => {
+    const lineOf = (html) => /<p class="who-can-buy"[^>]*>(.*?)<\/p>/.exec(html)?.[1]?.replace(/<[^>]+>/g, '') ?? null;
+    const withOwnership = (card, transferRestrictions, redemption = {}, depth = {}) => ({
+        ...card,
+        depth: { ...card.depth, ...depth },
+        ownership: { ...card.ownership, transferRestrictions: { ...card.ownership.transferRestrictions, ...transferRestrictions },
+            redemption: { ...card.ownership.redemption, ...redemption } }
+    });
+
+    it('says an open token is buyable by any wallet on a DEX while issuer redemption is gated', () => {
+        const card = cardFor('AAPLx');
+        expect(whoCanBuy(card)).toEqual({
+            buy: 'anyone with a Solana wallet, on a DEX, with no KYC, though the terms bar US persons',
+            redeem: 'only holders who pass the issuer’s KYC and are not US persons'
+        });
+        const html = renderCard(card, { version: 'v' });
+        expect(lineOf(html)).toBe('Who can buy: anyone with a Solana wallet, on a DEX, with no KYC, though the terms bar US persons. '
+            + 'Redeeming with the issuer: only holders who pass the issuer’s KYC and are not US persons. Terms →');
+        // It sits with the price line, above the five facts.
+        expect(html.indexOf('class="who-can-buy"')).toBeGreaterThan(html.indexOf('class="price-line"'));
+        expect(html.indexOf('class="who-can-buy"')).toBeLessThan(html.indexOf('The five things to know first'));
+    });
+
+    it('says an allowlisted token cannot be bought by an arbitrary wallet (SECZ)', () => {
+        const words = whoCanBuy(cardFor('SECZ'));
+        expect(words.buy).toBe('only wallets the issuer has allowlisted after KYC; an ordinary Solana wallet cannot receive it');
+        expect(words.redeem).toBe('only holders who pass the issuer’s KYC');
+        // The on-chain default-frozen state alone is enough to call it allowlisted.
+        const onChainOnly = withOwnership({ ...cardFor('AAPLx'), control: { ...cardFor('AAPLx').control, allowlist: true } }, {});
+        expect(whoCanBuy(onChainOnly).buy).toMatch(/^only wallets the issuer has allowlisted/);
+    });
+
+    it('names the market it found, and says so when there is none', () => {
+        const base = cardFor('AAPLx');
+        expect(whoCanBuy(withOwnership(base, {}, {}, { dexPairs: 0, cexMarkets: 3 })).buy)
+            .toBe('anyone with an account at an exchange that lists it (the exchange’s own checks apply), though the terms bar US persons');
+        expect(whoCanBuy(withOwnership(base, { usPersonsExcluded: false }, {}, { dexPairs: 0, cexMarkets: 0 })).buy)
+            .toBe('any Solana wallet may hold it, with no KYC; we found no market that sells it');
+    });
+
+    it('says unknown rather than guessing, and keeps redemption separate', () => {
+        const base = cardFor('AAPLx');
+        expect(whoCanBuy(withOwnership(base, { allowlist: null, kycToHold: null, usPersonsExcluded: null })).buy)
+            .toBe('not established from the documents we hold');
+        expect(whoCanBuy(withOwnership(base, {}, { available: false })).redeem).toBe('not offered');
+        expect(whoCanBuy(withOwnership(base, {}, { available: true, kyc: null })).redeem).toBe('offered; its KYC terms are not established');
+        expect(whoCanBuy(withOwnership(base, {}, { available: null })).redeem).toBe('not established');
     });
 });
 
@@ -1820,5 +1953,54 @@ describe('the "Pyth on this token" block', () => {
         expect(record.pyth.readAt).toBe(readAt);
         expect(record.pyth.lenders.map((l) => l.protocolId)).toEqual(expect.arrayContaining(['kamino', 'nest', 'jupiter-lend', 'loopscale']));
         expect(record.sources.pythOnchain).toBe(readAt);
+    });
+});
+
+describe('the health split on a card: this token and its programme', () => {
+    // The old summary was one worst-of word that read "caution" or "warning" on every card, because
+    // three issuer-wide checks can never be good for any current issuer (stocks/lib/health.mjs
+    // HEALTH_LEVELS). The card now names both levels and what holds each back.
+    const WORDS = { good: 'good', caution: 'caution', warning: 'warning', unknown: 'not measured' };
+    const healthSection = (html) => {
+        const start = html.indexOf('<details class="decision-health">');
+        return html.slice(start, html.indexOf('</details>', start));
+    };
+    const aaplx = cardFor('AAPLx');
+    const section = healthSection(renderCard(aaplx, { baseUrl: 'https://rwasonar.com', version: 't' }));
+
+    it('carries both levels in the card and in its published record', () => {
+        expect(aaplx.health.levels.token.total).toBe(8);
+        expect(aaplx.health.levels.programme.total).toBe(3);
+        expect(publicCard(aaplx).health.levels).toEqual(aaplx.health.levels);
+        expect(aaplx.health.rules.find((rule) => rule.id === 'verification').level).toBe('programme');
+    });
+
+    it('the summary names this token and its programme instead of one worst-of word', () => {
+        const { token, programme } = aaplx.health.levels;
+        expect(section).toContain(`Why the health checks say: this token ${WORDS[token.status]}, programme ${WORDS[programme.status]}`);
+    });
+
+    it('each level has its own banner, with the pass count and what holds the programme back', () => {
+        const { token, programme } = aaplx.health.levels;
+        expect(section).toContain(`<p class="banner banner-${token.status}"><strong>This token</strong>`);
+        expect(section).toContain(`${token.passed} of ${token.judged} checks that could be run pass`);
+        expect(section).toContain(`<p class="banner banner-${programme.status}"><strong>Programme</strong>`);
+        expect(section).toMatch(/the same for every [^<]+ token/);
+        const held = aaplx.health.rules.find((rule) => rule.id === programme.worstRuleId);
+        expect(held).toBeDefined();
+        expect(section).toContain(fmt.escapeHtml(held.label));
+    });
+
+    it('a token with no market is not called good on its own checks, and says so', () => {
+        const idle = tokenDb.tokens
+            .filter((row) => row.market?.usdPrice == null && row.market?.liquidity == null)
+            .slice(0, 40)
+            .map((row) => cardFor(row.symbol))
+            .find((card) => card.health.levels.token.status === 'unknown' && card.health.levels.token.judged > 0);
+        expect(idle).toBeDefined();
+        const html = healthSection(renderCard(idle, { baseUrl: 'https://rwasonar.com', version: 't' }));
+        expect(html).toContain('this token not measured');
+        expect(html).toContain('No market could be measured');
+        expect(html).not.toContain('<p class="banner banner-good"><strong>This token</strong>');
     });
 });

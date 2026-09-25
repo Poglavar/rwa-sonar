@@ -164,6 +164,22 @@ describe('landing/app separation', () => {
         expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
+    // On a 375 px phone the search sat ~1,220 px down, inside the example card below the whole hero
+    // text (measured 25 Sep). It is its own hero item now: beside the text on a wide screen, and
+    // straight after the lede on a phone, inside the first screen.
+    test('puts the home search in the hero itself, right after the lede on a phone', () => {
+        const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="latestEvents"'));
+        const form = hero.indexOf('<form class="hero-search"');
+        expect(form).toBeGreaterThan(hero.indexOf('</div>', hero.indexOf('class="hero-copy"')));
+        expect(form).toBeLessThan(hero.indexOf('<article class="comparison-preview"'));
+        const css = readFileSync(join(__dirname, 'landing.css'), 'utf8');
+        expect(css).toMatch(/\.hero-search \{ grid-area: search;/);
+        const phone = css.slice(css.indexOf('/* Phone hero order'));
+        expect(phone).toMatch(/\.hero-copy \{ display: contents; \}/);
+        expect(phone).toMatch(/\.hero-search \{ order: 4;/);
+        expect(phone).toMatch(/\.hero-lede \{ order: 3;/);
+    });
+
     test('carries the canonical X identity across the main public surfaces', () => {
         for (const file of ['stocks.html', 'watch.html', 'monitor.html', 'graph.html', 'live.html',
             'whatif.html', 'review.html', 'methodology.html', 'assets.html', 'learn/index.html']) {

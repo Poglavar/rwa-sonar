@@ -20,6 +20,7 @@ import {
 } from './lib/grade.mjs';
 
 import { controlFromOnchain, issuerLabel } from './lib/classify.mjs';
+import { privateCompany } from './lib/private-companies.mjs';
 import { CLAIM_FIELDS, dossierClaims, needed, publicClaims, summarise } from './lib/evidence.mjs';
 import { controlRecipe, recipeTally } from './lib/recipe.mjs';
 import { buildFunnel } from './lib/funnel.mjs';
@@ -208,6 +209,9 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
     // The shared shaping (lib/classify.mjs, unit-tested there): capability flags, the transfer fee
     // in effect at the read epoch and any fee already scheduled after it.
     const control = controlFromOnchain(onchain);
+    const type = instrumentType(universeItem, issuerApi);
+    // A pre-IPO token has no listed ticker; the company it references is its comparison key.
+    const company = type === 'private-company' ? privateCompany({ ...universeItem, issuerApi }) : null;
 
     return {
         mint: universeItem.mint,
@@ -215,7 +219,9 @@ function buildToken(universeItem, onchain, reference, sponsors, venuesItem, venu
         name: universeItem.name ?? null,
         issuer: universeItem.issuer ?? null,
         underlyingTicker: universeItem.underlyingTicker ?? null,
-        instrumentType: instrumentType(universeItem, issuerApi),
+        companyKey: company?.key ?? null,
+        companyName: company?.name ?? null,
+        instrumentType: type,
         listedOnJupiter: universeItem.listedOnJupiter === true,
         // Universe provenance (stocks/lib/universe.mjs): when the search first and last returned
         // this mint, and whether the LAST run returned it at all. `seenInSearch: false` means the
@@ -648,6 +654,8 @@ async function main() {
     if (missingOnchain.length) logWarn(`${missingOnchain.length} token(s) have no on-chain record, so their control flags are null: ${missingOnchain.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingOnchain.length > 5 ? ' …' : ''}`);
     if (missingReference.length) logWarn(`${missingReference.length} token(s) have no independent reference price source, so their premium is null`);
     if (missingIssuerApi.length) logWarn(`${missingIssuerApi.length} Ondo token(s) did not match an API item on ticker === underlyingTicker: ${missingIssuerApi.slice(0, 5).map((t) => t.symbol ?? t.mint).join(', ')}${missingIssuerApi.length > 5 ? ' …' : ''}`);
+    const unnamedCompany = tokens.filter((t) => t.instrumentType === 'private-company' && t.companyKey === null);
+    if (unnamedCompany.length) logWarn(`${unnamedCompany.length} pre-IPO token(s) name no company in lib/private-companies.mjs, so they get no comparison: ${unnamedCompany.map((t) => t.symbol ?? t.mint).join(', ')}`);
 
     const tokensByIssuer = new Map();
     for (const token of tokens) {

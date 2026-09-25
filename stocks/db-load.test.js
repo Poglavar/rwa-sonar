@@ -229,6 +229,20 @@ describe('buildTokenSql', () => {
         expect(embeddedDocs(sql)).toEqual([tokensDoc, healthDoc]);
     });
 
+    test('the programme and this-token levels are loaded beside the overall verdict', () => {
+        const { sql } = buildTokenSql({ tokensDoc, healthDoc });
+        expect(sql).toContain("x.r->'levels'->'programme'->>'status' AS programme_health");
+        expect(sql).toContain("x.r->'levels'->'token'->>'status' AS token_health");
+        expect(sql).toContain("(x.r->'levels'->'token'->>'passed')::int AS token_checks_passed");
+        expect(sql).toContain("(x.r->'levels'->'token'->>'judged')::int AS token_checks_judged");
+        expect(sql).toContain("(x.r->'levels'->'token'->>'rank')::int AS token_health_rank");
+        for (const column of ['programme_health', 'programme_worst_rule', 'token_health', 'token_worst_rule',
+            'token_checks_passed', 'token_checks_judged', 'token_health_rank']) {
+            expect(sql).toContain(`health.${column} AS ${column}`);
+            expect(updatedColumns(sql)).toContain(column);
+        }
+    });
+
     test('works with no health document at all — the verdict columns just stay null', () => {
         const { sql } = buildTokenSql({ tokensDoc });
         expect(embeddedDocs(sql)).toEqual([tokensDoc, { items: [] }]);

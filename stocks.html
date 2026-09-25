@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="./site-contact.css?v=20260924i" />
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260925m" />
+    <link rel="stylesheet" href="stocks.css?v=20260925t" />
     <link rel="stylesheet" href="trustchain.css?v=20260924u" />
     <link rel="stylesheet" href="flow-diagram.css?v=20260924y" />
     <link rel="stylesheet" href="watch-delivery.css?v=20260924a" />
@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="motion.css?v=20260924u" />
 </head>
 
-<body data-workspace-view="overview">
+<body data-workspace-view="assets">
 <!-- seo:noscript:start --><noscript><section class="site-noscript"><p>Compare every tokenized stock we can find on Solana by legal ownership, issuer controls, evidence quality, liquidity and market activity.</p><ul><li><strong>1,183</strong> exact token addresses</li><li><strong>12</strong> programmes tracked, live or not</li><li><strong>126</strong> tokens with confirmed DeFi use</li></ul><p>This view is interactive. Without JavaScript, read the same research as static pages: <a href="./issuers/">issuer dossiers</a>, <a href="./templates/">legal templates</a>, <a href="./protocols/">protocol dossiers</a>, <a href="./weekly/">weekly digests</a> and one report per token (for example <a href="./cards/NVDAx.html">NVDAx</a>); the data behind this page: <a href="./stocks-tokens.json">stocks-tokens.json</a>, <a href="./stocks-issuers.json">stocks-issuers.json</a>, <a href="./stocks-discovery.json">stocks-discovery.json</a>, <a href="./cards/index.json">cards/index.json</a>.</p></section></noscript><!-- seo:noscript:end -->
     <a class="skip-link" href="#workspaceMain">Skip to analytics</a>
     <header class="app-header"><a class="app-brand" href="./index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a><nav class="app-nav" aria-label="Site navigation"><a id="nav-stocks" href="./stocks.html?view=assets">Explore</a><a href="./stocks.html?view=compare">Compare</a><a id="nav-watch" href="./watch.html">Changes</a><a href="./learn/">Learn</a><details class="app-nav-menu"><summary>Research</summary><div><a class="nav-compact-only" href="./learn/">Learn</a><a href="./methodology.html">Methodology</a><a id="nav-graph" href="./graph.html">Trust map</a><a href="./powers.html">Who holds the keys</a><a id="nav-whatif" href="./whatif.html">Failure scenarios</a><a id="nav-templates" href="./templates/">Legal templates</a><a href="./issuers/">Issuer dossiers</a><a href="./exits.html">Exit routes</a><a href="./flows.html">Flows &amp; float</a><a href="./tracking.html">Premium &amp; concentration</a><a href="./economics.html">Fees &amp; incentives</a><a id="nav-monitor" href="./monitor.html">Health monitor</a><a id="nav-live" href="./live.html">Live trades</a><a id="nav-review" href="./review.html">Review queue</a><a href="./weekly/latest.html">This week</a><a href="./assets.html">All RWAs</a><a href="./pitch/">Pitch</a><a href="https://github.com/Poglavar/rwa-sonar">Code</a><button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button></div></details><button class="theme-switch" type="button" aria-label="Theme: Auto (follows your device)" title="Theme: Auto (follows your device)"><svg class="theme-icon" aria-hidden="true" focusable="false"><use class="theme-icon-auto" href="./images/theme-icons.svg?v=20260924y#auto"/><use class="theme-icon-light" href="./images/theme-icons.svg?v=20260924y#light"/><use class="theme-icon-dark" href="./images/theme-icons.svg?v=20260924y#dark"/></svg></button></nav></header>
@@ -160,13 +160,15 @@
     </details>
 
     <section id="gridSection" data-view="issuers">
-        <h2>Ledger maturity and claim depth</h2>
-        <p class="axis-caption"><strong>Vertical, ledger maturity (Level 4 top &rarr; Level 0 bottom):</strong> how far
-            the token behaves as a bearer digital asset whose blockchain is the authoritative ledger. The steps are:
-            main ledger, unconditional transfers, bearer redemption, forced-transfer mechanism.</p>
-        <p class="axis-caption"><strong>Horizontal, claim depth (0 left &rarr; 4 right):</strong> what the
-            holder legally owns: a synthetic exposure, an unsecured claim on the issuer, a claim secured over
-            collateral, a beneficial interest in the security, or the registered share itself.</p>
+        <!-- Buyer's words; the methodology names the axes ledger maturity and claim depth (kept as titles). -->
+        <h2>Is the token the official record, and how close is it to the share?</h2>
+        <p class="axis-caption"><strong title="Ledger maturity">Up the side, how far the token is the official record (Level 4 top &rarr; Level 0 bottom):</strong>
+            each step adds one thing. The blockchain is the official record of who owns it; then the token moves without
+            anyone’s approval; then holding it is enough to redeem, without the issuer; then a theft or court order can
+            be corrected on the ledger.</p>
+        <p class="axis-caption"><strong title="Claim depth">Across, how close you are to owning the share (0 left &rarr; 4 right):</strong> what the
+            holder legally owns: price exposure only, an unsecured claim on the issuer, a claim secured over
+            collateral, a beneficial interest in shares held for holders, or the registered share itself.</p>
         <div class="grid-scroll">
             <div class="claim-grid" id="claimGrid"></div>
         </div>
@@ -264,7 +266,7 @@
                 <div id="comparisonFilters" class="decision-filters">
                     <label><input type="checkbox" value="cashRedemption"> Cash redemption</label>
                     <label><input type="checkbox" value="noDiscretionaryFreeze"> No freeze, pause or clawback</label>
-                    <label><input type="checkbox" value="confirmedCollateral"> Source-listed collateral support</label>
+                    <label><input type="checkbox" value="confirmedCollateral"> Listed as collateral by a protocol</label>
                     <label><input type="checkbox" value="autonomousLiquidation"> Autonomous liquidation</label>
                     <label><input type="checkbox" value="segregatedAssets"> Segregated assets or direct share</label>
                     <label><input type="checkbox" value="nonUsHolders"> Available to non-US holders</label>
@@ -333,7 +335,7 @@
         <p id="defiUsageMethod" class="collection-note"></p>
         <p class="section-note">The <strong>Protocol support</strong> column in the token-address table lists the protocols
             and actions for each asset. Open <strong>Details</strong> for market size, LTV, access restrictions and
-            links to the product and evidence. A source listing shows the protocol supports the exact token. It does not show that any user action succeeded. “None source-listed” means we found no listing; the token may still be used somewhere we do not check.</p>
+            links to the product and evidence. A listing in a protocol’s own registry shows the protocol supports the exact token. It does not show that any user action succeeded. “Not listed” means we found no listing; the token may still be used somewhere we do not check.</p>
     </section>
 
     <details id="composabilitySection" data-view="defi" class="analysis-disclosure" hidden>
@@ -574,7 +576,7 @@
     <!-- The shared display formatters (also used by the server-rendered stock cards) must be in
          place before stocks.js reads them off window. -->
     <script src="stocks/lib/fmt.js?v=20260924a"></script>
-    <script src="stocks/lib/discovery.js?v=20260922g"></script>
+    <script src="stocks/lib/discovery.js?v=20260925t"></script>
     <script src="stocks/lib/evidence.js?v=20260922g"></script>
     <script src="stocks/lib/protocol-proof.js?v=20260924d"></script>
     <script src="stocks/lib/redemption-usability.js?v=20260924d"></script>
@@ -587,8 +589,8 @@
     <script src="stocks/lib/schematics.js?v=20260924s"></script>
     <script src="schematics-hook.js?v=20260924s"></script>
     <script src="stocks/lib/sort-values.js?v=20260923r"></script>
-    <script src="stocks/lib/issuer-labels.js?v=20260923r"></script>
-    <script src="stocks/lib/token-view.js?v=20260923r"></script>
+    <script src="stocks/lib/issuer-labels.js?v=20260925w"></script>
+    <script src="stocks/lib/token-view.js?v=20260925w"></script>
     <script src="stocks/lib/activity-rows.js?v=20260923r"></script>
     <script src="stocks/lib/funnel-layout.js?v=20260923r"></script>
     <script src="stocks/lib/evidence-view.js?v=20260923r"></script>
@@ -596,11 +598,11 @@
     <script src="stocks/lib/trustchain-section.js?v=20260923r"></script>
     <script src="stocks/lib/defi-view.js?v=20260923s"></script>
     <script src="stocks/lib/holder-rights.js?v=20260924a"></script>
-    <script src="stocks/lib/comparison-shape.js?v=20260925m"></script>
-    <script src="stocks/lib/saved-items.js?v=20260923r"></script>
-    <script src="stocks/lib/search-results.js?v=20260923r"></script>
+    <script src="stocks/lib/comparison-shape.js?v=20260925z"></script>
+    <script src="stocks/lib/saved-items.js?v=20260925z"></script>
+    <script src="stocks/lib/search-results.js?v=20260925z"></script>
     <script src="stocks/lib/panel-markup.js?v=20260923r"></script>
-    <script src="stocks.js?v=20260925m"></script>
+    <script src="stocks.js?v=20260925z"></script>
     <script src="watch-delivery.js?v=20260924c"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>

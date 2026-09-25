@@ -80,8 +80,9 @@ describe('the landing page box', () => {
         const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="tradeTicker"'));
         expect(hero.indexOf('id="heroSearch"')).toBeGreaterThan(-1);
         expect(hero.indexOf('id="latestEvents"')).toBeGreaterThan(hero.indexOf('id="heroSearch"'));
-        expect(css).toContain('grid-template-areas: "copy preview" "copy events"');
-        expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "preview" "events"; \}/);
+        // The search is its own hero area (25 Sep): under the card on a wide screen, before it below 900 px.
+        expect(css).toContain('grid-template-areas: "copy preview" "copy search" "copy events"');
+        expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "search" "preview" "events"; \}/);
     });
 
     test('is a plain list with a visible pause control and a link to every change; no live region', () => {

@@ -48,6 +48,9 @@ export const FILTERS = {
     legal_health: { sql: 't.legal_health', kind: 'text' },
     composability_health: { sql: 't.composability_health', kind: 'text' },
     worst_rule: { sql: 't.worst_rule', kind: 'text' },
+    programme_health: { sql: 't.programme_health', kind: 'text' },
+    token_health: { sql: 't.token_health', kind: 'text' },
+    token_worst_rule: { sql: 't.token_worst_rule', kind: 'text' },
     reference: { sql: 't.reference_source', kind: 'text' },
     legal_form: { sql: 'i.legal_form', kind: 'text' },
     claim_rung: { sql: 'i.claim_rung', kind: 'int' },
@@ -105,6 +108,11 @@ export const TOKEN_SORTS = {
     control_health: healthSeverityOrder('t.control_health'),
     legal_health: healthSeverityOrder('t.legal_health'),
     composability_health: healthSeverityOrder('t.composability_health'),
+    // The headline split (stocks/lib/health.mjs `levels`). This token sorts by the rank health.mjs
+    // computed — band, then failing checks, then passing checks — rather than a second SQL copy of
+    // that rule; not measured has no rank, so NULLS LAST keeps it last either way.
+    programme_health: healthSeverityOrder('t.programme_health'),
+    token_health: 't.token_health_rank',
     worst_rule: 't.worst_rule',
     venue_spread_pct: 't.venue_spread_pct',
     top1_share_pct: 't.top1_share_pct'
@@ -117,6 +125,8 @@ export const SLIM_TOKEN_COLUMNS = `t.mint, t.symbol, t.name, t.issuer_slug,
     t.record->>'cardSlug' AS card_slug,
     i.name AS issuer_name, t.underlying_ticker, t.instrument_type, t.recipe_label,
     t.health_status, t.worst_rule, t.market_health, t.control_health, t.legal_health, t.composability_health,
+    t.programme_health, t.programme_worst_rule, t.token_health, t.token_worst_rule,
+    t.token_checks_passed, t.token_checks_judged,
     t.usd_price, t.liquidity_usd, t.volume24_usd, t.organic_share_pct, t.premium_pct,
     t.venue_spread_pct, t.top1_share_pct,
     (t.record->'market'->>'top10HolderPct')::double precision AS top10_holder_pct,

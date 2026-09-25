@@ -32,7 +32,7 @@
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="./app-shell.css?v=20260925b" />
-    <link rel="stylesheet" href="landing.css?v=20260924y" />
+    <link rel="stylesheet" href="landing.css?v=20260925w" />
     <link rel="stylesheet" href="funnel-figure.css?v=20260924y" />
     <link rel="stylesheet" href="motion.css?v=20260924u" />
     <script src="./clarity.js?v=20260924a" defer></script>
@@ -56,6 +56,14 @@
                 <p class="hero-proof"><span class="live-dot" aria-hidden="true"></span><span id="freshnessLine"><!-- snapshot:landing:start --><span id="snapshotTokens">1,404</span> exact Solana token addresses from 9 issuer programmes with live tokens <span class="snapshot-qualifier">(of 12 tracked: Remora Markets and Ventuals Pre-IPO defunct; Republic Mirror: no mint yet)</span> · <span id="snapshotDateLabel">catalogue built</span> <time id="snapshotDate" datetime="2026-09-24T21:27:36Z">24 Sep 2026</time><!-- snapshot:landing:end --></span></p>
             </div>
 
+            <!-- The site search: its own hero item, beside the text on a wide screen and right after the
+                 lede on a phone (landing.css "Phone hero order"), so it is in the first screen. -->
+            <form class="hero-search" action="./stocks.html" method="get">
+                <input type="hidden" name="view" value="assets">
+                <label for="heroSearch">Find a stock, ticker, token, issuer or mint</label>
+                <div><input id="heroSearch" name="search" type="search" placeholder="Try AAPL, NVDAx or Ondo"
+                        autocomplete="off"><button type="submit">Search</button></div>
+            </form>
             <article class="comparison-preview" aria-labelledby="comparisonPreviewTitle">
                 <p class="preview-kicker">A real example from the catalogue</p>
                 <div class="preview-title-row">
@@ -76,12 +84,6 @@
                         <small>Observed mint: pause and freeze controls; no clawback</small>
                     </section>
                 </div>
-                <form class="hero-search" action="./stocks.html" method="get">
-                    <input type="hidden" name="view" value="assets">
-                    <label for="heroSearch">Find a stock, ticker, token, issuer or mint</label>
-                    <div><input id="heroSearch" name="search" type="search" placeholder="Try AAPL, NVDAx or Ondo"
-                            autocomplete="off"><button type="submit">Search</button></div>
-                </form>
             </article>
 
             <!-- The newest noteworthy events (stocks-events.json, written in at build time by
@@ -311,7 +313,7 @@
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/sort-values.js?v=20260923r"></script>
     <script src="stocks/lib/catalogue-counts.js?v=20260923b"></script>
-    <script src="stocks/lib/issuer-labels.js?v=20260923r"></script>
+    <script src="stocks/lib/issuer-labels.js?v=20260925w"></script>
     <script src="stocks/lib/funnel-layout.js?v=20260923r"></script>
     <script src="funnel-figure.js?v=20260924s"></script>
     <script src="landing.js?v=20260924a"></script>

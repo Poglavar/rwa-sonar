@@ -134,6 +134,29 @@ describe('release artifact validation', () => {
         await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/every exact current token once/);
     });
 
+    test('accepts a pre-IPO company bundle keyed by the company, and still checks its membership', async () => {
+        root = await fixture();
+        const tokens = JSON.parse(await readFile(join(root, 'stocks-tokens.json'), 'utf8'));
+        const discovery = JSON.parse(await readFile(join(root, 'stocks-discovery.json'), 'utf8'));
+        const openai = { mint: 'openai', issuer: 'prestocks', symbol: 'OPENAI', underlyingTicker: null, companyKey: 'OPENAI', instrumentType: 'private-company' };
+        await writeFile(join(root, 'stocks-tokens.json'), JSON.stringify({ ...tokens, tokens: [...tokens.tokens, openai] }));
+        await writeFile(join(root, 'stocks-discovery.json'), JSON.stringify({ ...discovery, tokens: [...discovery.tokens, { ...openai, discoveryProfile: {} }] }));
+        await writeFile(join(root, 'cards/index.json'), JSON.stringify([{ mint: 'one' }, { mint: 'openai' }]));
+        const index = JSON.parse(await readFile(join(root, 'comparisons/index.json'), 'utf8'));
+        await writeFile(join(root, 'comparisons/index.json'), JSON.stringify({ ...index, groups: [...index.groups,
+            { ticker: 'OPENAI', path: 'u-openai.json', issuerCount: 1, tokenCount: 1, issuers: ['prestocks'], mints: ['openai'] }] }));
+        const bundle = { schemaVersion: 1, ticker: 'OPENAI', builtAt: '2026-09-22T00:00:00Z', sources: {}, reviewPendingIssuers: [], models: [{
+            issuerSlug: 'prestocks', tokens: [{ mint: 'openai', symbol: 'OPENAI', issuer: 'prestocks', underlyingTicker: null, companyKey: 'OPENAI', instrumentType: 'private-company' }]
+        }] };
+        await writeFile(join(root, 'comparisons/u-openai.json'), JSON.stringify(bundle));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).resolves.toMatchObject({
+            tokenCount: 2, comparisonBundleCount: 2, ungroupedTokenCount: 0
+        });
+        bundle.models[0].tokens[0].companyKey = 'ANTHROPIC';
+        await writeFile(join(root, 'comparisons/u-openai.json'), JSON.stringify(bundle));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/model token disagrees with current OPENAI/);
+    });
+
     test('rejects card, issuer and template conclusion drift', async () => {
         root = await fixture();
         await writeFile(join(root, 'cards/NVDAx.json'), JSON.stringify({

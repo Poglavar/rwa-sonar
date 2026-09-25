@@ -26,4 +26,16 @@ describe('compact discovery index', () => {
         expect(JSON.stringify(result)).not.toContain('large prose');
         expect(JSON.stringify(result)).not.toContain('venues');
     });
+
+    test('carries the company a pre-IPO token references, so the first page can group it', () => {
+        const result = buildDiscoveryIndex({
+            issuerDb: { builtAt: '2026-09-22T00:00:00Z', issuers: [{ slug: 'tessera', name: 'Tessera' }] },
+            tokenDb: { builtAt: '2026-09-22T00:00:00Z', tokens: [
+                { mint: 't', symbol: 'tOpenAI', issuer: 'tessera', underlyingTicker: null, companyKey: 'OPENAI', companyName: 'OpenAI', instrumentType: 'private-company' },
+                { mint: 'l', symbol: 'AAPLx', issuer: 'tessera', underlyingTicker: 'AAPL', instrumentType: 'stock' }
+            ] }
+        });
+        expect(result.tokens[0]).toMatchObject({ underlyingTicker: null, companyKey: 'OPENAI', companyName: 'OpenAI', instrumentType: 'private-company' });
+        expect(result.tokens[1]).toMatchObject({ underlyingTicker: 'AAPL', companyKey: null, companyName: null });
+    });
 });

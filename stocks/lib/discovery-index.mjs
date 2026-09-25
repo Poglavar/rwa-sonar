@@ -26,6 +26,9 @@ function tokenRow(token, profile) {
         name: token.name ?? null,
         issuer: token.issuer ?? null,
         underlyingTicker: token.underlyingTicker ?? null,
+        // A pre-IPO token's comparison key and company (lib/private-companies.mjs); null otherwise.
+        companyKey: token.companyKey ?? null,
+        companyName: token.companyName ?? null,
         instrumentType: token.instrumentType ?? null,
         cardSlug: token.cardSlug ?? null,
         market: {

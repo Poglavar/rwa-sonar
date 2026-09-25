@@ -1085,6 +1085,8 @@ section {
 .buyer-grid thead th, .buyer-grid thead td { border-top: 0; background: var(--sunken-bg); }
 .buyer-grid thead th { font-size: .95rem; }
 .buyer-grid thead .issuer-link { display: block; margin-top: 2px; color: var(--muted-text); font-size: .72rem; font-weight: 600; }
+/* A pre-IPO wrapper's column: priced against its issuer's mark, not a share. */
+.buyer-kind { display: inline-block; margin-top: 4px; padding: 0 6px; border: 1px solid var(--sev-caution); border-radius: 999px; color: var(--sev-caution); font-size: .66rem; font-weight: 700; letter-spacing: .04em; }
 .buyer-grid tbody th { width: 12rem; font-weight: 400; }
 .buyer-grid tbody th strong { display: block; font-size: .8rem; }
 .buyer-grid tbody th small { display: block; margin-top: 2px; color: var(--muted-text); font-size: .68rem; line-height: 1.35; }

@@ -101,7 +101,7 @@ curl -s localhost:3300/api/history/overview
 curl -s 'localhost:3300/api/facets?by=recipe,health' | head -c 400
 # {"total":1183,…,"facets":{"recipe":[{"value":"token-2022 · pausable + clawback + rebase","count":898},…]}}
 
-# Every facet at once (26 of them) — the whole navigation state in one request:
+# Every facet at once (29 of them) — the whole navigation state in one request:
 curl -s 'localhost:3300/api/facets' | head -c 600
 
 # Warning-status tokens of two issuers, biggest 24 h volume first:
@@ -125,14 +125,16 @@ curl -s 'localhost:3300/api/trades/recent?limit=5&before=2026-09-17T09:58:11.000
 
 ### Filters and facets
 
-The 26 filter names are also the 26 facet names, so a facet can never offer a value its own
+The 29 filter names are also the 29 facet names, so a facet can never offer a value its own
 filter would reject. A comma list is OR (`?issuer=shift,prestocks`); the literal value `null`
 means IS NULL, so the null bucket a facet reports is clickable like any other. An **unknown**
 parameter name is a `400 unknown_filter`, never silently ignored — a dropped filter returns a
 wrong answer that looks right.
 
 Token columns: `issuer`, `instrument`, `recipe`, `program`, `health`, `market_health`,
-`control_health`, `legal_health`, `composability_health`, `worst_rule`, `reference`,
+`control_health`, `legal_health`, `composability_health`, `worst_rule`, `programme_health`,
+`token_health`, `token_worst_rule` (the headline split from `stocks/lib/health.mjs` `levels`: the
+issuer-wide programme verdict, this token's own verdict, and the check that fails it), `reference`,
 `pausable`, `paused`, `clawback`, `allowlist`, `transfer_fee` (installed extension or retained
 configuration/withdrawal authority, including a current rate of `0 bps`),
 `hook_active`, `seen_in_search`, `first_seen_day` (the UTC day of `first_seen_at`).
@@ -152,12 +154,15 @@ is added beside it for a chip.
 `sort` is a whitelist — `symbol`, `usd_price`, `liquidity_usd`, `volume24_usd`, `trades24`,
 `traders24`, `premium_pct`, `holder_count`, `first_seen_at`, `last_traded_at`, `health_status`,
 `market_health`, `control_health`, `legal_health`, `composability_health`, `worst_rule`, `venue_spread_pct`,
-`top1_share_pct` — and anything else is a `400 unknown_sort`, not a silent default. NULLs sort last
+`top1_share_pct`, `programme_health`, `token_health` — and anything else is a `400 unknown_sort`, not a silent default. NULLs sort last
 in both directions. `limit` defaults to 50 and is clamped to 500; `offset` is clamped to ≥ 0.
 
 **`sort=health_status` orders by SEVERITY**, not alphabetically: `good, caution, warning`, then
 everything unmeasured. The bare column sorts `caution, good, unknown, warning`, which puts the two
-ends of the scale in the middle and makes the column useless as a sort.
+ends of the scale in the middle and makes the column useless as a sort. `programme_health` sorts
+the same way. **`sort=token_health` orders by `token_health_rank`**, the number `health.mjs` computes:
+band first, then how many of the token's checks fail, then how many pass; a token with no market has
+no rank and sorts last.
 
 ### Multi-value filters
 
@@ -181,7 +186,7 @@ Duplicate values are deduplicated before they reach the `ANY()` array. Every rou
 ## Consumers
 
 `monitor.html` is the fullest API explorer. It calls `/api/health` once, then `/api/facets` (no
-`by`, so all 26) and `/api/tokens` on every filter change — debounced 150 ms, with a sequence number
+`by`, so all 29) and `/api/tokens` on every filter change — debounced 150 ms, with a sequence number
 so a slow earlier answer cannot repaint the table. Its filter state
 lives in the page's own query string, which means **a filtered view is a link**:
 

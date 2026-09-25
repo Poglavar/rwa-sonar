@@ -182,6 +182,13 @@ const TOKEN_COLUMNS = [
     ['control_health', 'health.control_health'],
     ['legal_health', 'health.legal_health'],
     ['composability_health', 'health.composability_health'],
+    ['programme_health', 'health.programme_health'],
+    ['programme_worst_rule', 'health.programme_worst_rule'],
+    ['token_health', 'health.token_health'],
+    ['token_worst_rule', 'health.token_worst_rule'],
+    ['token_checks_passed', 'health.token_checks_passed'],
+    ['token_checks_judged', 'health.token_checks_judged'],
+    ['token_health_rank', 'health.token_health_rank'],
     ['first_seen_at', "(r->>'firstSeenAt')::timestamptz"],
     ['last_seen_at', "(r->>'lastSeenAt')::timestamptz"],
     ['seen_in_search', "(r->>'seenInSearch')::bool"],
@@ -206,7 +213,14 @@ export function buildTokenSql({ tokensDoc, healthDoc = null }, { tag = DEFAULT_T
             + "\n                  x.r->'dimensions'->'market'->>'status' AS market_health,"
             + "\n                  x.r->'dimensions'->'control'->>'status' AS control_health,"
             + "\n                  x.r->'dimensions'->'legal'->>'status' AS legal_health,"
-            + "\n                  x.r->'dimensions'->'composability'->>'status' AS composability_health"
+            + "\n                  x.r->'dimensions'->'composability'->>'status' AS composability_health,"
+            + "\n                  x.r->'levels'->'programme'->>'status' AS programme_health,"
+            + "\n                  x.r->'levels'->'programme'->>'worstRuleId' AS programme_worst_rule,"
+            + "\n                  x.r->'levels'->'token'->>'status' AS token_health,"
+            + "\n                  x.r->'levels'->'token'->>'worstRuleId' AS token_worst_rule,"
+            + "\n                  (x.r->'levels'->'token'->>'passed')::int AS token_checks_passed,"
+            + "\n                  (x.r->'levels'->'token'->>'judged')::int AS token_checks_judged,"
+            + "\n                  (x.r->'levels'->'token'->>'rank')::int AS token_health_rank"
             + "\n             FROM health_doc, jsonb_array_elements(h->'items') WITH ORDINALITY AS x(r, ord)"
             + "\n            ORDER BY x.r->>'mint', x.ord DESC)",
             "src AS (SELECT DISTINCT ON (x.r->>'mint') (d->>'builtAt')::timestamptz AS built_at, x.r"

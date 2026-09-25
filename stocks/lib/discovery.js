@@ -112,9 +112,55 @@
     function tokenSearchText(token, issuer) {
         return [
             token && token.symbol, token && token.name, token && token.underlyingTicker,
+            token && token.companyName, token && token.companyKey,
             token && token.mint, token && token.issuer,
             issuer && issuer.name, issuer && issuer.slug, issuer && issuer.issuingEntity
         ].map(clean).filter(Boolean).join(' ').toLowerCase();
+    }
+
+    /**
+     * The key a token is compared under: its listed underlying ticker, else the company a pre-IPO
+     * token references (`companyKey`, stamped by build-stocks-db.mjs from lib/private-companies.mjs,
+     * and itself the listed ticker once the company has listed, e.g. SpaceX -> SPCX). Upper-case;
+     * '' when neither is known, and such a token is never grouped.
+     */
+    function comparisonKey(token) {
+        return (clean(token && token.underlyingTicker) || clean(token && token.companyKey)).toUpperCase();
+    }
+
+    function squashKey(value) {
+        return clean(value).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    /**
+     * Other names a compare URL may use for a pre-IPO company's group, from the tokens themselves:
+     * the company key and name and each wrapper's symbol, compared without case or punctuation
+     * ("openai", "tOpenAI", "SPACEX", "T-SpaceX"). Map of squashed alias -> comparison key.
+     */
+    function comparisonKeyAliases(tokens) {
+        const aliases = new Map();
+        for (const token of Array.isArray(tokens) ? tokens : []) {
+            const key = clean(token && token.companyKey).toUpperCase();
+            if (!key) continue;
+            for (const alias of [key, token.companyName, token.symbol]) {
+                const squashed = squashKey(alias);
+                if (squashed && !aliases.has(squashed)) aliases.set(squashed, key);
+            }
+        }
+        return aliases;
+    }
+
+    /** The name a reader recognizes for one group: the pre-IPO company, the issuer API's underlying, or a token name without the wrapper's words. */
+    function groupName(list, key) {
+        return clean(list.find((token) => clean(token?.companyName))?.companyName)
+            || clean(list.find((token) => clean(token?.issuerApi?.underlying?.name))?.issuerApi?.underlying?.name)
+            || clean(list.find((token) => clean(token?.name))?.name).replace(/\s*\([^)]*(?:tokenized|stock|ondo|xstock)[^)]*\)\s*$/i, '')
+            || key;
+    }
+
+    /** A company with no listed ticker at all: every token in the group is a pre-IPO wrapper. */
+    function groupIsPreIpo(list) {
+        return list.length > 0 && list.every((token) => !clean(token && token.underlyingTicker));
     }
 
     const SEARCH_STOP_WORDS = new Set([
@@ -177,10 +223,14 @@
         return { issuers: issuerMatches.slice(0, limit), tokens: tokenMatches.slice(0, limit), intent: parsed };
     }
 
+    /**
+     * Wrappers of one underlying, one row per issuer. `ticker` is the comparison key (see
+     * comparisonKey): a listed ticker, or a pre-IPO company's key, in which case `preIpo` is true.
+     */
     function sameUnderlyingGroups(tokens, { includeSingle = false } = {}) {
         const groups = new Map();
         for (const token of Array.isArray(tokens) ? tokens : []) {
-            const ticker = clean(token && token.underlyingTicker).toUpperCase();
+            const ticker = comparisonKey(token);
             const issuer = clean(token && token.issuer);
             if (!ticker || !issuer) continue;
             if (!groups.has(ticker)) groups.set(ticker, new Map());
@@ -192,6 +242,8 @@
             .filter(([, byIssuer]) => includeSingle || byIssuer.size >= 2)
             .map(([ticker, byIssuer]) => ({
                 ticker,
+                name: groupName([...byIssuer.values()].flat(), ticker),
+                preIpo: groupIsPreIpo([...byIssuer.values()].flat()),
                 issuerCount: byIssuer.size,
                 tokenCount: [...byIssuer.values()].reduce((sum, list) => sum + list.length, 0),
                 rows: [...byIssuer.entries()].map(([issuer, list]) => ({
@@ -210,7 +262,7 @@
     function underlyingGroups(tokens) {
         const groups = new Map();
         for (const token of Array.isArray(tokens) ? tokens : []) {
-            const ticker = clean(token && token.underlyingTicker).toUpperCase();
+            const ticker = comparisonKey(token);
             const issuer = clean(token && token.issuer);
             if (!ticker || !issuer) continue;
             if (!groups.has(ticker)) groups.set(ticker, []);
@@ -218,12 +270,10 @@
         }
         return [...groups.entries()].map(([ticker, list]) => {
             const issuers = [...new Set(list.map((token) => clean(token.issuer)).filter(Boolean))].sort();
-            const name = clean(list.find((token) => clean(token?.issuerApi?.underlying?.name))?.issuerApi?.underlying?.name)
-                || clean(list.find((token) => clean(token?.name))?.name).replace(/\s*\([^)]*(?:tokenized|stock|ondo|xstock)[^)]*\)\s*$/i, '')
-                || ticker;
             return {
                 ticker,
-                name,
+                name: groupName(list, ticker),
+                preIpo: groupIsPreIpo(list),
                 issuerCount: issuers.length,
                 tokenCount: list.length,
                 issuers,
@@ -253,6 +303,7 @@
 
     return {
         controlIsOn, laypersonVerdict, legalReviewStatus, tokenSearchText, parseStockSearch,
-        profileMatchesIntent, globalSearch, sameUnderlyingGroups, underlyingGroups, collectorHealth
+        profileMatchesIntent, globalSearch, comparisonKey, comparisonKeyAliases, sameUnderlyingGroups,
+        underlyingGroups, collectorHealth
     };
 });

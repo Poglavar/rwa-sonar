@@ -52,17 +52,18 @@ const {
     mintSuffix
 } = fmt;
 const {
-    collectorHealth, laypersonVerdict, legalReviewStatus, parseStockSearch, sameUnderlyingGroups,
-    underlyingGroups
+    collectorHealth, comparisonKeyAliases, laypersonVerdict, legalReviewStatus, parseStockSearch,
+    sameUnderlyingGroups, underlyingGroups
 } = discovery;
 const {
     makeComparator
 } = sortValues;
 const {
-    GRID_FIRST_DATA_COLUMN, GRID_LABEL_ROW, GRID_RUNGS, GRID_STAGES, MARKET_TOOLTIPS, cardLinkHtml,
-    chipSize, claimAxisLabels, claimLabel, claimRungTooltip, coverageClass, coverageLabel, displayName,
+    CLAIM_DEPTH_QUESTION, GRID_FIRST_DATA_COLUMN, GRID_LABEL_ROW, GRID_RUNGS, GRID_STAGES, LEDGER_RECORD_QUESTION,
+    MARKET_TOOLTIPS, cardLinkHtml,
+    chipSize, claimAxisLabels, claimDepthReason, claimDepthWords, claimRungTooltip, coverageClass, coverageLabel, displayName,
     fmtFeeBps, gridCell, indexTypes, isControlOn, issuerDossierHref, issuerHeadline, labelForSchema,
-    maturityLevelTooltip, newMintChipHtml, newMintChips, newMintsWindowDays, severityClass,
+    ledgerRecordWords, maturityLevelTooltip, newMintChipHtml, newMintChips, newMintsWindowDays, severityClass,
     sortIssuersForDisplay, transferFeeCapabilityLabel, verificationLabel, worstSeverity
 } = issuerLabels;
 const {
@@ -92,12 +93,12 @@ const {
     productDecisionProfile, redemptionUsabilitySummary
 } = defiView;
 const {
-    comparisonBundleFilename, comparisonBundleMatches, comparisonRequirementsParam, comparisonTickerFromParams,
-    conceptGuideRowHtml, conceptHelpHtml, filterComparisonModels, parseComparisonRequirements,
+    comparisonBundleFilename, comparisonBundleMatches, comparisonGroupTitle, comparisonRequirementsParam,
+    comparisonTickerFromParams, conceptGuideRowHtml, conceptHelpHtml, filterComparisonModels, parseComparisonRequirements,
     sameStockComparisonHtml, sameStockComparisonModels
 } = comparisonShape;
 const {
-    comparisonSnapshot, comparisonSnapshotChanges, normalizeSavedItems, personalJournalSummary,
+    comparisonSnapshot, comparisonSnapshotChanges, hasSavedState, normalizeSavedItems, personalJournalSummary,
     toggleSavedItem
 } = savedLib;
 const {
@@ -327,8 +328,18 @@ if (typeof document !== 'undefined') {
             detailClose: document.getElementById('detailClose')
         };
 
+        /**
+         * The view the URL asks for; a URL that names none opens "My briefing" only for a reader who
+         * saved something in this browser, and "Find a stock" for a first-time visitor. The three
+         * readers below each catch an unreadable localStorage and return empty.
+         */
         function requestedWorkspaceView() {
-            return workspaceViewFromUrl(window.location.href);
+            const returning = hasSavedState({
+                savedItems: readSavedItems(),
+                comparisons: readComparisonWatchlist(),
+                serverWatches: readServerWatchCredentials()
+            });
+            return workspaceViewFromUrl(window.location.href, returning ? 'overview' : 'assets');
         }
 
         function writeTokenViewUrl() {
@@ -743,12 +754,13 @@ if (typeof document !== 'undefined') {
             const counts = state.defiUsage?.counts;
             if (!counts || !els.defiUsageSection) return;
             const tiles = [
-                ['Any source-listed use', counts.withAnyConfirmedUse],
+                // "Listed" = the exact token address is in the protocol's own registry, pool or product.
+                ['Listed by a protocol for any use', counts.withAnyConfirmedUse],
                 ['Lending / collateral', counts.withLending],
                 ['Yield vault', counts.withYieldVault],
                 ['DEX pool', counts.withDexPool],
                 ['Account existence checked', counts.withAccountExistenceChecked],
-                ['None source-listed', counts.withNoneConfirmed]
+                ['Not listed by any protocol we checked', counts.withNoneConfirmed]
             ];
             els.defiUsageStats.innerHTML = tiles.map(([label, value]) =>
                 `<div><strong>${escapeHtml(fmtNumber(value))}</strong><span>${escapeHtml(label)}</span></div>`).join('');
@@ -764,7 +776,7 @@ if (typeof document !== 'undefined') {
                 els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) || dataStateHtml(
                     'none-source-listed', 'No checked protocol source lists this action',
                     'The reviewed registries and products contain no exact-token support for this action. This does not mean every protocol was checked.',
-                    [{ label: 'Show all source-listed protocols', action: 'clear-defi-filter' }]
+                    [{ label: 'Show every protocol that lists these tokens', action: 'clear-defi-filter' }]
                 );
                 const requestedProtocol = new URLSearchParams(window.location.search).get('protocol');
                 const target = requestedProtocol ? document.getElementById(`protocol-${requestedProtocol}`) : null;
@@ -828,13 +840,13 @@ if (typeof document !== 'undefined') {
                 const href = group.issuerCount > 1
                     ? `./stocks.html?view=compare&compare=${encodeURIComponent(group.ticker)}`
                     : `./cards/${encodeURIComponent(first?.cardSlug || cardSlug(first?.symbol, first?.mint))}.html`;
-                return `<a href="${escapeHtml(href)}" class="search-underlying"><strong>${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}</strong>`
+                return `<a href="${escapeHtml(href)}" class="search-underlying"><strong>${group.preIpo ? `${escapeHtml(group.name)} · pre-IPO` : `${escapeHtml(group.ticker)} · ${escapeHtml(group.name)}`}</strong>`
                     + `<span>${group.issuerCount} wrapper${group.issuerCount === 1 ? '' : 's'} · ${group.tokenCount} exact token${group.tokenCount === 1 ? '' : 's'}</span><small>${escapeHtml(reason)}</small></a>`;
             });
             const tokenRows = groupHtml('tokens', 'Exact tokens', results.tokens, ({ record: token, reason }) => {
                 const slug = token.cardSlug || cardSlug(token.symbol, token.mint);
                 return `<a href="./cards/${encodeURIComponent(slug)}.html"><strong>${escapeHtml(token.symbol || token.name || mintSuffix(token.mint))}</strong>`
-                    + `<span>${escapeHtml(token.underlyingTicker || 'underlying unknown')} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span><small>${escapeHtml(reason)}</small></a>`;
+                    + `<span>${escapeHtml(token.underlyingTicker || (token.companyName ? `${token.companyName} (pre-IPO)` : 'underlying unknown'))} · ${escapeHtml((state.issuersBySlug.get(token.issuer) || {}).name || token.issuer || 'issuer unknown')}</span><small>${escapeHtml(reason)}</small></a>`;
             });
             const issuerRows = groupHtml('issuers', 'Issuers', results.issuers, ({ record: issuer, reason }) =>
                 `<a href="${escapeHtml(issuerDossierHref(issuer.slug))}"><strong>${escapeHtml(issuer.name)}</strong>`
@@ -862,10 +874,11 @@ if (typeof document !== 'undefined') {
             }
             els.comparisonSection.hidden = false;
             els.comparisonUnderlying.innerHTML = state.comparisonGroups.map((group) =>
-                `<option value="${escapeHtml(group.ticker)}">${escapeHtml(group.ticker)} · ${group.issuerCount} issuers · ${group.tokenCount} tokens</option>`
+                `<option value="${escapeHtml(group.ticker)}">${escapeHtml(comparisonGroupTitle(group))} · ${group.issuerCount} issuers · ${group.tokenCount} tokens</option>`
             ).join('');
             const params = new URLSearchParams(window.location.search);
-            const requested = comparisonTickerFromParams(params, state.comparisonGroups.map((group) => group.ticker));
+            // A pre-IPO company opens by its key, name or a wrapper symbol: compare=SPACEX, compare=tOpenAI.
+            const requested = comparisonTickerFromParams(params, state.comparisonGroups.map((group) => group.ticker), comparisonKeyAliases(state.tokens));
             if (requested) els.comparisonUnderlying.value = requested;
             // The requirement checkboxes round-trip through `requires=` like the underlying and wrappers do.
             state.comparisonFilters = parseComparisonRequirements(params.get('requires'));
@@ -947,11 +960,11 @@ if (typeof document !== 'undefined') {
                 state.comparisonSelected = new Set(selected.filter((slug) => allModels.some((model) => model.issuerSlug === slug)));
             }
             state.comparisonModels = allModels;
-            document.getElementById('comparisonHeading').textContent = `${group.ticker} · ${allModels.length === 1 ? 'understand the token' : 'compare wrappers'}`;
+            document.getElementById('comparisonHeading').textContent = `${comparisonGroupTitle(group)} · ${allModels.length === 1 ? 'understand the token' : 'compare wrappers'}`;
             if (els.comparisonProducts) {
                 els.comparisonProducts.innerHTML = allModels.map((model) =>
                     `<label><input type="checkbox" value="${escapeHtml(model.issuerSlug)}" ${state.comparisonSelected.has(model.issuerSlug) ? 'checked' : ''}>` +
-                    `<span><strong>${escapeHtml(model.issuerName)}</strong><small>${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'} · ${escapeHtml(fmtMoney(model.liquidityUsd))} liquidity</small></span></label>`
+                    `<span><strong>${escapeHtml(model.issuerName)}</strong><small>${model.buyer?.preIpo ? 'Pre-IPO · ' : ''}${model.tokens.length} token${model.tokens.length === 1 ? '' : 's'} · ${escapeHtml(fmtMoney(model.liquidityUsd))} liquidity</small></span></label>`
                 ).join('');
             }
             if (els.comparisonFilters) {
@@ -966,12 +979,13 @@ if (typeof document !== 'undefined') {
             document.getElementById('comparisonSelectionSummary').textContent = `${models.length} of ${allModels.length} wrappers shown`;
             if (els.saveComparison) els.saveComparison.disabled = models.length === 0;
             const affected = models.filter((model) => bundle ? bundle.reviewPendingIssuers.includes(model.issuerSlug) : state.reviewP0ByIssuer.has(model.issuerSlug));
-            const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} priority-zero evidence changes. Marked legal conclusions are provisional.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
+            const reviewBanner = affected.length ? `<div class="comparison-review-warning"><strong>Comparison inputs under review</strong><span>${escapeHtml(affected.map((model) => model.issuerName).join(', '))} ${affected.length === 1 ? 'has' : 'have'} changes in the issuer's documents under review; the legal answers marked here may change.</span><a href="./review.html?priority=P0">Open review queue →</a></div>` : '';
             els.comparisonView.innerHTML = reviewBanner + (models.length >= 1
                 ? sameStockComparisonHtml(group, models, { sources: bundle?.sources ?? null })
                 : '<div class="comparison-empty"><strong>No wrappers selected or matching these requirements.</strong><p>Select one or more wrappers, or clear the requirements. We never add wrappers to your selection.</p></div>') +
                 (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Fees and incentives →</a> <span>Initial programme research; it does not include every cost.</span></p>` : '') +
-                (models.length ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
+                // History is kept per listed ticker (/api/history/underlyings), so a pre-IPO company has none to show.
+                (models.length && !group.preIpo ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
                 (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. Legal reviews have their own dates.</p>` : '');
             const history = els.comparisonView.querySelector('.comparison-history');
             history?.addEventListener('toggle', () => {
@@ -1127,7 +1141,7 @@ if (typeof document !== 'undefined') {
                 return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Protocol support changed')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${escapeHtml(humanizeSlug(row.kind || 'protocol change'))}</small></li>`;
             });
             els.personalProtocolChanges.innerHTML = personalListHtml(protocolRows,
-                'No source-listed protocol-support change is recorded in the current public journal.');
+                'The current public journal records no protocol adding or dropping one of these exact tokens.');
 
             els.personalStockCount.textContent = fmtNumber(stocks.length);
             els.personalIssuerCount.textContent = fmtNumber(issuers.length);
@@ -1559,7 +1573,7 @@ if (typeof document !== 'undefined') {
                 ['Market', isNum(market.dexLiquidityUsd) ? market.dexLiquidityUsd >= 50_000 ? 'healthy' : market.dexLiquidityUsd > 0 ? 'thin' : 'no depth' : 'unknown', market.dexLiquidityUsd >= 50_000 ? 'good' : isNum(market.dexLiquidityUsd) ? 'caution' : 'unknown'],
                 ['Control', hasOverride ? 'issuer powers' : controlsKnownOff ? 'no override found' : 'not established', hasOverride ? 'caution' : controlsKnownOff ? 'good' : 'unknown'],
                 ['Legal', p0Review.length ? 'under review' : review.pending ? 'review pending' : 'reviewed', p0Review.length || review.pending ? 'caution' : 'good'],
-                ['DeFi', hasCollateral ? 'collateral listed' : issuerIntegrations.length ? 'other listed use' : 'none source-listed', hasCollateral ? 'good' : 'unknown']
+                ['DeFi', hasCollateral ? 'collateral listed' : issuerIntegrations.length ? 'other listed use' : 'not listed', hasCollateral ? 'good' : 'unknown']
             ];
             const healthHtml = health.map(([label, value, status]) =>
                 `<span class="issuer-health issuer-health-${status}"><small>${escapeHtml(label)}</small><strong>${escapeHtml(value)}</strong></span>`).join('');
@@ -1607,7 +1621,7 @@ if (typeof document !== 'undefined') {
     ${provenanceHtml(issuer, { compact: true })}
     <div class="issuer-health-row" aria-label="Issuer health by dimension">${healthHtml}</div>
     ${discrepancyCalloutHtml(issuer)}
-    ${p0Review.length ? `<p class="review-status review-p0"><strong>Under review:</strong> ${p0Review.length} priority-zero evidence change${p0Review.length === 1 ? '' : 's'} may affect these conclusions. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
+    ${p0Review.length ? `<p class="review-status review-p0" title="${p0Review.length} priority-zero (P0) item${p0Review.length === 1 ? '' : 's'} in the evidence review queue"><strong>Under review:</strong> ${p0Review.length} change${p0Review.length === 1 ? '' : 's'} in this issuer’s documents may change these answers; our review is not finished. <a href="./review.html?priority=P0&issuer=${encodeURIComponent(issuer.slug)}">Inspect them →</a></p>` : ''}
     <details class="issuer-card-more">
         <summary>Claim, evidence, controls and metrics</summary>
     <div class="lay-verdict lay-verdict-more">
@@ -1616,11 +1630,10 @@ if (typeof document !== 'undefined') {
     </div>
     <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
-        <span class="maturity-pill level-${stage === null ? 0 : stage}">${escapeHtml(grades.maturityStage || (stage === null ? DASH : 'Level ' + stage))}</span>
-        <span class="grade-score" title="Sum over the ten site booleans: +1 yes, -1 no">score ${isNum(grades.maturityScore) ? (grades.maturityScore > 0 ? '+' : '') + grades.maturityScore : DASH}</span>
-        <span class="claim-rung" title="What the holder legally owns (claim depth 0-4)">rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} · ${escapeHtml(claimLabel(grades.claimRung, grades.claimLabel))}</span>
+        <span class="claim-rung" title="${escapeHtml(`Claim depth: rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} of 4. ${claimRungTooltip(grades.claimRung)}`)}">${escapeHtml(`${CLAIM_DEPTH_QUESTION}: ${claimDepthWords(grades.claimRung) ?? 'not established'}`)}</span>
+        <span class="claim-rung" title="${escapeHtml(`Ledger maturity: ${grades.maturityStage || (stage === null ? DASH : 'Level ' + stage)}, score ${isNum(grades.maturityScore) ? (grades.maturityScore > 0 ? '+' : '') + grades.maturityScore : DASH} (ten site booleans, +1 yes, -1 no). ${maturityLevelTooltip(stage)}`)}">${escapeHtml(`${LEDGER_RECORD_QUESTION}: ${ledgerRecordWords(stage) ?? 'not established'}`)}</span>
     </div>
-    <p class="claim-rung-explainer"><strong>Why this rung?</strong> ${escapeHtml(claimRungTooltip(grades.claimRung) || 'The available evidence does not establish where this claim belongs on the ownership ladder.')}</p>
+    <p class="claim-rung-explainer"><strong>What that means</strong> ${escapeHtml(claimDepthReason(grades.claimRung) || 'The available evidence does not establish what the holder legally owns.')}</p>
     ${conceptGuideRowHtml(['claim', 'control', 'insolvency', 'redemption', 'defi'])}
     <div class="verification-row">
         ${verificationBarHtml(grades.verificationStrength)}
@@ -1755,7 +1768,7 @@ if (typeof document !== 'undefined') {
                 `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
             sections.push(provenanceHtml(issuer));
             sections.push(`<aside class="detail-concept-guide"><strong>Start with the legal meaning</strong>` +
-                `<p>${escapeHtml(claimRungTooltip(grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
+                `<p>${escapeHtml(claimDepthReason(grades.claimRung) || 'What the holder legally owns is not yet established from the reviewed evidence.')}</p>` +
                 `${conceptGuideRowHtml(['claim', 'ownership', 'control', 'insolvency', 'redemption', 'defi'])}</aside>`);
             sections.push(evidenceLineHtml(issuer.evidence));
             sections.push(discrepanciesHtml(issuer));
@@ -1777,7 +1790,7 @@ if (typeof document !== 'undefined') {
                 field('Governing law', issuer.governingLaw, false, 'governingLaw'),
                 field('Regulatory status', issuer.regulatoryStatus, false, 'regulatoryStatus'),
                 field('Legal form', issuer.legalForm, false, 'legalForm'),
-                field('Claim depth', `rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} — ${claimLabel(grades.claimRung, grades.claimLabel)}`),
+                field(CLAIM_DEPTH_QUESTION, claimDepthWords(grades.claimRung)),
                 field('What the holder owns', issuer.holderClaim, false, 'holderClaim'),
                 field('Token program (as the issuer states it)', issuer.tokenProgram, false, 'tokenProgram'),
                 field('Chains', Array.isArray(issuer.chains) ? issuer.chains.join(', ') : null),
@@ -1861,8 +1874,10 @@ if (typeof document !== 'undefined') {
             const vocabulary = issuer.vocabulary && typeof issuer.vocabulary === 'object'
                 ? issuer.vocabulary
                 : {};
-            sections.push(detailSection('Ledger maturity vocabulary',
-                Object.keys(vocabulary).sort().map((key) => {
+            // Headed in a buyer's words; the methodology calls this the ledger-maturity vocabulary.
+            sections.push(detailSection(`${LEDGER_RECORD_QUESTION}: the questions behind the answer`, [
+                field('Answer', ledgerRecordWords(grades.maturityStageNum))
+            ].concat(Object.keys(vocabulary).sort().map((key) => {
                     const entry = vocabulary[key] || {};
                     const value = entry.value === null || entry.value === undefined || entry.value === ''
                         ? DASH
@@ -1870,7 +1885,7 @@ if (typeof document !== 'undefined') {
                     return `<div class="detail-field"${entry.reason ? ` title="${escapeHtml(String(entry.reason))}"` : ''}>` +
                         `<dt>${escapeHtml(humanizeSlug(key))}</dt>` +
                         `<dd>${escapeHtml(value)}${chipFor_(`vocabulary.${key}.value`, humanizeSlug(key))}</dd></div>`;
-                })));
+                }))));
 
             // The trust chain and the what-if answers (stocks/EVIDENCE.md §6). The diagram is drawn
             // from the record's own `chain`, so it is there the moment the panel opens; the answers
@@ -2030,7 +2045,7 @@ if (typeof document !== 'undefined') {
                     `<span class="review-status ${review.pending ? 'review-pending' : 'review-complete'}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</span></div>`);
                 sections.push(provenanceHtml(issuer));
                 sections.push(`<aside class="detail-concept-guide"><strong>How to read this token</strong>` +
-                    `<p>${escapeHtml(claimRungTooltip(issuer.grades && issuer.grades.claimRung) || 'The claim depth is not yet established from the reviewed evidence.')}</p>` +
+                    `<p>${escapeHtml(claimDepthReason(issuer.grades && issuer.grades.claimRung) || 'What the holder legally owns is not yet established from the reviewed evidence.')}</p>` +
                     `${conceptGuideRowHtml(['ownership', 'control', 'redemption', 'defi'])}</aside>`);
                 sections.push(discrepanciesHtml(issuer));
             }

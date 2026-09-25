@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Build one decision bundle per underlying (including lone wrappers) from existing snapshots;
+// Build one decision bundle per underlying (including lone wrappers and pre-IPO companies, keyed by
+// company: lib/private-companies.mjs) from existing snapshots;
 // this is a local derivation, never a collector or a source-review timestamp refresh.
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -37,6 +38,7 @@ async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (!flags.run) { console.log('node stocks/build-comparison-bundles.mjs --run [--out-dir=comparisons]'); return; }
     const index = await buildComparisonFiles({ outDir: resolve(ROOT, flags['out-dir'] ?? 'comparisons') });
-    log(`wrote ${index.groups.length} scoped underlying decision bundles`);
+    const preIpo = index.groups.filter((group) => group.preIpo);
+    log(`wrote ${index.groups.length} scoped underlying decision bundles, ${preIpo.length} of them pre-IPO companies with no listed ticker (${preIpo.map((group) => group.ticker).join(', ') || 'none'})`);
 }
 if (import.meta.filename === process.argv[1]) main().catch((error) => { logError(error.stack ?? String(error)); process.exit(1); });

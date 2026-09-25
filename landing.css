@@ -60,7 +60,8 @@ h1 span { color: var(--violet); }
 .wrapper-grid span { color: var(--muted); font-size: .68rem; }
 .wrapper-grid p { margin: 18px 0 4px; font-size: .8rem; font-weight: 780; }
 .wrapper-grid small { display: block; color: var(--muted); font-size: .69rem; line-height: 1.45; }
-.hero-search { margin-top: 16px; }
+/* The site search is its own hero item (grid area "search", below): a box like the events box. */
+.hero-search { grid-area: search; min-width: 0; margin: 0; padding: 16px 18px 18px; border: 1px solid color-mix(in srgb, var(--violet) 26%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: var(--shadow); }
 .hero-search label { display: block; margin-bottom: 7px; color: var(--muted); font-size: .7rem; font-weight: 730; }
 .hero-search > div { display: flex; }
 .hero-search input { width: 100%; min-width: 0; height: 46px; padding: 0 13px; border: 1px solid var(--rwa-control-line); border-right: 0; border-radius: 8px 0 0 8px; background: var(--panel); color: var(--ink); font: inherit; font-size: .83rem; }
@@ -280,7 +281,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
    Without script (and before the feed loads) it is a short scrollable list of the rows written in at
    build time; with motion allowed the script scrolls it (.is-scrolling); with reduced motion it is a
    static list of the newest six (.is-static, or the media query / .reduce-motion hook without script). */
-.hero { grid-template-areas: "copy preview" "copy events"; }
+.hero { grid-template-areas: "copy preview" "copy search" "copy events"; }
 @media (min-width: 901px) { .hero { row-gap: 18px; } }
 .hero-copy { grid-area: copy; }
 .comparison-preview { grid-area: preview; align-self: end; }
@@ -312,7 +313,22 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 .latest-events-foot a { color: var(--violet-dark); font-weight: 760; text-decoration: none; }
 .latest-events-foot a:hover, .latest-events-foot a:focus-visible { text-decoration: underline; }
 @media (max-width: 900px) {
-    .hero { grid-template-areas: "copy" "preview" "events"; }
+    .hero { grid-template-areas: "copy" "search" "preview" "events"; }
+}
+/* Phone hero order: the hero text's children join the hero's own column, so the search follows the
+   lede and sits in the first screen of a 375×812 phone (inside the example card it was ~1,220 px down,
+   measured 25 Sep). Wider screens keep the grid above. */
+@media (max-width: 560px) {
+    .hero { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+    .hero-copy { display: contents; }
+    .hero-copy > .eyebrow { order: 1; }
+    #heroTitle { order: 2; }
+    .hero-lede { order: 3; }
+    .hero-search { order: 4; margin-top: 20px; padding: 14px 14px 16px; }
+    .hero-actions { order: 5; }
+    .hero-proof { order: 6; }
+    .comparison-preview { order: 7; margin-top: 34px; }
+    .latest-events { order: 8; margin-top: 34px; }
 }
 @media (max-width: 560px) {
     .latest-events { padding: 12px 12px 10px; border-radius: 14px; }

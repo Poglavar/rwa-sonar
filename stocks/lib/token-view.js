@@ -50,13 +50,15 @@
     };
 
     /** The view a page URL asks for: ?view=, else a legacy #section anchor, else ?compare=, else overview. */
-    function workspaceViewFromUrl(href) {
+    // `fallback` is the view for a URL that names none: stocks.js passes "assets" (Find a stock) for a
+    // first-time visitor, who has no briefing to continue, and "overview" for a returning reader.
+    function workspaceViewFromUrl(href, fallback = 'overview') {
         const url = new URL(href);
         const requested = url.searchParams.get('view');
         if (WORKSPACE_VIEWS.has(requested)) return requested;
         if (LEGACY_VIEW_BY_HASH[url.hash]) return LEGACY_VIEW_BY_HASH[url.hash];
         if (url.searchParams.has('compare')) return 'compare';
-        return 'overview';
+        return WORKSPACE_VIEWS.has(fallback) ? fallback : 'overview';
     }
 
     const TOKEN_PAGE_SIZE = 50;

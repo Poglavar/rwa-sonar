@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // Builds stocks-health.json: the eleven lib/health.mjs rules run over every mint, reduced to one
-// status per rule plus the worst-of roll-up, so a page can colour 441 tokens without loading the
+// status per rule plus the worst-of roll-up and the programme / this-token levels (with the count
+// of checks each token passes), so a page can colour every token without loading the
 // four source files (1.1 MB + 2.4 MB + 2.5 MB + 613 kB) or re-deriving anything. Deliberately thin:
 // no rule `inputs` and no notes, which is what keeps it small enough to fetch — a stock card needs
 // those and therefore calls evaluateHealth itself (stocks/build-cards.mjs) rather than reading this.
 
 import { join } from 'node:path';
-import { HEALTH_DIMENSIONS, HEALTH_RULES, evaluateHealth } from './lib/health.mjs';
+import { HEALTH_DIMENSIONS, HEALTH_LEVELS, HEALTH_RULES, evaluateHealth } from './lib/health.mjs';
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import fmt from './lib/fmt.js';
@@ -42,9 +43,11 @@ INPUTS
   stocks/data/composability-templates.json — reviewed issuer + control-recipe outcomes
 
 OUTPUT
-  {generatedAt, sources, counts, byWorstRule, rules, items[]} sorted by mint. Each item carries
-  {mint, symbol, issuer, status, worstRuleId, rules:{<id>: status}, values:{<id>: value}} and nothing
-  else: a rule whose inputs are missing is \`unknown\`, which is never counted as bad.`);
+  {generatedAt, sources, counts, byLevel, byTokenWorstRule, byWorstRule, levels, rules, items[]}
+  sorted by mint. Each item carries {mint, symbol, issuer, status, worstRuleId, levels, dimensions,
+  rules:{<id>: status}, values:{<id>: value}} and nothing else: a rule whose inputs are missing is
+  \`unknown\`, which is never counted as bad. \`levels.programme\` / \`levels.token\` are the headline
+  (the issuer's shared verdict and this token's, each with passed of judged checks).`);
 }
 
 /** This mint's pools from the trade tape. A mint with no pool is [] — the rule then reads unknown. */
@@ -100,6 +103,7 @@ export function buildItems({ tokens, issuers, holders, pools, composabilityTempl
             issuer: token.issuer ?? null,
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            levels: verdict.levels,
             dimensions: verdict.dimensions,
             rules,
             values
@@ -110,9 +114,17 @@ export function buildItems({ tokens, issuers, holders, pools, composabilityTempl
     return items;
 }
 
-/** Counts per status, and how often each rule is the one dragging a token down. */
+/**
+ * Counts per status — overall, per level and per dimension — and how often each rule is the one
+ * dragging a token down: overall (`byWorstRule`, where the programme rules dominate because they
+ * are the same for every token of an issuer) and at the token level (`byTokenWorstRule`, which is
+ * what actually separates one token from another).
+ */
 export function summarize(items) {
     const counts = { good: 0, caution: 0, warning: 0, unknown: 0 };
+    const byLevel = Object.fromEntries(HEALTH_LEVELS.map((level) => [level.id, { good: 0, caution: 0, warning: 0, unknown: 0 }]));
+    const byTokenWorstRule = {};
+    for (const rule of HEALTH_RULES) if (rule.level === 'token') byTokenWorstRule[rule.id] = 0;
     const byDimension = Object.fromEntries(HEALTH_DIMENSIONS.map((dimension) => [
         dimension.id,
         { good: 0, caution: 0, warning: 0, unknown: 0 }
@@ -128,8 +140,15 @@ export function summarize(items) {
             const status = item?.dimensions?.[dimension.id]?.status;
             if (status in byDimension[dimension.id]) byDimension[dimension.id][status] += 1;
         }
+        for (const level of HEALTH_LEVELS) {
+            const status = item?.levels?.[level.id]?.status;
+            if (status in byLevel[level.id]) byLevel[level.id][status] += 1;
+        }
+        // A level names only a failing rule, so a good or unmeasured token counts under no rule.
+        const tokenWorst = item?.levels?.token?.worstRuleId;
+        if (typeof tokenWorst === 'string' && tokenWorst in byTokenWorstRule) byTokenWorstRule[tokenWorst] += 1;
     }
-    return { counts, byDimension, byWorstRule };
+    return { counts, byLevel, byTokenWorstRule, byDimension, byWorstRule };
 }
 
 async function main() {
@@ -165,7 +184,7 @@ async function main() {
         pools: tradeDb?.pools ?? [],
         composabilityTemplates: composabilityDb?.templates ?? []
     });
-    const { counts, byDimension, byWorstRule } = summarize(items);
+    const { counts, byLevel, byTokenWorstRule, byDimension, byWorstRule } = summarize(items);
 
     await writeJson(outPath, {
         generatedAt: ts(),
@@ -176,6 +195,9 @@ async function main() {
             composability: composabilityDb?.reviewedAt ?? null
         },
         counts,
+        levels: HEALTH_LEVELS,
+        byLevel,
+        byTokenWorstRule,
         dimensions: HEALTH_DIMENSIONS,
         byDimension,
         byWorstRule,
@@ -193,6 +215,16 @@ async function main() {
     log(`wrote ${outPath}: ${items.length} item(s) — ${counts.good} good, ${counts.caution} caution, ` +
         `${counts.warning} warning, ${counts.unknown} unknown`);
     log(`worst rule: ${worst || 'none (every token is unknown)'}`);
+    for (const level of HEALTH_LEVELS) {
+        const c = byLevel[level.id];
+        log(`${level.label.toLowerCase()} level: ${c.good} good, ${c.caution} caution, ${c.warning} warning, ${c.unknown} not measured`);
+    }
+    const tokenWorst = Object.entries(byTokenWorstRule)
+        .filter(([, n]) => n > 0)
+        .sort((a, b) => b[1] - a[1] || byString(a[0], b[0]))
+        .map(([id, n]) => `${id} ${n}`)
+        .join(', ');
+    log(`worst token-level rule: ${tokenWorst || 'none'}`);
     return 0;
 }
 

@@ -13,7 +13,7 @@ const FILTERS = { issuer: ['prestocks'], health: ['warning'], clawback: ['true']
 describe('parseFacetNames', () => {
     test('an empty `by` means every facet', () => {
         expect(parseFacetNames([])).toEqual(FACET_NAMES);
-        expect(parseFacetNames(undefined).length).toBe(26);
+        expect(parseFacetNames(undefined).length).toBe(29);
     });
 
     test('duplicates collapse', () => {

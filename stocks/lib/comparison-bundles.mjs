@@ -39,12 +39,21 @@ function slimToken(token, closedByMint) {
             clawback: control.clawback === true,
             pausable: control.pausable === true,
             transferFeeBps: num(control.transferFeeBps),
-            transferFeeScheduled: num(control.transferFeeScheduled?.bps) === null ? null : { bps: control.transferFeeScheduled.bps }
+            transferFeeScheduled: num(control.transferFeeScheduled?.bps) === null ? null
+                : { bps: control.transferFeeScheduled.bps, epoch: num(control.transferFeeScheduled.epoch) }
         }
     };
     if (closedByMint) {
         slim.closedMarket = compactLenders(closedByMint.get(token.mint) ?? null)
             .map((lender) => ({ protocolName: lender.protocolName, label: lender.label, labelKind: lender.labelKind }));
+    }
+    // A pre-IPO wrapper: the company it is grouped under and the issuer's own mark and valuation,
+    // which the buyer table prices it against (there is no share price for a private company).
+    if (token.instrumentType === 'private-company') {
+        slim.instrumentType = token.instrumentType;
+        slim.companyKey = token.companyKey ?? null;
+        slim.companyName = token.companyName ?? null;
+        slim.issuerApi = { markPrice: num(token.issuerApi?.markPrice), markValuation: num(token.issuerApi?.markValuation) };
     }
     return slim;
 }
@@ -57,9 +66,12 @@ export function buildComparisonBundles({ issuerDb, tokenDb, defiUsage = null, co
     const pending = new Set((reviewQueue?.items ?? []).filter((item) => item.priority === 'P0').map((item) => item.issuerSlug));
     const closedByMint = Array.isArray(closedMarket?.items) ? new Map(closedMarket.items.map((item) => [item.mint, item])) : null;
     const powersByIssuer = new Map((powerMap?.issuers ?? []).map((row) => [row.slug, buyerPowers(row)]));
+    // One bundle per listed underlying and per pre-IPO company (`ticker` is then the company key).
     return sameUnderlyingGroups(tokenDb?.tokens, { includeSingle: true }).map((group) => ({
         schemaVersion: 1,
         ticker: group.ticker,
+        name: group.name,
+        preIpo: group.preIpo,
         builtAt,
         sources: {
             tokensBuiltAt: tokenDb?.builtAt ?? null,
@@ -83,7 +95,7 @@ export function comparisonBundleIndex(bundles) {
         schemaVersion: 1,
         builtAt: bundles[0]?.builtAt ?? null,
         groups: bundles.map((bundle) => ({
-            ticker: bundle.ticker, path: comparisonBundleFilename(bundle.ticker),
+            ticker: bundle.ticker, name: bundle.name, preIpo: bundle.preIpo, path: comparisonBundleFilename(bundle.ticker),
             issuerCount: bundle.models.length,
             tokenCount: bundle.models.reduce((count, model) => count + model.tokens.length, 0),
             issuers: bundle.models.map((model) => model.issuerSlug),

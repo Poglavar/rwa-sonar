@@ -1,8 +1,8 @@
 <!doctype html>
-<!-- The health monitor, and the explorer over the whole token universe: every one of the API's 26
-     facets with its counts in the panel, the eleven per-token checks shown overall and in four
-     independent dimensions, what
-     the worst failing check is, one page of the token table sorted in Postgres, what changed since
+<!-- The health monitor, and the explorer over the whole token universe: every one of the API's 29
+     facets with its counts in the panel, the eleven checks split into this token's own and its
+     programme's (the issuer-wide ones), with the old worst-of-eleven and the four independent
+     dimensions beside them, which token check fails, one page of the token table sorted in Postgres, what changed since
      yesterday's snapshot, daily DeFi protocol changes, the curated event log and the Meteora pools
      with their real fee and bin configuration.
      The facets, the tiles, the rule strip and the table come from the read-only JSON API (api/,
@@ -47,7 +47,7 @@
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="stocks.css?v=20260924r" />
-    <link rel="stylesheet" href="monitor.css?v=20260925a" />
+    <link rel="stylesheet" href="monitor.css?v=20260925h" />
     <link rel="stylesheet" href="app-shell.css?v=20260925b" />
 </head>
 
@@ -62,10 +62,14 @@
         concentrated the holders are, how strong the issuer's reserve evidence is, how the authority
         keys are held, whether trading is paused, whether any top-20 account is frozen, and how far
         apart the venues price it, plus whether its tech and legal template lets a permissionless
-        smart-contract lender hold collateral and enforce a default. A token's status is the worst
-        result among the checks we could run.
+        smart-contract lender hold collateral and enforce a default. Three of the eleven — the legal
+        evidence, the authority keys and DeFi enforceability — describe the issuer's
+        <em>programme</em> and give every token of that issuer the same answer, so each token gets two
+        verdicts: its programme's, and its own from the other eight, with the number of those checks it
+        passes. A token is only called good on its own checks if at least one of its market checks
+        could be run.
         <strong>A check whose inputs are missing is <code>unknown</code>, and an unknown is never
-            counted as a pass.</strong></p>
+            counted as a pass or as a fail.</strong></p>
 
     <div class="data-line evidence-context"><span><small>Observed</small><strong>Universe built <time id="dataAsOf" datetime="">&hellip;</time></strong></span>
         <span><small>Coverage</small><strong><span id="tokenTotal">&hellip;</span> tokens tracked</strong></span>
@@ -87,22 +91,32 @@
 
     <section id="countsSection" aria-labelledby="countsHeading">
         <h2 id="countsHeading">Status counts</h2>
-        <p class="section-note">Each tile filters the table below; click it again to clear, and click
-            a second status to see both. Picking a status does not change the tiles' own counts: with
-            <em>warning</em> selected, the other three still show how many tokens you would get by
-            switching to them.</p>
-        <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by status"></div>
+        <p class="section-note">The tiles count each token on its <strong>own</strong> eight checks:
+            price tracking, liquidity, organic flow, failed swaps, holder concentration, venue spread,
+            trading pause and frozen accounts. Each tile filters the table below; click it again to
+            clear, and click a second status to see both. Picking a status does not change the tiles'
+            own counts: with <em>warning</em> selected, the other three still show how many tokens you
+            would get by switching to them.</p>
+        <div id="statusTiles" class="mon-tiles" role="group" aria-label="Filter by this token's status"></div>
         <p id="statusVerdict" class="mon-verdict" hidden></p>
 
+        <h3 class="mon-subhead">The programme, and the worst of all eleven</h3>
+        <p class="section-note"><strong>Programme</strong> is the worst of the three issuer-wide
+            checks: legal evidence and reserve verification, how the authority keys are held, and
+            whether a DeFi lender could enforce the token as collateral. Every token of an issuer gets
+            the same answer. <strong>Worst of all eleven</strong> is the single badge this page used to
+            lead with; it is kept so nothing is hidden, but it cannot tell two tokens of one issuer apart.</p>
+        <div id="healthLevels" class="mon-dimensions mon-levels" aria-label="Programme and overall health"></div>
+
         <h3 class="mon-subhead">The four dimensions</h3>
-        <p class="section-note">Overall status is the worst measured result below. The four columns
-            cover market quality, on-chain control, the evidence that the off-chain shares exist, and
-            whether a DeFi protocol can enforce custody and default. “Unknown” means we did not measure it.</p>
+        <p class="section-note">The same eleven checks grouped by what they are about: market quality,
+            on-chain control, the evidence that the off-chain shares exist, and whether a DeFi protocol
+            can enforce custody and default. “Unknown” means we did not measure it.</p>
         <div id="healthDimensions" class="mon-dimensions" aria-label="Health by dimension"></div>
 
-        <h3 class="mon-subhead">Which check scores worst</h3>
-        <p id="ruleCaption" class="section-note">Each bar counts the tokens whose worst-scoring check is that one.</p>
-        <div id="ruleStrip" class="mon-rules" role="group" aria-label="Filter by worst rule"></div>
+        <h3 class="mon-subhead">Which of a token's own checks fails</h3>
+        <p id="ruleCaption" class="section-note">Each bar counts the tokens whose own checks fail, under the first check that does.</p>
+        <div id="ruleStrip" class="mon-rules" role="group" aria-label="Filter by failing token check"></div>
     </section>
 
     <section id="tokensSection" aria-labelledby="tokensHeading">
@@ -147,7 +161,8 @@
                             <tr>
                                 <th data-sort="symbol" aria-sort="none">Token</th>
                                 <th>Issuer</th>
-                                <th data-sort="health_status" aria-sort="none">Overall</th>
+                                <th data-sort="token_health" aria-sort="none">This token</th>
+                                <th data-sort="programme_health" aria-sort="none">Programme</th>
                                 <th data-sort="market_health" aria-sort="none">Market</th>
                                 <th data-sort="control_health" aria-sort="none">Control</th>
                                 <th data-sort="legal_health" aria-sort="none">Legal / evidence</th>
@@ -170,8 +185,10 @@
                     <button id="nextPage" type="button" class="mon-reset">Next &rarr;</button>
                 </div>
                 <p class="section-note mon-sort-note">Only the columns with an arrow are sortable. A
-                    sort runs over every matching token, not just this page; <strong>Last trade</strong>
-                    sorts by the CoinGecko time.</p>
+                    sort runs over every matching token, not just this page. <strong>This token</strong>
+                    sorts good, caution, warning, then by how many of its checks fail and how many pass;
+                    a token with no market sorts last either way. <strong>Last trade</strong> sorts by
+                    the CoinGecko time.</p>
             </div>
         </div>
     </section>
@@ -252,7 +269,7 @@
     <script src="stocks/lib/fmt.js?v=20260924a"></script>
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
     <script src="stocks/lib/closed-market-view.js?v=20260924a"></script>
-    <script src="monitor.js?v=20260925a"></script>
+    <script src="monitor.js?v=20260925h"></script>
     <script src="nav-menus.js?v=20260923a" defer></script>
 </body>
 

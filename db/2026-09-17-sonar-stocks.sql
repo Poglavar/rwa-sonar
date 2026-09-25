@@ -109,6 +109,13 @@ CREATE TABLE IF NOT EXISTS sonar.stock_token (
     control_health        text,
     legal_health          text,
     composability_health  text,
+    programme_health      text,
+    programme_worst_rule  text,
+    token_health          text,
+    token_worst_rule      text,
+    token_checks_passed   int,
+    token_checks_judged   int,
+    token_health_rank     int,
     first_seen_at         timestamptz,
     last_seen_at          timestamptz,
     seen_in_search        bool,
@@ -127,6 +134,20 @@ CREATE INDEX IF NOT EXISTS stock_token_recipe_label_idx    ON sonar.stock_token 
 ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS composability_health text;
 CREATE INDEX IF NOT EXISTS stock_token_composability_health_idx ON sonar.stock_token (composability_health);
 CREATE INDEX IF NOT EXISTS stock_token_first_seen_at_idx   ON sonar.stock_token (first_seen_at);
+-- 2026-09-25: the headline health split (stocks/lib/health.mjs `levels`) — the programme's verdict,
+-- the same for every token of an issuer, and this token's, with the checks it passed of those that
+-- could be judged and the rank the monitor sorts by. Same upgrade guard as above.
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS programme_health text;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS programme_worst_rule text;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS token_health text;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS token_worst_rule text;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS token_checks_passed int;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS token_checks_judged int;
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS token_health_rank int;
+CREATE INDEX IF NOT EXISTS stock_token_programme_health_idx ON sonar.stock_token (programme_health);
+CREATE INDEX IF NOT EXISTS stock_token_token_health_idx ON sonar.stock_token (token_health);
+CREATE INDEX IF NOT EXISTS stock_token_token_worst_rule_idx ON sonar.stock_token (token_worst_rule);
+CREATE INDEX IF NOT EXISTS stock_token_token_health_rank_idx ON sonar.stock_token (token_health_rank);
 
 -- ---------------------------------------------------------------------------------------------
 -- Daily snapshots. The slim per-day rows written by stocks/snapshot.mjs into

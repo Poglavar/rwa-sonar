@@ -157,12 +157,14 @@ export const SITE_PAGES = [
         key: 'monitor', file: 'monitor.html', path: 'monitor.html',
         title: 'Health monitor — RWA Sonar',
         description: 'Monitor tokenized-stock price tracking, liquidity, holder concentration, authority controls and source changes on Solana, token by token.',
-        kicker: 'Health monitor', subtitle: 'Every token on four health dimensions; unknown never counts as good.',
+        kicker: 'Health monitor', subtitle: 'Each token on its own checks and on its programme’s; unknown never counts as good.',
         schema: 'dataset', dataset: { name: 'Tokenized-stock health checks', files: ['stocks-health.json'] },
         stats: (d) => [
-            { value: fmtCount(num(d.health?.counts?.warning)), label: 'tokens with a warning', tone: 'warning' },
-            { value: fmtCount(num(d.health?.counts?.caution)), label: 'tokens at caution', tone: 'caution' },
-            { value: fmtCount(num(d.health?.counts?.good)), label: 'tokens with every check good', tone: 'good' }
+            // The token's own checks (stocks/lib/health.mjs HEALTH_LEVELS): the issuer-wide checks rate
+            // every token of a programme alike, so they are counted per programme on the page itself.
+            { value: fmtCount(num(d.health?.byLevel?.token?.warning)), label: 'tokens failing a check of their own', tone: 'warning' },
+            { value: fmtCount(num(d.health?.byLevel?.token?.caution)), label: 'tokens at caution on their own checks', tone: 'caution' },
+            { value: fmtCount(num(d.health?.byLevel?.token?.good)), label: 'tokens passing every check on the token itself', tone: 'good' }
         ],
         lastmod: (d) => d.health?.generatedAt
     },

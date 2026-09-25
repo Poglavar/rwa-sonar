@@ -694,6 +694,35 @@ describe('the funnel graphic', () => {
         expect(html).not.toMatch(/<h2 id="funnelHeading">From/);
     });
 
+    // 25 Sep judge audit: "rung", "ledger maturity", "source-listed" and "priority-zero" are our
+    // vocabulary. Outside the compare section (another owner's code) the page labels say them in a
+    // buyer's words and keep the term in a title; issuer-labels.js claimDepthWords/ledgerRecordWords
+    // are the shared wording.
+    it('labels ownership, the record, DeFi listings and reviews in plain words outside compare', () => {
+        const js = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        const outsideCompare = html.slice(0, html.indexOf('id="comparisonSection"')) + html.slice(html.indexOf('id="discrepanciesSection"'));
+        for (const jargon of ["'Any source-listed use'", "'None source-listed'", "'Show all source-listed protocols'",
+            'No source-listed protocol-support change', "'none source-listed'", 'Why this rung?', "field('Claim depth'",
+            "detailSection('Ledger maturity vocabulary'", 'priority-zero evidence change${p0Review']) {
+            expect(js).not.toContain(jargon);
+        }
+        expect(js).toContain('claimDepthWords(grades.claimRung)');
+        expect(js).toContain('ledgerRecordWords(stage)');
+        expect(outsideCompare).not.toContain('<h2>Ledger maturity and claim depth</h2>');
+        expect(outsideCompare).not.toContain('“None source-listed”');
+        expect(outsideCompare).toContain('title="Ledger maturity"');
+        expect(outsideCompare).toContain('title="Claim depth"');
+    });
+
+    it('paints "Find a stock" before the script runs, the view a first-time visitor gets', () => {
+        const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
+        expect(html).toContain('<body data-workspace-view="assets">');
+        // stocks.js picks the briefing only for a reader who saved something (saved-items.js hasSavedState).
+        const js = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
+        expect(js).toMatch(/workspaceViewFromUrl\(window\.location\.href, returning \? 'overview' : 'assets'\)/);
+    });
+
     it('uses task views and progressive disclosure instead of one continuous analytics report', () => {
         const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
         expect(html).toContain('data-workspace-view="overview"');

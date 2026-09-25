@@ -113,7 +113,7 @@ describe('scoped comparison bundle generation', () => {
         const index = comparisonBundleIndex(bundles);
         const acme = index.groups.find((group) => group.ticker === 'ACME');
         expect(index).toMatchObject({ schemaVersion: 1, builtAt: '2026-09-20T11:00:00Z' });
-        expect(acme).toEqual({ ticker: 'ACME', path: comparisonBundleFilename('ACME'), issuerCount: 2, tokenCount: 3,
+        expect(acme).toEqual({ ticker: 'ACME', name: 'ALPHA token', preIpo: false, path: comparisonBundleFilename('ACME'), issuerCount: 2, tokenCount: 3,
             issuers: ['alpha', 'beta'], mints: ['a-1', 'a-2', 'b-1'] });
         expect(index.groups.every((group) => group.mints.every((mint) => !['unknown-ticker', 'unknown-issuer'].includes(mint)))).toBe(true);
     });
@@ -154,7 +154,7 @@ describe('buyer-table facts in the bundles', () => {
             reference: { price: 100, premiumPct: 1.5, source: 'pyth' },
             activity: { dexPairs: 2, cexMarkets: 3 },
             control: { freezeAuthority: true, permanentDelegate: true, clawback: true, pausable: true,
-                transferFeeBps: 100, transferFeeScheduled: { bps: 300 } },
+                transferFeeBps: 100, transferFeeScheduled: { bps: 300, epoch: 9 } },
             closedMarket: [
                 { protocolName: 'Kamino', label: 'frozen at close', labelKind: 'frozen-at-close' },
                 { protocolName: 'Loopscale', label: 'stale since 26 Aug', labelKind: 'stale' }
@@ -189,11 +189,79 @@ describe('buyer-table facts in the bundles', () => {
         expect(solo.control).toBeNull();
     });
 
+    test('the index names each group, and says which are pre-IPO companies', () => {
+        const index = comparisonBundleIndex(buildComparisonBundles(fixture()));
+        expect(index.groups.find((group) => group.ticker === 'ACME')).toMatchObject({ name: 'ALPHA token', preIpo: false });
+    });
+
     test('the bundles are built after the closed-market file and the power map they read', () => {
         const order = [...RELEASE_BUILD_STAGES.base, ...RELEASE_BUILD_STAGES.surfaces];
         const bundles = order.lastIndexOf('stocks/build-comparison-bundles.mjs');
         expect(order.indexOf('stocks/build-closed-market.mjs')).toBeGreaterThan(-1);
         expect(order.indexOf('stocks/build-closed-market.mjs')).toBeLessThan(bundles);
         expect(order.indexOf('stocks/build-power-map.mjs')).toBeLessThan(bundles);
+    });
+});
+
+describe('pre-IPO companies get their own bundles', () => {
+    const { mkdtemp, readFile, rm, writeFile } = require('node:fs/promises');
+    const { tmpdir } = require('node:os');
+    const { join } = require('node:path');
+    const PRE = { instrumentType: 'private-company', underlyingTicker: null };
+    // The catalogue's own records on 2026-09-23, trimmed: marks from each issuer's API.
+    const catalogue = () => ({
+        issuerDb: { builtAt: '2026-09-23T11:58:24Z', issuers: ['prestocks', 'tessera', 'backpack-securities'].map(issuer) },
+        tokenDb: { builtAt: '2026-09-23T11:58:24Z', tokens: [
+            { ...PRE, mint: 'PreweJ', symbol: 'OPENAI', name: 'OpenAI PreStocks', issuer: 'prestocks', companyKey: 'OPENAI', companyName: 'OpenAI', cardSlug: 'OPENAI',
+                market: { usdPrice: 1149.81, liquidity: 822306.44, vol24: 1330283.83 },
+                reference: { source: 'issuer-mark', price: 966.24, premiumPct: 2.47 },
+                control: { transferFeeBps: 100, transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } },
+                issuerApi: { markPrice: 966.24, markValuation: 1197105437719, description: 'LONG ISSUER PROSE' } },
+            { ...PRE, mint: 'oPAiAi', symbol: 'tOpenAI', name: 'T-OpenAI', issuer: 'tessera', companyKey: 'OPENAI', companyName: 'OpenAI', cardSlug: 'tOpenAI',
+                market: { usdPrice: 974.04, liquidity: 390511.4, vol24: 1235978.74 },
+                reference: { source: 'issuer-mark', price: 812.79, premiumPct: 13.34 },
+                control: { transferFeeBps: 20 }, issuerApi: { markPrice: 812.79, markValuation: 950000000000, holders: 8259 } },
+            { ...PRE, mint: 'PreANx', symbol: 'SPACEX', name: 'SpaceX PreStocks', issuer: 'prestocks', companyKey: 'SPCX', companyName: 'SpaceX' },
+            { mint: 'SPCXxc', symbol: 'SPCX', name: 'SpaceX - Backpack Securities', issuer: 'backpack-securities', underlyingTicker: 'SPCX', instrumentType: 'stock' }
+        ] }
+    });
+
+    test('OpenAI is one bundle holding PreStocks OPENAI and Tessera tOpenAI, with each issuer’s own mark', () => {
+        const bundles = buildComparisonBundles(catalogue());
+        const openai = bundles.find((bundle) => bundle.ticker === 'OPENAI');
+        expect(openai).toMatchObject({ ticker: 'OPENAI', name: 'OpenAI', preIpo: true });
+        expect(openai.models.map((model) => [model.issuerSlug, model.tokens.map((token) => token.symbol)]))
+            .toEqual([['prestocks', ['OPENAI']], ['tessera', ['tOpenAI']]]);
+        expect(openai.models[1].tokens[0]).toMatchObject({
+            underlyingTicker: null, instrumentType: 'private-company', companyKey: 'OPENAI', companyName: 'OpenAI',
+            reference: { source: 'issuer-mark', price: 812.79, premiumPct: 13.34 },
+            issuerApi: { markPrice: 812.79, markValuation: 950000000000 }
+        });
+        expect(JSON.stringify(openai)).not.toContain('LONG ISSUER PROSE');
+        // SpaceX's pre-IPO wrapper sits in the listed SPCX bundle; nothing else is emitted for it.
+        const spcx = bundles.find((bundle) => bundle.ticker === 'SPCX');
+        expect(spcx).toMatchObject({ name: 'SpaceX', preIpo: false });
+        expect(spcx.models.map((model) => model.issuerSlug)).toEqual(['backpack-securities', 'prestocks']);
+        expect(bundles.map((bundle) => bundle.ticker).sort()).toEqual(['OPENAI', 'SPCX']);
+        const index = comparisonBundleIndex(bundles);
+        expect(index.groups.find((group) => group.ticker === 'OPENAI')).toMatchObject({
+            name: 'OpenAI', preIpo: true, path: 'u-4f-50-45-4e-41-49.json', issuers: ['prestocks', 'tessera'], mints: ['PreweJ', 'oPAiAi']
+        });
+    });
+
+    test('build-comparison-bundles writes the OpenAI file the compare page fetches', async () => {
+        const { buildComparisonFiles } = require('./build-comparison-bundles.mjs');
+        const root = await mkdtemp(join(tmpdir(), 'rwa-bundles-'));
+        try {
+            const { issuerDb, tokenDb } = catalogue();
+            await writeFile(join(root, 'stocks-issuers.json'), JSON.stringify(issuerDb));
+            await writeFile(join(root, 'stocks-tokens.json'), JSON.stringify(tokenDb));
+            const index = await buildComparisonFiles({ root });
+            expect(index.groups.map((group) => group.ticker)).toContain('OPENAI');
+            const written = JSON.parse(await readFile(join(root, 'comparisons', comparisonBundleFilename('OPENAI')), 'utf8'));
+            expect(written.models.flatMap((model) => model.tokens.map((token) => token.symbol))).toEqual(['OPENAI', 'tOpenAI']);
+        } finally {
+            await rm(root, { recursive: true, force: true });
+        }
     });
 });

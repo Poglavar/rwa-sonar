@@ -74,7 +74,10 @@ npm run stocks:sync -- --apply   # writes rwa-assets-db.json + attestations-db.j
     market summaries, protocol-search rows and precomputed decision filters. Overview and Explore
     load this instead of paying for every dossier, venue and evidence claim. Comparison loads one
     generated `comparisons/u-<encoded-ticker>.json` bundle, including lone underlyings; issuer,
-    discrepancy, DeFi and token-detail views request the fuller research when needed.
+    discrepancy, DeFi and token-detail views request the fuller research when needed. A pre-IPO
+    token (PreStocks, Tessera) has no listed ticker, so it carries `companyKey`/`companyName` from
+    `lib/private-companies.mjs` and is compared under that key (OPENAI: OPENAI vs tOpenAI); a
+    company that has since listed is keyed by its ticker (SpaceX: SPACEX and tSpaceX sit in SPCX).
   - `stocks-issuers.json` (~2.75 MB in the 1,183-token build): the envelope carrying each input's own `fetchedAt` plus one
     full record per issuer exactly per MODEL.md §7 (dossier facts + `grades` + `control` + `market`
     + `tokenMints`). This is the full-research artifact; comparisons do not download it by default.
@@ -1032,9 +1035,15 @@ npm run stocks:cards -- --base-url=https://rwasonar.com   -> cards/             
 
 `build-health.mjs` runs the eleven `lib/health.mjs` rules over every mint and keeps only the verdict.
 The conservative overall status remains, but every item also carries independent `market`,
-`control`, `legal` and `composability` dimension verdicts; the top level carries their count distributions:
-`{generatedAt, sources, counts, dimensions, byDimension, byWorstRule, rules: HEALTH_RULES,
-items:[{mint, symbol, issuer, status, worstRuleId, dimensions, rules, values}]}`,
+`control`, `legal` and `composability` dimension verdicts and the two `levels` the monitor and the
+cards lead with: `programme` (legal evidence, authority keys, DeFi enforceability — the same for every
+token of an issuer) and `token` (the other eight), each `{status, worstRuleId, judged, passed,
+unknown, total}`; the token level adds `tradingJudged` and the `rank` the monitor sorts by, and is
+only `good` when at least one market check (tracking, liquidity, organic, failed swaps, spread) was
+judged. A level's `worstRuleId` names a caution or warning only. The top level carries the count
+distributions: `{generatedAt, sources, counts, levels, byLevel, byTokenWorstRule, dimensions,
+byDimension, byWorstRule, rules: HEALTH_RULES, items:[{mint, symbol, issuer, status, worstRuleId,
+levels, dimensions, rules, values}]}`,
 sorted by mint. It has no rule `inputs` and no notes, which keeps it at about **981 kB** for 1,183 mints, small
 enough for a page to fetch despite the four dimension verdicts, which is why it is written compact.
 Values are cut to six significant figures. `rules` carries the rule

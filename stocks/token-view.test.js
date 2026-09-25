@@ -138,4 +138,17 @@ describe('workspaceViewFromUrl', () => {
         // An explicit view wins over both.
         expect(at('?view=issuers&compare=NVDA#tokensSection')).toBe('issuers');
     });
+
+    // A first-time visitor has no briefing to continue, so stocks.js passes "assets" (Find a stock)
+    // as the fallback; only a URL that names nothing falls back.
+    it('falls back to the view it is given when the URL names none', () => {
+        const first = (query) => workspaceViewFromUrl(`https://rwasonar.com/stocks.html${query}`, 'assets');
+        expect(first('')).toBe('assets');
+        expect(first('?view=nonsense')).toBe('assets');
+        expect(first('?issuer=securitize')).toBe('assets');
+        expect(first('?view=overview')).toBe('overview');
+        expect(first('?compare=NVDA')).toBe('compare');
+        expect(first('#issuersSection')).toBe('issuers');
+        expect(workspaceViewFromUrl('https://rwasonar.com/stocks.html', 'nonsense')).toBe('overview');
+    });
 });

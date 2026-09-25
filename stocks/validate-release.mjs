@@ -64,8 +64,9 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
         throw new Error('comparison bundle index is missing schemaVersion 1 groups');
     }
     if (comparisonIndex.builtAt !== tokenBuiltAt) throw new Error('comparison bundle index builtAt disagrees with the full token catalogue');
-    // Do not invent a comparable underlying for an unclassified or private-company token.
-    // Such tokens still require their standalone card; only established groups get bundles.
+    // Do not invent a comparable underlying for an unclassified token. A pre-IPO token is grouped
+    // under the company it references (companyKey, lib/private-companies.mjs), never under a guess;
+    // a token with neither key still requires its standalone card and gets no bundle.
     const underlyingMints = new Map(discoveryHelpers.sameUnderlyingGroups(tokens, { includeSingle: true })
         .map((group) => [group.ticker, group.rows.flatMap((row) => row.tokens)]));
     const ungroupedTokenCount = tokens.length - [...underlyingMints.values()].reduce((sum, rows) => sum + rows.length, 0);
@@ -87,7 +88,7 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
         }
         for (const { model, token } of bundled) {
             const current = expectedByMint.get(token?.mint);
-            if (!current || token.issuer !== current.issuer || token.underlyingTicker !== group.ticker || model?.issuerSlug !== current.issuer) {
+            if (!current || token.issuer !== current.issuer || discoveryHelpers.comparisonKey(token) !== group.ticker || model?.issuerSlug !== current.issuer) {
                 throw new Error(`comparisons/${group.path}: model token disagrees with current ${group.ticker} membership`);
             }
         }

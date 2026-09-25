@@ -9,7 +9,7 @@ import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import {
-    CARD_BYTE_LIMIT, CARD_BYTE_TARGET, MATERIAL_CHANGE_DAYS, assignSlugs, buildCard, indexEntry, publicCard, renderCard
+    CARD_BYTE_LIMIT, CARD_BYTE_TARGET, MATERIAL_CHANGE_DAYS, assignSlugs, buildCard, indexEntry, isRealChange, publicCard, renderCard
 } from './lib/cards.mjs';
 import { composabilityTemplateFor, indexComposabilityTemplates } from './lib/composability.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -40,6 +40,9 @@ const MARKET_RESEARCH_PATH = join(HERE, 'data', 'protocol-market-research.json')
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const REVIEW_QUEUE_PATH = join(REPO_ROOT, 'stocks-review-queue.json');
+// Curated editorial decisions on watcher events: which changes are real (public, in the change
+// journal) and which were false alarms or our own corrections. They decide what a card may show.
+const EVENT_RESOLUTIONS_PATH = join(HERE, 'data', 'event-resolutions.json');
 // The underlying's trading schedule per mint (Pyth feed list), so a card can say whether that
 // market was open at the snapshot instant rather than repeat the feed's read-time flag.
 const REFERENCE_PRICES_PATH = join(HERE, 'data', 'reference-prices.json');
@@ -48,7 +51,7 @@ const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260925pyth';
+const ASSET_VERSION = '20260925health';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -78,6 +81,9 @@ INPUTS
   sonar.change_judgment in DATABASE_URL (.env): the change judge's MATERIAL verdicts on change
                             events detected in the ${MATERIAL_CHANGE_DAYS} days before stocks-tokens.json builtAt.
                             No DATABASE_URL, or no judgment table there: every card omits the line.
+                            Our own upkeep (a lost quote, an unreachable document) is dropped unless
+                            stocks/data/event-resolutions.json or a 'confirmed' review_resolution says
+                            it is a real change.
 
 OUTPUT
   <out-dir>/<slug>.html   the card, everything readable rendered server-side
@@ -163,8 +169,11 @@ async function researchProducts(dir, issuerSlugs, tokens) {
  * event detected in the ${MATERIAL_CHANGE_DAYS} days up to `asOf` whose latest VALID judgment says
  * material, the same "latest valid wins" rule /api/changes applies. `asOf` is stocks-tokens.json's
  * builtAt, not the clock, so two builds from the same inputs render the same line; timestamps are
- * formatted in SQL so the session time zone cannot change a byte. Returns {asOf, items} or null
- * when the verdicts cannot be read (no DATABASE_URL, or no judgment table) — said in the log.
+ * formatted in SQL so the session time zone cannot change a byte. Each row carries the facts a
+ * curated resolution matches on (field, before, after, source URL) and whether a reviewer
+ * `confirmed` it, so cardMaterialChanges can drop our own quote upkeep (cards.mjs isRealChange).
+ * Returns {asOf, items, resolutions} or null when the verdicts cannot be read (no DATABASE_URL, or
+ * no judgment table) — said in the log.
  */
 async function readMaterialChanges(asOf) {
     const env = { ...(await readEnvFile(join(REPO_ROOT, '.env'))), ...process.env };
@@ -189,9 +198,12 @@ async function readMaterialChanges(asOf) {
             SELECT e.id::text AS id,
                    to_char(e.detected_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS "detectedAt",
                    e.kind, e.severity, e.summary, e.subject_type AS "subjectType", e.subject_id AS "subjectId",
+                   e.field, e.before, e.after, e.evidence->>'url' AS "sourceUrl",
                    COALESCE(t.issuer_slug, s.issuer_slug,
                             CASE WHEN e.subject_type = 'issuer' THEN e.subject_id END,
                             e.evidence->>'issuer') AS "issuerSlug",
+                   EXISTS (SELECT 1 FROM sonar.review_resolution rc
+                           WHERE rc.event_id = e.id AND rc.resolution = 'confirmed') AS confirmed,
                    mj.id::text AS "judgmentId", (mj.change_event_id = e.id) AS representative,
                    mj.material, mj.severity AS "assessmentSeverity", mj.summary AS "assessmentSummary"
             FROM sonar.change_event e
@@ -218,7 +230,8 @@ async function readMaterialChanges(asOf) {
                                WHERE rr.event_id = e.id AND rr.resolution = 'false-alarm')
         ) r;`;
     const items = JSON.parse((await psql(env.DATABASE_URL, sql, 'material change verdicts', ['-t', '-A'])).trim() || '[]');
-    return { asOf, items };
+    const resolutions = (await readJson(EVENT_RESOLUTIONS_PATH, { items: [] }))?.items ?? [];
+    return { asOf, items, resolutions: Array.isArray(resolutions) ? resolutions : [] };
 }
 
 /**
@@ -369,8 +382,10 @@ async function main() {
         `${answered} of ${issuers.size} issuer(s) have answered them; ` +
         `${Object.keys(archives).length} source(s) have an archived copy`);
     if (materialChanges !== null) {
+        const upkeep = materialChanges.items.filter((row) => !isRealChange(row, materialChanges.resolutions)).length;
         log(`change judge: ${materialChanges.items.length} change event(s) read as material (model assessment) ` +
-            `in the ${MATERIAL_CHANGE_DAYS} days to ${materialChanges.asOf}`);
+            `in the ${MATERIAL_CHANGE_DAYS} days to ${materialChanges.asOf}; ${upkeep} of them are our own ` +
+            `quote upkeep or curated false alarms and stay off the cards`);
     }
 
     const slugs = assignSlugs(tokenDb.tokens);

@@ -60,7 +60,7 @@ describe('confirmed DeFi usage', () => {
             .toContain('No checked protocol');
         const html = sameStockComparisonHtml(group, models);
         for (const label of ['What do you own?', 'Redeem for cash', 'Smart-contract custody', 'Borrower default',
-            'Exact-token lending listing', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {
+            'Listed as loan collateral', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {
             expect(html).toContain(label);
         }
         expect(html).toContain('exact-token support and legal outcomes shown separately');
@@ -365,5 +365,125 @@ describe('the buyer table at the top of the compare view', () => {
         expect(buyerTableHtml(many(2))).not.toContain('buyer-hint');
         expect(buyerTableHtml(many(3))).toContain('<small class="buyer-hint">Scroll the table sideways to see all 3 wrappers.</small>');
         expect(buyerTableHtml(many(6))).toContain('<small class="buyer-hint buyer-hint-wide">Scroll the table sideways to see all 6 wrappers.</small>');
+    });
+});
+
+describe('the buyer table for pre-IPO tokens (OpenAI: PreStocks OPENAI vs Tessera tOpenAI)', () => {
+    const { buyerRows, buyerTableHtml } = require('./lib/comparison-shape.js');
+    const rights = JSON.parse(readFileSync(join(REPO, 'stocks/data/holder-rights.json'), 'utf8')).issuers;
+    const built = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+    const issuers = new Map(['prestocks', 'tessera', 'backpack-securities'].map((slug) =>
+        [slug, { ...built.find((row) => row.slug === slug), holderRights: rights[slug] }]));
+    const PRE = { instrumentType: 'private-company', underlyingTicker: null, closedMarket: [] };
+    // The catalogue's records on 2026-09-23 (stocks-tokens.json), trimmed to what the table reads.
+    const openai = { ...PRE, mint: 'PreweJ', symbol: 'OPENAI', issuer: 'prestocks', companyKey: 'OPENAI', companyName: 'OpenAI', cardSlug: 'OPENAI',
+        market: { usdPrice: 1149.8108, liquidity: 822306.44, vol24: 1330283.83 },
+        reference: { source: 'issuer-mark', price: 966.2411, premiumPct: 2.4737 },
+        activity: { dexPairs: 1, cexMarkets: 13 },
+        control: { freezeAuthority: 'WV9P', permanentDelegate: 'WV9P', clawback: true, pausable: true,
+            transferFeeBps: 100, transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } },
+        issuerApi: { markPrice: 966.2411, markValuation: 1197105437719 } };
+    const topenai = { ...PRE, mint: 'oPAiAi', symbol: 'tOpenAI', issuer: 'tessera', companyKey: 'OPENAI', companyName: 'OpenAI', cardSlug: 'tOpenAI',
+        market: { usdPrice: 974.0442, liquidity: 390511.4, vol24: 1235978.74 },
+        reference: { source: 'issuer-mark', price: 812.79, premiumPct: 13.3363 },
+        activity: { dexPairs: 1, cexMarkets: 4 },
+        control: { freezeAuthority: '7n2P', permanentDelegate: false, clawback: false, pausable: false, transferFeeBps: 20 },
+        issuerApi: { markPrice: 812.79, markValuation: 950000000000 } };
+    const group = sameUnderlyingGroups([openai, topenai])[0];
+    const models = sameStockComparisonModels(group, issuers, new Map(), null, Date.parse('2026-09-25T00:00:00Z'));
+    const rows = buyerRows(models);
+    const row = (id, list = rows) => list.find((entry) => entry.id === id);
+    const cellsOf = (list, id) => row(id, list).cells;
+    const cells = (id, list = rows) => Object.fromEntries(models.map((model, i) => [model.issuerSlug, row(id, list).cells[i]]));
+
+    test('the pair is one group, one column per issuer, titled by the company', () => {
+        const { comparisonGroupTitle } = require('./lib/comparison-shape.js');
+        expect(group).toMatchObject({ ticker: 'OPENAI', name: 'OpenAI', preIpo: true });
+        expect(comparisonGroupTitle(group)).toBe('OpenAI (pre-IPO)');
+        expect(comparisonGroupTitle({ ticker: 'SPCX', name: 'SpaceX', preIpo: false })).toBe('SPCX');
+        expect(comparisonGroupTitle({ ticker: 'OPENAI', preIpo: true })).toBe('OPENAI (pre-IPO)');
+        expect(models.map((model) => model.issuerSlug)).toEqual(['prestocks', 'tessera']);
+        expect(models.every((model) => model.buyer.preIpo)).toBe(true);
+    });
+
+    test('what you own: no shares at all, in each issuer’s own legal terms', () => {
+        const own = cells('own');
+        expect(own.prestocks).toMatchObject({ text: 'No shares: a token referencing the company’s value', href: './cards/OPENAI.html#own' });
+        expect(own.tessera.text).toBe('Unsecured loan participation, repaid from sale proceeds (Panama)');
+        // Both phrasings are the dossiers' own holder claims, shortened; the dossiers must still say so.
+        expect(issuers.get('prestocks').holderClaim).toMatch(/reference\[s\] economic exposure to designated pre-IPO companies/);
+        expect(issuers.get('prestocks').holderClaim).toMatch(/no ownership/);
+        expect(issuers.get('tessera').holderClaim).toMatch(/loan participation right/);
+        expect(issuers.get('tessera').holderClaim).toMatch(/repayable only out of Liquidity Event Proceeds/);
+    });
+
+    test('price is measured against each issuer’s own mark, with the valuation that mark implies', () => {
+        expect(row('price')).toMatchObject({ label: 'Price vs the issuer’s mark' });
+        expect(row('price').help).toContain('no share price');
+        const price = cells('price');
+        expect(price.prestocks).toMatchObject({ text: '+2.47% vs PreStocks’ own mark', tone: 'caution',
+            note: '$1,149.81 on Jupiter · mark $966.24 · values OpenAI at $1.20T', href: './cards/OPENAI.html#reference' });
+        expect(price.tessera).toMatchObject({ text: '+13.34% vs Tessera’s own mark',
+            note: '$974.04 on Jupiter · mark $812.79 · values OpenAI at $950.00B' });
+        // A valuation from a different mark reading is left out rather than paired with this mark.
+        const moved = [{ ...models[1], tokens: [{ ...topenai, issuerApi: { markPrice: 830, markValuation: 970000000000 } }] }];
+        expect(cellsOf(buyerRows(moved), 'price')[0].note).toBe('$974.04 on Jupiter · mark $812.79');
+        // No mark read: said in words, never a premium against nothing.
+        const bare = [{ ...models[1], tokens: [{ ...topenai, reference: { source: null, price: null, premiumPct: null }, issuerApi: null }] }];
+        expect(cellsOf(buyerRows(bare), 'price')).toEqual([expect.objectContaining({ text: 'Premium to the mark not measured', note: '$974.04 on Jupiter', tone: 'muted' })]);
+    });
+
+    test('redemption: PreStocks only on request at its discretion, Tessera only after a liquidity event', () => {
+        const redeem = cells('redeem');
+        expect(redeem.prestocks).toMatchObject({ text: 'On request, at the issuer’s discretion', note: 'Not an entitlement; exit by selling', tone: 'caution' });
+        expect(redeem.tessera).toMatchObject({ text: 'Only after a liquidity event', note: 'Paid when the issuer sells its whole stake; exit by selling until then', tone: 'caution' });
+    });
+
+    test('transfer fee: PreStocks 1.00% with 3.00% scheduled from epoch 1043, Tessera 0.20%', () => {
+        const fee = cells('fee');
+        expect(fee.prestocks).toMatchObject({ text: '1.00% now; 3.00% scheduled', note: 'The rise starts at Solana fee epoch 1043', tone: 'caution', href: './cards/OPENAI.html#control' });
+        expect(fee.tessera).toMatchObject({ text: '0.20% now', note: null });
+    });
+
+    test('rights, powers, liquidity and lending read the same sources as for any stock', () => {
+        expect(cells('rights').prestocks.text).toBe('No shareholder rights');
+        expect(cells('rights').tessera.text).toBe('No shareholder rights; the issuer passes through takeovers');
+        expect(cells('powers').prestocks.text).toBe('Yes: freeze, pause and take');
+        expect(cells('powers').tessera.text).toBe('Yes: freeze; cannot take');
+        expect(cells('liquidity').tessera.text).toBe('$390.5k liquidity · $1.24M traded 24 h');
+        // No market closes for a private company: the lending row drops "when the market is closed".
+        expect(row('borrow')).toMatchObject({ label: 'Borrow against it' });
+        expect(cells('borrow').tessera.text).toBe('No lender we track takes it');
+    });
+
+    test('every column is marked pre-IPO in the rendered table', () => {
+        const html = buyerTableHtml(models);
+        expect(html.match(/<span class="buyer-kind">Pre-IPO<\/span>/g)).toHaveLength(2);
+        expect(html).toContain('Price vs the issuer’s mark');
+        expect(html).not.toContain('when the market is closed');
+    });
+
+    test('SpaceX: listed wrappers against the share, pre-IPO wrappers against their mark, in one table', () => {
+        const spacex = { ...openai, mint: 'PreANx', symbol: 'SPACEX', companyKey: 'SPCX', companyName: 'SpaceX', cardSlug: 'SPACEX',
+            market: { usdPrice: 119.82, liquidity: 113298.22, vol24: 39234.36 },
+            reference: { source: 'issuer-mark', price: 146.5453, premiumPct: -23.6351 },
+            issuerApi: { markPrice: 146.5453, markValuation: 1921371313796 } };
+        const spcx = { mint: 'SPCXxc', symbol: 'SPCX', issuer: 'backpack-securities', underlyingTicker: 'SPCX', instrumentType: 'stock', cardSlug: 'SPCX',
+            market: { usdPrice: 152.89, liquidity: 969027.65, vol24: 9304656 }, closedMarket: [],
+            reference: { source: 'ondo-implied', price: 146.0088, premiumPct: -1.0929 },
+            control: { freezeAuthority: '2cVY', permanentDelegate: '2cVY', clawback: true, pausable: true, transferFeeBps: null } };
+        const mixedGroup = sameUnderlyingGroups([spcx, spacex])[0];
+        expect(mixedGroup).toMatchObject({ ticker: 'SPCX', name: 'SpaceX', preIpo: false });
+        const mixed = sameStockComparisonModels(mixedGroup, issuers, new Map(), null);
+        const mixedRows = buyerRows(mixed);
+        expect(row('price', mixedRows)).toMatchObject({ label: 'Price vs the stock or the issuer’s mark' });
+        expect(row('price', mixedRows).cells.map((cell) => cell.text)).toEqual(['-1.09% vs SPCX', '-23.64% vs PreStocks’ own mark']);
+        expect(row('price', mixedRows).cells[1].note).toBe('$119.82 on Jupiter · mark $146.55 · values SpaceX at $1.92T');
+        expect(row('borrow', mixedRows).label).toBe('Borrow against it when the market is closed');
+        expect(row('own', mixedRows).cells.map((cell) => cell.text)).toEqual(['Beneficial interest in pooled shares (BVI)', 'No shares: a token referencing the company’s value']);
+        expect(buyerTableHtml(mixed).match(/buyer-kind/g)).toHaveLength(1);
+        // A table with no pre-IPO column keeps its stock wording.
+        const listedOnly = buyerRows([mixed[0]]);
+        expect(row('price', listedOnly).label).toBe('Price vs the stock');
     });
 });

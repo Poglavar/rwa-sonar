@@ -1,7 +1,8 @@
 /**
  * Renders monitor.html: the health monitor, now an explorer over the read-only JSON API. The facet
- * panel lists every API facet with its count, the status tiles and the worst-rule
- * strip are two of those facets rendered larger, and the table is one page of /api/tokens with the
+ * panel lists every API facet with its count, the status tiles (this token's own checks), the
+ * programme block and the failing-check strip are facets rendered larger, and the table is one page
+ * of /api/tokens with the
  * sort and the filters applied in Postgres rather than here. The filter state lives in the page's
  * own query string, so a filtered view is a link.
  *
@@ -48,12 +49,17 @@
     /** How bad a judged status is. Also the set of statuses a row may report. */
     const STATUS_RANK = { good: 1, caution: 2, warning: 3, unknown: 4 };
 
-    /** What each tile says under its number, so a count is never a bare number without a claim. */
+    /**
+     * What each tile says under its number, so a count is never a bare number without a claim. The
+     * tiles count THIS TOKEN's own checks (stocks/lib/health.mjs `levels.token`): the programme's
+     * issuer-wide checks are counted separately, because they give every token of an issuer the
+     * same answer and, folded in, made every token caution or worse.
+     */
     const STATUS_BLURBS = {
-        good: 'every measured check passed',
-        caution: 'at least one check in its middle band',
-        warning: 'at least one check failed outright',
-        unknown: 'nothing could be measured, so this is not a pass'
+        good: 'a market was measured and every check we could run passed',
+        caution: 'its worst check sits in the middle band',
+        warning: 'at least one of its checks failed outright',
+        unknown: 'no market we could measure, so this is not a pass'
     };
 
     /** Where the per-token cards live, relative to this page. */
@@ -69,7 +75,8 @@
      */
     const FACET_NAMES = [
         'issuer', 'instrument', 'recipe', 'program', 'health', 'market_health', 'control_health',
-        'legal_health', 'composability_health', 'worst_rule', 'reference',
+        'legal_health', 'composability_health', 'worst_rule', 'programme_health', 'token_health',
+        'token_worst_rule', 'reference',
         'legal_form', 'claim_rung', 'maturity_stage', 'verification_type', 'key_governance_mint',
         'key_governance_freeze', 'jurisdiction', 'pausable', 'paused', 'clawback', 'allowlist',
         'transfer_fee', 'hook_active', 'seen_in_search', 'first_seen_day'
@@ -82,7 +89,8 @@
         { id: 'recipe', heading: 'Recipe & program', facets: ['recipe', 'program'] },
         {
             id: 'health', heading: 'Health',
-            facets: ['health', 'market_health', 'control_health', 'legal_health', 'composability_health', 'worst_rule']
+            facets: ['token_health', 'token_worst_rule', 'programme_health', 'health', 'market_health', 'control_health',
+                'legal_health', 'composability_health', 'worst_rule']
         },
         {
             id: 'issuer-shape',
@@ -107,12 +115,15 @@
         instrument: 'Instrument type',
         recipe: 'Recipe',
         program: 'Token program',
-        health: 'Status',
+        health: 'Worst of all eleven checks',
+        token_health: 'This token',
+        token_worst_rule: 'Failing token check',
+        programme_health: 'Programme',
         market_health: 'Market health',
         control_health: 'Control health',
         legal_health: 'Legal / evidence health',
         composability_health: 'DeFi composability',
-        worst_rule: 'Worst failing rule',
+        worst_rule: 'Worst check of all eleven',
         reference: 'Reference price source',
         legal_form: 'Legal form',
         claim_rung: 'Claim rung',
@@ -161,7 +172,7 @@
         'symbol', 'liquidity_usd', 'volume24_usd', 'premium_pct', 'holder_count',
         'first_seen_at', 'last_traded_at', 'health_status', 'market_health', 'control_health',
         'legal_health', 'composability_health', 'usd_price', 'trades24', 'traders24',
-        'worst_rule', 'venue_spread_pct', 'top1_share_pct'
+        'worst_rule', 'venue_spread_pct', 'top1_share_pct', 'programme_health', 'token_health'
     ];
 
     const DEFAULT_SORT = 'liquidity_usd';
@@ -246,9 +257,13 @@
     /** What a facet value is CALLED: the API's own short label where it has one, else the value. */
     function facetValueLabel(facet, row) {
         const value = row?.value;
+        // A token with no failing check of its own (good, or no market) has no failing rule: that
+        // is an answer, not a missing record.
+        if ((value === null || value === undefined) && facet === 'token_worst_rule') return 'none fails';
         if (value === null || value === undefined) return MISSING_LABEL;
         if (typeof value === 'boolean') return value ? 'yes' : 'no';
-        if (facet === 'worst_rule') return RULE_LABELS[value] ?? String(value);
+        if (facet === 'worst_rule' || facet === 'token_worst_rule') return RULE_LABELS[value] ?? String(value);
+        if (facet === 'token_health' && value === 'unknown') return 'not measured';
         if (facet === 'issuer') return str(row?.name) ?? humanizeSlug(String(value));
         if (facet === 'first_seen_day') return fmtDate(String(value));
         return str(row?.label) ?? String(value);
@@ -451,22 +466,70 @@
     }
 
     /**
-     * One plain line under the tiles. No token passing every check is the page's headline fact, and
-     * without it "0 good" reads like a broken counter; the checks' job is to tell tokens apart by
-     * WHAT fails. `filtered` narrows the claim to the selection. Null when nothing is counted.
+     * One plain line under the tiles. It says what the tiles count (the token's own checks), that the
+     * programme is judged separately, and — because the old single badge rated no token good — why:
+     * the programme checks are issuer-wide. `levels` holds three tile sets: `token` (the tiles),
+     * `programme` and `overall` (the worst of all eleven). `filtered` narrows the claim to the
+     * selection. Null when nothing is counted.
      */
-    function statusVerdict(tiles, { filtered = false } = {}) {
-        const count = (status) => (Array.isArray(tiles) ? tiles : []).find((tile) => tile.status === status)?.count ?? 0;
-        const total = STATUSES.reduce((sum, status) => sum + count(status), 0);
+    function statusVerdict(levels, { filtered = false } = {}) {
+        const count = (tiles, status) => (Array.isArray(tiles) ? tiles : []).find((tile) => tile.status === status)?.count ?? 0;
+        const sum = (tiles) => STATUSES.reduce((total, status) => total + count(tiles, status), 0);
+        const token = levels?.token;
+        const total = sum(token);
         if (total === 0) return null;
-        const good = count('good');
-        if (good > 0) return `${fmtNumber(good)} of ${fmtNumber(total)} tokens pass every check we could run.`;
-        const who = filtered ? 'No token in this selection passes every check' : 'No tokenized stock passes every check today';
-        const parts = [];
-        if (count('warning') > 0) parts.push(`${fmtNumber(count('warning'))} fail one outright`);
-        if (count('caution') > 0) parts.push(`${fmtNumber(count('caution'))} have their worst check in the middle band`);
-        if (count('unknown') > 0) parts.push(`${fmtNumber(count('unknown'))} could not be measured`);
-        return `${who} (0 of ${fmtNumber(total)}). The checks tell tokens apart by what fails: ${parts.join(', ')}.`;
+        const tokenParts = [];
+        if (count(token, 'caution') > 0) tokenParts.push(`${fmtNumber(count(token, 'caution'))} are at caution`);
+        if (count(token, 'warning') > 0) tokenParts.push(`${fmtNumber(count(token, 'warning'))} fail one outright`);
+        if (count(token, 'unknown') > 0) tokenParts.push(`${fmtNumber(count(token, 'unknown'))} have no market we could measure`);
+        const lead = `${filtered ? 'In this selection, ' : ''}${fmtNumber(count(token, 'good'))} of ${fmtNumber(total)} tokens pass every check we could run on the token itself`;
+        const tokenLine = tokenParts.length === 0 ? `${lead}.` : `${lead}; ${tokenParts.join(', ').replace(/, ([^,]*)$/, ' and $1')}.`;
+
+        const programme = levels?.programme;
+        if (sum(programme) === 0) return tokenLine;
+        const programmeParts = ['caution', 'warning', 'unknown']
+            .filter((status) => count(programme, status) > 0)
+            .map((status) => `${fmtNumber(count(programme, status))}${status === 'caution' ? ' tokens' : ''} ${status === 'unknown' ? 'unrated' : status}`);
+        const programmeGood = count(programme, 'good');
+        const programmeLine = programmeGood === 0
+            ? `Legal evidence, key control and DeFi enforceability are issuer-wide, so they are rated per programme: no programme is rated good (${programmeParts.join(', ')})`
+            : `Legal evidence, key control and DeFi enforceability are issuer-wide, so they are rated per programme: ${fmtNumber(programmeGood)} tokens belong to a programme rated good`
+                + (programmeParts.length ? ` (${programmeParts.join(', ')})` : '');
+        const overallTotal = sum(levels?.overall);
+        const overallLine = programmeGood === 0 && overallTotal > 0
+            ? ` — which is why the worst of all eleven checks is good for ${fmtNumber(count(levels.overall, 'good'))} of ${fmtNumber(overallTotal)}.`
+            : '.';
+        return `${tokenLine} ${programmeLine}${overallLine}`;
+    }
+
+    /**
+     * The programme's verdict and the worst of all eleven checks, as two clickable distributions
+     * beside the token tiles. The programme is shared by every token of an issuer; the worst of all
+     * eleven is the old single badge, kept visible so nothing that used to be shown is hidden.
+     */
+    function levelSummariesFromFacets(facets, filters) {
+        return [
+            { id: 'programme', label: 'Programme', facet: 'programme_health' },
+            { id: 'overall', label: 'Worst of all eleven checks', facet: 'health' }
+        ].map((block) => ({
+            ...block,
+            statuses: statusTilesFromFacet(facets?.[block.facet], filters?.[block.facet])
+        }));
+    }
+
+    /**
+     * The line under a token's This-token chip: how many of the checks that could be judged pass.
+     * An unknown is never counted either way. A token whose status is unknown but that WAS judged
+     * on something has no market: its other checks passed, and it is still not called good.
+     */
+    function tokenCheckLine(row) {
+        const passed = row?.tokenPassed;
+        const judged = row?.tokenJudged;
+        if (!isNum(passed) || !isNum(judged)) return null;
+        if (judged === 0) return 'nothing measured';
+        const counted = `${fmtNumber(passed)} of ${fmtNumber(judged)}`;
+        if (row.tokenStatus === 'unknown') return `no market · ${counted} other check${judged === 1 ? ' passes' : 's pass'}`;
+        return `${counted} check${judged === 1 ? ' passes' : 's pass'}`;
     }
 
     /** The same four-way distribution, kept separate for each health dimension. */
@@ -483,9 +546,9 @@
     }
 
     /**
-     * The "by worst rule" strip, from the `worst_rule` facet: biggest first, a rule that is nobody's
-     * worst left out. `share` is of the tokens that HAVE a worst rule, so the bars add to 100 % and
-     * the null bucket is not counted as a clean bill of health.
+     * The failing-check strip, from the `token_worst_rule` facet: biggest first, a rule that fails
+     * nobody left out. `share` is of the tokens that HAVE a failing check, so the bars add to 100 %
+     * and the null bucket (good, or no market) is not counted as anything.
      */
     function ruleStripFromFacet(rows, activeValues) {
         const list = (Array.isArray(rows) ? rows : [])
@@ -506,16 +569,18 @@
     }
 
     /**
-     * What the bars count, with the total they add up to. Every token not rated good has a worst
-     * check, and that check may have failed outright (warning) or only sit in its middle band
-     * (caution), so the bars are NOT "tokens with a failing rule" — the old caption said so and its
-     * bars summed to the whole universe. Null for an empty strip.
+     * What the bars count, with the total they add up to: every token whose OWN checks put it at
+     * caution or warning, under the first check that did. The programme checks are not here — they
+     * give every token of an issuer the same answer, and as the overall worst check they drowned
+     * every token-level difference (legal evidence was the "worst" check of 971 of 1,412 tokens).
+     * Null for an empty strip.
      */
     function ruleStripCaption(strip) {
         const total = (Array.isArray(strip) ? strip : []).reduce((sum, rule) => sum + (isNum(rule.count) ? rule.count : 0), 0);
         if (total === 0) return null;
-        return `Each bar counts the tokens whose worst-scoring check is that one: ${fmtNumber(total)} tokens, every token here that is not rated good. `
-            + 'That worst check failed outright (warning) for some and sits in its middle band (caution) for the rest; pick Warning above to see only outright failures. The bars filter the table too.';
+        return `Each bar counts the tokens whose own checks fail, under the first check that does: ${fmtNumber(total)} tokens. `
+            + 'That check failed outright (warning) for some and sits in its middle band (caution) for the rest. '
+            + 'Programme checks are not counted here: they are the same for every token of an issuer. The bars filter the table too.';
     }
 
     // ------------------------------------------------------------ table paging
@@ -610,7 +675,8 @@
             const mint = str(item?.mint);
             const symbol = str(item?.symbol);
             const issuer = str(item?.issuer_slug);
-            const worstRuleId = str(item?.worst_rule);
+            const tokenWorstRuleId = str(item?.token_worst_rule);
+            const programmeWorstRuleId = str(item?.programme_worst_rule);
             const closed = index === null || mint === null ? null : (index.get(mint) ?? { lenders: [] });
             const lastTrade = newestTrade(str(item?.last_traded_at), mint === null ? null : (tape.get(mint) ?? null));
             return {
@@ -619,13 +685,16 @@
                 name: str(item?.name),
                 issuer,
                 issuerName: str(item?.issuer_name) ?? (issuer === null ? null : humanizeSlug(issuer)),
-                status: STATUS_RANK[item?.health_status] ? item.health_status : 'unknown',
+                tokenStatus: STATUS_RANK[item?.token_health] ? item.token_health : 'unknown',
+                tokenWorstRuleLabel: tokenWorstRuleId === null ? null : (RULE_LABELS[tokenWorstRuleId] ?? tokenWorstRuleId),
+                tokenPassed: num(item?.token_checks_passed),
+                tokenJudged: num(item?.token_checks_judged),
+                programmeStatus: STATUS_RANK[item?.programme_health] ? item.programme_health : 'unknown',
+                programmeWorstRuleLabel: programmeWorstRuleId === null ? null : (RULE_LABELS[programmeWorstRuleId] ?? programmeWorstRuleId),
                 marketStatus: STATUS_RANK[item?.market_health] ? item.market_health : 'unknown',
                 controlStatus: STATUS_RANK[item?.control_health] ? item.control_health : 'unknown',
                 legalStatus: STATUS_RANK[item?.legal_health] ? item.legal_health : 'unknown',
                 composabilityStatus: STATUS_RANK[item?.composability_health] ? item.composability_health : 'unknown',
-                worstRuleId,
-                worstRuleLabel: worstRuleId === null ? null : (RULE_LABELS[worstRuleId] ?? worstRuleId),
                 liquidity: num(item?.liquidity_usd),
                 vol24: num(item?.volume24_usd),
                 premiumPct: num(item?.premium_pct),
@@ -956,6 +1025,8 @@
         filterChips,
         statusTilesFromFacet,
         statusVerdict,
+        levelSummariesFromFacets,
+        tokenCheckLine,
         dimensionSummariesFromFacets,
         ruleStripFromFacet,
         ruleStripCaption,
@@ -1031,10 +1102,29 @@
         console.error(`[${new Date().toISOString()}] monitor: ${message}`, detail ?? '');
     }
 
-    /** A status chip: the word carries the verdict, the colour only reinforces it. */
-    function statusChip(status) {
+    /**
+     * A status chip: the word carries the verdict, the colour only reinforces it. `unknownWord` lets
+     * a column say what its unknown means ("not measured") instead of the bare status name.
+     */
+    function statusChip(status, { unknownWord = 'unknown', title = null } = {}) {
         const safe = STATUS_RANK[status] ? status : 'unknown';
-        return `<span class="mon-chip mon-chip-${safe}">${escapeHtml(safe)}</span>`;
+        const word = safe === 'unknown' ? unknownWord : safe;
+        return `<span class="mon-chip mon-chip-${safe}"${title ? ` title="${escapeHtml(title)}"` : ''}>${escapeHtml(word)}</span>`;
+    }
+
+    /** This token's chip, with the checks it passes underneath and its failing check on hover. */
+    function tokenHealthCell(row) {
+        const line = tokenCheckLine(row);
+        const title = row.tokenWorstRuleLabel === null ? null : `First failing check: ${row.tokenWorstRuleLabel}`;
+        return statusChip(row.tokenStatus, { unknownWord: 'not measured', title })
+            + (line === null ? '' : `<span class="mon-sub">${escapeHtml(line)}</span>`)
+            + (row.tokenWorstRuleLabel === null ? '' : `<span class="mon-sub">${escapeHtml(row.tokenWorstRuleLabel)}</span>`);
+    }
+
+    /** The programme's chip, with the check that holds it back — the same for every token of the issuer. */
+    function programmeHealthCell(row) {
+        return statusChip(row.programmeStatus, { unknownWord: 'not rated' })
+            + (row.programmeWorstRuleLabel === null ? '' : `<span class="mon-sub">${escapeHtml(row.programmeWorstRuleLabel)}</span>`);
     }
 
     function tokenTableRow(row) {
@@ -1050,7 +1140,8 @@
         return `<tr>
             <td class="cell-token">${link}<span class="mon-name">${escapeHtml(row.name ?? '')}</span></td>
             <td>${escapeHtml(row.issuerName ?? row.issuer ?? DASH)}</td>
-            <td>${statusChip(row.status)}</td>
+            <td class="mon-level">${tokenHealthCell(row)}</td>
+            <td class="mon-level">${programmeHealthCell(row)}</td>
             <td>${statusChip(row.marketStatus)}</td>
             <td>${statusChip(row.controlStatus)}</td>
             <td>${statusChip(row.legalStatus)}</td>
@@ -1074,20 +1165,38 @@
     }
 
     function renderTiles() {
-        const tiles = statusTilesFromFacet(state.facets?.health, state.filters.health);
+        const tiles = statusTilesFromFacet(state.facets?.token_health, state.filters.token_health);
         els.tiles.innerHTML = tiles.map((tile) => `<button type="button"
             class="mon-tile mon-tile-${tile.status}${tile.active ? ' mon-tile-active' : ''}"
-            data-facet="health" data-value="${tile.status}" aria-pressed="${tile.active ? 'true' : 'false'}">
+            data-facet="token_health" data-value="${tile.status}" aria-pressed="${tile.active ? 'true' : 'false'}">
             <span class="mon-tile-count">${escapeHtml(fmtNumber(tile.count))}</span>
-            <span class="mon-tile-label">${escapeHtml(tile.label)}</span>
+            <span class="mon-tile-label">${escapeHtml(tile.status === 'unknown' ? 'Not measured' : tile.label)}</span>
             <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
         </button>`).join('');
         if (els.statusVerdict) {
-            const filtered = state.q !== '' || Object.keys(state.filters).some((name) => name !== 'health');
-            const line = state.facets === null ? null : statusVerdict(tiles, { filtered });
+            const filtered = state.q !== '' || Object.keys(state.filters).some((name) => name !== 'token_health');
+            const line = state.facets === null ? null : statusVerdict({
+                token: tiles,
+                programme: statusTilesFromFacet(state.facets?.programme_health, []),
+                overall: statusTilesFromFacet(state.facets?.health, [])
+            }, { filtered });
             els.statusVerdict.textContent = line ?? '';
             els.statusVerdict.hidden = line === null;
         }
+    }
+
+    /** The programme block and the old worst-of-eleven badge, both clickable like the dimensions. */
+    function renderLevels() {
+        const blocks = levelSummariesFromFacets(state.facets, state.filters);
+        els.levels.innerHTML = blocks.map((block) => `<section class="mon-dimension">
+            <h3>${escapeHtml(block.label)}</h3>
+            <div class="mon-dimension-statuses">${block.statuses.map((item) => `<button type="button"
+                class="mon-dimension-status mon-dimension-status-${item.status}${item.active ? ' mon-dimension-status-active' : ''}"
+                data-facet="${escapeHtml(block.facet)}" data-value="${item.status}"
+                aria-pressed="${item.active ? 'true' : 'false'}">
+                <span>${escapeHtml(item.label)}</span><strong>${escapeHtml(fmtNumber(item.count))}</strong>
+            </button>`).join('')}</div>
+        </section>`).join('');
     }
 
     function renderDimensions() {
@@ -1104,15 +1213,15 @@
     }
 
     function renderRuleStrip() {
-        const strip = ruleStripFromFacet(state.facets?.worst_rule, state.filters.worst_rule);
-        if (els.ruleCaption) els.ruleCaption.textContent = ruleStripCaption(strip) ?? 'Each bar counts the tokens whose worst-scoring check is that one.';
+        const strip = ruleStripFromFacet(state.facets?.token_worst_rule, state.filters.token_worst_rule);
+        if (els.ruleCaption) els.ruleCaption.textContent = ruleStripCaption(strip) ?? 'Each bar counts the tokens whose own checks fail, under the first check that does.';
         if (strip.length === 0) {
-            els.ruleStrip.innerHTML = '<p class="mon-empty">No token in this selection has a worst failing rule.</p>';
+            els.ruleStrip.innerHTML = '<p class="mon-empty">No token in this selection fails one of its own checks.</p>';
             return;
         }
         els.ruleStrip.innerHTML = strip.map((rule) => `<button type="button"
             class="mon-rule${rule.active ? ' mon-rule-active' : ''}"
-            data-facet="worst_rule" data-value="${escapeHtml(rule.id)}" aria-pressed="${rule.active ? 'true' : 'false'}">
+            data-facet="token_worst_rule" data-value="${escapeHtml(rule.id)}" aria-pressed="${rule.active ? 'true' : 'false'}">
             <span class="mon-rule-label">${escapeHtml(rule.label)}</span>
             <span class="mon-rule-count">${escapeHtml(fmtNumber(rule.count))}</span>
             <span class="mon-rule-bar"><span class="mon-rule-fill" style="width:${isNum(rule.share) ? rule.share.toFixed(1) : 0}%"></span></span>
@@ -1169,7 +1278,7 @@
     function renderTable() {
         const math = pageMath({ total: state.total, page: state.page });
         els.tokenBody.innerHTML = state.rows.length === 0
-            ? `<tr><td colspan="13" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows. See the message above.')}</td></tr>`
+            ? `<tr><td colspan="14" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows. See the message above.')}</td></tr>`
             : state.rows.map(tokenTableRow).join('');
         els.tokenCount.textContent = state.error === null
             ? `${fmtNumber(state.total)} mint${state.total === 1 ? '' : 's'} match`
@@ -1391,6 +1500,7 @@
     /** Everything the API drives. The file-fed sections render once, when their files land. */
     function renderExplorer() {
         renderTiles();
+        renderLevels();
         renderDimensions();
         renderRuleStrip();
         renderFacetPanel();
@@ -1558,7 +1668,7 @@
     function wireEvents() {
         // One handler for every facet-shaped control: the tiles, the rule strip and the panel rows
         // all carry data-facet + data-value, so they cannot drift apart from each other.
-        for (const el of [els.tiles, els.dimensions, els.ruleStrip, els.facetPanel]) {
+        for (const el of [els.tiles, els.levels, els.dimensions, els.ruleStrip, els.facetPanel]) {
             el.addEventListener('click', (event) => {
                 const button = event.target.closest('[data-facet][data-value]');
                 if (!button || button.disabled) return;
@@ -1630,6 +1740,7 @@
         els.newMintsSummary = document.getElementById('newMintsSummary');
         els.newMintsSummaryLink = document.getElementById('newMintsSummaryLink');
         els.tiles = document.getElementById('statusTiles');
+        els.levels = document.getElementById('healthLevels');
         els.dimensions = document.getElementById('healthDimensions');
         els.ruleStrip = document.getElementById('ruleStrip');
         els.statusVerdict = document.getElementById('statusVerdict');

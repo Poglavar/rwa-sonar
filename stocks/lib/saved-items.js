@@ -40,7 +40,7 @@
             if (!before) { changes.push(`${slug}: product added to this comparison`); continue; }
             if (!after) { changes.push(`${slug}: product no longer appears in this comparison`); continue; }
             if (before.confirmedCollateral !== after.confirmedCollateral) {
-                changes.push(`${slug}: source-listed collateral support ${after.confirmedCollateral ? 'appeared' : 'disappeared'}`);
+                changes.push(`${slug}: listing as collateral by a protocol ${after.confirmedCollateral ? 'appeared' : 'disappeared'}`);
             }
             if (before.autonomousLiquidation !== after.autonomousLiquidation || before.exitRating !== after.exitRating) {
                 changes.push(`${slug}: exit-after-default assessment changed from ${before.exitRating} to ${after.exitRating}`);
@@ -52,7 +52,7 @@
                 changes.push(`${slug}: legal-evidence review status changed`);
             }
             if (JSON.stringify(before.protocols) !== JSON.stringify(after.protocols)) {
-                changes.push(`${slug}: source-listed protocol set changed`);
+                changes.push(`${slug}: the protocols that list it changed`);
             }
             if (isNum(before.liquidityUsd) && isNum(after.liquidityUsd) && before.liquidityUsd > 0
                 && after.liquidityUsd < before.liquidityUsd * 0.6) {
@@ -84,6 +84,18 @@
         return next;
     }
 
+    /**
+     * Whether the reader saved anything in this browser: a stock or issuer, a comparison snapshot, or
+     * a cross-device watch. It decides where stocks.html opens (returning reader: "My briefing";
+     * first-time visitor: "Find a stock"). The "since your last visit" marker does not count: the
+     * briefing writes it on every visit, so it says the page was seen, not that anything was saved.
+     */
+    function hasSavedState({ savedItems = null, comparisons = null, serverWatches = null } = {}) {
+        const items = normalizeSavedItems(savedItems);
+        const entries = (value) => value && typeof value === 'object' && !Array.isArray(value) ? Object.keys(value).length : 0;
+        return items.tickers.length + items.issuers.length + entries(comparisons) + entries(serverWatches) > 0;
+    }
+
     function personalJournalSummary(items, previous) {
         const rows = Array.isArray(items) ? items : [];
         const identity = (row) => typeof row?.id === 'string' && row.id
@@ -110,6 +122,7 @@
         SAVED_ITEM_LIMIT,
         normalizeSavedItems,
         toggleSavedItem,
+        hasSavedState,
         personalJournalSummary
     };
 });

@@ -65,7 +65,7 @@ describe('the API names this page holds a copy of', () => {
         // The API rejects an unknown filter rather than ignoring it, so a name this page makes up
         // breaks every request; a name it FORGETS is a facet no reader can ever see.
         expect(M.FACET_NAMES).toEqual(keysOf('FILTERS'));
-        expect(M.FACET_NAMES).toHaveLength(26);
+        expect(M.FACET_NAMES).toHaveLength(29);
     });
 
     test('TOKEN_SORTS is exactly the API\'s sort whitelist', () => {
@@ -280,7 +280,7 @@ describe('filterChips', () => {
         const state = { filters: { clawback: ['true'], health: ['warning'] }, q: 'nvda' };
         expect(M.filterChips(state, facets)).toEqual([
             { facet: 'q', value: 'nvda', title: 'Search', label: 'nvda' },
-            { facet: 'health', value: 'warning', title: 'Status', label: 'warning' },
+            { facet: 'health', value: 'warning', title: 'Worst of all eleven checks', label: 'warning' },
             { facet: 'clawback', value: 'true', title: 'Clawback', label: 'yes' }
         ]);
     });
@@ -291,7 +291,7 @@ describe('filterChips', () => {
 
     test('a value the facets do not carry still gets a chip, so it can be removed', () => {
         const chips = M.filterChips({ filters: { health: ['gone'] } }, facets);
-        expect(chips).toEqual([{ facet: 'health', value: 'gone', title: 'Status', label: 'gone' }]);
+        expect(chips).toEqual([{ facet: 'health', value: 'gone', title: 'Worst of all eleven checks', label: 'gone' }]);
     });
 
     test('no filters is no chips', () => {
@@ -433,7 +433,9 @@ describe('tokenRowsFromApi and closedMarketIndex', () => {
                 recipe_label: 'token-2022 · pausable + clawback', health_status: 'caution',
                 market_health: 'warning', control_health: 'good', legal_health: 'caution',
                 composability_health: 'caution',
-                worst_rule: 'keyControl', liquidity_usd: 5871523.44, volume24_usd: 22884814.38,
+                worst_rule: 'keyControl', programme_health: 'caution', programme_worst_rule: 'verification',
+                token_health: 'caution', token_worst_rule: 'failedTx', token_checks_passed: 6, token_checks_judged: 7,
+                liquidity_usd: 5871523.44, volume24_usd: 22884814.38,
                 premium_pct: -0.1795, venue_spread_pct: 1.3734, top1_share_pct: 29.257,
                 holder_count: 68863, trades24: 117526, last_traded_at: '2026-09-16T20:24:51.000Z',
                 first_seen_at: '2026-09-16T20:27:15.000Z', paused: false
@@ -460,12 +462,16 @@ describe('tokenRowsFromApi and closedMarketIndex', () => {
         expect(rows.map((row) => row.symbol)).toEqual(['SPYx', 'GHOST']);
         expect(rows[0]).toMatchObject({
             issuerName: 'Kraken xStocks',
-            status: 'caution',
+            tokenStatus: 'caution',
+            tokenWorstRuleLabel: 'Failed swaps',
+            tokenPassed: 6,
+            tokenJudged: 7,
+            programmeStatus: 'caution',
+            programmeWorstRuleLabel: 'Legal evidence review',
             marketStatus: 'warning',
             controlStatus: 'good',
             legalStatus: 'caution',
             composabilityStatus: 'caution',
-            worstRuleLabel: 'Authority keys',
             liquidity: 5871523.44,
             premiumPct: -0.1795,
             venueSpreadPct: 1.3734,
@@ -493,14 +499,18 @@ describe('tokenRowsFromApi and closedMarketIndex', () => {
         expect(row.liquidity).toBeNull();
         expect(row.premiumPct).toBeNull();
         expect(row.top1SharePct).toBeNull();
-        expect(row.worstRuleLabel).toBeNull();
+        expect(row.tokenWorstRuleLabel).toBeNull();
+        expect(row.programmeWorstRuleLabel).toBeNull();
+        expect(row.tokenPassed).toBeNull();
+        expect(row.tokenJudged).toBeNull();
         expect(row.lastTradedAt).toBeNull();
     });
 
     test('a status the API does not report is `unknown`, never silently treated as good', () => {
-        expect(M.tokenRowsFromApi(items(), gaps)[1].status).toBe('unknown');
+        expect(M.tokenRowsFromApi(items(), gaps)[1].tokenStatus).toBe('unknown');
+        expect(M.tokenRowsFromApi(items(), gaps)[1].programmeStatus).toBe('unknown');
         expect(M.tokenRowsFromApi(items(), gaps)[1].marketStatus).toBe('unknown');
-        expect(M.tokenRowsFromApi([{ mint: 'M', health_status: 'splendid' }], gaps)[0].status).toBe('unknown');
+        expect(M.tokenRowsFromApi([{ mint: 'M', token_health: 'splendid' }], gaps)[0].tokenStatus).toBe('unknown');
     });
 
     test('an issuer the API has no name for is humanized rather than left blank', () => {
@@ -508,7 +518,7 @@ describe('tokenRowsFromApi and closedMarketIndex', () => {
     });
 
     test('a rule id the labels do not know is shown as the id, not as a dash', () => {
-        expect(M.tokenRowsFromApi([{ mint: 'M', worst_rule: 'newRule' }], gaps)[0].worstRuleLabel).toBe('newRule');
+        expect(M.tokenRowsFromApi([{ mint: 'M', token_worst_rule: 'newRule' }], gaps)[0].tokenWorstRuleLabel).toBe('newRule');
     });
 
     test('no items, and no closed-market file, yields no rows and throws nothing', () => {
@@ -1021,37 +1031,80 @@ describe('the verdict line under the status tiles', () => {
         { value: 'warning', count: warning }, { value: 'unknown', count: unknown }
     ], []);
 
-    test('with no good token it says so in plain words, and that the checks sort tokens by what fails', () => {
-        const line = M.statusVerdict(tiles(0, 1006, 398));
-        expect(line).toContain('No tokenized stock passes every check today');
-        expect(line).toContain('0 of 1,404');
-        expect(line).toMatch(/tell tokens apart by what fails/);
-        expect(line).toContain('398 fail one outright');
-        expect(line).toContain('1,006 have their worst check in the middle band');
+    test('it counts tokens by their own checks and says the programme verdict is separate', () => {
+        const line = M.statusVerdict({ token: tiles(29, 112, 336, 935), programme: tiles(0, 1326, 86), overall: tiles(0, 1025, 387) });
+        expect(line).toContain('29 of 1,412 tokens pass every check we could run on the token itself');
+        expect(line).toContain('112 are at caution');
+        expect(line).toContain('336 fail one outright');
+        expect(line).toContain('935 have no market we could measure');
+        expect(line).toContain('no programme is rated good (1,326 tokens caution, 86 warning)');
+        expect(line).toContain('why the worst of all eleven checks is good for 0 of 1,412');
     });
 
     test('a filtered view speaks about the selection, not the whole universe', () => {
-        expect(M.statusVerdict(tiles(0, 10, 2), { filtered: true })).toContain('No token in this selection passes every check');
+        expect(M.statusVerdict({ token: tiles(1, 10, 2), programme: tiles(0, 13, 0), overall: tiles(0, 13, 0) }, { filtered: true }))
+            .toMatch(/^In this selection, 1 of 13 tokens pass/);
     });
 
-    test('when some pass, it counts them instead; nothing counted is no line at all', () => {
-        expect(M.statusVerdict(tiles(12, 1000, 404))).toBe('12 of 1,416 tokens pass every check we could run.');
-        expect(M.statusVerdict(tiles(0, 0, 0))).toBeNull();
+    test('a programme rated good is counted, not denied', () => {
+        const line = M.statusVerdict({ token: tiles(2, 0, 0), programme: tiles(2, 0, 0), overall: tiles(2, 0, 0) });
+        expect(line).toContain('2 tokens belong to a programme rated good');
+        expect(line).not.toContain('no programme is rated good');
+    });
+
+    test('nothing counted is no line at all', () => {
+        expect(M.statusVerdict({ token: tiles(0, 0, 0), programme: tiles(0, 0, 0), overall: tiles(0, 0, 0) })).toBeNull();
+        expect(M.statusVerdict(null)).toBeNull();
     });
 });
 
-describe('the caption over the worst-check bars agrees with the bars', () => {
+describe('the programme block beside the token tiles', () => {
+    test('the programme and the old worst-of-eleven status are two separate, clickable distributions', () => {
+        const blocks = M.levelSummariesFromFacets({
+            programme_health: [{ value: 'caution', count: 1326 }, { value: 'warning', count: 86 }],
+            health: [{ value: 'caution', count: 1025 }, { value: 'warning', count: 387 }]
+        }, { programme_health: ['warning'] });
+        expect(blocks.map((block) => [block.facet, block.label])).toEqual([
+            ['programme_health', 'Programme'], ['health', 'Worst of all eleven checks']
+        ]);
+        expect(blocks[0].statuses.find((item) => item.status === 'warning')).toMatchObject({ count: 86, active: true });
+        expect(blocks[1].statuses.find((item) => item.status === 'good').count).toBe(0);
+    });
+});
+
+describe('the level facets in the panel read as words', () => {
+    test('a failing token check is named like the rule, and its empty bucket says nothing fails', () => {
+        expect(M.facetValueLabel('token_worst_rule', { value: 'failedTx' })).toBe('Failed swaps');
+        expect(M.facetValueLabel('token_worst_rule', { value: null })).toBe('none fails');
+        expect(M.facetValueLabel('token_health', { value: 'unknown' })).toBe('not measured');
+        expect(M.facetValueLabel('token_health', { value: 'warning' })).toBe('warning');
+        // Other facets keep the generic missing-value wording.
+        expect(M.facetValueLabel('reference', { value: null })).toBe(M.MISSING_LABEL);
+    });
+});
+
+describe('the pass count in the This token column', () => {
+    test('judged checks only, and a token with no market says so instead of reading as good', () => {
+        expect(M.tokenCheckLine({ tokenStatus: 'caution', tokenPassed: 6, tokenJudged: 7 })).toBe('6 of 7 checks pass');
+        expect(M.tokenCheckLine({ tokenStatus: 'good', tokenPassed: 1, tokenJudged: 1 })).toBe('1 of 1 check passes');
+        expect(M.tokenCheckLine({ tokenStatus: 'unknown', tokenPassed: 3, tokenJudged: 3 })).toBe('no market · 3 of 3 other checks pass');
+        expect(M.tokenCheckLine({ tokenStatus: 'unknown', tokenPassed: 0, tokenJudged: 0 })).toBe('nothing measured');
+        expect(M.tokenCheckLine({ tokenStatus: 'unknown', tokenPassed: null, tokenJudged: null })).toBeNull();
+    });
+});
+
+describe('the caption over the failing-check bars agrees with the bars', () => {
     const strip = M.ruleStripFromFacet([
-        { value: 'verification', count: 980 }, { value: 'tracking', count: 170 }, { value: 'concentration', count: 135 },
-        { value: 'liquidity', count: 93 }, { value: 'organic', count: 18 }, { value: 'defiComposability', count: 6 }, { value: 'failedTx', count: 2 }
+        { value: 'concentration', count: 161 }, { value: 'tracking', count: 154 }, { value: 'liquidity', count: 120 },
+        { value: 'organic', count: 6 }, { value: 'failedTx', count: 5 }, { value: 'spread', count: 2 }
     ], []);
 
-    test('it names the total the bars add up to, and does not claim they are only outright failures', () => {
+    test('it names the total the bars add up to, both kinds of failure, and why programme checks are absent', () => {
         const caption = M.ruleStripCaption(strip);
-        expect(caption).toContain('1,404 tokens');
-        expect(caption).not.toMatch(/failing rule/);
+        expect(caption).toContain('448 tokens');
         expect(caption).toMatch(/failed outright \(warning\)/);
         expect(caption).toMatch(/middle band \(caution\)/);
+        expect(caption).toMatch(/programme checks are not counted here/i);
     });
 
     test('an empty strip has no caption', () => {
@@ -1099,6 +1152,16 @@ describe('monitor layout and wording', () => {
     test('the page sections keep the shared side gutter (no margin shorthand that zeroes margin-inline)', () => {
         const rule = /#countsSection,[\s\S]*?#meteoraSection\s*\{([^}]*)\}/.exec(css)[1];
         expect(rule).not.toMatch(/(^|[\s;])margin\s*:/);
+    });
+
+    test('the table leads with this token and its programme, both sortable; the old single badge is not a column', () => {
+        const headers = [...html.matchAll(/<th\b[^>]*>([^<]*)<\/th>/g)].map((match) => match[0]);
+        expect(headers[2]).toMatch(/data-sort="token_health"/);
+        expect(headers[2]).toContain('This token');
+        expect(headers[3]).toMatch(/data-sort="programme_health"/);
+        expect(headers[3]).toContain('Programme');
+        expect(html).not.toContain('data-sort="health_status"');
+        expect(html).toContain('id="healthLevels"');
     });
 
     test('no internal names reach the reader in the visible copy', () => {

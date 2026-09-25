@@ -41,4 +41,31 @@ describe('layperson discovery helpers', () => {
         expect(html).toContain('data-save-ticker="AAPL"');
         expect(underlyingDirectoryHtml(groups, new Map(), 48, new Set(['AAPL']))).toContain('Saved stock');
     });
+
+    it('offers the OpenAI comparison when a reader searches for the company', () => {
+        const PRE = { instrumentType: 'private-company', underlyingTicker: null };
+        const tokens = [
+            { ...PRE, symbol: 'OPENAI', name: 'OpenAI PreStocks', issuer: 'prestocks', companyKey: 'OPENAI', companyName: 'OpenAI', mint: 'Prewe' },
+            { ...PRE, symbol: 'tOpenAI', name: 'T-OpenAI', issuer: 'tessera', companyKey: 'OPENAI', companyName: 'OpenAI', mint: 'oPAiA' }
+        ];
+        const issuers = [{ slug: 'prestocks', name: 'PreStocks' }, { slug: 'tessera', name: 'Tessera' }];
+        const results = groupedSearchResults(tokens, issuers, [], 'OpenAI');
+        expect(results.stocks).toHaveLength(1);
+        expect(results.stocks[0].record).toMatchObject({ ticker: 'OPENAI', name: 'OpenAI', preIpo: true, issuerCount: 2 });
+        expect(results.stocks[0].reason).toBe('Pre-IPO company name');
+        expect(results.tokens.map((row) => row.record.symbol)).toEqual(['OPENAI', 'tOpenAI']);
+        // A company matched only through one pre-IPO wrapper is still flagged by its whole group:
+        // SpaceX has listed, so a search that happens to hit tSpaceX alone must not call it pre-IPO.
+        const spacex = [
+            { ...PRE, symbol: 'tSpaceX', name: 'T-SpaceX', issuer: 'tessera', companyKey: 'SPCX', companyName: 'SpaceX', mint: 'TSPX' },
+            { symbol: 'SPCXx', name: 'SpaceX xStock', issuer: 'xstocks-backed', underlyingTicker: 'SPCX', mint: 'Xs3o' }
+        ];
+        const viaWrapper = groupedSearchResults(spacex, issuers, [], 'tSpaceX').stocks[0].record;
+        expect(viaWrapper).toMatchObject({ ticker: 'SPCX', name: 'SpaceX', preIpo: false });
+        // The stock directory shows it under its name, marked pre-IPO, linking to the comparison.
+        const html = underlyingDirectoryHtml(underlyingGroups(tokens), new Map(issuers.map((row) => [row.slug, row])));
+        expect(html).toContain('<span class="underlying-card-kicker">Pre-IPO · OPENAI</span>');
+        expect(html).toContain('<strong>OpenAI</strong>');
+        expect(html).toContain('view=compare&amp;compare=OPENAI');
+    });
 });

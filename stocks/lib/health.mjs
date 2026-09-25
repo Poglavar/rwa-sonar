@@ -1,10 +1,12 @@
 // PURE health-status rules for the tokenized-stocks section (no fs, no network, no clock, no DOM):
 // the single source of truth for the eleven per-token checks — price tracking, pool liquidity, organic
 // flow, failed swaps, holder concentration, legal-evidence review, authority-key governance, trading
-// pause, frozen accounts and cross-venue spread — plus the worst-of roll-up that the stock cards and
-// the health monitor both display. A check whose inputs are missing is reported as `unknown` and is
-// NEVER counted as bad, so "we did not measure this" can never read as "this is fine" or as a fault.
-// Unit-tested in ../health.test.js.
+// pause, frozen accounts and cross-venue spread — plus the roll-ups that the stock cards and the
+// health monitor display: the conservative worst-of-everything `status`, and the two LEVELS the
+// headline uses (a programme verdict shared by every token of an issuer, and a verdict for this one
+// token with a count of the checks it passes). A check whose inputs are missing is reported as
+// `unknown` and is NEVER counted as bad, so "we did not measure this" can never read as "this is
+// fine" or as a fault. Unit-tested in ../health.test.js.
 
 import { toFiniteNumber } from './grade.mjs';
 import sharedFmt from './fmt.js';
@@ -23,17 +25,48 @@ export const HEALTH_DIMENSIONS = [
     { id: 'composability', label: 'DeFi composability', description: 'Whether a protocol can custody the token and enforce a default without discretionary issuer help.' }
 ];
 
+/**
+ * Who a check describes. Measured on 1,412 tokens (2026-09-25): the three programme rules gave the
+ * SAME verdict to every token of each of the nine issuers, and no issuer reached `good` on legal
+ * evidence or DeFi enforceability — so a worst-of badge over all eleven rules read "caution" or
+ * "warning" for every token and said nothing about the token itself (0 of 1,412 good). The headline
+ * therefore shows the two levels side by side, and the eleven rules and their thresholds stay
+ * exactly as visible as before.
+ */
+export const HEALTH_LEVELS = [
+    {
+        id: 'programme',
+        label: 'Programme',
+        description: 'The issuer’s legal evidence and reserve verification, how its authority keys are held, and whether its technology and legal template let a DeFi lender enforce collateral — the same answer for every token of the programme.'
+    },
+    {
+        id: 'token',
+        label: 'This token',
+        description: 'This one mint: price tracking, liquidity, organic flow, failed swaps, holder concentration, venue spread, trading pause and frozen accounts.'
+    }
+];
+
+/**
+ * The checks that need a working market: without a price, a pool or a trade none of them can run.
+ * A token is only called `good` at the token level when at least one of them was judged — "not
+ * paused, not frozen, not concentrated" on a token nobody trades is not a clean bill of health, and
+ * 954 of the 1,412 tokens measured on 2026-09-25 had no market to judge at all.
+ */
+export const TRADING_RULE_IDS = ['tracking', 'liquidity', 'organic', 'failedTx', 'spread'];
+
 /** How bad each judged status is. `unknown` is deliberately absent — it has no severity. */
 const SEVERITY = { good: 1, caution: 2, warning: 3 };
 
 /**
  * The eleven rules, in the fixed display order. `thresholds` are human-readable strings, and a band a
  * rule can never produce is `null` (keyControl and frozen never warn; paused never cautions) so a
- * card cannot advertise a verdict the rule is incapable of reaching.
+ * card cannot advertise a verdict the rule is incapable of reaching. `level` is who the rule
+ * describes (HEALTH_LEVELS); `dimension` is what it is about (HEALTH_DIMENSIONS).
  */
 export const HEALTH_RULES = [
     {
         id: 'tracking',
+        level: 'token',
         dimension: 'market',
         label: 'Price tracking',
         description: 'How far the on-chain price sits from a reference price for the same underlying share.',
@@ -41,6 +74,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'liquidity',
+        level: 'token',
         dimension: 'market',
         label: 'Pool liquidity',
         description: 'Dollar liquidity the venues report behind the token, i.e. how much can be traded at all.',
@@ -48,13 +82,15 @@ export const HEALTH_RULES = [
     },
     {
         id: 'organic',
+        level: 'token',
         dimension: 'market',
         label: 'Organic flow',
-        description: 'Whether 24 h trading comes from many traders or from a few bots.',
-        thresholds: { good: '≥ 10 % organic and ≤ 25 trades/trader', caution: 'one of the two fails', warning: 'both fail' }
+        description: 'Whether 24 h trading comes from many traders or from a few bots. Bot-classified volume spread across many wallets is ordinary arbitrage; a few wallets making most of the trades is the concern. When only one of the two inputs is reported, that one is judged alone.',
+        thresholds: { good: '≤ 25 trades/trader, whatever the organic share', caution: '> 25 trades/trader with ≥ 10 % organic', warning: '> 25 trades/trader and < 10 % organic' }
     },
     {
         id: 'failedTx',
+        level: 'token',
         dimension: 'market',
         label: 'Failed swaps',
         description: 'Share of the sampled pool signatures that reverted without settling a swap.',
@@ -62,6 +98,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'concentration',
+        level: 'token',
         dimension: 'market',
         label: 'Holder concentration',
         description: 'Supply share of the largest wallet we cannot identify (issuer keys and burn addresses excluded).',
@@ -69,6 +106,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'verification',
+        level: 'programme',
         dimension: 'legal',
         label: 'Legal evidence review',
         description: 'Whether required legal fields are sourced and reviewed, together with the strength of reserve verification.',
@@ -80,6 +118,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'defiComposability',
+        level: 'programme',
         dimension: 'composability',
         label: 'DeFi enforceability',
         description: 'Whether a smart-contract lender can custody the token and seize realisable value after default without discretionary issuer cooperation.',
@@ -91,6 +130,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'keyControl',
+        level: 'programme',
         dimension: 'control',
         label: 'Authority keys',
         description: 'How each installed mint, freeze, pause, delegate, transfer-fee and rebase path is ultimately governed.',
@@ -98,6 +138,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'paused',
+        level: 'token',
         dimension: 'control',
         label: 'Trading pause',
         description: 'Whether transfers or issuer trading are paused right now.',
@@ -105,6 +146,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'frozen',
+        level: 'token',
         dimension: 'control',
         label: 'Frozen accounts',
         description: 'Frozen token accounts among the top 20 holders. A frozen account cannot transfer.',
@@ -112,6 +154,7 @@ export const HEALTH_RULES = [
     },
     {
         id: 'spread',
+        level: 'token',
         dimension: 'market',
         label: 'Venue spread',
         description: 'Gap between the cheapest and the dearest venue pricing the same token.',
@@ -242,10 +285,18 @@ function liquidityRule(token) {
 }
 
 /**
- * 3. Organic share ≥ 10 % AND ≤ 25 trades per trader. Both pass → good, one fails → caution, both
- * fail → warning. When only one of the two is reported the rule judges THAT one alone (pass → good,
- * fail → caution) and the note says which input was missing, rather than inventing the other.
- * `value` is the organic share when known, else the trades-per-trader figure that was judged.
+ * 3. "Many traders or a few bots". ≤ 25 trades per trader → good, whatever the organic share;
+ * > 25 trades per trader → caution, and warning when the organic share is also < 10 %. When only
+ * one of the two is reported the rule judges THAT one alone (pass → good, fail → caution) and the
+ * note says which input was missing, rather than inventing the other. `value` is the organic share
+ * when known, else the trades-per-trader figure that was judged.
+ *
+ * Recalibrated 2026-09-25. It used to caution whenever EITHER input failed, and the organic share
+ * failed exactly where markets work: of the 57 tokens with ≥ $100k liquidity only 4 reached 10 %
+ * organic (median 4 %; AAPLx 3.4 %, NVDAx 4.0 %), while most tokens with < $10k or unreported
+ * liquidity passed (median 30–100 %). Arbitrage and routing bots are what keep a deep token on the
+ * share price, so a low organic share across many wallets is not "a few bots"; a few wallets doing
+ * most of the trading is, and a few mostly-bot wallets is the warning. Organic share is still shown.
  */
 function organicRule(token) {
     const organic = toFiniteNumber(token?.market?.organicSharePct);
@@ -276,9 +327,9 @@ function organicRule(token) {
         return { status: passed ? 'good' : 'caution', value, inputs, note };
     }
 
-    const failures = (organicOk ? 0 : 1) + (perTraderOk ? 0 : 1);
-    const status = failures === 0 ? 'good' : failures === 1 ? 'caution' : 'warning';
-    const note = `${fmt(organic)} % organic share and ${fmt(perTrader)} trades per trader over ${sharedFmt.fmtNumber(trades24)} trades`;
+    const status = perTraderOk ? 'good' : organicOk ? 'caution' : 'warning';
+    const note = `${fmt(organic)} % organic share and ${fmt(perTrader)} trades per trader over ${sharedFmt.fmtNumber(trades24)} trades`
+        + (perTraderOk && !organicOk ? '; most volume is bot-classified but spread across many wallets' : '');
     return { status, value, inputs, note };
 }
 
@@ -500,15 +551,38 @@ function keyControlRule(issuer, token) {
     return { status: 'unknown', value: null, inputs, note: 'how the authority keys are held has not been recorded' };
 }
 
-/** 8. Transfers or issuer trading paused right now. Warning or good — never a caution. */
+/**
+ * 8. Transfers or issuer trading paused right now. Warning or good — never a caution.
+ *
+ * An issuer pause whose reason is `unavailable_in_session` is NOT a pause: Ondo returns
+ * `isTradingPaused: true` with that reason for every asset it does not offer in the current session
+ * (91 tokens overnight at 01:04 UTC on 2026-09-25, none in US hours). That is the issuer's trading
+ * calendar, like an exchange being shut, and read as a warning it flipped ~90 tokens between good and
+ * warning twice a day. Any other reason (`scheduled`, a halt) and any on-chain pause still warn.
+ */
+const SESSION_CLOSED_REASON = 'unavailable_in_session';
+
 function pausedRule(token, issuerApi) {
     const control = booleanOrNull(token?.control?.paused);
     const api = booleanOrNull(issuerApi?.isTradingPaused);
-    const inputs = { controlPaused: control, issuerApiPaused: api };
+    const reason = stringOrNull(issuerApi?.tradingStatus?.assetPauseReason);
+    const session = stringOrNull(issuerApi?.tradingStatus?.currentSession);
+    const inputs = { controlPaused: control, issuerApiPaused: api, issuerPauseReason: reason, issuerSession: session };
+    const sessionClosed = api === true && reason === SESSION_CLOSED_REASON;
 
-    if (control === true || api === true) {
-        const who = control === true ? (api === true ? 'on-chain and at the issuer' : 'on-chain') : 'at the issuer';
+    if (control === true || (api === true && !sessionClosed)) {
+        const who = control === true ? (api === true && !sessionClosed ? 'on-chain and at the issuer' : 'on-chain') : 'at the issuer';
         return { status: 'warning', value: null, inputs, note: `trading is paused ${who}` };
+    }
+    if (sessionClosed) {
+        const when = session === null ? 'the current session' : `the ${session} session`;
+        return {
+            status: 'good',
+            value: null,
+            inputs,
+            note: `not halted: the issuer lists this asset as not offered in ${when}, its normal trading calendar`
+                + (control === false ? '; on-chain transfers are not paused' : '')
+        };
     }
     if (control === false || api === false) {
         return { status: 'good', value: null, inputs, note: 'not paused' };
@@ -551,11 +625,53 @@ function spreadRule(token) {
     return { status, value, inputs, note };
 }
 
+/** Band order for the token rank: healthiest first. */
+const RANK_BAND = { good: 0, caution: 1, warning: 2 };
+
 /**
- * The health verdict for one token: `{status, worstRuleId, dimensions, rules}` with `rules` always
- * the eleven HEALTH_RULES in their fixed order. `dimensions` keeps market, control, legal/evidence
- * and DeFi composability
- * separate, while the top-level status remains the conservative worst-of summary.
+ * One level's verdict: the worst judged status among its rules, the first rule carrying it when
+ * that is a caution or warning (null otherwise), and how many of its rules were judged and passed. `passed` counts `good` among JUDGED rules only, so an
+ * unknown is never a pass and never a fail. At the token level `requireTrading` withholds `good`
+ * (→ unknown) when none of TRADING_RULE_IDS was judged; a caution or warning found without a market
+ * still stands, because a fault needs no market to be one.
+ *
+ * The token level also carries `rank`, the one number the monitor sorts by (lower is healthier):
+ * band first, then how many judged checks fail, then how many pass — `band×100 + failed×10 +
+ * (total − passed)`, each term smaller than the step above it with eight token checks. Not measured
+ * has no rank (null), so it sorts last in either direction rather than posing as the best or worst.
+ */
+function levelVerdict(memberRules, { requireTrading = false } = {}) {
+    const judgedRules = memberRules.filter((rule) => rule.status !== 'unknown');
+    const passed = judgedRules.filter((rule) => rule.status === 'good').length;
+    const tradingJudged = judgedRules.filter((rule) => TRADING_RULE_IDS.includes(rule.id)).length;
+    let status = worstStatus(judgedRules.map((rule) => rule.status));
+    if (requireTrading && status === 'good' && tradingJudged === 0) status = 'unknown';
+    // Only a failing rule is named: a good level has nothing dragging it down (the overall
+    // worstRuleId keeps its older "first rule carrying the status" meaning for its consumers).
+    const worstRuleId = status === 'caution' || status === 'warning'
+        ? (memberRules.find((rule) => rule.status === status)?.id ?? null)
+        : null;
+    const verdict = {
+        status,
+        worstRuleId,
+        judged: judgedRules.length,
+        passed,
+        unknown: memberRules.length - judgedRules.length,
+        total: memberRules.length
+    };
+    if (!requireTrading) return verdict;
+    const rank = status in RANK_BAND
+        ? RANK_BAND[status] * 100 + (verdict.judged - passed) * 10 + (verdict.total - passed)
+        : null;
+    return { ...verdict, tradingJudged, rank };
+}
+
+/**
+ * The health verdict for one token: `{status, worstRuleId, levels, dimensions, rules}` with `rules`
+ * always the eleven HEALTH_RULES in their fixed order. `levels` is the headline: the programme's
+ * verdict (the same for every token of the issuer) and this token's, each with `passed` of `judged`
+ * checks. `dimensions` keeps market, control, legal/evidence and DeFi composability separate, while
+ * the top-level status remains the conservative worst-of summary of all eleven.
  *
  * Every field of the input is optional and may be null — a token with nothing known comes back
  * `status: 'unknown'` with eleven unknown rules, and can never come back `warning`. `status` is the
@@ -596,6 +712,7 @@ export function evaluateHealth(input = {}) {
         return {
             id: rule.id,
             label: rule.label,
+            level: rule.level,
             dimension: rule.dimension,
             status: out.status,
             value: out.value,
@@ -607,6 +724,10 @@ export function evaluateHealth(input = {}) {
 
     const status = worstStatus(rules.map((rule) => rule.status));
     const worstRuleId = status === 'unknown' ? null : (rules.find((rule) => rule.status === status)?.id ?? null);
+    const levels = {
+        programme: levelVerdict(rules.filter((rule) => rule.level === 'programme')),
+        token: levelVerdict(rules.filter((rule) => rule.level === 'token'), { requireTrading: true })
+    };
     const dimensions = Object.fromEntries(HEALTH_DIMENSIONS.map((dimension) => {
         const memberRules = rules.filter((rule) => rule.dimension === dimension.id);
         const dimensionStatus = worstStatus(memberRules.map((rule) => rule.status));
@@ -616,5 +737,5 @@ export function evaluateHealth(input = {}) {
         const judged = memberRules.filter((rule) => rule.status !== 'unknown').length;
         return [dimension.id, { status: dimensionStatus, worstRuleId: dimensionWorstRuleId, judged, unknown: memberRules.length - judged, total: memberRules.length }];
     }));
-    return { status, worstRuleId, dimensions, rules };
+    return { status, worstRuleId, levels, dimensions, rules };
 }

@@ -30,7 +30,7 @@ A longer version of this file, with the method and the data model, is at https:/
 - [Flows and float](https://rwasonar.com/flows.html): daily creations and redemptions per issuer; xStocks public float
 - [Premium and concentration](https://rwasonar.com/tracking.html): wrapper price versus the underlying share, holder concentration
 - [Fees and incentives](https://rwasonar.com/economics.html): holder costs, who gets paid, caps
-- [Health monitor](https://rwasonar.com/monitor.html): four health dimensions per token
+- [Health monitor](https://rwasonar.com/monitor.html): each token's own checks and its programme's
 - [Parties graph](https://rwasonar.com/graph.html): issuers, custodians, transfer agents, verifiers and venues
 - [Watch](https://rwasonar.com/watch.html): the public change journal and private watches
 - [Live trades](https://rwasonar.com/live.html): decoded DEX trades on the busiest pools

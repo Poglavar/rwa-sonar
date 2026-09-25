@@ -5,10 +5,33 @@
 const {
     comparisonSnapshot,
     comparisonSnapshotChanges,
+    hasSavedState,
     normalizeSavedItems,
     toggleSavedItem,
     personalJournalSummary
 } = require('./lib/saved-items.js');
+
+/**
+ * Whether this browser holds anything the reader saved, which decides where stocks.html opens: a
+ * returning reader continues "My briefing", a first-time visitor lands on "Find a stock".
+ */
+describe('hasSavedState', () => {
+    const empty = { savedItems: normalizeSavedItems(null), comparisons: {}, serverWatches: {} };
+
+    it('is false for a first-time visitor and for anything unreadable', () => {
+        expect(hasSavedState(empty)).toBe(false);
+        expect(hasSavedState()).toBe(false);
+        expect(hasSavedState({ savedItems: null, comparisons: null, serverWatches: null })).toBe(false);
+        expect(hasSavedState({ savedItems: 'AAPL', comparisons: [], serverWatches: 'x' })).toBe(false);
+    });
+
+    it('is true once the reader saved a stock, an issuer, a comparison or a cross-device watch', () => {
+        expect(hasSavedState({ ...empty, savedItems: normalizeSavedItems({ tickers: ['aapl'] }) })).toBe(true);
+        expect(hasSavedState({ ...empty, savedItems: normalizeSavedItems({ issuers: ['securitize'] }) })).toBe(true);
+        expect(hasSavedState({ ...empty, comparisons: { AAPL: { ticker: 'AAPL', products: {} } } })).toBe(true);
+        expect(hasSavedState({ ...empty, serverWatches: { AAPL: { watchId: 'w', watchKey: 'k' } } })).toBe(true);
+    });
+});
 
 describe('decision comparison and saved-watch helpers', () => {
     const issuer = {
@@ -33,8 +56,8 @@ describe('decision comparison and saved-watch helpers', () => {
         const changes = comparisonSnapshotChanges(
             comparisonSnapshot('NVDA', beforeModels), comparisonSnapshot('NVDA', afterModels));
         expect(changes).toEqual(expect.arrayContaining([
-            expect.stringContaining('source-listed collateral support disappeared'),
-            expect.stringContaining('source-listed protocol set changed'),
+            expect.stringContaining('listing as collateral by a protocol disappeared'),
+            expect.stringContaining('the protocols that list it changed'),
             expect.stringContaining('liquidity fell more than 40%')
         ]));
     });

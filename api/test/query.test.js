@@ -117,12 +117,28 @@ describe('sort and order whitelists', () => {
         // 2026-09-18: worst_rule, venue_spread_pct and top1_share_pct added — the monitor table
         // shows those three columns and could not sort them. health_status is now a severity CASE
         // rather than the bare column; see api/test/evidence.test.js for the ordering itself.
+        // 2026-09-25: programme_health and token_health added — the monitor's headline columns.
         expect(Object.keys(TOKEN_SORTS).sort()).toEqual([
             'composability_health', 'control_health', 'first_seen_at', 'health_status', 'holder_count', 'last_traded_at',
-            'legal_health', 'liquidity_usd', 'market_health', 'premium_pct', 'symbol',
-            'top1_share_pct', 'traders24', 'trades24', 'usd_price', 'venue_spread_pct',
+            'legal_health', 'liquidity_usd', 'market_health', 'premium_pct', 'programme_health', 'symbol',
+            'token_health', 'top1_share_pct', 'traders24', 'trades24', 'usd_price', 'venue_spread_pct',
             'volume24_usd', 'worst_rule'
         ]);
+    });
+
+    test('this-token health sorts by the rank stocks/lib/health.mjs computed, not by the band word', () => {
+        // The rank orders band, then failing checks, then passing checks (health.test.js pins it);
+        // re-deriving it here in SQL would be a second copy of the rule that could drift.
+        expect(TOKEN_SORTS.token_health).toBe('t.token_health_rank');
+        expect(TOKEN_SORTS.programme_health).toMatch(/^CASE t\.programme_health\b/);
+        expect(TOKEN_SORTS.programme_health).toMatch(/'good' THEN 0 WHEN 'caution' THEN 1 WHEN 'warning' THEN 2 END$/);
+    });
+
+    test('the slim token row carries both health levels and the pass count the monitor shows', () => {
+        for (const column of ['programme_health', 'programme_worst_rule', 'token_health', 'token_worst_rule',
+            'token_checks_passed', 'token_checks_judged']) {
+            expect(SLIM_TOKEN_COLUMNS).toMatch(new RegExp(`\\bt\\.${column}\\b`));
+        }
     });
 });
 
@@ -320,14 +336,14 @@ describe('column lists have not drifted from the DDL', () => {
         expect(missing).toEqual([]);
     });
 
-    test('the filter set is exactly the 26 documented facets', () => {
-        expect(FILTER_NAMES.length).toBe(26);
+    test('the filter set is exactly the 29 documented facets', () => {
+        expect(FILTER_NAMES.length).toBe(29);
         expect([...FILTER_NAMES].sort()).toEqual([
             'allowlist', 'claim_rung', 'clawback', 'composability_health', 'control_health', 'first_seen_day', 'health',
             'hook_active', 'instrument', 'issuer', 'jurisdiction', 'key_governance_freeze',
             'key_governance_mint', 'legal_form', 'legal_health', 'market_health', 'maturity_stage',
-            'pausable', 'paused', 'program', 'recipe', 'reference', 'seen_in_search',
-            'transfer_fee', 'verification_type', 'worst_rule'
+            'pausable', 'paused', 'program', 'programme_health', 'recipe', 'reference', 'seen_in_search',
+            'token_health', 'token_worst_rule', 'transfer_fee', 'verification_type', 'worst_rule'
         ]);
     });
 });

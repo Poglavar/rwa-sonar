@@ -330,6 +330,48 @@ describe('ladder tooltips', () => {
     });
 });
 
+/**
+ * The buyer-facing words for the two ladders (25 Sep judge audit): "rung 2 of 4" and "ledger
+ * maturity Level 2" are our jargon; a buyer reads a question and an "N of 4" answer, and the
+ * technical name stays in a tooltip.
+ */
+describe('plain words for claim depth and ledger maturity', () => {
+    const { CLAIM_DEPTH_QUESTION, LEDGER_RECORD_QUESTION, claimDepthWords, ledgerRecordWords } = require('./lib/issuer-labels.js');
+
+    it('asks each ladder as a question a buyer would ask', () => {
+        expect(CLAIM_DEPTH_QUESTION).toBe('How close to owning the share');
+        expect(LEDGER_RECORD_QUESTION).toBe('How far the token is the official record');
+    });
+
+    it('answers claim depth as "N of 4" plus what the holder has, with no rung jargon', () => {
+        expect(claimDepthWords(2)).toBe('2 of 4 — a secured claim on collateral');
+        expect(claimDepthWords(4)).toBe('4 of 4 — the registered share itself');
+        expect(claimDepthWords(0)).toBe('0 of 4 — price exposure only, no claim on the share');
+        for (let rung = 0; rung <= 4; rung++) expect(claimDepthWords(rung)).not.toMatch(/rung/i);
+    });
+
+    it('answers ledger maturity as "N of 4" plus what the chain records, with no level jargon', () => {
+        expect(ledgerRecordWords(0)).toBe('0 of 4 — the official record of who owns it is kept off-chain');
+        expect(ledgerRecordWords(2)).toBe('2 of 4 — the chain is the official record and the token moves without anyone’s approval');
+        for (let stage = 0; stage <= 4; stage++) expect(ledgerRecordWords(stage)).not.toMatch(/level|maturity|bearer/i);
+    });
+
+    it('returns null for a rung or stage that is not one of the five, never a guess', () => {
+        const { claimDepthReason } = require('./lib/issuer-labels.js');
+        for (const bad of [-1, 5, null, undefined, 1.5, '2']) {
+            expect(claimDepthWords(bad)).toBeNull();
+            expect(ledgerRecordWords(bad)).toBeNull();
+            expect(claimDepthReason(bad)).toBe('');
+        }
+    });
+
+    it('explains each claim level in one standalone sentence, without ladder jargon', () => {
+        const { claimDepthReason } = require('./lib/issuer-labels.js');
+        expect(claimDepthReason(2)).toBe('A note or certificate backed by a security interest over the collateral, granted to a named security holder.');
+        for (let rung = 0; rung <= 4; rung++) expect(claimDepthReason(rung)).not.toMatch(/rung|the same note|SPV/i);
+    });
+});
+
 describe('the sample fixtures', () => {
     const issuerDb = require('./fixtures/stocks-issuers.sample.json');
 

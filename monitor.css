@@ -194,6 +194,16 @@
 .mon-dimension-status-warning strong { color: var(--sev-critical); }
 .mon-dimension-status-unknown strong { color: var(--muted-text); }
 
+/* The programme and the worst-of-eleven blocks under the token tiles: two blocks, each status on
+   one row on a wide screen. They stack (the 900px rule above) and wrap to two by two on a phone. */
+.mon-levels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mon-levels .mon-dimension-statuses {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 /* --- worst-rule strip ------------------------------------------------- */
 
 .mon-rules {
@@ -956,6 +966,10 @@
 
     .mon-rules {
         grid-template-columns: 1fr;
+    }
+
+    .mon-levels .mon-dimension-statuses {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     /* A four-column change row has nothing left for the note at 360px; stack it. */

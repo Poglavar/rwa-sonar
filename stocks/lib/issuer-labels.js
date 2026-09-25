@@ -309,6 +309,55 @@
         return CLAIM_RUNG_TOOLTIPS[rung];
     }
 
+    // ---------------------------------------------------------------------------
+    // The same two ladders in a buyer's words (25 Sep judge audit): the visible label is a question
+    // and the value an "N of 4" answer. "Claim depth", "rung", "ledger maturity" and "Level" stay in
+    // the tooltips above and the methodology, never in a buyer-facing label.
+    // ---------------------------------------------------------------------------
+
+    const CLAIM_DEPTH_QUESTION = 'How close to owning the share';
+    const LEDGER_RECORD_QUESTION = 'How far the token is the official record';
+    const CLAIM_DEPTH_WORDS = [
+        'price exposure only, no claim on the share',
+        'an unsecured claim on the issuer',
+        'a secured claim on collateral',
+        'a beneficial interest in shares held for holders',
+        'the registered share itself'
+    ];
+    const LEDGER_RECORD_WORDS = [
+        'the official record of who owns it is kept off-chain',
+        'the chain is the official record of who owns it',
+        'the chain is the official record and the token moves without anyone’s approval',
+        'the chain is the record, the token moves freely, and holding it is enough to redeem without the issuer',
+        'the chain is the record, the token moves freely, holding it is enough to redeem, and a theft can be reversed on the ledger'
+    ];
+
+    /** "2 of 4 — a secured claim on collateral", or null when the rung is not one of 0–4. */
+    function claimDepthWords(rung) {
+        if (!Number.isInteger(rung) || rung < 0 || rung >= CLAIM_DEPTH_WORDS.length) return null;
+        return `${rung} of 4 — ${CLAIM_DEPTH_WORDS[rung]}`;
+    }
+
+    const CLAIM_DEPTH_REASONS = [
+        'The holder has price exposure only (a derivative or a synthetic position), with no claim on any share.',
+        'A note or certificate with no security interest: if the issuer fails, the holder is an unsecured creditor.',
+        'A note or certificate backed by a security interest over the collateral, granted to a named security holder.',
+        'A separate company holds the share and the token is a claim on that share, redeemable against it.',
+        'The holder is the registered owner of the share itself, the same class as the listed security.'
+    ];
+
+    /** Why a claim sits where it does, in one sentence without ladder jargon; "" when unknown. */
+    function claimDepthReason(rung) {
+        if (!Number.isInteger(rung) || rung < 0 || rung >= CLAIM_DEPTH_REASONS.length) return '';
+        return CLAIM_DEPTH_REASONS[rung];
+    }
+
+    /** "0 of 4 — the official record of who owns it is kept off-chain", or null for an unknown stage. */
+    function ledgerRecordWords(stage) {
+        if (!Number.isInteger(stage) || stage < 0 || stage >= LEDGER_RECORD_WORDS.length) return null;
+        return `${stage} of 4 — ${LEDGER_RECORD_WORDS[stage]}`;
+    }
+
     /**
      * The "Card ↗" link for one token: the shareable page stocks/build-cards.mjs generates. The slug is
      * supplied by the build/API when symbols collide case-insensitively, with the ordinary cardSlug
@@ -439,6 +488,11 @@
         MARKET_TOOLTIPS,
         maturityLevelTooltip,
         claimRungTooltip,
+        CLAIM_DEPTH_QUESTION,
+        LEDGER_RECORD_QUESTION,
+        claimDepthWords,
+        claimDepthReason,
+        ledgerRecordWords,
         cardLinkHtml,
         issuerDossierHref,
         CARDS_DIR,

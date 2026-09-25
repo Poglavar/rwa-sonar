@@ -97,6 +97,9 @@
                 volume24Usd,
                 // The issuer facts the buyer table needs, small enough to ship in every bundle.
                 buyer: {
+                    // A pre-IPO wrapper (PreStocks, Tessera): no listed share, so the table prices it
+                    // against the issuer's own mark and words its claim and redemption for that.
+                    preIpo: tokens.length > 0 && tokens.every((token) => token?.instrumentType === 'private-company'),
                     claimRung: isNum(grades.claimRung) ? grades.claimRung : null,
                     claimLabel: typeof grades.claimLabel === 'string' ? grades.claimLabel : null,
                     legalForm: typeof issuer.legalForm === 'string' ? issuer.legalForm : null,
@@ -110,13 +113,28 @@
 
     const DEBT_NOTE_FORMS = new Set(['tracker-certificate', 'structured-note', 'debt-note']);
 
+    /**
+     * What a pre-IPO token holder owns, by the issuer's legal form: the dossiers' holderClaim,
+     * shortened (tested against the dossier wording). PreStocks (spv-synthetic): a token that
+     * "reference[s] economic exposure to designated pre-IPO companies" with "no ownership" rights.
+     * Tessera (structured-note): "an unsecured stablecoin-loan participation right ... repayable only
+     * out of Liquidity Event Proceeds". Any other form falls back to the claim-depth words below.
+     */
+    const PRE_IPO_OWN = {
+        'spv-synthetic': 'No shares: a token referencing the company’s value',
+        'structured-note': 'Unsecured loan participation, repaid from sale proceeds'
+    };
+
     /** "Secured debt note tracking the share (Jersey)": the claim-depth rung and legal form in plain words. */
     function ownWords(buyer) {
         const rung = buyer?.claimRung;
         const note = DEBT_NOTE_FORMS.has(buyer?.legalForm);
-        const words = rung === 4 ? 'The registered share itself'
-            : note && rung === 2 ? 'Secured debt note tracking the share'
-                : note && rung === 1 ? 'Unsecured debt note tracking the share'
+        // A pre-IPO note references a private company's value; there is no listed share to track.
+        const tracks = buyer?.preIpo ? 'referencing the company' : 'tracking the share';
+        const words = buyer?.preIpo && PRE_IPO_OWN[buyer?.legalForm] ? PRE_IPO_OWN[buyer.legalForm]
+            : rung === 4 ? 'The registered share itself'
+            : note && rung === 2 ? `Secured debt note ${tracks}`
+                : note && rung === 1 ? `Unsecured debt note ${tracks}`
                     : rung === 3 ? 'Beneficial interest in pooled shares'
                         : rung === 0 ? 'Price exposure only, no claim on shares'
                             : buyer?.claimLabel ? buyer.claimLabel.charAt(0).toUpperCase() + buyer.claimLabel.slice(1)
@@ -178,7 +196,40 @@
         return { text, note: note.charAt(0).toUpperCase() + note.slice(1), tone: 'caution' };
     }
 
+    /** "PreStocks’", "Tessera’s": an issuer's name as a possessive. */
+    function possessive(name) {
+        return /s$/i.test(name) ? `${name}’` : `${name}’s`;
+    }
+
+    /**
+     * A pre-IPO wrapper has no share price to compare with: the premium is against the issuer's own
+     * published mark (reference source `issuer-mark`, read with the Jupiter price it was measured
+     * against), and the note adds the valuation that mark implies (the issuer API's markValuation,
+     * shown only when the API's markPrice is the same mark, so a valuation never sits beside another
+     * reading's price).
+     */
+    function markPriceCell(model) {
+        const token = model.tokens[0] ?? {};
+        const price = token.market?.usdPrice;
+        const fromMark = token.reference?.source === 'issuer-mark';
+        const mark = fromMark ? token.reference.price : null;
+        const premium = fromMark ? token.reference.premiumPct : null;
+        const valuation = isNum(mark) && isNum(token.issuerApi?.markValuation)
+            && Math.abs(token.issuerApi.markPrice - mark) <= Math.abs(mark) * 1e-9 ? token.issuerApi.markValuation : null;
+        const prefix = model.tokens.length > 1 ? `${token.symbol}: ` : '';
+        const note = [
+            isNum(price) ? `${prefix}${fmtPrice(price)} on Jupiter` : null,
+            isNum(mark) ? `mark ${fmtPrice(mark)}` : null,
+            isNum(valuation) ? `values ${token.companyName || 'the company'} at ${fmtMoney(valuation)}` : null
+        ].filter(Boolean).join(' · ') || null;
+        if (isNum(premium)) {
+            return { text: `${fmtSignedPct(premium)} vs ${possessive(model.issuerName)} own mark`, note, tone: Math.abs(premium) >= 2 ? 'caution' : null };
+        }
+        return { text: note ? 'Premium to the mark not measured' : 'Not measured', note, tone: 'muted' };
+    }
+
     function priceCell(model) {
+        if (model.buyer?.preIpo) return markPriceCell(model);
         const token = model.tokens[0] ?? {};
         const price = token.market?.usdPrice;
         const premium = token.reference?.premiumPct;
@@ -225,6 +276,18 @@
             return { text: usability.directRedemption === false ? 'No' : 'Not established', note: 'Exit by selling the token', tone: 'caution' };
         }
         const field = (id) => (Array.isArray(usability.fields) ? usability.fields : []).find((row) => row.id === id) ?? null;
+        if (model.buyer?.preIpo) {
+            // The dossier's eligibility terms: Tessera redeems only after a Liquidity Event (the
+            // issuer's "divestment of all interests" in the company); PreStocks' holder "may request
+            // redemption - discretionary, not an entitlement", or be pointed at on-chain liquidity.
+            const terms = String(field('eligibility-and-place')?.value ?? '');
+            if (/\bliquidity event\b/i.test(terms)) {
+                return { text: 'Only after a liquidity event', note: 'Paid when the issuer sells its whole stake; exit by selling until then', tone: 'caution' };
+            }
+            if (/\bdiscretion/i.test(terms)) {
+                return { text: 'On request, at the issuer’s discretion', note: 'Not an entitlement; exit by selling', tone: 'caution' };
+            }
+        }
         const who = [field('kyc')?.value === true ? 'KYC’d' : null, model.buyer?.usPersonsExcluded ? 'non-US' : null].filter(Boolean);
         // A term counts only where it covers this exact token (a TSLAx fee is not an AAPLx fee).
         const minimum = field('minimum')?.applicable === true ? firstMoney(field('minimum').value) : null;
@@ -256,8 +319,11 @@
         const control = model.tokens.map((token) => token?.control).find((row) => row && (isNum(row.transferFeeBps) || isNum(row.transferFeeScheduled?.bps)));
         if (!control) return { text: 'None', note: null, tone: null };
         const now = isNum(control.transferFeeBps) ? `${feePct(control.transferFeeBps)} now` : 'fee in effect not read';
-        const next = isNum(control.transferFeeScheduled?.bps) ? `; ${feePct(control.transferFeeScheduled.bps)} scheduled` : '';
-        return { text: `${now}${next}`, note: null, tone: 'caution' };
+        const scheduled = control.transferFeeScheduled;
+        const next = isNum(scheduled?.bps) ? `; ${feePct(scheduled.bps)} scheduled` : '';
+        const change = isNum(control.transferFeeBps) && isNum(scheduled?.bps) && scheduled.bps < control.transferFeeBps ? 'cut' : 'rise';
+        const note = isNum(scheduled?.bps) && isNum(scheduled?.epoch) ? `The ${change} starts at Solana fee epoch ${scheduled.epoch}` : null;
+        return { text: `${now}${next}`, note, tone: 'caution' };
     }
 
     function tokenCardHref(token, section = '') {
@@ -271,6 +337,14 @@
      */
     function buyerRows(models) {
         const columns = Array.isArray(models) ? models.filter((model) => Array.isArray(model?.tokens)) : [];
+        // Pre-IPO wrappers have no share price and no market close: those rows say what they compare.
+        const preIpo = columns.filter((model) => model.buyer?.preIpo).length;
+        const allPreIpo = preIpo > 0 && preIpo === columns.length;
+        const price = allPreIpo ? ['Price vs the issuer’s mark', 'Premium or discount against the issuer’s own published mark; a private company has no share price.']
+            : preIpo ? ['Price vs the stock or the issuer’s mark', 'Listed wrappers against the share’s reference price; pre-IPO wrappers against their issuer’s own mark.']
+                : ['Price vs the stock', 'Premium or discount against the share’s reference price.'];
+        const borrow = allPreIpo ? ['Borrow against it', 'Lenders we track that take this exact token.']
+            : ['Borrow against it when the market is closed', 'The price each lender uses while the US market is shut.'];
         const charges = columns.some((model) => model.tokens.some((token) => {
             const control = token?.control ?? {};
             return (isNum(control.transferFeeBps) && control.transferFeeBps > 0) || (isNum(control.transferFeeScheduled?.bps) && control.transferFeeScheduled.bps > 0);
@@ -281,10 +355,10 @@
             ['powers', 'Can the issuer freeze or take your tokens?', 'From the token’s on-chain settings; who holds each key.', 'control', powersCell],
             ['rights', 'Shareholder rights', '✓ yours · ◐ passed through · ◌ at the issuer’s discretion · ✕ no · ? not stated', 'holder-rights',
                 (model) => ({ text: holderRightsHeadline(model.rights), note: null, tone: null, rights: model.rights ?? [] })],
-            ['price', 'Price vs the stock', 'Premium or discount against the share’s reference price.', 'reference', priceCell],
+            ['price', ...price, 'reference', priceCell],
             ['liquidity', 'Liquidity and where to trade', 'DEX liquidity (Jupiter, all pools) and 24 h volume.', 'depth', liquidityCell],
             ['redeem', 'Redeem with the issuer', 'Who may, and the minimum and fee where set for this token.', 'own', redeemCell],
-            ['borrow', 'Borrow against it when the market is closed', 'The price each lender uses while the US market is shut.', 'closed-market', borrowCell],
+            ['borrow', ...borrow, 'closed-market', borrowCell],
             ...(charges ? [['fee', 'Transfer fee', 'Charged on-chain on every transfer.', 'control', feeCell]] : [])
         ];
         return rows.map(([id, label, help, section, cell]) => ({
@@ -300,7 +374,8 @@
         const rows = buyerRows(columns);
         const header = columns.map((model) => `<th scope="col"><span class="buyer-tokens">${model.tokens.map((token) =>
             `<a href="${escapeHtml(tokenCardHref(token))}">${escapeHtml(token.symbol || mintSuffix(token.mint))}</a>`).join(' · ')}</span>`
-            + `<a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a></th>`).join('');
+            + `<a class="issuer-link" href="${escapeHtml(issuerDossierHref(model.issuerSlug))}">${escapeHtml(model.issuerName)}</a>`
+            + `${model.buyer?.preIpo ? '<span class="buyer-kind">Pre-IPO</span>' : ''}</th>`).join('');
         const cellHtml = (cell) => {
             const tone = cell.tone ? ` class="buyer-${escapeHtml(cell.tone)}"` : '';
             if (cell.rights) return `<td${tone}>${holderRightsStripHtml(cell.rights, { href: cell.href })}</td>`;
@@ -359,7 +434,7 @@
             ['redemption', 'Cash exit', (model) => model.outcome?.cashExit],
             ['control', 'Issuer intervention', (model) => model.verdict?.controlNote],
             ['defi', 'Collateral exit', (model) => `${model.outcome?.exitQuality?.label}: ${model.outcome?.exitQuality?.reason}`],
-            ['defi', 'Source-listed DeFi use', (model) => model.outcome?.confirmedLending],
+            ['defi', 'Listed by a DeFi protocol', (model) => model.outcome?.confirmedLending],
             ['insolvency', 'Evidence status', (model) => `${model.review?.label}: ${model.review?.detail}`],
             ['ownership', 'Shareholder rights', (model) => rightsText(model.rights, differing)]
         ];
@@ -382,7 +457,7 @@
             ['Smart-contract custody', 'Can an unstaffed protocol account hold and later release it?', 'analysis', (model) => outcome(model.outcome.custody, model.outcome.status), 'defi'],
             ['Borrower default', 'Can the lender seize and dispose of the collateral by code?', 'analysis', (model) => outcome(model.outcome.default, model.outcome.status), 'defi'],
             ['Exit after default', 'Bottom line: can seized collateral become usable value?', 'analysis', (model) => `<span class="comparison-verdict comparison-exit-${escapeHtml(model.outcome.exitQuality.rating)}">${escapeHtml(model.outcome.exitQuality.label)}</span><small>${escapeHtml(model.outcome.exitQuality.reason)}</small>`, 'defi'],
-            ['Exact-token lending listing', 'Exact token address in a checked live collateral registry; listing is not execution proof.', 'source-listing', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All source-listed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`, 'defi'],
+            ['Listed as loan collateral', 'This exact token in a lending protocol\'s own live list of accepted collateral; a listing does not prove a loan works.', 'source-listing', (model) => `<strong>${escapeHtml(model.outcome.confirmedLending)}</strong>${model.protocols.length ? `<small>All source-listed uses: ${escapeHtml(model.protocols.join(', '))}</small>` : ''}`, 'defi'],
             ['Secondary-market exit', 'A pool is an exit path, not a promise of executable size.', 'confirmed-fact', (model) => `<strong>${escapeHtml(fmtMoney(model.liquidityUsd))} reported liquidity</strong><small>${escapeHtml(fmtMoney(model.volume24Usd))} reported 24 h volume. ${escapeHtml(model.outcome.marketExit)}</small>`, 'redemption'],
             ['If the protocol is hacked', 'Whether issuer powers may help—and may override finality.', 'analysis', (model) => outcome(model.outcome.hack, model.outcome.status), 'control'],
             ['If access is lost', 'What happens when the contract or controlling key is inaccessible?', 'analysis', (model) => outcome(model.outcome.accessLoss, model.outcome.status), 'defi'],
@@ -453,14 +528,24 @@
      * Which underlying a compare URL asks for: `compare=` first, else a `search=` that is exactly a
      * ticker in the list (so `?view=compare&search=NVDA` opens NVDA, not the first group), else null
      * for the caller's default. Case-insensitive, and never a ticker the list does not contain.
+     * `aliases` (discovery.js comparisonKeyAliases) lets a pre-IPO company be named by its name or a
+     * wrapper symbol: `compare=SPACEX` and `compare=tOpenAI` open SPCX and OPENAI.
      */
-    function comparisonTickerFromParams(params, tickers) {
+    function comparisonTickerFromParams(params, tickers, aliases = null) {
         const known = new Set((Array.isArray(tickers) ? tickers : []).map((ticker) => String(ticker)));
         for (const key of ['compare', 'search']) {
             const value = params?.get?.(key)?.trim().toUpperCase();
-            if (value && known.has(value)) return value;
+            if (!value) continue;
+            if (known.has(value)) return value;
+            const alias = aliases instanceof Map ? aliases.get(value.replace(/[^A-Z0-9]/g, '')) : null;
+            if (alias && known.has(alias)) return alias;
         }
         return null;
+    }
+
+    /** What the compare view calls a group: its ticker, or a pre-IPO company's name ("OpenAI (pre-IPO)"). */
+    function comparisonGroupTitle(group) {
+        return group?.preIpo ? `${group.name || group.ticker} (pre-IPO)` : String(group?.ticker ?? '');
     }
 
     /** Stable URL-safe filename shared with the scoped builder; ticker punctuation cannot escape it. */
@@ -494,6 +579,7 @@
         parseComparisonRequirements,
         comparisonRequirementsParam,
         comparisonTickerFromParams,
+        comparisonGroupTitle,
         comparisonBundleFilename,
         comparisonBundleMatches
     };
