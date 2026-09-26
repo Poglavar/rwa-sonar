@@ -87,3 +87,6 @@ stocks/data/event-first-seen.json
 # Pyth prices read from Solana's push-oracle accounts every refresh (stocks/fetch-pyth-onchain.mjs):
 # runtime state that changes each run; the cards carry what they show in their own .json records.
 /stocks/data/pyth-onchain.json
+
+# The universe view's generated index (stocks/build-universe-view.mjs).
+/universe-view/

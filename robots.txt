@@ -1,8 +1,8 @@
 # robots.txt for rwasonar.com. Everything public is meant to be read: search engines, social link
 # previews and AI crawlers alike (the research is only useful if it is found and cited). The API is
 # crawlable too, but its paginated and filtered routes are endless, so crawlers are pointed at the
-# static pages and data files listed in the sitemap and in /llms.txt instead. /design/ and
-# sonar-animation.html are design work files, not site pages.
+# static pages and data files listed in the sitemap and in /llms.txt instead. /design/,
+# sonar-animation.html and universe.html are design work files, not site pages.
 
 User-agent: *
 Allow: /
@@ -10,6 +10,7 @@ Disallow: /api/watchlists/
 Disallow: /api/review/
 Disallow: /design/
 Disallow: /sonar-animation.html
+Disallow: /universe.html
 
 # Named explicitly so no default "block AI bots" list is read as covering them.
 User-agent: GPTBot
@@ -33,5 +34,6 @@ Disallow: /api/watchlists/
 Disallow: /api/review/
 Disallow: /design/
 Disallow: /sonar-animation.html
+Disallow: /universe.html
 
 Sitemap: https://rwasonar.com/sitemap.xml

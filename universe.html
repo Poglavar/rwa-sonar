@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Universe · RWA Sonar</title>
+    <meta name="description" content="Every tokenized stock on Solana as a planet; its rights, legal structure, custody, on-chain powers, DeFi use and health as moons you can open." />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./universe.css?v=20260926b" />
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="./stocks/lib/universe-view-model.js?v=20260926c"></script>
+    <script type="module" src="./universe.js?v=20260926f"></script>
+</head>
+<body>
+    <div id="stage" class="stage" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <a class="brand" href="./index.html">RWA Sonar</a>
+        <nav id="crumbs" class="crumbs" aria-label="Where you are"></nav>
+        <form id="search" class="search" role="search">
+            <label class="visually-hidden" for="searchInput">Find a token</label>
+            <input id="searchInput" list="searchList" placeholder="Find a token, e.g. AAPLx" autocomplete="off" />
+            <datalist id="searchList"></datalist>
+        </form>
+    </header>
+
+    <aside id="panel" class="panel" aria-live="polite">
+        <p id="panelKicker" class="kicker"></p>
+        <h1 id="panelTitle">Loading the catalogue…</h1>
+        <p id="panelSummary" class="summary"></p>
+        <dl id="panelDetails" class="details"></dl>
+        <div id="panelChildren" class="children"></div>
+        <p class="panel-actions">
+            <button id="backButton" type="button" hidden>← Back</button>
+            <a id="panelLink" hidden>Open on the card →</a>
+        </p>
+    </aside>
+
+    <p class="hint">Drag to turn · scroll to zoom · click a body to open it · Esc to go back</p>
+</body>
+</html>

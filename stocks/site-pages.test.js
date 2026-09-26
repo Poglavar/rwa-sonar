@@ -130,7 +130,7 @@ describe('hand-written pages', () => {
             expectContactFooter(readText(file));
         }
         // Every root page is either in the registry, contact-only, or a design file kept out of crawls.
-        const known = new Set([...SITE_PAGES.map((page) => page.file), ...Object.keys(CONTACT_ONLY_PAGES), 'sonar-animation.html']);
+        const known = new Set([...SITE_PAGES.map((page) => page.file), ...Object.keys(CONTACT_ONLY_PAGES), 'sonar-animation.html', 'universe.html']);
         for (const file of fs.readdirSync(ROOT).filter((name) => name.endsWith('.html'))) expect(known.has(file)).toBe(true);
     });
 });

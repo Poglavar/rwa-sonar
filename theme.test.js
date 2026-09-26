@@ -190,7 +190,8 @@ function expectSwitch(html) {
 }
 
 describe('every page loads theme.js first and carries the switch', () => {
-    const rootPages = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html') && f !== 'sonar-animation.html');
+    // Design work files (robots.txt keeps them out of crawls) carry no site header: the universe view is always dark space.
+    const rootPages = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html') && !['sonar-animation.html', 'universe.html'].includes(f));
     const learnPages = fs.readdirSync(path.join(ROOT, 'learn')).filter((f) => f.endsWith('.html')).map((f) => `learn/${f}`);
     const rootOf = (file) => (file === '404.html' ? '/' : file.includes('/') ? '../' : './');
     // The card shim has no header (it redirects), and the pitch deck keeps its own deck bar and
