@@ -60,6 +60,14 @@ controls.maxDistance = 1500;
 scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 // Every centre is the sun of its own system: the light sits inside it.
 scene.add(new THREE.PointLight(0xfff1d6, 2.4, 0, 0));
+// A soft headlight from the camera's upper left. The centre's own light is inside it, so without this
+// the face you look at gets ambient light only and the relief of its lettering cannot show.
+const headlight = new THREE.DirectionalLight(0xffffff, 0.9);
+headlight.position.set(-1.2, 1.4, 1);
+camera.add(headlight);
+camera.add(headlight.target);
+headlight.target.position.set(0, 0, -1);
+scene.add(camera);
 
 /** The panel covers part of the screen, so the picture's centre moves to the middle of what is left. */
 function resize() {
@@ -197,52 +205,90 @@ function patternTexture(dimensionId) {
 }
 
 /**
- * The marquee: a band round a body's equator (±23° of latitude, a little proud of the surface) that
- * carries the body's name, tiled so it wraps seamlessly, and scrolls by moving the texture offset.
+ * Lettering: a body's name written into its own surface, round the equator, so it turns with the body.
+ * The surface is redrawn with a smooth belt along the equator (the pattern would drown the letters)
+ * and the name on it, at least twice round so the side facing the camera always carries it. Tokens
+ * wear it raised (embossed: letters lighter than the belt, and high in the bump map), everything else
+ * cut in (engraved: darker, and low in the bump map), so the light catches the relief. The canvas is
+ * twice as wide as tall, which keeps the letters undistorted at the equator. Each lettered body owns
+ * its two textures; clearSystem disposes them.
  */
-const BAND = new THREE.SphereGeometry(1.03, 96, 6, 0, Math.PI * 2, Math.PI / 2 - 0.4, 0.8);
-const MARQUEE_W = 1024;
-const MARQUEE_H = 128; // the band's circumference is about 8 times its height
-const MARQUEE_SPEED = 0.025; // turns of the band per second
+const LETTERING_SIZES = { orbiter: [512, 256], centre: [1024, 512] };
+const RELIEF_BUMP = { emboss: 9, engrave: 9 };
+// How much a lettered body glows compared with a plain one: glow is flat light, and flattens relief.
+const LETTERED_GLOW = 0.45;
 
-function marqueeTexture(text, color) {
-    const texture = canvasTexture(MARQUEE_W, MARQUEE_H, (ctx, w, h) => {
-        ctx.fillStyle = 'rgba(3, 7, 18, 0.62)';
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, w, 4);
-        ctx.fillRect(0, h - 4, w, 4);
-        ctx.font = '700 84px system-ui, -apple-system, "Segoe UI", sans-serif';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#f8fafc';
-        const unit = `${text}   ·   `;
-        const width = ctx.measureText(unit).width;
-        // Whole copies only, spread evenly, so the seam at u = 0 / 1 never cuts a word; at least two, so
-        // the half facing the camera always has the name on it (a long name is narrowed to fit).
-        const copies = Math.max(2, Math.floor(w / width));
-        const step = w / copies;
-        const squeeze = Math.min(1, step / width);
+/**
+ * Writes the name round the canvas. `bevel` paints the relief into the colour too, so it reads at any
+ * angle to the light: a raised letter has a highlight on its upper left and a shadow on its lower
+ * right; a cut-in letter the other way round.
+ */
+function drawName(ctx, w, h, text, fill, bevel = null) {
+    const fontPx = Math.round(h * 0.14);
+    ctx.font = `800 ${fontPx}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+    ctx.textBaseline = 'middle';
+    const unit = `${text}   ·   `;
+    const width = ctx.measureText(unit).width;
+    // Whole copies only, spread evenly, so the seam at u = 0 / 1 never cuts a word (a long name is narrowed).
+    const copies = Math.max(2, Math.floor(w / width));
+    const step = w / copies;
+    const squeeze = Math.min(1, step / width);
+    const offset = Math.max(1, fontPx * 0.05);
+    const passes = bevel
+        ? [[bevel.upperLeft, -offset], [bevel.lowerRight, offset], [fill, 0]]
+        : [[fill, 0]];
+    for (const [colour, shift] of passes) {
+        ctx.fillStyle = colour;
         for (let i = 0; i < copies; i += 1) {
             ctx.save();
-            ctx.translate(i * step, 0);
+            ctx.translate(i * step + shift, h / 2 + shift);
             ctx.scale(squeeze, 1);
-            ctx.fillText(unit, 0, h / 2 + 4);
+            ctx.fillText(unit, 0, fontPx * 0.06);
             ctx.restore();
         }
-    });
-    texture.wrapS = THREE.RepeatWrapping;
-    return texture;
+    }
+    return fontPx;
 }
 
-/** Adds a marquee with `text` round a sphere of radius `radius` inside `parent`; returns the band mesh. */
-function addMarquee(parent, text, color, radius) {
-    const band = new THREE.Mesh(BAND, new THREE.MeshBasicMaterial({
-        map: marqueeTexture(text, color), transparent: true, depthWrite: false, side: THREE.FrontSide
-    }));
-    band.scale.setScalar(radius);
-    band.userData.marquee = true;
-    parent.add(band);
-    return band;
+/** {map, bump} for a body: `base` is its shared pattern or band texture (or null for a plain `color`). */
+function letteredSurface({ base = null, color, text, relief, size }) {
+    const [w, h] = LETTERING_SIZES[size];
+    const tint = new THREE.Color(color);
+    const shade = (dl) => `#${tint.clone().offsetHSL(0, 0, dl).getHexString()}`;
+    const belt = shade(relief === 'emboss' ? -0.1 : 0.04);
+    const letters = shade(relief === 'emboss' ? 0.22 : -0.3);
+    const light = shade(0.4);
+    const dark = shade(-0.42);
+    const bevel = relief === 'emboss' ? { upperLeft: light, lowerRight: dark } : { upperLeft: dark, lowerRight: light };
+    const beltHeight = h * 0.24;
+    const map = canvasTexture(w, h, (ctx) => {
+        if (base) ctx.drawImage(base.image, 0, 0, w, h);
+        else {
+            ctx.fillStyle = `#${tint.getHexString()}`;
+            ctx.fillRect(0, 0, w, h);
+        }
+        ctx.fillStyle = belt;
+        ctx.fillRect(0, (h - beltHeight) / 2, w, beltHeight);
+        drawName(ctx, w, h, text, letters, bevel);
+    });
+    const bump = canvasTexture(w, h, (ctx) => {
+        ctx.fillStyle = '#808080';
+        ctx.fillRect(0, 0, w, h);
+        // A softened edge reads as a bevel rather than a cliff.
+        ctx.filter = `blur(${Math.max(1, h / 256)}px)`;
+        drawName(ctx, w, h, text, relief === 'emboss' ? '#ffffff' : '#000000');
+    });
+    // Heights, not colours: no sRGB decoding.
+    bump.colorSpace = THREE.NoColorSpace;
+    return { map, bump };
+}
+
+/** A lit sphere material over a lettered (or plain patterned) surface; its glow follows the surface. */
+function surfaceMaterial({ map, bump = null, relief = 'emboss', emissive, roughness = 0.8 }) {
+    return new THREE.MeshStandardMaterial({
+        color: 0xffffff, map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: bump ? emissive * LETTERED_GLOW : emissive, roughness, metalness: 0.05,
+        bumpMap: bump, bumpScale: bump ? RELIEF_BUMP[relief] : 1
+    });
 }
 
 function ringLine(radius, color, opacity) {
@@ -376,8 +422,8 @@ function clearSystem() {
     scene.remove(system.group);
     system.group.traverse((object) => {
         if (object.isCSS2DObject) object.element.remove();
-        if (object.geometry && object.geometry !== SPHERE && object.geometry !== BAND) object.geometry.dispose();
-        if (object.userData.marquee) object.material.map.dispose();
+        if (object.geometry && object.geometry !== SPHERE) object.geometry.dispose();
+        for (const texture of object.userData.ownTextures ?? []) texture.dispose();
         if (object.material) object.material.dispose();
     });
     system = null;
@@ -404,7 +450,12 @@ function makeCentre(stop) {
     let label;
     if (isSun(stop)) {
         radius = SUN_RADIUS;
-        group.add(new THREE.Mesh(new THREE.SphereGeometry(radius, 64, 32), new THREE.MeshBasicMaterial({ color: '#ffcf6e' })));
+        // Unlit, so its engraving shows by colour alone.
+        const { map, bump } = letteredSurface({ color: '#ffcf6e', text: 'Solana', relief: 'engrave', size: 'centre' });
+        bump.dispose();
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(radius, 64, 32), new THREE.MeshBasicMaterial({ map }));
+        sun.userData.ownTextures = [map];
+        group.add(sun);
         const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: '#ffc46b', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
         glow.scale.setScalar(radius * 6);
         group.add(glow);
@@ -413,10 +464,9 @@ function makeCentre(stop) {
         radius = PLANET_CENTRE_RADIUS;
         const token = IX.tokens[stop.token];
         const color = tokenColor(stop.token);
-        const bands = bandTexture(color, U.hash01(token.slug, 3));
-        const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
-            color: 0xffffff, map: bands, emissive: 0xffffff, emissiveMap: bands, emissiveIntensity: 0.3, roughness: 0.8
-        }));
+        const surface = letteredSurface({ base: bandTexture(color, U.hash01(token.slug, 3)), color, text: token.symbol, relief: 'emboss', size: 'centre' });
+        const mesh = new THREE.Mesh(SPHERE, surfaceMaterial({ ...surface, relief: 'emboss', emissive: 0.22 }));
+        mesh.userData.ownTextures = [surface.map, surface.bump];
         mesh.scale.setScalar(radius);
         group.add(mesh);
         label = makeLabel(token.symbol, 'planet focus', color);
@@ -426,10 +476,10 @@ function makeCentre(stop) {
             : stop.without.length ? stop.without[stop.without.length - 1] : IX.values[stop.filters[stop.filters.length - 1]].attribute;
         const dimensionId = stop.kind === 'aspect' ? stop.dimension : attributeById.get(attribute)?.dimension;
         const color = dimensionById.get(dimensionId)?.color ?? '#e2e8f0';
-        const texture = patternTexture(dimensionId);
-        const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
-            color: 0xffffff, map: texture, emissive: 0xffffff, emissiveMap: texture, emissiveIntensity: 0.4, roughness: 0.7
-        }));
+        const centreText = stop.kind === 'aspect' ? `${IX.tokens[stop.token].symbol} · ${stopLabel(stop)}` : stopLabel(stop);
+        const surface = letteredSurface({ base: patternTexture(dimensionId), color, text: centreText, relief: 'engrave', size: 'centre' });
+        const mesh = new THREE.Mesh(SPHERE, surfaceMaterial({ ...surface, relief: 'engrave', emissive: 0.26, roughness: 0.7 }));
+        mesh.userData.ownTextures = [surface.map, surface.bump];
         mesh.scale.setScalar(radius);
         group.add(mesh);
         const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending }));
@@ -444,12 +494,11 @@ function makeCentre(stop) {
     const labelObject = new CSS2DObject(label);
     labelObject.position.set(0, radius * 1.2, 0);
     group.add(labelObject);
-    const band = addMarquee(group, label.textContent, label.style.getPropertyValue('--dot') || '#ffd98a', radius);
-    return { group, radius, label: labelObject, band, labelText: label.textContent };
+    return { group, radius, label: labelObject, labelText: label.textContent };
 }
 
 /** One orbiting body: a tilted plane, a spinning arm, and the sphere with its label at the arm's end. */
-function makeOrbiter(parent, { orbit, size, color, texture = null, emissive = 0.15, label, dot, labelled, ringOpacity, item }) {
+function makeOrbiter(parent, { orbit, size, color, texture = null, emissive = 0.15, label, dot, labelled, ringOpacity, item, relief = 'engrave' }) {
     const incl = new THREE.Group();
     incl.rotation.x = orbit.tilt;
     const spin = new THREE.Group();
@@ -458,17 +507,21 @@ function makeOrbiter(parent, { orbit, size, color, texture = null, emissive = 0.
     const anchor = new THREE.Group();
     anchor.position.set(orbit.radius, 0, 0);
     spin.add(anchor);
-    // A textured body glows through its own pattern, so the glow never washes the pattern out.
-    const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
-        color: texture ? 0xffffff : color, map: texture, emissive: texture ? 0xffffff : color, emissiveMap: texture,
-        emissiveIntensity: emissive, roughness: 0.85, metalness: 0.05
-    }));
+    // A labelled body carries its name in its surface; the others (the outer planets of a crowded
+    // system) keep the shared texture, to spare the memory of a canvas pair each. A textured body glows
+    // through its own surface, so the glow never washes the pattern out.
+    const surface = labelled ? letteredSurface({ base: texture, color, text: label, relief, size: 'orbiter' }) : null;
+    const mesh = new THREE.Mesh(SPHERE, surface
+        ? surfaceMaterial({ ...surface, relief, emissive, roughness: 0.85 })
+        : new THREE.MeshStandardMaterial({
+            color: texture ? 0xffffff : color, map: texture, emissive: texture ? 0xffffff : color, emissiveMap: texture,
+            emissiveIntensity: emissive, roughness: 0.85, metalness: 0.05
+        }));
+    if (surface) mesh.userData.ownTextures = [surface.map, surface.bump];
     mesh.scale.setScalar(size);
     anchor.add(mesh);
     if (ringOpacity > 0) incl.add(ringLine(orbit.radius, color, ringOpacity));
-    // The band sits on the anchor, not the mesh, so the planet's own spin does not carry the text.
-    const band = addMarquee(anchor, label, dot, size);
-    const body = { orbit, size, spin, anchor, mesh, band, labelled, item };
+    const body = { orbit, size, spin, anchor, mesh, lettered: Boolean(surface), labelled, item };
     const labelEl = makeLabel(label, 'orbiter', dot, () => enter(body));
     labelEl.addEventListener('pointerenter', () => setHover(body));
     labelEl.addEventListener('pointerleave', () => setHover(null));
@@ -581,7 +634,7 @@ function buildSystem(stop) {
                 emissive: item.kind === 'token' ? 0.12 : 0.3,
                 label: item.kind === 'group' ? `${item.label} · ${item.tokens.length}` : item.label,
                 dot: item.kind === 'group' ? U.TONE_COLORS[item.tone] : item.color,
-                labelled: rank < LABELLED, ringOpacity: 0.1, item
+                labelled: rank < LABELLED, ringOpacity: 0.1, item, relief: item.kind === 'token' ? 'emboss' : 'engrave'
             }));
             extent = Math.max(extent, orbit.radius + item.size);
         });
@@ -1052,9 +1105,9 @@ renderer.domElement.addEventListener('pointermove', (event) => {
 
 const projected = new THREE.Vector3();
 
-// A body at least this many pixels in radius on screen carries its name on its marquee (the text is
+// A lettered body at least this many pixels in radius on screen shows its name in its surface (the text is
 // about half the radius tall); a smaller one shows the band-less body with the label above it.
-const MARQUEE_MIN_PX = 30;
+const LETTERING_MIN_PX = 30;
 const worldPoint = new THREE.Vector3();
 
 function screenRadius(object, radius, height) {
@@ -1063,7 +1116,7 @@ function screenRadius(object, radius, height) {
 }
 
 /**
- * Each body shows its name one way: on its marquee when it is big enough on screen to read, else as
+ * Each body shows its name one way: in its own surface when it is lettered and big enough on screen to read, else as
  * a label above it. Labels that would overlap one drawn before them are hidden, in body order (inner
  * rings and bigger pools first); the hovered body's label always shows. Boxes are estimated from the
  * text length.
@@ -1072,8 +1125,7 @@ function declutter() {
     if (!system) return;
     const rect = renderer.domElement.getBoundingClientRect();
     const placed = [];
-    const centreReadable = screenRadius(system.centre.group, system.centre.radius, rect.height) >= MARQUEE_MIN_PX;
-    system.centre.band.visible = centreReadable;
+    const centreReadable = screenRadius(system.centre.group, system.centre.radius, rect.height) >= LETTERING_MIN_PX;
     system.centre.label.visible = !centreReadable;
     if (!centreReadable) {
         // The centre's label is placed first, so no orbiting label hides under it.
@@ -1084,8 +1136,7 @@ function declutter() {
         placed.push({ x0: cx - cw / 2, x1: cx + cw / 2, y0: cy - 9, y1: cy + 9 });
     }
     for (const body of system.bodies) {
-        const readable = screenRadius(body.anchor, body.size, rect.height) >= MARQUEE_MIN_PX;
-        body.band.visible = readable;
+        const readable = body.lettered && screenRadius(body.anchor, body.size, rect.height) >= LETTERING_MIN_PX;
         if (readable || !body.labelled) {
             body.label.visible = body === hovered;
             continue;
@@ -1112,10 +1163,9 @@ function animate(now) {
         for (const body of system.bodies) {
             body.spin.rotation.y += body.orbit.speed * dt;
             body.mesh.rotation.y += dt * 0.12;
-            if (body.band.visible) body.band.material.map.offset.x += MARQUEE_SPEED * dt;
         }
-        system.centre.group.rotation.y += dt * 0.03;
-        system.centre.band.material.map.offset.x += MARQUEE_SPEED * dt;
+        // The centre turns fast enough to carry its name past in about a minute.
+        system.centre.group.rotation.y += dt * 0.1;
     }
     stepFlight(now);
     controls.update();
