@@ -18,16 +18,22 @@
 })(this, function () {
     const TAU = Math.PI * 2;
 
-    /** Moon dimensions: one ring each around a planet, inner to outer, each with its own colour. */
+    /**
+     * Moon dimensions, inner to outer. Each has its own colour AND its own surface pattern, so a
+     * category is recognisable by either one, even beside a token planet of a similar hue (token
+     * planets are always banded, a pattern no dimension uses).
+     */
     const DIMENSIONS = [
-        { id: 'identity', label: 'Stock and issuer', color: '#e2e8f0' },
-        { id: 'legal', label: 'Legal structure', color: '#a78bfa' },
-        { id: 'rights', label: 'Shareholder rights', color: '#f5c451' },
-        { id: 'custody', label: 'Custody', color: '#2dd4bf' },
-        { id: 'keys', label: 'On-chain keys', color: '#fb7185' },
-        { id: 'defi', label: 'DeFi', color: '#60a5fa' },
-        { id: 'health', label: 'Health warnings', color: '#f472b6' }
+        { id: 'identity', label: 'Stock and issuer', color: '#e2e8f0', pattern: 'meridians' },
+        { id: 'legal', label: 'Legal structure', color: '#c084fc', pattern: 'grid' },
+        { id: 'rights', label: 'Shareholder rights', color: '#facc15', pattern: 'dots' },
+        { id: 'custody', label: 'Custody', color: '#2dd4bf', pattern: 'checker' },
+        { id: 'keys', label: 'On-chain keys', color: '#f87171', pattern: 'diagonal' },
+        { id: 'defi', label: 'DeFi', color: '#60a5fa', pattern: 'waves' },
+        { id: 'health', label: 'Health warnings', color: '#f97316', pattern: 'craters' }
     ];
+    /** The surface pattern token planets wear; no dimension may use it. */
+    const TOKEN_PATTERN = 'bands';
 
     /**
      * The attributes a token can be grouped on. A moon is one value of one attribute; its id is
@@ -336,7 +342,66 @@
             return { shared, single };
         }
 
-        return { tokens, values, attributes, byToken, byValue, tokenBySlug, valueById, tokensWhere, groupBy, sharedValues };
+        const dimensionOfAttribute = new Map(attributes.map((a) => [a.id, a.dimension]));
+
+        /**
+         * A token's values by dimension (Custody, Shareholder rights…), in DIMENSIONS order, leaving out
+         * dimensions it has nothing in: the level between a token and the values it shares. Each is
+         * {dimension, shared, single}, split as sharedValues does.
+         */
+        function aspects(t) {
+            const { shared, single } = sharedValues(t);
+            return DIMENSIONS.map((dim) => {
+                const own = (v) => dimensionOfAttribute.get(values[v].attribute) === dim.id;
+                return { dimension: dim.id, shared: shared.filter(own), single: single.filter(own) };
+            }).filter((a) => a.shared.length + a.single.length > 0);
+        }
+
+        return { tokens, values, attributes, byToken, byValue, tokenBySlug, valueById, tokensWhere, groupBy, sharedValues, aspects };
+    }
+
+    // --- search ----------------------------------------------------------------------------------
+
+    /** How well `text` matches the lower-cased query: 0 exact, 1 prefix, 2 a word starts with it, 3 contains it, null not at all. */
+    function matchScore(text, query) {
+        const value = String(text ?? '').toLowerCase();
+        if (!value || !query) return null;
+        if (value === query) return 0;
+        if (value.startsWith(query)) return 1;
+        const at = value.indexOf(query);
+        if (at < 0) return null;
+        return /[\s\-_.:/(]/.test(value[at - 1]) ? 2 : 3;
+    }
+
+    function best(...scores) {
+        const found = scores.filter((s) => s !== null);
+        return found.length ? Math.min(...found) : null;
+    }
+
+    /**
+     * The search box: tokens by symbol, the stock they track or their name (a name match ranks one step
+     * below a symbol match), and the shared values by label or by the raw value (a key's full address).
+     * Best match first; ties go to the bigger pool, or to the value more tokens share. `ix` is a
+     * tableIndex. Returns {tokens: [{t, score}], values: [{v, score, count}]}.
+     */
+    function search(ix, query, { tokens: tokenLimit = 8, values: valueLimit = 6 } = {}) {
+        const q = String(query ?? '').trim().toLowerCase();
+        if (!q) return { tokens: [], values: [] };
+        const tokens = [];
+        ix.tokens.forEach((token, t) => {
+            const name = matchScore(token.name, q);
+            const score = best(matchScore(token.symbol, q), matchScore(token.underlying, q), name === null ? null : name + 1);
+            if (score !== null) tokens.push({ t, score });
+        });
+        tokens.sort((a, b) => a.score - b.score || a.t - b.t);
+        const values = [];
+        ix.values.forEach((value, v) => {
+            const raw = String(value.id).slice(String(value.id).indexOf(':') + 1);
+            const score = best(matchScore(value.label, q), q.length >= 4 ? matchScore(raw, q) : null);
+            if (score !== null) values.push({ v, score, count: ix.byValue[v].length });
+        });
+        values.sort((a, b) => a.score - b.score || b.count - a.count || a.v - b.v);
+        return { tokens: tokens.slice(0, tokenLimit), values: values.slice(0, valueLimit) };
     }
 
     /** Groups with several tokens (drawn as moons) and groups of one token (listed, opening the token itself). */
@@ -422,6 +487,27 @@
     }
 
     /**
+     * Bodies of different sizes spaced evenly round one ring, far enough out that the biggest clears
+     * the centre and no two neighbours touch. `bodies` is [{id, size}]; returns {radius, orbits}.
+     */
+    function evenRing(bodies, centreRadius) {
+        const list = Array.isArray(bodies) ? bodies : [];
+        const biggest = Math.max(0, ...list.map((b) => b.size));
+        const fit = (list.length * biggest * 3) / TAU;
+        const radius = Math.max(centreRadius * 2.4 + biggest, fit);
+        const phase = hash01(list.map((b) => b.id).join('|'), 8) * TAU;
+        return {
+            radius,
+            orbits: list.map((body, i) => ({
+                id: body.id, radius, size: body.size,
+                angle: (phase + (i / list.length) * TAU) % TAU,
+                tilt: (hash01(body.id, 9) - 0.5) * 0.12,
+                speed: 0.3 / Math.pow(radius / centreRadius, 1.2)
+            }))
+        };
+    }
+
+    /**
      * How far the camera stands to frame a centre and everything orbiting out to `extent`, for a
      * screen at least as wide as it is tall; a narrower screen (aspect < 1) stands back further.
      */
@@ -441,7 +527,7 @@
     }
 
     return {
-        DIMENSIONS, ATTRIBUTES, TONE_COLORS, ISSUER_COLORS, ISSUER_PALETTE,
-        tokenMoons, attributeOf, readTable, tableIndex, splitSingles, moonHref, dimensionOf, planetRadius, hash01, splitForView, planetOrbit, moonRings, frameDistance, issuerColor
+        DIMENSIONS, TOKEN_PATTERN, ATTRIBUTES, TONE_COLORS, ISSUER_COLORS, ISSUER_PALETTE,
+        tokenMoons, attributeOf, readTable, tableIndex, search, splitSingles, moonHref, dimensionOf, planetRadius, hash01, splitForView, planetOrbit, moonRings, evenRing, frameDistance, issuerColor
     };
 });

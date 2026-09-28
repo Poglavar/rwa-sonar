@@ -844,6 +844,16 @@ describe('every real card', () => {
         }
     });
 
+    it('links each card to its own planet in the universe view, marked new', () => {
+        for (const { card, html } of rendered) {
+            const link = html.match(/<a class="planet-link" href="([^"]+)">(.*?)<\/a>/);
+            expect(link?.[1]).toBe(`../universe.html#*/@${encodeURIComponent(card.slug)}`);
+            expect(link[2]).toContain('<span class="badge-new">New</span>');
+            // In the page header, not buried further down the card.
+            expect(html.indexOf('class="planet-link"')).toBeLessThan(html.indexOf('</header>', html.indexOf('<header class="card-head">')));
+        }
+    });
+
     it('renders the shared application header exactly once', () => {
         for (const { html } of rendered) {
             expect((html.match(/<header class="app-header">/g) ?? [])).toHaveLength(1);

@@ -174,10 +174,17 @@ describe('landing/app separation', () => {
         expect(form).toBeLessThan(hero.indexOf('<article class="comparison-preview"'));
         const css = readFileSync(join(__dirname, 'landing.css'), 'utf8');
         expect(css).toMatch(/\.hero-search \{ grid-area: search;/);
+        // On a wide screen the search heads the right column, above the real example.
+        expect(css).toMatch(/\.hero \{ grid-template-areas: "copy search" "copy preview" "copy events"; \}/);
         const phone = css.slice(css.indexOf('/* Phone hero order'));
         expect(phone).toMatch(/\.hero-copy \{ display: contents; \}/);
         expect(phone).toMatch(/\.hero-search \{ order: 4;/);
         expect(phone).toMatch(/\.hero-lede \{ order: 3;/);
+    });
+
+    test('offers the universe view among the hero actions, marked new', () => {
+        const actions = html.slice(html.indexOf('<div class="hero-actions">'), html.indexOf('</div>', html.indexOf('<div class="hero-actions">')));
+        expect(actions).toMatch(/<a class="button button-planets" href="\.\/universe\.html"><span class="badge-new">New<\/span>See as planets<\/a>/);
     });
 
     test('carries the canonical X identity across the main public surfaces', () => {

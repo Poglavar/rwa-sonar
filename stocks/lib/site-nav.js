@@ -70,7 +70,20 @@
         return `<button class="theme-switch" type="button" aria-label="${THEME_LABEL}" title="${THEME_LABEL}">`
             + `<svg class="theme-icon" aria-hidden="true" focusable="false">${use('auto')}${use('light')}${use('dark')}</svg></button>`;
     }
-    const THEME_MENU_HTML = '<button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button>';
+    /**
+     * The way into the universe view (universe.html), beside the logo: a NEW badge and a ringed planet
+     * (the ring's back half, the planet over it, then the ring's front half, so the ring goes round).
+     * On a phone the row has no room for it: app-shell.css shows the planet alone under 720 px and,
+     * under 400 px, swaps it for the "See as planets" copy at the top of the Research menu.
+     */
+    const PLANETS_LABEL = 'New: see every tokenized stock as a planet';
+    const PLANETS_HTML = (root) => `<a class="app-planets" href="${root}universe.html" aria-label="${PLANETS_LABEL}" title="${PLANETS_LABEL}">`
+        + '<span class="badge-new">New</span>'
+        + '<svg class="app-planets-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+        + '<g transform="rotate(-20 12 12)"><path class="ring" d="M1 12a11 3.6 0 0 1 22 0"/><circle class="planet" cx="12" cy="12" r="6.2"/>'
+        + '<path class="ring" d="M23 12a11 3.6 0 0 1-22 0"/></g></svg></a>';
+
+    const THEME_MENU_HTML ='<button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button>';
 
     /**
      * The header for a page `root` ('./' or '../') whose own nav entry is `current` (an href from
@@ -91,10 +104,12 @@
         const learn = PRIMARY.find((item) => item.href === 'learn/');
         return `<header class="app-header">`
             + `<a class="app-brand" href="${root}index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>`
+            + PLANETS_HTML(root)
             + `<nav class="app-nav" aria-label="Site navigation">`
             + PRIMARY.map((item) => link(item)).join('')
             + `<details class="app-nav-menu"><summary${inMenu ? ' aria-current="page"' : ''}>${MENU_LABEL}</summary><div>`
             + link(learn, 'nav-compact-only')
+            + `<a class="planets-compact" href="${root}universe.html"><span class="badge-new">New</span> See as planets</a>`
             + RESEARCH.map((item) => link(item)).join('')
             + THEME_MENU_HTML
             + `</div></details>${themeSwitchHtml(root)}</nav></header>`;

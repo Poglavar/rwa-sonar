@@ -199,6 +199,21 @@ describe('grouping on any attribute', () => {
         expect(model.splitSingles(null)).toEqual({ multi: [], single: [] });
     });
 
+    it('sorts what a token has into its dimensions, the level between the token and the values', () => {
+        const aspects = IX.aspects(tokenOf('AAPLx'));
+        expect(aspects.map((a) => a.dimension)).toEqual(['identity', 'legal', 'rights', 'custody', 'keys', 'defi', 'health']);
+        const ids = (list) => list.map((v) => IX.values[v].id);
+        const custody = aspects.find((a) => a.dimension === 'custody');
+        expect(ids(custody.shared)).toEqual(expect.arrayContaining(['custodian:Alpaca Securities', 'custodian:InCore Bank AG', 'attestor:Chainlink']));
+        expect(ids(aspects.find((a) => a.dimension === 'defi').single)).toEqual(['defi:nest']);
+        // Every value lands in exactly one dimension, on the same side as sharedValues puts it.
+        const { shared, single } = IX.sharedValues(tokenOf('AAPLx'));
+        expect(aspects.flatMap((a) => a.shared).sort((a, b) => a - b)).toEqual([...shared].sort((a, b) => a - b));
+        expect(aspects.flatMap((a) => a.single).sort((a, b) => a - b)).toEqual([...single].sort((a, b) => a - b));
+        // A dimension the token has nothing in is left out.
+        expect(IX.aspects(tokenOf('DEADx')).map((a) => a.dimension)).not.toContain('defi');
+    });
+
     it('puts two wrappers of one stock on the same moon', () => {
         expect(valuesOf('AAPLx')).toContain('stock:AAPL');
         expect(valuesOf('AAPLon')).toContain('stock:AAPL');
@@ -206,7 +221,90 @@ describe('grouping on any attribute', () => {
     });
 });
 
+describe('search', () => {
+    const symbols = (found) => found.tokens.map(({ t }) => IX.tokens[t].symbol);
+    const labels = (found) => found.values.map(({ v }) => IX.values[v].label);
+
+    it('finds every wrapper of a stock by its ticker, bigger pool first, and the stock itself as a value', () => {
+        const found = model.search(IX, ' AAPL ');
+        expect(symbols(found)).toEqual(['AAPLx', 'AAPLon']);
+        expect(labels(found)[0]).toBe('AAPL');
+    });
+
+    it('ranks an exact symbol above a prefix, and a symbol above a name', () => {
+        expect(symbols(model.search(IX, 'aaplon'))).toEqual(['AAPLon']);
+        expect(symbols(model.search(IX, 'apple'))).toEqual(['AAPLx', 'AAPLon']);
+        expect(model.search(IX, 'apple').tokens.every(({ score }) => score >= 2)).toBe(true);
+        expect(model.search(IX, 'nvdax').tokens[0]).toEqual({ t: tokenOf('NVDAx'), score: 0 });
+    });
+
+    it('finds the things tokens share by label, with how many share them', () => {
+        const found = model.search(IX, 'alpaca');
+        expect(found.values).toEqual([{ v: IX.valueById.get('custodian:Alpaca Securities'), score: 1, count: 3 }]);
+        expect(found.tokens).toEqual([]);
+        expect(labels(model.search(IX, 'ondo'))).toContain('Ondo Global Markets');
+        expect(symbols(model.search(IX, 'ondo'))).toEqual(['AAPLon']); // "Apple (Ondo)", by name
+    });
+
+    it('finds a key by its full address, which its label shortens', () => {
+        const found = model.search(IX, 'freezekey1111');
+        expect(found.values.map(({ v }) => IX.values[v].id)).toEqual(['key:FREEZEKEY11111111']);
+    });
+
+    it('returns nothing for an empty or unmatched query, and keeps to the limits', () => {
+        expect(model.search(IX, '   ')).toEqual({ tokens: [], values: [] });
+        expect(model.search(IX, 'qqqzzz')).toEqual({ tokens: [], values: [] });
+        const limited = model.search(IX, 'a', { tokens: 1, values: 2 });
+        expect(limited.tokens.length).toBe(1);
+        expect(limited.values.length).toBe(2);
+    });
+});
+
+describe('telling categories apart', () => {
+    const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    const distance = (a, b) => Math.hypot(...rgb(a).map((c, i) => c - rgb(b)[i]));
+
+    it('gives every category its own colour, far enough from every other to tell apart', () => {
+        const dims = model.DIMENSIONS;
+        for (let i = 0; i < dims.length; i += 1) {
+            for (let j = i + 1; j < dims.length; j += 1) {
+                expect([dims[i].id, dims[j].id, distance(dims[i].color, dims[j].color) > 80]).toEqual([dims[i].id, dims[j].id, true]);
+            }
+        }
+    });
+
+    it('gives every category its own surface pattern, never the one token planets wear', () => {
+        const patterns = model.DIMENSIONS.map((d) => d.pattern);
+        expect(new Set(patterns).size).toBe(patterns.length);
+        expect(patterns.every((p) => typeof p === 'string' && p)).toBe(true);
+        expect(patterns).not.toContain(model.TOKEN_PATTERN);
+    });
+
+    it('writes colour and pattern into the index the page reads', () => {
+        const rows = model.readTable(DATA.tables.dimensions);
+        expect(rows).toEqual(model.DIMENSIONS.map(({ id, label, color, pattern }) => ({ id, label, color, pattern })));
+    });
+});
+
 describe('sizes and orbits', () => {
+    it('spaces bodies of different sizes round one ring, clear of the centre and of each other', () => {
+        const bodies = [{ id: 'identity', size: 0.3 }, { id: 'legal', size: 0.5 }, { id: 'custody', size: 0.4 }];
+        const { radius, orbits } = model.evenRing(bodies, 1.3);
+        expect(orbits.map((o) => o.id)).toEqual(['identity', 'legal', 'custody']);
+        expect(radius - 0.5).toBeGreaterThan(1.3 * 2);
+        for (let i = 0; i < orbits.length; i += 1) {
+            const a = orbits[i];
+            const b = orbits[(i + 1) % orbits.length];
+            const gap = 2 * radius * Math.sin(Math.abs(a.angle - b.angle) / 2);
+            expect(gap).toBeGreaterThan(a.size + b.size);
+        }
+        // Many bodies push the ring out rather than overlapping.
+        const many = Array.from({ length: 40 }, (_, i) => ({ id: `m${i}`, size: 0.5 }));
+        const wide = model.evenRing(many, 1.3);
+        expect(2 * wide.radius * Math.sin(Math.PI / 40)).toBeGreaterThan(1);
+        expect(model.evenRing([], 1.3).orbits).toEqual([]);
+    });
+
     it('sizes planets by liquidity on a log scale, with a floor for tokens with no measured pool', () => {
         const sizes = [null, undefined, NaN, -5, 0, 1e3, 1e5, 1e7, 1e12].map(model.planetRadius);
         for (const size of sizes) expect(Number.isFinite(size)).toBe(true);

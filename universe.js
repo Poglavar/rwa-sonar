@@ -21,7 +21,7 @@ const MOON_CENTRE_RADIUS = 1.1;
 
 const $ = (id) => document.getElementById(id);
 const els = {
-    stage: $('stage'), panel: $('panel'), crumbs: $('crumbs'), search: $('search'), searchInput: $('searchInput'), searchList: $('searchList'),
+    stage: $('stage'), panel: $('panel'), crumbs: $('crumbs'), search: $('search'), searchInput: $('searchInput'), searchResults: $('searchResults'),
     kicker: $('panelKicker'), title: $('panelTitle'), summary: $('panelSummary'), details: $('panelDetails'),
     children: $('panelChildren'), back: $('backButton'), link: $('panelLink')
 };
@@ -115,6 +115,135 @@ function bandTexture(color, seed) {
     return texture;
 }
 
+/**
+ * Each category's surface pattern (its `pattern` in the dimensions table) in its colour, so a
+ * category reads by pattern as well as by hue. Drawn on an equirectangular 256×128 canvas; every
+ * horizontal period divides 256 so the seam at the back of the sphere does not show. Cached: every
+ * body of a category shares one texture, and clearing a system never disposes it.
+ */
+const patternCache = new Map();
+function patternTexture(dimensionId) {
+    if (patternCache.has(dimensionId)) return patternCache.get(dimensionId);
+    const dim = dimensionById.get(dimensionId);
+    const base = new THREE.Color(dim?.color ?? '#e2e8f0');
+    const dark = `#${base.clone().offsetHSL(0, 0, -0.24).getHexString()}`;
+    const light = `#${base.clone().offsetHSL(0, -0.05, 0.12).getHexString()}`;
+    const texture = canvasTexture(256, 128, (ctx, w, h) => {
+        ctx.fillStyle = `#${base.getHexString()}`;
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = dark;
+        ctx.strokeStyle = dark;
+        switch (dim?.pattern) {
+            case 'meridians':
+                for (let x = 0; x < w; x += 32) ctx.fillRect(x, 0, 10, h);
+                break;
+            case 'grid':
+                for (let x = 0; x < w; x += 32) ctx.fillRect(x, 0, 3, h);
+                for (let y = 8; y < h; y += 16) ctx.fillRect(0, y, w, 3);
+                break;
+            case 'dots':
+                for (let y = 8, row = 0; y < h; y += 16, row += 1) {
+                    for (let x = (row % 2) * 8; x < w + 8; x += 16) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                break;
+            case 'checker':
+                for (let y = 0; y < h; y += 16) for (let x = (y / 16) % 2 ? 0 : 16; x < w; x += 32) ctx.fillRect(x, y, 16, 16);
+                break;
+            case 'diagonal':
+                ctx.lineWidth = 9;
+                for (let x = -h; x < w + h; x += 32) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x + h, h);
+                    ctx.stroke();
+                }
+                break;
+            case 'waves':
+                ctx.lineWidth = 4;
+                for (let y = 10; y < h; y += 18) {
+                    ctx.beginPath();
+                    for (let x = 0; x <= w; x += 2) ctx.lineTo(x, y + Math.sin((x / 64) * Math.PI * 2) * 5);
+                    ctx.stroke();
+                }
+                break;
+            case 'craters':
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 26; i += 1) {
+                    const x = U.hash01(`${dimensionId}${i}`, 11) * w;
+                    const y = 12 + U.hash01(`${dimensionId}${i}`, 12) * (h - 24);
+                    const r = 4 + U.hash01(`${dimensionId}${i}`, 13) * 9;
+                    // Drawn twice, a width apart, so a crater on the seam wraps round.
+                    for (const dx of [0, -w, w]) {
+                        ctx.beginPath();
+                        ctx.arc(x + dx, y, r, 0, Math.PI * 2);
+                        ctx.fillStyle = dark;
+                        ctx.fill();
+                        ctx.strokeStyle = light;
+                        ctx.stroke();
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    });
+    patternCache.set(dimensionId, texture);
+    return texture;
+}
+
+/**
+ * The marquee: a band round a body's equator (±23° of latitude, a little proud of the surface) that
+ * carries the body's name, tiled so it wraps seamlessly, and scrolls by moving the texture offset.
+ */
+const BAND = new THREE.SphereGeometry(1.03, 96, 6, 0, Math.PI * 2, Math.PI / 2 - 0.4, 0.8);
+const MARQUEE_W = 1024;
+const MARQUEE_H = 128; // the band's circumference is about 8 times its height
+const MARQUEE_SPEED = 0.025; // turns of the band per second
+
+function marqueeTexture(text, color) {
+    const texture = canvasTexture(MARQUEE_W, MARQUEE_H, (ctx, w, h) => {
+        ctx.fillStyle = 'rgba(3, 7, 18, 0.62)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, w, 4);
+        ctx.fillRect(0, h - 4, w, 4);
+        ctx.font = '700 84px system-ui, -apple-system, "Segoe UI", sans-serif';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#f8fafc';
+        const unit = `${text}   ·   `;
+        const width = ctx.measureText(unit).width;
+        // Whole copies only, spread evenly, so the seam at u = 0 / 1 never cuts a word; at least two, so
+        // the half facing the camera always has the name on it (a long name is narrowed to fit).
+        const copies = Math.max(2, Math.floor(w / width));
+        const step = w / copies;
+        const squeeze = Math.min(1, step / width);
+        for (let i = 0; i < copies; i += 1) {
+            ctx.save();
+            ctx.translate(i * step, 0);
+            ctx.scale(squeeze, 1);
+            ctx.fillText(unit, 0, h / 2 + 4);
+            ctx.restore();
+        }
+    });
+    texture.wrapS = THREE.RepeatWrapping;
+    return texture;
+}
+
+/** Adds a marquee with `text` round a sphere of radius `radius` inside `parent`; returns the band mesh. */
+function addMarquee(parent, text, color, radius) {
+    const band = new THREE.Mesh(BAND, new THREE.MeshBasicMaterial({
+        map: marqueeTexture(text, color), transparent: true, depthWrite: false, side: THREE.FrontSide
+    }));
+    band.scale.setScalar(radius);
+    band.userData.marquee = true;
+    parent.add(band);
+    return band;
+}
+
 function ringLine(radius, color, opacity) {
     const points = [];
     for (let i = 0; i <= 160; i += 1) {
@@ -178,8 +307,9 @@ async function loadCard(t) {
 // --- stops --------------------------------------------------------------------------------------
 
 /**
- * A stop is where the walk stands: {kind:'planet', token} or {kind:'filter', filters:[value…],
- * without:[attribute…], groupBy:attribute|null}. Solana is the filter with nothing in it.
+ * A stop is where the walk stands: {kind:'planet', token}, {kind:'aspect', token, dimension} (one
+ * dimension of a token, such as its custody, orbited by its values there) or {kind:'filter',
+ * filters:[value…], without:[attribute…], groupBy:attribute|null}. Solana is the filter with nothing in it.
  */
 function stopTokens(stop) {
     let tokens = IX.tokensWhere(stop.filters);
@@ -194,16 +324,24 @@ function isSun(stop) {
     return stop.kind === 'filter' && stop.filters.length === 0 && stop.without.length === 0;
 }
 
+/** The token a planet or aspect stop is about; null for a filter. */
+function tokenOfStop(stop) {
+    return stop?.kind === 'planet' || stop?.kind === 'aspect' ? stop.token : null;
+}
+
 function stopKey(stop) {
     if (stop.kind === 'planet') return `@${encodeURIComponent(IX.tokens[stop.token].slug)}`;
+    if (stop.kind === 'aspect') return `@${encodeURIComponent(IX.tokens[stop.token].slug)}~${stop.dimension}`;
     const parts = [...stop.filters.map((v) => encodeURIComponent(IX.values[v].id)), ...stop.without.map((a) => `!${encodeURIComponent(a)}`)];
     return `${parts.length ? parts.join('+') : '*'}${stop.groupBy ? `|${encodeURIComponent(stop.groupBy)}` : ''}`;
 }
 
 function parseStop(key) {
     if (key.startsWith('@')) {
-        const token = IX.tokenBySlug.get(decodeURIComponent(key.slice(1)));
-        return token === undefined ? null : { kind: 'planet', token };
+        const [slug, dimension] = key.slice(1).split('~');
+        const token = IX.tokenBySlug.get(decodeURIComponent(slug));
+        if (token === undefined) return null;
+        return dimension && dimensionById.has(dimension) ? { kind: 'aspect', token, dimension } : { kind: 'planet', token };
     }
     const [body, group] = key.split('|');
     const filters = [];
@@ -222,6 +360,7 @@ function parseStop(key) {
 
 function stopLabel(stop) {
     if (stop.kind === 'planet') return IX.tokens[stop.token].symbol;
+    if (stop.kind === 'aspect') return dimensionById.get(stop.dimension)?.label ?? stop.dimension;
     if (isSun(stop)) return 'Solana';
     if (stop.without.length) return attributeById.get(stop.without[stop.without.length - 1])?.none ?? 'None';
     return IX.values[stop.filters[stop.filters.length - 1]].label;
@@ -236,7 +375,8 @@ function clearSystem() {
     scene.remove(system.group);
     system.group.traverse((object) => {
         if (object.isCSS2DObject) object.element.remove();
-        if (object.geometry && object.geometry !== SPHERE) object.geometry.dispose();
+        if (object.geometry && object.geometry !== SPHERE && object.geometry !== BAND) object.geometry.dispose();
+        if (object.userData.marquee) object.material.map.dispose();
         if (object.material) object.material.dispose();
     });
     system = null;
@@ -272,29 +412,39 @@ function makeCentre(stop) {
         radius = PLANET_CENTRE_RADIUS;
         const token = IX.tokens[stop.token];
         const color = tokenColor(stop.token);
+        const bands = bandTexture(color, U.hash01(token.slug, 3));
         const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
-            color: 0xffffff, map: bandTexture(color, U.hash01(token.slug, 3)), emissive: color, emissiveIntensity: 0.35, roughness: 0.8
+            color: 0xffffff, map: bands, emissive: 0xffffff, emissiveMap: bands, emissiveIntensity: 0.3, roughness: 0.8
         }));
         mesh.scale.setScalar(radius);
         group.add(mesh);
         label = makeLabel(token.symbol, 'planet focus', color);
     } else {
         radius = MOON_CENTRE_RADIUS;
-        const attribute = stop.without.length ? stop.without[stop.without.length - 1] : IX.values[stop.filters[stop.filters.length - 1]].attribute;
-        const color = dimensionColor(attribute);
-        const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.5, roughness: 0.7 }));
+        const attribute = stop.kind === 'aspect' ? null
+            : stop.without.length ? stop.without[stop.without.length - 1] : IX.values[stop.filters[stop.filters.length - 1]].attribute;
+        const dimensionId = stop.kind === 'aspect' ? stop.dimension : attributeById.get(attribute)?.dimension;
+        const color = dimensionById.get(dimensionId)?.color ?? '#e2e8f0';
+        const texture = patternTexture(dimensionId);
+        const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
+            color: 0xffffff, map: texture, emissive: 0xffffff, emissiveMap: texture, emissiveIntensity: 0.4, roughness: 0.7
+        }));
         mesh.scale.setScalar(radius);
         group.add(mesh);
         const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending }));
         glow.scale.setScalar(radius * 4);
         group.add(glow);
-        const tone = stop.without.length ? 'muted' : valueTone(stop.filters[stop.filters.length - 1]);
-        label = makeLabel(stopLabel(stop), 'moon focus', U.TONE_COLORS[tone]);
+        if (stop.kind === 'aspect') label = makeLabel(`${IX.tokens[stop.token].symbol} · ${stopLabel(stop)}`, 'moon focus', color);
+        else {
+            const tone = stop.without.length ? 'muted' : valueTone(stop.filters[stop.filters.length - 1]);
+            label = makeLabel(stopLabel(stop), 'moon focus', U.TONE_COLORS[tone]);
+        }
     }
     const labelObject = new CSS2DObject(label);
     labelObject.position.set(0, radius * 1.2, 0);
     group.add(labelObject);
-    return { group, radius };
+    const band = addMarquee(group, label.textContent, label.style.getPropertyValue('--dot') || '#ffd98a', radius);
+    return { group, radius, label: labelObject, band, labelText: label.textContent };
 }
 
 /** One orbiting body: a tilted plane, a spinning arm, and the sphere with its label at the arm's end. */
@@ -307,13 +457,17 @@ function makeOrbiter(parent, { orbit, size, color, texture = null, emissive = 0.
     const anchor = new THREE.Group();
     anchor.position.set(orbit.radius, 0, 0);
     spin.add(anchor);
+    // A textured body glows through its own pattern, so the glow never washes the pattern out.
     const mesh = new THREE.Mesh(SPHERE, new THREE.MeshStandardMaterial({
-        color: texture ? 0xffffff : color, map: texture, emissive: color, emissiveIntensity: emissive, roughness: 0.85, metalness: 0.05
+        color: texture ? 0xffffff : color, map: texture, emissive: texture ? 0xffffff : color, emissiveMap: texture,
+        emissiveIntensity: emissive, roughness: 0.85, metalness: 0.05
     }));
     mesh.scale.setScalar(size);
     anchor.add(mesh);
     if (ringOpacity > 0) incl.add(ringLine(orbit.radius, color, ringOpacity));
-    const body = { orbit, size, spin, anchor, mesh, labelled, item };
+    // The band sits on the anchor, not the mesh, so the planet's own spin does not carry the text.
+    const band = addMarquee(anchor, label, dot, size);
+    const body = { orbit, size, spin, anchor, mesh, band, labelled, item };
     const labelEl = makeLabel(label, 'orbiter', dot, () => enter(body));
     labelEl.addEventListener('pointerenter', () => setHover(body));
     labelEl.addEventListener('pointerleave', () => setHover(null));
@@ -375,16 +529,31 @@ function buildSystem(stop) {
     let extent = centre.radius * 2;
 
     if (stop.kind === 'planet') {
-        const { shared, single } = IX.sharedValues(stop.token);
-        singles = single.map((v) => ({ kind: 'value', v }));
-        const moons = shared.map((v) => ({ id: IX.values[v].id, dimension: attributeById.get(IX.values[v].attribute)?.dimension }));
+        // A token's moons are its dimensions (custody, rights, keys…); what it has in each is one level down.
+        const aspects = IX.aspects(stop.token);
+        const sizeOf = (a) => centre.radius * (0.16 + 0.05 * Math.sqrt(a.shared.length + a.single.length));
+        const { radius, orbits } = U.evenRing(aspects.map((a) => ({ id: a.dimension, size: sizeOf(a) })), centre.radius);
+        aspects.forEach((aspect, i) => {
+            const dim = dimensionById.get(aspect.dimension);
+            const n = aspect.shared.length + aspect.single.length;
+            bodies.push(makeOrbiter(group, {
+                orbit: orbits[i], size: orbits[i].size, color: dim.color, texture: patternTexture(aspect.dimension), emissive: 0.3, label: `${dim.label} · ${n}`, dot: dim.color, labelled: true, ringOpacity: 0,
+                item: { kind: 'aspect', aspect }
+            }));
+            extent = Math.max(extent, radius + orbits[i].size);
+        });
+        group.add(ringLine(radius, '#c7d2fe', 0.2));
+    } else if (stop.kind === 'aspect') {
+        const aspect = IX.aspects(stop.token).find((a) => a.dimension === stop.dimension) ?? { shared: [], single: [] };
+        singles = aspect.single.map((v) => ({ kind: 'value', v }));
+        const moons = aspect.shared.map((v) => ({ id: IX.values[v].id, dimension: stop.dimension }));
         const { size, rings } = U.moonRings(moons, centre.radius);
         for (const ring of rings) {
             const color = dimensionById.get(ring.dimension)?.color ?? '#e2e8f0';
             for (const orbit of ring.orbits) {
                 const v = IX.valueById.get(orbit.id);
                 bodies.push(makeOrbiter(group, {
-                    orbit, size, color, emissive: 0.3, label: IX.values[v].label, dot: U.TONE_COLORS[valueTone(v)], labelled: true, ringOpacity: 0,
+                    orbit, size, color, texture: patternTexture(stop.dimension), emissive: 0.3, label: IX.values[v].label, dot: U.TONE_COLORS[valueTone(v)], labelled: true, ringOpacity: 0,
                     item: { kind: 'value', v }
                 }));
             }
@@ -407,8 +576,8 @@ function buildSystem(stop) {
             const orbit = U.planetOrbit(rank, item.key, centre.radius);
             bodies.push(makeOrbiter(group, {
                 orbit, size: item.size, color: item.color,
-                texture: item.kind === 'token' ? bandTexture(item.color, U.hash01(item.key, 3)) : null,
-                emissive: item.kind === 'token' ? 0.12 : 0.35,
+                texture: item.kind === 'token' ? bandTexture(item.color, U.hash01(item.key, 3)) : patternTexture(attributeById.get(stop.groupBy)?.dimension),
+                emissive: item.kind === 'token' ? 0.12 : 0.3,
                 label: item.kind === 'group' ? `${item.label} · ${item.tokens.length}` : item.label,
                 dot: item.kind === 'group' ? U.TONE_COLORS[item.tone] : item.color,
                 labelled: rank < LABELLED, ringOpacity: 0.1, item
@@ -475,10 +644,18 @@ function frame(sys) {
 
 let trail = [];
 let busy = false;
+let queued = null;
 
-/** Goes to `stop`. From a clicked body, the camera first dives into it and it becomes the new centre. */
+/**
+ * Goes to `stop`. From a clicked body, the camera first dives into it and it becomes the new centre.
+ * Asked again mid-flight (a search pick, Esc), the latest request waits and runs when this one lands;
+ * its body will be gone by then, so it goes without the dive.
+ */
 async function go(stop, { from = null, push = true } = {}) {
-    if (busy) return;
+    if (busy) {
+        queued = { stop, push };
+        return;
+    }
     busy = true;
     try {
         let nextTrail = trail;
@@ -488,17 +665,17 @@ async function go(stop, { from = null, push = true } = {}) {
             nextTrail = at >= 0 ? trail.slice(0, at + 1) : [...trail, stop];
         }
         let cardError = null;
-        if (stop.kind === 'planet') {
-            renderLoading(IX.tokens[stop.token].symbol);
+        if (tokenOfStop(stop) !== null) {
+            if (!cards.has(IX.tokens[stop.token].slug)) renderLoading(IX.tokens[stop.token].symbol);
             await loadCard(stop.token).catch((err) => {
                 cardError = err;
                 console.error(`[universe ${new Date().toISOString()}]`, err);
             });
         }
-        // A moon reached from a planet says what it means for that planet, so read that card too
-        // (a link can land here without the planet ever having been opened).
+        // A moon reached from a token says what it means for that token, so read that card too
+        // (a link can land here without the token ever having been opened).
         const previous = nextTrail.length > 1 ? nextTrail[nextTrail.length - 2] : null;
-        if (stop.kind === 'filter' && previous?.kind === 'planet') {
+        if (stop.kind === 'filter' && tokenOfStop(previous) !== null) {
             await loadCard(previous.token).catch((err) => console.error(`[universe ${new Date().toISOString()}]`, err));
         }
         let relative = null;
@@ -521,16 +698,23 @@ async function go(stop, { from = null, push = true } = {}) {
     } finally {
         busy = false;
     }
+    if (queued) {
+        const next = queued;
+        queued = null;
+        await go(next.stop, { push: next.push });
+    }
 }
 
 function enter(body) {
+    if (body.item.kind === 'aspect') return go({ kind: 'aspect', token: system.stop.token, dimension: body.item.aspect.dimension }, { from: body });
     if (body.item.kind === 'value') return go({ kind: 'filter', filters: [body.item.v], without: [], groupBy: null }, { from: body });
     if (body.item.kind === 'token') return go({ kind: 'planet', token: body.item.t }, { from: body });
     return go(body.item.next, { from: body });
 }
 
+/** Back and the breadcrumbs cut the trail themselves, so they wait for a flight to land rather than queue. */
 function back() {
-    if (trail.length < 2) return;
+    if (busy || trail.length < 2) return;
     trail = trail.slice(0, -1);
     go(trail[trail.length - 1], { push: false });
 }
@@ -588,7 +772,6 @@ function renderPanel(cardError = null) {
     els.link.hidden = true;
     if (stop.kind === 'planet') {
         const token = IX.tokens[stop.token];
-        const entry = cards.get(token.slug) ?? null;
         const issuer = issuerBySlug.get(token.issuer);
         const template = DATA.templates?.[token.template] ?? null;
         els.kicker.textContent = `Token · ${issuer?.name ?? token.issuer ?? ''}`;
@@ -596,18 +779,44 @@ function renderPanel(cardError = null) {
         els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its moons still come from the tables.` : (token.name ?? '');
         els.details.innerHTML = detailsHtml([['Tracks', token.underlying], ['Price', money(token.priceUsd)], ['Liquidity', money(token.liquidityUsd)],
             ['Health', token.status], ...(template ? DATA.scenarios.map((s) => [s.label, template[s.id]?.headline]) : [])].filter(([, v]) => v));
-        const dimensionOf = (v) => attributeById.get(IX.values[v].attribute)?.dimension;
+        // One entry per dimension moon, previewing what is inside it.
+        const list = bodies.map((b, i) => {
+            const { aspect } = b.item;
+            const dim = dimensionById.get(aspect.dimension);
+            const inside = [...aspect.shared, ...aspect.single].map((v) => IX.values[v].label);
+            const preview = inside.slice(0, 4).join(' · ') + (inside.length > 4 ? ` · and ${inside.length - 4} more` : '');
+            return button(i, `${dim.label} · ${inside.length}`, preview, dim.color);
+        }).join('');
+        els.children.innerHTML = `<p class="hint-line">Each moon is one side of ${esc(token.symbol)}: its legal structure, custody, rights, keys, DeFi use. `
+            + 'Open one to see what it has there, then open any of those to see every token that shares it.</p>'
+            + `<h2>What ${esc(token.symbol)} is made of</h2>${list}`;
+        els.link.hidden = false;
+        els.link.href = `./cards/${encodeURIComponent(token.slug)}.html`;
+        els.link.textContent = 'Open its card →';
+        return;
+    }
+
+    if (stop.kind === 'aspect') {
+        const token = IX.tokens[stop.token];
+        const entry = cards.get(token.slug) ?? null;
+        const dim = dimensionById.get(stop.dimension);
         const relationOf = (v) => entry?.relations.get(IX.values[v].id)?.summary ?? null;
-        const sections = [...dimensionById.values()].map((dim) => {
-            const own = bodies.map((b, i) => ({ b, i })).filter(({ b }) => dimensionOf(b.item.v) === dim.id);
-            const alone = system.singles.filter((item) => dimensionOf(item.v) === dim.id);
+        els.kicker.textContent = `${token.symbol} · ${token.name ?? ''}`;
+        els.title.textContent = dim?.label ?? stop.dimension;
+        els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its moons still come from the tables.`
+            : `What ${token.symbol} has here. Each moon is shared with other tokens; the number is how many. Open one to see them all.`;
+        els.details.innerHTML = '';
+        // Grouped by attribute (Custodian, Attestor…) within the dimension.
+        const attributeOfValue = (v) => IX.values[v].attribute;
+        const sections = IX.attributes.filter((a) => a.dimension === stop.dimension).map((a) => {
+            const own = bodies.map((b, i) => ({ b, i })).filter(({ b }) => attributeOfValue(b.item.v) === a.id);
+            const alone = system.singles.filter((item) => attributeOfValue(item.v) === a.id);
             if (!own.length && !alone.length) return '';
-            return `<h2>${esc(dim.label)}</h2>`
+            return `<h2>${esc(a.label)}</h2>`
                 + own.map(({ b, i }) => button(i, `${IX.values[b.item.v].label} · ${IX.byValue[b.item.v].length}`, relationOf(b.item.v), U.TONE_COLORS[valueTone(b.item.v)])).join('')
                 + alone.map((item) => lineItem(IX.values[item.v].label, relationOf(item.v), U.TONE_COLORS[valueTone(item.v)], `only ${token.symbol}`)).join('');
         }).join('');
-        els.children.innerHTML = `<p class="hint-line">Each moon is something ${esc(token.symbol)} shares with other tokens; the number is how many share it. Open one to see them all. `
-            + `What only ${esc(token.symbol)} has is listed without a moon.</p>${sections}`;
+        els.children.innerHTML = `${sections}${system.singles.length ? `<p class="hint-line">What only ${esc(token.symbol)} has is listed without a moon.</p>` : ''}`;
         els.link.hidden = false;
         els.link.href = `./cards/${encodeURIComponent(token.slug)}.html`;
         els.link.textContent = 'Open its card →';
@@ -629,7 +838,7 @@ function renderPanel(cardError = null) {
         els.title.textContent = stopLabel(stop);
         els.summary.textContent = `${tokens.length.toLocaleString('en-US')} token${tokens.length === 1 ? '' : 's'} ${labels.length > 1 ? `share all of: ${labels.join(' · ')}` : 'share this'}.`;
         const previous = trail.length > 1 ? trail[trail.length - 2] : null;
-        const relation = previous?.kind === 'planet' && last !== null ? cards.get(IX.tokens[previous.token].slug)?.relations.get(IX.values[last].id) : null;
+        const relation = tokenOfStop(previous) !== null && last !== null ? cards.get(IX.tokens[previous.token].slug)?.relations.get(IX.values[last].id) : null;
         els.details.innerHTML = relation ? `<dt>For ${esc(IX.tokens[previous.token].symbol)}</dt><dd>${esc(relation.summary ?? '')}</dd>${detailsHtml(relation.details ?? [])}` : '';
         const href = last !== null ? U.moonHref(IX.values[last].id) : null;
         if (href) {
@@ -667,7 +876,7 @@ function renderCrumbs() {
 
 els.crumbs.addEventListener('click', (event) => {
     const target = event.target.closest('button[data-crumb]');
-    if (!target) return;
+    if (!target || busy) return;
     const i = Number(target.dataset.crumb);
     trail = trail.slice(0, i + 1);
     go(trail[i], { push: false });
@@ -680,23 +889,122 @@ els.children.addEventListener('click', (event) => {
 });
 els.back.addEventListener('click', back);
 window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') back();
+    const typing = event.target.closest?.('input, select, textarea');
+    if (event.key === 'Escape' && !typing) back();
+    if (event.key === '/' && !typing) {
+        event.preventDefault();
+        els.searchInput.focus();
+    }
 });
+
+// --- search -------------------------------------------------------------------------------------
+
+/** The results under the search box: tokens, then the things tokens share; `active` is the highlighted one. */
+let results = [];
+let active = -1;
+
+function resultOption(result, i) {
+    return `<div class="result" role="option" id="result-${i}" data-result="${i}" aria-selected="${i === active}" style="--dot:${esc(result.dot)}">`
+        + `<span class="dot"></span><strong>${esc(result.label)}</strong><small>${esc(result.hint)}</small></div>`;
+}
+
+function renderResults() {
+    const query = els.searchInput.value;
+    const found = IX ? U.search(IX, query) : { tokens: [], values: [] };
+    const tokenResults = found.tokens.map(({ t }) => {
+        const token = IX.tokens[t];
+        return {
+            section: 'Tokens', label: token.symbol, dot: tokenColor(t),
+            hint: [token.name, issuerBySlug.get(token.issuer)?.name].filter(Boolean).join(' · '),
+            stop: { kind: 'planet', token: t }
+        };
+    });
+    const valueResults = found.values.map(({ v, count }) => {
+        const value = IX.values[v];
+        const only = count === 1 ? IX.byValue[v][0] : null;
+        return {
+            section: 'Shared by tokens', label: value.label, dot: U.TONE_COLORS[valueTone(v)],
+            hint: `${attributeById.get(value.attribute)?.label ?? value.attribute} · ${only === null ? `${count.toLocaleString('en-US')} tokens` : `only ${IX.tokens[only].symbol}`}`,
+            // A value only one token has would open a system of one: it opens that token instead.
+            stop: only === null ? { kind: 'filter', filters: [v], without: [], groupBy: null } : { kind: 'planet', token: only }
+        };
+    });
+    // The section holding the best match goes first, so Enter opens it; tokens win a tie.
+    const valuesFirst = found.values.length && (!found.tokens.length || found.values[0].score < found.tokens[0].score);
+    results = valuesFirst ? [...valueResults, ...tokenResults] : [...tokenResults, ...valueResults];
+    active = results.length ? Math.min(Math.max(active, 0), results.length - 1) : -1;
+    let html = '';
+    let section = null;
+    results.forEach((result, i) => {
+        if (result.section !== section) {
+            section = result.section;
+            html += `<p class="result-section">${esc(section)}</p>`;
+        }
+        html += resultOption(result, i);
+    });
+    if (query.trim() && !results.length) html = '<p class="result-empty">Nothing by that name.</p>';
+    els.searchResults.innerHTML = html;
+    const open = query.trim() !== '';
+    els.searchResults.hidden = !open;
+    els.searchInput.setAttribute('aria-expanded', String(open));
+    if (active >= 0) els.searchInput.setAttribute('aria-activedescendant', `result-${active}`);
+    else els.searchInput.removeAttribute('aria-activedescendant');
+}
+
+function closeResults() {
+    els.searchResults.hidden = true;
+    els.searchInput.setAttribute('aria-expanded', 'false');
+}
+
+function pickResult(i) {
+    const result = results[i];
+    if (!result) return;
+    els.searchInput.value = '';
+    active = -1;
+    closeResults();
+    els.searchInput.blur();
+    go(result.stop);
+}
+
+function moveActive(step) {
+    if (!results.length) return;
+    active = (active + step + results.length) % results.length;
+    for (const el of els.searchResults.querySelectorAll('[data-result]')) el.setAttribute('aria-selected', String(Number(el.dataset.result) === active));
+    els.searchInput.setAttribute('aria-activedescendant', `result-${active}`);
+    document.getElementById(`result-${active}`)?.scrollIntoView({ block: 'nearest' });
+}
 
 els.search.addEventListener('submit', (event) => {
     event.preventDefault();
-    const wanted = els.searchInput.value.trim().toLowerCase();
-    const t = IX.tokens.findIndex((token) => token.symbol.toLowerCase() === wanted || token.slug.toLowerCase() === wanted);
-    if (t < 0) {
-        els.searchInput.setCustomValidity('No token with that symbol');
-        els.searchInput.reportValidity();
-        return;
-    }
-    els.searchInput.setCustomValidity('');
-    els.searchInput.value = '';
-    go({ kind: 'planet', token: t });
+    pickResult(active >= 0 ? active : 0);
 });
-els.searchInput.addEventListener('input', () => els.searchInput.setCustomValidity(''));
+els.searchInput.addEventListener('input', () => {
+    active = 0;
+    renderResults();
+});
+els.searchInput.addEventListener('focus', () => {
+    if (els.searchInput.value.trim()) renderResults();
+});
+els.searchInput.addEventListener('blur', closeResults);
+els.searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        moveActive(event.key === 'ArrowDown' ? 1 : -1);
+    } else if (event.key === 'Escape') {
+        event.stopPropagation();
+        if (els.searchInput.value) {
+            els.searchInput.value = '';
+            closeResults();
+        } else els.searchInput.blur();
+    }
+});
+// pointerdown, not click: a click would come after the input's blur had already closed the list.
+els.searchResults.addEventListener('pointerdown', (event) => {
+    const option = event.target.closest('[data-result]');
+    if (!option) return;
+    event.preventDefault();
+    pickResult(Number(option.dataset.result));
+});
 
 // --- picking ------------------------------------------------------------------------------------
 
@@ -743,16 +1051,44 @@ renderer.domElement.addEventListener('pointermove', (event) => {
 
 const projected = new THREE.Vector3();
 
+// A body at least this many pixels in radius on screen carries its name on its marquee (the text is
+// about half the radius tall); a smaller one shows the band-less body with the label above it.
+const MARQUEE_MIN_PX = 30;
+const worldPoint = new THREE.Vector3();
+
+function screenRadius(object, radius, height) {
+    const distance = camera.position.distanceTo(object.getWorldPosition(worldPoint));
+    return distance > 0 ? (radius / (distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) * (height / 2) : Infinity;
+}
+
 /**
- * Hides a label that would overlap one drawn before it, in body order (inner rings and bigger pools
- * first); the hovered body's label always shows. Screen boxes are estimated from the text length.
+ * Each body shows its name one way: on its marquee when it is big enough on screen to read, else as
+ * a label above it. Labels that would overlap one drawn before them are hidden, in body order (inner
+ * rings and bigger pools first); the hovered body's label always shows. Boxes are estimated from the
+ * text length.
  */
 function declutter() {
     if (!system) return;
     const rect = renderer.domElement.getBoundingClientRect();
     const placed = [];
+    const centreReadable = screenRadius(system.centre.group, system.centre.radius, rect.height) >= MARQUEE_MIN_PX;
+    system.centre.band.visible = centreReadable;
+    system.centre.label.visible = !centreReadable;
+    if (!centreReadable) {
+        // The centre's label is placed first, so no orbiting label hides under it.
+        projected.set(0, system.centre.radius * 1.2, 0).project(camera);
+        const cx = (projected.x + 1) / 2 * rect.width;
+        const cy = (1 - projected.y) / 2 * rect.height - 16;
+        const cw = system.centre.labelText.length * 6.6 + 22;
+        placed.push({ x0: cx - cw / 2, x1: cx + cw / 2, y0: cy - 9, y1: cy + 9 });
+    }
     for (const body of system.bodies) {
-        if (!body.labelled) continue;
+        const readable = screenRadius(body.anchor, body.size, rect.height) >= MARQUEE_MIN_PX;
+        body.band.visible = readable;
+        if (readable || !body.labelled) {
+            body.label.visible = body === hovered;
+            continue;
+        }
         body.anchor.getWorldPosition(projected).project(camera);
         const x = (projected.x + 1) / 2 * rect.width;
         const y = (1 - projected.y) / 2 * rect.height - 16;
@@ -775,8 +1111,10 @@ function animate(now) {
         for (const body of system.bodies) {
             body.spin.rotation.y += body.orbit.speed * dt;
             body.mesh.rotation.y += dt * 0.12;
+            if (body.band.visible) body.band.material.map.offset.x += MARQUEE_SPEED * dt;
         }
         system.centre.group.rotation.y += dt * 0.03;
+        system.centre.band.material.map.offset.x += MARQUEE_SPEED * dt;
     }
     stepFlight(now);
     controls.update();
@@ -805,7 +1143,6 @@ async function start() {
     ruleLabels = new Map(Object.entries(DATA.ruleLabels ?? {}));
     for (const a of IX.attributes) attributeById.set(a.id, a);
     for (const d of U.readTable(DATA.tables.dimensions)) dimensionById.set(d.id, d);
-    els.searchList.innerHTML = IX.tokens.map((t) => `<option value="${esc(t.symbol)}">${esc(t.name ?? '')}</option>`).join('');
     log(`${IX.tokens.length} tokens, ${IX.values.length} shared values, ${IX.attributes.length} attributes; reduceMotion=${REDUCE}`);
     requestAnimationFrame(animate);
     const stops = trailFromHash();

@@ -113,6 +113,23 @@ h1 {
     color: var(--muted-text);
 }
 
+/* The way into the universe view (cards.mjs planetLinkHtml). */
+.card-head .planet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 5px 12px 5px 6px;
+    border: 1px solid var(--rwa-new-line);
+    border-radius: 999px;
+    background: var(--rwa-new-soft);
+    color: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.card-head .planet-link:hover { border-color: var(--rwa-new); }
+
 /* The price line under the title (cards.mjs priceLineHtml): price, premium, DEX liquidity, each sourced. */
 .card-head .price-line {
     margin: -6px 0 14px;

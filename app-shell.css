@@ -26,6 +26,11 @@
     --rwa-green: #27735b;
     --rwa-red: #a83e48;
     --rwa-shadow: 0 22px 64px rgba(34, 45, 76, .12);
+    /* "New": the yellow that flags a new feature (the NEW badge, the planet links). */
+    --rwa-new: #f5b800;
+    --rwa-new-soft: #fff4c7;
+    --rwa-new-line: #e2b33a;
+    --rwa-on-new: #2b1d00;
     /* A pressed filter chip or toggle, on every page. */
     --rwa-pressed-bg: var(--rwa-cobalt-soft);
     --rwa-pressed-line: var(--rwa-cobalt);
@@ -53,6 +58,10 @@
     --rwa-green: #75c7a6;
     --rwa-red: #ff8992;
     --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
+    --rwa-new: #facc15;
+    --rwa-new-soft: #3a3421;
+    --rwa-new-line: #8f7426;
+    --rwa-on-new: #231a00;
 }
 
 /* The theme is chosen by theme.js (Auto follows the device, or Light / Dark from the header switch),
@@ -178,6 +187,40 @@ h1 { font-family: var(--rwa-display); font-weight: 500; }
     border-radius: 50%;
     background: var(--rwa-coral);
 }
+
+/* The planet link's copy in the Research menu, shown only when the row has no room (under 400 px). */
+.app-nav .planets-compact { display: none; }
+
+/* NEW: the badge that flags a new feature, on every page family. */
+.badge-new {
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--rwa-new);
+    color: var(--rwa-on-new);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+/* The way into the universe view beside the logo: a NEW badge and a ringed planet. The auto margin
+   keeps it next to the brand while the nav stays at the right end of the row. */
+.app-planets {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    padding: 3px 8px 3px 4px;
+    border: 1px solid var(--rwa-new-line);
+    border-radius: 999px;
+    background: var(--rwa-new-soft);
+    text-decoration: none;
+}
+.app-planets:hover { border-color: var(--rwa-new); }
+.app-planets-icon { width: 22px; height: 22px; }
+.app-planets-icon .planet { fill: var(--rwa-new); }
+.app-planets-icon .ring { fill: none; stroke: var(--rwa-ink); stroke-width: 1.6; }
 
 .app-nav {
     display: flex;
@@ -369,6 +412,9 @@ body.app-page {
        a header without a menu (the cards) keeps all four. */
     .app-nav:has(> details) > a:nth-of-type(4) { display: none; }
     .app-nav .nav-compact-only { display: block; }
+    /* The planet link keeps only its planet; the pill's yellow still flags it as new. */
+    .app-planets .badge-new { display: none; }
+    .app-planets { padding: 3px; }
     /* The theme switch keeps its 32px box but gets a 44px target like the links beside it. */
     .app-header .app-nav > .theme-switch::before { content: ""; position: absolute; inset: -6px 0 -6px -12px; }
     .app-page > :not(.page-header):not(dialog) { width: min(100% - 24px, 1180px); }
@@ -380,6 +426,10 @@ body.app-page {
 @media (max-width: 400px) {
     .app-header { gap: 14px; }
     .app-nav { gap: 10px; }
+    /* No room left for the planet link in the row: its copy heads the Research menu instead. */
+    .app-header .app-planets { display: none; }
+    .app-header .app-brand { margin-right: auto; }
+    .app-nav .planets-compact { display: block; }
 }
 
 /* Too narrow for the brand, the links, the menu and the theme switch in one row (under 360px): the

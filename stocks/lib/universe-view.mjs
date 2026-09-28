@@ -128,7 +128,7 @@ export function buildUniverseIndex({ tokensDoc, issuersDoc, rightsDoc, templates
             values: table(['id', 'attribute', 'label', 'tone'], values),
             tokenValues: table(['token', 'value'], links),
             attributes: table(['id', 'dimension', 'label', 'none'], model.ATTRIBUTES.map((a) => [a.id, a.dimension, a.label, a.none])),
-            dimensions: table(['id', 'label', 'color'], model.DIMENSIONS.map((d) => [d.id, d.label, d.color]))
+            dimensions: table(['id', 'label', 'color', 'pattern'], model.DIMENSIONS.map((d) => [d.id, d.label, d.color, d.pattern]))
         },
         issuers,
         scenarios: COMPOSABILITY_SCENARIOS.map(({ id, label, question }) => ({ id, label, question })),

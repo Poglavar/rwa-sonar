@@ -2953,6 +2953,11 @@ function assetDecisionHtml(card) {
  * aggregate over every DEX pool; the pool table below and the exits page read DexScreener, which
  * lists fewer pools and so a different total, and each is labelled with its source.
  */
+/** The way into the universe view (universe.html), opened on this token's planet. */
+export function planetLinkHtml(card) {
+    return `<a class="planet-link" href="../universe.html#*/@${encodeURIComponent(card.slug)}"><span class="badge-new">New</span>See it as a planet →</a>`;
+}
+
 export function priceLineHtml(card) {
     const r = card.reference ?? {};
     const parts = [];
@@ -3132,6 +3137,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
+        planetLinkHtml(card) +
         priceLineHtml(card) +
         whoCanBuyHtml(card) +
         assetDecisionHtml(card) +

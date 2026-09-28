@@ -32,7 +32,8 @@ a { color: inherit; }
 
 main, footer { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
 
-.hero { min-height: 650px; display: grid; grid-template-columns: minmax(0, .88fr) minmax(460px, 1.12fr); align-items: center; gap: 72px; padding: 68px 0 86px; }
+/* Starts close under the header rule: the hero used to centre itself in a 650 px box below a 68 px pad. */
+.hero { display: grid; grid-template-columns: minmax(0, .88fr) minmax(460px, 1.12fr); align-items: start; gap: 72px; padding: 28px 0 72px; }
 h1, h2, h3, p { text-wrap: pretty; }
 h1 { margin: 0; max-width: 680px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.4rem, 6.5vw, 6.1rem); font-weight: 500; letter-spacing: -.065em; line-height: .94; }
 h1 span { color: var(--violet); }
@@ -41,6 +42,9 @@ h1 span { color: var(--violet); }
 /* The shared .button / .button-primary (app-shell.css), a little taller in the hero. */
 .hero-actions .button { min-height: 48px; }
 .hero-actions .button-primary { box-shadow: 0 10px 24px rgba(49,84,216,.2); }
+/* The way into the universe view (universe.html), flagged as new. */
+.button-planets { gap: 8px; border-color: var(--rwa-new-line); background: var(--rwa-new-soft); }
+.button-planets:hover { border-color: var(--rwa-new); color: var(--rwa-ink); }
 .hero-proof { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 .hero-proof .live-dot { flex: none; margin-top: .45em; }
 #snapshotTokens { color: var(--ink); font-weight: 800; }
@@ -63,8 +67,19 @@ h1 span { color: var(--violet); }
 /* The site search is its own hero item (grid area "search", below): a box like the events box. */
 .hero-search { grid-area: search; min-width: 0; margin: 0; padding: 16px 18px 18px; border: 1px solid color-mix(in srgb, var(--violet) 26%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: var(--shadow); }
 .hero-search label { display: block; margin-bottom: 7px; color: var(--muted); font-size: .7rem; font-weight: 730; }
-.hero-search > div { display: flex; }
+/* The input row; the results list below is a div of its own and must not be laid out as a row. */
+.hero-search > div:not(.quick-results) { display: flex; }
 .hero-search input { width: 100%; min-width: 0; height: 46px; padding: 0 13px; border: 1px solid var(--rwa-control-line); border-right: 0; border-radius: 8px 0 0 8px; background: var(--panel); color: var(--ink); font: inherit; font-size: .83rem; }
+/* Search as you type (landing.js wireHeroSearch): the answer drops down under the box. */
+.hero-search { position: relative; }
+.quick-results { position: absolute; z-index: 20; left: 18px; right: 18px; top: calc(100% - 10px); max-height: min(60vh, 460px); overflow-y: auto; padding: 6px; border: 1px solid var(--rwa-control-line); border-radius: 12px; background: var(--panel); box-shadow: 0 18px 40px rgba(8,12,30,.28); }
+.quick-results-title { margin: 8px 10px 4px; color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.quick-results a[role="option"] { display: flex; align-items: baseline; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; }
+.quick-results a[role="option"] strong { font-size: .86rem; white-space: nowrap; }
+.quick-results a[role="option"] span { overflow: hidden; color: var(--muted); font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.quick-results a[role="option"]:hover, .quick-results a[aria-selected="true"] { background: color-mix(in srgb, var(--violet) 14%, transparent); }
+.quick-results-empty { margin: 10px; color: var(--muted); font-size: .8rem; }
+.quick-results-all { display: block; margin-top: 4px; padding: 9px 10px; border-top: 1px solid var(--rwa-control-line); color: var(--violet); font-size: .78rem; font-weight: 750; text-decoration: none; }
 .hero-search button { min-width: 82px; border: 1px solid var(--violet); border-radius: 0 8px 8px 0; background: var(--violet); color: var(--rwa-on-accent); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
 /* The night-watch metaphor stays separate from the comparison, charts and live status. */
 .research-story { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 34px; align-items: center; margin: 0 0 36px; padding: 28px; border: 1px solid #294265; border-radius: 22px; background: var(--band-bg); color: #f1f5ff; scroll-margin-top: 24px; }
@@ -191,7 +206,7 @@ footer p { max-width: 650px; margin: 0; }
 footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 
 @media (max-width: 900px) {
-    .hero { grid-template-columns: 1fr; gap: 48px; padding-top: 48px; }
+    .hero { grid-template-columns: 1fr; gap: 48px; padding-top: 24px; }
     .signal-grid { grid-template-columns: 1fr; }
     .signal-card > p { min-height: 0; }
     .trust-section { grid-template-columns: 1fr; gap: 30px; }
@@ -281,7 +296,8 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
    Without script (and before the feed loads) it is a short scrollable list of the rows written in at
    build time; with motion allowed the script scrolls it (.is-scrolling); with reduced motion it is a
    static list of the newest six (.is-static, or the media query / .reduce-motion hook without script). */
-.hero { grid-template-areas: "copy preview" "copy search" "copy events"; }
+/* Wide screens: the search heads the right column, above the real example (as on a phone). */
+.hero { grid-template-areas: "copy search" "copy preview" "copy events"; }
 @media (min-width: 901px) { .hero { row-gap: 18px; } }
 .hero-copy { grid-area: copy; }
 .comparison-preview { grid-area: preview; align-self: end; }

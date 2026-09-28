@@ -569,10 +569,102 @@
     // The hero count is server-rendered, so it can count up from the first frame.
     countUpWhenSeen(document.getElementById('snapshotTokens'));
 
+    /**
+     * Search as you type in the hero: each keystroke asks /api/search and shows the answer grouped
+     * (stocks/lib/quick-search.js), cancelling the request before it, so an older, slower answer can
+     * never overwrite a newer one. Arrows move, Enter opens the highlighted row or, with none, submits
+     * the form to the full catalogue search; Esc closes. Without the API the form still submits.
+     */
+    function wireHeroSearch(api, base) {
+        const input = document.getElementById('heroSearch');
+        const list = document.getElementById('heroSearchResults');
+        const quick = (typeof __rwaQuickSearch !== 'undefined') ? __rwaQuickSearch : null;
+        if (!input || !list || !api || !quick) return;
+        let pending = null;
+        let rows = [];
+        let active = -1;
+
+        const close = () => {
+            list.hidden = true;
+            input.setAttribute('aria-expanded', 'false');
+            input.removeAttribute('aria-activedescendant');
+        };
+        const mark = () => {
+            list.querySelectorAll('[role="option"]').forEach((el, i) => el.setAttribute('aria-selected', String(i === active)));
+            if (active >= 0) {
+                input.setAttribute('aria-activedescendant', `heroSearchResult-${active}`);
+                document.getElementById(`heroSearchResult-${active}`)?.scrollIntoView({ block: 'nearest' });
+            } else input.removeAttribute('aria-activedescendant');
+        };
+        const render = (groups, query) => {
+            rows = [];
+            const section = (title, items) => (items.length
+                ? `<p class="quick-results-title">${escapeHtml(title)}</p>` + items.map((item) => {
+                    const i = rows.push(item) - 1;
+                    return `<a id="heroSearchResult-${i}" role="option" aria-selected="false" href="${escapeHtml(item.href)}">`
+                        + `<strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.detail)}</span></a>`;
+                }).join('') : '');
+            const titles = { stocks: 'Underlying stocks', tokens: 'Exact tokens', issuers: 'Issuers' };
+            const body = groups.order.map((key) => section(titles[key], groups[key])).join('');
+            list.innerHTML = (body || `<p class="quick-results-empty">No stock, token or issuer matches “${escapeHtml(query)}”.</p>`)
+                + `<a class="quick-results-all" href="${escapeHtml(groups.allHref)}">Search the whole catalogue for “${escapeHtml(query)}” →</a>`;
+            active = -1;
+            list.hidden = false;
+            input.setAttribute('aria-expanded', 'true');
+        };
+
+        input.addEventListener('input', async () => {
+            const query = input.value.trim();
+            pending?.abort();
+            if (!query) {
+                close();
+                return;
+            }
+            const controller = new AbortController();
+            pending = controller;
+            try {
+                const response = await fetch(api.apiUrl('/api/search', { q: query }, base),
+                    { headers: { accept: 'application/json' }, signal: controller.signal });
+                if (!response.ok) throw new Error(`/api/search: HTTP ${response.status}`);
+                const answer = await response.json();
+                if (pending === controller) render(quick.quickSearchGroups(answer, query), query);
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error(`[${new Date().toISOString()}] landing: search suggestions unavailable`, error);
+                close();
+            }
+        });
+        input.addEventListener('keydown', (event) => {
+            if (list.hidden) return;
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (!rows.length) return;
+                active = (active + (event.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length;
+                mark();
+            } else if (event.key === 'Enter' && active >= 0) {
+                event.preventDefault();
+                window.location.href = rows[active].href;
+            } else if (event.key === 'Escape') {
+                close();
+            }
+        });
+        input.addEventListener('focus', () => {
+            if (input.value.trim() && list.innerHTML) {
+                list.hidden = false;
+                input.setAttribute('aria-expanded', 'true');
+            }
+        });
+        // Close when focus leaves the whole search (a click on a result is inside it, so it lands first).
+        input.form.addEventListener('focusout', (event) => {
+            if (!input.form.contains(event.relatedTarget)) close();
+        });
+    }
+
     async function boot() {
         const api = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
         wireChartRanges();
         const base = api ? api.apiBase(document, window.location) : '';
+        wireHeroSearch(api, base);
         if (api) afterLoad(() => loadTicker(api, base));
         try {
             const [overview, journal] = await Promise.all([
