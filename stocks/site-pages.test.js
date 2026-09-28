@@ -15,10 +15,11 @@ const { renderIssuerIndex, renderIssuerPage } = require('./lib/issuer-pages.mjs'
 const { renderTemplateIndex, renderTemplatePage } = require('./lib/template-pages.mjs');
 const { buildProtocolDossiers, renderProtocolDossier, renderProtocolIndex } = require('./lib/protocol-dossiers.mjs');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const ROOT = path.join(__dirname, '..');
 const ORIGIN = 'https://rwasonar.com';
 const readText = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
-const readJson = (file) => JSON.parse(readText(file));
+const readJson = (file) => JSON.parse(fs.readFileSync(repoFile(ROOT, file), 'utf8'));
 
 function unescape(value) {
     return value.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');

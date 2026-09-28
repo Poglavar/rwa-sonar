@@ -3,6 +3,7 @@
 // which still tests the page wiring that calls it.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture } = require('../test-fixtures/catalogue.js');
 const REPO = join(__dirname, '..');
 
 const {
@@ -25,7 +26,7 @@ const {
 } = require('./lib/discovery.js');
 
 describe('confirmed DeFi usage', () => {
-    const db = JSON.parse(readFileSync(join(REPO, 'stocks/data/defi-usage.json'), 'utf8'));
+    const db = JSON.parse(readFileSync(fixture('stocks/data/defi-usage.json'), 'utf8'));
     const index = defiUsageIndex(db);
 
     it('uses the shared scoped fee answer in token details and comparison bundles', () => {
@@ -48,8 +49,8 @@ describe('confirmed DeFi usage', () => {
     });
 
     it('compares the same stock across legal structure, live lending, market exit and loss outcomes', () => {
-        const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
-        const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
         const templates = JSON.parse(readFileSync(join(REPO, 'stocks/data/composability-templates.json'), 'utf8'));
         const group = sameUnderlyingGroups(tokens).find((row) => row.ticker === 'NVDA');
         const models = sameStockComparisonModels(group, new Map(issuers.map((row) => [row.slug, row])), index, templates);
@@ -371,7 +372,7 @@ describe('the buyer table at the top of the compare view', () => {
 describe('the buyer table for pre-IPO tokens (OpenAI: PreStocks OPENAI vs Tessera tOpenAI)', () => {
     const { buyerRows, buyerTableHtml } = require('./lib/comparison-shape.js');
     const rights = JSON.parse(readFileSync(join(REPO, 'stocks/data/holder-rights.json'), 'utf8')).issuers;
-    const built = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+    const built = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
     const issuers = new Map(['prestocks', 'tessera', 'backpack-securities'].map((slug) =>
         [slug, { ...built.find((row) => row.slug === slug), holderRights: rights[slug] }]));
     const PRE = { instrumentType: 'private-company', underlyingTicker: null, closedMarket: [] };

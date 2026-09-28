@@ -1,3 +1,4 @@
+const { fixture } = require('../test-fixtures/catalogue.js');
 // Unit tests for stocks/lib/funnel-layout.js: the funnel graphic's layout: circles inside the box,
 // radii by mint count, connectors between circles that exist. Moved with the code out of
 // stocks-page.test.js (next-steps.md F11), which still tests the page wiring that calls it.
@@ -14,7 +15,7 @@ const {
  */
 describe('the funnel graphic', () => {
     const page = require('./lib/funnel-layout.js');
-    const funnelDb = require('../stocks-funnel.json');
+    const funnelDb = require(fixture('stocks-funnel.json'));
 
     /** A funnel small enough to reason about, with the same shape lib/funnel.mjs emits. */
     const FUNNEL = {

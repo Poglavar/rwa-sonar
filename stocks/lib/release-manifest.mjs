@@ -19,8 +19,14 @@ export const RELEASE_ARTIFACTS = [
     // Redemption, creation, what-if and relationship diagrams (stocks/build-schematics.mjs).
     'stocks-schematics.json',
     // The home page's latest-events feed and the /api/events fallback (stocks/build-events.mjs).
-    'stocks-events.json'
+    'stocks-events.json',
+    // The universe view's tables (universe.html), built from the cards (stocks/build-universe-view.mjs).
+    'universe-view'
 ];
+
+// Artifacts that are curated inputs, not job output: edited by hand and only read by the jobs, so they
+// stay tracked in git while every other artifact is ignored (.gitignore, "Job-owned runtime data").
+export const RELEASE_CURATED = ['stocks/data/events.json', 'stocks/data/defi-program-registry.json'];
 
 // Release construction has explicit phases because the review queue reads the database, while
 // cards/templates must be regenerated after that queue exists.  `base` rebuilds the catalogue
@@ -42,6 +48,8 @@ export const RELEASE_BUILD_STAGES = {
         // the lending watcher's rows in the database; the cards read it, so both come first.
         'stocks/build-tracking.mjs', 'stocks/build-closed-market.mjs',
         'stocks/build-cards.mjs',
+        // Reads every card's .json record, so it runs right after the cards.
+        'stocks/build-universe-view.mjs',
         'stocks/build-protocol-dossiers.mjs', 'stocks/build-comparison-bundles.mjs',
         // Exits reads protocols/index.json; weekly reads the snapshot, changes, journal and
         // database state, so both come after the dossiers.

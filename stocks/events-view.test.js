@@ -76,12 +76,13 @@ describe('the landing page box', () => {
     const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
     const css = readFileSync(join(ROOT, 'landing.css'), 'utf8');
 
-    test('sits in the hero right after the comparison card and its search, on a phone and on a wide screen', () => {
+    test('sits in the hero after the search and the comparison card, on a phone and on a wide screen', () => {
         const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="tradeTicker"'));
         expect(hero.indexOf('id="heroSearch"')).toBeGreaterThan(-1);
         expect(hero.indexOf('id="latestEvents"')).toBeGreaterThan(hero.indexOf('id="heroSearch"'));
-        // The search is its own hero area (25 Sep): under the card on a wide screen, before it below 900 px.
-        expect(css).toContain('grid-template-areas: "copy preview" "copy search" "copy events"');
+        // The search is its own hero area (25 Sep), and heads the right column above the card on a wide
+        // screen too since 28 Sep, as it already did below 900 px.
+        expect(css).toContain('grid-template-areas: "copy search" "copy preview" "copy events"');
         expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "search" "preview" "events"; \}/);
     });
 

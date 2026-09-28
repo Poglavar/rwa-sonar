@@ -6,6 +6,7 @@
 const { readFileSync, statSync } = require('node:fs');
 const { join } = require('node:path');
 
+const { fixture } = require('./test-fixtures/catalogue.js');
 const NOTHINGS = [null, undefined, '', NaN, Infinity, -Infinity, 'n/a', {}];
 
 /**
@@ -502,8 +503,8 @@ describe('the sample fixtures', () => {
 });
 
 describe('the built database', () => {
-    const issuerDb = require('./stocks-issuers.json');
-    const tokenDb = require('./stocks-tokens.json');
+    const issuerDb = require(fixture('stocks-issuers.json'));
+    const tokenDb = require(fixture('stocks-tokens.json'));
 
     it('splits one build into the file the page reads first and the file it reads second', () => {
         expect(issuerDb.issuers.length).toBeGreaterThan(0);
@@ -545,7 +546,7 @@ describe('the built database', () => {
      * pretending the file can remain below its old fixed-size limit as the verified universe grows.
      */
     it('keeps the token file inside its byte budget, which is why it was split off', () => {
-        const bytes = statSync(join(__dirname, 'stocks-tokens.json')).size;
+        const bytes = statSync(fixture('stocks-tokens.json')).size;
         // Genuine catalogue growth scales this file. Keep a per-mint ceiling so schema bloat still
         // fails without treating 1,183 confirmed assets as though there were still ~500.
         expect(bytes).toBeLessThan(tokenDb.tokens.length * 3 * 1024);
@@ -781,7 +782,7 @@ describe('the funnel graphic', () => {
 });
 
 describe('claim-versus-reality discrepancies', () => {
-    const issuerDb = require('./stocks-issuers.json');
+    const issuerDb = require(fixture('stocks-issuers.json'));
 
     it('publishes only discrepancies with evidence on both sides', () => {
         const rows = issuerDb.issuers.flatMap((issuer) => issuer.discrepancies ?? []);
@@ -845,7 +846,7 @@ describe('evidence chips on the issuer panel', () => {
     });
 
     it('carries the summary on every built issuer and on every issuerIndex entry', () => {
-        const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8'));
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
         for (const issuer of issuers.issuers) {
             expect(Array.isArray(issuer.claims)).toBe(true);
             expect(Array.isArray(issuer.evidenceFields)).toBe(true);
@@ -854,7 +855,7 @@ describe('evidence chips on the issuer panel', () => {
                 .toBeLessThanOrEqual(issuer.evidence.coverage.needed);
             expect(issuer.evidence.claims).toBe(issuer.claims.length);
         }
-        const tokens = JSON.parse(readFileSync(join(__dirname, 'stocks-tokens.json'), 'utf8'));
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8'));
         for (const entry of tokens.issuerIndex) {
             expect(entry.evidence.coverage.needed).toBeGreaterThan(0);
             // The SUMMARY only: the quotes must not be duplicated into the byte-budgeted file.
@@ -882,7 +883,7 @@ describe('the trust-chain section on the issuer panel', () => {
 
     const source = readFileSync(join(__dirname, 'stocks.js'), 'utf8');
     const html = readFileSync(join(__dirname, 'stocks.html'), 'utf8');
-    const issuers = JSON.parse(readFileSync(join(__dirname, 'stocks-issuers.json'), 'utf8')).issuers;
+    const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
     const catalogue = JSON.parse(readFileSync(
         join(__dirname, 'stocks', 'data', 'trust-chain.json'), 'utf8'));
     const record = issuers.find((row) => row.slug === 'xstocks-backed');

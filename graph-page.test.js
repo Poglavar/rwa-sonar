@@ -9,6 +9,7 @@ const { join } = require('node:path');
 
 const GL = require('./graph-layout.js');
 
+const { fixture } = require('./test-fixtures/catalogue.js');
 const FIXTURE = JSON.parse(readFileSync(join(__dirname, 'stocks', 'fixtures', 'graph.sample.json'), 'utf8'));
 const VIEW = { width: 1100, height: 760, seed: 20260916 };
 
@@ -445,7 +446,7 @@ describe('fitTransform', () => {
 
 describe('initialView (the first view, Reset and a resize)', () => {
     // The real 136-node graph in the page's own layout box, the case the phone QA pass measured.
-    const REAL = JSON.parse(readFileSync(join(__dirname, 'stocks-graph.json'), 'utf8'));
+    const REAL = JSON.parse(readFileSync(fixture('stocks-graph.json'), 'utf8'));
     const PAGE_LAYOUT = { width: 1360, height: 940, seed: 20260916, iterations: 420, padding: 56 };
     const { positions } = GL.layout(REAL, PAGE_LAYOUT);
     const phone = { width: 375, height: 520, padding: 16, minScale: 0.2, maxScale: 4 };

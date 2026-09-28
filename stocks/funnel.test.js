@@ -11,11 +11,13 @@ import { join } from 'node:path';
 
 import { buildFunnel, instrumentNodeId, programNodeId, recipeNodeId } from './lib/funnel.mjs';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture, repoFile } = catalogueFixtures;
 const HERE = import.meta.dirname;
 const REPO_ROOT = join(HERE, '..');
 
 function readJson(name) {
-    return JSON.parse(readFileSync(join(REPO_ROOT, name), 'utf8'));
+    return JSON.parse(readFileSync(repoFile(REPO_ROOT, name), 'utf8'));
 }
 
 /** A built token record, cut down to the fields the funnel reads. */
@@ -225,7 +227,7 @@ describe('the built stocks-funnel.json', () => {
     });
 
     it('stays small enough to fetch alongside the issuer file', () => {
-        expect(readFileSync(join(REPO_ROOT, 'stocks-funnel.json'), 'utf8').length).toBeLessThan(32 * 1024);
+        expect(readFileSync(fixture('stocks-funnel.json'), 'utf8').length).toBeLessThan(32 * 1024);
     });
 
     it('agrees with each issuer’s own recipes tally', () => {

@@ -8,6 +8,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     STATUSES,
     HEALTH_DIMENSIONS,
@@ -1293,7 +1294,7 @@ describe('levels', () => {
 
 describe('the real stocks data', () => {
     const root = path.join(__dirname, '..');
-    const readJson = (relative) => JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
+    const readJson = (relative) => JSON.parse(fs.readFileSync(repoFile(root, relative), 'utf8'));
 
     const tokensDb = readJson('stocks-tokens.json');
     const issuersDb = readJson('stocks-issuers.json');

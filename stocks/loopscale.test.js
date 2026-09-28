@@ -4,6 +4,7 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     LOAN_COLLATERAL_SLICE,
     LOAN_DISCRIMINATOR_BASE58,
@@ -321,7 +322,7 @@ describe('Loopscale SECZ market configuration (real mainnet accounts, one finali
 
 describe('SECZ Loopscale market review promotes the dossier to configuration-decoded', () => {
     const { buildProtocolDossiers, renderProtocolDossier } = require('./lib/protocol-dossiers.mjs');
-    const read = (p) => JSON.parse(readFileSync(join(__dirname, '..', p), 'utf8'));
+    const read = (p) => JSON.parse(readFileSync(repoFile(join(__dirname, '..'), p), 'utf8'));
     const research = read('stocks/data/protocol-market-research.json');
     const review = research.markets.find((m) => m.id === 'loopscale:secz-usdc-usdc-rwa-vault');
 

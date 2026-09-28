@@ -11,6 +11,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 import {
     ANSWER_STATUSES, buildChain, buildNodes, evidenceGrade, isRegulatorUrl,
     isThirdPartyVerification, partiesByRole, stableJson, validateCatalogue, validateWhatIf,
@@ -533,7 +535,7 @@ describe('every real dossier', () => {
 });
 
 describe('the built stocks-issuers.json', () => {
-    const BUILT = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8'));
+    const BUILT = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
 
     test('every issuer record carries `chain` and `whatIfCounts`', () => {
         expect(BUILT.issuers.length).toBeGreaterThan(0);

@@ -9,6 +9,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     CONTACT_LINKS, META_DESCRIPTION_MAX, SITE_IMAGE, clampText, contactFooterHtml, jsonLdScript, readSeoRegion,
     replaceSeoRegion, seoHeadTags
@@ -22,7 +23,7 @@ const { CONTACT_ONLY_PAGES, ensureRegions, sitemapIndexXml, urlsetXml } = requir
 const { SITE_PAGES } = require('./lib/site-pages.mjs');
 
 const REPO_ROOT = path.join(__dirname, '..');
-const read = (...parts) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, ...parts), 'utf8'));
+const read = (...parts) => JSON.parse(fs.readFileSync(repoFile(REPO_ROOT, ...parts), 'utf8'));
 
 let fonts;
 beforeAll(async () => {
@@ -221,10 +222,10 @@ describe('build-site-seo.mjs end to end', () => {
     beforeAll(() => {
         root = fs.mkdtempSync(path.join(os.tmpdir(), 'site-seo-'));
         for (const file of [...SITE_PAGES.map((page) => page.file), ...Object.keys(CONTACT_ONLY_PAGES)]) {
-            put(file, fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'));
+            put(file, fs.readFileSync(repoFile(REPO_ROOT, file), 'utf8'));
         }
         for (const file of ['stocks-tokens.json', 'stocks-issuers.json', 'stocks-health.json', 'stocks-power-map.json']) {
-            put(file, fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'));
+            put(file, fs.readFileSync(repoFile(REPO_ROOT, file), 'utf8'));
         }
         put('cards/index.json', [{ slug: 'AAPLx' }, { slug: 'A&B' }]);
         put('cards/AAPLx.json', { sources: { tokens: '2026-09-23T10:00:00Z', holders: '2026-09-20T08:00:00Z', meteora: null } });

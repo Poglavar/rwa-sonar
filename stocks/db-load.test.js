@@ -11,6 +11,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture, repoFile } = catalogueFixtures;
 import {
     buildClaimOrphanSql, buildClaimSql, buildFailureModeSql, buildIssuerSql, buildSnapshotSql,
     buildTokenSql, buildTradeSql, buildWhatIfDeleteSql, buildWhatIfSql,
@@ -400,7 +402,7 @@ describe('the DDL and the builders agree', () => {
 });
 
 describe('the repo’s real documents', () => {
-    const read = (p) => JSON.parse(readFileSync(join(REPO, p), 'utf8'));
+    const read = (p) => JSON.parse(readFileSync(repoFile(REPO, p), 'utf8'));
 
     test('stocks-issuers.json builds one row per issuer and round-trips through the literal', () => {
         const doc = read('stocks-issuers.json');

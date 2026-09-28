@@ -8,6 +8,7 @@ const vm = require('node:vm');
 const { MODES, STORAGE_KEY, modeLabel, nextMode, normalizeMode, resolveTheme } = require('./theme.js');
 const { THEME_JS_VERSION, siteHeaderHtml, themeScriptHtml } = require('./stocks/lib/site-nav.js');
 
+const { fixture, repoFile } = require('./test-fixtures/catalogue.js');
 const ROOT = __dirname;
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const THEME_SOURCE = read('theme.js');
@@ -220,7 +221,7 @@ describe('generated families load theme.js first and carry the switch', () => {
     const { renderTemplateIndex, renderTemplatePage } = require('./stocks/lib/template-pages.mjs');
     const { buildProtocolDossiers, renderProtocolDossier, renderProtocolIndex } = require('./stocks/lib/protocol-dossiers.mjs');
     const { buildWeek, renderWeekPage, renderWeeklyIndex, weekFromId } = require('./stocks/lib/weekly.mjs');
-    const json = (file) => JSON.parse(read(file));
+    const json = (file) => JSON.parse(fs.readFileSync(repoFile(ROOT, file), 'utf8'));
     const tokenDb = json('stocks-tokens.json');
     const issuerDb = json('stocks-issuers.json');
     const templates = json('stocks-legal-templates.json').templates;

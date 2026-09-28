@@ -3,6 +3,7 @@
 // table say what the data says, and "yes" stays reserved for holders who own the share itself.
 const fs = require('node:fs');
 const path = require('node:path');
+const { fixture } = require('../test-fixtures/catalogue.js');
 const {
     RIGHTS, STATUSES, holderRightsDetailHtml, holderRightsHeadline, holderRightsRows, holderRightsStripHtml, validateHolderRights
 } = require('./lib/holder-rights.js');
@@ -16,7 +17,7 @@ const ISSUER_SLUGS = fs.readdirSync(path.join(__dirname, 'data', 'issuers'))
 
 describe('the curated rights file', () => {
     it('answers all five rights for every issuer programme, each with a source', () => {
-        const slugs = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'stocks-issuers.json'), 'utf8')).issuers.map((row) => row.slug);
+        const slugs = JSON.parse(fs.readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers.map((row) => row.slug);
         expect(validateHolderRights(DATA, slugs)).toEqual([]);
         expect(Object.keys(DATA.issuers).sort()).toEqual([...slugs].sort());
     });

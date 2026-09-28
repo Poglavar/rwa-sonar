@@ -5,6 +5,7 @@ const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 const page = require('./flows.js');
 
+const { fixture } = require('./test-fixtures/catalogue.js');
 const side = (hours, usd, extra = {}) => ({ coveredHours: hours, amountHours: hours, count: hours > 0 ? 3 : null,
     value: usd === null ? null : { usd, complete: true, events: 3, unpricedMints: [], sources: { settlement: 3 }, top: [], ...extra } });
 const issuer = {
@@ -209,7 +210,7 @@ describe('visible text names no internal file, field path or slug', () => {
     });
 
     test('the whole page, drawn from the committed data, reads without a file name or a field path', () => {
-        const data = JSON.parse(readFileSync(join(__dirname, 'stocks-flows.json'), 'utf8'));
+        const data = JSON.parse(readFileSync(fixture('stocks-flows.json'), 'utf8'));
         expectPlain(readFileSync(join(__dirname, 'flows.html'), 'utf8'));
         expectPlain(page.contextHtml(data) + page.leadHtml(data.float) + page.floatSectionHtml(data.float, 720)
             + page.flowsSectionHtml(data.flows, 720) + (data.caveats ?? []).join(' '));

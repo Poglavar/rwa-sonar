@@ -2,6 +2,8 @@
 import { readFileSync } from 'node:fs';
 import economics from './lib/economics.js';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 const { selectProfile, selectFees } = economics;
 
 function fee(id, scope, amountText = null) {
@@ -49,7 +51,7 @@ describe('economics model', () => {
 
     test('real data has the exact issuer set and does not turn the PreStocks authority into a beneficiary', () => {
         const data = JSON.parse(readFileSync(new URL('./data/economics.json', import.meta.url)));
-        const issuers = JSON.parse(readFileSync(new URL('../stocks-issuers.json', import.meta.url)));
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json')));
         expect(data.profiles.map((profile) => profile.id).sort()).toEqual(issuers.issuers.map(issuer => issuer.slug).sort());
         const authority = selectProfile(data, 'prestocks').actors.find((actor) => actor.role === 'protocol role');
         expect(authority.payment).toBeNull();

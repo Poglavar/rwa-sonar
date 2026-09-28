@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const { fixture } = require('../test-fixtures/catalogue.js');
 const ROOT = path.join(__dirname, '..');
 const ISSUER_DIR = path.join(__dirname, 'data', 'issuers');
 
@@ -317,7 +318,7 @@ describe('canonical-parties.json', () => {
         }
         // Venue rows (DEXes and exchanges) are referenced by stocks/data/venues.json, not by
         // dossiers: a canonical row counts as used when its name is a market label or a dexId there.
-        const venuesPath = path.join(__dirname, 'data', 'venues.json');
+        const venuesPath = fixture('stocks/data/venues.json');
         if (fs.existsSync(venuesPath)) {
             const venues = readJson(venuesPath);
             for (const item of venues.items ?? []) {

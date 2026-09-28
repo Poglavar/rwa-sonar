@@ -15,6 +15,8 @@ import { fileURLToPath } from 'node:url';
 import app from '../src/app.js';
 import { closePool } from '../src/db.js';
 import { ApiError, parseSort } from '../src/lib/query.js';
+import catalogueFixtures from '../../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 import {
     ANSWER_STATUSES, MISSING_STATUS, WHAT_IF_FILTERS, WHAT_IF_SORTS, WHAT_IF_STATUS_ORDER,
     buildFailureModeSummarySql, buildIssuerRecordSql, buildIssuerWhatIfSql, buildWhatIfCountSql,
@@ -375,7 +377,7 @@ describeDb('the trust-chain routes against the real sonar schema', () => {
     });
 
     test('the chain the API serves is the chain the BUILDER built — same library, same grades', async () => {
-        const built = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8'));
+        const built = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
         for (const slug of ['xstocks-backed', 'prestocks', 'superstate-opening-bell']) {
             const { body } = await get(`/api/issuers/${slug}/chain`);
             const record = built.issuers.find((i) => i.slug === slug);

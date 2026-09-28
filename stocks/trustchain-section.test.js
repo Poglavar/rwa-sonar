@@ -3,6 +3,7 @@
 // tests the page wiring that calls it.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture } = require('../test-fixtures/catalogue.js');
 const REPO = join(__dirname, '..');
 
 // --- the trust chain and the what-if answers on the issuer panel (EVIDENCE.md §6) -------------
@@ -10,7 +11,7 @@ describe('the trust-chain section on the issuer panel', () => {
     const { readFileSync } = require('node:fs');
     const S = require('./lib/trustchain-section.js');
 
-    const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+    const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
     const catalogue = JSON.parse(readFileSync(
         join(REPO, 'stocks', 'data', 'trust-chain.json'), 'utf8'));
     const record = issuers.find((row) => row.slug === 'xstocks-backed');

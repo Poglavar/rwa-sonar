@@ -14,6 +14,7 @@
 
 const M = require('./monitor.js');
 
+const { fixture } = require('./test-fixtures/catalogue.js');
 /** A stocks-tokens.json with one token deliberately absent (MINT_E), to prove nulls survive. */
 function tokens() {
     return {
@@ -83,7 +84,7 @@ describe('the API names this page holds a copy of', () => {
     test('RULE_LABELS is the health file\'s own rule names, so a renamed rule cannot drift', () => {
         // The API serves the rule ID and no label, which is why this map exists at all. It is
         // display text only — stocks/lib/health.mjs stays the one copy of the rules themselves.
-        const health = JSON.parse(readFileSync(join(__dirname, 'stocks-health.json'), 'utf8'));
+        const health = JSON.parse(readFileSync(fixture('stocks-health.json'), 'utf8'));
         const fromFile = Object.fromEntries(health.rules.map((rule) => [rule.id, rule.label]));
         expect(M.RULE_LABELS).toEqual(fromFile);
     });

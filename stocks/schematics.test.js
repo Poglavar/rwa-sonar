@@ -11,6 +11,8 @@ import schematics from './lib/schematics.js';
 import kit from './lib/flow-diagram.js';
 import { dossierFileFor } from './lib/issuer-whatif.mjs';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 const {
     KEY_MODES, resolvePath, splitRef, claimFor, publishedSource, curatedSpec, sentences,
     whatIfLanes, whatIfSpec, relationshipSpec, buildSchematics, indexSpecs, specsForToken
@@ -21,7 +23,7 @@ const DATA = join(REPO, 'stocks', 'data');
 const read = (path) => readFileSync(path, 'utf8');
 const curated = JSON.parse(read(join(DATA, 'schematics.json')));
 const catalogue = JSON.parse(read(join(DATA, 'trust-chain.json')));
-const issuersDb = JSON.parse(read(join(REPO, 'stocks-issuers.json')));
+const issuersDb = JSON.parse(read(fixture('stocks-issuers.json')));
 const SLUGS = issuersDb.issuers.map((issuer) => issuer.slug);
 const DOSSIER_FILES = readdirSync(join(DATA, 'issuers')).filter((name) => name.endsWith('.json'));
 

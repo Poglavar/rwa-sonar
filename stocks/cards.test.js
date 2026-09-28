@@ -7,6 +7,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     CARD_BYTE_LIMIT,
     CARD_BYTE_TARGET,
@@ -41,7 +42,7 @@ const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib
 const fmt = require('./lib/fmt.js');
 
 const REPO_ROOT = path.join(__dirname, '..');
-const read = (...parts) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, ...parts), 'utf8'));
+const read = (...parts) => JSON.parse(fs.readFileSync(repoFile(REPO_ROOT, ...parts), 'utf8'));
 const trustChainSvg = require('./lib/trustchain-svg.js');
 const whatIfLib = require('./lib/whatif-render.js');
 
@@ -103,7 +104,7 @@ function dossierFileFor(slug) {
 }
 
 /** The built schematics (stocks-schematics.json), so every card is measured with its drawn route. */
-const SCHEMATICS = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'stocks-schematics.json'), 'utf8'));
+const SCHEMATICS = JSON.parse(fs.readFileSync(fixture('stocks-schematics.json'), 'utf8'));
 
 const whatIfBySlug = new Map();
 for (const row of issuerDb.issuers) {

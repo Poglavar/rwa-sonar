@@ -3,6 +3,7 @@
 // wiring that calls it.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const REPO = join(__dirname, '..');
 
 const {
@@ -12,8 +13,8 @@ const {
 } = require('./lib/discrepancy-view.js');
 
 describe('claims-versus-reality directory', () => {
-    const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
-    const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
+    const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
+    const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
     const rows = discrepancyRows(issuers, tokens);
 
     it('publishes current outside-world conflicts with programme and token scope', () => {
@@ -143,7 +144,7 @@ describe('claim-versus-reality discrepancies', () => {
 
 describe('protocol docs-versus-chain findings in the directory', () => {
     const S = require('./lib/discrepancy-view.js');
-    const read = (file) => JSON.parse(readFileSync(join(REPO, file), 'utf8'));
+    const read = (file) => JSON.parse(readFileSync(repoFile(REPO, file), 'utf8'));
     const research = read('stocks/data/protocol-market-research.json');
     const records = S.protocolDiscrepancyRecords(research, { protocolNames: S.protocolNamesFromUsage(read('stocks/data/defi-usage.json')) });
     const rows = S.discrepancyRows(read('stocks-issuers.json').issuers, read('stocks-tokens.json').tokens, records);

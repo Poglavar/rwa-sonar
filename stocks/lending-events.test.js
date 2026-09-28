@@ -8,6 +8,8 @@
 import { readFileSync } from 'node:fs';
 
 import { decodeLendingTransaction } from './lib/lending-decode.mjs';
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture, repoFile } = catalogueFixtures;
 import {
     BACKFILL_FROM, JL_CACHE_MAX_GAP_S, SCOPE_CONFIGURATION, TRADE_PRICE_FILL_SQL, advanceCheckpoints, applyCacheSignatures,
     applyPythReading, applyReserveObservation, applyScopeResume, buildFreezeSql, buildLiquidationSql, buildScanSql,
@@ -21,8 +23,8 @@ const TX = read('./fixtures/lending/transactions.sample.json').transactions;
 const CACHE_SIGS = read('./fixtures/lending/jl-cache-qqqx-signatures.sample.json').signatures;
 const ACCOUNTS = read('./fixtures/lending/accounts.sample.json').accounts;
 const RESEARCH = read('./data/protocol-market-research.json');
-const DEFI = read('./data/defi-usage.json');
-const TOKENS = read('../stocks-tokens.json').tokens;
+const DEFI = JSON.parse(readFileSync(fixture('stocks/data/defi-usage.json'), 'utf8'));
+const TOKENS = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
 
 const QQQX = 'Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ';
 const QQQX_RESERVE = '2jerdAXR8r2B6z3P7P6VgSiePQX7wqcpbEqdDbm8mgeB';

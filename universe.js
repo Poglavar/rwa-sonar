@@ -5,9 +5,10 @@
 // a body flies into it and it becomes the next centre. The data are tables (universe-view/index.json);
 // every grouping and lookup is a query in stocks/lib/universe-view-model.js (window.__rwaUniverseView).
 // This file is the three.js scene and the DOM wiring only. ?reduceMotion=1 turns off orbits and flights.
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+// three.js is self-hosted (vendor/three/README.md): the site's CSP allows no CDN and no import map.
+import * as THREE from './vendor/three/0.186.1/three.module.js';
+import { OrbitControls } from './vendor/three/0.186.1/addons/OrbitControls.js';
+import { CSS2DObject, CSS2DRenderer } from './vendor/three/0.186.1/addons/CSS2DRenderer.js';
 
 const U = window.__rwaUniverseView;
 const params = new URLSearchParams(location.search);

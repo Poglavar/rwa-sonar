@@ -3,6 +3,7 @@
 
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     DOCUMENT_PRECEDENCE,
     EVIDENCE_LEVELS,
@@ -11,7 +12,7 @@ const {
 } = require('./lib/legal-templates.mjs');
 const { renderTemplateIndex, renderTemplatePage } = require('./lib/template-pages.mjs');
 
-const read = (...parts) => JSON.parse(readFileSync(join(__dirname, '..', ...parts), 'utf8'));
+const read = (...parts) => JSON.parse(readFileSync(repoFile(join(__dirname, '..'), ...parts), 'utf8'));
 const issuerDb = read('stocks-issuers.json');
 const tokenDb = read('stocks-tokens.json');
 const composability = read('stocks', 'data', 'composability-templates.json');

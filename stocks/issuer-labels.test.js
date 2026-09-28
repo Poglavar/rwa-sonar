@@ -4,6 +4,7 @@
 // that calls it.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture } = require('../test-fixtures/catalogue.js');
 const REPO = join(__dirname, '..');
 
 const {
@@ -482,7 +483,7 @@ describe('the rebase authority in the issuer panel', () => {
     });
 
     it('carries the value on every built issuer record, so the row is never empty', () => {
-        const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8'));
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
         for (const issuer of issuers.issuers) {
             expect(typeof issuer.keyGovernance.rebase).toBe('string');
             expect(Object.keys(S.KEY_GOVERNANCE_LABELS)).toContain(issuer.keyGovernance.rebase);

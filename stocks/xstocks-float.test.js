@@ -6,6 +6,7 @@ const {
 } = require('./lib/xstocks-float.mjs');
 const dossier = require('./data/issuers/xstocks-backed.json');
 
+const { fixture } = require('../test-fixtures/catalogue.js');
 const TREASURY = 'S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS';
 const REDEEM = 'CgyuW2dWDJzWW2H1XTjPRkbg9Y41dW2Fjj69KWsiir8C';
 const mintAccount = (supply, decimals, scaled = null) => ({ data: { parsed: { type: 'mint', info: {
@@ -86,8 +87,8 @@ describe('aggregate, baseline and history', () => {
 describe('the xStocks card row', () => {
     const { buildCard, renderCard } = require('./lib/cards.mjs');
     const { cardFloatItem } = require('./lib/xstocks-float.mjs');
-    const tokens = require('../stocks-tokens.json').tokens;
-    const issuers = require('../stocks-issuers.json').issuers;
+    const tokens = require(fixture('stocks-tokens.json')).tokens;
+    const issuers = require(fixture('stocks-issuers.json')).issuers;
     const token = tokens.find((t) => t.issuer === 'xstocks-backed' && t.symbol === 'NVDAx') ?? tokens.find((t) => t.issuer === 'xstocks-backed');
     const issuer = issuers.find((i) => i.slug === 'xstocks-backed') ?? null;
     const floatFile = { readAt: '2026-09-23T22:31:59Z', items: [{ mint: token.mint, status: 'ok', floatRaw: '14252376954788', decimals: 8, uiMultiplier: '1', inventorySharePct: 55.7133 }] };

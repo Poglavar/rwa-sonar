@@ -8,6 +8,8 @@ import { join } from 'node:path';
 
 import kit from './lib/flow-diagram.js';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 const {
     STATUSES, LAYOUT, wrapText, statusOf, layoutSequence, layoutFlow, layoutHub, layoutDiagram,
     sequenceSvg, flowSvg, hubSvg, diagramSvg, stepListHtml, usedStatuses, legendHtml, figureHtml,
@@ -261,7 +263,7 @@ describe('the SVG and the figure', () => {
 });
 
 describe('every published schematic', () => {
-    const built = JSON.parse(readFileSync(join(REPO, 'stocks-schematics.json'), 'utf8'));
+    const built = JSON.parse(readFileSync(fixture('stocks-schematics.json'), 'utf8'));
     const specs = [
         ...Object.values(built.issuers).flatMap((row) => [...row.redemption, ...row.creation, ...row.whatIf, row.relationships]),
         ...built.defi

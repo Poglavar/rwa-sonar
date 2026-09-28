@@ -33,8 +33,8 @@ stocks-watchlist-changes.json
 /cards/
 /weekly/
 
-# Reusable legal-template pages are generated alongside cards on every refresh. The machine-readable
-# stocks-legal-templates.json catalogue remains tracked for initial deployments and API consumers.
+# Reusable legal-template pages are generated alongside cards on every refresh (and the catalogue,
+# stocks-legal-templates.json, is ignored with the other job-owned files below).
 # Anchored to the root: an unanchored `issuers/` also ignored the research dossiers in
 # stocks/data/issuers/, so a new dossier file would never have been committed.
 /templates/
@@ -90,3 +90,38 @@ stocks/data/event-first-seen.json
 
 # The universe view's generated index (stocks/build-universe-view.mjs).
 /universe-view/
+
+# Job-owned runtime data: written by the prod jobs on every refresh (the release manifest's list,
+# stocks/lib/release-manifest.mjs), so never committed. A local copy comes from prod with
+# `./pull-prod-data.sh`; tests read the frozen copy in test-fixtures/catalogue/. Two files in the
+# manifest are curated inputs, edited by hand and only read by the jobs, so they stay tracked:
+# stocks/data/events.json and stocks/data/defi-program-registry.json (RELEASE_CURATED in the manifest).
+/stocks-issuers.json
+/stocks-tokens.json
+/stocks-discovery.json
+/stocks-funnel.json
+/stocks-graph.json
+/stocks-health.json
+/stocks-collector-status.json
+/stocks-review-queue.json
+/stocks-closed-market.json
+/stocks-changes.json
+/stocks-change-journal.json
+/stocks-defi-changes.json
+/stocks-defi-new.json
+/stocks-legal-templates.json
+/stocks-power-map.json
+/stocks-flows.json
+/stocks-tracking.json
+/stocks-exits.json
+/stocks-schematics.json
+/stocks-events.json
+/stocks/data/venues.json
+/stocks/data/holders.json
+/stocks/data/meteora.json
+/stocks/data/reference-prices.json
+/stocks/data/defi-usage.json
+/stocks/data/discovery-candidates.json
+/stocks/data/identity-onchain.json
+/stocks/data/mint-identities.json
+/stocks/data/history/

@@ -2,7 +2,8 @@
 const { readFileSync } = require('node:fs'); const { join } = require('node:path');
 const { buildProtocolDossiers, renderProtocolDossier, renderProtocolIndex } = require('./lib/protocol-dossiers.mjs');
 const { protocolProofModel } = require('./lib/protocol-proof.js');
-const read = (p) => JSON.parse(readFileSync(join(__dirname, '..', p), 'utf8'));
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
+const read = (p) => JSON.parse(readFileSync(repoFile(join(__dirname, '..'), p), 'utf8'));
 describe('protocol dossiers', () => {
  const rows = buildProtocolDossiers({ tokens: read('stocks-tokens.json').tokens, issuers: read('stocks-issuers.json').issuers, usage: read('stocks/data/defi-usage.json'), templates: read('stocks/data/composability-templates.json').templates });
  const researchedRows = buildProtocolDossiers({ tokens: read('stocks-tokens.json').tokens, issuers: read('stocks-issuers.json').issuers, usage: read('stocks/data/defi-usage.json'), templates: read('stocks/data/composability-templates.json').templates, marketResearch: read('stocks/data/protocol-market-research.json') });

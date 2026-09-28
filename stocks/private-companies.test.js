@@ -5,6 +5,7 @@ const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 const { PRIVATE_COMPANIES, privateCompany } = require('./lib/private-companies.mjs');
 
+const { fixture } = require('../test-fixtures/catalogue.js');
 const prestocks = (symbol, company) => ({ issuer: 'prestocks', symbol, name: `${company} PreStocks` });
 const tessera = (code, company) => ({ issuer: 'tessera', symbol: code, name: `T-${company}` });
 
@@ -49,7 +50,7 @@ describe('the company a pre-IPO token references', () => {
     });
 
     test('a company key is either its listed ticker or collides with no listed ticker in the catalogue', () => {
-        const tokens = JSON.parse(readFileSync(join(__dirname, '..', 'stocks-tokens.json'), 'utf8')).tokens;
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
         const listed = new Set(tokens.map((token) => token.underlyingTicker).filter(Boolean));
         for (const company of PRIVATE_COMPANIES) {
             if (company.listedTicker) {

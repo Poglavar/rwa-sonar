@@ -68,24 +68,34 @@ if ! flock -n 9; then
 fi
 PREV_SHA="$(git rev-parse HEAD 2>/dev/null || true)"
 git fetch origin "$BRANCH" --quiet
-# The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) rewrite these
-# job-owned files on the server. Tracked generated files are set aside before reset; ignored
-# runtime files (the trade store/payload) survive `git clean -fd` in place. The next refresh run
-# rebuilds them from the deployed code anyway. First deploy: committed seed files ship where present.
-JOB_OWNED=(stocks-issuers.json stocks-tokens.json stocks-graph.json stocks-health.json stocks-collector-status.json stocks-review-queue.json
-	stocks-closed-market.json stocks-changes.json stocks-defi-changes.json stocks-legal-templates.json stocks-trades.json
-	stocks-change-journal.json
-	stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
-	stocks/data/reference-prices.json stocks/data/venues.json stocks/data/holders.json
-	stocks/data/meteora.json stocks/data/defi-usage.json stocks/data/discovery-candidates.json
-	stocks/data/identity-onchain.json stocks/data/mint-identities.json
-	stocks/data/trades-24h.json stocks/data/history)
+# The tokenized-stocks jobs (stocks/refresh-on-server.sh, ecosystem.config.cjs) write these files on
+# the server; the release manifest lists them, plus the raw stores below that are not published.
+# Since 28 Sep 2026 none of them is tracked in git. Any that the checkout still tracks (the deploy
+# that untracks them, or a rollback to an older commit) would be DELETED or overwritten by
+# `git reset --hard`, so every tracked one is set aside first, changed or not, and put back after:
+# the server's copy always wins. Ignored ones are never touched by the reset or `git clean -fd`.
+# The curated inputs (RELEASE_CURATED in the manifest) are tracked on purpose and come from git.
+# The manifest is read from the checkout as it is BEFORE the reset, which lists the same paths.
+# A fresh server has none of this data: run stocks/refresh-on-server.sh once before the first deploy.
+CURATED=(stocks/data/events.json stocks/data/defi-program-registry.json)
+RAW_STORES=(stocks-trades.json stocks/data/universe.json stocks/data/onchain.json stocks/data/sponsor-apis.json
+	stocks/data/trades-24h.json)
+MANIFEST=()
+while IFS= read -r line; do MANIFEST+=("$line"); done < <(node stocks/lib/release-manifest.mjs --rsync-excludes 2>/dev/null || true)
 KEEP="$(mktemp -d)"
-for p in "${JOB_OWNED[@]}"; do
-	if [ -e "$p" ] && [ -n "$(git status --porcelain -- "$p")" ]; then
+KEPT=0
+for p in "${MANIFEST[@]}" "${RAW_STORES[@]}"; do
+	[ -n "$p" ] && [ -e "$p" ] || continue
+	CURATED_HIT=0
+	for c in "${CURATED[@]}"; do [ "$p" = "$c" ] && CURATED_HIT=1; done
+	# (no `case` here: its bare `)` would end the $( ... ) this heredoc runs in)
+	[ "$CURATED_HIT" = 1 ] && continue
+	if [ -n "$(git ls-files -- "$p")" ]; then
 		mkdir -p "$KEEP/$(dirname "$p")" && cp -a "$p" "$KEEP/$p"
+		KEPT=$((KEPT + 1))
 	fi
 done
+echo "set aside ${KEPT} tracked job-owned path(s) before the reset" >&2
 git reset --hard "origin/$BRANCH" --quiet
 git clean -fd --quiet
 if [ -n "$(ls -A "$KEEP")" ]; then

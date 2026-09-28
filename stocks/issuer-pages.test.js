@@ -6,10 +6,11 @@ const { dossierFileFor } = require('./lib/issuer-whatif.mjs');
 const { renderTemplatePage } = require('./lib/template-pages.mjs');
 const { assignSlugs } = require('./lib/cards.mjs');
 
+const { fixture } = require('../test-fixtures/catalogue.js');
 const root = join(__dirname, '..');
-const issuers = JSON.parse(readFileSync(join(root, 'stocks-issuers.json'), 'utf8'));
-const tokens = JSON.parse(readFileSync(join(root, 'stocks-tokens.json'), 'utf8'));
-const templates = JSON.parse(readFileSync(join(root, 'stocks-legal-templates.json'), 'utf8'));
+const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
+const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8'));
+const templates = JSON.parse(readFileSync(fixture('stocks-legal-templates.json'), 'utf8'));
 
 describe('canonical issuer dossiers', () => {
     const issuer = issuers.issuers.find((row) => row.slug === 'xstocks-backed');
@@ -184,7 +185,7 @@ describe('recurring on-chain redemption scan on issuer dossiers', () => {
 });
 
 describe('issuer page schematics', () => {
-    const schematics = JSON.parse(readFileSync(join(root, 'stocks-schematics.json'), 'utf8'));
+    const schematics = JSON.parse(readFileSync(fixture('stocks-schematics.json'), 'utf8'));
     const issuer = issuers.issuers.find((row) => row.slug === 'ondo-global-markets');
     const render = (entry) => renderIssuerPage({ issuer, tokens: [], templates: templates.templates, builtAt: issuers.builtAt,
         schematics: entry }, { version: 'test' });

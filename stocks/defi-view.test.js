@@ -3,6 +3,7 @@
 // stocks-page.test.js (next-steps.md F11), which still tests the page wiring that calls it.
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { fixture } = require('../test-fixtures/catalogue.js');
 const REPO = join(__dirname, '..');
 const { lenderExitQuality } = require('./lib/composability.mjs');
 const {
@@ -20,8 +21,8 @@ const {
 
 describe('DeFi composability template table', () => {
     const S = require('./lib/defi-view.js');
-    const tokenDb = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8'));
-    const issuerDb = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8'));
+    const tokenDb = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8'));
+    const issuerDb = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8'));
     const composability = JSON.parse(readFileSync(join(REPO, 'stocks/data/composability-templates.json'), 'utf8'));
 
     it('renders one row per used tech + legal template and accounts for every mint', () => {
@@ -60,11 +61,11 @@ describe('DeFi composability template table', () => {
 });
 
 describe('confirmed DeFi usage', () => {
-    const db = JSON.parse(readFileSync(join(REPO, 'stocks/data/defi-usage.json'), 'utf8'));
+    const db = JSON.parse(readFileSync(fixture('stocks/data/defi-usage.json'), 'utf8'));
     const index = defiUsageIndex(db);
 
     it('covers every mint and keeps no-result assets explicit', () => {
-        const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
         expect(index.size).toBe(tokens.length);
         const noResult = [...index.values()].find((item) => item.integrations.length === 0);
         expect(noResult).toBeDefined();
@@ -114,8 +115,8 @@ describe('confirmed DeFi usage', () => {
     });
 
     it('connects a confirmed integration to the token template’s escrow and loss outcomes', () => {
-        const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
-        const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
         const templates = JSON.parse(readFileSync(join(REPO, 'stocks/data/composability-templates.json'), 'utf8'));
         const nvdaToken = tokens.find((token) => token.symbol === 'NVDAx');
         const template = composabilityTemplateForToken(templates, nvdaToken);
@@ -165,8 +166,8 @@ describe('confirmed DeFi usage', () => {
     });
 
     it('keeps structural lender outcomes visible when no current integration is confirmed', () => {
-        const tokens = JSON.parse(readFileSync(join(REPO, 'stocks-tokens.json'), 'utf8')).tokens;
-        const issuers = JSON.parse(readFileSync(join(REPO, 'stocks-issuers.json'), 'utf8')).issuers;
+        const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
+        const issuers = JSON.parse(readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers;
         const templates = JSON.parse(readFileSync(join(REPO, 'stocks/data/composability-templates.json'), 'utf8'));
         const token = tokens.find((row) => row.issuer === 'ondo-global-markets' && index.get(row.mint)?.integrations.length === 0);
         const template = composabilityTemplateForToken(templates, token);

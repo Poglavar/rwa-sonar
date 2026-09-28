@@ -4,6 +4,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 import {
     COMPOSABILITY_SCENARIOS,
     composabilityHealthRule,
@@ -14,7 +16,7 @@ import {
 } from './lib/composability.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
-const tokens = JSON.parse(readFileSync(join(ROOT, 'stocks-tokens.json'), 'utf8')).tokens;
+const tokens = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).tokens;
 const db = JSON.parse(readFileSync(join(import.meta.dirname, 'data', 'composability-templates.json'), 'utf8'));
 
 describe('DeFi composability templates', () => {

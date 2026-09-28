@@ -8,6 +8,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import catalogueFixtures from '../test-fixtures/catalogue.js';
+const { fixture } = catalogueFixtures;
 import {
     NO_EXTENSIONS,
     RECIPE_EXTENSIONS,
@@ -241,7 +243,7 @@ describe('recipeTally', () => {
 // against the real database.
 
 describe('the rebase flag in the built stocks-tokens.json', () => {
-    const tokenDb = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'stocks-tokens.json'), 'utf8'));
+    const tokenDb = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8'));
 
     it('is a boolean on every mint that has been read from the chain', () => {
         const bad = tokenDb.tokens

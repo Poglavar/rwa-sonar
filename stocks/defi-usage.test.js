@@ -1,5 +1,6 @@
 const { readFileSync } = require('node:fs');
 
+const { fixture } = require('../test-fixtures/catalogue.js');
 const {
     applyOnchainCorroboration,
     buildDefiUsage,
@@ -162,8 +163,8 @@ describe('confirmed DeFi usage', () => {
     });
 
     test('committed data covers the complete current mint universe', () => {
-        const tokenDb = JSON.parse(readFileSync('stocks-tokens.json'));
-        const usageDb = JSON.parse(readFileSync('stocks/data/defi-usage.json'));
+        const tokenDb = JSON.parse(readFileSync(fixture('stocks-tokens.json')));
+        const usageDb = JSON.parse(readFileSync(fixture('stocks/data/defi-usage.json')));
         expect(usageDb.items).toHaveLength(tokenDb.tokens.length);
         expect(new Set(usageDb.items.map((item) => item.mint))).toEqual(new Set(tokenDb.tokens.map((item) => item.mint)));
     });

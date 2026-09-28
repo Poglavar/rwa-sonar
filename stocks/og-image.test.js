@@ -8,6 +8,7 @@ const os = require('node:os');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
 const {
     OG_HEIGHT, OG_WIDTH, ensureOgImage, fitSize, freezeFact, loadFonts, ogImageAlt, ogImageHash, ogImageModel,
     pruneOgImages, redemptionFact, renderOgSvg, textWidth, truncateToWidth, wrapToWidth
@@ -16,7 +17,7 @@ const { encodeIndexedPng } = require('./lib/png-indexed.mjs');
 const { OG_IMAGE_ALT, OG_IMAGE_PATH, assignSlugs, buildCard, renderCard } = require('./lib/cards.mjs');
 
 const REPO_ROOT = path.join(__dirname, '..');
-const read = (...parts) => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, ...parts), 'utf8'));
+const read = (...parts) => JSON.parse(fs.readFileSync(repoFile(REPO_ROOT, ...parts), 'utf8'));
 const tokenDb = read('stocks-tokens.json');
 const issuers = new Map(read('stocks-issuers.json').issuers.map((row) => [row.slug, row]));
 const SLUGS = assignSlugs(tokenDb.tokens);
