@@ -194,8 +194,9 @@ describe('watcher rows: chain', () => {
             'Ondo Global Markets paused AAPLon'
         ]);
         expect(events.every((e) => e.category === 'keys')).toBe(true);
-        expect(events[0]).toMatchObject({ href: './issuers/prestocks.html', subject: { type: 'issuer', id: 'prestocks' } });
+        expect(events[0]).toMatchObject({ href: './issuers/prestocks.html', subject: { type: 'issuer', id: 'prestocks' }, mints: ['MINTP1', 'MINTP2'] });
         expect(events[1].href).toBe('./cards/AAPLon.html');
+        expect(events[1].mints).toEqual(['MINTA']);
     });
 
     // Token-2022 puts a new transfer fee in force two epochs after it is set, and the chain watcher
@@ -304,6 +305,8 @@ describe('DeFi scanner', () => {
         expect(events.map((e) => e.title)).toEqual(['Loopscale now lists SECZ for lending', 'Kamino dropped 2 tokens from lending (AAPLon, APHx)']);
         expect(events[0]).toMatchObject({ at: '2026-09-24', href: './protocols/secz-loopscale-collateral.html', category: 'defi', source: 'DeFi scanner' });
         expect(events[1].severity).toBe('warning');
+        // A grouped event names every token it is about, so each token's card can list it.
+        expect(events.map((e) => e.mints)).toEqual([['MINTS'], ['MINTA', 'MINTX']]);
         expect(tally['DeFi scanner: DEX pool listing churn']).toBe(1);
         expect(tally['DeFi scanner: unconfirmed holdings under review']).toBe(2);
     });

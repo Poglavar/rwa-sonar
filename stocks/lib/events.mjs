@@ -239,9 +239,16 @@ function symbolOf(symbol, mint) {
     return text(symbol) ?? (text(mint) ? `token …${mintSuffix(mint)}` : 'a token');
 }
 
-function makeEvent({ id, at, kind, category, title, subject, severity, href, source, keys = [], origin, assessment = null, ongoing = false }) {
+/**
+ * `mints` names every token the event is about, so a token's own page can list it; a token subject
+ * implies its one mint. An event with no mints (a court case, an issuer's document or fee) concerns
+ * the whole programme (lib/events-view.js eventConcernsToken).
+ */
+function makeEvent({ id, at, kind, category, title, subject, mints = null, severity, href, source, keys = [], origin, assessment = null, ongoing = false }) {
+    const named = [...new Set((mints ?? (subject?.type === 'token' ? [subject.id] : [])).filter((m) => typeof m === 'string' && m !== ''))].sort();
     const event = {
         id, at, kind, category, title: clipTitle(title), subject,
+        ...(named.length > 0 ? { mints: named } : {}),
         severity: SEVERITY_RANK[severity] === undefined ? 'info' : severity,
         href: href ?? './watch.html',
         source
@@ -335,6 +342,7 @@ export function catalogueEvents(tokens, ctx, tally = null) {
             at: newest(shown.map((m) => (kind === 'tokens-created' ? m.verdict.at : m.seen))),
             kind, category: 'catalogue', title,
             subject: single ? { type: 'token', id: single.mint, name: single.symbol } : { type: 'issuer', id: issuer.slug, name },
+            mints: shown.map((m) => m.mint),
             severity: 'info',
             href: (single ? cardHref(single.mint, ctx, single.cardSlug) : null) ?? issuerHref(issuer) ?? './stocks.html',
             source: SOURCES.catalogue,
@@ -698,6 +706,7 @@ function chainGroupEvent(members, ctx) {
         kind, category: 'keys',
         title: n > 1 && !title.includes('(') ? withNames(title, symbols) : title,
         subject: n === 1 ? { type: 'token', id: first.subjectId, name: symbols[0] } : { type: 'issuer', id: issuer.slug, name: issuer.name },
+        mints: members.map((m) => m.subjectId),
         severity,
         href: (n === 1 ? cardHref(first.subjectId, ctx, first.cardSlug) : null) ?? issuerHref(issuer),
         source: SOURCES.chain,
@@ -852,6 +861,7 @@ export function defiEvents(feed, ctx, tally = null) {
             kind: added ? 'defi-added' : 'defi-removed',
             category: 'defi', title,
             subject: single ? { type: 'token', id: single.mint, name: symbols[0] } : { type: 'protocol', id: slugPart(group.protocol), name: group.protocol },
+            mints: group.items.map((item) => item.mint),
             severity: maxSeverity(group.items.map((item) => item.severity ?? (added ? 'info' : 'warning'))),
             href: single ? (protocolPage(single.mint, single, ctx) ?? cardHref(single.mint, ctx, single.cardSlug) ?? './monitor.html#defiChangesSection')
                 : './monitor.html#defiChangesSection',
@@ -987,6 +997,7 @@ export function liquidationEvents(rows, ctx, tally = null) {
                     ? `${who} liquidation wave: ${members.length} ${symbols[0]} positions in an hour (${collateralText(members)})`
                     : withNames(`${who} liquidation wave: ${members.length} positions in an hour (${collateralText(members)})`, symbols),
                 subject: symbols.length === 1 ? { type: 'token', id: top.mint, name: top.symbol } : { type: 'protocol', id: slugPart(protocol), name: who },
+                mints: members.map((m) => m.mint),
                 severity: sum.usd >= 100000 || members.length >= 2 * LIQUIDATION_WAVE_MIN ? 'critical' : 'warning',
                 href: lendingHref(top, protocol, ctx),
                 source: SOURCES.lending, keys: [`liquidation|${protocol}|${members[0].at}`], origin: 'lending'
@@ -1112,6 +1123,7 @@ export function freezeEvents(rows, ctx, tally = null) {
             id: `lending-freeze-${first.startedAt.replace(/[^0-9]/g, '').slice(0, 12)}-${slugPart(symbols.join('-')).slice(0, 32)}`,
             at: first.startedAt, kind: ongoing ? 'price-freeze-ongoing' : 'price-freeze', category: 'lending', title,
             subject: symbols.length === 1 ? { type: 'token', id: first.mint, name: first.symbol } : { type: 'protocol', id: slugPart(who), name: who },
+            mints: members.map((m) => m.mint),
             severity: ongoing || longest >= 6 * HOUR_MS ? 'warning' : 'caution',
             href: lendingHref(lead, lead.protocol, ctx),
             // No merge keys: no other source reports freezes, and a shared key would let two
@@ -1296,6 +1308,7 @@ export function snapshotEvents(diffs, ctx, tally = null) {
             at: group.at, kind, category: 'keys',
             title: symbols.length > 1 ? withNames(title, symbols) : title,
             subject: single ? { type: 'token', id: single.mint, name: single.symbol } : { type: 'issuer', id: group.issuer.slug, name: group.issuer.name },
+            mints: group.members.map((m) => m.mint),
             severity: group.after || group.field !== 'paused' ? 'warning' : 'info',
             href: (single ? cardHref(single.mint, ctx) : null) ?? issuerHref(group.issuer),
             source: SOURCES.catalogue, keys, origin: 'file'
@@ -1349,6 +1362,8 @@ export function mergeEvents(events, tally = null) {
         }
         note(tally, `merged: same fact from the ${event.source} and the ${twin.source}`);
         for (const key of event.keys ?? []) if (!twin.keys.includes(key)) twin.keys.push(key);
+        // Either side's tokens: a twin that named no mints stays programme-wide.
+        if (twin.mints && event.mints) twin.mints = [...new Set([...twin.mints, ...event.mints])].sort();
         if (isDateOnly(twin.at) && !isDateOnly(event.at) && event.at.slice(0, 10) <= twin.at
             && (twin.preciseAt === undefined || timeMs(event.at) < timeMs(twin.preciseAt))) twin.preciseAt = event.at;
     }

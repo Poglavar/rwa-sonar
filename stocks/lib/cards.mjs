@@ -3052,6 +3052,21 @@ export function materialChangesHtml(card) {
         + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
 }
 
+/**
+ * The token's latest events: an empty list the page fills from the live feed (card.js wireEvents:
+ * GET /api/events?mint=&issuer=, else stocks-events.json filtered the same way by
+ * lib/events-view.js). The feed is built after the cards, so the list cannot be written in here;
+ * without script the section says where the events are.
+ */
+export function tokenEventsHtml(card) {
+    const issuer = card.issuer?.slug ?? '';
+    return `<section id="events" class="token-events" data-mint="${escapeHtml(card.mint)}" data-issuer="${escapeHtml(issuer)}" data-symbol="${escapeHtml(card.symbol ?? '')}">`
+        + '<h2>Latest events</h2>'
+        + '<ul class="token-events-list"><li class="event-empty">Loading events…</li></ul>'
+        + `<p class="token-events-foot">Last 30 days: this token, and its programme’s filings, terms and fees. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer)}">All changes →</a></p>`
+        + '</section>';
+}
+
 /** The footer's per-input timestamps, named for a reader rather than by their record keys. */
 const SOURCE_WORDS = {
     tokens: 'catalogue', issuers: 'issuer dossiers', issuerApi: 'issuer APIs', referencePrices: 'reference prices',
@@ -3151,7 +3166,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
 
     const siteHeader = siteNav.siteHeaderHtml('../');
 
-    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#own">Rights</a>` +
+    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#events">Events</a><a href="#own">Rights</a>` +
         `<a href="#control">Control</a><a href="#defi-usage">DeFi</a><a href="#market-detail">Markets</a>` +
         `<a href="#evidence-detail">Evidence</a></nav>`;
 
@@ -3174,6 +3189,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const body = [
         header,
         localNav,
+        tokenEventsHtml(card),
         card.discrepancies.length ? section('discrepancies', 'Claim vs observed reality', discrepanciesBody(card)) : '',
         section('own', 'What you own', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>'),
         markets,
@@ -3184,5 +3200,5 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../card.js${v}"></script><script src="../nav-menus.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../stocks/lib/fmt.js${v}"></script><script src="../stocks/lib/events-view.js${v}"></script><script src="../card.js${v}"></script><script src="../nav-menus.js${v}"></script></body></html>`;
 }

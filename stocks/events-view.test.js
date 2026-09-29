@@ -72,6 +72,39 @@ describe('latest-events rows', () => {
     });
 });
 
+describe('a token card\'s events', () => {
+    const feed = { events: [
+        { id: 'a', at: '2026-09-24', title: 'Kamino dropped 2 tokens from lending', subject: { type: 'protocol', id: 'kamino' }, mints: ['MINTA', 'MINTX'], href: './monitor.html' },
+        { id: 'b', at: '2026-09-23', title: 'Court filing names Kraken xStocks', subject: { type: 'issuer', id: 'xstocks-backed' }, href: './issuers/xstocks-backed.html' },
+        { id: 'c', at: '2026-09-22', title: 'Backpack: new token NOK first seen', subject: { type: 'issuer', id: 'xstocks-backed' }, mints: ['MINTN'] },
+        { id: 'd', at: '2026-09-21', title: 'APHx split', subject: { type: 'token', id: 'MINTX' } },
+        { id: 'e', at: '2026-09-20', title: 'A protocol-wide freeze', subject: { type: 'protocol', id: 'kamino' } }
+    ] };
+
+    test('a token sees events naming its mint and its programme\'s events that name no token; never a protocol-wide one', () => {
+        expect(view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 20).map((e) => e.id)).toEqual(['a', 'b', 'd']);
+        expect(view.eventsForToken(feed, { mint: 'MINTZ', issuer: 'superstate' }, 20)).toEqual([]);
+        expect(view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 1).map((e) => e.id)).toEqual(['a']);
+    });
+
+    test('the marquee is one link per event with its tag, title and age; its loop copy is out of the tab order', () => {
+        const events = view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 20);
+        const html = view.eventMarqueeHtml(events, { root: '../', nowMs: Date.parse('2026-09-24T12:00:00Z') });
+        expect(html.match(/<a class="event-marquee-item"/g)).toHaveLength(3);
+        expect(html).toContain('href="../monitor.html"');
+        expect(html).toContain('<span class="event-tag">Terms</span>Kamino dropped 2 tokens from lending<span class="event-marquee-when">today</span>');
+        expect(html).not.toContain('tabindex');
+        expect(view.eventMarqueeHtml(events, { copy: true }).match(/tabindex="-1"/g)).toHaveLength(3);
+        expect(view.eventMarqueeHtml([])).toBe('');
+    });
+
+    test('a page one folder down rebases the feed\'s site-root links', () => {
+        const html = view.eventRowHtml({ ...EVENT, href: './issuers/xstocks-backed.html' }, { root: '../' });
+        expect(html).toContain('href="../issuers/xstocks-backed.html"');
+        expect(view.eventRowHtml(EVENT)).toContain('href="./watch.html?material=true#change-835"');
+    });
+});
+
 describe('the landing page box', () => {
     const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
     const css = readFileSync(join(ROOT, 'landing.css'), 'utf8');

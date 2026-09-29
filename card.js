@@ -2,7 +2,8 @@
  * The only script a generated card loads (stocks/build-cards.mjs renders everything else at build
  * time, so a card is complete with JavaScript off). Its jobs are all additive: turn every absolute
  * <time> into "… (3 h ago)", which cannot be baked in without making two builds differ, put a
- * copy button behind the mint address, draw the history chart, and open what a deep link targets.
+ * copy button behind the mint address, draw the history chart, list the token's latest events, and
+ * open what a deep link targets.
  * Nothing here is needed to read the page.
  */
 
@@ -80,6 +81,68 @@
     }
 
     /**
+     * The token's latest events (#events): the live feed filtered to this token and its programme,
+     * else the release's stocks-events.json filtered the same way (lib/events-view.js), else a note.
+     */
+    function wireEvents() {
+        var section = document.getElementById('events');
+        var view = globalThis.__rwaEventsView;
+        var fmt = globalThis.__rwaFmt;
+        var api = globalThis.__rwaApi;
+        if (!section || !view || !fmt) return;
+        var list = section.querySelector('.token-events-list');
+        var token = { mint: section.getAttribute('data-mint'), issuer: section.getAttribute('data-issuer') || null };
+        var LIMIT = 20;
+        function getJson(url) {
+            return fetch(url, { headers: { accept: 'application/json' } }).then(function (response) {
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            });
+        }
+        function draw(events) {
+            var now = Date.now();
+            drawMarquee(events, now);
+            list.innerHTML = events.length === 0
+                ? '<li class="event-empty">No events for ' + fmt.escapeHtml(section.getAttribute('data-symbol') || 'this token') + ' in the last 30 days.</li>'
+                : events.map(function (event) { return view.eventRowHtml(event, { nowMs: now, root: '../' }); }).join('');
+        }
+        var live = api
+            ? getJson(api.apiUrl('/api/events', { mint: token.mint, issuer: token.issuer, limit: LIMIT }, api.apiBase()))
+                .then(function (body) { return view.listEvents(body, LIMIT); })
+            : Promise.reject(new Error('no API base'));
+        live.catch(function () {
+            return getJson('../stocks-events.json').then(function (feed) { return view.eventsForToken(feed, token, LIMIT); });
+        }).then(draw, function () {
+            list.innerHTML = '<li class="event-empty">Events are temporarily unavailable.</li>';
+        });
+    }
+
+    /** Pixels per second the marquee moves: slow enough to read a title as it passes. */
+    var MARQUEE_PX_PER_S = 45;
+
+    /**
+     * A one-line horizontal marquee of the token's events under its ticker, looping two copies of
+     * the run. Hover or focus pauses it; with reduced motion it is a still row the reader can scroll
+     * (card.css). No events, no marquee.
+     */
+    function drawMarquee(events, now) {
+        var view = globalThis.__rwaEventsView;
+        var heading = document.querySelector('.card-head h1');
+        if (!heading || events.length === 0) return;
+        var box = document.createElement('div');
+        box.className = 'event-marquee';
+        box.setAttribute('role', 'region');
+        box.setAttribute('aria-label', 'Latest events');
+        box.innerHTML = '<div class="event-marquee-track"><span class="event-marquee-run">'
+            + view.eventMarqueeHtml(events, { nowMs: now, root: '../' })
+            + '</span><span class="event-marquee-run" aria-hidden="true">'
+            + view.eventMarqueeHtml(events, { nowMs: now, root: '../', copy: true }) + '</span></div>';
+        heading.insertAdjacentElement('afterend', box);
+        var run = box.querySelector('.event-marquee-run');
+        box.style.setProperty('--marquee-s', Math.max(8, run.offsetWidth / MARQUEE_PX_PER_S).toFixed(1) + 's');
+    }
+
+    /**
      * A deep link into a collapsed disclosure must reveal its target before scrolling to it. A fold
      * row (one item of a growing list: a discrepancy, a finding, a change) that a link targets also
      * opens itself and is marked, so the reader lands on the item in full.
@@ -114,9 +177,12 @@
     }
 
     if (typeof document !== 'undefined') {
+        // The site's ?reduceMotion hook (as landing.js): the marquee then stands still.
+        if (/[?&]reduceMotion(=1|=true)?(&|$)/.test(location.search)) document.documentElement.classList.add('reduce-motion');
         addAges();
         wireCopy();
         wireHistory();
+        wireEvents();
         wireLocalNav();
     }
 })();

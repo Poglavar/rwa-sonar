@@ -52,6 +52,15 @@ describe('GET /api/events', () => {
         expect(body.events).toHaveLength(1);
     });
 
+    test('?mint=&issuer= keeps the token\'s own events and its programme\'s, not other tokens\' or protocols\'', async () => {
+        const hono = app({ readFeed: async () => FEED, queryRows: async () => ({ rows: ROWS, issuerNames: { tessera: 'Tessera' } }) });
+        const { body } = await get(hono, '/api/events?mint=M&issuer=tessera');
+        expect(body.events.map((e) => e.title)).toEqual(['Tessera paused T-OPENAI', 'A v. B names Tessera']);
+        expect(body.count).toBe(2);
+        const other = await get(hono, '/api/events?mint=OTHER&issuer=superstate');
+        expect(other.body.events).toEqual([]);
+    });
+
     test('reuses one merged answer until it is a minute old', async () => {
         let calls = 0;
         let clock = 1_000_000;

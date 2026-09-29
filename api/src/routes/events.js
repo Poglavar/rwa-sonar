@@ -15,6 +15,7 @@ import { query } from '../db.js';
 import { clampLimit } from '../lib/query.js';
 import { log, logWarn } from '../lib/log.js';
 import { WINDOW_DAYS, changeRowsSelect, eventContext, lendingRowsSelect, mergeLiveFeed } from '../../../stocks/lib/events.mjs';
+import eventsView from '../../../stocks/lib/events-view.js';
 
 const REPO_ROOT = join(import.meta.dirname, '..', '..', '..');
 
@@ -123,8 +124,13 @@ export function createEventsRoutes({
             return c.json({ error: { code: 'events_unavailable', message: 'no built events file and no watcher database' } }, 503);
         }
         const body = cached.body;
+        // ?mint=<mint>&issuer=<programme slug>: only the events that concern that token (a token page).
+        const mint = c.req.query('mint');
+        const events = typeof mint === 'string' && mint !== ''
+            ? body.events.filter((event) => eventsView.eventConcernsToken(event, { mint, issuer: c.req.query('issuer') ?? null }))
+            : body.events;
         c.header('Cache-Control', 'public, max-age=60');
-        return c.json({ ...body, count: Math.min(limit, body.events.length), limit, events: body.events.slice(0, limit) });
+        return c.json({ ...body, count: Math.min(limit, events.length), limit, events: events.slice(0, limit) });
     });
 
     return routes;

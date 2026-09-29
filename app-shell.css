@@ -546,3 +546,19 @@ body.app-page {
 /* Open, line 1 is ordinary text again: an unclamped -webkit-box drops the spaces between its parts. */
 .fold-row > details[open] .fold-line1 { display: block; }
 .fold-body { padding: 4px 14px 12px 30px; border-top: 1px solid var(--rwa-line); min-width: 0; overflow-wrap: anywhere; }
+
+/* Latest-events rows (stocks/lib/events-view.js eventRowHtml): the home page's box and each token card's list. */
+.event-row { display: grid; gap: 3px; padding: 9px 2px; border-bottom: 1px solid var(--rwa-line); }
+.event-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 8px; color: var(--rwa-muted); font-size: .68rem; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.event-meta time { color: var(--rwa-ink); font-weight: 700; }
+.event-tag { --tag: var(--rwa-cobalt-dark); padding: 1px 6px; border-radius: 4px; background: color-mix(in srgb, var(--tag) 13%, transparent); color: var(--tag); font-size: .6rem; font-weight: 820; letter-spacing: .06em; text-transform: uppercase; }
+[data-category="terms"] .event-tag { --tag: var(--rwa-amber); }
+[data-category="keys"] .event-tag { --tag: var(--rwa-coral-text); }
+[data-category="defi"] .event-tag { --tag: var(--rwa-green); }
+/* Liquidations and collateral price freezes: between the DeFi green and the market red, in both themes. */
+[data-category="lending"] .event-tag { --tag: color-mix(in srgb, var(--rwa-red) 55%, var(--rwa-cobalt-dark)); }
+[data-category="market"] .event-tag { --tag: var(--rwa-red); }
+[data-category="legal"] .event-tag { --tag: var(--rwa-ink); }
+.event-title { color: var(--rwa-ink); font-size: .86rem; font-weight: 650; line-height: 1.38; text-decoration: none; overflow-wrap: anywhere; }
+.event-title:hover, .event-title:focus-visible { color: var(--rwa-cobalt-dark); text-decoration: underline; }
+.event-empty { color: var(--rwa-muted); font-size: .8rem; }

@@ -108,6 +108,32 @@ h1 {
     letter-spacing: -0.01em;
 }
 
+/* The token's events running under its ticker (card.js drawMarquee): two copies of one run, moved
+   left by one run's width and looped. Paused on hover or focus; still and scrollable with reduced motion. */
+.event-marquee {
+    margin: 6px 0 4px;
+    overflow: hidden;
+    border-block: 1px solid var(--panel-border);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.event-marquee-track { display: flex; width: max-content; animation: event-marquee var(--marquee-s, 30s) linear infinite; }
+.event-marquee:hover .event-marquee-track, .event-marquee:focus-within .event-marquee-track { animation-play-state: paused; }
+.event-marquee-run { display: flex; flex: none; }
+.event-marquee-item { display: inline-flex; align-items: center; gap: 7px; padding: 7px 26px 7px 0; color: var(--page-text); font-size: .82rem; font-weight: 650; white-space: nowrap; text-decoration: none; }
+.event-marquee-item:hover, .event-marquee-item:focus-visible { color: var(--link-color); text-decoration: underline; }
+.event-marquee-item::before { content: "•"; color: var(--muted-text); }
+.event-marquee-when { color: var(--muted-text); font-size: .72rem; font-weight: 600; }
+@keyframes event-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+    .event-marquee { overflow-x: auto; scrollbar-width: thin; }
+    .event-marquee-track { animation: none; }
+    .event-marquee-run[aria-hidden="true"] { display: none; }
+}
+:root.reduce-motion .event-marquee { overflow-x: auto; scrollbar-width: thin; }
+:root.reduce-motion .event-marquee-track { animation: none; }
+:root.reduce-motion .event-marquee-run[aria-hidden="true"] { display: none; }
+
 .card-head .sub {
     margin: 2px 0 12px;
     color: var(--muted-text);
@@ -937,3 +963,11 @@ footer h2 {
     .defi-use-grid { grid-template-columns: 1fr; }
     .defi-capabilities li { grid-template-columns: 1fr; }
 }
+
+/* --- latest events (card.js wireEvents; rows styled in app-shell.css) -------------------------- */
+
+.token-events-list { max-height: 18rem; margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; scrollbar-width: thin; }
+.token-events-list .event-row:last-child { border-bottom: 0; }
+.token-events-foot { margin: 10px 0 0; color: var(--muted-text); font-size: .74rem; line-height: 1.5; }
+.token-events-foot a { color: var(--link-color); font-weight: 760; text-decoration: none; }
+.token-events-foot a:hover, .token-events-foot a:focus-visible { text-decoration: underline; }

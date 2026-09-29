@@ -311,20 +311,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 .latest-events.is-scrolling .latest-events-viewport { height: 16rem; scrollbar-width: none; -webkit-mask-image: linear-gradient(transparent, #000 12px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(transparent, #000 12px, #000 calc(100% - 24px), transparent); }
 .latest-events.is-scrolling .latest-events-viewport::-webkit-scrollbar { display: none; }
 .latest-events-list { margin: 0; padding: 0; list-style: none; }
-.event-row { display: grid; gap: 3px; padding: 9px 2px; border-bottom: 1px solid var(--line); }
-.event-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 8px; color: var(--muted); font-size: .68rem; line-height: 1.35; font-variant-numeric: tabular-nums; }
-.event-meta time { color: var(--ink); font-weight: 700; }
-.event-tag { --tag: var(--rwa-cobalt-dark); padding: 1px 6px; border-radius: 4px; background: color-mix(in srgb, var(--tag) 13%, transparent); color: var(--tag); font-size: .6rem; font-weight: 820; letter-spacing: .06em; text-transform: uppercase; }
-.event-row[data-category="terms"] .event-tag { --tag: var(--rwa-amber); }
-.event-row[data-category="keys"] .event-tag { --tag: var(--rwa-coral-text); }
-.event-row[data-category="defi"] .event-tag { --tag: var(--rwa-green); }
-/* Liquidations and collateral price freezes: between the DeFi green and the market red, in both themes. */
-.event-row[data-category="lending"] .event-tag { --tag: color-mix(in srgb, var(--rwa-red) 55%, var(--rwa-cobalt-dark)); }
-.event-row[data-category="market"] .event-tag { --tag: var(--rwa-red); }
-.event-row[data-category="legal"] .event-tag { --tag: var(--rwa-ink); }
-.event-title { color: var(--ink); font-size: .86rem; font-weight: 650; line-height: 1.38; text-decoration: none; overflow-wrap: anywhere; }
-.event-title:hover, .event-title:focus-visible { color: var(--violet-dark); text-decoration: underline; }
-.event-empty { color: var(--muted); font-size: .8rem; }
+/* The event rows themselves (.event-row …) are in app-shell.css: the token cards list them too. */
 .latest-events-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin: 9px 0 0; color: var(--muted); font-size: .7rem; line-height: 1.5; }
 .latest-events-foot a { color: var(--violet-dark); font-weight: 760; text-decoration: none; }
 .latest-events-foot a:hover, .latest-events-foot a:focus-visible { text-decoration: underline; }

@@ -56,12 +56,32 @@
     }
 
     /**
+     * Whether `event` concerns the token `{mint, issuer}` (issuer = the programme slug): it names the
+     * mint, or it names no token at all and is about the token's programme (a court case, a fee or
+     * document change). A protocol event that names no token concerns no token page.
+     */
+    function eventConcernsToken(event, token) {
+        if (!event || !token || typeof token.mint !== 'string') return false;
+        if (Array.isArray(event.mints) && event.mints.length > 0) return event.mints.includes(token.mint);
+        if (event.subject?.type === 'token') return event.subject.id === token.mint;
+        return event.subject?.type === 'issuer' && typeof token.issuer === 'string' && event.subject.id === token.issuer;
+    }
+
+    /** The events of `feed` that concern `token`, newest first, at most `limit`. */
+    function eventsForToken(feed, token, limit) {
+        const events = Array.isArray(feed?.events) ? feed.events : [];
+        return listEvents({ events: events.filter((event) => eventConcernsToken(event, token)) }, limit);
+    }
+
+    /**
      * One row: when (a <time> whose title is the source's own ISO time), the category tag, the title
      * as a link and the source label — plus the model's rating, labelled as a model assessment, on a
      * document change. `copy` marks the second copy a seamless scroll needs: hidden from assistive
      * technology and out of the tab order, so a reader meets each event once.
      */
-    function eventRowHtml(event, { nowMs = null, copy = false } = {}) {
+    function eventRowHtml(event, { nowMs = null, copy = false, root = './' } = {}) {
+        // Feed links are relative to the site root; a page one folder down (a card) passes root '../'.
+        const href = safeHref(event.href);
         const category = Object.prototype.hasOwnProperty.call(CATEGORY_LABELS, event.category) ? event.category : 'terms';
         const severity = ['info', 'caution', 'warning', 'critical'].includes(event.severity) ? event.severity : 'info';
         const assessment = event.assessment && typeof event.assessment.severity === 'string'
@@ -70,7 +90,22 @@
             + `<span class="event-meta"><time datetime="${escapeHtml(event.at)}" title="${escapeHtml(event.at)}" data-at="${escapeHtml(event.at)}">${escapeHtml(whenLabel(event.at, nowMs))}</time>`
             + `<span class="event-tag">${CATEGORY_LABELS[category]}</span>`
             + `<span class="event-source">${escapeHtml(event.source ?? '')}${assessment}</span></span>`
-            + `<a class="event-title" href="${escapeHtml(safeHref(event.href))}"${copy ? ' tabindex="-1"' : ''}>${escapeHtml(event.title)}</a></li>`;
+            + `<a class="event-title" href="${escapeHtml(href.startsWith('./') ? root + href.slice(2) : href)}"${copy ? ' tabindex="-1"' : ''}>${escapeHtml(event.title)}</a></li>`;
+    }
+
+    /**
+     * The items of a card's horizontal marquee: each event's category tag, title and age, as one
+     * link. `copy` marks the second run a seamless loop needs (out of the tab order; its container is
+     * hidden from assistive technology). Links are rebased with `root` as in eventRowHtml.
+     */
+    function eventMarqueeHtml(events, { nowMs = null, root = './', copy = false } = {}) {
+        return (Array.isArray(events) ? events : []).map((event) => {
+            const category = Object.prototype.hasOwnProperty.call(CATEGORY_LABELS, event.category) ? event.category : 'terms';
+            const href = safeHref(event.href);
+            return `<a class="event-marquee-item" data-category="${category}" href="${escapeHtml(href.startsWith('./') ? root + href.slice(2) : href)}"${copy ? ' tabindex="-1"' : ''}>`
+                + `<span class="event-tag">${CATEGORY_LABELS[category]}</span>${escapeHtml(event.title)}`
+                + `<span class="event-marquee-when">${escapeHtml(whenLabel(event.at, nowMs))}</span></a>`;
+        }).join('');
     }
 
     /** The line under the list: the cadence and the newest event's own time. */
@@ -93,5 +128,5 @@
         return next >= loopPx ? next - loopPx : next;
     }
 
-    return { CATEGORY_LABELS, SCROLL_PX_PER_S, validAt, absoluteLabel, whenLabel, safeHref, listEvents, eventRowHtml, updatedLineHtml, nextScroll };
+    return { CATEGORY_LABELS, SCROLL_PX_PER_S, validAt, absoluteLabel, whenLabel, safeHref, listEvents, eventConcernsToken, eventsForToken, eventRowHtml, eventMarqueeHtml, updatedLineHtml, nextScroll };
 });

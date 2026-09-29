@@ -40,7 +40,7 @@ export const ROUTES = [
     'GET /api/issuers/:slug/claims',
     'GET /api/sources?issuer=&kind=&status=',
     'GET /api/changes?kind=&severity=&issuer=&since=&limit=',
-    'GET /api/events?limit=',
+    'GET /api/events?limit=&mint=&issuer=',
     'GET /api/rules',
     'GET|POST /api/review/resolutions (Bearer editor token)',
     'GET /api/failure-modes',
