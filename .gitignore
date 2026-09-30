@@ -134,3 +134,6 @@ stocks/data/event-first-seen.json
 .regulators-watch-checkpoint*.json
 .last-powers-watch-stats.json
 stocks/data/cmc-tokenized.json
+
+# Private open-work list, kept local only
+next-steps.md

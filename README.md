@@ -236,7 +236,6 @@ quoted or cached here remain under their own terms.
 ## Repository map
 
 - [`SUBMISSION.md`](SUBMISSION.md): submission descriptions, demo flow, claims to make precisely.
-- [`next-steps.md`](next-steps.md): open work.
 - [`TODO.md`](TODO.md): product and research backlog; [`UX-audit1.md`](UX-audit1.md): the first UX audit.
 - [`stocks/README.md`](stocks/README.md): collection/build pipeline, outputs and operational rules.
 - [`stocks/MODEL.md`](stocks/MODEL.md): the legal/technical grading model and its limits.
