@@ -102,6 +102,10 @@
         function draw(events) {
             var now = Date.now();
             drawMarquee(events, now);
+            // The collapsed block's hint says how many there are, so it need not be opened to find out.
+            var hint = section.querySelector('summary small');
+            if (hint) hint.textContent = events.length === 0 ? 'None in the last 30 days'
+                : events.length + (events.length === LIMIT ? '+' : '') + ' in the last 30 days';
             list.innerHTML = events.length === 0
                 ? '<li class="event-empty">No events for ' + fmt.escapeHtml(section.getAttribute('data-symbol') || 'this token') + ' in the last 30 days.</li>'
                 : events.map(function (event) { return view.eventRowHtml(event, { nowMs: now, root: '../' }); }).join('');
@@ -151,8 +155,7 @@
         if (!location.hash) return;
         var target = document.getElementById(location.hash.slice(1));
         if (!target) return;
-        var disclosure = target.closest('details');
-        if (disclosure) disclosure.open = true;
+        openAncestors(target);
         var marked = document.querySelectorAll('.fold-target');
         for (var i = 0; i < marked.length; i += 1) marked[i].classList.remove('fold-target');
         if (target.classList.contains('fold-row')) {
@@ -162,15 +165,20 @@
         }
     }
 
+    /** Opens every collapsed block that contains `node`, so a target nested two levels deep is visible. */
+    function openAncestors(node) {
+        for (var d = node && node.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+    }
+
+    /**
+     * Any in-page link (the local nav, the five facts, the banners) opens the blocks around its
+     * target, including when the hash is already set and no hashchange fires.
+     */
     function wireLocalNav() {
-        var nav = document.querySelector('.card-local-nav');
-        if (!nav) return;
-        nav.addEventListener('click', function (event) {
-            var link = event.target.closest('a[href^="#"]');
-            if (!link) return;
-            var target = document.getElementById(link.getAttribute('href').slice(1));
-            var disclosure = target && target.closest('details');
-            if (disclosure) disclosure.open = true;
+        document.addEventListener('click', function (event) {
+            var link = event.target.closest && event.target.closest('a[href^="#"]');
+            if (!link || link.getAttribute('href').length < 2) return;
+            openAncestors(document.getElementById(link.getAttribute('href').slice(1)));
         });
         window.addEventListener('hashchange', revealHashTarget);
         revealHashTarget();

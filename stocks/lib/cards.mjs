@@ -1409,6 +1409,18 @@ function section(id, title, body) {
     return `<section id="${id}"><h2>${escapeHtml(title)}</h2>${body}</section>`;
 }
 
+/**
+ * One collapsible block of the card body. Every block below the decision summary uses this, so each
+ * reads the same: a title, an optional one-line hint, and a +/− toggle. `body`, `titleHtml` and
+ * `attrs` (extra attributes, with their leading space) are trusted markup;
+ * a deep link into the block opens it (card.js revealHashTarget).
+ */
+function disclosure({ id = null, cls = '', attrs = '', title, titleHtml = null, hint = null, body }) {
+    return `<details${id ? ` id="${id}"` : ''} class="card-disclosure${cls ? ` ${cls}` : ''}"${attrs}><summary>`
+        + `<span>${titleHtml ?? escapeHtml(title)}</span>${hint ? `<small>${escapeHtml(hint)}</small>` : ''}`
+        + `</summary><div>${body}</div></details>`;
+}
+
 function chip(status) {
     const key = status in STATUS_WORDS ? status : 'unknown';
     return `<b class="c-${key}">${escapeHtml(STATUS_WORDS[key])}</b>`;
@@ -3060,11 +3072,12 @@ export function materialChangesHtml(card) {
  */
 export function tokenEventsHtml(card) {
     const issuer = card.issuer?.slug ?? '';
-    return `<section id="events" class="token-events" data-mint="${escapeHtml(card.mint)}" data-issuer="${escapeHtml(issuer)}" data-symbol="${escapeHtml(card.symbol ?? '')}">`
-        + '<h2>Latest events</h2>'
-        + '<ul class="token-events-list"><li class="event-empty">Loading events…</li></ul>'
-        + `<p class="token-events-foot">Last 30 days: this token, and its programme’s filings, terms and fees. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer)}">All changes →</a></p>`
-        + '</section>';
+    return disclosure({
+        id: 'events', cls: 'token-events', title: 'Latest events', hint: 'Last 30 days',
+        attrs: ` data-mint="${escapeHtml(card.mint)}" data-issuer="${escapeHtml(issuer)}" data-symbol="${escapeHtml(card.symbol ?? '')}"`,
+        body: '<ul class="token-events-list"><li class="event-empty">Loading events…</li></ul>'
+            + `<p class="token-events-foot">This token, and its programme’s filings, terms and fees. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer)}">All changes →</a></p>`
+    });
 }
 
 /** The footer's per-input timestamps, named for a reader rather than by their record keys. */
@@ -3159,18 +3172,20 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
         `${card.underReview.length ? `<div class="under-review-banner" title="${card.underReview.length} priority-zero (P0) item${card.underReview.length === 1 ? '' : 's'} in the evidence review queue"><strong>Legal conclusions under review</strong><span>${escapeHtml(underReviewWords(card.underReview.length))}</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         materialChangesHtml(card) +
-        `<details class="decision-health"><summary>Why the health checks say: this token ${escapeHtml(levelWord(card.health.levels.token))}, ` +
-        `programme ${escapeHtml(levelWord(card.health.levels.programme))}</summary>` +
-        healthLevelsHtml(card) + healthDimensionsHtml(card) + `</details>` +
         '</header>';
+
+    const health = disclosure({ id: 'health', cls: 'decision-health',
+        titleHtml: `Why the health checks say: this token ${escapeHtml(levelWord(card.health.levels.token))}, `
+            + `programme ${escapeHtml(levelWord(card.health.levels.programme))}`,
+        hint: 'What holds each level back', body: healthLevelsHtml(card) + healthDimensionsHtml(card) });
 
     const siteHeader = siteNav.siteHeaderHtml('../');
 
-    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#events">Events</a><a href="#own">Rights</a>` +
+    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#events">Events</a><a href="#health">Health</a><a href="#own">Rights</a>` +
         `<a href="#control">Control</a><a href="#defi-usage">DeFi</a><a href="#market-detail">Markets</a>` +
         `<a href="#evidence-detail">Evidence</a></nav>`;
 
-    const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium & holders</span></summary><div>` +
+    const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium &amp; holders</span><small>Reference price, history, depth and holders</small></summary><div>` +
         section('reference', 'Reference & premium', referenceBody(card)) +
         `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
         section('closed-market', 'When the market is closed', closedMarketBody(card)) +
@@ -3178,7 +3193,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         section('depth', 'Depth, volume, activity', depthBody(card)) +
         section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
 
-    const evidenceAndTechnical = `<details id="evidence-detail" class="card-disclosure"><summary><span>Evidence, scenarios & technical detail</span></summary><div>` +
+    const evidenceAndTechnical = `<details id="evidence-detail" class="card-disclosure"><summary><span>Evidence, scenarios &amp; technical detail</span><small>Verification, venues, trust chain and rules</small></summary><div>` +
         section('verification', 'Verification', verificationBody(card)) +
         section('venues', 'Venues', venuesBody(card)) +
         (card.issuerApi === null ? '' : section('issuer-api', 'Issuer API', issuerApiBody(card))) +
@@ -3190,12 +3205,15 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         header,
         localNav,
         tokenEventsHtml(card),
-        card.discrepancies.length ? section('discrepancies', 'Claim vs observed reality', discrepanciesBody(card)) : '',
-        section('own', 'What you own', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>'),
+        health,
+        card.discrepancies.length ? disclosure({ title: 'Claim vs observed reality', hint: 'Where the documents and the chain disagree',
+            body: section('discrepancies', 'Source-backed discrepancies', discrepanciesBody(card)) }) : '',
+        disclosure({ title: 'What you own', hint: 'Legal claim, holder rights and redemption',
+            body: section('own', 'Ownership and redemption', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>') }),
         markets,
         `<details class="card-disclosure"><summary><span>Control surface &amp; key governance</span><small>Freeze, pause, forced transfer and authority keys</small></summary><div>${section('control', 'Observed issuer powers', controlBody(card))}<nav class="concept-links"><a href="../learn/issuer-control.html">What issuer intervention means →</a></nav></div></details>`,
         `<details class="card-disclosure"><summary><span>Exact-token protocol support</span><small>Source listings, observed markets and proof limits</small></summary><div>${section('defi-usage', 'Evidence available now', defiUsageBody(card))}<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav></div></details>`,
-        `<details class="card-disclosure"><summary><span>What could work in DeFi?</span></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
+        `<details class="card-disclosure"><summary><span>What could work in DeFi?</span><small>Composability by protocol type</small></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
         evidenceAndTechnical,
         footerBody(card)
     ].join('');

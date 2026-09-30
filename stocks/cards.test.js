@@ -356,7 +356,7 @@ describe('renderCard', () => {
         expect(html).toContain('../learn/issuer-control.html');
         expect(html).toContain('../learn/redemption.html');
         expect(html).toContain('../learn/defi-custody.html');
-        expect(html).toContain('class="decision-health"');
+        expect(html).toContain('class="card-disclosure decision-health"');
         expect(html).toContain('Exact-token support is source-listed.');
         expect(html).toContain('No configuration decoding or read-only execution simulation was performed');
     });
@@ -1763,7 +1763,7 @@ describe('the price line under a card’s title', () => {
 describe('plain words at the top of a card and in "What you own"', () => {
     const visibleText = (fragment) => fragment.replace(/<script[\s\S]*?<\/script>/g, '')
         .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details class="decision-health">'));
+    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details id="health" class="card-disclosure decision-health">'));
     const ownOf = (html) => html.slice(html.indexOf('<section id="own">'), html.indexOf('id="market-detail"'));
     const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis/i;
 
@@ -1994,7 +1994,7 @@ describe('the health split on a card: this token and its programme', () => {
     // HEALTH_LEVELS). The card now names both levels and what holds each back.
     const WORDS = { good: 'good', caution: 'caution', warning: 'warning', unknown: 'not measured' };
     const healthSection = (html) => {
-        const start = html.indexOf('<details class="decision-health">');
+        const start = html.indexOf('<details id="health" class="card-disclosure decision-health">');
         return html.slice(start, html.indexOf('</details>', start));
     };
     const aaplx = cardFor('AAPLx');
@@ -2146,10 +2146,10 @@ describe('card.js opens the fold row a link targets', () => {
         const rowDetails = { open: false };
         const row = { classList: classes(['fold-row']), closest: () => disclosure, querySelector: (sel) => (sel === 'details' ? rowDetails : null) };
         const stale = { classList: classes(['fold-row', 'fold-target']) };
-        const nav = { addEventListener: () => {} };
         const document = {
+            addEventListener: () => {},
             getElementById: (id) => (id === 'discrepancy-x' ? row : null),
-            querySelector: (sel) => (sel === '.card-local-nav' ? nav : null),
+            querySelector: () => null,
             querySelectorAll: (sel) => (sel === '.fold-target' ? [stale] : [])
         };
         const context = { document, location: { hash }, window: { addEventListener: () => {} }, Date, isFinite };

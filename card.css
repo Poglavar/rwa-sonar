@@ -80,10 +80,18 @@ body.card-page > .app-header { width: min(1180px, 100%); margin-top: -20px; }
 .card-disclosure > summary::-webkit-details-marker { display: none; }
 .card-disclosure > summary::after { content: "+"; color: var(--accent); font-size: 1.35rem; }
 .card-disclosure[open] > summary::after { content: "−"; }
-.card-disclosure > summary span { font-weight: 790; }
-.card-disclosure > summary small { margin-left: auto; color: var(--muted-text); text-align: right; }
-.card-disclosure > div { padding: 16px 16px 0; border-top: 1px solid var(--panel-border); }
-.card-disclosure > div > section:last-child { margin-bottom: 16px; }
+.card-disclosure > summary span { color: var(--page-text); font-size: 1.05rem; font-weight: 760; line-height: 1.3; }
+.card-disclosure > summary small { margin-left: auto; color: var(--muted-text); font-size: .78rem; text-align: right; }
+.card-disclosure > div { padding: 16px; border-top: 1px solid var(--panel-border); }
+/* Inside a block, its sections are flat parts divided by a rule, not boxes within a box; their
+   titles sit one step below the block's own title. */
+.card-disclosure > div > section { margin: 0; padding: 16px 0; border: 0; border-radius: 0; background: none; }
+.card-disclosure > div > section:first-child { padding-top: 0; }
+.card-disclosure > div > section:last-child { padding-bottom: 0; }
+.card-disclosure > div > section + section { border-top: 1px solid var(--panel-border); }
+.card-disclosure > div > section > h2,
+.card-disclosure > div > section > header > h2 { margin-bottom: 10px; font-size: .8rem; }
+@media (max-width: 480px) { .card-disclosure > summary small { display: none; } }
 
 a {
     color: var(--link-color);
@@ -197,9 +205,6 @@ h1 {
 .asset-decision-grid article:first-child strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.18rem; font-weight: 550; }
 .asset-decision-grid a { margin-top: auto; font-size: .74rem; font-weight: 760; }
 .asset-decision-limit { margin: 10px 0 0; color: var(--muted-text); font-size: .72rem; }
-.decision-health { margin: 0 0 16px; border: 1px solid var(--panel-border); border-radius: 8px; background: color-mix(in srgb, var(--card-bg) 80%, transparent); }
-.decision-health > summary { padding: 11px 13px; color: var(--link-color); font-size: .78rem; font-weight: 780; cursor: pointer; }
-.decision-health > :not(summary) { margin-right: 12px; margin-left: 12px; }
 .decision-health .banner { margin: 0 0 10px; }
 .concept-links { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--panel-border); }
 .concept-links a { font-size: .75rem; font-weight: 760; }
