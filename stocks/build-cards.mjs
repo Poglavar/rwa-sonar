@@ -18,6 +18,7 @@ import { dossierFileFor, readWhatIf } from './lib/issuer-whatif.mjs';
 import { cardFloatItem } from './lib/xstocks-float.mjs';
 import { outstandingOf, solanaShares } from './lib/solana-share.mjs';
 import { crossChainFor, crossChainTotals } from './lib/cross-chain.mjs';
+import { validatePrimaryMarket } from './lib/primary-market.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import {
     OG_SUBDIR, ensureOgDir, ensureOgImage, loadFonts, ogImageAlt, ogImageModel, pruneOgImages, renderOgSvg
@@ -53,7 +54,7 @@ const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260930chains';
+const ASSET_VERSION = '20260930honest';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -77,6 +78,7 @@ INPUTS
   stocks/data/pyth-onchain.json (Pyth prices read from Solana for "Where prices come from"; absent: the
                             block lists the feeds and says the prices were not read),
   stocks/data/composability-templates.json, stocks/data/defi-usage.json,
+  stocks/data/primary-market.json (who can create and redeem at each issuer: "Who keeps the price honest"),
   stocks/data/protocol-market-research.json (docs-vs-chain findings on decoded protocol markets),
   stocks/data/trust-chain.json, stocks/data/issuers/*.json (the what-if answers),
   stocks/data/sources-state.json (the archived copy behind each answer's source)
@@ -414,6 +416,14 @@ async function main() {
     // Every issuer's tokens of the same stock across chains (stocks/fetch-cmc-tokenized.mjs); absent
     // on a machine that never fetched it, and then the cards leave the cross-chain part out.
     const cmcTokenized = await readJson(join(HERE, 'data', 'cmc-tokenized.json'), null);
+    // Who can create and redeem at each issuer (curated). A malformed entry, or an issuer with tokens
+    // and no entry, fails the build: a card must not go out silent on whether its premium can be
+    // arbitraged away.
+    const primaryMarket = await readJson(join(HERE, 'data', 'primary-market.json'));
+    const primaryMarketProblems = validatePrimaryMarket(primaryMarket);
+    if (primaryMarketProblems.length) throw new Error(`stocks/data/primary-market.json: ${primaryMarketProblems.join('; ')}`);
+    const withoutPrimaryMarket = [...new Set(tokenDb.tokens.map((token) => token.issuer))].filter((slug) => !primaryMarket.issuers[slug]);
+    if (withoutPrimaryMarket.length) throw new Error(`stocks/data/primary-market.json has no entry for issuer(s): ${withoutPrimaryMarket.join(', ')}`);
     const tickers = new Set(tokenDb.tokens.map((token) => token.underlyingTicker).filter(Boolean));
     const crossTotals = cmcTokenized ? crossChainTotals(cmcTokenized.coins, tickers, cmcTokenized.fetchedAt) : new Map();
     log(`cross-chain totals: ${crossTotals.size} underlying(s) listed by CoinMarketCap${cmcTokenized ? ` (fetched ${cmcTokenized.fetchedAt})` : ' — no stocks/data/cmc-tokenized.json'}`);
@@ -431,6 +441,7 @@ async function main() {
             solanaShare: shares.get(token.mint) ?? null,
             crossChain: shares.has(token.mint) ? crossChainFor(token.symbol, token.underlyingTicker, crossTotals) : null,
             crossChainFetchedAt: cmcTokenized?.fetchedAt ?? null,
+            primaryMarket: primaryMarket.issuers[token.issuer] ?? null,
             venuesItem: venues.get(token.mint) ?? null,
             closedMarketItem: closedMarket.get(token.mint) ?? null,
             closedMarketMeta: closedMarketDb,

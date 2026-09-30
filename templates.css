@@ -68,6 +68,12 @@ blockquote { margin: .65rem 0; padding-left: .8rem; border-left: .16rem solid va
 .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .two-col article { padding: 1rem; background: var(--panel-2); border-radius: .7rem; }.two-col article h3 { margin-top: 0; }
 .facts { display: grid; grid-template-columns: minmax(10rem, .35fr) 1fr; gap: .55rem 1rem; }.facts dt { color: var(--muted); }.facts dd { margin: 0; overflow-wrap: anywhere; }
+/* "Who keeps the price honest" on issuer pages: the verdict above its facts (same classes as the cards). */
+.price-anchor { margin: 0 0 .7rem; padding: .6rem .8rem; border-left: 4px solid var(--muted); background: color-mix(in srgb, var(--muted) 10%, transparent); border-radius: 0 6px 6px 0; }
+.price-anchor-good { border-color: var(--rwa-green); background: color-mix(in srgb, var(--rwa-green) 10%, transparent); }
+.price-anchor-caution { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); }
+.price-anchor-warning { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 10%, transparent); }
+.price-anchor + .facts + .method { font-size: .9em; color: var(--muted); }
 .precedence { display: grid; gap: .6rem; padding: 0; list-style: none; }.precedence li { display: grid; grid-template-columns: 2rem 1fr; gap: .75rem; padding: .75rem; border: 1px solid var(--line); border-radius: .65rem; }.precedence li > span { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: var(--rwa-on-accent); font-weight: 900; }.precedence p { margin: .15rem 0 0; color: var(--muted); }
 .archive { margin-left: .45rem; }
 .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: .82rem; } th, td { padding: .6rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; } th { color: var(--muted); } td small { display: block; color: var(--muted); }

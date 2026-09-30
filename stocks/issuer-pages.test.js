@@ -251,3 +251,22 @@ describe('growing lists on issuer and template pages are compact rows that open 
         expect(row.body).toContain('href="https://example.com/terms"');
     });
 });
+
+describe('who keeps the price honest (issuer page)', () => {
+    const primaryMarket = JSON.parse(readFileSync(join(root, 'stocks', 'data', 'primary-market.json'), 'utf8')).issuers;
+    const ondo = issuers.issuers.find((row) => row.slug === 'ondo-global-markets');
+
+    it('names who can create and redeem, the tokens with other hours, and links the redemption terms', () => {
+        const html = renderIssuerPage({ issuer: ondo, primaryMarket: primaryMarket['ondo-global-markets'] });
+        expect(html).toContain('<summary>Who keeps the price honest</summary>');
+        expect(html).toContain('<p class="price-anchor price-anchor-good"><strong>Arbitrage is open to wallets the issuer has onboarded while the rail is open');
+        expect(html).toContain('6 tokens (SPYon, QQQon, CRCLon, NVDAon, TSLAon, GOOGLon) mint and redeem 24/7.');
+        expect(html).toContain('<dl class="facts"><dt>Who can create and redeem</dt>');
+        expect(html).toContain('<a href="#redemption">Can a holder redeem?</a>');
+        expect(html).toContain('<details class="dossier-section" id="redemption">');
+    });
+
+    it('says nothing without an entry', () => {
+        expect(renderIssuerPage({ issuer: ondo })).not.toContain('Who keeps the price honest');
+    });
+});

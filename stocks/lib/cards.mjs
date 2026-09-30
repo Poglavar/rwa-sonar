@@ -20,6 +20,7 @@ import { COMPOSABILITY_SCENARIOS, lenderExitQuality } from './composability.mjs'
 import { DEFI_ACTION_LABELS } from './defi-usage.mjs';
 import { dossierSlug as protocolDossierSlug } from './protocol-dossiers.mjs';
 import { timelockFrom } from './power-map.mjs';
+import { anchorObservation, primaryMarketHtml, shapePrimaryMarket } from './primary-market.mjs';
 import { shapeRedemptionUsability, describeObservationFeed } from './redemption-usability.mjs';
 import { shapeAuthorityAttribution } from './authority-attribution.mjs';
 import { resolutionForEvent } from './event-resolutions.mjs';
@@ -355,6 +356,8 @@ export function buildCard(input) {
         solanaShare = null,
         crossChain = null,
         crossChainFetchedAt = null,
+        // stocks/data/primary-market.json's entry for the token's issuer (lib/primary-market.mjs).
+        primaryMarket = null,
         venuesItem = null,
         closedMarketItem = null,
         closedMarketMeta = null,
@@ -615,6 +618,7 @@ export function buildCard(input) {
             withoutSupply: crossChain.withoutSupply, units: crossChain.units === null ? null : roundSignificant(crossChain.units, 6),
             sharePct: crossChain.sharePct === null ? null : roundSignificant(crossChain.sharePct, 4), fetchedAt: str(crossChainFetchedAt)
         },
+        primaryMarket: shapePrimaryMarket(primaryMarket, token.symbol ?? null),
         holders: {
             supplyUi: num(holdersItem?.supplyUi ?? token?.supplyUi),
             top1SharePctExLabels: topSharePctExcludingLabels(top20, 1),
@@ -1211,6 +1215,7 @@ export function publicCard(card) {
         depth: card.depth,
         solanaShare: card.solanaShare,
         crossChain: card.crossChain,
+        primaryMarket: card.primaryMarket,
         holders: card.holders,
         control: card.control,
         keyGovernance: {
@@ -2373,6 +2378,23 @@ function verificationBody(card) {
     ], card.evidence);
 }
 
+/**
+ * Who can create and redeem at the issuer, how fast and at what cost, so a reader knows whether the
+ * premium above can be arbitraged away; the recurring redemption scan's line is the evidence that
+ * the rail is used (lib/primary-market.mjs).
+ */
+function primaryMarketBody(card) {
+    const feed = card.ownership?.redemptionFeed ?? null;
+    // Only a scan that ran over the programme is evidence here; "not observable" and "not yet
+    // covered" belong to the redemption terms above and would only repeat a long reason.
+    const seen = feed && /^(Redemptions observed|On-chain leg only|No )/.test(feed.text) ? humanDates(feed.text) : null;
+    const observation = anchorObservation({
+        verdict: card.primaryMarket.anchor.verdict, hours: card.primaryMarket.hours,
+        premiumPct: card.reference?.premiumPct ?? null, liquidityUsd: card.depth?.liquidityUsd ?? null, marketOpen: card.reference?.marketOpen ?? null
+    });
+    return primaryMarketHtml(card.primaryMarket, { seenOnChain: seen, termsHref: '#rights', observation });
+}
+
 function venuesBody(card) {
     const dexRows = card.venues.dex.map((row) => {
         const name = row.url === null ? text(row.dexId) : link(row.url, row.dexId ?? 'pool');
@@ -3249,11 +3271,14 @@ export function blockAnswers(card) {
     const control = `${status('control')} ${join([powers.length ? `can ${powers.join(', ')}` : 'no holder-affecting power found', keys.length ? `keys: ${keys.join(', ')}` : null])}`;
 
     const r = card.reference ?? {};
-    const markets = `${status('market')} ${join([
+    const marketFacts = join([
         isNum(r.usdPrice) ? fmtPrice(r.usdPrice) : null,
         isNum(r.premiumPct) ? `${fmtSignedPct(r.premiumPct)} vs ${card.underlyingTicker ?? referenceLabel(r.source) ?? 'reference'}` : null,
         isNum(card.depth?.liquidityUsd) ? `${fmtMoney(card.depth.liquidityUsd)} liquidity` : null
-    ]) || 'no market measured'}`;
+    ]) || 'no market measured';
+    // …and whether that premium can be arbitraged away (lib/primary-market.mjs).
+    const anchor = card.primaryMarket?.anchor?.words ?? null;
+    const markets = `${status('market')} ${anchor === null ? marketFacts : `${marketFacts} · ${escapeHtml(anchor)}`}`;
 
     const integrations = Array.isArray(card.defiUsage?.integrations) ? card.defiUsage.integrations : [];
     const protocols = [...new Set(integrations.map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
@@ -3412,6 +3437,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     const markets = disclosure({ id: 'market-detail', title: 'Markets', hintHtml: answers.markets,
         body: checks('market') +
             section('reference', 'Reference & premium', referenceBody(card)) +
+            (card.primaryMarket === null ? '' : section('primary-market', 'Who keeps the price honest', primaryMarketBody(card))) +
             `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
             section('depth', 'Depth, volume, activity', depthBody(card)) +
             // Fetched only when a reader opens Markets (card.js wireCmc): CoinMarketCap's own price,

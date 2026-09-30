@@ -1345,6 +1345,20 @@ from the operator notice stream.
 npm run stocks:watchlist-changes
 ```
 
+### Who keeps the price honest — `stocks/data/primary-market.json`
+
+One entry per issuer: who can create and redeem tokens at the issuer (`who`: anyone, onboarded,
+exchange-users, authorized-participants, market-makers, allowlisted-holders, nobody), how
+(`mechanism`), how fast (`settlement`), when (`hours`, with `hoursExceptions` for tokens the
+issuer treats differently, e.g. Ondo's six 24/7 tokens), the minimum, the cost and whether it
+settles in shares or cash. Each sentence rests on the dossier's redemption fields named in
+`basis`, re-read on `checkedAt`; the dossier keeps the quotes and sources, this file keeps the
+reading. `stocks/lib/primary-market.mjs` derives the verdict (`anchored`, `anchored-by-few`,
+`anchored-slowly`, `floats`, `no-open-market`) and the header words ("only authorized
+participants can arbitrage"); the card's Markets block and the issuer page render it. The card
+build fails when a token's issuer has no entry or an entry is malformed
+(`validatePrimaryMarket`), so no card can go out silent on whether its premium can be arbitraged.
+
 ### DeFi composability — `stocks/data/composability-templates.json`
 
 Composability is reviewed once per **issuer legal programme + exact control recipe**, and that one

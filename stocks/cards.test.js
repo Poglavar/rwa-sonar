@@ -107,6 +107,8 @@ function dossierFileFor(slug) {
 
 /** The built schematics (stocks-schematics.json), so every card is measured with its drawn route. */
 const SCHEMATICS = JSON.parse(fs.readFileSync(fixture('stocks-schematics.json'), 'utf8'));
+/** Who can create and redeem at each issuer (curated, committed): the card's "Who keeps the price honest". */
+const PRIMARY_MARKET = read('stocks', 'data', 'primary-market.json');
 
 const whatIfBySlug = new Map();
 for (const row of issuerDb.issuers) {
@@ -164,6 +166,7 @@ function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverr
         composabilityTemplate: composabilityTemplateFor(token, composability),
         defiUsageItem: defiUsage.get(token.mint) ?? null,
         schematics: SCHEMATICS.issuers[token.issuer] ?? null,
+        primaryMarket: PRIMARY_MARKET.issuers[token.issuer] ?? null,
         referenceItem: referenceItems.get(token.mint) ?? null,
         pythOnchain: PYTH_ONCHAIN,
         oraclePricing,
@@ -2258,7 +2261,7 @@ describe('each topic block states its answer and carries its own checks (30 Sep)
         // Only the four keys' types reach the answer, never the evidence sentence stored beside them.
         expect(blockAnswers({ ...aaplx, keyGovernance: { ...aaplx.keyGovernance, evidence: 'Finalized getMultipleAccounts…' } }).control).not.toMatch(/getMultipleAccounts/i);
         expect(blockAnswers({ ...aaplx, keyGovernance: { mint: 'program', freeze: 'unknown', delegate: 'none', rebase: null } }).control).toMatch(/keys: program-controlled$/);
-        expect(answers.markets).toMatch(/^<b class="c-\w+">\w+<\/b> \$[\d,.]+ · [-+−]?[\d.]+% vs AAPL · \$[\d,.]+[kM]? liquidity$/);
+        expect(answers.markets).toMatch(/^<b class="c-\w+">\w+<\/b> \$[\d,.]+ · [-+−]?[\d.]+% vs AAPL · \$[\d,.]+[kM]? liquidity · only authorized participants can arbitrage$/);
         expect(answers.defi).toMatch(chip);
         expect(answers.defi).toMatch(/Kamino.* · as collateral$/);
         expect(answers.risks).toMatch(/^38 what-if scenarios: 34 documented, 1 unknown$/);
@@ -2309,5 +2312,34 @@ describe('no card says a lender is "not researched" (30 Sep)', () => {
             const html = renderCard(cardFor(symbol), { version: 'v' });
             expect(html).not.toMatch(/not researched yet/i);
         }
+    });
+});
+
+describe('who keeps the price honest', () => {
+    test('the Markets block says who can create and redeem, and the verdict is toned like a health check', () => {
+        const nvdax = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(nvdax).toContain('<h2>Who keeps the price honest</h2>');
+        expect(nvdax).toContain('<p class="price-anchor price-anchor-good"><strong>Only authorized participants can create and redeem, so they keep the price near the share on weekdays; nobody else can arbitrage it.</strong></p>');
+        expect(nvdax).toContain('<dt>Minimum</dt><dd>$5,000 direct with the issuer</dd>');
+        expect(nvdax).toContain('<a href="#rights">Can a holder redeem?</a>');
+        expect(renderCard(cardFor('OPENAI'), { version: 'v' })).toContain('<p class="price-anchor price-anchor-warning"><strong>No one can create or redeem, so nothing ties the price to the share: it is what the last trade paid.</strong></p>');
+        expect(renderCard(cardFor('FWDI'), { version: 'v' })).toContain('price-anchor-unknown"><strong>Only allowlisted wallets can hold or convert it and it has no open market');
+    });
+
+    test('an Ondo token reads its own hours: six mint and redeem around the clock, the rest in market hours', () => {
+        expect(renderCard(cardFor('NVDAon'), { version: 'v' })).toContain('instantly and around the clock, so the price should stay close to the share.');
+        const aaplon = renderCard(cardFor('AAPLon'), { version: 'v' });
+        expect(aaplon).toContain('so the price should track the share in US market hours; outside them it floats.');
+        expect(aaplon).toContain('<dt>When</dt><dd>US market hours: Ondo pauses the token outside them (“unavailable in session”).</dd>');
+        expect(blockAnswers(cardFor('AAPLon')).markets).toMatch(/ · arbitrage open to onboarded wallets$/);
+    });
+
+    test('the card record carries the verdict without the exception list; without an entry the section and the words are absent', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.primaryMarket).toMatchObject({ who: 'authorized-participants', hours: '24/5', anchor: { verdict: 'anchored-by-few', tone: 'good' } });
+        expect(record.primaryMarket.hoursExceptions).toBeUndefined();
+        const bare = { ...cardFor('NVDAx'), primaryMarket: null };
+        expect(renderCard(bare, { version: 'v' })).not.toContain('Who keeps the price honest');
+        expect(blockAnswers(bare).markets).toMatch(/liquidity$/);
     });
 });

@@ -612,6 +612,11 @@ h3:first-child {
 .redemption-usability dd > :first-child { min-width: 0; }
 .redemption-usability dd > .evidence-state { flex: none; }
 .redemption-term { overflow-wrap: anywhere; }
+/* "Who keeps the price honest": the verdict, toned like a health check, above its facts. */
+.price-anchor { margin: 0 0 10px; padding: 10px 12px; border-left: 4px solid var(--unknown); background: var(--unknown-bg); border-radius: 0 6px 6px 0; }
+.price-anchor-good { border-color: var(--good); background: var(--good-bg); }
+.price-anchor-caution { border-color: var(--caution); background: var(--caution-bg); }
+.price-anchor-warning { border-color: var(--warning); background: var(--warning-bg); }
 .redemption-observation { padding: 12px 14px; border-left: 4px solid var(--unknown); background: color-mix(in srgb, var(--unknown) 8%, transparent); }
 .evidence-state { color: var(--muted-text); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
 

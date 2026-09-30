@@ -20,6 +20,7 @@ const ROOT = join(HERE, '..');
 const ISSUERS_PATH = join(ROOT, 'stocks-issuers.json');
 const TOKENS_PATH = join(ROOT, 'stocks-tokens.json');
 const COMPOSABILITY_PATH = join(HERE, 'data', 'composability-templates.json');
+const PRIMARY_MARKET_PATH = join(HERE, 'data', 'primary-market.json');
 const SOURCES_STATE_PATH = join(HERE, 'data', 'sources-state.json');
 const ISSUER_DOSSIER_DIR = join(HERE, 'data', 'issuers');
 const OUTPUT_PATH = join(ROOT, 'stocks-legal-templates.json');
@@ -27,7 +28,7 @@ const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const POWER_MAP_PATH = join(ROOT, 'stocks-power-map.json');
 const DEFAULT_OUT_DIR = 'templates';
 const DEFAULT_ISSUER_OUT_DIR = 'issuers';
-const ASSET_VERSION = '20260930chains';
+const ASSET_VERSION = '20260930honest';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages
@@ -88,6 +89,8 @@ export async function main(argv = process.argv.slice(2)) {
     const issuerDb = await readJson(ISSUERS_PATH);
     const tokenDb = await readJson(TOKENS_PATH);
     const composability = await readJson(COMPOSABILITY_PATH);
+    // Who can create and redeem at each issuer, for the issuer page's "Who keeps the price honest".
+    const primaryMarket = await readJson(PRIMARY_MARKET_PATH, { issuers: {} });
     const sourceState = await readJson(SOURCES_STATE_PATH, {});
     const reviewQueue = await readJson(REVIEW_QUEUE_PATH, { items: [] });
     if (!Array.isArray(issuerDb?.issuers)) throw new Error(`${ISSUERS_PATH}: expected issuers[]`);
@@ -190,7 +193,8 @@ export async function main(argv = process.argv.slice(2)) {
             builtAt: issuerDb.builtAt,
             whatIf: whatIfBySlug.get(issuer.slug) ?? null,
             whatIfQuestions: TRUST_CHAIN.failureModes.length,
-            schematics: schematics.issuers[issuer.slug] ?? null
+            schematics: schematics.issuers[issuer.slug] ?? null,
+            primaryMarket: primaryMarket.issuers[issuer.slug] ?? null
         }, { baseUrl, version: ASSET_VERSION, cardSlugs, ogImage }), 'utf8');
     }
     await finishFamilyOg(templateOg);
