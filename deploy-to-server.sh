@@ -5,7 +5,7 @@
 #
 # Why git-pull rather than a laptop rsync: rsync copies whatever is in the working
 # directory, including gitignored files. That is how six .env files - one holding a
-# live Cloudflare API token - ended up served with 200 from /var/www/zagreb.lol on
+# live Cloudflare API token - ended up served with 200 from another site's docroot on
 # 2026-08-19. Git physically cannot ship a gitignored file. The repo checkout also
 # stays OUT of the docroot, so the repo's own .git is never web-reachable either.
 #
