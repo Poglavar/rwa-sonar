@@ -63,7 +63,7 @@ describe('canonical issuer dossiers', () => {
 
     it('links the reusable legal template and limits the initial asset wall', () => {
         expect(html).toContain('../templates/xstocks-backed--token-2022-pausable-clawback-rebase.html');
-        expect(html).toContain('Browse the complete catalogue');
+        expect(html).toContain('Browse the whole universe');
         expect((html.match(/<li><a href="\.\.\/cards\//g) || []).length).toBe(36);
         expect(html).not.toContain('[object Object]');
     });

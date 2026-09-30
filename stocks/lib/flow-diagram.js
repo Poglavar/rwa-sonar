@@ -46,6 +46,10 @@
         catalogue: 'the scenario or generic chain, not an issuer claim'
     };
 
+    /** The word a reader sees for a status; the ids stay as the data spells them. */
+    const STATUS_WORDS = { unknown: 'not established', catalogue: 'scenario' };
+    function statusWord(status) { return STATUS_WORDS[status] ?? status; }
+
     /**
      * Every number the drawings use, in viewBox units. CHAR_* are average glyph widths as a fraction
      * of the font size (system-ui), used to wrap without a text-measuring DOM; they err on the wide
@@ -597,7 +601,7 @@
             return `<li class="fd-st-${status}">`
                 + (who ? `<span class="fd-who">${escapeHtml(who ?? '')}</span> ` : '')
                 + `${escapeHtml(str(step?.label) ?? 'Step not described')} `
-                + `<span class="fd-chip fd-st-${status}">${escapeHtml(status === 'unknown' ? 'not established' : status)}</span>`
+                + `<span class="fd-chip fd-st-${status}">${escapeHtml(statusWord(status))}</span>`
                 + (sources ? ` ${sourceHtml(step?.source)}` : '') + '</li>';
         }).join('');
         const loop = spec?.kind === 'flow' && str(spec?.loopBack?.label)
@@ -619,7 +623,7 @@
 
     function legendHtml(spec) {
         const items = usedStatuses(spec).map((status) =>
-            `<li><span class="fd-key fd-st-${status}"></span><b>${escapeHtml(status === 'unknown' ? 'not established' : status)}</b>`
+            `<li><span class="fd-key fd-st-${status}"></span><b>${escapeHtml(statusWord(status))}</b>`
             + ` <small>${escapeHtml(STATUS_LEGEND[status])}</small></li>`).join('');
         return items ? `<ul class="fd-legend" aria-label="Step colours">${items}</ul>` : '';
     }

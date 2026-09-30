@@ -8,7 +8,7 @@ A longer version of this file, with the method and the data model, is at https:/
 
 ## Start here
 
-- [Landing page](https://rwasonar.com/): what RWA Sonar is and how the catalogue is growing
+- [Landing page](https://rwasonar.com/): what RWA Sonar is and how the universe is growing
 - [Stock workspace](https://rwasonar.com/stocks.html): search a ticker, compare its wrappers, filter the token table
 - [Example token report: NVDAx](https://rwasonar.com/cards/NVDAx.html): one static, JavaScript-optional report per exact token address (every token has one under /cards/)
 - [Methodology](https://rwasonar.com/methodology.html): evidence hierarchy, claim statuses, health model, collector freshness, known blind spots

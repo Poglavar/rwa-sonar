@@ -63,7 +63,7 @@ async function readFreezeRows({ flags, since }) {
     if (!env.DATABASE_URL) return { read: false, reason: 'no DATABASE_URL', freezes: [], scan: [] };
     try {
         if ((await psql(env.DATABASE_URL, CLOSED_MARKET_TABLE_PROBE, 'lending table probe', ['-t', '-A'])).trim() !== 't') {
-            return { read: false, reason: 'lending watcher tables absent (stocks/watch-lending.mjs --ddl creates them)', freezes: [], scan: [] };
+            return { read: false, reason: 'lending watcher tables absent (stocks/apply-schema.mjs creates them at deploy)', freezes: [], scan: [] };
         }
         const doc = JSON.parse((await psql(env.DATABASE_URL, closedMarketRowsPsql({ since }), 'closed-market rows', ['-t', '-A'])).trim() || '{}');
         log(`freeze rows: ${doc?.freezes?.length ?? 0} episode(s) touching the window since ${since}, ${doc?.scan?.length ?? 0} scan row(s) from ${describeUrl(env.DATABASE_URL)}`);

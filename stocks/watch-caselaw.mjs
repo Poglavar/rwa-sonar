@@ -34,7 +34,6 @@ const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const QUERIES_FILE = join(HERE, 'data', 'caselaw-queries.json');
 const EXTRA_FILE = join(HERE, 'data', 'caselaw-extra.json');
 const REVIEWED_FILE = join(HERE, 'data', 'caselaw-reviewed.json');
-const DDL_FILE = join(REPO, 'db', '2026-09-23-sonar-caselaw.sql');
 const STATS_FILE = join(REPO, '.last-caselaw-watch-stats.json');
 const CHECKPOINT_FILE = join(REPO, '.caselaw-watch-checkpoint.json');
 const RUN_STARTED_MS = Date.now();
@@ -57,7 +56,6 @@ USAGE
 
 OPTIONS
   --run              Actually search. Without it this help is printed and nothing runs.
-  --ddl              Apply db/${DDL_FILE.split('/').pop()} first (tables + the \`litigation\` event kind). Idempotent.
   --write-queries    Rewrite stocks/data/caselaw-queries.json from the dossiers (review, then commit it).
                      Without it the file is only compared, and a stale file is a warning.
   --only=<issuer>    Only the queries watched for this issuer slug.
@@ -105,7 +103,7 @@ LIMITS AND KEYS
   sec.gov is sent the declared User-Agent from lib/watch.mjs.
 
 PM2
-  ecosystem.config.cjs app \`rwa-watch-caselaw\`: daily at 04:23 UTC, --run --ddl, autorestart off.
+  ecosystem.config.cjs app \`rwa-watch-caselaw\`: daily at 04:23 UTC, --run, autorestart off (the schema is applied at deploy: stocks/apply-schema.mjs).
 
 FILES
   stocks/data/caselaw-queries.json    the derived query set, generated (--write-queries), reviewed, committed
@@ -261,11 +259,6 @@ async function main() {
     const runs = new Map();
     if (dbUrl) {
         log(`db: ${describeUrl(dbUrl)}`);
-        if (flags.ddl) {
-            const ddl = await readFile(DDL_FILE, 'utf8');
-            log(`db: applying ${relative(REPO, DDL_FILE)} (${ddl.length} bytes, idempotent)`);
-            await psql(dbUrl, ddl, 'ddl');
-        }
         const cases = normaliseStoredRows(JSON.parse((await psql(dbUrl, buildReadCasesQuery(), 'read cases', ['-t', '-A'])).trim() || '[]'));
         for (const row of cases) {
             // A decision made since the last run applies now, not when the case next turns up.

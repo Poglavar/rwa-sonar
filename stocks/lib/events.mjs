@@ -32,7 +32,7 @@ export const CATEGORIES = ['catalogue', 'terms', 'keys', 'defi', 'lending', 'mar
 export const SOURCES = {
     documents: 'document watcher',
     chain: 'chain watcher',
-    catalogue: 'catalogue',
+    catalogue: 'universe scan',
     defi: 'DeFi scanner',
     court: 'court watcher',
     journal: 'change journal',

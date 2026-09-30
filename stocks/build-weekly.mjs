@@ -27,7 +27,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WEEK_FILE_RE = /^\d{4}-W\d{2}\.html$/;
 
 /** Cache-busting stamp on ../templates.css and ../weekly.css. Bump when either changes. */
-const ASSET_VERSION = '20260930answers';
+const ASSET_VERSION = '20260930universe';
 
 function usage() {
     console.log(`build-weekly.mjs — "This week in tokenized stocks", one static page per ISO week
@@ -183,7 +183,7 @@ async function main() {
             { value: fmtCount(digest.numbers.tokens.value), label: 'tokens tracked' },
             { value: fmtCount(digest.journal.length), label: 'issuer, venue or protocol changes' },
             { value: digest.material === null ? null : fmtCount(digest.material.length), label: 'material changes (model assessment)' },
-            { value: fmtCount(digest.newTokens.reduce((sum, row) => sum + (row?.count ?? 0), 0)), label: 'tokens first catalogued' },
+            { value: fmtCount(digest.newTokens.reduce((sum, row) => sum + (row?.count ?? 0), 0)), label: 'tokens joined the universe' },
             { value: fmtCount(digest.discrepancies.length), label: 'new claim ≠ reality discrepancies' }
         ]
     })));

@@ -159,21 +159,21 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         items.push({
             id: `catalogue-${added ? 'new-mint' : 'removed-mint'}-${date}-${issuer ?? 'unknown'}`, date, category: 'catalogue',
             eventAt: null, effectiveAt: null, firstObservedAt: date, reviewedAt: null,
-            kind: added ? 'asset-added' : 'asset-removed', severity: 'info', actor: 'RWA Sonar catalogue',
+            kind: added ? 'asset-added' : 'asset-removed', severity: 'info', actor: 'RWA Sonar universe scan',
             issuer,
-            title: `${label} ${added ? 'entered' : 'left'} the tracked catalogue`,
+            title: `${label} ${added ? 'entered' : 'left'} the universe we track`,
             summary: added
-                ? `RWA Sonar first confirmed and catalogued ${count === 1 ? 'this exact Solana token address' : `these ${count} exact Solana token addresses`} on ${date}. This is an observation date, not a claim that the issuer created the ${count === 1 ? 'token' : 'tokens'} that day.`
-                : `${count === 1 ? 'This exact token address was' : `These ${count} exact token addresses were`} no longer carried by the catalogue on ${date}. That does not by itself mean ${count === 1 ? 'the token was' : 'the tokens were'} burned or ceased to exist on-chain.`,
+                ? `RWA Sonar first confirmed and added to the universe ${count === 1 ? 'this exact Solana token address' : `these ${count} exact Solana token addresses`} on ${date}. This is an observation date, not a claim that the issuer created the ${count === 1 ? 'token' : 'tokens'} that day.`
+                : `${count === 1 ? 'This exact token address was' : `These ${count} exact token addresses were`} no longer carried in the universe on ${date}. That does not by itself mean ${count === 1 ? 'the token was' : 'the tokens were'} burned or ceased to exist on-chain.`,
             whyItMatters: added
                 ? 'The headline asset count rises only when a specific token address has enough identity evidence to be included.'
                 : 'A falling headline count can reflect an issuer registry or evidence change; the underlying token may still exist.',
             consequence: added
-                ? 'This address can now be searched and compared in the tracked catalogue.'
-                : 'The address no longer appears in current catalogue views; the token may still exist on-chain.',
+                ? 'This address can now be searched and compared in the universe we track.'
+                : 'The address no longer appears in current universe views; the token may still exist on-chain.',
             affectedHolders: ['people researching this exact token address'],
-            before: added ? 'Not in catalogue' : 'In catalogue',
-            after: added ? 'In catalogue' : 'Not in catalogue',
+            before: added ? 'Not in the universe' : 'In the universe',
+            after: added ? 'In the universe' : 'Not in the universe',
             assets, sources: [], href: count === 1 ? assets[0].href ?? issuerHref(issuer) : issuerHref(issuer)
         });
     }

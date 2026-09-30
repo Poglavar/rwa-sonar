@@ -2430,7 +2430,7 @@ function trustChainBody(card) {
  */
 function whatIfBody(card) {
     if (card.whatIf === null) {
-        return '<p class="wi-empty">The failure-mode catalogue did not load at build time, so this '
+        return '<p class="wi-empty">The failure-mode list did not load at build time, so this '
             + 'card cannot say which questions are answered.</p>';
     }
     const actors = card.whatIf.actors ?? [];
@@ -3173,7 +3173,7 @@ export function blockAnswers(card) {
 
 /** The footer's per-input timestamps, named for a reader rather than by their record keys. */
 const SOURCE_WORDS = {
-    tokens: 'catalogue', issuers: 'issuer dossiers', issuerApi: 'issuer APIs', referencePrices: 'reference prices',
+    tokens: 'token universe', issuers: 'issuer dossiers', issuerApi: 'issuer APIs', referencePrices: 'reference prices',
     holders: 'holders', venues: 'DEX pools', trades: 'trades', closedMarket: 'closed-market data',
     meteora: 'Meteora pools', defiUsage: 'DeFi usage', pythOnchain: 'Pyth on Solana'
 };

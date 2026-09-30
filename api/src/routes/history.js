@@ -138,7 +138,7 @@ SELECT d.snapshot_date, d.previous_date,
     ]);
     return c.json({
         methodology: {
-            tokenCount: 'Exact Solana token addresses catalogued by RWA Sonar on that observation date; growth is discovery, not proof of same-day issuance.',
+            tokenCount: 'Exact Solana token addresses in the RWA Sonar universe on that observation date; growth is discovery, not proof of same-day issuance.',
             activeTokenCount: 'Addresses whose issuer dossier was live and which were measured as unpaused or not pausable. Missing control data is not proof of activity.',
             supplyUi: 'Sum of displayed token units only where measured; unlike shares in one company, units across different products are not economically comparable.',
             holderAccounts: 'Sum of non-zero token accounts reported per mint; one wallet holding several tokens is counted several times and accounts are not people.',

@@ -196,7 +196,7 @@
     }
 
     function sourcesText(value) {
-        const names = { settlement: 'stablecoin leg', 'dex-tape': 'DEX tape', 'daily-snapshot': 'day snapshot', 'same-day-catalogue': 'same-day catalogue' };
+        const names = { settlement: 'stablecoin leg', 'dex-tape': 'DEX tape', 'daily-snapshot': 'day snapshot', 'same-day-catalogue': 'same-day universe' };
         const entries = Object.entries(value?.sources ?? {});
         return entries.length ? entries.map(([k, n]) => `${names[k] ?? k.replace(/[-_]+/g, ' ')} ${n}`).join(', ') : DASH;
     }
@@ -286,7 +286,7 @@
         const text = typeof source === 'string' ? source.trim() : '';
         const provider = /\(([^()]+)\)\s*$/.exec(text)?.[1]?.trim();
         if (provider) return `${provider} prices`;
-        if (text === '' || /\.json\b|\w\.\w*[A-Z]/.test(text)) return 'catalogue prices';
+        if (text === '' || /\.json\b|\w\.\w*[A-Z]/.test(text)) return 'token universe prices';
         return text;
     }
 

@@ -479,7 +479,7 @@ if (typeof document !== 'undefined') {
             const issuersPath = useSample ? SAMPLE_ISSUERS_PATH : ISSUERS_PATH;
             const tokensPath = useSample ? SAMPLE_TOKENS_PATH : TOKENS_PATH;
 
-            tokenTableMessage('loading', 'Loading token catalogue', 'Reading the current token snapshot and preparing the first page.');
+            tokenTableMessage('loading', 'Loading the token universe', 'Reading the current token snapshot and preparing the first page.');
             els.tokenCount.textContent = 'loading…';
 
             // The change log and the funnel are two more small files (~30 kB and ~7 kB) feeding one
@@ -525,7 +525,7 @@ if (typeof document !== 'undefined') {
                     `${BUILD_HINT}, or append ?db=sample to this URL to view the bundled sample fixture.`;
                 els.status.classList.add('status-error');
                 els.tokenCount.textContent = DASH;
-                tokenTableMessage('failed', 'Issuer research failed to load', `The token catalogue cannot be linked to issuer dossiers because ${issuersPath} is unavailable.`, [
+                tokenTableMessage('failed', 'Issuer research failed to load', `The token universe cannot be linked to issuer dossiers because ${issuersPath} is unavailable.`, [
                     { label: 'Retry page', action: 'reload-page' }, { label: 'Open health monitor', href: './monitor.html' }
                 ]);
                 return;
@@ -569,7 +569,7 @@ if (typeof document !== 'undefined') {
         }
 
         async function loadDiscoveryPage() {
-            tokenTableMessage('loading', 'Loading token catalogue', 'Reading the compact discovery index and preparing the first page.');
+            tokenTableMessage('loading', 'Loading the token universe', 'Reading the compact discovery index and preparing the first page.');
             els.tokenCount.textContent = 'loading…';
             // The scoped decision path needs identities, not the full change history. Briefing
             // data loads only when the briefing is opened; search remains available in every view.
@@ -955,7 +955,7 @@ if (typeof document !== 'undefined') {
                     if (!comparisonBundleMatches(bundle, group, state.builtAt)) {
                         document.getElementById('comparisonHeading').textContent = `${group.ticker} · research unavailable`;
                         document.getElementById('comparisonSelectionSummary').textContent = '';
-                        els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The research for this stock could not be loaded or does not match the current catalogue, so its wrappers and risks are unknown here.', [{ label: 'Retry', action: 'retry-comparison' }]);
+                        els.comparisonView.innerHTML = dataStateHtml('failed', 'This decision record is unavailable', 'The research for this stock could not be loaded or does not match the current universe, so its wrappers and risks are unknown here.', [{ label: 'Retry', action: 'retry-comparison' }]);
                         return;
                     }
                     state.comparisonBundles.set(group.ticker, bundle);
@@ -997,7 +997,7 @@ if (typeof document !== 'undefined') {
                 (models.length ? `<p class="comparison-note"><a href="./economics.html?issuers=${encodeURIComponent(models.map((model) => model.issuerSlug).join(','))}">Fees and incentives →</a> <span>Initial programme research; it does not include every cost.</span></p>` : '') +
                 // History is kept per listed ticker (/api/history/underlyings), so a pre-IPO company has none to show.
                 (models.length && !group.preIpo ? `<details class="comparison-history"><summary>${escapeHtml(group.ticker)} observed market history</summary><header><div><small>Daily measurements; gaps mean not measured. Markers are evidence or control changes.</small></div><label>Metric<select class="history-metric"></select></label></header><div class="history-chart" role="status">Open to load history.</div></details>` : '') +
-                (bundle ? `<p class="comparison-note">Catalogue built ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. Legal reviews have their own dates.</p>` : '');
+                (bundle ? `<p class="comparison-note">Universe mapped ${escapeHtml(fmtDateTime(bundle.builtAt))} · DeFi collected ${escapeHtml(fmtDateTime(bundle.sources?.defiFetchedAt))}. Legal reviews have their own dates.</p>` : '');
             const history = els.comparisonView.querySelector('.comparison-history');
             history?.addEventListener('toggle', () => {
                 if (history.open && !history.dataset.loaded) {
@@ -1111,7 +1111,7 @@ if (typeof document !== 'undefined') {
                 : visit.unseen.length ? `${fmtNumber(visit.unseen.length)} public change${visit.unseen.length === 1 ? '' : 's'} since your last visit.`
                     : 'You are caught up.';
             const visitDetail = visit.firstVisit
-                ? 'Return later and this browser will identify new issuer, venue, protocol and catalogue changes.'
+                ? 'Return later and this browser will identify new issuer, venue, protocol and universe changes.'
                 : visit.unseen.length ? `Last baseline ${fmtRelativeTime(visit.previousVisitedAt)}. The newest changes are listed below.`
                     : `No new external changes since ${fmtRelativeTime(visit.previousVisitedAt)}.`;
             els.personalVisit.innerHTML = `<strong>${escapeHtml(visitHeading)}</strong><span>${escapeHtml(visitDetail)}</span>` +
@@ -1138,7 +1138,7 @@ if (typeof document !== 'undefined') {
             els.personalComparisons.innerHTML = personalListHtml(comparisons.slice(0, 6).map((row) =>
                 `<li${ownedWatchId(row.ticker) ? ` data-watch-id="${escapeHtml(ownedWatchId(row.ticker))}"` : ''}>` +
                 `<a href="./stocks.html?view=compare&amp;compare=${encodeURIComponent(row.ticker)}">${escapeHtml(row.ticker)} comparison</a>` +
-                `<small>${row.missing ? 'Not found in the current catalogue' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
+                `<small>${row.missing ? 'Not found in the current universe' : row.pending ? 'Open to refresh this saved comparison' : row.changes.length ? `${row.changes.length} material change${row.changes.length === 1 ? '' : 's'} since saved` : 'No material difference from the saved baseline'}${row.crossDevice ? ' · daily cross-device watch active' : ' · browser-only baseline'}</small></li>`),
             'Save a same-stock comparison to watch its legal, market and DeFi conclusions.');
 
             const additionRows = visit.newAssets.slice(0, 4).map((row) => {
@@ -1146,7 +1146,7 @@ if (typeof document !== 'undefined') {
                 const count = Array.isArray(row.assets) ? row.assets.length : 0;
                 return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Assets added')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${fmtNumber(count)} exact token${count === 1 ? '' : 's'}</small></li>`;
             });
-            els.personalNewAssets.innerHTML = personalListHtml(additionRows, 'No catalogue additions are recorded in the current public journal.');
+            els.personalNewAssets.innerHTML = personalListHtml(additionRows, 'No additions to the universe are recorded in the current public journal.');
             const protocolRows = visit.protocolChanges.slice(0, 4).map((row) => {
                 const href = isSafeUrl(row.href) ? row.href : './watch.html';
                 return `<li><a href="${escapeHtml(href)}">${escapeHtml(row.title || 'Protocol support changed')}</a><small>${escapeHtml(row.date || 'date unavailable')} · ${escapeHtml(humanizeSlug(row.kind || 'protocol change'))}</small></li>`;
@@ -1238,7 +1238,7 @@ if (typeof document !== 'undefined') {
             if (!match) return;
             try {
                 const watch = await watchApi('GET', `/watchlists/${match[1]}`, match[2]);
-                if (!applyServerWatch(watch, { readKey: match[2] })) throw new Error('the watched ticker is not in the current catalogue');
+                if (!applyServerWatch(watch, { readKey: match[2] })) throw new Error('the watched ticker is not in the current universe');
                 els.comparisonWatchStatus.textContent = watch.changes?.length
                     ? `${watch.changes.length} material change${watch.changes.length === 1 ? '' : 's'} in the latest daily check.`
                         : watch.baselineRecorded ? 'Read-only shared watch · no material change in the latest daily check.'
@@ -2262,7 +2262,7 @@ if (typeof document !== 'undefined') {
             renderSortIndicators();
             if (!state.tokensLoaded) return;
             const request = ++state.tokenRequestSeq;
-            tokenTableMessage('loading', 'Loading this page', 'Applying the current filters and sort to the API-backed token catalogue.');
+            tokenTableMessage('loading', 'Loading this page', 'Applying the current filters and sort to the API-backed token universe.');
 
             if (state.useSample) {
                 const local = localTokenPage();
@@ -2311,8 +2311,8 @@ if (typeof document !== 'undefined') {
             } else {
                 const filtered = Boolean(state.filters.issuer || state.filters.instrumentType || state.filters.query);
                 tokenTableMessage(filtered ? 'filtered-empty' : 'none-exists',
-                    filtered ? 'No token matches these filters' : 'No token exists in this catalogue page',
-                    filtered ? 'The catalogue loaded successfully, but the current issuer, instrument and search combination returned no rows.' : 'The catalogue loaded successfully and returned no admitted token addresses.',
+                    filtered ? 'No token matches these filters' : 'No token exists on this page of the universe',
+                    filtered ? 'The universe loaded successfully, but the current issuer, instrument and search combination returned no rows.' : 'The universe loaded successfully and returned no admitted token addresses.',
                     filtered ? [{ label: 'Clear token filters', action: 'clear-token-filters' }] : [{ label: 'Review collection coverage', href: './methodology.html' }]);
             }
             els.tokenCount.textContent = state.useSample

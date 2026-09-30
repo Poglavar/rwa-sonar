@@ -52,14 +52,6 @@ const STATE_FILE = join(HERE, 'data', 'sources-state.json');
 const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
-// The evidence tables, then the read-provenance columns on them (read_via, capture_at), then the
-// source status list — the unreadable file's list includes `reachable-unverified` and supersedes
-// db/2026-09-24-sonar-source-reachable.sql, which must not be re-applied once `unreadable` rows exist.
-const DDL_FILES = [
-    join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
-    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'),
-    join(REPO, 'db', '2026-09-24-sonar-source-unreadable.sql')
-];
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
 let runStatsFile = STATS_FILE;
 const RUN_STARTED_MS = Date.now();
@@ -107,7 +99,6 @@ OPTIONS
   --archive          Push every NEW version — and any source with no archive yet — to the
                      Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
-  --ddl              Apply ${DDL_FILES.map((f) => `db/${f.split('/').pop()}`).join(', ')} before loading. Idempotent.
   --no-db            Do everything except the Postgres load (files and checkpoint only).
   --pace=<ms>        Minimum gap between two requests to the SAME host (default ${HOST_PACE_MS}).
   --help             This text.
@@ -1378,14 +1369,7 @@ function buildRows(results, previousState) {
     return { sources, versions, events };
 }
 
-async function loadToPostgres(rows, { url, applyDdl }) {
-    if (applyDdl) {
-        for (const file of DDL_FILES) {
-            const ddl = await readFile(file, 'utf8');
-            log(`db: applying ${relative(REPO, file)} (${ddl.length} bytes, idempotent)`);
-            await psql(url, ddl, 'ddl');
-        }
-    }
+async function loadToPostgres(rows, { url }) {
     const source = buildSourceSql(rows.sources);
     log(`db: ${source.rows} source rows`);
     await psql(url, wrapTransaction(source.sql), source.table);
@@ -1827,7 +1811,7 @@ async function main() {
             logWarn(`DATABASE_URL is not set in ${join(REPO, '.env')} — skipping the Postgres load`);
         } else {
             log(`db: ${describeUrl(dbUrl)}`);
-            await loadToPostgres(rows, { url: dbUrl, applyDdl: Boolean(flags.ddl) });
+            await loadToPostgres(rows, { url: dbUrl });
             const claimChecks = [];
             for (const r of results) {
                 if (!r.quotes) continue;

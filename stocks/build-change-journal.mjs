@@ -49,7 +49,7 @@ async function main() {
     const out = typeof flags.out === 'string' ? flags.out : join(ROOT, 'stocks-change-journal.json');
     await writeJson(out, {
         generatedAt: ts(),
-        methodology: 'Real issuer, venue, protocol and source changes plus observed catalogue membership changes. RWA Sonar editorial corrections and transient watcher failures are excluded.',
+        methodology: 'Real issuer, venue, protocol and source changes plus tokens observed joining or leaving the universe we track. RWA Sonar editorial corrections and transient watcher failures are excluded.',
         items
     });
     log(`change journal: ${items.length} public item(s) (${items.filter((item) => item.category === 'catalogue').length} catalogue)`);

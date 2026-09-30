@@ -125,7 +125,7 @@ export function landingSnapshotHtml(facts) {
         : '';
     return `<span id="snapshotTokens">${escapeHtml(fmtNumber(tokens))}</span> exact Solana token addresses from `
         + `${escapeHtml(fmtNumber(p.withTokens))} issuer programmes with live tokens${qualifier} · `
-        + `<span id="snapshotDateLabel">catalogue built</span> <time id="snapshotDate" datetime="${escapeHtml(facts.builtAt)}">${escapeHtml(fmtDate(facts.builtAt))}</time>`;
+        + `<span id="snapshotDateLabel">universe mapped</span> <time id="snapshotDate" datetime="${escapeHtml(facts.builtAt)}">${escapeHtml(fmtDate(facts.builtAt))}</time>`;
 }
 
 /** The pitch's built-state numbers, each dated to the file it came from. */
@@ -139,7 +139,7 @@ export function pitchProofHtml(facts) {
     // defi-usage.json counts two things: token addresses with any confirmed use, and token–protocol
     // integrations (one token in three protocols is three). The weekly page shows the second.
     return `<article><strong data-live-token-count>${escapeHtml(fmtNumber(tokens))}</strong><span>exact Solana token addresses in the ${escapeHtml(fmtDate(facts.builtAt))} public snapshot</span></article>`
-        + `<article><strong>${escapeHtml(fmtNumber(templates))}</strong><span>reviewed legal and technology templates covering the catalogue</span></article>`
+        + `<article><strong>${escapeHtml(fmtNumber(templates))}</strong><span>reviewed legal and technology templates covering the universe</span></article>`
         + `<article><strong>${escapeHtml(fmtNumber(rules))}</strong><span>health checks split across market, control, legal/evidence and DeFi use</span></article>`
         + `<article><strong>${escapeHtml(fmtNumber(defi))}</strong><span>token addresses with at least one confirmed DeFi integration `
         + `(${escapeHtml(fmtNumber(integrations))} token–protocol integrations in all) in the ${escapeHtml(fmtDate(facts.defiFetchedAt))} composability snapshot</span></article>`;

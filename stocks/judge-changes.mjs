@@ -25,7 +25,6 @@ import {
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
-const DDL_FILE = join(REPO, 'db', '2026-09-23-sonar-change-judgment.sql');
 const CHECKPOINT_DIR = join(HERE, 'data', 'raw', 'change-judge');
 const REPO_NAME = 'rwa-sonar';
 const SCRIPT = 'judge-changes';
@@ -56,7 +55,7 @@ function usage() {
 Asks a model whether each unjudged document change (sonar.change_event kinds ${JUDGED_KINDS.join(', ')})
 alters what a holder owns, can do, or can have done to them. One candidate per change: events of
 the same source and content hash are judged once. Results go to sonar.change_judgment
-(${DDL_FILE.replace(`${REPO}/`, '')}), one row per change with its tokens and cost_usd; every
+(db/2026-09-23-sonar-change-judgment.sql, applied at deploy by stocks/apply-schema.mjs), one row per change with its tokens and cost_usd; every
 call is also appended to the shared ledger (agents/lib/llm-cost, \`llm-cost --repo ${REPO_NAME}\`).
 
   --dry-run       default. Lists candidates, prints the first prompt, estimates cost per item and
@@ -67,6 +66,11 @@ call is also appended to the shared ledger (agents/lib/llm-cost, \`llm-cost --re
   --limit=N       items in the batch (default ${DEFAULT_LIMIT}; more than ${LARGE_LIMIT} needs --allow-large).
   --model=ID      default ${DEFAULT_MODEL} (must be priced in agents/lib/llm-cost/rates.json).
   --allow-large   permit --limit above ${LARGE_LIMIT}. Do not use without the owner's approval.
+  --export=FILE   write the next --limit unjudged changes' prompts as JSON lines (no model call,
+                  nothing stored). A change judged by ANY model is skipped. For the CLI judge:
+                  stocks/judge-with-cli.mjs runs them through the Claude CLI on a machine that has it.
+  --import=FILE   store the CLI judge's answers (JSON lines from judge-with-cli.mjs). Each answer is
+                  validated against the exact change text it was exported with, as a batch answer is.
   --direct        with --run: send the items as online calls at FULL price instead of a batch (at most
                   ${DIRECT_LIMIT}). A fallback for a batch that is accepted but never processed; each call
                   is costed and ledgered like a batch item, stored with batch_id "direct".
@@ -103,11 +107,13 @@ async function loadEvents(url) {
          WHERE e.kind IN (${JUDGED_KINDS.map((k) => `'${k}'`).join(', ')})) t;`, 'change events');
 }
 
+/** Changes already judged by `model` (or by any model when `model` is null) with this prompt. */
 async function loadJudgedKeys(url, model) {
     const exists = await queryJson(url, "SELECT to_json(to_regclass('sonar.change_judgment') IS NOT NULL);", 'judgment table');
     if (!exists) return new Set();
+    const byModel = model === null ? '' : `model = '${model.replace(/'/g, "''")}' AND `;
     const keys = await queryJson(url, `SELECT coalesce(json_agg(DISTINCT dedupe_key), '[]') FROM sonar.change_judgment
- WHERE model = '${model.replace(/'/g, "''")}' AND prompt_version = '${PROMPT_VERSION}' AND status <> 'error';`, 'judged keys');
+ WHERE ${byModel}prompt_version = '${PROMPT_VERSION}' AND status <> 'error';`, 'judged keys');
     return new Set(keys);
 }
 
@@ -291,6 +297,64 @@ async function judgeDirect({ client, llm, dbUrl, model, items }) {
     return totals.error ? 1 : 0;
 }
 
+/**
+ * --export: the prompts of the next `limit` unjudged changes, one JSON line each, for
+ * stocks/judge-with-cli.mjs. Each line carries the candidate (without its full event), the system
+ * and user text and the bounded change text, so --import validates quotes against exactly what the
+ * model saw. Nothing is sent to a model and nothing is stored.
+ */
+async function exportPrompts({ dbUrl, file, limit }) {
+    const events = await loadEvents(dbUrl);
+    const judgedKeys = await loadJudgedKeys(dbUrl, null);
+    const candidates = selectCandidates(events, { judgedKeys });
+    const sources = await loadSources(dbUrl, [...new Set(candidates.filter((c) => c.url).map((c) => sourceId(c.url)))]);
+    const lines = [];
+    for (const c of candidates.slice(0, limit)) {
+        const p = await prepare(c, c.url ? sources.get(sourceId(c.url)) : null);
+        const { event, ...candidate } = p.candidate;
+        lines.push(JSON.stringify({
+            customId: customIdFor(p.candidate), promptVersion: PROMPT_VERSION,
+            candidate: { ...candidate, event: { id: event.id, kind: event.kind } },
+            system: p.prompt.system, user: p.prompt.user, changeText: p.prompt.changeText
+        }));
+    }
+    await writeFile(file, lines.map((line) => `${line}\n`).join(''));
+    log(`export: ${lines.length} of ${candidates.length} unjudged change(s) (by any model) → ${file}`);
+    return 0;
+}
+
+/**
+ * --import: store the CLI judge's answers. An answer is a judgment like a batch item's
+ * ({customId, text, usage}), validated by judgmentRow against the change text it was exported with.
+ * Billed to a subscription, so its cost is 0; the ledger entry (equivalent value) was written on the
+ * machine that ran it. A change already judged by this model is skipped, so a re-import is a no-op.
+ */
+async function importAnswers({ dbUrl, file }) {
+    const answers = (await readFile(file, 'utf8')).split('\n').filter(Boolean).map((line) => JSON.parse(line));
+    const totals = { items: 0, valid: 0, invalid: 0, error: 0, skipped: 0 };
+    const judgedByModel = new Map();
+    for (const a of answers) {
+        if (a.promptVersion !== PROMPT_VERSION) throw new Error(`${a.customId}: prompt ${a.promptVersion}, this judge is ${PROMPT_VERSION}`);
+        if (!judgedByModel.has(a.model)) judgedByModel.set(a.model, await loadJudgedKeys(dbUrl, a.model));
+        if (judgedByModel.get(a.model).has(a.candidate.key)) {
+            totals.skipped += 1;
+            continue;
+        }
+        const item = a.error ? { customId: a.customId, error: a.error } : { customId: a.customId, text: a.text, usage: a.usage, costUsd: 0 };
+        const row = judgmentRow({ candidate: a.candidate, changeText: a.changeText, item, model: a.model, batchId: 'claude-cli' });
+        const sql = buildJudgmentSql([row]);
+        await psql(dbUrl, wrapTransaction(sql.sql), sql.table);
+        totals.items += 1;
+        totals[row.status] += 1;
+        const j = row.judgment;
+        log(`  event ${row.changeEventId} [${row.status}] ${j?.severity ?? '-'}${j?.material ? ' material' : ''}`
+            + (row.reasons.length ? ` · ${row.reasons.join('; ')}` : ''));
+    }
+    log(`import: ${totals.items} stored (${totals.valid} valid, ${totals.invalid} invalid, ${totals.error} error), `
+        + `${totals.skipped} already judged by the same model`);
+    return totals.error ? 1 : 0;
+}
+
 async function main() {
     const { flags } = parseArgs(process.argv.slice(2));
     if (flags.help) {
@@ -304,6 +368,7 @@ async function main() {
         logError(`DATABASE_URL is not set in ${join(REPO, '.env')}`);
         return 1;
     }
+    if (typeof flags.import === 'string') return importAnswers({ dbUrl, file: flags.import });
     const apiKey = env.ANTHROPIC_API_KEY || null;
     const model = typeof flags.model === 'string' ? flags.model : DEFAULT_MODEL;
     const limit = flags.limit === undefined ? DEFAULT_LIMIT : Number(flags.limit);
@@ -315,6 +380,7 @@ async function main() {
         logError(`--limit=${limit} is above ${LARGE_LIMIT}; pass --allow-large only with the owner's approval`);
         return 1;
     }
+    if (typeof flags.export === 'string') return exportPrompts({ dbUrl, file: flags.export, limit });
     if (run && !apiKey) {
         logError(`ANTHROPIC_API_KEY is not set in ${join(REPO, '.env')} — the change judge needs an Anthropic API key `
             + 'to submit a batch. Add ANTHROPIC_API_KEY=... to that file (it is read from there only, never from argv).');
@@ -330,7 +396,6 @@ async function main() {
     const client = apiKey ? createAnthropicClient({ apiKey }) : null;
 
     if (run) {
-        await psql(dbUrl, await readFile(DDL_FILE, 'utf8'), 'ddl change_judgment');
         const open = (await readCheckpoints()).filter((cp) => !cp.done);
         const stalled = open.filter((cp) => isStalledBatch(cp, Date.now()));
         for (const cp of stalled) {

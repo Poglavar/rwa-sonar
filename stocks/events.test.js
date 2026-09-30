@@ -65,7 +65,7 @@ describe('catalogue: new tokens', () => {
             'Ondo Global Markets: 2 new tokens first seen (BLSHon, RTXon)'
         ]);
         const ondo = events.find((e) => e.subject.id === 'ondo-global-markets');
-        expect(ondo).toMatchObject({ at: '2026-09-24T09:00:00Z', category: 'catalogue', source: 'catalogue', href: './issuers/ondo-global-markets.html' });
+        expect(ondo).toMatchObject({ at: '2026-09-24T09:00:00Z', category: 'catalogue', source: 'universe scan', href: './issuers/ondo-global-markets.html' });
         expect(events.find((e) => e.subject.type === 'token').href).toBe('./cards/NVDA.html');
         expect(tally['catalogue: founding cohort (first seen the day records began)']).toBe(1);
     });
@@ -346,7 +346,7 @@ describe('daily snapshot diffs', () => {
             'Ondo Global Markets paused AAPLon',
             'Shift leveraged tokens: programme now listed as defunct'
         ]);
-        expect(events.every((e) => e.at === '2026-09-22T18:28:54Z' && e.source === 'catalogue')).toBe(true);
+        expect(events.every((e) => e.at === '2026-09-22T18:28:54Z' && e.source === 'universe scan')).toBe(true);
         expect(tally['catalogue: liquidity drops on pools under $100k']).toBe(1);
         expect(tally['catalogue: health got worse']).toBe(1);
     });
@@ -453,7 +453,7 @@ describe('window and envelope', () => {
             expect(event.title.length).toBeLessThanOrEqual(TITLE_MAX);
             for (const slug of Object.keys(NAMES)) expect(event.title).not.toContain(slug);
         }
-        expect(feed.counts).toEqual({ total: 2, byCategory: { catalogue: 1, terms: 1 }, bySource: { catalogue: 1, 'change journal': 1 } });
+        expect(feed.counts).toEqual({ total: 2, byCategory: { catalogue: 1, terms: 1 }, bySource: { 'universe scan': 1, 'change journal': 1 } });
         expect(MAX_EVENTS).toBe(200);
     });
 

@@ -116,9 +116,11 @@ fi
 # Rebuild the catalogue from retained live raw inputs plus the freshly deployed curated dossiers.
 # This creates issuer/token/funnel/health data before the API database load; no collector runs.
 node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$PUBLIC_BASE_URL" >&2
-# Apply idempotent DDL only after the rebuilt token snapshot exists, then derive the queue from
-# that database state before rendering review-aware public pages.
-node stocks/load-db.mjs --run --ddl --only=tokens,snapshots >&2
+# The schema, once, here and nowhere else: scheduled jobs never apply it (re-applying it on every run
+# took exclusive table locks that made overlapping jobs cancel each other). Then load the rebuilt
+# token snapshot and derive the queue from that database state before rendering review-aware pages.
+node stocks/apply-schema.mjs --run >&2
+node stocks/load-db.mjs --run --only=tokens,snapshots >&2
 node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url="$PUBLIC_BASE_URL" >&2
 node stocks/build-review-queue.mjs --run >&2
 node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url="$PUBLIC_BASE_URL" >&2
@@ -194,7 +196,7 @@ if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 	pm2 delete rwa-watch-first >/dev/null 2>&1 || true
 	APPS="rwa-trades rwa-sonar-api"
 	if [ -z "$PREV_SHA" ] || ! git diff --quiet "$PREV_SHA" HEAD -- ecosystem.config.cjs; then
-		APPS="$APPS rwa-watch rwa-refresh rwa-watch-chain rwa-watch-lending"
+		APPS="$APPS rwa-watch rwa-refresh rwa-watch-chain rwa-watch-lending rwa-watch-caselaw rwa-judge rwa-redemptions"
 		echo "ecosystem.config.cjs changed: restarting the scheduled jobs too" >&2
 	fi
 	for app in $APPS; do

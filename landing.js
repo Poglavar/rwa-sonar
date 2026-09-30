@@ -127,8 +127,8 @@
             const entered = kind === 'new-mint';
             output.push({
                 date: latest.to ?? null,
-                type: entered ? 'Catalogue discovery' : 'Catalogue removal',
-                title: `${matching.length} token address${matching.length === 1 ? '' : 'es'} ${entered ? 'entered' : 'left'} the catalogue`,
+                type: entered ? 'Universe addition' : 'Universe removal',
+                title: `${matching.length} token address${matching.length === 1 ? '' : 'es'} ${entered ? 'entered' : 'left'} the universe`,
                 detail: `${issuerText} · snapshots ${latest.from ?? '?'} → ${latest.to ?? '?'} · ${entered ? 'newly discovered; issuance may predate discovery' : 'no longer present in the built universe'}`,
                 href: './monitor.html#changesSection'
             });
@@ -155,7 +155,7 @@
             items.push({
                 date: mint.firstSeenAt ?? null,
                 type: 'Newly observed',
-                title: `${mint.symbol ?? mint.name ?? 'Token'} entered the catalogue`,
+                title: `${mint.symbol ?? mint.name ?? 'Token'} entered the universe`,
                 detail: `${mint.issuerName ?? humanizeSlug(mint.issuer) ?? 'Unknown issuer'} · newly observed; issuance may predate discovery`,
                 href: mint.cardSlug ? `./cards/${mint.cardSlug}.html` : `./cards/${cardSlug(mint.symbol, mint.mint)}.html`
             });
@@ -178,7 +178,7 @@
             .map((row) => ({
                 date: row.effectiveAt ?? row.eventAt ?? row.firstObservedAt ?? row.date ?? null,
                 severity: row.severity ?? 'info',
-                type: row.category === 'catalogue' ? 'Catalogue observation' : humanizeSlug(row.kind) ?? 'Recorded change',
+                type: row.category === 'catalogue' ? 'Universe observation' : humanizeSlug(row.kind) ?? 'Recorded change',
                 title: row.title ?? 'Recorded change',
                 detail: row.whyItMatters ?? row.summary ?? 'Open the public journal for evidence and affected assets.',
                 href: row.id
@@ -324,7 +324,7 @@
             const show = index === 0 || index === model.points.length - 1 || (hero && point.annotation !== null);
             const anchor = index === 0 ? 'start' : index === model.points.length - 1 ? 'end' : 'middle';
             const changeText = point.annotation === null ? ''
-                : ` · +${point.annotation.added ?? 0} / −${point.annotation.removed ?? 0} catalogue addresses`;
+                : ` · +${point.annotation.added ?? 0} / −${point.annotation.removed ?? 0} tracked addresses`;
             const marker = point.annotation === null || ((point.annotation.added ?? 0) === 0 && (point.annotation.removed ?? 0) === 0)
                 ? ''
                 : `<line class="chart-event-line" x1="${point.x}" y1="${model.padding.top}" x2="${point.x}" y2="${floor}" />`;
@@ -418,7 +418,7 @@
         const offered = new Set(availableRanges(rows, buttons.map((button) => button.dataset.chartRange)));
         if (!offered.has(chartRange)) chartRange = 'all';
         const charts = [
-            ['catalogueChart', 'tokenCount', 'Catalogue size by day'],
+            ['catalogueChart', 'tokenCount', 'Universe size by day'],
             ['holdersChart', 'holderAccounts', 'Summed token holding accounts by day'],
             ['volumeChart', 'volume24Usd', 'Reported rolling 24-hour volume by day']
         ];
@@ -463,7 +463,7 @@
         const deltas = issuerDeltas(rows);
         const issuerDelta = document.getElementById('issuerDelta');
         if (issuerDelta) issuerDelta.innerHTML = deltas.length === 0
-            ? '<span class="delta-pill">No issuer-level catalogue change</span>'
+            ? '<span class="delta-pill">No issuer-level universe change</span>'
             : deltas.map((row) => `<span class="delta-pill"><strong>${escapeHtml(humanizeSlug(row.issuer))}</strong> ${escapeHtml(signed(row.delta))}</span>`).join('');
         const methodology = overview?.methodology ?? {};
         document.getElementById('methodologyText').innerHTML = Object.values(methodology)
@@ -607,7 +607,7 @@
             const titles = { stocks: 'Underlying stocks', tokens: 'Exact tokens', issuers: 'Issuers' };
             const body = groups.order.map((key) => section(titles[key], groups[key])).join('');
             list.innerHTML = (body || `<p class="quick-results-empty">No stock, token or issuer matches “${escapeHtml(query)}”.</p>`)
-                + `<a class="quick-results-all" href="${escapeHtml(groups.allHref)}">Search the whole catalogue for “${escapeHtml(query)}” →</a>`;
+                + `<a class="quick-results-all" href="${escapeHtml(groups.allHref)}">Search the whole universe for “${escapeHtml(query)}” →</a>`;
             active = -1;
             list.hidden = false;
             input.setAttribute('aria-expanded', 'true');

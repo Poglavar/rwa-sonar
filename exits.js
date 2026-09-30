@@ -94,7 +94,7 @@
     function renderUnderlying() {
         const wrappers = view.wrappersOf(state.data.tokens, state.ticker);
         const scaleMax = Math.max(0, ...wrappers.map((t) => (Number.isFinite(t.dexLiquidityUsd) ? t.dexLiquidityUsd : 0)));
-        $('wrappers').innerHTML = wrappers.length ? wrappers.map((t) => wrapperCard(t, scaleMax)).join('') : '<p class="ex-missing">No wrapper of this stock is catalogued.</p>';
+        $('wrappers').innerHTML = wrappers.length ? wrappers.map((t) => wrapperCard(t, scaleMax)).join('') : '<p class="ex-missing">No wrapper of this stock is tracked.</p>';
         const venues = new Map();
         for (const t of wrappers) for (const v of view.venueTotals(t.pools)) venues.set(v.slot, v.slot === 'other' ? 'Other venue' : v.venueName);
         $('venueKey').innerHTML = [...venues].map(([slot, name]) => `<li><i class="ex-swatch venue-${esc(slot)}" aria-hidden="true"></i>${esc(name)}</li>`).join('');

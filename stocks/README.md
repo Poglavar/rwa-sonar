@@ -1411,14 +1411,22 @@ throws away everything older than 24 h on every publish. So the same data is als
 schema **`sonar`** of the one shared Postgres database (`geodata`, the same name on the laptop, on
 valhalla and on prod; never a new database, always a new schema).
 
-    node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims,whatif]
+    node stocks/apply-schema.mjs --run      # every db/*.sql, once, in order (deploy runs this)
+    node stocks/load-db.mjs --run [--only=issuers,tokens,snapshots,trades,claims,whatif]
     npm run stocks:db
+
+**The schema is applied in one place only**: `stocks/apply-schema.mjs`, from the list in
+`stocks/lib/schema.mjs`, run by the deploy. No scheduled job applies it. Until 30 Sep 2026 each
+job re-applied its own DDL on every run, and `ALTER TABLE … OWNER` / `DROP+ADD CONSTRAINT` take an
+exclusive lock even when nothing changes, so the six-hour refresh and the hourly lending watcher
+cancelled each other on lock timeout when they overlapped (06:35 UTC). `stocks/schema.test.js`
+keeps it that way: every `db/*.sql` is listed (or marked superseded), and no job passes `--ddl`.
 
 `db/2026-09-17-sonar-stocks.sql` is the DDL: idempotent, re-runnable as a no-op, and it makes
 `geo_user` the owner of everything (the connecting role, `zagreb_user` or `magician`, is a
 member, so the file `SET ROLE`s to it; DDL needs *ownership*, and `CREATE INDEX IF NOT EXISTS`
 checks it even when the index already exists, so one table owned by the wrong role would abort a
-whole later migration). `--ddl` applies it first and is what the server refresh passes.
+whole later migration). `stocks/apply-schema.mjs` applies it first, at deploy.
 
 Tables, loaded in FK order, one transaction each:
 
@@ -1677,7 +1685,7 @@ id up and a re-run addresses exactly the same rows. `check_every` is stored (def
 run; selecting only what is overdue belongs to the scheduled job in slice 3, and the query for it is
 in the DDL's examples. `db/2026-09-18-sonar-evidence.sql` creates
 `sonar.source`, `sonar.source_version` and `sonar.change_event` (idempotent, `geo_user`-owned);
-`--ddl` applies it, and the load is the same dollar-quoted-jsonb-through-`psql` pattern as
+`stocks/apply-schema.mjs` applies it, and the load is the same dollar-quoted-jsonb-through-`psql` pattern as
 `stocks/load-db.mjs`, with the same `IS DISTINCT FROM` guard so an unchanged re-run does not move
 `updated_at`. `first_seen_at` is insert-only; `last_modified` and `etag` are only ever the server's
 own header values.
@@ -1755,8 +1763,8 @@ step hours after the fetching.
 Every 2xx read (and every stored copy a 304 stands on) goes through `classifyRead`: a
 region-restriction page served to the server's region, a script-only shell, an RPC endpoint's info
 page, a text file hashed as bytes, a response with no text, or a collapse to a third of the last
-readable version is `unreadable` (db/2026-09-24-sonar-source-unreadable.sql, applied by the
-watcher's `--ddl` in place of the narrower reachable-unverified file). It records no version and no
+readable version is `unreadable` (db/2026-09-24-sonar-source-unreadable.sql, applied by
+`stocks/apply-schema.mjs` in place of the narrower reachable-unverified file, which is superseded). It records no version and no
 event; the last readable version stays the baseline. A read containing every quote registered on it
 is the document regardless. Tests: `stocks/unreadable.test.js` on real reads in
 `stocks/fixtures/unreadable/`.
@@ -1857,9 +1865,9 @@ is read as one under the field `findings[3]`, `incidents[0]`, `attestations[2]`.
 
 ### In Postgres
 
-`db/2026-09-18-sonar-claims.sql` creates `sonar.claim`; `node stocks/load-db.mjs --run --ddl
---only=claims` loads it (the `--ddl` flag now applies all three `db/` files in dependency order,
-since the claim's `source_id` references `sonar.source`). The id is **content-addressed**
+`db/2026-09-18-sonar-claims.sql` creates `sonar.claim` (applied by `stocks/apply-schema.mjs`, after
+the evidence file, since the claim's `source_id` references `sonar.source`); `node
+stocks/load-db.mjs --run --only=claims` loads it. The id is **content-addressed**
 (`<issuer_slug>:<field>:<first 8 hex of sha1(url|quote)>`), so a re-load is an upsert that addresses
 exactly the same row without looking anything up, and a second run touches nothing.
 
@@ -1980,7 +1988,7 @@ the link assertions in `stocks/cards.test.js` and `stocks-page.test.js`.
 
 ## Chain watcher
 
-`stocks/watch-chain.mjs --run [--ddl] [--only=<issuer>] [--limit=n] [--rpc=<url>] [--wallets=n]
+`stocks/watch-chain.mjs --run [--only=<issuer>] [--limit=n] [--rpc=<url>] [--wallets=n]
 [--metadata=n] [--no-db] [--no-telegram]`: slice 3 of `EVIDENCE.md` (§2.4), hourly. The document
 watcher above refetches the PDFs and pages the dossiers cite once a day; this is its on-chain half,
 and it runs hourly because a key rotation or a pause matters sooner than a terms-of-service
@@ -2058,9 +2066,9 @@ exactly as `gone` and `blocked` are for the document watcher; both use the same 
 
 ## Lending watcher
 
-`stocks/watch-lending.mjs --run [--ddl] [--budget=n] [--since=<iso>] [--max-pages=n] [--only=<protocols>]
+`stocks/watch-lending.mjs --run [--budget=n] [--since=<iso>] [--max-pages=n] [--only=<protocols>]
 [--rpc=<url>] [--no-db] [--print] [--tx-cache=<dir>]` runs hourly as PM2 `rwa-watch-lending` (minute 33,
-`--run --ddl --budget=1000`). It records two things about the Solana lending markets that take a
+`--run --budget=1000`). It records two things about the Solana lending markets that take a
 tracked stock token as collateral, from the lending programs' own transactions:
 
 - **Liquidations** whose seized collateral is a tracked stock: Kamino KLend (xStocks Pool, Sentora
@@ -2120,7 +2128,7 @@ is an explicit coverage gap. A failed RPC call marks that issuer's scan `failed`
 
 ## Case-law watcher
 
-`stocks/watch-caselaw.mjs --run [--ddl] [--only=<issuer>] [--limit=n] [--entries=n] [--no-sec]
+`stocks/watch-caselaw.mjs --run [--only=<issuer>] [--limit=n] [--entries=n] [--no-sec]
 [--fresh] [--no-db] [--no-telegram]` runs daily as PM2 `rwa-watch-caselaw` (04:23 UTC). It derives
 search phrases from the dossiers (every legal entity in each `issuingEntity`, the brand, and every
 token issuer, provider, transfer agent, custodian, parent and security agent, expanded to their

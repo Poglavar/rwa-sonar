@@ -885,7 +885,7 @@
         }
         base = apiLib.apiBase();
         wireEvents();
-        setStatus('Loading the catalogue and every answer…', false);
+        setStatus('Loading the question list and every answer…', false);
 
         // The catalogue file is fetched from the page's own origin, not the API, and its absence is
         // not an error: it only supplies the group ORDER and the actor labels.

@@ -128,7 +128,7 @@
     const IMPACT_LEVELS = {
         high: { rank: 3, label: 'Could change holder rights or control' },
         medium: { rank: 2, label: 'Could change usability, exit or market risk' },
-        low: { rank: 1, label: 'Context or catalogue update' }
+        low: { rank: 1, label: 'Context or universe update' }
     };
 
     /** Holder impact is separate from watcher severity: it says why a human should read first. */

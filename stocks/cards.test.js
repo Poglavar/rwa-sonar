@@ -1327,7 +1327,7 @@ describe('the what-if answers on a card', () => {
             token, issuer: issuers.get('xstocks-backed'), slug: 'test', builtAt: BUILT_AT, sources: SOURCES
         });
         expect(card.whatIf).toBeNull();
-        expect(renderCard(card, { version: 'test' })).toContain('catalogue did not load at build time');
+        expect(renderCard(card, { version: 'test' })).toContain('failure-mode list did not load at build time');
     });
 });
 
@@ -1592,7 +1592,7 @@ describe('no internal key reaches a reader', () => {
     it('prints dates as dates and each block’s sources in words', () => {
         expect(visible(html)).not.toMatch(/observed \d{4}-\d{2}-\d{2}/);
         const lines = [...html.matchAll(/<p class="block-src">([\s\S]*?)<\/p>/g)].map((m) => visible(m[1]));
-        expect(lines.join(' ')).toContain('catalogue');
+        expect(lines.join(' ')).toContain('token universe');
         expect(lines.join(' ')).not.toMatch(/\b(tokens|issuerApi|closedMarket|defiUsage)\b/);
     });
 
@@ -1601,7 +1601,7 @@ describe('no internal key reaches a reader', () => {
         expect(Object.keys(card.sources).filter((key) => !Object.values(BLOCK_SOURCES).flat().includes(key))).toEqual([]);
         const markets = html.slice(html.indexOf('<details id="market-detail"'), html.indexOf('<details id="risks"'));
         expect(markets).toContain('<p class="block-src">Data as of: ');
-        expect(blockFreshnessHtml(card, 'control')).toMatch(/^<p class="block-src">Data as of: catalogue <time/);
+        expect(blockFreshnessHtml(card, 'control')).toMatch(/^<p class="block-src">Data as of: token universe <time/);
         expect(blockFreshnessHtml({ ...card, sources: {} }, 'control')).toBe('');
         expect(html).not.toContain('<h2>Data</h2>');
     });

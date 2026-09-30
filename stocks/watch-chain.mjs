@@ -17,7 +17,6 @@
 // reading. A kill therefore loses at most one hourly pass and can never lose correctness — so the
 // run prints progress instead of writing a resume file it would have to invalidate anyway.
 
-import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
 
@@ -45,7 +44,6 @@ const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
 const TOKENS_FILE = join(REPO, 'stocks-tokens.json');
 const ONCHAIN_FILE = join(HERE, 'data', 'onchain.json');
-const DDL_FILE = join(REPO, 'db', '2026-09-18-sonar-chain.sql');
 const STATS_FILE = join(REPO, '.last-chain-watch-stats.json');
 const RUN_STARTED_MS = Date.now();
 const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
@@ -64,7 +62,6 @@ USAGE
 
 OPTIONS
   --run             Actually read the chain. Without it this help is printed and nothing runs.
-  --ddl             Apply db/${DDL_FILE.split('/').pop()} before loading. Idempotent.
   --only=<issuer>   Only this issuer's mints (e.g. --only=xstocks-backed).
   --limit=<n>       Only the first n mints after filtering (smoke test).
   --rpc=<url>       RPC endpoint (default SOLANA_RPC_URL from .env, else ${DEFAULT_RPC}).
@@ -234,12 +231,7 @@ async function readWallets(watched, { rpc, watchedMints, failures }) {
     return balances;
 }
 
-async function loadToPostgres({ states, balances, events }, { url, applyDdl }) {
-    if (applyDdl) {
-        const ddl = await readFile(DDL_FILE, 'utf8');
-        log(`db: applying ${relative(REPO, DDL_FILE)} (${ddl.length} bytes, idempotent)`);
-        await psql(url, ddl, 'ddl');
-    }
+async function loadToPostgres({ states, balances, events }, { url }) {
     if (states.length) {
         const sql = buildMintStateSql(states);
         log(`db: ${sql.rows} new mint_state row(s)`);
@@ -316,11 +308,6 @@ async function main() {
         throw new Error(`DATABASE_URL is not set in ${join(REPO, '.env')} — pass --no-db to run without Postgres`);
     } else {
         log(`db: ${describeUrl(dbUrl)}`);
-        if (flags.ddl) {
-            const ddl = await readFile(DDL_FILE, 'utf8');
-            log(`db: applying ${relative(REPO, DDL_FILE)} before reading (${ddl.length} bytes, idempotent)`);
-            await psql(dbUrl, ddl, 'ddl');
-        }
         previous = await readPreviousStates(dbUrl);
         previousBalances = await readPreviousBalances(dbUrl);
         log(`db: ${previous.size} stored mint state(s), ${previousBalances.length} stored balance(s)`);
@@ -444,7 +431,7 @@ async function main() {
     }
 
     if (!flags['no-db']) {
-        await loadToPostgres({ states: newStates, balances, events }, { url: dbUrl, applyDdl: false });
+        await loadToPostgres({ states: newStates, balances, events }, { url: dbUrl });
     }
 
     const durationMs = Date.now() - startedMs;

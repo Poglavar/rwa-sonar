@@ -60,7 +60,7 @@ export const SITE_PAGES = [
         kicker: 'Stock workspace', subtitle: 'Search a ticker, compare its wrappers and open the exact token address behind each.',
         schema: 'dataset',
         dataset: {
-            name: 'RWA Sonar catalogue of tokenized stocks on Solana',
+            name: 'RWA Sonar universe of tokenized stocks on Solana',
             files: ['stocks-tokens.json', 'stocks-issuers.json', 'stocks-discovery.json', 'cards/index.json'],
             keywords: ['tokenized stocks', 'Solana', 'Token-2022', 'real-world assets', 'xStocks', 'Ondo Global Markets']
         },
@@ -310,9 +310,9 @@ export const SITE_PAGES = [
     {
         key: 'assets', file: 'assets.html', path: 'assets.html',
         title: 'RWA asset explorer — RWA Sonar',
-        description: 'The earlier general RWA catalogue: what tokenized real-world assets actually represent, who controls them and which trust assumptions holders accept.',
-        kicker: 'General RWA explorer', subtitle: 'The pre-stocks catalogue of tokenized real-world assets across chains.',
-        schema: 'dataset', dataset: { name: 'General tokenized real-world asset catalogue', files: ['rwa-assets-db.json'] },
+        description: 'The earlier general RWA collection: what tokenized real-world assets actually represent, who controls them and which trust assumptions holders accept.',
+        kicker: 'General RWA explorer', subtitle: 'The pre-stocks collection of tokenized real-world assets across chains.',
+        schema: 'dataset', dataset: { name: 'General tokenized real-world asset collection', files: ['rwa-assets-db.json'] },
         stats: (d) => [{ value: fmtCount(arr(d.assets).length || null), label: 'real-world asset records graded' }],
         lastmod: () => null
     }

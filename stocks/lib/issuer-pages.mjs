@@ -123,7 +123,7 @@ function assetHtml(tokens, cardSlugs) {
     }).join('');
     if (!items) return '<li>No current Solana token address is recorded for this programme.</li>';
     const remaining = all.length - 36;
-    return items + (remaining > 0 ? `<li class="asset-more"><a href="../stocks.html?view=assets"><strong>+${fmtNumber(remaining)} more</strong><span>Browse the complete catalogue</span></a></li>` : '');
+    return items + (remaining > 0 ? `<li class="asset-more"><a href="../stocks.html?view=assets"><strong>+${fmtNumber(remaining)} more</strong><span>Browse the whole universe</span></a></li>` : '');
 }
 
 function documentsHtml(issuer) {

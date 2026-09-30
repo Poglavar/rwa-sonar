@@ -13,7 +13,7 @@
 // what was read and stored in the same database transaction, so a killed run loses at most that
 // run's reads and the next one resumes from the checkpoints.
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import { decodeLendingTransaction } from './lib/lending-decode.mjs';
@@ -35,7 +35,6 @@ import { refreshCollectorStatus } from './build-collector-status.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
-const DDL_FILE = join(REPO, 'db', '2026-09-24-sonar-lending.sql');
 const STATS_FILE = join(REPO, '.last-lending-watch-stats.json');
 const RUN_STARTED_MS = Date.now();
 const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
@@ -60,7 +59,6 @@ USAGE
 
 OPTIONS
   --run              Actually read the chain. Without it this help is printed and nothing runs.
-  --ddl              Apply db/${DDL_FILE.split('/').pop()} first. Idempotent.
   --budget=<n>       Max getTransaction reads this run, oldest unprocessed first (default ${DEFAULT_BUDGET}).
   --since=<iso>      Where a never-read account starts (default ${BACKFILL_FROM}, the start of our records).
   --max-pages=<n>    Max signature pages (${PAGE} each) listed per account per run (default ${DEFAULT_MAX_PAGES}).
@@ -229,11 +227,6 @@ async function main() {
     } else {
         if (!dbUrl) throw new Error(`DATABASE_URL is not set in ${join(REPO, '.env')} — pass --no-db to run without Postgres`);
         log(`db: ${describeUrl(dbUrl)}`);
-        if (flags.ddl) {
-            const ddl = await readFile(DDL_FILE, 'utf8');
-            log(`db: applying ${relative(REPO, DDL_FILE)} (${ddl.length} bytes, idempotent)`);
-            await psql(dbUrl, ddl, 'ddl');
-        }
         scan = await readScanState(dbUrl);
         log(`db: ${scan.size} stored checkpoint(s)`);
     }

@@ -67,7 +67,7 @@
         if (sheet === null) return '<p class="wi-empty">Loading the answer sheet…</p>';
         const answers = whatIfLib.answersFromApi(sheet.items);
         if (answers.length === 0) {
-            return '<p class="wi-empty">The API returned no questions at all, which means the catalogue '
+            return '<p class="wi-empty">The API returned no questions at all, which means the failure-mode list '
                 + 'did not load on the server.</p>';
         }
         return whatIfLib.whatIfHtml(answers, {

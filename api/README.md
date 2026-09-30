@@ -304,7 +304,7 @@ to run when `WATCH_BOT_TOKEN` equals `TELEGRAM_BOT_TOKEN`.
    lookups (`sonar.stock_watch_delivery`), keyed by `WATCH_DELIVERY_KEY`.
 3. The owner enables the digest and picks an hour. Changes found by
    `stocks/build-watchlist-changes.mjs` are kept in `sonar.stock_watch_event`.
-4. `api/src/jobs/send-watch-digests.js --run` (PM2 `rwa-watch-digest`, hourly at :50) sends one
+4. `api/src/jobs/run-watch-digests.js --run` (PM2 `rwa-watch-digest`, hourly at :50; the logic is in `send-watch-digests.js`) sends one
    message per watch per local day, within three hours of its hour, only when a material change was
    found since its last digest; `sonar.stock_watch_digest_log` makes reruns send nothing twice. A
    chat that blocked the bot (HTTP 403) is disconnected. Any other failure produces ONE operator

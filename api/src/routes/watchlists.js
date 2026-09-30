@@ -50,12 +50,12 @@ async function jsonBody(c) {
 async function validateProducts(payload) {
     if (payload.type === 'token') {
         const { rows } = await query('SELECT mint FROM sonar.stock_token WHERE mint = $1', [payload.target.mint]);
-        if (!rows[0]) throw new ApiError(400, 'invalid_token', 'the exact token is not in the current catalogue');
+        if (!rows[0]) throw new ApiError(400, 'invalid_token', 'the exact token is not in the current universe');
         return;
     }
     if (payload.type === 'issuer') {
         const { rows } = await query('SELECT slug FROM sonar.stock_issuer WHERE slug = $1', [payload.target.issuerSlug]);
-        if (!rows[0]) throw new ApiError(400, 'invalid_issuer', 'the issuer is not in the current catalogue');
+        if (!rows[0]) throw new ApiError(400, 'invalid_issuer', 'the issuer is not in the current universe');
         return;
     }
     if (payload.type === 'protocol-market') {

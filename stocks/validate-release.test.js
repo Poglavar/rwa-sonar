@@ -212,7 +212,10 @@ describe('deployment release ordering', () => {
         expect(manifest.indexOf("'stocks/build-stocks-db.mjs'")).toBeLessThan(manifest.indexOf("'stocks/build-discovery-index.mjs'"));
         expect(manifest.indexOf("'stocks/build-health.mjs'")).toBeLessThan(manifest.indexOf("'stocks/build-legal-templates.mjs'"));
         const baseAt = script.indexOf('node stocks/build-release-artifacts.mjs --run --phase=base');
-        const dbAt = script.indexOf('node stocks/load-db.mjs --run --ddl --only=tokens,snapshots');
+        // The schema first (apply-schema.mjs, the only place it is applied), then the load.
+        expect(script.indexOf('node stocks/apply-schema.mjs --run')).toBeGreaterThan(baseAt);
+        const dbAt = script.indexOf('node stocks/load-db.mjs --run --only=tokens,snapshots');
+        expect(dbAt).toBeGreaterThan(script.indexOf('node stocks/apply-schema.mjs --run'));
         const preReviewAt = script.indexOf('node stocks/build-release-artifacts.mjs --run --phase=pre-review');
         const queueAt = script.indexOf('node stocks/build-review-queue.mjs --run');
         const surfacesAt = script.indexOf('node stocks/build-release-artifacts.mjs --run --phase=surfaces');
@@ -234,7 +237,8 @@ describe('deployment release ordering', () => {
         const seedAt = script.indexOf('node stocks/build-stocks-db.mjs --run');
         const defiAt = script.indexOf('node stocks/fetch-defi-usage.mjs --run');
         const baseAt = script.indexOf('node stocks/build-release-artifacts.mjs --run --phase=base');
-        const dbAt = script.indexOf('node stocks/load-db.mjs --run --ddl');
+        // No --ddl: a scheduled refresh never applies the schema (stocks/schema.test.js).
+        const dbAt = script.indexOf('node stocks/load-db.mjs --run');
         const queueAt = script.indexOf('node stocks/build-review-queue.mjs --run');
         const surfacesAt = script.indexOf('node stocks/build-release-artifacts.mjs --run --phase=surfaces');
         expect(seedAt).toBeGreaterThan(script.indexOf('node stocks/fetch-meteora.mjs --run'));

@@ -36,7 +36,7 @@ module.exports = {
             name: 'rwa-watch',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-sources.mjs',
-            args: '--run --ddl --archive',
+            args: '--run --archive',
             interpreter: 'node',
             cron_restart: '41 2 * * *',
             autorestart: false,
@@ -55,7 +55,7 @@ module.exports = {
             name: 'rwa-watch-chain',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-chain.mjs',
-            args: '--run --ddl --no-telegram',
+            args: '--run --no-telegram',
             interpreter: 'node',
             cron_restart: '7 * * * *',
             autorestart: false,
@@ -78,7 +78,7 @@ module.exports = {
             name: 'rwa-watch-lending',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-lending.mjs',
-            args: '--run --ddl --budget=1000',
+            args: '--run --budget=1000',
             interpreter: 'node',
             cron_restart: '33 * * * *',
             autorestart: false,
@@ -98,7 +98,7 @@ module.exports = {
             name: 'rwa-watch-caselaw',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-caselaw.mjs',
-            args: '--run --ddl',
+            args: '--run',
             interpreter: 'node',
             cron_restart: '23 4 * * *',
             autorestart: false,
@@ -132,12 +132,13 @@ module.exports = {
         {
             // The change judge (stocks/judge-changes.mjs): once a day, one small Message Batches
             // batch of the newest unjudged document changes, costed per item into
-            // sonar.change_judgment. Kept at 10 items (about $0.08) so a day's spend stays bounded;
-            // a larger backlog run is the owner's decision. Needs ANTHROPIC_API_KEY in the clone's .env.
+            // sonar.change_judgment. 25 items a day (about $0.20; raised from 10 on 30 Sep by the
+            // owner, when 10 a day let a 243-change backlog grow); a backlog is judged with the
+            // Claude CLI on the laptop (stocks/judge-with-cli.mjs). Needs ANTHROPIC_API_KEY in .env.
             name: 'rwa-judge',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/judge-changes.mjs',
-            args: '--run --limit=10',
+            args: '--run --limit=25',
             interpreter: 'node',
             cron_restart: '47 6 * * *',
             autorestart: false,
@@ -174,7 +175,7 @@ module.exports = {
             // start list: start it by hand once the watch bot and its webhook are set up.
             name: 'rwa-watch-digest',
             cwd: '/root/code/rwa-sonar',
-            script: 'api/src/jobs/send-watch-digests.js',
+            script: 'api/src/jobs/run-watch-digests.js',
             args: '--run',
             interpreter: 'node',
             node_args: '--env-file=/root/code/rwa-sonar/.env',

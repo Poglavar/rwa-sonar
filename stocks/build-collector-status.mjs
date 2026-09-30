@@ -12,7 +12,7 @@ const HERE = resolve(fileURLToPath(new URL('.', import.meta.url)));
 const ROOT = resolve(HERE, '..');
 
 export const COLLECTOR_SPECS = [
-    { id: 'catalogue', label: 'Token catalogue', cadenceHours: 24, file: 'universe', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token records', source: 'Jupiter token search plus reviewed issuer lists' },
+    { id: 'catalogue', label: 'Token universe', cadenceHours: 24, file: 'universe', timestamp: 'fetchedAt', countPath: ['items'], unit: 'token records', source: 'Jupiter token search plus reviewed issuer lists' },
     { id: 'chain', label: 'On-chain token state', cadenceHours: 24, file: 'onchain', timestamp: 'fetchedAt', countPath: ['items'], unit: 'mint reads', source: 'Solana RPC' },
     { id: 'identity-chain', label: 'Issuer identity & chain coverage', cadenceHours: 24, file: 'identities', timestamp: 'fetchedAt', countPath: ['items'], unit: 'issuer-known mint identities', source: 'Issuer exact-mint registries, reserves and Solana RPC' },
     { id: 'authority-watch', label: 'Authority & extension watch', cadenceHours: 1, file: 'chainWatch', timestamp: 'lastRunEndedAt', fallbackTimestamp: 'generatedAt', countPath: ['mintsRead'], unit: 'mints checked', source: 'Solana RPC; hourly change detection' },

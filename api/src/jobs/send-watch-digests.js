@@ -10,7 +10,7 @@
 //   node --env-file=/root/code/rwa-sonar/.env api/src/jobs/send-watch-digests.js --run
 
 import { writeFile, rename } from 'node:fs/promises';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { closePool, query } from '../db.js';
 import { log, logError } from '../lib/log.js';
@@ -88,7 +88,7 @@ async function writeStats(stats) {
 
 async function main(argv) {
     if (!argv.includes('--run')) {
-        console.log('Usage: node --env-file=.env api/src/jobs/send-watch-digests.js --run\n'
+        console.log('Usage: node --env-file=.env api/src/jobs/run-watch-digests.js --run\n'
             + 'Sends each due personal saved-watch digest once (hourly; see ecosystem.config.cjs rwa-watch-digest).');
         return 0;
     }
@@ -115,8 +115,14 @@ async function main(argv) {
     return stats.ok ? 0 : 1;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main(process.argv.slice(2))
+/**
+ * The command line: run, report, close the pool, exit. Started by run-watch-digests.js, the PM2
+ * entry. This module used to start itself behind an `import.meta.url === argv[1]` guard, which is
+ * false under PM2 (argv[1] is PM2's own container), so the hourly job idled until its cron kill and
+ * never sent a digest (found 28 Sep, fixed 30 Sep).
+ */
+export function runCli(argv = process.argv.slice(2)) {
+    return main(argv)
         .then(async (code) => {
             await closePool();
             process.exit(code);

@@ -773,11 +773,11 @@ describe('quotelessRefusal: a refusal nothing quotes is reachability, not a bloc
         expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'error'\)\)/);
         expect(ddl).toMatch(/DROP CONSTRAINT IF EXISTS source_status_check/);
         // Re-applying the narrower reachable list after an `unreadable` row exists would fail the
-        // whole load, so --ddl must apply the superset INSTEAD of it, not after it.
-        const watcher = readFileSync(new URL('./watch-sources.mjs', import.meta.url), 'utf8');
-        const list = watcher.slice(watcher.indexOf('const DDL_FILES = ['), watcher.indexOf('];', watcher.indexOf('const DDL_FILES = [')));
-        expect(list).toContain("'2026-09-24-sonar-source-unreadable.sql'");
-        expect(list).not.toContain("'2026-09-24-sonar-source-reachable.sql'");
+        // whole load, so the schema step applies the superset INSTEAD of it, never after it.
+        const list = readFileSync(new URL('./lib/schema.mjs', import.meta.url), 'utf8');
+        const applied = list.slice(list.indexOf('export const SCHEMA_FILES = ['), list.indexOf('];', list.indexOf('export const SCHEMA_FILES = [')));
+        expect(applied).toContain("'2026-09-24-sonar-source-unreadable.sql'");
+        expect(applied).not.toContain("'2026-09-24-sonar-source-reachable.sql'");
     });
 });
 

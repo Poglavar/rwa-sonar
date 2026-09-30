@@ -11,7 +11,7 @@ Example from the issuer documents: asked "what happens if my keys are stolen?", 
 ## Scope (as of September 2026)
 
 - Tokenized stocks on Solana only. About 1,200 exact token addresses across 12 issuer programmes (xStocks/Backed, Ondo Global Markets, Backpack Securities, PreStocks, Superstate Opening Bell, Securitize, Bullish, Tessera, Shift, Republic Mirror, and the defunct Remora Markets and Ventuals). The live count is in https://rwasonar.com/stocks-tokens.json.
-- A token enters the catalogue only through a reviewed source, an issuer-controlled exact-address registry, or a verified issuer tag concordant with a known programme authority. Search results alone are discovery candidates, never catalogue entries.
+- A token enters the universe only through a reviewed source, an issuer-controlled exact-address registry, or a verified issuer tag concordant with a known programme authority. Search results alone are discovery candidates, never entries in the universe.
 - Coverage is a dated observation of a changing system, not a claim of completeness.
 
 ## How to read the answers

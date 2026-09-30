@@ -253,7 +253,7 @@
             to: failing,
             label: triggerText(modeDef.question),
             status: 'catalogue',
-            source: { label: 'Failure-scenario catalogue', url: null, locator: mode }
+            source: { label: 'Failure-scenario list', url: null, locator: mode }
         }];
         const far = failing === 'holder' ? laneIds[laneIds.length - 1] : holderLane;
         if (far !== failing && flowDef) {
@@ -264,7 +264,7 @@
                     ? `Who could act on it: the “${str(flowDef.label)}” chain`
                     : `Reaches the holder along “${str(flowDef.label)}”`,
                 status: 'catalogue',
-                source: { label: 'Trust-chain catalogue', url: null, locator: `flow: ${flowDef.id}` }
+                source: { label: 'Trust-chain list', url: null, locator: `flow: ${flowDef.id}` }
             });
         }
         for (const sentence of outcome) {

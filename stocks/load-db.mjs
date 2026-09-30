@@ -9,7 +9,7 @@
 // and is never logged — only the host and database name are.
 
 import { spawn } from 'node:child_process';
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,24 +24,6 @@ import { TRUST_CHAIN, TRUST_CHAIN_PATH, validateWhatIf } from './lib/trustchain.
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..');
-// Applied in this order by --ddl: the claim and what_if tables' foreign keys need sonar.source,
-// which the evidence file creates. Every file is idempotent, so applying all of them every time is
-// right.
-const DDL_FILES = [
-    join(REPO, 'db', '2026-09-17-sonar-stocks.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-evidence.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-claims.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-whatif.sql'),
-    join(REPO, 'db', '2026-09-18-sonar-health-dimensions.sql'),
-    join(REPO, 'db', '2026-09-19-sonar-snapshot-history.sql'),
-    join(REPO, 'db', '2026-09-19-sonar-watchlists.sql'),
-    join(REPO, 'db', '2026-09-20-sonar-review-resolutions.sql'),
-    join(REPO, 'db', '2026-09-22-sonar-watch-cardinality.sql'),
-    join(REPO, 'db', '2026-09-22-sonar-focused-watches.sql'),
-    join(REPO, 'db', '2026-09-22-sonar-current-claims.sql'),
-    join(REPO, 'db', '2026-09-23-sonar-source-provenance.sql'),
-    join(REPO, 'db', '2026-09-23-sonar-watch-delivery.sql')
-];
 const HISTORY_DIR = join(REPO, 'stocks', 'data', 'history');
 const ISSUERS_DIR = join(REPO, 'stocks', 'data', 'issuers');
 const STEPS = ['issuers', 'tokens', 'snapshots', 'trades', 'claims', 'whatif'];
@@ -62,11 +44,9 @@ const DOSSIER_SLUGS = {
 function usage() {
     console.log(`Load the built stocks JSON into schema \`sonar\` of the geodata database.
 
-  node stocks/load-db.mjs --run [--ddl] [--only=issuers,tokens,snapshots,trades,claims,whatif]
+  node stocks/load-db.mjs --run [--only=issuers,tokens,snapshots,trades,claims,whatif]
 
   --run     actually connect and load. Without it nothing happens (this message is printed).
-  --ddl     apply ${DDL_FILES.map((f) => f.replace(`${REPO}/`, '')).join(', ')} first,
-            in that order. All idempotent; safe on every run.
   --only    limit to some of the steps, comma separated. Default: all six, in FK order
             (${STEPS.join(' -> ')}).
   --help    this message.
@@ -124,15 +104,6 @@ function psql(url, sqlText, label, extraArgs = []) {
     });
 }
 
-async function applyDdl(url) {
-    for (const file of DDL_FILES) {
-        const name = file.replace(`${REPO}/`, '');
-        const ddl = await readFile(file, 'utf8');
-        log(`ddl: applying ${name} (${ddl.length} bytes, idempotent)`);
-        await psql(url, ddl, `ddl ${name}`);
-    }
-    log(`ddl: applied ${DDL_FILES.length} file(s)`);
-}
 
 async function loadIssuers(url) {
     const doc = await readJson(join(REPO, 'stocks-issuers.json'));
@@ -372,8 +343,8 @@ async function main() {
     }
 
     const since = ts();
-    log(`load-db: ${describeUrl(url)} — steps ${only.join(', ')}${flags.ddl ? ' (+ddl)' : ''}`);
-    if (flags.ddl) await applyDdl(url);
+    // The schema is applied by stocks/apply-schema.mjs at deploy, never here (lock contention).
+    log(`load-db: ${describeUrl(url)} — steps ${only.join(', ')}`);
 
     const loaded = {};
     // FK order: a token references its issuer, so issuers must exist first.

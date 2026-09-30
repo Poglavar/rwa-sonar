@@ -568,7 +568,7 @@ export function weekHeadlines(digest) {
     const removed = digest.removed.length;
     lines.push({
         anchor: 'tokens',
-        text: `${plural(added, 'token')} first catalogued, ${fmtNumber(removed, 0)} removed`,
+        text: `${plural(added, 'token')} joined the universe, ${fmtNumber(removed, 0)} removed`,
         empty: added === 0 && removed === 0
     });
     const covered = digest.redemptions.observed.filter((row) => row.redemptions !== null);
@@ -756,20 +756,20 @@ function journalSection(digest) {
             };
         }), { className: 'wk-fold' });
     return section('journal', 'Issuer, venue and protocol changes', body
-        + '<p class="muted">From the public change journal: changes by issuers, venues, protocols and sources, and catalogue membership changes. RWA Sonar\'s own editorial corrections are excluded.</p>', String(rows.length));
+        + '<p class="muted">From the public change journal: changes by issuers, venues, protocols and sources, and tokens joining or leaving the universe. RWA Sonar\'s own editorial corrections are excluded.</p>', String(rows.length));
 }
 
 function tokensSection(digest) {
     const groups = digest.newTokens;
     const added = sum(groups, 'count');
-    const addedBody = groups.length === 0 ? '<p>No token was first catalogued this week.</p>'
+    const addedBody = groups.length === 0 ? '<p>No token joined the universe this week.</p>'
         : groups.map((group) => `<h3>${issuerLink(group.issuer, digest.issuerNames, group.issuerName)} <span class="wk-count">${escapeHtml(fmtNumber(group.count, 0))}</span></h3>`
             + `<ul class="asset-chips">${listCap(group.tokens, (row) => `<li>${cardLink(row)} <span>${escapeHtml((row.firstSeenAt ?? '').slice(0, 10))}</span></li>`,
                 `all on ${issuerLink(group.issuer, digest.issuerNames, group.issuerName)}`)}</ul>`).join('');
-    const removedBody = digest.removed.length === 0 ? '<p>No token left the catalogue this week.</p>'
+    const removedBody = digest.removed.length === 0 ? '<p>No token left the universe this week.</p>'
         : `<ul class="asset-chips">${listCap(digest.removed, (row) => `<li>${cardLink(row)} <span>gone by ${escapeHtml(row.date)}</span></li>`)}</ul>`;
-    const note = '<p class="muted">"First catalogued" is when RWA Sonar first confirmed the exact token address (stocks-tokens.json <code>firstSeenAt</code>). The issuer may have minted it earlier. Tokens known when records began are not counted as new.</p>';
-    return section('tokens', 'New and removed tokens', `${note}<h3>First catalogued (${escapeHtml(fmtNumber(added, 0))})</h3>${addedBody}<h3>Removed (${escapeHtml(fmtNumber(digest.removed.length, 0))})</h3>${removedBody}`,
+    const note = '<p class="muted">"Joined the universe" is when RWA Sonar first confirmed the exact token address (stocks-tokens.json <code>firstSeenAt</code>). The issuer may have minted it earlier. Tokens known when records began are not counted as new.</p>';
+    return section('tokens', 'New and removed tokens', `${note}<h3>Joined the universe (${escapeHtml(fmtNumber(added, 0))})</h3>${addedBody}<h3>Removed (${escapeHtml(fmtNumber(digest.removed.length, 0))})</h3>${removedBody}`,
         `+${fmtNumber(added, 0)} / −${fmtNumber(digest.removed.length, 0)}`);
 }
 
@@ -831,7 +831,7 @@ function evidenceSection(digest) {
         : events.total === 0 ? '<p>The source and chain watchers raised no change event this week.</p>'
             : `<ul class="whatif-counts">${Object.entries(events.byKind).map(([kind, n]) => `<li>${escapeHtml(kind)} <strong>${escapeHtml(fmtNumber(n, 0))}</strong></li>`).join('')}</ul>`
                 + '<p><a href="../watch.html">Every event with its diff on the change feed →</a></p>';
-    const whatIf = '<p class="muted">What-if answers and individual claims carry no change date in the built data, so this page cannot say which of them are new this week. Current answers: <a href="../whatif.html">what-if catalogue</a>; open evidence gaps: <a href="../review.html">review queue</a>.</p>';
+    const whatIf = '<p class="muted">What-if answers and individual claims carry no change date in the built data, so this page cannot say which of them are new this week. Current answers: <a href="../whatif.html">what-if list</a>; open evidence gaps: <a href="../review.html">review queue</a>.</p>';
     const count = digest.discrepancies.length + (events?.total ?? 0);
     return section('evidence', 'Discrepancies and evidence changes',
         `<h3>New discrepancies</h3>${disc}<h3>Watcher change events</h3>${eventBody}${whatIf}`, String(count));

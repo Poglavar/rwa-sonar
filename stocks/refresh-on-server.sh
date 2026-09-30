@@ -134,10 +134,12 @@ fi
 step "legal templates before review"; node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url="$BASE_URL"
 step "collector status"; node stocks/build-collector-status.mjs --run
 # The same data into schema `sonar` of the geodata database, so it can be grouped and joined.
-# --ddl is idempotent; the trade table accumulates past the 24 h window the JSON keeps. No --only,
+# The schema is applied at deploy (stocks/apply-schema.mjs), never here: re-applying it every run took
+# exclusive table locks that collided with the hourly watchers. The trade table accumulates past the
+# 24 h window the JSON keeps. No --only,
 # so every step runs, the claims and what-if loads included (a new step is picked up here for
 # free; a --only list here would have to be edited every time one is added).
-step "db";         node stocks/load-db.mjs --run --ddl
+step "db";         node stocks/load-db.mjs --run
 step "evidence review queue"; node stocks/build-review-queue.mjs --run
 # When the newest first-seen mints were created (a bounded getSignaturesForAddress pass, cached for
 # good), so the latest-events feed says "created" or leaves out old tokens the catalogue only just

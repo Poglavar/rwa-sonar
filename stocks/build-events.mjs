@@ -121,7 +121,7 @@ async function readLendingRows({ flags, since }) {
     const env = { ...(await readEnvFile(join(REPO_ROOT, '.env'))), ...process.env };
     if (!env.DATABASE_URL) return null;
     if ((await psql(env.DATABASE_URL, LENDING_TABLE_PROBE, 'lending table probe', ['-t', '-A'])).trim() !== 't') {
-        logWarn('lending watcher tables absent (stocks/watch-lending.mjs --ddl creates them): no lending events this build');
+        logWarn('lending watcher tables absent (stocks/apply-schema.mjs creates them at deploy): no lending events this build');
         return null;
     }
     const doc = JSON.parse((await psql(env.DATABASE_URL, lendingRowsPsql({ since }), 'lending rows', ['-t', '-A'])).trim() || '{}');

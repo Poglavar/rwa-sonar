@@ -142,8 +142,8 @@ export function buildWatchSnapshot(watch, {
 
 function tokenChanges(before, after) {
     const id = `${after?.symbol ?? before?.symbol ?? 'Token'} ${after?.mint ?? before?.mint}`;
-    if (before?.present && !after?.present) return [`${id}: exact token removed from the catalogue`];
-    if (!before?.present && after?.present) return [`${id}: exact token added to the catalogue`];
+    if (before?.present && !after?.present) return [`${id}: exact token removed from the universe`];
+    if (!before?.present && after?.present) return [`${id}: exact token added to the universe`];
     if (!before?.present || !after?.present) return [];
     const changes = [];
     if (before.issuerSlug !== after.issuerSlug) changes.push(`${id}: issuer attribution changed from ${before.issuerSlug ?? 'unknown'} to ${after.issuerSlug ?? 'unknown'}`);
@@ -169,8 +169,8 @@ function tokenChanges(before, after) {
 
 function issuerChanges(before, after) {
     const id = after?.name ?? before?.name ?? after?.slug ?? before?.slug ?? 'Issuer';
-    if (before?.present && !after?.present) return [`${id}: issuer removed from the catalogue`];
-    if (!before?.present && after?.present) return [`${id}: issuer added to the catalogue`];
+    if (before?.present && !after?.present) return [`${id}: issuer removed from the universe`];
+    if (!before?.present && after?.present) return [`${id}: issuer added to the universe`];
     if (!before?.present || !after?.present) return [];
     const changes = [];
     if (before.status !== after.status) changes.push(`${id}: programme status changed from ${before.status ?? 'unknown'} to ${after.status ?? 'unknown'}`);
