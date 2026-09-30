@@ -9,7 +9,7 @@
 -- noise in the refresh log and nothing else. Quiet only NOTICE; warnings and errors still speak.
 SET client_min_messages = warning;
 
--- Every object must end up owned by `geo_user`. The connecting role (zagreb_user / magician) is
+-- Every object must end up owned by `geo_user`. The connecting role (a per-app login role) is
 -- a member, so switch to it; if we already ARE geo_user, or are a superuser that is not a member,
 -- the guard leaves the session alone rather than failing the whole run.
 DO $$

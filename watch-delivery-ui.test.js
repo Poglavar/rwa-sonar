@@ -45,8 +45,8 @@ describe('deep link', () => {
 
 describe('digest settings', () => {
     test('accepts an IANA zone and an hour 0–23 (a <select> value string included)', () => {
-        expect(D.validateDigestSettings({ enabled: true, hour: '7', timezone: 'Europe/Zagreb' }))
-            .toEqual({ ok: true, value: { enabled: true, hour: 7, timezone: 'Europe/Zagreb' } });
+        expect(D.validateDigestSettings({ enabled: true, hour: '7', timezone: 'Europe/London' }))
+            .toEqual({ ok: true, value: { enabled: true, hour: 7, timezone: 'Europe/London' } });
         expect(D.validateDigestSettings({ enabled: false, hour: 0, timezone: 'UTC' }).ok).toBe(true);
         expect(D.validateDigestSettings({ enabled: true, hour: 23, timezone: ' America/New_York ' }).value.timezone).toBe('America/New_York');
     });
@@ -68,7 +68,7 @@ describe('digest settings', () => {
     });
 
     test('connected label names the hour and zone, or says the digest is off', () => {
-        expect(D.connectedLabel({ enabled: true, hour: 7, timezone: 'Europe/Zagreb' })).toBe('Connected. Daily digest at 07:00 Europe/Zagreb.');
+        expect(D.connectedLabel({ enabled: true, hour: 7, timezone: 'Europe/London' })).toBe('Connected. Daily digest at 07:00 Europe/London.');
         expect(D.connectedLabel({ enabled: false, hour: 7, timezone: 'UTC' })).toBe('Connected. Daily digest is off.');
     });
 });

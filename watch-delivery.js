@@ -95,7 +95,7 @@
         const timezone = typeof input?.timezone === 'string' ? input.timezone.trim() : input?.timezone;
         if (typeof enabled !== 'boolean') return { ok: false, error: 'Choose whether the digest is on or off.' };
         if (!Number.isInteger(hour) || hour < 0 || hour > 23) return { ok: false, error: 'The digest hour must be 0–23.' };
-        if (!isValidTimezone(timezone)) return { ok: false, error: 'The timezone must be an IANA zone such as Europe/Zagreb.' };
+        if (!isValidTimezone(timezone)) return { ok: false, error: 'The timezone must be an IANA zone such as Europe/London.' };
         return { ok: true, value: { enabled, hour, timezone } };
     }
 

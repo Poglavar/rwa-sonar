@@ -175,10 +175,10 @@ describeDb('private Telegram delivery for saved watches', () => {
         await botUpdate(`/start ${new URL(link.body.url).searchParams.get('start')}`, OTHER_CHAT);
         expect(replies.at(-1).text).toMatch(/^Connected\./);
         const enabled = await call(`${base}/digest`, {
-            method: 'PUT', watchKey: watch.watchKey, body: { enabled: true, hour: 8, timezone: 'Europe/Zagreb' }
+            method: 'PUT', watchKey: watch.watchKey, body: { enabled: true, hour: 8, timezone: 'Europe/London' }
         });
         expect(enabled.status).toBe(200);
-        expect(enabled.body).toMatchObject({ bound: true, digest: { enabled: true, hour: 8, timezone: 'Europe/Zagreb' } });
+        expect(enabled.body).toMatchObject({ bound: true, digest: { enabled: true, hour: 8, timezone: 'Europe/London' } });
         await call(`${base}/delivery`, { method: 'DELETE', watchKey: watch.watchKey });
     });
 

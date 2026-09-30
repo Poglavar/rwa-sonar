@@ -1423,7 +1423,7 @@ cancelled each other on lock timeout when they overlapped (06:35 UTC). `stocks/s
 keeps it that way: every `db/*.sql` is listed (or marked superseded), and no job passes `--ddl`.
 
 `db/2026-09-17-sonar-stocks.sql` is the DDL: idempotent, re-runnable as a no-op, and it makes
-`geo_user` the owner of everything (the connecting role, `zagreb_user` or `magician`, is a
+`geo_user` the owner of everything (the connecting role, a per-app login role, is a
 member, so the file `SET ROLE`s to it; DDL needs *ownership*, and `CREATE INDEX IF NOT EXISTS`
 checks it even when the index already exists, so one table owned by the wrong role would abort a
 whole later migration). `stocks/apply-schema.mjs` applies it first, at deploy.

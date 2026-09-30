@@ -2,7 +2,7 @@
 // job sends at most ONE summary per run through alerts-server-telegram's chat; that repo's own
 // sender is CommonJS with its own config and token, so a job in this repo posts directly with the
 // credentials in ITS .env (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) — the same shape the
-// zagreb-veleprojekti pipeline uses.
+// other pipelines on this server use.
 //
 // Absent credentials are NOT an error and never fail a run: the summary is logged instead, saying
 // so in as many words, because a watcher that dies for want of a chat id is worse than a silent one.
