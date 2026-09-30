@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0" xml:base="https://www.sec.gov/">
+  <channel>
+    <title>Press Releases</title>
+    <link>https://www.sec.gov/</link>
+    <description>Official announcements highlighting recent actions taken by the SEC and other newsworthy information.</description>
+    <language>en</language>
+    
+    <item>
+  <title>    SEC Charges Multiple Entities in Fraud Schemes Totaling at Least $15 Million That Used WhatsApp and Other Platforms to Lure Investors
+</title>
+  <link>https://www.sec.gov/newsroom/press-releases/2026-95-sec-charges-multiple-entities-fraud-schemes-totaling-least-15-million-used-whatsapp-other-platforms</link>
+  <description>The Securities and Exchange Commission today charged multiple entities that are likely operated by individuals located overseas for defrauding hundreds of retail investors, including many in the U.S., through so-called investment confidence scams where…</description>
+  <pubDate>Tue, 29 Sep 2026 09:55:53 -0400</pubDate>
+    <dc:creator> </dc:creator>
+    <guid isPermaLink="false">24ecbd59-921b-4629-ad59-3274eba339e1</guid>
+    </item>
+<item>
+  <title>  SEC Charges Registered Investment Adviser Zoe Financial for Failure to Disclose Conflict of Interest
+</title>
+  <link>https://www.sec.gov/newsroom/press-releases/2026-94-sec-charges-registered-investment-adviser-zoe-financial-failure-disclose-conflict-interest</link>
+  <description>The Securities and Exchange Commission today announced settled charges against New York-based investment adviser Zoe Financial Inc. for failing to fully and fairly disclose material facts concerning conflicts of interest to its clients and prospective…</description>
+  <pubDate>Mon, 28 Sep 2026 13:46:30 -0400</pubDate>
+    <dc:creator> </dc:creator>
+    <guid isPermaLink="false">054c4054-b2b9-48f6-b30d-dc6f219db7e1</guid>
+    </item>
+<item>
+  <title>  SEC Publishes Updated Market Statistics, Highlighting Increase in IPOs and Proceeds Raised
+</title>
+  <link>https://www.sec.gov/newsroom/press-releases/2026-93-sec-publishes-updated-market-statistics-highlighting-increase-ipos-proceeds-raised</link>
+  <description>The Securities and Exchange Commission’s Division of Economic and Risk Analysis (DERA) published updated statistics and data visualizations covering key segments of the U.S. capital markets, including a notable increase in the number of initial public…</description>
+  <pubDate>Wed, 23 Sep 2026 14:27:00 -0400</pubDate>
+    <dc:creator> </dc:creator>
+    <guid isPermaLink="false">fb47e924-a7a1-41a4-92c3-a177cb83af75</guid>
+    </item>
+</channel>
+</rss>

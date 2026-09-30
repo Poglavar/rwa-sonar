@@ -18,6 +18,20 @@ describe('the schema is applied once, at deploy, and never by a scheduled job', 
         for (const reason of Object.values(SUPERSEDED_SCHEMA_FILES)) expect(reason.length).toBeGreaterThan(20);
     });
 
+    it('the allowed change_event kinds are stated once, in the last file, atomically, and cover every watcher\'s kinds', () => {
+        const restating = SCHEMA_FILES.filter((file) => /ADD CONSTRAINT change_event_kind_check/.test(read('db', file)));
+        expect(restating).toEqual(['2026-10-01-sonar-change-event-kinds.sql']);
+        expect(SCHEMA_FILES.at(-1)).toBe('2026-10-01-sonar-change-event-kinds.sql');
+        const kinds = read('db', '2026-10-01-sonar-change-event-kinds.sql');
+        expect(kinds).toMatch(/^BEGIN;$[\s\S]*DROP CONSTRAINT IF EXISTS change_event_kind_check;[\s\S]*^COMMIT;$/m);
+        // Each watcher's own kind, and every kind the events feed reads.
+        for (const kind of ['litigation', 'entity-status', 'insolvency', 'regulator-notice', 'quote-lost', 'rebase', 'authority-key']) {
+            expect(kinds).toContain(`'${kind}'`);
+        }
+        // No file keeps an ad-hoc way of changing the list.
+        for (const file of SCHEMA_FILES.slice(0, -1)) expect(read('db', file)).not.toMatch(/DROP CONSTRAINT[^;]*change_event_kind_check/);
+    });
+
     it('applies the files a later one depends on first', () => {
         const at = (name) => SCHEMA_FILES.indexOf(name);
         // sonar.source (evidence) before the claim and what-if foreign keys and the source status lists;
@@ -34,7 +48,8 @@ describe('the schema is applied once, at deploy, and never by a scheduled job', 
     it('no scheduled job applies schema: no --ddl in the PM2 jobs or the refresh, and no script accepts it', () => {
         expect(read('ecosystem.config.cjs')).not.toMatch(/--ddl/);
         expect(read('stocks', 'refresh-on-server.sh')).not.toMatch(/--ddl/);
-        for (const script of ['load-db', 'watch-sources', 'watch-chain', 'watch-lending', 'watch-caselaw', 'judge-changes']) {
+        for (const script of ['load-db', 'watch-sources', 'watch-chain', 'watch-lending', 'watch-caselaw', 'judge-changes',
+            'watch-reserves', 'watch-entities', 'watch-corporate-actions', 'watch-regulators', 'watch-powers']) {
             const source = read('stocks', `${script}.mjs`);
             expect(source).not.toMatch(/flags\.ddl|DDL_FILES?\b|readFile\([^)]*\.sql/);
         }
@@ -49,7 +64,7 @@ describe('the schema is applied once, at deploy, and never by a scheduled job', 
         const cronJobs = ecosystem.split(/(?=name: ')/).filter((block) => /cron_restart:/.test(block))
             .map((block) => /name: '([\w-]+)'/.exec(block)[1]);
         expect(cronJobs.length).toBeGreaterThanOrEqual(7);
-        const restarted = /APPS="\$APPS ([^"]+)"/.exec(deploy)[1].split(' ');
+        const restarted = [...deploy.matchAll(/APPS="\$APPS ([^"]+)"/g)].flatMap((m) => m[1].split(' '));
         for (const job of cronJobs.filter((name) => name !== 'rwa-watch-digest')) expect(restarted).toContain(job);
     });
 });

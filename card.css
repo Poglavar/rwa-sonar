@@ -128,17 +128,23 @@ h1 {
 :root.reduce-motion .event-marquee-track { animation: none; }
 :root.reduce-motion .event-marquee-run[aria-hidden="true"] { display: none; }
 
+.card-head .solana-share { margin: -6px 0 12px; color: var(--muted-text); font-size: .86rem; }
+.card-head .solana-share b { color: var(--page-text); }
+
 .card-head .sub {
     margin: 2px 0 12px;
     color: var(--muted-text);
 }
+
+/* The ticker with its planet link to the right; wraps under it on a narrow screen. */
+.card-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 
 /* The way into the universe view (cards.mjs planetLinkHtml). */
 .card-head .planet-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin: 0 0 12px;
+    margin: 0;
     padding: 5px 12px 5px 6px;
     border: 1px solid var(--rwa-new-line);
     border-radius: 999px;
@@ -165,8 +171,9 @@ h1 {
 }
 
 /* Who may hold the token and who may redeem it with the issuer (cards.mjs whoCanBuyHtml). */
+/* Now the first line inside "Things to know first". */
 .card-head .who-can-buy {
-    margin: -8px 0 14px;
+    margin: 0 0 12px;
     color: var(--muted-text);
     font-size: 0.86rem;
     line-height: 1.45;
@@ -944,3 +951,7 @@ footer h2 {
 .token-events-foot { margin: 10px 0 0; color: var(--muted-text); font-size: .74rem; line-height: 1.5; }
 .token-events-foot a { color: var(--link-color); font-weight: 760; text-decoration: none; }
 .token-events-foot a:hover, .token-events-foot a:focus-visible { text-decoration: underline; }
+
+/* CoinMarketCap in Markets (card.js wireCmc, stocks/lib/cmc-view.js). */
+.cmc-empty, .cmc-src { margin: 8px 0 0; color: var(--muted-text); font-size: .76rem; line-height: 1.5; }
+.cmc-src a { font-weight: 700; }

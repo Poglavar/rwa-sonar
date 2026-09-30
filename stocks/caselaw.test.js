@@ -423,13 +423,12 @@ describe('SQL and DDL', () => {
         expect(sql.split('DO UPDATE SET')[1]).not.toContain('first_run_at');
     });
 
-    test('`litigation` is an allowed event kind in BOTH files that restate the constraint', () => {
-        // evidence.sql is re-applied by load-db and watch-sources on every run; if it did not carry
-        // `litigation`, its DROP+ADD would fail against the stored events.
-        const lastList = (ddl) => [...ddl.matchAll(/ADD CONSTRAINT change_event_kind_check CHECK \(kind IN \(([\s\S]*?)\)\)/g)].at(-1)[1];
-        expect(lastList(CASELAW_DDL)).toContain("'litigation'");
-        expect(lastList(EVIDENCE_DDL)).toContain("'litigation'");
-        expect(lastList(CASELAW_DDL).replace(/\s+/g, ' ')).toBe(lastList(EVIDENCE_DDL).replace(/\s+/g, ' '));
+    test('`litigation` is an allowed event kind, stated in the one kinds file; neither older file touches the list', () => {
+        // Since 30 Sep one file, applied last, states the list (db/2026-10-01-sonar-change-event-kinds.sql).
+        const kinds = readFileSync(new URL('../db/2026-10-01-sonar-change-event-kinds.sql', import.meta.url), 'utf8');
+        expect(kinds).toContain("'litigation'");
+        expect(CASELAW_DDL).not.toMatch(/ADD CONSTRAINT change_event_kind_check/);
+        expect(EVIDENCE_DDL).not.toMatch(/ALTER TABLE sonar\.change_event ADD CONSTRAINT change_event_kind_check/);
     });
 
     test('events go through the shared change_event loader', () => {

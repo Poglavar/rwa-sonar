@@ -1,0 +1,237 @@
+{
+ "capturedAt": "2026-09-30T12:36:27Z",
+ "slot": 451966435,
+ "note": "Real getMultipleAccounts(jsonParsed): AZNx (scaled-UI multiplier ≈0.511), TSLAx, FWDI (Superstate).",
+ "accounts": {
+  "Xs3ZFkPYT2BN7qBMqf1j1bfTeTm1rFzEFSsQ1z3wAKU": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "Xs3ZFkPYT2BN7qBMqf1j1bfTeTm1rFzEFSsQ1z3wAKU"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "0.5111362527152737",
+         "newMultiplier": "0.5111362527152737",
+         "newMultiplierEffectiveTimestamp": 1786062600
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "Xs3ZFkPYT2BN7qBMqf1j1bfTeTm1rFzEFSsQ1z3wAKU",
+         "name": "AstraZeneca xStock",
+         "symbol": "AZNx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/AZNx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "16652538920887"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 682
+   },
+   "executable": false,
+   "lamports": 5637600,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 682
+  },
+  "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+         "name": "Tesla xStock",
+         "symbol": "TSLAx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/TSLAx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "22963622076161"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 678
+   },
+   "executable": false,
+   "lamports": 1043189183,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 678
+  },
+  "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 6,
+      "extensions": [
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "frozen"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x"
+        }
+       },
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+         "metadataAddress": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+         "name": "Forward Industries, Inc.",
+         "symbol": "FWDI",
+         "updateAuthority": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+         "uri": "https://api.superstate.com/v1/instruments/8/solana/token-metadata"
+        }
+       }
+      ],
+      "freezeAuthority": "2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x",
+      "isInitialized": true,
+      "mintAuthority": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+      "supply": "7280819100000"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 512
+   },
+   "executable": false,
+   "lamports": 6681600,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 512
+  }
+ }
+}

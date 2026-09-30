@@ -55,6 +55,7 @@ describe('labels', () => {
             'nest:xstocks-pyth-lazer:oracle': 'token-24x7',
             'nest:jupiter-signed:oracle': 'signed-quote',
             'loopscale:xstocks-orca-vaults:oracle': 'stale',
+            'loopscale:order-book-usdc:oracle': 'frozen-at-close',
             'loopscale:secz-usdc-rwa:oracle': 'frozen-at-close'
         });
         expect(labelKindOf({ whenMarketClosed: { behaviour: 'something-new' } })).toBe('not-researched');
@@ -77,14 +78,45 @@ describe('labels', () => {
     });
 });
 
+describe('no lender row says "not researched" (30 Sep)', () => {
+    const AAPLX = 'XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp';
+    const loopscaleUsage = (markets, metrics) => ({ integrations: [{ protocolId: 'loopscale', protocolName: 'Loopscale', category: 'lending', id: 'loopscale:collateral', markets, metrics }] });
+
+    test('the Loopscale order book prices AAPLx from its BEAM account in US hours: frozen at close, with its own terms', () => {
+        const row = lenderRowsFor(AAPLX, ctx()).find((r) => r.marketId === 'loopscale:order-book-usdc');
+        expect(row).toMatchObject({ labelKind: 'frozen-at-close', maxLtvPct: 50, liquidationLtvPct: 70 });
+        expect(row.sentence).toMatch(/US market hours only/);
+        // The lending watcher reads no price account for this market: no freeze line, not a "none".
+        expect(row.freezes.watched).toBe(false);
+    });
+
+    test('an unresearched lender is never published: it stays off the item and is listed for research instead', () => {
+        const defiUsageItem = { mint: QQQX, integrations: [{ category: 'lending', protocolId: 'loopscale', protocolName: 'Loopscale', id: 'loopscale:collateral', metrics: { debtAgainstCollateralUsd: 5, maxLtvMin: 0.4 } }] };
+        const { items, unresearched } = buildClosedMarket({ tokens: [{ mint: QQQX, symbol: 'QQQx' }], oraclePricing, defiUsage: { items: [defiUsageItem] },
+            freezeRows: [], scanRows: SCAN, freezesRead: true, gapDoc: null, depthDoc: null, tracking: null, findingTypes, asOf: AS_OF });
+        expect(items.flatMap((item) => item.lenders).some((l) => l.labelKind === 'not-researched')).toBe(false);
+        expect(unresearched).toEqual([{ mint: QQQX, symbol: 'QQQx', protocolId: 'loopscale', marketId: 'loopscale:collateral' }]);
+        expect(items.every((item) => !('unresearched' in item))).toBe(true);
+    });
+
+    test('an empty loan with no terms (dust, no debt, no market) is not a lender; a loan with terms still gets a row', () => {
+        const empty = loopscaleUsage([{ configuration: null }], { debtAgainstCollateralUsd: 0, maxLtvMin: null, maxLtvMax: null });
+        expect(lenderRowsFor(QQQX, ctx({ defiUsageItem: empty })).filter((r) => r.protocolId === 'loopscale')).toEqual([]);
+        const withTerms = loopscaleUsage([{ configuration: { marketInformation: 'X' } }], { debtAgainstCollateralUsd: 10, maxLtvMin: 0.4 });
+        expect(lenderRowsFor(QQQX, ctx({ defiUsageItem: withTerms })).filter((r) => r.protocolId === 'loopscale')).toHaveLength(1);
+    });
+});
+
 describe('lenderRowsFor', () => {
-    test('NVDAx: five markets, each with its closed-market label and liquidation threshold', () => {
+    test('NVDAx: six markets, each with its closed-market label and liquidation threshold', () => {
         const rows = lenderRowsFor(NVDAX, ctx());
         expect(rows.map((r) => [r.marketId, r.label, r.liquidationLtvPct])).toEqual([
             ['kamino:sentora-xstocks-market', 'frozen at close', 73],
             ['kamino:xstocks-pool', 'frozen at close', 65],
             ['jupiter-lend:xstocks-vaults', '24/5 overnight', 75],
             ['nest:xstocks-pyth-lazer', '24/7 token price', 60],
+            // The Loopscale order book prices NVDAx separately, from its BEAM account in US hours (30 Sep).
+            ['loopscale:order-book-usdc', 'frozen at close', 60],
             ['loopscale:xstocks-orca-vaults', 'stale since 26 Aug 2026', 60]
         ]);
         const nest = rows.find((r) => r.protocolId === 'nest');
@@ -94,14 +126,14 @@ describe('lenderRowsFor', () => {
     });
 
     test('the stale label takes the watcher\'s ongoing episode: TSLAx stale since 11 Sep, still stale at the last read', () => {
-        const row = lenderRowsFor(TSLAX, ctx()).find((r) => r.protocolId === 'loopscale');
+        const row = lenderRowsFor(TSLAX, ctx()).find((r) => r.marketId === 'loopscale:xstocks-orca-vaults');
         expect(row.label).toBe('stale since 11 Sep 2026');
         expect(row.staleStillAt).toBe('2026-09-24T18:59:18Z');
     });
 
     test('a stale price the watcher has seen updated again is no longer called stale', () => {
         const ended = FREEZES.map((r) => (r.mint === NVDAX && r.protocol === 'loopscale' ? { ...r, ended_at: '2026-09-25T13:31:00Z', last_seen_stale_at: '2026-09-25T13:00:00Z' } : r));
-        const row = lenderRowsFor(NVDAX, ctx({ freezeRows: ended })).find((r) => r.protocolId === 'loopscale');
+        const row = lenderRowsFor(NVDAX, ctx({ freezeRows: ended })).find((r) => r.marketId === 'loopscale:xstocks-orca-vaults');
         expect(row.labelKind).toBe('frozen-at-close');
         expect(row.staleEndedAt).toBe('2026-09-25T13:31:00Z');
     });
@@ -111,8 +143,8 @@ describe('lenderRowsFor', () => {
         expect(state).toEqual({ since: '2026-09-11T23:59:59Z', stillAt: null, ended: null, basis: 'research' });
     });
 
-    test('a lending integration the research did not price is labelled not researched, never guessed', () => {
-        const defiUsageItem = { mint: QQQX, integrations: [{ category: 'lending', protocolId: 'loopscale', protocolName: 'Loopscale', id: 'loopscale:collateral' }] };
+    test('a lending integration the research did not price is labelled not researched, never guessed (and never published: buildClosedMarket)', () => {
+        const defiUsageItem = { mint: QQQX, integrations: [{ category: 'lending', protocolId: 'loopscale', protocolName: 'Loopscale', id: 'loopscale:collateral', metrics: { debtAgainstCollateralUsd: 5, maxLtvMin: 0.4 } }] };
         const rows = lenderRowsFor(QQQX, ctx({ defiUsageItem }));
         const loopscale = rows.find((r) => r.protocolId === 'loopscale');
         expect(loopscale.label).toBe('not researched');
@@ -149,7 +181,8 @@ describe('freezeSummary', () => {
     test('an episode that ended before the window is left out; an ongoing one never is', () => {
         const old = [{ ...FREEZES[1], started_at: '2026-08-01T00:00:00Z', ended_at: '2026-08-02T00:00:00Z' }, FREEZES[4]];
         expect(freezeSummary({ freezeRows: old, scanRows: [], marketId: 'jupiter-lend:xstocks-vaults', mint: QQQX, protocolId: 'jupiter-lend', freezesRead: true, asOf: AS_OF }).episodes).toEqual([]);
-        const ongoing = freezeSummary({ freezeRows: old, scanRows: [], marketId: 'loopscale:xstocks-orca-vaults', mint: NVDAX, protocolId: 'loopscale', freezesRead: true, asOf: AS_OF });
+        // A Loopscale market counts as watched only where the watcher reads its price account (SCAN).
+        const ongoing = freezeSummary({ freezeRows: old, scanRows: SCAN, marketId: 'loopscale:xstocks-orca-vaults', mint: NVDAX, protocolId: 'loopscale', freezesRead: true, asOf: AS_OF });
         expect(ongoing.episodes).toHaveLength(1);
         expect(ongoing.episodes[0].ongoing).toBe(true);
     });
@@ -287,7 +320,7 @@ describe('buildClosedMarket / payload / SQL', () => {
         const { items } = buildClosedMarket({ tokens, oraclePricing, defiUsage: null, freezeRows: FREEZES, scanRows: SCAN, freezesRead: true, gapDoc: null, depthDoc: null, tracking: null, findingTypes, asOf: AS_OF });
         const stats = summarize(items);
         expect(stats.tokens).toBe(2);
-        expect(stats.byKind['frozen-at-close']).toBe(4);
+        expect(stats.byKind['frozen-at-close']).toBe(5); // + the Loopscale order book (30 Sep)
         expect(stats.byKind.stale).toBe(1);
         expect(stats.freezeEpisodes).toBe(3);
         expect(items[0].depth).toEqual({ read: false, weekday: null, weekend: null });

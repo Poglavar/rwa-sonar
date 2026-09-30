@@ -85,6 +85,9 @@ step "holders";   node stocks/fetch-holders.mjs --run
 # Issuer inventory for the xStocks public float (flows.html); a failed read keeps the previous file.
 soft "xstocks float" node stocks/fetch-xstocks-float.mjs --run
 step "prices";    node stocks/fetch-reference-prices.mjs --run --force
+# Every issuer's tokenized stocks across chains, for the cards' cross-chain share (8 CoinMarketCap credits).
+step "tokenized stocks across chains"; node stocks/fetch-cmc-tokenized.mjs --run \
+    || echo "[$(date -u +%FT%TZ)] WARN CoinMarketCap listings not refreshed; the cards keep the previous file"
 # Pyth prices read straight from Solana's push-oracle accounts, keyless: the stock feed ids from the
 # reference prices just written, plus each xStocks/Ondo token's own feed, on shards 0 and 1, in one
 # bounded getMultipleAccounts pass (6 requests of 100 keys, with the Clock sysvar). For the cards'

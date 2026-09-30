@@ -3,7 +3,7 @@
 // reported by two sources becomes one event, and the window. Every rule has a case that fails when
 // the rule is removed.
 import {
-    MAX_EVENTS, TITLE_MAX, buildEventsFeed, catalogueEvents, changeRowEvents, changeRowsPsql, changeRowsSelect,
+    CHANGE_ROW_KINDS, MAX_EVENTS, TITLE_MAX, buildEventsFeed, catalogueEvents, changeRowEvents, changeRowsPsql, changeRowsSelect,
     defiEvents, eventContext, eventTime, finaliseEvents, issuerStatusChanges,
     journalEvents, mergeEvents, mergeLiveFeed, resolvedObservations, snapshotEvents, stampFirstSeen
 } from './lib/events.mjs';
@@ -152,6 +152,32 @@ describe('the public change journal', () => {
         const events = journalEvents(items, context(), null, new Map([['fee', '2026-09-19T08:07:00Z'], ['moved-hard', '2026-09-20T01:00:00Z']]));
         expect(events.find((e) => e.id === 'journal-fee').at).toBe('2026-09-19T08:07:00Z');
         expect(events.find((e) => e.id === 'journal-moved-hard').at).toBe('2026-09-19');
+    });
+});
+
+describe('watcher rows: registers and regulators (30 Sep)', () => {
+    test('a lapsed LEI of a trust-chain party is a legal event linked to its register record, per issuer', () => {
+        const [event] = changeRowEvents([row(3542, 'entity-status', {
+            subject_type: 'issuer', subject_id: 'xstocks-backed', field: 'BitGo Trust Company, Inc. · gleif:registrationStatus', after: 'LAPSED',
+            evidence: { entity: 'BitGo Trust Company, Inc.', url: 'https://search.gleif.org/#/record/254900QXDWGM1T0HGF47' }
+        })], context());
+        expect(event).toMatchObject({ category: 'legal', source: 'registry watcher', severity: 'warning',
+            href: 'https://search.gleif.org/#/record/254900QXDWGM1T0HGF47', subject: { type: 'issuer', id: 'xstocks-backed' } });
+        expect(event.title).toMatch(/^BitGo Trust Company, Inc\.: LEI registration lapsed/);
+    });
+
+    test('a regulator notice names the party, with the notice’s own date and type, and links the notice', () => {
+        const [event] = changeRowEvents([row(3547, 'regulator-notice', {
+            subject_type: 'issuer', subject_id: 'xstocks-backed', field: 'notice:finra-disciplinary:2021072094901',
+            after: 'AWCs (Letters of Acceptance, Waiver, and Consent): Alpaca Securities LLC',
+            evidence: { url: 'https://www.finra.org/x.pdf', phrases: ['Alpaca Securities LLC'], regulator: 'finra-disciplinary', noticeType: 'enforcement', matchedIn: 'subject', publishedDate: '2026-03-17' }
+        })], context());
+        expect(event.title).toBe('FINRA enforcement action names Alpaca Securities LLC (17 Mar 2026)');
+        expect(event).toMatchObject({ category: 'legal', source: 'regulator watcher', href: 'https://www.finra.org/x.pdf' });
+    });
+
+    test('the watcher rows query reads the new kinds', () => {
+        expect(CHANGE_ROW_KINDS).toEqual(expect.arrayContaining(['entity-status', 'insolvency', 'regulator-notice']));
     });
 });
 
@@ -479,7 +505,7 @@ describe('the watcher rows query', () => {
     test('reads only the kinds the rules use, public rows only, and inlines nothing but a checked instant', () => {
         const sql = changeRowsPsql({ since: '2026-08-25T00:00:00Z', judgments: true });
         expect(sql).toContain("e.detected_at >= '2026-08-25T00:00:00Z'::timestamptz");
-        expect(sql).toContain("e.kind IN ('authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term')");
+        expect(sql).toContain("e.kind IN ('authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term', 'entity-status', 'insolvency', 'regulator-notice')");
         expect(sql).toContain('sonar.change_judgment');
         expect(sql).toContain("NOT (e.kind = 'status'");
         expect(() => changeRowsPsql({ since: "2026-08-25'; DROP TABLE x; --", judgments: true })).toThrow('ISO UTC instant');

@@ -51,7 +51,7 @@ export const LEGAL_SUFFIXES = new Set([
  * suffix) — "Trust Company", "Delaware LLC", "New York Limited" — is a description, not a party,
  * and as an exact phrase it would match half of PACER.
  */
-const GENERIC_WORDS = new Set([
+export const GENERIC_WORDS = new Set([
     'the', 'a', 'an', 'and', 'of', 'trust', 'company', 'bank', 'capital', 'holdings', 'holding',
     'group', 'services', 'service', 'securities', 'financial', 'finance', 'global', 'international',
     'markets', 'market', 'management', 'partners', 'fund', 'funds', 'investments', 'digital',

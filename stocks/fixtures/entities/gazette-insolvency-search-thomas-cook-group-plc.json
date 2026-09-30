@@ -1,0 +1,294 @@
+{
+  "id": "https://www.thegazette.co.uk/insolvency/notice/data.feed?text=&quot;Thomas Cook Group plc&quot;&results-page-size=100&results-page=1",
+  "link": [
+    {
+      "@href": "https://www.thegazette.co.uk/insolvency/notice/data.feed?text=%22Thomas Cook Group plc%22&results-page-size=100&results-page=1",
+      "@rel": "alternate",
+      "@type": "application/atom+xml",
+      "@title": "ATOM"
+    },
+    {
+      "@href": "https://www.thegazette.co.uk/insolvency/notice/data.json?text=%22Thomas Cook Group plc%22&results-page=1",
+      "@rel": "first",
+      "@type": "application/json"
+    },
+    {
+      "@href": "https://www.thegazette.co.uk/insolvency/notice/data.json?text=%22Thomas Cook Group plc%22&results-page=1",
+      "@rel": "last",
+      "@type": "application/json"
+    },
+    {
+      "@href": "https://www.thegazette.co.uk/insolvency/notice/data.htm?text=%22Thomas Cook Group plc%22&results-page-size=100&results-page=1",
+      "@rel": "alternate",
+      "@title": "HTML",
+      "@type": "application/xhtml+xml"
+    },
+    {
+      "@href": "https://www.thegazette.co.uk/insolvency/notice/data.json?text=%22Thomas Cook Group plc%22&results-page-size=100&results-page=1",
+      "@rel": "self",
+      "@type": "application/json"
+    }
+  ],
+  "title": "Search Result",
+  "updated": "2026-09-30T13:45:54.474591+01:00",
+  "openSearch:Query": {
+    "@role": "request",
+    "@searchTerms": "\"Thomas Cook Group plc\""
+  },
+  "f:page-number": "1",
+  "f:page-size": "100",
+  "f:page-start": "1",
+  "f:page-stop": "3",
+  "f:total": "3",
+  "f:facets": null,
+  "entry": [
+    {
+      "id": "https://www.thegazette.co.uk/id/notice/4660296",
+      "f:status": "published",
+      "f:notice-code": "2407",
+      "f:name": "Gazette production team",
+      "f:familyName": "Gazette production team",
+      "title": "/n THOMAS COOK GROUP PLC ",
+      "link": [
+        {
+          "@href": "https://www.thegazette.co.uk/id/notice/4660296",
+          "@rel": "self"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.ttl",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.jsonld",
+          "@rel": "alternate",
+          "@title": "JSON-LD",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.rdf",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.ttl?view=linked-data",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.json?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-SIMPLE",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.rdfjson?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-RDF",
+          "@type": "application/rdf+json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.rdf?view=linked-data",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.xml?view=linked-data",
+          "@rel": "alternate",
+          "@title": "XML",
+          "@type": "application/xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4660296/data.html?view=linked-data",
+          "@rel": "alternate",
+          "@title": "HTML",
+          "@type": "application/html"
+        }
+      ],
+      "author": {
+        "name": "tso"
+      },
+      "updated": "2024-07-09T07:10:34Z",
+      "published": "2024-07-08T15:00:23",
+      "category": {
+        "@term": "Notice of Dividends"
+      },
+      "geo:Point": {
+        "geo:lat": "51.51747",
+        "geo:long": "-0.097507"
+      },
+      "content": "<div><p>In the High Court No 006326 of 2019 …</p></div>"
+    },
+    {
+      "id": "https://www.thegazette.co.uk/id/notice/4445601",
+      "f:status": "published",
+      "f:notice-code": "2406",
+      "f:name": "London",
+      "f:familyName": "Gazette",
+      "title": "THOMAS COOK GROUP PLC",
+      "link": [
+        {
+          "@href": "https://www.thegazette.co.uk/id/notice/4445601",
+          "@rel": "self"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.ttl",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.jsonld",
+          "@rel": "alternate",
+          "@title": "JSON-LD",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.rdf",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.ttl?view=linked-data",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.json?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-SIMPLE",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.rdfjson?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-RDF",
+          "@type": "application/rdf+json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.rdf?view=linked-data",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.xml?view=linked-data",
+          "@rel": "alternate",
+          "@title": "XML",
+          "@type": "application/xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/4445601/data.html?view=linked-data",
+          "@rel": "alternate",
+          "@title": "HTML",
+          "@type": "application/html"
+        }
+      ],
+      "author": {
+        "name": "tso"
+      },
+      "updated": "2023-09-22T08:37:03Z",
+      "published": "2023-09-21T01:03:01",
+      "category": {
+        "@term": "Notice of Intended Dividends"
+      },
+      "geo:Point": {
+        "geo:lat": "53.4806",
+        "geo:long": "-2.242935"
+      },
+      "content": "<div><p>In the High Court of Justice Court Number: CR-2019-006326 …</p></div>"
+    },
+    {
+      "id": "https://www.thegazette.co.uk/id/notice/3393949",
+      "f:status": "published",
+      "f:notice-code": "2452",
+      "f:name": "Mahmood",
+      "f:familyName": "Hans",
+      "title": "THOMAS COOK GROUP PLC",
+      "link": [
+        {
+          "@href": "https://www.thegazette.co.uk/id/notice/3393949",
+          "@rel": "self"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.ttl",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.jsonld",
+          "@rel": "alternate",
+          "@title": "JSON-LD",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.rdf",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.ttl?view=linked-data",
+          "@rel": "alternate",
+          "@title": "TURTLE",
+          "@type": "text/turtle"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.json?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-SIMPLE",
+          "@type": "application/json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.rdfjson?view=linked-data",
+          "@rel": "alternate",
+          "@title": "JSON-RDF",
+          "@type": "application/rdf+json"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.rdf?view=linked-data",
+          "@rel": "alternate",
+          "@title": "RDF/XML",
+          "@type": "application/rdf+xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.xml?view=linked-data",
+          "@rel": "alternate",
+          "@title": "XML",
+          "@type": "application/xml"
+        },
+        {
+          "@href": "https://www.thegazette.co.uk/notice/3393949/data.html?view=linked-data",
+          "@rel": "alternate",
+          "@title": "HTML",
+          "@type": "application/html"
+        }
+      ],
+      "author": {
+        "name": "tso"
+      },
+      "updated": "2019-10-01T11:43:04+01:00",
+      "published": "2019-09-30T09:51:40",
+      "category": {
+        "@term": "Winding-Up Orders"
+      },
+      "content": "<div><p>…</p></div>"
+    }
+  ]
+}

@@ -182,7 +182,12 @@ function firstEvidence(market) {
  * were not read in this build, which is not the same as "no freezes".
  */
 export function freezeSummary({ freezeRows, scanRows, marketId, mint, protocolId, freezesRead, asOf, windowDays = FREEZE_WINDOW_DAYS }) {
-    const watched = protocolId === 'kamino' || protocolId === 'jupiter-lend' || protocolId === 'loopscale';
+    // Kamino reserves and Jupiter Lend caches are read for every market; Loopscale only where the
+    // lending watcher reads the market's price account (a `pyth-price` scan row). A market it does
+    // not read has no freeze line at all, rather than a "none" nobody measured.
+    const watched = protocolId === 'kamino' || protocolId === 'jupiter-lend'
+        || (protocolId === 'loopscale' && (Array.isArray(scanRows) ? scanRows : [])
+            .some((row) => row?.market_id === marketId && row?.role === 'pyth-price'));
     if (!watched) return { read: freezesRead, watched: false, coverage: null, episodes: [], shorter: 0 };
     if (!freezesRead) return { read: false, watched: true, coverage: null, episodes: [], shorter: 0 };
     const asOfMs = timeMs(asOf);
@@ -243,6 +248,13 @@ export function gapsFor(gapDoc, marketId, mint, weeks = GAP_WEEKS_SHOWN) {
         }));
 }
 
+/** Whether a DeFi-scanner lending integration carries any lending terms (a market configuration, an LTV or open debt). */
+export function hasLendingTerms(integration) {
+    const m = integration?.metrics ?? {};
+    const configured = (Array.isArray(integration?.markets) ? integration.markets : []).some((market) => market?.configuration);
+    return configured || finite(m.maxLtvMin) !== null || finite(m.maxLtvMax) !== null || (finite(m.debtAgainstCollateralUsd) ?? 0) > 0;
+}
+
 /**
  * One row per lending market that takes this mint: from the research's structured markets, then any
  * lending integration the DeFi collector saw that the research did not price (labelled
@@ -299,6 +311,9 @@ export function lenderRowsFor(mint, { oraclePricing, defiUsageItem, freezeRows, 
         if (integration?.category !== 'lending') continue;
         const protocolId = text(integration.protocolId);
         if (protocolId === null || researchedProtocols.has(protocolId)) continue;
+        // A position with no lending terms (an empty Loopscale loan holding dust, no debt, no market)
+        // is not a lender taking the token: nothing prices it, so there is nothing to say about when.
+        if (!hasLendingTerms(integration)) continue;
         researchedProtocols.add(protocolId);
         const protocolName = text(integration.protocolName) ?? PROTOCOL_NAMES[protocolId] ?? protocolId;
         rows.push({
@@ -499,12 +514,17 @@ export function tokenFindings({ mint, symbol, lenders, oraclePricing, findingTyp
 export function closedMarketItem(token, ctx) {
     const mint = token?.mint;
     const symbol = text(token?.symbol) ?? mint;
-    const lenders = lenderRowsFor(mint, { ...ctx, defiUsageItem: ctx.defiUsage?.get?.(mint) ?? null });
+    const rows = lenderRowsFor(mint, { ...ctx, defiUsageItem: ctx.defiUsage?.get?.(mint) ?? null });
+    // A lender whose pricing is not researched is never published: a reader gets no "not
+    // researched" line. It is kept in `unresearched` so the build names it and it gets researched
+    // (the lending integration itself still shows under the card's DeFi support).
+    const lenders = rows.filter((l) => l.labelKind !== 'not-researched');
     const priced24x7 = lenders.some((l) => l.labelKind === 'token-24x7' || l.labelKind === 'signed-quote');
     return {
         mint,
         symbol,
         lenders,
+        unresearched: rows.filter((l) => l.labelKind === 'not-researched').map((l) => ({ protocolId: l.protocolId, marketId: l.marketId })),
         depth: lenders.length ? depthFor(ctx.depthDoc, mint, ctx.asOf) : null,
         // The weekend premium survives only where a lender's price follows the token (Nest).
         weekendMove: priced24x7 ? { read: ctx.tracking !== null && ctx.tracking !== undefined, move: weekendMoveFor(ctx.tracking, mint, ctx.weekend) } : null,
@@ -521,13 +541,16 @@ export function buildClosedMarket({ tokens, oraclePricing, defiUsage, freezeRows
         depthDoc: depthDoc ?? null, tracking: tracking ?? null, weekend: latestWeekend(tracking), findingTypes, asOf
     };
     const items = [];
+    const unresearched = [];
     for (const token of Array.isArray(tokens) ? tokens : []) {
         if (typeof token?.mint !== 'string') continue;
         const item = closedMarketItem(token, ctx);
+        for (const gap of item.unresearched) unresearched.push({ mint: item.mint, symbol: item.symbol, ...gap });
+        delete item.unresearched;
         if (item.lenders.length) items.push(item);
     }
     items.sort((a, b) => (a.mint < b.mint ? -1 : a.mint > b.mint ? 1 : 0));
-    return { items, weekend: ctx.weekend === null ? null : { from: ctx.weekend.from, to: ctx.weekend.to } };
+    return { items, unresearched, weekend: ctx.weekend === null ? null : { from: ctx.weekend.from, to: ctx.weekend.to } };
 }
 
 /** Counts for the run log. */
@@ -582,7 +605,8 @@ export function buildPayload({ generatedAt, asOf, researchReviewedAt, inputs, we
         asOf,
         researchReviewedAt: researchReviewedAt ?? null,
         freezeWindowDays: FREEZE_WINDOW_DAYS,
-        labels: LABEL_KINDS,
+        // Only the labels a published row can carry: an unresearched lender is never published.
+        labels: Object.fromEntries(Object.entries(LABEL_KINDS).filter(([kind]) => kind !== 'not-researched')),
         method: 'For each lending market that accepts a token: the price it uses while the US market is closed and its liquidation threshold, from on-chain reads recorded in stocks/data/protocol-market-research.json (oraclePricing); '
             + `collateral price freezes of ${FREEZE_FLOOR_MS / 60000} minutes or more in the last ${FREEZE_WINDOW_DAYS} days from the lending watcher (sonar.lending_price_freeze), with how far it has read; `
             + 'the Monday gap from Kamino\'s hourly reserve history (the lender\'s price at the second hourly reading after Friday\'s close against its first reading after the reopening); '

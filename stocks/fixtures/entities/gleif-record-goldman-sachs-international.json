@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    }
+  },
+  "data": {
+    "type": "lei-records",
+    "id": "W22LROWP2IHZNBB6K528",
+    "attributes": {
+      "lei": "W22LROWP2IHZNBB6K528",
+      "entity": {
+        "legalName": {
+          "name": "GOLDMAN SACHS INTERNATIONAL",
+          "language": "en"
+        },
+        "otherNames": [
+          {
+            "name": "TRUSHELFCO (NO.1266) LIMITED",
+            "language": "en",
+            "type": "PREVIOUS_LEGAL_NAME"
+          }
+        ],
+        "transliteratedOtherNames": [],
+        "legalAddress": {
+          "language": "en",
+          "addressLines": [
+            "Plumtree Court",
+            "25 Shoe Lane"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "London",
+          "region": "GB-LND",
+          "country": "GB",
+          "postalCode": "EC4A 4AU"
+        },
+        "headquartersAddress": {
+          "language": "en",
+          "addressLines": [
+            "Plumtree Court",
+            "25 Shoe Lane"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "London",
+          "region": "GB-LND",
+          "country": "GB",
+          "postalCode": "EC4A 4AU"
+        },
+        "registeredAt": {
+          "id": "RA000585",
+          "other": null
+        },
+        "registeredAs": "02263951",
+        "jurisdiction": "GB",
+        "category": "GENERAL",
+        "legalForm": {
+          "id": "57V7",
+          "other": null
+        },
+        "associatedEntity": {
+          "lei": null,
+          "name": null
+        },
+        "status": "ACTIVE",
+        "expiration": {
+          "date": null,
+          "reason": null
+        },
+        "successorEntity": {
+          "lei": null,
+          "name": null
+        },
+        "successorEntities": [],
+        "creationDate": "1988-06-02T00:00:00Z",
+        "subCategory": null,
+        "otherAddresses": [],
+        "eventGroups": []
+      },
+      "registration": {
+        "initialRegistrationDate": "2012-06-06T15:51:00Z",
+        "lastUpdateDate": "2026-04-20T11:53:18Z",
+        "status": "ISSUED",
+        "nextRenewalDate": "2027-04-27T17:39:03Z",
+        "managingLou": "529900T8BM49AURSDO55",
+        "corroborationLevel": "FULLY_CORROBORATED",
+        "validatedAt": {
+          "id": "RA000585",
+          "other": null
+        },
+        "validatedAs": "02263951",
+        "otherValidationAuthorities": []
+      },
+      "bic": [
+        "GSIIITM1XXX",
+        "GSILGB2X394",
+        "GSILGB2XCM2",
+        "GSILGB2XEQD",
+        "GSILGB2XFRM",
+        "GSILGB2XFUT",
+        "GSILGB2XGCS",
+        "GSILGB2XGSS",
+        "GSILGB2XHUL",
+        "GSILGB2XMRA",
+        "GSILGB2XPAR",
+        "GSILGB2XREP",
+        "GSILGB2XSEG",
+        "GSILGB2XSPX",
+        "GSILGB2XXXX",
+        "GSIUESM1XXX",
+        "GSIWPLP1XXX",
+        "GSJOZAJ1XXX",
+        "GSNDAEA1XXX",
+        "GSQBQAQ1XXX",
+        "GSSKSES1XXX",
+        "GSZFDEA1XXX",
+        "INZUCHZ1XXX"
+      ],
+      "mic": [
+        "GIPB",
+        "GSIL"
+      ],
+      "ocid": "gb/02263951",
+      "qcc": "QGBB4K7NGH",
+      "gem": null,
+      "spglobal": [
+        "1585508"
+      ],
+      "conformityFlag": "CONFORMING"
+    },
+    "relationships": {
+      "managing-lou": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/managing-lou"
+        }
+      },
+      "lei-issuer": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/lei-issuer"
+        }
+      },
+      "field-modifications": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/field-modifications"
+        }
+      },
+      "direct-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/direct-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/direct-parent"
+        }
+      },
+      "ultimate-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/ultimate-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/ultimate-parent"
+        }
+      },
+      "direct-children": {
+        "links": {
+          "relationship-records": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/direct-child-relationships",
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/direct-children"
+        }
+      },
+      "branches": {
+        "links": {
+          "relationship-records": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/branch-relationships",
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/branches"
+        }
+      },
+      "isins": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528/isins"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.gleif.org/api/v1/lei-records/W22LROWP2IHZNBB6K528"
+    }
+  }
+}

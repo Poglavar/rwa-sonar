@@ -334,6 +334,7 @@ function controlFlag(value) {
  * @param {object|null} input.issuer its stocks-issuers.json .issuers[] record
  * @param {object|null} input.holdersItem its stocks/data/holders.json .items[] record
  * @param {object|null} input.floatItem xStocks only: lib/xstocks-float.mjs cardFloatItem() ({floatUi, inventorySharePct, readAt})
+ * @param {object|null} input.solanaShare lib/solana-share.mjs: this token's share of its underlying on Solana
  * @param {object|null} input.venuesItem its stocks/data/venues.json .items[] record
  * @param {object|null} input.closedMarketItem its stocks-closed-market.json .items[] record (null: no lender takes it)
  * @param {object|null} input.closedMarketMeta that file's {generatedAt, researchReviewedAt, inputs}; null when the file is absent
@@ -351,6 +352,9 @@ export function buildCard(input) {
         issuer = null,
         holdersItem = null,
         floatItem = null,
+        solanaShare = null,
+        crossChain = null,
+        crossChainFetchedAt = null,
         venuesItem = null,
         closedMarketItem = null,
         closedMarketMeta = null,
@@ -597,6 +601,17 @@ export function buildCard(input) {
             lastTradedVenue: str(activity.lastTradedVenue),
             holderCount: num(market.holderCount),
             mcapUsd: num(market.mcap)
+        },
+        solanaShare: solanaShare === null ? null : {
+            ticker: solanaShare.ticker, basis: solanaShare.basis, tokens: solanaShare.tokens,
+            units: roundSignificant(solanaShare.units, 6), totalUnits: roundSignificant(solanaShare.totalUnits, 6),
+            sharePct: roundSignificant(solanaShare.sharePct, 4),
+            others: solanaShare.others.map((o) => ({ symbol: o.symbol, units: roundSignificant(o.units, 6) }))
+        },
+        crossChain: crossChain === null ? null : {
+            ticker: crossChain.ticker, totalUnits: roundSignificant(crossChain.totalUnits, 6), listings: crossChain.listings,
+            withoutSupply: crossChain.withoutSupply, units: crossChain.units === null ? null : roundSignificant(crossChain.units, 6),
+            sharePct: crossChain.sharePct === null ? null : roundSignificant(crossChain.sharePct, 4), fetchedAt: str(crossChainFetchedAt)
         },
         holders: {
             supplyUi: num(holdersItem?.supplyUi ?? token?.supplyUi),
@@ -1191,6 +1206,8 @@ export function publicCard(card) {
         closedMarket: card.closedMarket,
         pyth: card.pyth,
         depth: card.depth,
+        solanaShare: card.solanaShare,
+        crossChain: card.crossChain,
         holders: card.holders,
         control: card.control,
         keyGovernance: {
@@ -1871,7 +1888,8 @@ function gatePct(priceSource, which, words) {
 const NON_PYTH_SOURCES = {
     'chainlink-data-streams-v11-24x5-mid': 'Chainlink Data Streams',
     'protocol-signed-quote': 'a Nest-signed Jupiter quote',
-    'redstone-end-of-day': 'RedStone’s end-of-day price'
+    'redstone-end-of-day': 'RedStone’s end-of-day price',
+    'loopscale-beam-market-hours': 'Loopscale’s own BEAM price account, written during US market hours only'
 };
 
 /**
@@ -2000,8 +2018,10 @@ export function cardPyth({ token, referenceItem = null, pythOnchain = null, orac
         token: pythReading(tokenRaw, readAt),
         gap: tokenStockGap(tokenRaw, stockRaw),
         premium,
+        // A lender whose pricing the research does not cover is left out, never shown as "not researched".
         lenders: (Array.isArray(closedMarketItem?.lenders) ? closedMarketItem.lenders : [])
             .map((lender) => pythLender(lender, token?.mint, oraclePricing, index, readAt))
+            .filter((lender) => lender.uses !== 'unknown')
     };
 }
 
@@ -2087,7 +2107,8 @@ function pythLenderHtml(l) {
         return out;
     }
     if (l.uses === 'none') return `${name} prices it from ${escapeHtml(l.priceFrom)}; no Pyth feed.`;
-    return `${name}: not researched yet.`;
+    // Unreachable for a published lender: pythBlock drops `unknown` ones.
+    return '';
 }
 
 function pythBody(card) {
@@ -2962,9 +2983,9 @@ export function assetDecisionFacts(card) {
 
 function assetDecisionHtml(card) {
     const rows = assetDecisionFacts(card);
-    return disclosure({ id: 'five-things', cls: 'asset-decision', title: 'The five things to know first', open: true,
-        hint: 'Ownership, intervention, exit, DeFi and the largest risk',
-        body: `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}"${row.title ? ` title="${escapeHtml(row.title)}"` : ''}>`
+    return disclosure({ id: 'five-things', cls: 'asset-decision', title: 'Things to know first', open: true,
+        hint: 'Who can buy, ownership, intervention, exit, DeFi and the largest risk',
+        body: whoCanBuyHtml(card) + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}"${row.title ? ` title="${escapeHtml(row.title)}"` : ''}>`
             + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
             + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
         + `<div class="asset-rights"><small>Shareholder rights you get</small>`
@@ -2977,6 +2998,45 @@ function assetDecisionHtml(card) {
  * aggregate over every DEX pool; the pool table below and the exits page read DexScreener, which
  * lists fewer pools and so a different total, and each is labelled with its source.
  */
+/**
+ * "98.7% of the AAPL tokenized on Solana (2 tokens in total)": this token's share of its underlying on Solana, on outstanding supply. Nothing when
+ * the share is unknown (a leveraged or pre-IPO token, or a sibling with unknown supply).
+ */
+export function solanaShareHtml(card) {
+    const s = card.solanaShare;
+    if (!s || !Number.isFinite(s.sharePct)) return '';
+    const symbol = escapeHtml(card.symbol ?? 'This token');
+    const ticker = escapeHtml(s.ticker);
+    const basis = s.basis === 'float' ? 'the issuer’s published float: supply minus its own inventory wallets'
+        : 'supply minus the wallets we identify as the issuer’s own';
+    const title = `Counted on what investors hold (${basis}), multiplier applied, across every ${s.ticker} token on Solana RWA Sonar tracks.`;
+    const across = crossChainText(card);
+    if (s.tokens === 1) return `<p class="solana-share" title="${escapeHtml(title)}">The only tokenized ${ticker} on Solana${across}</p>`;
+    const pct = s.sharePct >= 99.95 || s.sharePct < 0.05 ? fmtPct(s.sharePct, 2) : fmtPct(s.sharePct, 1);
+    // The counts behind the share stay in the hover title and the card's JSON record.
+    const counted = `${symbol}: ${s.units.toLocaleString('en-US', { maximumFractionDigits: 2 })} of ${s.totalUnits.toLocaleString('en-US', { maximumFractionDigits: 2 })} shares held by investors; also ${s.others.map((o) => o.symbol).join(', ')}.`;
+    return `<p class="solana-share" title="${escapeHtml(`${title} ${counted}`)}"><b>${pct}</b> of the ${ticker} tokenized on Solana (${s.tokens} tokens in total)${across}</p>`;
+}
+
+/**
+ * " · 47.1% of all tokenized AAPL, across chains and issuers": this token's CoinMarketCap listing
+ * (all its chains) against every live issuer's listings of the stock. "at least" is not claimed of
+ * the share: a listing without a supply figure makes the TOTAL a floor, so the share is then "at most".
+ */
+function crossChainText(card) {
+    const c = card.crossChain;
+    if (!c || !Number.isFinite(c.totalUnits)) return '';
+    const floor = c.withoutSupply > 0;
+    const title = `CoinMarketCap's circulating supply of every live listing of ${c.ticker} across chains and issuers (${c.listings} with a supply figure`
+        + `${floor ? `, ${c.withoutSupply} without one, so the total is a floor` : ''}; wrapped copies and dead listings left out)`
+        + `${c.fetchedAt ? `, read ${fmtDateTime(c.fetchedAt)}` : ''}: ${c.totalUnits.toLocaleString('en-US', { maximumFractionDigits: 0 })} shares.`;
+    if (!Number.isFinite(c.sharePct)) {
+        return ` · <span title="${escapeHtml(title)}">${escapeHtml(c.totalUnits.toLocaleString('en-US', { maximumFractionDigits: 0 }))} ${escapeHtml(c.ticker)} tokenized across chains</span>`;
+    }
+    const pct = c.sharePct >= 99.95 || c.sharePct < 0.05 ? fmtPct(c.sharePct, 2) : fmtPct(c.sharePct, 1);
+    return ` · <span title="${escapeHtml(title)}"><b>${floor ? 'up to ' : ''}${pct}</b> of all tokenized ${escapeHtml(c.ticker)}, across chains and issuers</span>`;
+}
+
 /** The way into the universe view (universe.html), opened on this token's planet. */
 export function planetLinkHtml(card) {
     return `<a class="planet-link" href="../universe.html#*/@${encodeURIComponent(card.slug)}"><span class="badge-new">New</span>See it as a planet →</a>`;
@@ -3273,12 +3333,11 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     // compact rather than spending the card budget on indentation repeated in every card.
     ].filter((line) => line !== null).join('');
 
-    const header = `<header class="card-head"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>` +
+    const header = `<header class="card-head"><div class="card-title-row"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>${planetLinkHtml(card)}</div>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
-        planetLinkHtml(card) +
+        solanaShareHtml(card) +
         priceLineHtml(card) +
-        whoCanBuyHtml(card) +
         assetDecisionHtml(card) +
         // Discrepancies sit where a reader looks first, open and tinted red; no banner linking below.
         (card.discrepancies.length ? disclosure({ id: 'discrepancy-detail', cls: 'discrepancy-block', open: true,
@@ -3315,6 +3374,9 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
             section('reference', 'Reference & premium', referenceBody(card)) +
             `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
             section('depth', 'Depth, volume, activity', depthBody(card)) +
+            // Fetched only when a reader opens Markets (card.js wireCmc): CoinMarketCap's own price,
+            // volume and market cap for this exact mint, through our API so its key stays on the server.
+            `<section id="cmc" data-mint="${escapeHtml(card.mint)}"><h2>CoinMarketCap</h2><div class="cmc-body"><p class="cmc-empty">Loads when you open Markets.</p></div></section>` +
             section('holders', 'Holder concentration', holdersBody(card)) +
             section('venues', 'Venues', venuesBody(card)) +
             (card.issuerApi === null ? '' : section('issuer-api', 'The issuer’s own numbers', issuerApiBody(card))) + fresh('markets') });
@@ -3346,5 +3408,5 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         footerBody(card)
     ].join('');
 
-    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../stocks/lib/fmt.js${v}"></script><script src="../stocks/lib/events-view.js${v}"></script><script src="../card.js${v}"></script><script src="../nav-menus.js${v}"></script></body></html>`;
+    return `<!doctype html><html lang="en"><head>${head}</head><body class="card-page">${siteHeader}<main class="card">${body}</main><script src="../stocks/lib/api-base.js${v}"></script><script src="../stocks/lib/history-charts.js${v}"></script><script src="../stocks/lib/fmt.js${v}"></script><script src="../stocks/lib/events-view.js${v}"></script><script src="../stocks/lib/cmc-view.js${v}"></script><script src="../card.js${v}"></script><script src="../nav-menus.js${v}"></script></body></html>`;
 }

@@ -352,7 +352,7 @@ describe('renderCard', () => {
         const facts = assetDecisionFacts(card);
         expect(facts.map((row) => row.id)).toEqual(['ownership', 'control', 'exit', 'defi', 'risk']);
         expect(facts.every((row) => row.value && row.href && row.link)).toBe(true);
-        expect(html).toContain('The five things to know first');
+        expect(html).toContain('Things to know first');
         expect(html).toContain('../learn/beneficial-ownership.html');
         expect(html).toContain('../learn/issuer-control.html');
         expect(html).toContain('../learn/redemption.html');
@@ -1768,7 +1768,7 @@ describe('the price line under a card’s title', () => {
         expect(plain(line)).toBe('$333.99 on Jupiter · -0.18% vs AAPL · $591.7k DEX liquidity (Jupiter, all pools)');
         expect(line).toContain('href="#depth"');
         // The header sits right under the title, before the five facts.
-        expect(html.indexOf('class="price-line"')).toBeLessThan(html.indexOf('The five things to know first'));
+        expect(html.indexOf('class="price-line"')).toBeLessThan(html.indexOf('Things to know first'));
     });
 
     it('labels each liquidity figure with its source, so the two do not read as a contradiction', () => {
@@ -1848,7 +1848,9 @@ describe('the "who can buy" line at the top of a card', () => {
             + 'Redeeming with the issuer: only holders who pass the issuer’s KYC and are not US persons. Terms →');
         // It sits with the price line, above the five facts.
         expect(html.indexOf('class="who-can-buy"')).toBeGreaterThan(html.indexOf('class="price-line"'));
-        expect(html.indexOf('class="who-can-buy"')).toBeLessThan(html.indexOf('The five things to know first'));
+        // Since 30 Sep the line opens "Things to know first", before its five facts.
+        expect(html.indexOf('class="who-can-buy"')).toBeGreaterThan(html.indexOf('Things to know first'));
+        expect(html.indexOf('class="who-can-buy"')).toBeLessThan(html.indexOf('class="asset-decision-grid"'));
     });
 
     it('says an allowlisted token cannot be bought by an arbitrary wallet (SECZ)', () => {
@@ -1942,7 +1944,8 @@ describe('the "Where prices come from" block', () => {
         const text = visible(blockOf(html('AAPLx')));
         expect(text).toContain('Nest xStock markets values it at Pyth Lazer Crypto.AAPLX/USD (feed 1792), the token’s own 24/7 price, less its confidence interval.');
         expect(text).toContain('Kamino xStocks Pool prices it from Chainlink Data Streams; Pyth Lazer is the check: Chainlink and Crypto.AAPLX/USD (feed 1792) must agree within 5 %, and a Chainlink report more than 5 % from Equity.US.AAPL/USD (feed 922) is rejected.');
-        expect(text).toMatch(/Loopscale[^.]*: not researched yet\./);
+        // A lender whose pricing is not researched is left out; the page never says "not researched" (30 Sep).
+        expect(text).not.toMatch(/not researched/);
     });
 
     it('SPYx: the Loopscale account stopped being updated — dated, aged against its 900 s maximum, never "Pyth failed"', () => {
@@ -2264,5 +2267,15 @@ describe('each topic block states its answer and carries its own checks (30 Sep)
         const css = fs.readFileSync(path.join(REPO_ROOT, 'card.css'), 'utf8');
         expect(css).toMatch(/@media \(max-width: 480px\) \{\s*\.card-disclosure > summary \{ flex-wrap: wrap;/);
         expect(css).not.toMatch(/summary small \{ display: none/);
+    });
+});
+
+describe('no card says a lender is "not researched" (30 Sep)', () => {
+    it('a lender the research does not price is left out of "Where prices come from" instead of saying so', () => {
+        // The frozen closed-market fixture predates the research; the card must not print its gap.
+        for (const symbol of ['AAPLx', 'MSTRx', 'QQQx']) {
+            const html = renderCard(cardFor(symbol), { version: 'v' });
+            expect(html).not.toMatch(/not researched yet/i);
+        }
     });
 });

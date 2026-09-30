@@ -21,7 +21,14 @@ export const SCHEMA_FILES = [
     '2026-09-23-sonar-caselaw.sql',
     '2026-09-23-sonar-change-judgment.sql',
     '2026-09-24-sonar-lending.sql',
-    '2026-09-24-sonar-source-unreadable.sql'
+    '2026-09-24-sonar-source-unreadable.sql',
+    '2026-10-01-sonar-reserves.sql',
+    '2026-10-01-sonar-entities.sql',
+    '2026-10-01-sonar-corporate-actions.sql',
+    '2026-10-01-sonar-regulators.sql',
+    '2026-10-01-sonar-powers.sql',
+    // Always last: the one statement of the allowed change_event kinds.
+    '2026-10-01-sonar-change-event-kinds.sql'
 ];
 
 /** Files kept for the record but never applied again, with the reason. */

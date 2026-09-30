@@ -1,0 +1,438 @@
+{
+ "capturedAt": "2026-09-30T12:36:27Z",
+ "source": "https://api.superstate.com/v2/instruments",
+ "note": "Real response cut to the equities plus one fund (which the parser must skip).",
+ "payload": {
+  "HSDT": {
+   "instrument_id": 10,
+   "instrument_symbol": "HSDT",
+   "instrument_domain": "Equities",
+   "instrument_name": "Solana Company Class A Common Stock",
+   "nickname": "Solana Company",
+   "logo": "https://assets.superstate.com/instruments/logos/512041f180b3.png",
+   "description": "Solana Company (Nasdaq: HSDT) is a listed digital asset treasury dedicated to acquiring Solana (SOL), created in partnership with Pantera and Summer Capital. Focused on maximizing SOL per share by leveraging capital markets opportunities and onchain activity, Solana Company offers public market investors optimal exposure to Solana’s secular growth",
+   "created_at": "2025-11-12T21:24:25.887065Z",
+   "allowlist_type": "Public",
+   "cusip": "42328V876",
+   "issuer_entity_id": 1502,
+   "issuer_entity_name": "Solana Company",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "900": {
+      "type": "Completed",
+      "token_address": "8UBqBGXM4NF22y5TZs8PhNVwVNqsHw2jBstfcxsSZaQ4",
+      "deploy_transaction_hash": "RpxBprZTzKveY1B6vM7kM7dUB4vGnjAGRfqLNC2EPw4VbQgSDftkqroQypXaxTkYp1cMFxp7yPAadtMkP2mXfjZ",
+      "deployed_contract_address_created_at": "2025-11-14T20:49:01.405694Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": null,
+   "equity_burn_addresses_by_chain": {
+    "900": "2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E"
+   },
+   "total_supply": "0.000000",
+   "circulating_supply": "0",
+   "has_active_dip_market": false,
+   "current_price": null,
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": false,
+    "is_trade_enabled_any_chain": false,
+    "is_featured_on_frontend": false,
+    "is_portfolio_enabled": false,
+    "is_in_nav_menu": false,
+    "is_minting_enabled": true,
+    "updated_at": "2025-12-03T16:51:27.000785Z"
+   },
+   "capabilities": {},
+   "equity_info": {
+    "equity_type": "Common",
+    "current_split_multiplier": {
+     "multiplier": "1"
+    }
+   },
+   "active_announcements": []
+  },
+  "GLXY": {
+   "instrument_id": 4,
+   "instrument_symbol": "GLXY",
+   "instrument_domain": "Equities",
+   "instrument_name": "Galaxy Digital Inc. Class A Common Stock",
+   "nickname": "Galaxy Digital Inc.",
+   "logo": "https://assets.superstate.com/instruments/logos/ba4c59a8d386.png",
+   "description": "Galaxy (NASDAQ/TSX: GLXY) is a global leader in digital assets and data center infrastructure, delivering solutions that accelerate progress in finance and artificial intelligence. Galaxy's digital assets platform offers institutional access to trading, advisory, asset management, staking, self-custody, and tokenization technology. In addition, Galaxy invests in and operates cutting-edge data center infrastructure to power AI and high-performance computing, meeting the growing demand for scalable energy and compute solutions in the U.S. The Company is headquartered in New York City, with offices across North America, Europe, the Middle East and Asia.",
+   "created_at": "2025-07-10T19:25:44.746217Z",
+   "allowlist_type": "Public",
+   "cusip": "36317J209",
+   "issuer_entity_id": 547,
+   "issuer_entity_name": "Galaxy Digital Inc.",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "900": {
+      "type": "Completed",
+      "token_address": "2HehXG149TXuVptQhbiWAWDjbbuCsXSAtLTB5wc2aajK",
+      "deploy_transaction_hash": "fiECEGz69B8zLoG1ukPMMQcRx8mwc8mYWsbJ5x7atCo5MQCZpbvFSrmty7tFGvjrsHjtuWA2yyLVyAq3smsqyVt",
+      "deployed_contract_address_created_at": "2025-08-08T18:10:46.493507Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": null,
+   "equity_burn_addresses_by_chain": {
+    "900": "2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E"
+   },
+   "total_supply": "43534.100000",
+   "circulating_supply": "13399.282876",
+   "has_active_dip_market": false,
+   "current_price": "23.170070",
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": true,
+    "is_trade_enabled_any_chain": true,
+    "is_featured_on_frontend": true,
+    "is_portfolio_enabled": true,
+    "is_in_nav_menu": true,
+    "is_minting_enabled": true,
+    "updated_at": "2025-11-24T15:03:11.811388Z"
+   },
+   "capabilities": {},
+   "equity_info": {
+    "equity_type": "Common",
+    "current_split_multiplier": {
+     "multiplier": "1"
+    }
+   },
+   "active_announcements": []
+  },
+  "FWDI": {
+   "instrument_id": 8,
+   "instrument_symbol": "FWDI",
+   "instrument_domain": "Equities",
+   "instrument_name": "Forward Industries, Inc. Common Stock",
+   "nickname": "Forward Industries, Inc.",
+   "logo": "https://assets.superstate.com/instruments/logos/fa4d23831e06.svg",
+   "description": "Forward Industries, Inc. (NASDAQ: FWDI) is a global design company serving top tier medical and technology companies. For over 60 years the company has been successful in developing and producing a portfolio of outstanding products for some of the world’s leading companies and brands. In September 2025, Forward Industries initiated a Solana treasury strategy dedicated to acquiring SOL and increasing SOL-per-share through bespoke strategies and active management of the company’s treasury. Forward Industries Solana treasury strategy is supported by industry leading investors and operating partners, including Galaxy Digital, Jump Crypto, and Multicoin Capital.",
+   "created_at": "2025-09-23T17:53:12.806877Z",
+   "allowlist_type": "Public",
+   "cusip": "349862409",
+   "issuer_entity_id": 1233,
+   "issuer_entity_name": "Forward Industries, Inc.",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "900": {
+      "type": "Completed",
+      "token_address": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+      "deploy_transaction_hash": "dTftMyZccEfHdRVJEU9pFsuUhx3Mca45NsZrF83QJTB6pi28dYzZ9YYTteASuPYuYEdb1vRgGJoPKnFEfmLmQhh",
+      "deployed_contract_address_created_at": "2025-09-23T19:46:24.051041Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": null,
+   "equity_burn_addresses_by_chain": {
+    "900": "2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E"
+   },
+   "total_supply": "8453165.100000",
+   "circulating_supply": "7280819.200000",
+   "has_active_dip_market": false,
+   "current_price": "7.985010",
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": true,
+    "is_trade_enabled_any_chain": true,
+    "is_featured_on_frontend": true,
+    "is_portfolio_enabled": true,
+    "is_in_nav_menu": true,
+    "is_minting_enabled": true,
+    "updated_at": "2025-12-18T13:06:17.615356Z"
+   },
+   "capabilities": {},
+   "equity_info": {
+    "equity_type": "Common",
+    "current_split_multiplier": {
+     "multiplier": "1"
+    }
+   },
+   "active_announcements": []
+  },
+  "SBET": {
+   "instrument_id": 9,
+   "instrument_symbol": "SBET",
+   "instrument_domain": "Equities",
+   "instrument_name": "SharpLink Gaming, Inc. Common Stock",
+   "nickname": "SharpLink Gaming, Inc.",
+   "logo": "https://assets.superstate.com/instruments/logos/fad83343d798.png",
+   "description": "SharpLink Gaming, Inc. (Nasdaq: SBET) is one of the world’s largest publicly traded companies to adopt ETH as its primary treasury reserve asset – a move that aligns the Company with the future of digital capital and gives investors direct exposure to Ethereum, the world’s leading smart-contract platform and second largest digital asset.",
+   "created_at": "2025-09-25T15:36:50.525994Z",
+   "allowlist_type": "Public",
+   "cusip": "820014405",
+   "issuer_entity_id": 1246,
+   "issuer_entity_name": "Sharplink Gaming, Inc.",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "1": {
+      "type": "Completed",
+      "token_address": "0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51",
+      "deploy_transaction_hash": "0x44a243b695bf33b357c83a5cd9acf228ad6fcf1f6bca7dc5c61e56741e95419e",
+      "deployed_contract_address_created_at": "2025-09-25T21:25:40.427030Z"
+     },
+     "59144": {
+      "type": "Completed",
+      "token_address": "0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51",
+      "deploy_transaction_hash": "0xa51aa74f8757744b6293fbf8886c1a5020552ecd8aa0260482241a5c1923b002",
+      "deployed_contract_address_created_at": "2025-10-30T18:23:51.428883Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": null,
+   "equity_burn_addresses_by_chain": {
+    "1": "0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51",
+    "59144": "0x139c3d0d52c58FD1ea10b44981Aaf21976F7FF51"
+   },
+   "total_supply": "1912.000000",
+   "circulating_supply": "0",
+   "has_active_dip_market": false,
+   "current_price": "9.465000",
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": true,
+    "is_trade_enabled_any_chain": false,
+    "is_featured_on_frontend": false,
+    "is_portfolio_enabled": false,
+    "is_in_nav_menu": false,
+    "is_minting_enabled": true,
+    "updated_at": "2026-05-13T16:15:10.014939Z"
+   },
+   "capabilities": {},
+   "equity_info": {
+    "equity_type": "Common",
+    "current_split_multiplier": {
+     "multiplier": "1"
+    }
+   },
+   "active_announcements": []
+  },
+  "EXOD": {
+   "instrument_id": 7,
+   "instrument_symbol": "EXOD",
+   "instrument_domain": "Equities",
+   "instrument_name": "Exodus Movement, Inc. Class A Common Stock",
+   "nickname": "Exodus Movement, Inc.",
+   "logo": "https://assets.superstate.com/instruments/logos/01ab6387a9ce.png",
+   "description": "Exodus (NYSE American: EXOD) is a financial technology leader empowering individuals and businesses with secure, user-friendly crypto software solutions. Since 2015, Exodus has made digital assets accessible to everyone through its multi-asset crypto wallets prioritizing design and ease of use. With self-custodial wallets, Exodus puts customers in full control of their funds, enabling them to swap, buy, and sell crypto. Its business solutions include Passkeys Wallet and XO Swap, industry-leading tools for embedded crypto wallets and swap aggregation. Exodus is committed to driving the future of accessible and secure finance.",
+   "created_at": "2025-09-02T18:56:12.488485Z",
+   "allowlist_type": "Public",
+   "cusip": "30209R106",
+   "issuer_entity_id": 772,
+   "issuer_entity_name": "Exodus Movement, Inc.",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "900": {
+      "type": "Completed",
+      "token_address": "3DBudkWQNbXGAjzEAtpjMKorb76sjozcHCzc8ZtkHDAQ",
+      "deploy_transaction_hash": "3TCUyKGr3TF86J92ATGq8sRfeUMoatWVkJpsDdo47TGks85Zrc5YasuRhLxkTRc4RbFHddYziJxdzBDbxDZUR4tS",
+      "deployed_contract_address_created_at": "2025-10-16T18:25:08.852114Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": null,
+   "equity_burn_addresses_by_chain": {
+    "900": "2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E"
+   },
+   "total_supply": "310.000000",
+   "circulating_supply": "60.000000",
+   "has_active_dip_market": false,
+   "current_price": null,
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": false,
+    "is_trade_enabled_any_chain": false,
+    "is_featured_on_frontend": false,
+    "is_portfolio_enabled": false,
+    "is_in_nav_menu": false,
+    "is_minting_enabled": true,
+    "updated_at": "2026-05-13T16:15:08.556132Z"
+   },
+   "capabilities": {},
+   "equity_info": {
+    "equity_type": "Common",
+    "current_split_multiplier": {
+     "multiplier": "1"
+    }
+   },
+   "active_announcements": []
+  },
+  "CUSHY": {
+   "instrument_id": 13,
+   "instrument_symbol": "CUSHY",
+   "instrument_domain": "Funds",
+   "instrument_name": "Coinbase Tokenized Stablecoin Yield US Feeder Fund LTD",
+   "nickname": "Coinbase USD Stablecoin Yield Fund",
+   "logo": "https://assets.superstate.com/instruments/logos/8a60c0647d86.png",
+   "description": null,
+   "created_at": "2026-05-13T23:03:09.933707Z",
+   "allowlist_type": "Private",
+   "cusip": null,
+   "issuer_entity_id": 2345,
+   "issuer_entity_name": "Coinbase Asset Management, LLC",
+   "deploy_status_by_chain": {
+    "by_chain": {
+     "900": {
+      "type": "Completed",
+      "token_address": "HSWt2izBvgNnxG982DcsysGikDnrgSq3EAWMYCSMGziP",
+      "deploy_transaction_hash": "3nNZxgsBJ14u1v2w6DHgp59NDn2Niop1DfP2cRQscpu1RmLy2kk41A8gnGYdT5P8EC18VTdgs4fnbbPQWYwUgv4d",
+      "deployed_contract_address_created_at": "2026-05-13T23:12:21.082965Z"
+     },
+     "8453": {
+      "type": "Completed",
+      "token_address": "0x140C50f6dB6932DC5758937c05122b7881C57F8C",
+      "deploy_transaction_hash": "0x66a9de13fc6ae76d8013e9ad494e40d94fad6079d976422e3ed98329faf377e3",
+      "deployed_contract_address_created_at": "2026-08-05T19:12:55.288668Z"
+     }
+    }
+   },
+   "fund_redemption_addresses_by_chain": {
+    "900": "2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E",
+    "8453": "0x140C50f6dB6932DC5758937c05122b7881C57F8C"
+   },
+   "equity_burn_addresses_by_chain": null,
+   "total_supply": "269804.135411",
+   "circulating_supply": "269804.135411",
+   "has_active_dip_market": false,
+   "current_price": null,
+   "features": {
+    "is_announced": true,
+    "is_token_enabled_any_chain": false,
+    "is_trade_enabled_any_chain": false,
+    "is_featured_on_frontend": true,
+    "is_portfolio_enabled": true,
+    "is_in_nav_menu": false,
+    "is_minting_enabled": true,
+    "updated_at": "2026-06-10T13:48:09.928205Z"
+   },
+   "capabilities": {
+    "onboarding": {
+     "self_serve_enabled": false,
+     "manual_shareholder_onboarding_enabled": true,
+     "fund_admin_contact": "https://cbam.coinbase.com/contactus"
+    },
+    "purchase": {
+     "self_serve_enabled": false
+    }
+   },
+   "fund_configuration": {
+    "distributions_enabled": false,
+    "nav_pricing_type": "Monthly",
+    "wire_instructions": null,
+    "nav_source": "SftpAccounting",
+    "superstate_manages_redemptions": false,
+    "redemption_frequency": "quarterly",
+    "has_subscription_nav_per_share": false,
+    "manual_subscriptions_allowed": true,
+    "base_currency": {
+     "instrument_id": 11,
+     "symbol": "USD"
+    }
+   },
+   "marketing_metadata": {
+    "status": "Public",
+    "go_live_at": "2026-08-14T18:26:54.697962Z",
+    "about_text": "CUSHY seeks to generate yield from high-quality stablecoin private credit, direct lending, and tokenized credit opportunities. CUSHY targets yield similar to the Secured Overnight Financing Rate SOFR + 400-700bps+. While the strategy may expand over time, the credit exposure primarily comes from three core areas, including: Liquid Public Credit; Senior Secured, Direct Lending & Asset Backed Finance; and Opportunistic Credit & Structural Alpha.",
+    "hero_image_url": "https://assets.superstate.com/images/2026/04/20/og-cushy.jpg",
+    "og_image_url": "https://assets.superstate.com/images/2026/04/20/og-cushy.jpg",
+    "historical_chart_color_token": null,
+    "cta_primary_text": "Register",
+    "cta_primary_url": "https://cbam.coinbase.com/contactus",
+    "cta_secondary_text": "Learn more",
+    "cta_secondary_url": "https://cbam.coinbase.com/cushy-details",
+    "cta_body_text": "Register to access tokenized shares of Coinbase USD Stablecoin Yield Fund. Follow the instructions provided by the issuer or fund administrator to complete onboarding.",
+    "fee_display": "0.75%",
+    "tradingview_symbol": null,
+    "issuer_homepage_url": null,
+    "disclosures": null,
+    "supplemental_key_fact_rows": [
+     {
+      "name": "Documentation",
+      "link_label": "Read more →",
+      "link_href": "https://docs.superstate.com/investors/tokenized-funds/available-funds/coinbase-cushy"
+     },
+     {
+      "name": "Custodian",
+      "value": "Coinbase Custody Trust Company, LLC and other qualified custodians"
+     },
+     {
+      "name": "Auditor",
+      "value": "Deloitte & Touche Chartered Accountants"
+     },
+     {
+      "name": "Investment manager",
+      "value": "Coinbase Asset Management, LLC"
+     },
+     {
+      "name": "Fund administrator",
+      "value": "Northern Trust Global Fund Services Cayman Limited"
+     },
+     {
+      "name": "Transfer agent",
+      "value": "Superstate Services LLC"
+     },
+     {
+      "name": "Domicile",
+      "value": "Cayman"
+     },
+     {
+      "name": "Structure",
+      "value": "506(c) -- Open-ended"
+     },
+     {
+      "name": "Eligible investors",
+      "value": "US UBO, Qualified Purchasers, Non-US UBOs qualified per their jurisdiction"
+     },
+     {
+      "name": "Website",
+      "link_label": "cbam.coinbase.com",
+      "link_href": "https://cbam.coinbase.com/"
+     },
+     {
+      "name": "Subscription timing",
+      "value": "Monthly"
+     },
+     {
+      "name": "Redemption timing",
+      "value": "Quarterly"
+     }
+    ],
+    "feature_rows": null,
+    "disclaimers": [
+     {
+      "kind": "paragraph",
+      "text": "Prospective investors must review the full final offering documents before investing. Virtual currencies are highly volatile with unique risks. Past performance does not guarantee future results. Target and net returns (quoted as a spread over SOFR) are hypothetical, illustrative, and may not be achieved. Third-party projections included herein and in linked materials are estimates only; Coinbase Asset Management does not guarantee this growth. CME Reference Rates (BRR) align with the 4PM NY cutoff."
+     },
+     {
+      "kind": "paragraph",
+      "text": "Target returns are hypothetical and presented for illustrative purposes only. Hypothetical results have inherent limitations: they are prepared with hindsight, do not involve financial risk, and cannot account for the emotional or market factors of actual trading. No representation is made that any account will achieve similar profits or losses; actual results often differ sharply. NO HYPOTHETICAL TRADING RECORD CAN COMPLETELY ACCOUNT FOR THE IMPACT OF FINANCIAL RISK IN ACTUAL TRADING. FOR EXAMPLE, THE ABILITY TO WITHSTAND LOSSES OR TO ADHERE TO A PARTICULAR TRADING PROGRAM IN SPITE OF TRADING LOSSES ARE MATERIAL POINTS WHICH CAN ALSO ADVERSELY AFFECT ACTUAL TRADING RESULTS. THERE ARE NUMEROUS OTHER FACTORS RELATED TO THE MARKETS IN GENERAL OR TO THE IMPLEMENTATION OF ANY SPECIFIC TRADING PROGRAM WHICH CANNOT BE FULLY ACCOUNTED FOR IN THE PREPARATION OF HYPOTHETICAL PERFORMANCE RESULTS AND ALL OF WHICH CAN ADVERSELY AFFECT ACTUAL TRADING RESULTS. Private Credit opportunities are evaluated by managers with 30+ years of experience. Do not base investment decisions on forward-looking statements. See fund documents for a full description of risks."
+     },
+     {
+      "kind": "paragraph",
+      "text": "Net returns account for a management fee, a 10% performance fee, and operating costs (custodial/admin). The management fee for the standard Share Class A is 1.25%. The management for the tokenized Share Class T is 0.75%. This is not an exhaustive list of fees. See offering documents for a full fee schedule."
+     },
+     {
+      "kind": "paragraph",
+      "text": "The information contained herein and in linked materials is confidential, cannot be distributed without the consent of COINBASE ASSET MANAGEMENT, LLC (together with, or separately as applicable, CBAM (CAYMAN) LTD. SEZC, \"CBAM\"), and is intended solely for use by accredited investors and qualified eligible persons. This information herein and in linked materials is not a solicitation for investment, is not comprehensive, and is qualified by (and if contradictory with the offering documents, superseded by) the relevant fund offering documents. The information herein and in linked materials is not an offer to sell or a solicitation of an offer to buy any securities and may not be relied upon in connection with the purchase or sale of any security. Any such offer would only be made by means of offering documents."
+     },
+     {
+      "kind": "paragraph",
+      "text": "Please note that the Information is being provided to you because we believe (based on statements and other indications you have provided) that (i) you have sufficient knowledge, experience and professional advice to understand and to make your own independent evaluation of the merits, risks and suitability of making an investment of these types, (ii) you are not relying on CBAM for information, advice or recommendations of any sort, except factual information, about the terms of any proposed investment, and (iii) you have sufficient financial wherewithal to accept the risks of the transaction. CBAM does not give any tax, accounting, legal or regulatory advice to you and you should satisfy yourself in this regard and ensure that you consult with appropriate advisors to assist in understanding the transactions contemplated by this information herein and in linked materials. Information provided reflects CBAM’s views as of a particular time and are subject to change without notice. Prospective investors should not make investment decisions on the basis of any forward-looking statements contained herein or in linked materials and should verify the information before relying on its accuracy."
+     },
+     {
+      "kind": "paragraph",
+      "text": "This Presentation contains statements of opinion, including but not limited to, CBAM’s analysis and views with respect to: digital assets, projected inflation, macroeconomic policy, the market adoption of digital assets, and the market in general. Statements of opinion herein have been formulated using CBAM’s experience, research, and/or analysis, however, such statements also contain elements of subjectivity and are often subjective in nature. In addition, when conducting the analyses on which it bases statements of opinion, CBAM will incorporate assumptions, which in some cases may be shown to be inaccurate in the future, including in certain material respects."
+     }
+    ],
+    "hide_holdings_section": true,
+    "hide_historical_data_section": true,
+    "cta_primary_open_in_new_tab": true,
+    "cta_secondary_open_in_new_tab": true
+   },
+   "active_announcements": []
+  }
+ }
+}

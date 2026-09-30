@@ -50,6 +50,7 @@
     "stocks:watch-lending": "node stocks/watch-lending.mjs --run",
     "stocks:watch-caselaw": "node stocks/watch-caselaw.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
+    "stocks:watch-regulators": "node stocks/watch-regulators.mjs --run",
     "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/'"
   },
   "devDependencies": {

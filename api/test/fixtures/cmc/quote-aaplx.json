@@ -1,0 +1,116 @@
+{
+ "data": {
+  "36994": {
+   "tags": [
+    {
+     "slug": "defi",
+     "name": "DeFi",
+     "category": "CATEGORY"
+    },
+    {
+     "slug": "ethereum-ecosystem",
+     "name": "Ethereum Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "tokenized-stock",
+     "name": "Tokenized Stock",
+     "category": "CATEGORY"
+    },
+    {
+     "slug": "solana-ecosystem",
+     "name": "Solana Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "arbitrum-ecosystem",
+     "name": "Arbitrum Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "bnb-chain-ecosystem",
+     "name": "BNB Chain Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "toncoin-ecosystem",
+     "name": "Toncoin Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "x-layer-ecosystem",
+     "name": "X Layer Ecosystem",
+     "category": "PLATFORM"
+    },
+    {
+     "slug": "internet-capital-markets",
+     "name": "Internet Capital Markets",
+     "category": "CATEGORY"
+    },
+    {
+     "slug": "tokenized-assets",
+     "name": "Tokenized Assets",
+     "category": "CATEGORY"
+    },
+    {
+     "slug": "xstocks-ecosystem",
+     "name": "xStocks Ecosystem",
+     "category": "CATEGORY"
+    }
+   ],
+   "id": 36994,
+   "name": "Apple tokenized stock (xStock)",
+   "symbol": "AAPLX",
+   "slug": "apple-tokenized-stock-xstock",
+   "is_active": 1,
+   "infinite_supply": true,
+   "is_fiat": 0,
+   "circulating_supply": 39442.47926803,
+   "total_supply": 637629.74630235,
+   "max_supply": null,
+   "date_added": "2025-07-01T07:38:36.000Z",
+   "num_market_pairs": 86,
+   "cmc_rank": 869,
+   "last_updated": "2026-09-30T12:34:00.000Z",
+   "tvl_ratio": null,
+   "platform": {
+    "id": 5426,
+    "slug": "solana",
+    "name": "Solana",
+    "symbol": "SOL",
+    "token_address": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp"
+   },
+   "self_reported_circulating_supply": null,
+   "self_reported_market_cap": null,
+   "minted_market_cap": 211525581.4,
+   "quote": {
+    "USD": {
+     "price": 331.73731718810495,
+     "volume_24h": 8619522.05660567,
+     "volume_change_24h": 19.3704,
+     "cex_volume_24h": 7628190.43296919,
+     "dex_volume_24h": 991331.62363648,
+     "percent_change_1h": 0.54295704,
+     "percent_change_24h": -1.80514082,
+     "percent_change_7d": -2.74373873,
+     "percent_change_30d": 3.96406359,
+     "percent_change_60d": 7.57937558,
+     "percent_change_90d": 12.27525821,
+     "market_cap": 13084542.255623722,
+     "market_cap_dominance": 0,
+     "fully_diluted_market_cap": 211525581.4,
+     "tvl": null,
+     "last_updated": "2026-09-30T12:34:59.000Z"
+    }
+   }
+  }
+ },
+ "status": {
+  "timestamp": "2026-09-30T12:36:39.971Z",
+  "error_code": 0,
+  "error_message": null,
+  "elapsed": 6,
+  "credit_count": 1,
+  "notice": null
+ }
+}

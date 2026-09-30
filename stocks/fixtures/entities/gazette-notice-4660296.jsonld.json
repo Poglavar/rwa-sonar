@@ -1,0 +1,303 @@
+{
+  "@graph" : [ {
+    "@id" : "http://business.data.gov.uk/id/company/06091951",
+    "@type" : "gazorg:LimitedCompany",
+    "companyNumber" : "06091951",
+    "hasPrincipalTradingAddress" : "https://www.thegazette.co.uk/id/notice/4660296#company-1-PrincipalTradingAddress-1",
+    "hasRegisteredOffice" : "https://www.thegazette.co.uk/id/notice/4660296#company-1-CompanyRegisteredOffice-1",
+    "isTradingAs" : "Thomas Cook Group plc",
+    "gazorg:name" : "\n               THOMAS COOK GROUP PLC                                                ",
+    "status" : "Official Receivers ref: LQD5764399"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000010929",
+    "rdfs:label" : "Newham"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000011105",
+    "rdfs:label" : "City and County of the City of London"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000018821",
+    "rdfs:label" : "Manchester"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/edition/London",
+    "@type" : "gaz:Edition",
+    "editionName" : "London"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/edition/London/issue/64454",
+    "@type" : "gaz:Issue",
+    "hasEdition" : "https://www.thegazette.co.uk/id/edition/London",
+    "hasIssueNumber" : "64454"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296",
+    "@type" : [ "insolvency:NoticeOfDividends", "gaz:Notice" ],
+    "publisher" : "TSO (The Stationery Office), customer.services@thegazette.co.uk",
+    "sameAs" : "https://www.thegazette.co.uk/id/edition/London/issue/64454/notice/4660296",
+    "alternateOf" : "http://www.london-gazette.co.uk/id/issues/64454/notices/4660296",
+    "has_anchor" : "https://www.thegazette.co.uk/id/notice/4660296",
+    "has_provenance" : "https://www.thegazette.co.uk/id/notice/4660296/provenance",
+    "gaz:hasNoticeCode" : 2407,
+    "hasNoticeID" : "4660296",
+    "gaz:hasNoticeNumber" : 4660296,
+    "hasPageNumber" : "13272",
+    "hasPublicationDate" : "2024-07-08T15:00:23",
+    "isAbout" : "https://www.thegazette.co.uk/id/notice/4660296#notifiableThing",
+    "isInIssue" : "https://www.thegazette.co.uk/id/edition/London/issue/64454"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#administrator-1-AddressLineGroup-1",
+    "@type" : "vcard:Address",
+    "label" : "16th Floor, 1 Westfield Avenue Stratford E20 1HZ",
+    "postcode" : "https://www.thegazette.co.uk/id/postcode/E201HZ"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#administrator-1-PersonName-1",
+    "@type" : [ "foaf:Agent", "person:Role" ],
+    "adr" : "https://www.thegazette.co.uk/id/notice/4660296#administrator-1-AddressLineGroup-1",
+    "familyName" : "Chapman",
+    "firstName" : "David",
+    "name" : "David Chapman",
+    "hasIPCapacity" : "Liquidator",
+    "hasRole" : "https://www.thegazette.co.uk/id/notice/4660296#administrator-1-PersonName-1-role",
+    "roleName" : "Liquidator"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#company-1-CompanyRegisteredOffice-1",
+    "@type" : "vcard:Address",
+    "label" : "\n          Ship Canal House 8th Floor, 98 King Street, Manchester, M2 4WU",
+    "postcode" : "https://www.thegazette.co.uk/id/postcode/M24WU"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#company-1-PrincipalTradingAddress-1",
+    "@type" : "vcard:Address",
+    "label" : "3rd Floor South Building 200 Aldersgate London EC1A 4HD United Kingdom",
+    "postcode" : "https://www.thegazette.co.uk/id/postcode/EC1A4HD"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#court",
+    "@type" : "court:Court",
+    "courtName" : "\n          High Court"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#courtCase",
+    "@type" : "court:CourtCase",
+    "caseNumber" : "006326",
+    "caseYear" : "2019",
+    "hasCourt" : "https://www.thegazette.co.uk/id/notice/4660296#court"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/notice/4660296#notifiableThing",
+    "@type" : [ "gaz:NotifiableThing", "insolvency:CorporateInsolvency" ],
+    "hasCompany" : "http://business.data.gov.uk/id/company/06091951",
+    "hasCourtCase" : "https://www.thegazette.co.uk/id/notice/4660296#courtCase",
+    "hasPrimaryIP" : "https://www.thegazette.co.uk/id/notice/4660296#IP1",
+    "postcode" : "https://www.thegazette.co.uk/id/postcode/M24WU",
+    "email" : [ "tcukcreditors@alixpartners.com", "tcukcreditors@alixpartners.com \n" ],
+    "relatedDate" : [ "2024-07-08", "2024-08-02" ]
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/postcode/E201HZ",
+    "rdfs:label" : "E20 1HZ",
+    "lat" : "51.542808",
+    "long" : "-0.009977",
+    "administrative-area" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000010929"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/postcode/EC1A4HD",
+    "rdfs:label" : "EC1A 4HD",
+    "lat" : "51.517471",
+    "long" : "-0.097507",
+    "administrative-area" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000011105"
+  }, {
+    "@id" : "https://www.thegazette.co.uk/id/postcode/M24WU",
+    "rdfs:label" : "M2 4WU",
+    "lat" : "53.480597",
+    "long" : "-2.242935",
+    "administrative-area" : "https://www.thegazette.co.uk/id/administrative-area/gb/7000000000018821"
+  } ],
+  "@context" : {
+    "courtName" : {
+      "@id" : "https://www.thegazette.co.uk/def/court#courtName"
+    },
+    "postcode" : {
+      "@id" : "https://www.thegazette.co.uk/def/postcode",
+      "@type" : "@id"
+    },
+    "label" : {
+      "@id" : "http://www.w3.org/2006/vcard/ns#label"
+    },
+    "hasCourt" : {
+      "@id" : "https://www.thegazette.co.uk/def/court#hasCourt",
+      "@type" : "@id"
+    },
+    "caseNumber" : {
+      "@id" : "https://www.thegazette.co.uk/def/court#caseNumber"
+    },
+    "caseYear" : {
+      "@id" : "https://www.thegazette.co.uk/def/court#caseYear",
+      "@type" : "http://www.w3.org/2001/XMLSchema#gYear"
+    },
+    "name" : {
+      "@id" : "http://xmlns.com/foaf/0.1/name"
+    },
+    "adr" : {
+      "@id" : "http://www.w3.org/2006/vcard/ns#adr",
+      "@type" : "@id"
+    },
+    "hasRole" : {
+      "@id" : "https://www.thegazette.co.uk/def/person#hasRole",
+      "@type" : "@id"
+    },
+    "hasIPCapacity" : {
+      "@id" : "https://www.thegazette.co.uk/def/person#hasIPCapacity"
+    },
+    "roleName" : {
+      "@id" : "https://www.thegazette.co.uk/def/person#roleName"
+    },
+    "familyName" : {
+      "@id" : "http://xmlns.com/foaf/0.1/familyName"
+    },
+    "firstName" : {
+      "@id" : "http://xmlns.com/foaf/0.1/firstName"
+    },
+    "relatedDate" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#relatedDate",
+      "@type" : "http://www.w3.org/2001/XMLSchema#date"
+    },
+    "email" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#email"
+    },
+    "hasPrimaryIP" : {
+      "@id" : "https://www.thegazette.co.uk/def/insolvency#hasPrimaryIP",
+      "@type" : "@id"
+    },
+    "hasCourtCase" : {
+      "@id" : "https://www.thegazette.co.uk/def/insolvency#hasCourtCase",
+      "@type" : "@id"
+    },
+    "hasCompany" : {
+      "@id" : "https://www.thegazette.co.uk/def/insolvency#hasCompany",
+      "@type" : "@id"
+    },
+    "long" : {
+      "@id" : "http://www.w3.org/2003/01/geo/wgs84_pos#long",
+      "@type" : "http://www.w3.org/2001/XMLSchema#decimal"
+    },
+    "lat" : {
+      "@id" : "http://www.w3.org/2003/01/geo/wgs84_pos#lat",
+      "@type" : "http://www.w3.org/2001/XMLSchema#decimal"
+    },
+    "administrative-area" : {
+      "@id" : "https://www.thegazette.co.uk/def/administrative-area",
+      "@type" : "@id"
+    },
+    "editionName" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#editionName"
+    },
+    "has_anchor" : {
+      "@id" : "http://www.w3.org/ns/prov#has_anchor",
+      "@type" : "@id"
+    },
+    "publisher" : {
+      "@id" : "http://purl.org/dc/elements/1.1/publisher"
+    },
+    "hasNoticeNumber" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasNoticeNumber",
+      "@type" : "http://www.w3.org/2001/XMLSchema#integer"
+    },
+    "hasNoticeID" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasNoticeID"
+    },
+    "hasPageNumber" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasPageNumber"
+    },
+    "alternateOf" : {
+      "@id" : "http://www.w3.org/ns/prov#alternateOf",
+      "@type" : "@id"
+    },
+    "isAbout" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#isAbout",
+      "@type" : "@id"
+    },
+    "hasPublicationDate" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasPublicationDate",
+      "@type" : "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "isInIssue" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#isInIssue",
+      "@type" : "@id"
+    },
+    "has_provenance" : {
+      "@id" : "http://www.w3.org/ns/prov#has_provenance",
+      "@type" : "@id"
+    },
+    "sameAs" : {
+      "@id" : "http://www.w3.org/2002/07/owl#sameAs",
+      "@type" : "@id"
+    },
+    "hasNoticeCode" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasNoticeCode",
+      "@type" : "http://www.w3.org/2001/XMLSchema#integer"
+    },
+    "hasRegisteredOffice" : {
+      "@id" : "https://www.thegazette.co.uk/def/organisation#hasRegisteredOffice",
+      "@type" : "@id"
+    },
+    "hasPrincipalTradingAddress" : {
+      "@id" : "https://www.thegazette.co.uk/def/organisation#hasPrincipalTradingAddress",
+      "@type" : "@id"
+    },
+    "status" : {
+      "@id" : "https://www.thegazette.co.uk/def/organisation#status"
+    },
+    "isTradingAs" : {
+      "@id" : "https://www.thegazette.co.uk/def/organisation#isTradingAs"
+    },
+    "companyNumber" : {
+      "@id" : "https://www.thegazette.co.uk/def/organisation#companyNumber"
+    },
+    "hasIssueNumber" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasIssueNumber"
+    },
+    "hasEdition" : {
+      "@id" : "https://www.thegazette.co.uk/def/publication#hasEdition",
+      "@type" : "@id"
+    },
+    "public-finance" : "https://www.thegazette.co.uk/def/public-finance#",
+    "geonames" : "http://www.geonames.org/ontology#",
+    "personal-legal" : "https://www.thegazette.co.uk/def/personal-legal#",
+    "owl" : "http://www.w3.org/2002/07/owl#",
+    "church" : "https://www.thegazette.co.uk/def/church#",
+    "xsd" : "http://www.w3.org/2001/XMLSchema#",
+    "spatialrelations" : "http://data.ordnancesurvey.co.uk/ontology/spatialrelations/",
+    "rdfs" : "http://www.w3.org/2000/01/rdf-schema#",
+    "parliament" : "https://www.thegazette.co.uk/def/parliament#",
+    "geo" : "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "agriculture" : "https://www.thegazette.co.uk/def/agriculture#",
+    "insolvency" : "https://www.thegazette.co.uk/def/insolvency#",
+    "partnerships" : "https://www.thegazette.co.uk/def/partnerships#",
+    "gazorg" : "https://www.thegazette.co.uk/def/organisation#",
+    "military" : "https://www.thegazette.co.uk/def/military#",
+    "telecom" : "https://www.thegazette.co.uk/def/telecom#",
+    "honours" : "https://www.thegazette.co.uk/def/honours#",
+    "state" : "https://www.thegazette.co.uk/def/state#",
+    "societies" : "https://www.thegazette.co.uk/def/societies#",
+    "prov" : "http://www.w3.org/ns/prov#",
+    "foaf" : "http://xmlns.com/foaf/0.1/",
+    "admingeo" : "http://data.ordnancesurvey.co.uk/ontology/admingeo/",
+    "legislation" : "https://www.thegazette.co.uk/def/legislation#",
+    "energy" : "https://www.thegazette.co.uk/def/energy#",
+    "gaz" : "https://www.thegazette.co.uk/def/publication#",
+    "appointments" : "https://www.thegazette.co.uk/def/appointments#",
+    "os" : "http://data.ordnancesurvey.co.uk/ontology/postcode/",
+    "org" : "http://www.w3.org/ns/org#",
+    "royal-warrants" : "https://www.thegazette.co.uk/def/royal-warrants#",
+    "health" : "https://www.thegazette.co.uk/def/health#",
+    "vcard" : "http://www.w3.org/2006/vcard/ns#",
+    "transport" : "https://www.thegazette.co.uk/def/transport#",
+    "companies-partnerships" : "https://www.thegazette.co.uk/def/companies-partnerships#",
+    "court" : "https://www.thegazette.co.uk/def/court#",
+    "water" : "https://www.thegazette.co.uk/def/water#",
+    "planning" : "https://www.thegazette.co.uk/def/planning#",
+    "environment" : "https://www.thegazette.co.uk/def/environment#",
+    "other-notices" : "https://www.thegazette.co.uk/def/other-notices#",
+    "rdf" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "person" : "https://www.thegazette.co.uk/def/person#",
+    "gazdef" : "https://www.thegazette.co.uk/def/",
+    "authority" : "https://www.thegazette.co.uk/def/authority#",
+    "councils" : "https://www.thegazette.co.uk/def/councils#",
+    "geometry" : "http://data.ordnancesurvey.co.uk/ontology/geometry/",
+    "location" : "https://www.thegazette.co.uk/def/location#",
+    "consultation" : "https://www.thegazette.co.uk/def/consultation#",
+    "dc" : "http://purl.org/dc/elements/1.1/"
+  }
+}

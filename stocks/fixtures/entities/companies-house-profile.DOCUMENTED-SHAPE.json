@@ -1,0 +1,15 @@
+{
+  "_note": "NOT a captured payload: no COMPANIES_HOUSE_API_KEY was available on 2026-09-30. Hand-written from the documented companyProfile resource (developer-specs.company-information.service.gov.uk, GET /company/{companyNumber}) with the fields lib/entities.mjs reads; replace with a real response once a key exists.",
+  "company_name": "EXAMPLE TOKEN CUSTODY LIMITED",
+  "company_number": "01234567",
+  "company_status": "liquidation",
+  "company_status_detail": "active-proposal-to-strike-off",
+  "has_insolvency_history": true,
+  "date_of_creation": "2019-03-01",
+  "jurisdiction": "england-wales",
+  "type": "ltd",
+  "previous_company_names": [
+    { "name": "EXAMPLE CUSTODY LIMITED", "ceased_on": "2021-05-01", "effective_from": "2019-03-01" }
+  ],
+  "links": { "self": "/company/01234567", "insolvency": "/company/01234567/insolvency" }
+}

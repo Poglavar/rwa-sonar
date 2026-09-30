@@ -1,0 +1,180 @@
+{
+ "data": {
+  "36994": {
+   "id": 36994,
+   "name": "Apple tokenized stock (xStock)",
+   "symbol": "AAPLX",
+   "category": "token",
+   "description": "Apple tokenized stock (xStock) (AAPLX) is a cryptocurrency and operates on the Solana platform. Apple tokenized stock (x",
+   "slug": "apple-tokenized-stock-xstock",
+   "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/36994.png",
+   "subreddit": "",
+   "notice": "",
+   "tags": [
+    "defi",
+    "ethereum-ecosystem",
+    "tokenized-stock",
+    "solana-ecosystem",
+    "arbitrum-ecosystem",
+    "bnb-chain-ecosystem",
+    "toncoin-ecosystem",
+    "x-layer-ecosystem",
+    "internet-capital-markets",
+    "tokenized-assets",
+    "xstocks-ecosystem"
+   ],
+   "tag-names": [
+    "DeFi",
+    "Ethereum Ecosystem",
+    "Tokenized Stock",
+    "Solana Ecosystem",
+    "Arbitrum Ecosystem",
+    "BNB Chain Ecosystem",
+    "Toncoin Ecosystem",
+    "X Layer Ecosystem",
+    "Internet Capital Markets",
+    "Tokenized Assets",
+    "xStocks Ecosystem"
+   ],
+   "tag-groups": [
+    "CATEGORY",
+    "PLATFORM",
+    "CATEGORY",
+    "PLATFORM",
+    "PLATFORM",
+    "PLATFORM",
+    "PLATFORM",
+    "PLATFORM",
+    "CATEGORY",
+    "CATEGORY",
+    "CATEGORY"
+   ],
+   "urls": {
+    "website": [
+     "https://xstocks.fi/"
+    ],
+    "twitter": [
+     "https://twitter.com/xStocksFi"
+    ],
+    "message_board": [],
+    "chat": [],
+    "facebook": [],
+    "explorer": [
+     "https://solscan.io/token/XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+     "https://web3.okx.com/explorer/x-layer/evm/token/0x9d275685dC284C8eB1C79f6ABA7a63Dc75ec890a",
+     "https://www.arbiscan.io/token/0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+     "https://etherscan.io/token/0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a"
+    ],
+    "reddit": [],
+    "technical_doc": [],
+    "source_code": [],
+    "announcement": []
+   },
+   "platform": {
+    "id": "5426",
+    "name": "Solana",
+    "symbol": "SOL",
+    "slug": "solana",
+    "token_address": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp"
+   },
+   "date_added": "2025-07-01T07:38:36.000Z",
+   "twitter_username": "xStocksFi",
+   "is_hidden": 0,
+   "contract_address": [
+    {
+     "contract_address": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+     "platform": {
+      "name": "Solana",
+      "coin": {
+       "id": "5426",
+       "name": "Solana",
+       "symbol": "SOL",
+       "slug": "solana"
+      }
+     }
+    },
+    {
+     "contract_address": "0x9d275685dC284C8eB1C79f6ABA7a63Dc75ec890a",
+     "platform": {
+      "name": "X Layer",
+      "coin": {
+       "id": "3897",
+       "name": "OKB",
+       "symbol": "OKB",
+       "slug": "okb"
+      }
+     }
+    },
+    {
+     "contract_address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+     "platform": {
+      "name": "Ethereum",
+      "coin": {
+       "id": "1027",
+       "name": "Ethereum",
+       "symbol": "ETH",
+       "slug": "ethereum"
+      }
+     }
+    },
+    {
+     "contract_address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+     "platform": {
+      "name": "Ink",
+      "coin": {
+       "id": "36851",
+       "name": "INK",
+       "symbol": "INK",
+       "slug": "ink-token"
+      }
+     }
+    },
+    {
+     "contract_address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+     "platform": {
+      "name": "Arbitrum",
+      "coin": {
+       "id": "11841",
+       "name": "Arbitrum",
+       "symbol": "ARB",
+       "slug": "arbitrum"
+      }
+     }
+    },
+    {
+     "contract_address": "EQDsjAwfKo-6FVZv2EYt-1CaZTY_ZL-pfkSId6jeQchNwmdo",
+     "platform": {
+      "name": "TON",
+      "coin": {
+       "id": "11419",
+       "name": "Gram (prev. Toncoin)",
+       "symbol": "GRAM",
+       "slug": "gram"
+      }
+     }
+    },
+    {
+     "contract_address": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a",
+     "platform": {
+      "name": "BNB Smart Chain (BEP20)",
+      "coin": {
+       "id": "1839",
+       "name": "BNB",
+       "symbol": "BNB",
+       "slug": "bnb"
+      }
+     }
+    }
+   ],
+   "infinite_supply": true
+  }
+ },
+ "status": {
+  "timestamp": "2026-09-30T12:36:39.504Z",
+  "error_code": 0,
+  "error_message": null,
+  "elapsed": 10,
+  "credit_count": 1,
+  "notice": null
+ }
+}

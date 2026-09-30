@@ -35,6 +35,8 @@ export const SOURCES = {
     catalogue: 'universe scan',
     defi: 'DeFi scanner',
     court: 'court watcher',
+    registry: 'registry watcher',
+    regulator: 'regulator watcher',
     journal: 'change journal',
     lending: 'lending watcher'
 };
@@ -60,7 +62,8 @@ const SEVERITY_RANK = { info: 0, caution: 1, warning: 2, critical: 3 };
 const SAME_FACT_MS = { doc: 7 * DAY_MS, other: 36 * HOUR_MS };
 
 /** The change_event kinds the feed can use; everything else (supply, treasury, metadata) is routine. */
-export const CHANGE_ROW_KINDS = ['authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term'];
+export const CHANGE_ROW_KINDS = ['authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term',
+    'entity-status', 'insolvency', 'regulator-notice'];
 const DOC_KINDS = new Set(['quote-lost', 'document-gone', 'legal-term']);
 
 /** DeFi uses that change what a holder can do with the token; DEX pool listings churn daily. */
@@ -736,6 +739,89 @@ function courtEvent(row, ctx) {
     });
 }
 
+/** A register field name in words: `nextRenewalDate` → "next renewal date". */
+function humanizeWords(field) {
+    return String(field ?? 'record').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').toLowerCase();
+}
+
+/** Registers the entity watcher reads, and a field's words (stocks/watch-entities.mjs). */
+const REGISTRY_LABELS = { gleif: 'LEI record', zefix: 'Swiss commercial register', 'companies-house': 'UK Companies House', gazette: 'UK Gazette' };
+const REGISTRY_FIELDS = {
+    registrationStatus: 'LEI registration', entityStatus: 'status', legalName: 'legal name', successorEntity: 'successor',
+    status: 'status', name: 'name', seat: 'registered seat', company_status: 'company status'
+};
+
+/**
+ * A trust-chain party's register changed (entity-status) or an insolvency notice names it
+ * (insolvency): "BitGo Trust Company, Inc.: LEI registration lapsed". The row's own `after` is the
+ * new state; a first observation of an already-bad state is news too. Linked to the register record.
+ */
+function registryEvent(row, ctx) {
+    const issuer = issuerOf(row.subjectType === 'issuer' ? row.subjectId : row.issuer, ctx);
+    const entity = text(row.evidence.entity) ?? text(String(row.field ?? '').split(' · ')[0]) ?? 'A trust-chain party';
+    const [source, field] = String(row.field ?? '').split(' · ')[1]?.split(':') ?? [];
+    const after = text(row.after);
+    const title = row.kind === 'insolvency'
+        ? `${entity}: insolvency notice${after ? `, ${after}` : ''}`
+        : field === 'registrationStatus' && after ? `${entity}: LEI registration ${after.toLowerCase()}`
+            : `${entity}: ${REGISTRY_LABELS[source] ?? 'register'} ${REGISTRY_FIELDS[field] ?? humanizeWords(field)}${text(row.before) ? ` ${text(row.before)} →` : ''} ${after ?? 'changed'}`;
+    const url = text(row.evidence.url);
+    return makeEvent({
+        id: `registry-${row.id}`,
+        at: row.at, kind: row.kind, category: 'legal',
+        title: `${title}${issuer.name ? ` (${issuer.name})` : ''}`,
+        subject: { type: 'issuer', id: issuer.slug, name: issuer.name },
+        severity: row.severity,
+        href: (url && url.startsWith('https://') ? url : null) ?? issuerHref(issuer) ?? './watch.html',
+        source: SOURCES.registry,
+        keys: [`registry|${row.field}|${after}|${issuer.slug}`],
+        origin: 'db'
+    });
+}
+
+/**
+ * A regulator's notice names a trust-chain party: "FINRA: AWC against Alpaca Securities LLC
+ * (17 Mar 2026)". The notice's own date is in the title; the event time is when we found it.
+ */
+function regulatorEvent(row, ctx) {
+    const issuer = issuerOf(row.subjectType === 'issuer' ? row.subjectId : row.issuer, ctx);
+    const ev = row.evidence;
+    const who = Array.isArray(ev.phrases) && text(ev.phrases[0]) ? text(ev.phrases[0]) : (issuer.name ?? 'a tracked party');
+    const regulator = REGULATOR_NAMES[text(ev.regulator) ?? ''] ?? text(ev.regulator) ?? 'A regulator';
+    const published = text(ev.publishedDate);
+    const d = published ? new Date(`${published.slice(0, 10)}T00:00:00Z`) : null;
+    const dated = d && Number.isFinite(d.getTime()) ? ` (${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()})` : '';
+    const what = NOTICE_TYPE_WORDS[text(ev.noticeType) ?? ''] ?? 'notice';
+    const url = text(ev.url);
+    return makeEvent({
+        id: `regulator-${row.id}`,
+        at: row.at, kind: 'regulator-notice', category: 'legal',
+        title: `${regulator} ${what} ${ev.matchedIn === 'text' ? 'mentions' : 'names'} ${who}${dated}`,
+        subject: { type: 'issuer', id: issuer.slug, name: issuer.name },
+        severity: row.severity,
+        href: (url && url.startsWith('https://') ? url : null) ?? issuerHref(issuer) ?? './watch.html',
+        source: SOURCES.regulator,
+        keys: [`regulator|${row.field}|${issuer.slug}`],
+        origin: 'db'
+    });
+}
+
+/** A regulator notice's type in words (stocks/lib/regulators.mjs `noticeType`). */
+const NOTICE_TYPE_WORDS = {
+    enforcement: 'enforcement action', warning: 'warning', suspension: 'trading suspension', sanction: 'sanction',
+    filing: 'filing', register: 'register entry', news: 'announcement', disclosure: 'disclosure record'
+};
+
+/** Display names of the regulator watcher's sources (stocks/lib/regulators.mjs ids). */
+const REGULATOR_NAMES = {
+    'finra-disciplinary': 'FINRA', 'finra-brokercheck': 'FINRA BrokerCheck', 'sec-trading-suspensions': 'SEC', 'sec-press-releases': 'SEC',
+    'sec-edgar-fts': 'SEC EDGAR', 'cftc-enforcement': 'CFTC', 'fca-news': 'FCA', 'fca-publications': 'FCA', 'fca-warnings': 'FCA',
+    'finma-warnings': 'FINMA', 'finma-news': 'FINMA', 'bafin-news': 'BaFin', 'bafin-measures': 'BaFin', 'esma-sanctions': 'ESMA',
+    'esma-mica-ncasp': 'ESMA', 'cbi-unauthorised': 'Central Bank of Ireland', 'fma-li-warnings': 'FMA Liechtenstein',
+    'fma-li-news': 'FMA Liechtenstein', 'cima-warnings': 'CIMA', 'cima-enforcement': 'CIMA', 'cima-public-notices': 'CIMA',
+    'mas-investor-alerts': 'MAS', 'smv-panama-alerts': 'SMV Panama', 'asic-bannings-alerts': 'ASIC'
+};
+
 function reviewedResolution(raw, ctx) {
     if (ctx.resolutions.length === 0) return null;
     const evidence = parseJson(raw?.evidence) ?? {};
@@ -790,6 +876,10 @@ export function changeRowEvents(rows, ctx, tally = null) {
             if (event) out.push(event);
         } else if (row.kind === 'litigation') {
             out.push(courtEvent(row, ctx));
+        } else if (row.kind === 'entity-status' || row.kind === 'insolvency') {
+            out.push(registryEvent(row, ctx));
+        } else if (row.kind === 'regulator-notice') {
+            out.push(regulatorEvent(row, ctx));
         } else if (DOC_KINDS.has(row.kind)) {
             // A document row reaches the public feed only through its reviewed change-journal entry
             // (handled above). An unreviewed row stays on the changes page: a lost quote is as often

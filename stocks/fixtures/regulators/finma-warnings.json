@@ -1,0 +1,243 @@
+{
+ "Items": [
+  {
+   "Id": "{FF1B5247-0E2C-4666-BD48-69C56E451109}",
+   "Title": "Crypto-Börse / crypto-boerse.com",
+   "Link": "/en/finma-public/warnungen/warning-list/crypto-boerse-crypto-boerse-com/",
+   "Category": null,
+   "Type": "Page",
+   "Date": "24.09.2026",
+   "DateMobile": "24.09.2026",
+   "Timestamp": 639257976000000000,
+   "FacetColumn": "Not entered in commercial register",
+   "Tab": "tab1",
+   "Panel": "panel1"
+  },
+  {
+   "Id": "{2ACF28E8-0168-44E4-AFA2-674F9C03AA42}",
+   "Title": "quintetcapitalsa.com",
+   "Link": "/en/finma-public/warnungen/warning-list/quintetcapitalsa-com/",
+   "Category": null,
+   "Type": "Page",
+   "Date": "24.09.2026",
+   "DateMobile": "24.09.2026",
+   "Timestamp": 639257976000000000,
+   "FacetColumn": "Not entered in commercial register",
+   "Tab": "tab1",
+   "Panel": "panel1"
+  },
+  {
+   "Id": "{78DF6535-B6B3-433A-9EC2-2A91FE789B97}",
+   "Title": "Bullish Capital",
+   "Link": "/en/finma-public/warnungen/warning-list/bullish-capital/",
+   "Category": null,
+   "Type": "Page",
+   "Date": "19.09.2024",
+   "DateMobile": "19.09.2024",
+   "Timestamp": 638623008000000000,
+   "FacetColumn": "Not entered in commercial register",
+   "Tab": "tab1",
+   "Panel": "panel1"
+  },
+  {
+   "Id": "{CA6F2CAF-13EC-4C26-A4C4-1FB3BE993D28}",
+   "Title": "www.incore-fund.com / www.incore-private.com/",
+   "Link": "/en/finma-public/warnungen/warning-list/www-incore-fund-com/",
+   "Category": null,
+   "Type": "Page",
+   "Date": "28.08.2024",
+   "DateMobile": "28.08.2024",
+   "Timestamp": 638604000000000000,
+   "FacetColumn": "Not entered in commercial register",
+   "Tab": "tab1",
+   "Panel": "panel1"
+  }
+ ],
+ "Groups": null,
+ "Searchstring": "*",
+ "Searchroot": "{06C76F7C-A14E-4873-87EF-69A1D07D67F6}",
+ "Facets": [
+  {
+   "Name": "Publiziert als",
+   "Values": [
+    {
+     "id": "{48C3971E-6680-4D3F-A550-9F750C41972B}",
+     "Name": "{48C3971E-6680-4D3F-A550-9F750C41972B}",
+     "category": "Publiziert als",
+     "AggregateCount": 2308,
+     "selected": false
+    }
+   ]
+  },
+  {
+   "Name": "Warnliste",
+   "Values": [
+    {
+     "id": "{323EB632-A516-47E4-97CA-D8EC9F7D4FBC}",
+     "Name": "{323EB632-A516-47E4-97CA-D8EC9F7D4FBC}",
+     "category": "Warnliste",
+     "AggregateCount": 2122,
+     "selected": false
+    },
+    {
+     "id": "{FC8EEF3E-2366-4C27-B805-3AE0625B725C}",
+     "Name": "{FC8EEF3E-2366-4C27-B805-3AE0625B725C}",
+     "category": "Warnliste",
+     "AggregateCount": 223,
+     "selected": false
+    }
+   ]
+  },
+  {
+   "Name": "Jahr",
+   "Values": [
+    {
+     "id": "{963D5DE6-2772-40A6-B111-17F881906CDD}",
+     "Name": "{963D5DE6-2772-40A6-B111-17F881906CDD}",
+     "category": "Jahr",
+     "AggregateCount": 316,
+     "selected": false
+    },
+    {
+     "id": "{DA84AAEF-A0F0-4D3F-98A8-40FF511B94EA}",
+     "Name": "{DA84AAEF-A0F0-4D3F-98A8-40FF511B94EA}",
+     "category": "Jahr",
+     "AggregateCount": 278,
+     "selected": false
+    },
+    {
+     "id": "{9E024A32-CF41-4AC0-AA9B-056AF4A75904}",
+     "Name": "{9E024A32-CF41-4AC0-AA9B-056AF4A75904}",
+     "category": "Jahr",
+     "AggregateCount": 277,
+     "selected": false
+    },
+    {
+     "id": "{C6603128-AEA8-4712-B0C9-F590DC760DAE}",
+     "Name": "{C6603128-AEA8-4712-B0C9-F590DC760DAE}",
+     "category": "Jahr",
+     "AggregateCount": 194,
+     "selected": false
+    },
+    {
+     "id": "{5D641577-5377-4304-ADE3-0FF60C5B7B3C}",
+     "Name": "{5D641577-5377-4304-ADE3-0FF60C5B7B3C}",
+     "category": "Jahr",
+     "AggregateCount": 157,
+     "selected": false
+    },
+    {
+     "id": "{6136F708-E41A-44CB-BDA9-876491E589C0}",
+     "Name": "{6136F708-E41A-44CB-BDA9-876491E589C0}",
+     "category": "Jahr",
+     "AggregateCount": 141,
+     "selected": false
+    },
+    {
+     "id": "{EF0C43D3-3B20-403D-BCD2-44A64D14C702}",
+     "Name": "{EF0C43D3-3B20-403D-BCD2-44A64D14C702}",
+     "category": "Jahr",
+     "AggregateCount": 133,
+     "selected": false
+    },
+    {
+     "id": "{1B4327AE-9664-465A-A7D3-97055B2B80E7}",
+     "Name": "{1B4327AE-9664-465A-A7D3-97055B2B80E7}",
+     "category": "Jahr",
+     "AggregateCount": 132,
+     "selected": false
+    },
+    {
+     "id": "{AD70F793-6F76-4331-9B02-F977C199731D}",
+     "Name": "{AD70F793-6F76-4331-9B02-F977C199731D}",
+     "category": "Jahr",
+     "AggregateCount": 85,
+     "selected": false
+    },
+    {
+     "id": "{AF84A403-0851-4D9F-97B0-AA6509F2BBB7}",
+     "Name": "{AF84A403-0851-4D9F-97B0-AA6509F2BBB7}",
+     "category": "Jahr",
+     "AggregateCount": 83,
+     "selected": false
+    },
+    {
+     "id": "{9076B66B-03FC-4680-BEB1-69FDE009FD21}",
+     "Name": "{9076B66B-03FC-4680-BEB1-69FDE009FD21}",
+     "category": "Jahr",
+     "AggregateCount": 76,
+     "selected": false
+    },
+    {
+     "id": "{88562CFB-78AB-443B-8FFC-196A6A25F8D9}",
+     "Name": "{88562CFB-78AB-443B-8FFC-196A6A25F8D9}",
+     "category": "Jahr",
+     "AggregateCount": 71,
+     "selected": false
+    },
+    {
+     "id": "{94925637-F6F6-4915-9C75-4DBD3162F160}",
+     "Name": "{94925637-F6F6-4915-9C75-4DBD3162F160}",
+     "category": "Jahr",
+     "AggregateCount": 67,
+     "selected": false
+    },
+    {
+     "id": "{BF6E5761-796E-484B-B673-F8C735F1E408}",
+     "Name": "{BF6E5761-796E-484B-B673-F8C735F1E408}",
+     "category": "Jahr",
+     "AggregateCount": 64,
+     "selected": false
+    },
+    {
+     "id": "{C75EBDD9-926E-4D0B-974B-88258B948E2D}",
+     "Name": "{C75EBDD9-926E-4D0B-974B-88258B948E2D}",
+     "category": "Jahr",
+     "AggregateCount": 63,
+     "selected": false
+    },
+    {
+     "id": "{2FEE13CC-155D-4FCA-8B3D-A9CD49DE2E40}",
+     "Name": "{2FEE13CC-155D-4FCA-8B3D-A9CD49DE2E40}",
+     "category": "Jahr",
+     "AggregateCount": 60,
+     "selected": false
+    },
+    {
+     "id": "{92D1AF79-03A6-45AA-A55A-554D5406D93A}",
+     "Name": "{92D1AF79-03A6-45AA-A55A-554D5406D93A}",
+     "category": "Jahr",
+     "AggregateCount": 54,
+     "selected": false
+    },
+    {
+     "id": "{11927AA0-B857-4758-9165-95DD640471EE}",
+     "Name": "{11927AA0-B857-4758-9165-95DD640471EE}",
+     "category": "Jahr",
+     "AggregateCount": 51,
+     "selected": false
+    }
+   ]
+  }
+ ],
+ "SearchFacets": [],
+ "SearchFacetGroups": [],
+ "Count": 2345,
+ "Resultstring": null,
+ "NextPageLink": null,
+ "LastPageLink": null,
+ "ResultsPerPage": 20000,
+ "Skip": 0,
+ "SkipNext": 0,
+ "SkipLast": 0,
+ "MaxResultCount": 1000,
+ "FixCount": 0,
+ "Archive": false,
+ "IsGrouped": false,
+ "UseLanguageFallback": false,
+ "IsExclusiveFacetSearch": false,
+ "Bankruptcy": {
+  "Finishedcount": 0,
+  "Pendingcount": 0
+ }
+}

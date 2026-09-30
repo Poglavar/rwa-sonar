@@ -1,0 +1,32 @@
+[
+ {
+  "id": 34832,
+  "date": "2026-09-11T10:32:24",
+  "date_gmt": "2026-09-11T15:32:24",
+  "modified": "2026-09-11T10:32:24",
+  "link": "https://supervalores.gob.pa/warning-non-authorized-entity-algobi-com/",
+  "title": {
+   "rendered": "WARNING – NON AUTHORIZED ENTITY –ALGOBI.COM"
+  }
+ },
+ {
+  "id": 34829,
+  "date": "2026-09-11T10:21:08",
+  "date_gmt": "2026-09-11T15:21:08",
+  "modified": "2026-09-11T10:21:08",
+  "link": "https://supervalores.gob.pa/advertencia-entidad-no-autorizada-algobi-com/",
+  "title": {
+   "rendered": "ADVERTENCIA – ENTIDAD NO AUTORIZADA – ALGOBI.COM"
+  }
+ },
+ {
+  "id": 34424,
+  "date": "2026-07-31T10:37:42",
+  "date_gmt": "2026-07-31T15:37:42",
+  "modified": "2026-07-31T10:37:42",
+  "link": "https://supervalores.gob.pa/warning-non-authorized-entity-preferred-capital-limited-y-simas-as-latam/",
+  "title": {
+   "rendered": "WARNING – NON AUTHORIZED ENTITY –  PREFERRED CAPITAL LIMITED Y SIMAS AS LATAM"
+  }
+ }
+]

@@ -2278,6 +2278,130 @@
         ]
       },
       {
+        "id": "loopscale:order-book-usdc:oracle",
+        "protocolId": "loopscale",
+        "marketName": "Loopscale order book (USDC)",
+        "programId": "1oopBoJG58DgkUVKkEzKgyG9dvRmpgeEm1AVjoHkF78",
+        "relatedMarketIds": [],
+        "relatedIntegrationIds": [
+          "loopscale:collateral"
+        ],
+        "collateral": [
+          {
+            "symbol": "TSLAx",
+            "mint": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "lastPrice": 352.74760595,
+            "lastPublish": "2026-09-29T19:50:25Z"
+          },
+          {
+            "symbol": "CRCLx",
+            "mint": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 60,
+            "lastPrice": 83.60155593,
+            "lastPublish": "2026-09-29T19:47:36Z"
+          },
+          {
+            "symbol": "NVDAx",
+            "mint": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 60,
+            "lastPrice": 228.19396238,
+            "lastPublish": "2026-09-29T19:47:36Z"
+          },
+          {
+            "symbol": "SPYx",
+            "mint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 60,
+            "liquidationLtvPct": 75,
+            "lastPrice": 768.81476368,
+            "lastPublish": "2026-09-29T19:47:36Z"
+          },
+          {
+            "symbol": "AAPLx",
+            "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 50,
+            "liquidationLtvPct": 70,
+            "lastPrice": 330.51282247,
+            "lastPublish": "2026-09-29T19:47:36Z"
+          },
+          {
+            "symbol": "MSTRx",
+            "mint": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
+            "beamPriceAccount": "E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "feed": "Loopscale BEAM price account",
+            "maxLtvPct": 40,
+            "liquidationLtvPct": 60,
+            "lastPrice": 154.12967838,
+            "lastPublish": "2026-09-29T19:47:36Z"
+          }
+        ],
+        "priceSource": {
+          "kind": "loopscale-beam-market-hours",
+          "summary": "MarketInformation Go6kfC… (the USDC order book the observed AAPLx and MSTRx loans are checked against) lists TSLAx, CRCLx, NVDAx, SPYx, AAPLx and MSTRx with oracle type 19: Loopscale's BEAM price account E22Z2n… (program beamVVkN…), one 152-byte entry per mint holding an 18-decimal price and its write time. Max age 900 s, max uncertainty 5 %."
+        },
+        "whenMarketClosed": {
+          "behaviour": "frozen-at-regular-close",
+          "summary": "Every xStock entry was last written 2026-09-29 between 19:47:36 and 19:50:25 UTC, just before the 20:00 UTC US close, and was unchanged when read on 2026-09-30 at 12:4x UTC before the open: the price is written during US market hours only. With a 900 s maximum age it is too old for any price-dependent action from 15 minutes after the last write until the next open."
+        },
+        "stalenessAndPause": {
+          "maxPriceAgeSeconds": 900,
+          "note": "A stale price reverts the transaction; Loopscale's docs say lending and liquidation pause while an oracle is stale. So outside US market hours no loan against these xStocks can be opened, refinanced or liquidated on this market; at the open the price is written again in one step."
+        },
+        "dumpToLiquidate": {
+          "verdict": "not-feasible",
+          "reason": "The price does not follow token trading: it is written from the US session only."
+        },
+        "gapRisk": "A weekend or overnight move in the stock is applied in one step at the next open, so a loan can go from healthy to liquidatable at the first write.",
+        "holderMeaning": "Nights and weekends are safe from liquidation on this market, because nothing can happen at all; the gap is taken at the open.",
+        "borrowerSentence": "Priced by Loopscale's own feed during US market hours only; outside them the price is too old, so nothing can be borrowed, refinanced or liquidated until the open, which applies any weekend move in one step.",
+        "evidence": [
+          {
+            "kind": "onchain-rpc",
+            "label": "Loopscale MarketInformation Go6kfC… (USDC order book): six xStocks with oracle type 19 on BEAM account E22Z2n…, max age 900 s, max uncertainty 5 %, LTV and liquidation thresholds",
+            "url": "https://solscan.io/account/Go6kfCbT9f1R1MFSfbh9uYviWE4TAG9MFrTWot8s7rCB",
+            "locator": "decoded with stocks/lib/loopscale.mjs decodeMarketInformation at slot 451970145",
+            "accessedAt": "2026-09-30T12:46:00Z",
+            "slot": 451970145
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Loopscale BEAM price account E22Z2n… (owner beamVVkN…): per-mint entries, price as u128 with 18 decimals at +32, write time as i64 at +80",
+            "url": "https://solscan.io/account/E22Z2nKBdA3RpJhM8G2mB35zFA95Qdbs3WGbMNxFhmuH",
+            "locator": "getAccountInfo slot 451970145: AAPLx 330.513 written 2026-09-29T19:47:36Z; MSTRx 154.130, CRCLx 83.602, NVDAx 228.194, SPYx 768.815 same time; TSLAx 352.748 written 2026-09-29T19:50:25Z",
+            "accessedAt": "2026-09-30T12:46:00Z",
+            "slot": 451970145
+          },
+          {
+            "kind": "onchain-rpc",
+            "label": "Observed loans against this market: AAPLx loan 9U8jGS… and MSTRx loan 8BeEcV… (borrower 5SC2P7…), both with marketInformation Go6kfC…",
+            "url": "https://solscan.io/account/9U8jGSsvPnTk1FtR5GpquZKiVgPGV89MRVCNeVy8fKg9",
+            "locator": "stocks/data/defi-usage.json loopscale:collateral markets[].configuration",
+            "accessedAt": "2026-09-30T12:46:00Z"
+          },
+          {
+            "kind": "official-protocol-docs",
+            "label": "Loopscale: stale price reverts",
+            "url": "https://docs.loopscale.com/resources/asset-parameters",
+            "locator": "Assets and Oracles",
+            "quote": "If a price is stale or its uncertainty is too high, the transaction reverts rather than falling back to a degraded value.",
+            "accessedAt": "2026-09-24T14:30:57Z"
+          }
+        ]
+      },
+      {
         "id": "loopscale:secz-usdc-rwa:oracle",
         "protocolId": "loopscale",
         "marketName": "Loopscale USDC RWA (SECZ)",

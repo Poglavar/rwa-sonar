@@ -2126,6 +2126,29 @@ is an explicit coverage gap. A failed RPC call marks that issuer's scan `failed`
 `scan-failed` (never "no redemptions"), and the run exits non-zero. Telegram is off in production:
 `lastRun.noticeLines` reaches the morning digest through the central monitor.
 
+## Reserves, entity, corporate-action and regulator watchers (30 Sep 2026)
+
+Four daily watchers added together; each prints its own `--help`, writes a `.last-*-watch-stats.json`
+record for its outcome check (alerts-server-telegram `bot-list.json`), sends at most one Telegram
+summary per run, and is restartable. Their tables are created by `stocks/apply-schema.mjs` at deploy.
+
+| Job (PM2) | Script | When (UTC) | Reads | Stores |
+|---|---|---|---|---|
+| `rwa-watch-reserves` | `stocks/watch-reserves.mjs` | 13:52 | xStocks proof-of-reserves API, Superstate's register, Solana mint supply × multiplier | `sonar.reserve_observation` |
+| `rwa-watch-entities` | `stocks/watch-entities.mjs` | 03:29 | GLEIF LEI records, Swiss register (Zefix), UK Gazette insolvency notices; Companies House with a key | `sonar.entity_observation`, events `entity-status` / `insolvency` |
+| `rwa-watch-corporate-actions` | `stocks/watch-corporate-actions.mjs` | 05:13 | Yahoo chart splits and dividends against each mint's multiplier history (`sonar.mint_state`) | `sonar.corporate_action`, `sonar.corporate_action_check` |
+| `rwa-watch-regulators` (+ `-fca`, hourly :21) | `stocks/watch-regulators.mjs` | 05:37 | 23 regulator sources, matched against the case-law watcher's party names | `sonar.regulator_notice_match`, `sonar.regulator_check`, events `regulator-notice` |
+
+Not machine-readable, so not watched: Ondo's and PreStocks' reserves (PDF only / never published),
+Tessera's and xStocks' Chainlink proof-of-reserve streams (credentials), the Jersey, BVI, Gibraltar and
+NZ regulators and IOSCO I-SCAN (Cloudflare-blocked), most US LLCs' registers (no LEI, paid state APIs).
+`stocks/data/entity-registry-ids.json` is the reviewed mapping of legal names to LEIs and register ids
+(`--resolve` proposes; an entry marked `reviewed: true` is never overwritten).
+
+**The allowed `change_event` kinds are stated once**, in `db/2026-10-01-sonar-change-event-kinds.sql`,
+applied last and in one transaction. A new kind is added there and nowhere else: when three files
+each restated a fixed list, a narrower earlier one dropped the constraint and failed to re-add it.
+
 ## Case-law watcher
 
 `stocks/watch-caselaw.mjs --run [--only=<issuer>] [--limit=n] [--entries=n] [--no-sec]

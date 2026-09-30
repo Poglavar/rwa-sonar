@@ -99,7 +99,7 @@ async function main() {
     if (depthDoc === null) logWarn('stocks/data/solana-depth.json absent: Solana depth not collected (run stocks/fetch-solana-depth.mjs)');
     if (tracking === null) logWarn('stocks-tracking.json absent: the weekend move in 24/7 lenders\' prices is not collected');
 
-    const { items, weekend } = buildClosedMarket({
+    const { items, unresearched, weekend } = buildClosedMarket({
         tokens: tokenDb.tokens,
         oraclePricing: research.oraclePricing,
         defiUsage,
@@ -133,6 +133,11 @@ async function main() {
     log(`wrote ${outPath}: ${stats.tokens} token(s) with a lender, ${stats.lenderRows} lender row(s) `
         + `(${Object.entries(stats.byKind).map(([k, n]) => `${k} ${n}`).join(', ')}), ${stats.freezeEpisodes} freeze episode(s) listed, `
         + `${stats.findings} finding(s), depth for ${stats.withDepth}, weekend move for ${stats.withWeekendMove}`);
+    // Kept off every page until researched (stocks/data/protocol-market-research.json oraclePricing).
+    if (unresearched.length) {
+        logWarn(`${unresearched.length} lending market(s) take a token but their pricing is not researched, so no page shows them yet: `
+            + unresearched.map((u) => `${u.symbol} ${u.marketId ?? u.protocolId}`).join(', '));
+    }
     return 0;
 }
 

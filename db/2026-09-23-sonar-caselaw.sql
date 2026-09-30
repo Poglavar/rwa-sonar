@@ -105,14 +105,10 @@ END
 $$;
 
 -- 2026-09-23: the case-law watcher raises `litigation` events (a new case or a new docket entry
--- naming an issuer's party). Re-stated as DROP+ADD so an existing database picks the wider list
--- up; the same list is carried by db/2026-09-18-sonar-evidence.sql's own restatement, so applying
--- that older file again later cannot narrow the constraint back and reject the stored rows.
-ALTER TABLE sonar.change_event DROP CONSTRAINT IF EXISTS change_event_kind_check;
-ALTER TABLE sonar.change_event ADD CONSTRAINT change_event_kind_check CHECK (kind IN (
-    'legal-term', 'document-gone', 'quote-lost', 'authority-key', 'extension-toggle', 'rebase',
-    'supply', 'treasury', 'holder-concentration', 'venue', 'float', 'liquidity', 'metadata', 'status',
-    'litigation'));
+-- naming an issuer's party).
+-- The allowed change_event kinds are stated in ONE place: db/2026-10-01-sonar-change-event-kinds.sql,
+-- applied last (stocks/lib/schema.mjs). A kind list restated here would drop other watchers' kinds.
+
 
 -- ---------------------------------------------------------------------------------------------
 -- Examples.

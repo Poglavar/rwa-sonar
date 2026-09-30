@@ -121,6 +121,39 @@
         });
     }
 
+    /**
+     * CoinMarketCap's figures for this mint (#cmc, in Markets), asked for only when the reader opens
+     * Markets, once per page: GET /api/tokens/:mint/cmc (our API holds the key and caches the answer).
+     */
+    function wireCmc() {
+        var section = document.getElementById('cmc');
+        var block = document.getElementById('market-detail');
+        var view = globalThis.__rwaCmcView;
+        var api = globalThis.__rwaApi;
+        if (!section || !block || !view || !api) return;
+        var body = section.querySelector('.cmc-body');
+        var asked = false;
+        function load() {
+            if (asked || !block.open) return;
+            asked = true;
+            body.innerHTML = '<p class="cmc-empty">Asking CoinMarketCap…</p>';
+            var url = api.apiUrl('/api/tokens/' + encodeURIComponent(section.getAttribute('data-mint')) + '/cmc', {}, api.apiBase());
+            fetch(url, { headers: { accept: 'application/json' } }).then(function (response) {
+                return response.json().then(function (answer) {
+                    if (!response.ok) throw new Error((answer && answer.error && answer.error.message) || ('HTTP ' + response.status));
+                    return answer;
+                });
+            }).then(function (answer) {
+                body.innerHTML = view.cmcHtml(answer);
+            }, function (err) {
+                asked = false;
+                body.innerHTML = '<p class="cmc-empty">CoinMarketCap is unavailable right now (' + globalThis.__rwaFmt.escapeHtml(err.message) + '). Reopen Markets to retry.</p>';
+            });
+        }
+        block.addEventListener('toggle', load);
+        load();
+    }
+
     /** Pixels per second the marquee moves: slow enough to read a title as it passes. */
     var MARQUEE_PX_PER_S = 45;
 
@@ -131,7 +164,8 @@
      */
     function drawMarquee(events, now) {
         var view = globalThis.__rwaEventsView;
-        var heading = document.querySelector('.card-head h1');
+        // Under the ticker's line (the ticker and its planet link), above the name.
+        var heading = document.querySelector('.card-head .card-title-row') || document.querySelector('.card-head h1');
         if (!heading || events.length === 0) return;
         var box = document.createElement('div');
         box.className = 'event-marquee';
@@ -191,6 +225,7 @@
         wireCopy();
         wireHistory();
         wireEvents();
+        wireCmc();
         wireLocalNav();
     }
 })();

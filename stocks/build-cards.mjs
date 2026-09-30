@@ -16,6 +16,8 @@ import { readEnvFile } from './lib/env.mjs';
 import { psql } from './lib/psql.mjs';
 import { dossierFileFor, readWhatIf } from './lib/issuer-whatif.mjs';
 import { cardFloatItem } from './lib/xstocks-float.mjs';
+import { outstandingOf, solanaShares } from './lib/solana-share.mjs';
+import { crossChainFor, crossChainTotals } from './lib/cross-chain.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 import {
     OG_SUBDIR, ensureOgDir, ensureOgImage, loadFonts, ogImageAlt, ogImageModel, pruneOgImages, renderOgSvg
@@ -51,7 +53,7 @@ const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260930universe';
+const ASSET_VERSION = '20260930chains';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -400,6 +402,19 @@ async function main() {
     const overLimit = [];
     const counts = { good: 0, caution: 0, warning: 0, unknown: 0 };
 
+    // Each token's share of its underlying's tokenized shares on Solana, on outstanding supply.
+    const shares = solanaShares(tokenDb.tokens.map((token) => ({
+        mint: token.mint, symbol: token.symbol, underlyingTicker: token.underlyingTicker, instrumentType: token.instrumentType,
+        outstanding: outstandingOf({ supplyUi: holders.get(token.mint)?.supplyUi ?? token.supplyUi,
+            top20: holders.get(token.mint)?.top20 ?? null, publicFloat: cardFloatItem(floatDb, token.mint) })
+    })));
+    log(`solana shares: ${shares.size} token(s) with a share of their underlying on Solana`);
+    // Every issuer's tokens of the same stock across chains (stocks/fetch-cmc-tokenized.mjs); absent
+    // on a machine that never fetched it, and then the cards leave the cross-chain part out.
+    const cmcTokenized = await readJson(join(HERE, 'data', 'cmc-tokenized.json'), null);
+    const tickers = new Set(tokenDb.tokens.map((token) => token.underlyingTicker).filter(Boolean));
+    const crossTotals = cmcTokenized ? crossChainTotals(cmcTokenized.coins, tickers, cmcTokenized.fetchedAt) : new Map();
+    log(`cross-chain totals: ${crossTotals.size} underlying(s) listed by CoinMarketCap${cmcTokenized ? ` (fetched ${cmcTokenized.fetchedAt})` : ' — no stocks/data/cmc-tokenized.json'}`);
     for (const token of tokenDb.tokens) {
         const slug = slugs.get(token.mint);
         if (slug === undefined) {
@@ -411,6 +426,9 @@ async function main() {
             issuer: issuers.get(token.issuer) ?? null,
             holdersItem: holders.get(token.mint) ?? null,
             floatItem: cardFloatItem(floatDb, token.mint),
+            solanaShare: shares.get(token.mint) ?? null,
+            crossChain: shares.has(token.mint) ? crossChainFor(token.symbol, token.underlyingTicker, crossTotals) : null,
+            crossChainFetchedAt: cmcTokenized?.fetchedAt ?? null,
             venuesItem: venues.get(token.mint) ?? null,
             closedMarketItem: closedMarket.get(token.mint) ?? null,
             closedMarketMeta: closedMarketDb,

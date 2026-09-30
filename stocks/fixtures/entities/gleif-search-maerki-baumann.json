@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    },
+    "pagination": {
+      "currentPage": 1,
+      "perPage": 20,
+      "from": 1,
+      "to": 2,
+      "total": 2,
+      "lastPage": 1
+    }
+  },
+  "links": {
+    "first": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Maerki+Baumann+%26+Co.+AG&page%5Bnumber%5D=1&page%5Bsize%5D=20",
+    "last": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Maerki+Baumann+%26+Co.+AG&page%5Bnumber%5D=1&page%5Bsize%5D=20"
+  },
+  "data": [
+    {
+      "type": "lei-records",
+      "id": "984500771XABFC806105",
+      "attributes": {
+        "lei": "984500771XABFC806105",
+        "entity": {
+          "legalName": {
+            "name": "MAERKI BAUMANN & CO. AG",
+            "language": "en"
+          },
+          "otherNames": [
+            {
+              "name": "ARCHIP BY MAERKI BAUMANN",
+              "language": "en",
+              "type": "TRADING_OR_OPERATING_NAME"
+            },
+            {
+              "name": "ARCHIP",
+              "language": "en",
+              "type": "TRADING_OR_OPERATING_NAME"
+            }
+          ],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "Unit 1129, Floor 11, Al Maqam Tower",
+              "Regus ADGM Square",
+              "Abu Dhabi Global Market Square, 8002",
+              "Al Maryah Island"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Abu Dhabi",
+            "region": "AE-AZ",
+            "country": "AE",
+            "postalCode": null
+          },
+          "headquartersAddress": {
+            "language": "de",
+            "addressLines": [
+              "Dreikongstrasse 6"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Zürich",
+            "region": "CH-ZH",
+            "country": "CH",
+            "postalCode": "8002"
+          },
+          "registeredAt": {
+            "id": "RA000569",
+            "other": null
+          },
+          "registeredAs": "28833",
+          "jurisdiction": "CH",
+          "category": "BRANCH",
+          "legalForm": {
+            "id": "MVII",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2025-07-16T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2026-04-12T22:15:25Z",
+          "lastUpdateDate": "2026-04-20T11:22:49Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-04-12T22:15:28Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000569",
+            "other": null
+          },
+          "validatedAs": "28833",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": null,
+        "gem": null,
+        "spglobal": null,
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105/field-modifications"
+          }
+        },
+        "head-office": {
+          "links": {
+            "lei-record": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105/head-office",
+            "relationship-record": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105/head-office-relationship"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/984500771XABFC806105"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "529900FMZSRFHZA8OU51",
+      "attributes": {
+        "lei": "529900FMZSRFHZA8OU51",
+        "entity": {
+          "legalName": {
+            "name": "Maerki Baumann & Co. AG",
+            "language": "de"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "de",
+            "addressLines": [
+              "Dreikönigstrasse 6"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Zürich",
+            "region": "CH-ZH",
+            "country": "CH",
+            "postalCode": "8002"
+          },
+          "headquartersAddress": {
+            "language": "de",
+            "addressLines": [
+              "Dreikönigstrasse 6"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Zürich",
+            "region": "CH-ZH",
+            "country": "CH",
+            "postalCode": "8002"
+          },
+          "registeredAt": {
+            "id": "RA000549",
+            "other": null
+          },
+          "registeredAs": "CHE-101.015.393",
+          "jurisdiction": "CH",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "MVII",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "1949-12-29T23:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2016-06-09T07:50:25Z",
+          "lastUpdateDate": "2026-03-20T12:11:08Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-04-28T08:27:13Z",
+          "managingLou": "5299000J2N45DDNE4Y28",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000549",
+            "other": null
+          },
+          "validatedAs": "CHE-101.015.393",
+          "otherValidationAuthorities": []
+        },
+        "bic": [
+          "MAEBCHZZXXX"
+        ],
+        "mic": null,
+        "ocid": null,
+        "qcc": "QCH5D0KAMJ",
+        "gem": null,
+        "spglobal": [
+          "6563792"
+        ],
+        "conformityFlag": "NON_CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/ultimate-parent-reporting-exception"
+          }
+        },
+        "branches": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/branch-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/branches"
+          }
+        },
+        "isins": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51/isins"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/529900FMZSRFHZA8OU51"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0">
+<channel>
+<title>Alle Veröffentlichungen</title>
+<link>https://www.bafin.de</link>
+<description>Dies ist der RSS-Newsfeed der Bafin.</description>
+<language>de-de</language>
+<copyright>Copyright by Bafin. Alle Rechte vorbehalten</copyright>
+<managingEditor>editor@bafin.de</managingEditor>
+<webMaster>webmaster@bafin.de</webMaster>
+<category>Newspapers</category>
+<generator>Government Site Builder</generator>
+<docs>http://blogs.law.harvard.edu/tech/rss</docs>
+<ttl>60</ttl>
+<item>
+     <title>bitbucks(.)space: Bafin warnt vor Website</title>
+     <link>https://www.bafin.de/SharedDocs/Veroeffentlichungen/DE/Verbrauchermitteilung/unerlaubte/2026/meldung_2026_09_30_bitbucks_space.html</link>
+     <pubDate>Wed, 30 Sep 2026 09:32:00 +0200</pubDate>
+     <description>Die Finanzaufsicht Bafin warnt vor Angeboten von BitBucks. Es besteht der Verdacht, dass die unbekannten Betreiber auf der Website bitbucks(.)space ohne Erlaubnis Finanz- und Wertpapierdienstleistungen sowie Kryptowerte-Dienstleistungen anbieten.</description>
+</item>
+<item>
+     <title>fintresor(.)online: Bafin warnt vor Website</title>
+     <link>https://www.bafin.de/SharedDocs/Veroeffentlichungen/DE/Verbrauchermitteilung/unerlaubte/2026/meldung_2026_09_30_fintresor_online.html</link>
+     <pubDate>Wed, 30 Sep 2026 07:41:00 +0200</pubDate>
+     <description>Die Finanzaufsicht&#160;Bafin&#160;warnt vor Angeboten der Fintresor Verm&#246;gensverwaltung GmbH. Es besteht der Verdacht, dass die unbekannten Betreiber der Website fintresor(.)online ohne die erforderliche Erlaubnis Finanzdienstleistungen und Kryptowerte-Dienstleistungen anbieten.</description>
+</item>
+<item>
+     <title>HDI Global Specialty SE</title>
+     <link>https://www.bafin.de/SharedDocs/Veroeffentlichungen/DE/Bekanntmachungen/02_Aufnahme_Dienstleistungsverkehr/2026_09_29_hdi_global_va.html</link>
+     <pubDate>Tue, 29 Sep 2026 17:38:37 +0200</pubDate>
+     <description>Aufnahme des Gesch&#228;ftsbetriebes im Rahmen des Dienstleistungsverkehrs</description>
+</item>
+</channel>
+</rss>

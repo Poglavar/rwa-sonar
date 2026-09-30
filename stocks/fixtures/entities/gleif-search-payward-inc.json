@@ -1,0 +1,1070 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    },
+    "pagination": {
+      "currentPage": 1,
+      "perPage": 20,
+      "from": 1,
+      "to": 20,
+      "total": 76983,
+      "lastPage": 3850
+    }
+  },
+  "links": {
+    "first": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Payward%2C+Inc.&page%5Bnumber%5D=1&page%5Bsize%5D=20",
+    "next": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Payward%2C+Inc.&page%5Bnumber%5D=2&page%5Bsize%5D=20",
+    "last": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.legalName%5D=Payward%2C+Inc.&page%5Bnumber%5D=3850&page%5Bsize%5D=20"
+  },
+  "data": [
+    {
+      "type": "lei-records",
+      "id": "254900IE1ULEZR01BF54",
+      "attributes": {
+        "lei": "254900IE1ULEZR01BF54",
+        "entity": {
+          "legalName": {
+            "name": "PAYWARD, INC.",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O THE CORPORATION TRUST COMPANY",
+              "CORPORATION TRUST CENTER",
+              "1209 ORANGE ST"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WILMINGTON",
+            "region": "US-DE",
+            "country": "US",
+            "postalCode": "19801"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "100 Pine St",
+              "Suite 1250-PMB B297"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "San Francisco",
+            "region": "US-CA",
+            "country": "US",
+            "postalCode": "94111"
+          },
+          "registeredAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "registeredAs": "5017249",
+          "jurisdiction": "US-DE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "XTIQ",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2011-07-28T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": [
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "OTHER_OFFICIAL_DOCUMENTS",
+                  "effectiveDate": "2024-02-01T00:00:00Z",
+                  "recordedDate": "2025-02-26T21:31:55Z",
+                  "type": "CHANGE_LEGAL_ADDRESS",
+                  "status": "COMPLETED"
+                }
+              ]
+            },
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "ACCOUNTS_FILING",
+                  "effectiveDate": "2023-01-01T00:00:00Z",
+                  "recordedDate": "2025-02-26T21:31:55Z",
+                  "type": "CHANGE_HQ_ADDRESS",
+                  "status": "COMPLETED"
+                }
+              ]
+            }
+          ]
+        },
+        "registration": {
+          "initialRegistrationDate": "2022-06-06T17:26:28Z",
+          "lastUpdateDate": "2026-01-29T09:26:47Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-02-27T17:47:48Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "validatedAs": "5017249",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": "us_de/5017249",
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "260965170"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/254900IE1ULEZR01BF54"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "2549008NQ4DQBUVIRG20",
+      "attributes": {
+        "lei": "2549008NQ4DQBUVIRG20",
+        "entity": {
+          "legalName": {
+            "name": "Payward Ventures, Inc.",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O THE CORPORATION TRUST COMPANY",
+              "CORPORATION TRUST CENTER",
+              "1209 ORANGE ST"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "WILMINGTON",
+            "region": "US-DE",
+            "country": "US",
+            "postalCode": "19801"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "100 Pine St",
+              "Suite 1250-PMB B297"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "San Francisco",
+            "region": "US-CA",
+            "country": "US",
+            "postalCode": "94111"
+          },
+          "registeredAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "registeredAs": "5359931",
+          "jurisdiction": "US-DE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "XTIQ",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2013-07-01T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2022-01-04T12:15:06Z",
+          "lastUpdateDate": "2026-02-28T13:30:00Z",
+          "status": "LAPSED",
+          "nextRenewalDate": "2026-02-28T09:59:47Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "validatedAs": "5359931",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": "us_de/5359931",
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "657883761"
+        ],
+        "conformityFlag": "NON_CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/2549008NQ4DQBUVIRG20"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "254900Q8A2GWZJUPWO79",
+      "attributes": {
+        "lei": "254900Q8A2GWZJUPWO79",
+        "entity": {
+          "legalName": {
+            "name": "Payward Financial, Inc.",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O C T Corporation System",
+              "2232 Dell Range Blvd",
+              "Ste 200"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Cheyenne",
+            "region": "US-WY",
+            "country": "US",
+            "postalCode": "82009"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "106 E. Lincolnway",
+              "Fourth Floor"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Cheyenne",
+            "region": "US-WY",
+            "country": "US",
+            "postalCode": "82001"
+          },
+          "registeredAt": {
+            "id": "RA000644",
+            "other": null
+          },
+          "registeredAs": "2020-000914724",
+          "jurisdiction": "US-WY",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "9GXA",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2020-05-04T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2020-06-03T15:38:28Z",
+          "lastUpdateDate": "2026-01-30T10:30:31Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-02-28T11:01:48Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000644",
+            "other": null
+          },
+          "validatedAs": "2020-000914724",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": "us_wy/2020-000914724",
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "671128825"
+        ],
+        "conformityFlag": "NON_CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/254900Q8A2GWZJUPWO79"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "2549006IFILD1MBQXF43",
+      "attributes": {
+        "lei": "2549006IFILD1MBQXF43",
+        "entity": {
+          "legalName": {
+            "name": "PAYWARD LTD.",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "6th Floor",
+              "One London Wall"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "London",
+            "region": "GB-LND",
+            "country": "GB",
+            "postalCode": "EC2Y 5EB"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "6th Floor",
+              "One London Wall"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "London",
+            "region": "GB-LND",
+            "country": "GB",
+            "postalCode": "EC2Y 5EB"
+          },
+          "registeredAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "registeredAs": "08593670",
+          "jurisdiction": "GB",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "H0PO",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2013-07-02T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2020-06-02T17:16:02Z",
+          "lastUpdateDate": "2026-03-09T19:15:39Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-05-08T19:06:55Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000585",
+            "other": null
+          },
+          "validatedAs": "08593670",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QGB0CN05VT",
+        "gem": null,
+        "spglobal": [
+          "636169006"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/2549006IFILD1MBQXF43"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "254900AXMKR0R3OG8R21",
+      "attributes": {
+        "lei": "254900AXMKR0R3OG8R21",
+        "entity": {
+          "legalName": {
+            "name": "PAYWARD EUROPE LIMITED",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "70 SIR JOHN ROGERSON'S QUAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "DUBLIN",
+            "region": "IE-D",
+            "country": "IE",
+            "postalCode": "D02 R296"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "70 SIR JOHN ROGERSON'S QUAY"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "DUBLIN",
+            "region": "IE-D",
+            "country": "IE",
+            "postalCode": "D02 R296"
+          },
+          "registeredAt": {
+            "id": "RA000402",
+            "other": null
+          },
+          "registeredAs": "687722",
+          "jurisdiction": "IE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "MNQ7",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2021-02-11T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2021-07-14T16:36:06Z",
+          "lastUpdateDate": "2026-06-02T05:08:24Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-07-31T21:29:00Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000402",
+            "other": null
+          },
+          "validatedAs": "687722",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": "ie/687722",
+        "qcc": "QIE81QB4B2",
+        "gem": null,
+        "spglobal": [
+          "1674013488"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "2549004T4TVIRHZ3VY61",
+      "attributes": {
+        "lei": "2549004T4TVIRHZ3VY61",
+        "entity": {
+          "legalName": {
+            "name": "PAYWARD IRELAND LIMITED",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "70 Sir John Rogerson's Quay"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Dublin",
+            "region": "IE-D",
+            "country": "IE",
+            "postalCode": "D02 R296"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "70 Sir John Rogerson's Quay"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Dublin",
+            "region": "IE-D",
+            "country": "IE",
+            "postalCode": "D02 R296"
+          },
+          "registeredAt": {
+            "id": "RA000402",
+            "other": null
+          },
+          "registeredAs": "688569",
+          "jurisdiction": "IE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "MNQ7",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2021-02-23T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2021-07-14T16:36:05Z",
+          "lastUpdateDate": "2026-02-10T11:04:09Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-02-26T18:47:00Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000402",
+            "other": null
+          },
+          "validatedAs": "688569",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": "ie/688569",
+        "qcc": "QIE5GB2P0N",
+        "gem": null,
+        "spglobal": [
+          "1674011352"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/2549004T4TVIRHZ3VY61"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "254900Y9H8TYQYVUR623",
+      "attributes": {
+        "lei": "254900Y9H8TYQYVUR623",
+        "entity": {
+          "legalName": {
+            "name": "Payward Oceanic Ltd.",
+            "language": "en"
+          },
+          "otherNames": [
+            {
+              "name": "Payward OTC Ltd.",
+              "language": "en",
+              "type": "PREVIOUS_LEGAL_NAME"
+            }
+          ],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O SHRM Trustees (BVI) Limited",
+              "Trinity Chambers",
+              "P.O. Box 4301",
+              "Tortola"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Road Town",
+            "region": null,
+            "country": "VG",
+            "postalCode": "VG1110"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "Trinity Chambers",
+              "P.O. Box 4301",
+              "Tortola"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Road Town",
+            "region": null,
+            "country": "VG",
+            "postalCode": "VG1110"
+          },
+          "registeredAt": {
+            "id": "RA000063",
+            "other": null
+          },
+          "registeredAs": "2061297",
+          "jurisdiction": "VG",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "6EH6",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2021-04-26T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": [
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "OTHER_OFFICIAL_DOCUMENTS",
+                  "effectiveDate": "2025-05-12T00:00:00Z",
+                  "recordedDate": "2025-07-06T17:13:51Z",
+                  "type": "CHANGE_LEGAL_NAME",
+                  "status": "COMPLETED"
+                }
+              ]
+            }
+          ]
+        },
+        "registration": {
+          "initialRegistrationDate": "2021-06-09T11:46:45Z",
+          "lastUpdateDate": "2025-12-12T18:53:12Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-01-10T10:20:03Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000063",
+            "other": null
+          },
+          "validatedAs": "2061297",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QVGTWHEUJ0",
+        "gem": null,
+        "spglobal": [
+          "718092367"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/254900Y9H8TYQYVUR623"
+      }
+    },
+    {
+      "type": "lei-records",
+      "id": "254900FTWCM5HUUKID93",
+      "attributes": {
+        "lei": "254900FTWCM5HUUKID93",
+        "entity": {
+          "legalName": {
+            "name": "Payward Trading Ltd",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O FFP (BVI) Limited",
+              "2nd Floor, Water's Edge Building",
+              "Wickhams Cay II",
+              "Tortola"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Road Town",
+            "region": null,
+            "country": "VG",
+            "postalCode": "VG1110"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "100 Pine St",
+              "Suite 1250-PMB B297"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "San Francisco",
+            "region": "US-CA",
+            "country": "US",
+            "postalCode": "94111"
+          },
+          "registeredAt": {
+            "id": "RA000063",
+            "other": null
+          },
+          "registeredAs": "2043622",
+          "jurisdiction": "VG",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "6EH6",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2020-09-11T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2020-09-15T13:26:37Z",
+          "lastUpdateDate": "2026-02-03T14:42:11Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-03-03T05:43:03Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000063",
+            "other": null
+          },
+          "validatedAs": "2043622",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QVGE53KNY3",
+        "gem": null,
+        "spglobal": [
+          "688548786"
+        ],
+        "conformityFlag": "NON_CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/254900FTWCM5HUUKID93"
+      }
+    }
+  ]
+}

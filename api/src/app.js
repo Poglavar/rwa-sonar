@@ -7,6 +7,7 @@ import { cors } from 'hono/cors';
 
 import { ApiError } from './lib/query.js';
 import { log, logError } from './lib/log.js';
+import cmcRoutes from './routes/cmc.js';
 import eventRoutes from './routes/events.js';
 import evidenceRoutes from './routes/evidence.js';
 import facetRoutes from './routes/facets.js';
@@ -30,6 +31,7 @@ export const ROUTES = [
     'GET /api/tokens?<filters>&q=&sort=&order=&limit=&offset=',
     'GET /api/tokens/:mint',
     'GET /api/tokens/:mint/history?days=',
+    'GET /api/tokens/:mint/cmc (CoinMarketCap, on demand)',
     'GET /api/tokens/:mint/trades?limit=&before=',
     'GET /api/issuers',
     'GET /api/issuers/:slug',
@@ -123,6 +125,7 @@ app.route('/api', eventRoutes);
 app.route('/api', whatIfRoutes);
 app.route('/api', litigationRoutes);
 app.route('/api', facetRoutes);
+app.route('/api', cmcRoutes);
 app.route('/api', tokenRoutes);
 app.route('/api', issuerRoutes);
 app.route('/api', searchRoutes);

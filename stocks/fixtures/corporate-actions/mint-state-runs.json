@@ -1,0 +1,337 @@
+{
+ "note": "REAL sonar.mint_state configuration runs (stocks/lib/corporate-actions.mjs MINT_STATE_RUNS_QUERY) read from the local geodata database on 2026-09-30; lastObservedAt is the chain watcher's newest reading of any mint. MU (Backpack) is cut to its first 6 runs.",
+ "tokens": {
+  "APHx": {
+   "mint": "XsvqNba1k4wF5ZEZ6Nrx8AXUDkKzAFuj4HaVDEemyYH",
+   "issuer": "xstocks-backed",
+   "underlyingTicker": "APH",
+   "firstPoolAt": null,
+   "runs": [
+    {
+     "mint": "XsvqNba1k4wF5ZEZ6Nrx8AXUDkKzAFuj4HaVDEemyYH",
+     "observedAt": "2026-09-20T12:07:03+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1",
+     "next": "2",
+     "effectiveAt": "2026-09-03T08:45:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsvqNba1k4wF5ZEZ6Nrx8AXUDkKzAFuj4HaVDEemyYH",
+     "observedAt": "2026-09-21T21:07:03+00:00",
+     "prevObservedAt": "2026-09-20T23:07:03+00:00",
+     "multiplier": "2",
+     "next": "2.002167988108",
+     "effectiveAt": "2026-09-22T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "MDTx": {
+   "mint": "XsDgw22qRLTv5Uwuzn6T63cW69exG41T6gwQhEK22u2",
+   "issuer": "xstocks-backed",
+   "underlyingTicker": "MDT",
+   "firstPoolAt": null,
+   "runs": [
+    {
+     "mint": "XsDgw22qRLTv5Uwuzn6T63cW69exG41T6gwQhEK22u2",
+     "observedAt": "2026-09-20T12:07:01+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.022582161772571",
+     "next": "1.0294400153167536",
+     "effectiveAt": "2026-06-26T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsDgw22qRLTv5Uwuzn6T63cW69exG41T6gwQhEK22u2",
+     "observedAt": "2026-09-24T21:07:01+00:00",
+     "prevObservedAt": "2026-09-20T13:07:01+00:00",
+     "multiplier": "1.0294400153167536",
+     "next": "1.0357206345492815",
+     "effectiveAt": "2026-09-25T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "OPENAI": {
+   "mint": "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+   "issuer": "prestocks",
+   "underlyingTicker": null,
+   "firstPoolAt": "2025-09-16T05:13:10Z",
+   "runs": [
+    {
+     "mint": "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF",
+     "observedAt": "2026-09-17T17:51:57+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1",
+     "next": "1.4861347",
+     "effectiveAt": "2026-07-17T16:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "SPACEX": {
+   "mint": "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+   "issuer": "prestocks",
+   "underlyingTicker": null,
+   "firstPoolAt": "2025-09-16T05:13:23Z",
+   "runs": [
+    {
+     "mint": "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+     "observedAt": "2026-09-17T17:51:57+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1",
+     "next": "5",
+     "effectiveAt": "2026-06-10T04:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "AAPLon": {
+   "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+   "issuer": "ondo-global-markets",
+   "underlyingTicker": "AAPL",
+   "firstPoolAt": "2025-12-31T17:23:03Z",
+   "runs": [
+    {
+     "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+     "observedAt": "2026-09-17T17:51:57+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.003376073740221",
+     "next": "1.003376073740221",
+     "effectiveAt": "2026-09-02T10:14:04+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+     "observedAt": "2026-09-18T18:07:00+00:00",
+     "prevObservedAt": "2026-09-18T17:07:00+00:00",
+     "multiplier": "1.003376073740221",
+     "next": "1.003376073740221",
+     "effectiveAt": "2026-09-18T17:54:15+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "CIBRon": {
+   "mint": "BVdL3WUxtxUD4vXRWwqChJLbGxvfzZjBGPp63Wtondo",
+   "issuer": "ondo-global-markets",
+   "underlyingTicker": "CIBR",
+   "firstPoolAt": "2026-08-24T17:36:39Z",
+   "runs": [
+    {
+     "mint": "BVdL3WUxtxUD4vXRWwqChJLbGxvfzZjBGPp63Wtondo",
+     "observedAt": "2026-09-17T17:51:57+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.001877709100959",
+     "next": "1.001877709100959",
+     "effectiveAt": "2026-09-02T10:14:04+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "BVdL3WUxtxUD4vXRWwqChJLbGxvfzZjBGPp63Wtondo",
+     "observedAt": "2026-09-18T18:07:00+00:00",
+     "prevObservedAt": "2026-09-17T19:07:00+00:00",
+     "multiplier": "1.001877709100959",
+     "next": "1.001877709100959",
+     "effectiveAt": "2026-09-18T17:54:15+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "BVdL3WUxtxUD4vXRWwqChJLbGxvfzZjBGPp63Wtondo",
+     "observedAt": "2026-09-24T00:05:34+00:00",
+     "prevObservedAt": "2026-09-18T18:07:00+00:00",
+     "multiplier": "1.0018973051801883",
+     "next": "1.0018973051801883",
+     "effectiveAt": "2026-09-24T00:04:04+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "SATAx": {
+   "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+   "issuer": "xstocks-backed",
+   "underlyingTicker": "SATA",
+   "firstPoolAt": null,
+   "runs": [
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-17T17:51:58+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.0458835365354957",
+     "next": "1.046423158477987",
+     "effectiveAt": "2026-09-17T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-17T21:07:01+00:00",
+     "prevObservedAt": "2026-09-17T18:10:10+00:00",
+     "multiplier": "1.046423158477987",
+     "next": "1.046963274862202",
+     "effectiveAt": "2026-09-18T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-18T21:07:01+00:00",
+     "prevObservedAt": "2026-09-17T22:07:01+00:00",
+     "multiplier": "1.046963274862202",
+     "next": "1.0475034538939607",
+     "effectiveAt": "2026-09-19T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-21T21:07:01+00:00",
+     "prevObservedAt": "2026-09-18T21:07:01+00:00",
+     "multiplier": "1.0475034538939607",
+     "next": "1.0480439116302294",
+     "effectiveAt": "2026-09-22T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-22T21:07:01+00:00",
+     "prevObservedAt": "2026-09-22T18:07:01+00:00",
+     "multiplier": "1.0480439116302294",
+     "next": "1.048584648214805",
+     "effectiveAt": "2026-09-23T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-23T20:40:28+00:00",
+     "prevObservedAt": "2026-09-22T21:07:01+00:00",
+     "multiplier": "1.048584648214805",
+     "next": "1.049125663791559",
+     "effectiveAt": "2026-09-24T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-24T21:07:01+00:00",
+     "prevObservedAt": "2026-09-23T20:40:28+00:00",
+     "multiplier": "1.049125663791559",
+     "next": "1.049666958504437",
+     "effectiveAt": "2026-09-25T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsAxB3xLnt7xto5ChiSbVNHBoXcXzKuzS7FieiNYwtY",
+     "observedAt": "2026-09-25T21:07:02+00:00",
+     "prevObservedAt": "2026-09-24T21:07:01+00:00",
+     "multiplier": "1.049666958504437",
+     "next": "1.0502085324974586",
+     "effectiveAt": "2026-09-26T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "AAPLx": {
+   "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+   "issuer": "xstocks-backed",
+   "underlyingTicker": "AAPL",
+   "firstPoolAt": "2025-06-27T14:21:12Z",
+   "runs": [
+    {
+     "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
+     "observedAt": "2026-09-17T17:51:58+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.0026642075893797",
+     "next": "1.0032690125398187",
+     "effectiveAt": "2026-08-08T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "LRCXx": {
+   "mint": "XsSN912SN4Whn2xn59vWZHt1uLbw9WnoNGp5MigmHFf",
+   "issuer": "xstocks-backed",
+   "underlyingTicker": "LRCX",
+   "firstPoolAt": null,
+   "runs": [
+    {
+     "mint": "XsSN912SN4Whn2xn59vWZHt1uLbw9WnoNGp5MigmHFf",
+     "observedAt": "2026-09-20T12:07:02+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1",
+     "next": "1.000492770889",
+     "effectiveAt": "2026-06-17T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "XsSN912SN4Whn2xn59vWZHt1uLbw9WnoNGp5MigmHFf",
+     "observedAt": "2026-09-22T21:07:02+00:00",
+     "prevObservedAt": "2026-09-20T16:07:02+00:00",
+     "multiplier": "1.000492770889",
+     "next": "1.0012359977671856",
+     "effectiveAt": "2026-09-23T00:30:00+00:00",
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  },
+  "MU": {
+   "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+   "issuer": "backpack-securities",
+   "underlyingTicker": "MU",
+   "firstPoolAt": "2026-06-22T04:14:32Z",
+   "runs": [
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-17T17:51:57+00:00",
+     "prevObservedAt": null,
+     "multiplier": "1.000106866878625",
+     "next": "1.000106866878625",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-17T19:07:00+00:00",
+     "prevObservedAt": "2026-09-17T18:10:10+00:00",
+     "multiplier": "1.000106866892159",
+     "next": "1.000106866892159",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-17T23:07:01+00:00",
+     "prevObservedAt": "2026-09-17T20:07:00+00:00",
+     "multiplier": "1.0001068669398092",
+     "next": "1.0001068669398092",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-18T00:07:00+00:00",
+     "prevObservedAt": "2026-09-17T23:07:01+00:00",
+     "multiplier": "1.0001068669919548",
+     "next": "1.0001068669919548",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-18T01:07:00+00:00",
+     "prevObservedAt": "2026-09-18T00:07:00+00:00",
+     "multiplier": "1.0001068670397648",
+     "next": "1.0001068670397648",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    },
+    {
+     "mint": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
+     "observedAt": "2026-09-18T04:07:00+00:00",
+     "prevObservedAt": "2026-09-18T03:07:01+00:00",
+     "multiplier": "1.0001068671836055",
+     "next": "1.0001068671836055",
+     "effectiveAt": null,
+     "lastObservedAt": "2026-09-28T18:07:05+00:00"
+    }
+   ]
+  }
+ }
+}

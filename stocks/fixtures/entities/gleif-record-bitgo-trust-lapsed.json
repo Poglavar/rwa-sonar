@@ -1,0 +1,134 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    }
+  },
+  "data": {
+    "type": "lei-records",
+    "id": "254900QXDWGM1T0HGF47",
+    "attributes": {
+      "lei": "254900QXDWGM1T0HGF47",
+      "entity": {
+        "legalName": {
+          "name": "BitGo Trust Company, Inc.",
+          "language": "en"
+        },
+        "otherNames": [],
+        "transliteratedOtherNames": [],
+        "legalAddress": {
+          "language": "en",
+          "addressLines": [
+            "C/O C T CORPORATION SYSTEM",
+            "319 S COTEAU ST"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "PIERRE",
+          "region": "US-SD",
+          "country": "US",
+          "postalCode": "57501"
+        },
+        "headquartersAddress": {
+          "language": "en",
+          "addressLines": [
+            "6216 S PINNACLE PLACE",
+            "SUITE 101"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "SIOUX FALLS",
+          "region": "US-SD",
+          "country": "US",
+          "postalCode": "57108"
+        },
+        "registeredAt": {
+          "id": "RA000635",
+          "other": null
+        },
+        "registeredAs": "DB153900",
+        "jurisdiction": "US-SD",
+        "category": "GENERAL",
+        "legalForm": {
+          "id": "JZWN",
+          "other": null
+        },
+        "associatedEntity": {
+          "lei": null,
+          "name": null
+        },
+        "status": "ACTIVE",
+        "expiration": {
+          "date": null,
+          "reason": null
+        },
+        "successorEntity": {
+          "lei": null,
+          "name": null
+        },
+        "successorEntities": [],
+        "creationDate": "2018-09-14T00:00:00Z",
+        "subCategory": null,
+        "otherAddresses": [],
+        "eventGroups": []
+      },
+      "registration": {
+        "initialRegistrationDate": "2021-09-03T11:11:24Z",
+        "lastUpdateDate": "2026-09-23T13:30:00Z",
+        "status": "LAPSED",
+        "nextRenewalDate": "2026-09-22T21:02:34Z",
+        "managingLou": "5493001KJTIIGC8Y1R12",
+        "corroborationLevel": "FULLY_CORROBORATED",
+        "validatedAt": {
+          "id": "RA000635",
+          "other": null
+        },
+        "validatedAs": "DB153900",
+        "otherValidationAuthorities": []
+      },
+      "bic": null,
+      "mic": null,
+      "ocid": "us_sd/DB153900",
+      "qcc": null,
+      "gem": null,
+      "spglobal": [
+        "646025902"
+      ],
+      "conformityFlag": "NON_CONFORMING"
+    },
+    "relationships": {
+      "managing-lou": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/managing-lou"
+        }
+      },
+      "lei-issuer": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/lei-issuer"
+        }
+      },
+      "field-modifications": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/field-modifications"
+        }
+      },
+      "direct-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/direct-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/direct-parent"
+        }
+      },
+      "ultimate-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/ultimate-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47/ultimate-parent"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.gleif.org/api/v1/lei-records/254900QXDWGM1T0HGF47"
+    }
+  }
+}

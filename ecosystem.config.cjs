@@ -201,6 +201,103 @@ module.exports = {
             error_file: './logs/rwa-refresh-error.log',
             out_file: './logs/rwa-refresh-out.log',
             merge_logs: true
+        },
+        {
+            // Legal-entity status and insolvency of every trust-chain party (stocks/watch-entities.mjs
+            // --help): GLEIF, Zefix, the UK Gazette (Companies House when a key is set). About a minute.
+            name: 'rwa-watch-entities',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-entities.mjs',
+            args: '--run',
+            interpreter: 'node',
+            cron_restart: '29 3 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-entities-error.log',
+            out_file: './logs/rwa-watch-entities-out.log',
+            merge_logs: true
+        },
+        {
+            // Do the tokens' multipliers follow the underlying's splits and dividends (stocks/watch-
+            // corporate-actions.mjs --help)? Yahoo chart data, ~25 min; after the 00:04/00:30 UTC updates.
+            name: 'rwa-watch-corporate-actions',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-corporate-actions.mjs',
+            args: '--run',
+            interpreter: 'node',
+            cron_restart: '13 5 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-corporate-actions-error.log',
+            out_file: './logs/rwa-watch-corporate-actions-out.log',
+            merge_logs: true
+        },
+        {
+            // Regulator notices naming a trust-chain party (stocks/watch-regulators.mjs --help): 23 daily
+            // sources (SEC, FINRA, CFTC, FCA, FINMA, BaFin, ESMA, CBI, FMA-LI, CIMA, MAS, SMV, ASIC).
+            name: 'rwa-watch-regulators',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-regulators.mjs',
+            args: '--run',
+            interpreter: 'node',
+            cron_restart: '37 5 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-regulators-error.log',
+            out_file: './logs/rwa-watch-regulators-out.log',
+            merge_logs: true
+        },
+        {
+            // The FCA warnings feed carries only its newest 20, and 20+ appear a day: read hourly, with
+            // its own stats file (.last-regulators-watch-stats-fca-warnings.json).
+            name: 'rwa-watch-regulators-fca',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-regulators.mjs',
+            args: '--run --only=fca-warnings',
+            interpreter: 'node',
+            cron_restart: '21 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-regulators-fca-error.log',
+            out_file: './logs/rwa-watch-regulators-fca-out.log',
+            merge_logs: true
+        },
+        {
+            // Issuer reserve figures against Solana supply per token (stocks/watch-reserves.mjs --help):
+            // xStocks' proof-of-reserves API and Superstate's register. About 30 s.
+            name: 'rwa-watch-reserves',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-reserves.mjs',
+            args: '--run',
+            interpreter: 'node',
+            cron_restart: '52 13 * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-reserves-error.log',
+            out_file: './logs/rwa-watch-reserves-out.log',
+            merge_logs: true
+        },
+        {
+            // Uses of issuer powers (stocks/watch-powers.mjs --help): transactions signed by each
+            // token's freeze, mint, pause, delegate, multiplier and fee-config keys and their Squads
+            // multisigs; holder-affecting uses and multisig changes stored, routine ones counted per day.
+            name: 'rwa-watch-powers',
+            cwd: '/root/code/rwa-sonar',
+            script: 'stocks/watch-powers.mjs',
+            args: '--run --budget=1500',
+            interpreter: 'node',
+            cron_restart: '57 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-powers-error.log',
+            out_file: './logs/rwa-watch-powers-out.log',
+            merge_logs: true
         }
     ]
 };

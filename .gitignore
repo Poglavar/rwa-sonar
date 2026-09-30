@@ -125,3 +125,12 @@ stocks/data/event-first-seen.json
 /stocks/data/identity-onchain.json
 /stocks/data/mint-identities.json
 /stocks/data/history/
+.last-reserves-watch-stats.json
+.last-entities-watch-stats.json
+.entities-watch-checkpoint.json
+.last-corporate-actions-watch-stats.json
+.last-regulators-watch-stats.json
+.last-regulators-watch-stats-*.json
+.regulators-watch-checkpoint*.json
+.last-powers-watch-stats.json
+stocks/data/cmc-tokenized.json
