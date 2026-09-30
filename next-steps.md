@@ -48,8 +48,11 @@ Open work only, as of 30 September 2026 (the Stocklana submission is in). Effort
 9. **Smaller polish** — S each. The chain watcher and power map still read a scheduled fee leg as
    the current one (the feed wording and cards handle it). The live tape hides every routed trade,
    including a person's Jupiter swap; telling them apart needs program ids in the trade API.
-10. **Home path in git history** — S, **you** decide. `AGENTS.md` no longer names a home directory,
-    but 7 older commits do. Only a history rewrite removes it.
+10. **Identity cleanup after judging ends** — S, decided 30 Sep: do it once Stocklana judging is over.
+    (a) Remove the 11 "Zagreb" mentions from `colosseum-worlds-fair` (timezone example, role-name
+    comments, a docroot comment; the same fix as `universe` 7e36e7a). (b) Rewrite history on every
+    branch to drop the owner's name, home paths and "zagreb" (16 and 11 commits, two commit messages),
+    then force-push and move the `stocklana-submission` tag; every commit id changes.
 11. **Health follow-ups** — S, **you** decide. Organic flow cautions only above 25 trades per trader,
     and Ondo's scheduled `unavailable_in_session` is not a pause (both 25 Sep; either may be vetoed).
     The holder headline counts holder concentration from caution (one unlabelled wallet over 25 %):
