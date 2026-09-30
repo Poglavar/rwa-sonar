@@ -34,7 +34,8 @@ const {
     renderCard,
     shortAddress,
     truncate,
-    whoCanBuy
+    whoCanBuy,
+    BLOCK_SOURCES, blockAnswers, blockFreshnessHtml,
 } = require('./lib/cards.mjs');
 const evidenceLib = require('./lib/evidence.js');
 const { HEALTH_RULES } = require('./lib/health.mjs');
@@ -437,8 +438,11 @@ describe('renderCard', () => {
     });
 
     it('renders all sections in the order a reader needs them', () => {
-        const order = ['own', 'reference', 'closed-market', 'depth', 'holders', 'control',
-            'defi-usage', 'composability', 'verification', 'venues', 'issuer-api', 'rules'];
+        // The big topics (30 Sep): terms, legal rights, legal control, onchain control, markets,
+        // DeFi, risks. Each block opens with its own health checks and carries its own evidence.
+        const order = ['terms-detail', 'own', 'checks-legal', 'trust-chain', 'verification', 'checks-control', 'control',
+            'checks-market', 'reference', 'depth', 'holders', 'venues', 'issuer-api',
+            'checks-composability', 'defi-usage', 'composability', 'closed-market', 'pyth', 'what-if'];
         const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
         let cursor = -1;
         for (const id of order) {
@@ -651,7 +655,9 @@ describe('renderCard', () => {
         expect(card.authorityAttribution.authorities).toHaveLength(10);
         expect(html).toContain('Capability and permission');
         expect(html).toContain('Controller / threshold / rotation');
-        expect(html).toContain('Contractual circumstances');
+        // No "Contractual circumstances" row: 0 of 1,418 cards carry the field (30 Sep), so the row
+        // read "Not established" everywhere; what the terms let the issuer do is in the what-ifs.
+        expect(html).not.toContain('Contractual circumstances');
         expect(html).toContain('Technical control notes');
         expect(html).toContain('Technical observations');
         expect(publicCard(card).control).toEqual(card.control);
@@ -746,7 +752,7 @@ describe('renderCard', () => {
         expect(html.startsWith('<!doctype html>')).toBe(true);
         expect(html).not.toContain('noindex');
         expect(html).toContain('<meta name="description"');
-        expect(html).toContain('class="asset-decision"');
+        expect(html).toContain('<details id="five-things" class="card-disclosure asset-decision" open>');
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
         // The trust-chain/what-if rules are one shared sheet, after card.css (next-steps.md F11).
         expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" /><link rel="stylesheet" href="../trustchain.css?v=20260917a" />');
@@ -1031,7 +1037,9 @@ describe('evidence chips on a card', () => {
             .toBe('Evidence: 0 of 46 fields sourced · never checked');
         expect(evidenceLine(null)).toBe('');
         const html = renderCard(fixtureCard(), { version: 'test' });
-        expect(html).toMatch(/<p class="ev-line">Evidence: \d+ of \d+ fields sourced/);
+        // At the foot of the Legal control block, with the legal evidence check it feeds, not in the page footer.
+        const evidenceBlock = html.slice(html.indexOf('<details id="legal-control"'), html.indexOf('<details id="control-detail"'));
+        expect(evidenceBlock).toMatch(/<span class="ev-line">Evidence: \d+ of \d+ fields sourced/);
     });
 
     it('publishes the evidence SUMMARY only — the claims are rendered above it', () => {
@@ -1260,7 +1268,7 @@ describe('the what-if answers on a card', () => {
 
     it('cites one numbered source list instead of repeating a URL on every row', () => {
         const html = renderCard(cardFor('NVDAx'), { version: 'test' });
-        const section = html.slice(html.indexOf('<section id="what-if">'), html.indexOf('<section id="rules">'));
+        const section = html.slice(html.indexOf('<section id="what-if">'), html.indexOf('<footer>'));
         expect(section).toContain('<ol class="wi-sources">');
         const refs = [...section.matchAll(/class="wi-ref" href="#wi-src-(\d+)"/g)].map((m) => Number(m[1]));
         const entries = [...section.matchAll(/<li id="wi-src-(\d+)"/g)].map((m) => Number(m[1]));
@@ -1357,7 +1365,7 @@ describe('model-assessed material changes on a card', () => {
         const card = cardFor('NVDAx', BUILT_AT, exportOf(row()));
         const html = renderCard(card, { version: 'v' });
         expect(MATERIAL_CHANGE_TITLE).toContain('model assessment');
-        expect(html).toContain(`<strong>${MATERIAL_CHANGE_TITLE}</strong>`);
+        expect(html).toContain(`<details id="material-changes" class="card-disclosure model-changes" open><summary><span>${MATERIAL_CHANGE_TITLE}</span>`);
         expect(html).toContain('A redemption fee now applies to every holder.');
         expect(html).toContain('not a legal conclusion');
         expect(html).toContain(`../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(token.issuer)}&amp;material=true`);
@@ -1443,7 +1451,7 @@ describe('model-assessed material changes on a card', () => {
 // --- When the market is closed ------------------------------------------------------------------
 
 describe('the "When the market is closed" section on a card', () => {
-    const sectionOf = (html) => html.slice(html.indexOf('<section id="closed-market">'), html.indexOf('<section id="depth">'));
+    const sectionOf = (html) => html.slice(html.indexOf('<section id="closed-market">'), html.indexOf('<section id="pyth">'));
 
     it('replaces the closed-hours premium: no premium-gap wording is left on any card', () => {
         const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
@@ -1581,11 +1589,21 @@ describe('no internal key reaches a reader', () => {
         expect(html).toContain('>Base Prospectus, Backed Assets (JE) Limited');
     });
 
-    it('prints dates as dates and the footer’s sources in words', () => {
+    it('prints dates as dates and each block’s sources in words', () => {
         expect(visible(html)).not.toMatch(/observed \d{4}-\d{2}-\d{2}/);
-        const footer = visible(html.slice(html.indexOf('<footer><h2>Data</h2>')));
-        expect(footer).toContain('catalogue');
-        expect(footer).not.toMatch(/\b(tokens|issuerApi|closedMarket|defiUsage)\b/);
+        const lines = [...html.matchAll(/<p class="block-src">([\s\S]*?)<\/p>/g)].map((m) => visible(m[1]));
+        expect(lines.join(' ')).toContain('catalogue');
+        expect(lines.join(' ')).not.toMatch(/\b(tokens|issuerApi|closedMarket|defiUsage)\b/);
+    });
+
+    it('says in each block when its own inputs were read, and every input is named in some block', () => {
+        const card = aaplx;
+        expect(Object.keys(card.sources).filter((key) => !Object.values(BLOCK_SOURCES).flat().includes(key))).toEqual([]);
+        const markets = html.slice(html.indexOf('<details id="market-detail"'), html.indexOf('<details id="risks"'));
+        expect(markets).toContain('<p class="block-src">Data as of: ');
+        expect(blockFreshnessHtml(card, 'control')).toMatch(/^<p class="block-src">Data as of: catalogue <time/);
+        expect(blockFreshnessHtml({ ...card, sources: {} }, 'control')).toBe('');
+        expect(html).not.toContain('<h2>Data</h2>');
     });
 });
 
@@ -1609,6 +1627,17 @@ describe('the largest unresolved risk, in a sentence a holder can read', () => {
             for (const rule of card.health.rules) if (rule.note) expect(value).not.toContain(rule.note);
             expect(value).not.toMatch(/organic share and|trades per trader over/);
         }
+    });
+
+    it('shows found discrepancies at the top as an open block, with no banner pointing below', () => {
+        const fgdl = cardFor('FGDLx');
+        const html = renderCard(fgdl, { version: 'v' });
+        const head = html.indexOf('<header class="card-head">');
+        const top = html.slice(head, html.indexOf('<details id="events"', head));
+        expect(top).toContain(`<details id="discrepancy-detail" class="card-disclosure discrepancy-block" open><summary><span>Claim ≠ observed reality (${fgdl.discrepancies.length})</span>`);
+        expect(top).toContain('<section id="discrepancies">');
+        expect(html).not.toContain('discrepancy-banner');
+        expect(renderCard(without(fgdl, 'discrepancy'), { version: 'v' })).not.toContain('discrepancy-detail');
     });
 
     it('leads with a documented claim-vs-reality conflict, then a priority-zero review', () => {
@@ -1763,8 +1792,9 @@ describe('the price line under a card’s title', () => {
 describe('plain words at the top of a card and in "What you own"', () => {
     const visibleText = (fragment) => fragment.replace(/<script[\s\S]*?<\/script>/g, '')
         .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details id="health" class="card-disclosure decision-health">'));
-    const ownOf = (html) => html.slice(html.indexOf('<section id="own">'), html.indexOf('id="market-detail"'));
+    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details id="events"'));
+    // Terms and legal rights: the instrument as documented, then what it gives the holder.
+    const ownOf = (html) => html.slice(html.indexOf('<section id="terms-detail">'), html.indexOf('<details id="legal-control"'));
     const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis/i;
 
     it('says claim depth and ledger maturity as questions with "N of 4" answers, the terms kept as titles', () => {
@@ -1863,14 +1893,14 @@ describe('ISO instants inside generated prose', () => {
 
 describe('the "Where prices come from" block', () => {
     const html = (symbol, card = cardFor(symbol)) => renderCard(card, { baseUrl: null, version: 'v' });
-    const blockOf = (page) => page.slice(page.indexOf('<section id="pyth">'), page.indexOf('<section id="depth">'));
+    const blockOf = (page) => page.slice(page.indexOf('<section id="pyth">'), page.indexOf('</section>', page.indexOf('<section id="pyth">')));
     const visible = (fragment) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
     const readAt = PYTH_ONCHAIN.readAt;
 
-    it('sits in Markets right after "When the market is closed", which points to it', () => {
+    it('sits in DeFi right after "When the market is closed", which points to it', () => {
         const page = html('AAPLx');
         expect(page.indexOf('<section id="pyth"><h2>Where prices come from</h2>')).toBeGreaterThan(page.indexOf('<section id="closed-market">'));
-        expect(page.indexOf('<section id="pyth">')).toBeLessThan(page.indexOf('<section id="depth">'));
+        expect(page.indexOf('<section id="pyth">')).toBeLessThan(page.indexOf('<details id="risks"'));
         expect(blockOf(page).length).toBeGreaterThan(200);
         expect(page.slice(page.indexOf('<section id="closed-market">'), page.indexOf('<section id="pyth">'))).toContain('<a href="#pyth">Which price each lender uses</a>');
     });
@@ -1994,7 +2024,7 @@ describe('the health split on a card: this token and its programme', () => {
     // HEALTH_LEVELS). The card now names both levels and what holds each back.
     const WORDS = { good: 'good', caution: 'caution', warning: 'warning', unknown: 'not measured' };
     const healthSection = (html) => {
-        const start = html.indexOf('<details id="health" class="card-disclosure decision-health">');
+        const start = html.indexOf('<details id="risks" class="card-disclosure decision-health">');
         return html.slice(start, html.indexOf('</details>', start));
     };
     const aaplx = cardFor('AAPLx');
@@ -2009,7 +2039,7 @@ describe('the health split on a card: this token and its programme', () => {
 
     it('the summary names this token and its programme instead of one worst-of word', () => {
         const { token, programme } = aaplx.health.levels;
-        expect(section).toContain(`Why the health checks say: this token ${WORDS[token.status]}, programme ${WORDS[programme.status]}`);
+        expect(section).toContain(`Risks: token ${WORDS[token.status]} · programme ${WORDS[programme.status]}`);
     });
 
     it('each level has its own banner, with the pass count and what holds the programme back', () => {
@@ -2031,7 +2061,7 @@ describe('the health split on a card: this token and its programme', () => {
             .find((card) => card.health.levels.token.status === 'unknown' && card.health.levels.token.judged > 0);
         expect(idle).toBeDefined();
         const html = healthSection(renderCard(idle, { baseUrl: 'https://rwasonar.com', version: 't' }));
-        expect(html).toContain('this token not measured');
+        expect(html).toContain('Risks: token not measured');
         expect(html).toContain('No market could be measured');
         expect(html).not.toContain('<p class="banner banner-good"><strong>This token</strong>');
     });
@@ -2104,7 +2134,7 @@ describe('growing lists on a card are compact rows that open to the full item', 
 
     it('shows each lender\'s Pyth feed as one row; the stale Loopscale account is flagged and its links sit in the body', () => {
         const card = cardFor('NVDAx');
-        const rows = foldRows(sectionOf(renderCard(card, { version: 'v' }), 'pyth', 'depth'));
+        const rows = foldRows(sectionOf(renderCard(card, { version: 'v' }), 'pyth', 'what-if'));
         expect(rows).toHaveLength(card.pyth.lenders.length);
         const loopscale = rows.find((row) => row.summary.includes('Loopscale'));
         expect(loopscale.summary).not.toContain('<a ');
@@ -2123,7 +2153,7 @@ describe('growing lists on a card are compact rows that open to the full item', 
             assessmentSeverity: 'caution', assessmentSummary: 'A redemption fee now applies to every holder.'
         }] });
         const html = renderCard(card, { version: 'v' });
-        const block = html.slice(html.indexOf('<div class="model-changes">'));
+        const block = html.slice(html.indexOf('<details id="material-changes"'));
         const [row] = foldRows(block);
         expect(row.open).toBe(' id="material-139" class="fold-row fold-caution"');
         expect(row.summary).toContain('22 Sep 2026 · <b class="fold-chip">caution</b>');
@@ -2169,5 +2199,70 @@ describe('card.js opens the fold row a link targets', () => {
         const { rowDetails, row } = load('#nothing-here');
         expect(rowDetails.open).toBe(false);
         expect(row.classList.has('fold-target')).toBe(false);
+    });
+});
+
+describe('each topic block states its answer and carries its own checks (30 Sep)', () => {
+    const aaplx = cardFor('AAPLx');
+    const html = renderCard(aaplx, { version: 'v' });
+    const block = (id, next) => html.slice(html.indexOf(`<details id="${id}"`), html.indexOf(`<details id="${next}"`));
+    const chip = /^<b class="c-(good|caution|warning|unknown)">\w[\w ]*<\/b> /;
+
+    it('answers, built only from the record: terms, rights, custody and reserves, powers and keys, market, DeFi, what-ifs', () => {
+        const answers = blockAnswers(aaplx);
+        expect(answers.terms).toBe('Tracker certificate · Jersey');
+        expect(answers.rights).toMatch(/^2 of 4 — a secured claim on collateral · .+ · redeemable through the issuer$/);
+        // The rights words, on a record that states them (the frozen issuer fixture predates holder rights).
+        const stated = { ...aaplx, ownership: { ...aaplx.ownership, holderRights: { dividends: { status: 'value' }, voting: { status: 'no' }, splits: { status: 'value' } } } };
+        expect(blockAnswers(stated).rights).toBe('2 of 4 — a secured claim on collateral · dividends, splits pass through · redeemable through the issuer');
+        expect(blockAnswers({ ...aaplx, ownership: { ...aaplx.ownership, holderRights: { dividends: { status: 'no' }, voting: { status: 'no' } } } }).rights).toContain('no shareholder rights');
+        expect(answers.legalControl).toMatch(chip);
+        expect(answers.legalControl).toContain('custody: InCore Bank AG +4 · reserves: on-chain PoR (4 of 5)');
+        expect(answers.control).toMatch(chip);
+        expect(answers.control).toMatch(/ can freeze, pause, move or burn, rebase · keys: hot key, multisig$/);
+        // Only the four keys' types reach the answer, never the evidence sentence stored beside them.
+        expect(blockAnswers({ ...aaplx, keyGovernance: { ...aaplx.keyGovernance, evidence: 'Finalized getMultipleAccounts…' } }).control).not.toMatch(/getMultipleAccounts/i);
+        expect(blockAnswers({ ...aaplx, keyGovernance: { mint: 'program', freeze: 'unknown', delegate: 'none', rebase: null } }).control).toMatch(/keys: program-controlled$/);
+        expect(answers.markets).toMatch(/^<b class="c-\w+">\w+<\/b> \$[\d,.]+ · [-+−]?[\d.]+% vs AAPL · \$[\d,.]+[kM]? liquidity$/);
+        expect(answers.defi).toMatch(chip);
+        expect(answers.defi).toMatch(/Kamino.* · as collateral$/);
+        expect(answers.risks).toMatch(/^38 what-if scenarios: 34 documented, 1 unknown$/);
+        const spacex = blockAnswers(cardFor('SPACEX'));
+        expect(spacex.terms).toBe('SPV synthetic');
+        expect(spacex.legalControl).toContain('no custodian named · reserves: auditor (2 of 5)');
+        expect(spacex.control).toMatch(/ can freeze, pause, move or burn, rebase, transfer fee · keys: multisig$/);
+    });
+
+    it('puts each answer in its block header, and every topic block has one', () => {
+        for (const [id, key] of [['terms', 'terms'], ['rights', 'rights'], ['legal-control', 'legalControl'], ['control-detail', 'control'], ['market-detail', 'markets'], ['defi-detail', 'defi'], ['risks', 'risks']]) {
+            expect(html).toContain(`<details id="${id}" class="card-disclosure${id === 'risks' ? ' decision-health' : ''}"><summary><span>`);
+            expect(html).toContain(`<small>${blockAnswers(aaplx)[key]}</small>`);
+        }
+    });
+
+    it('opens each block with the health checks of its own dimension; Risks maps them with tiles that link to the blocks', () => {
+        expect(block('legal-control', 'control-detail')).toMatch(/^<details id="legal-control"[^>]*><summary>[\s\S]*?<\/summary><div><section id="checks-legal"><h2>Legal \/ evidence checks<\/h2>/);
+        expect(block('control-detail', 'market-detail')).toContain('<section id="checks-control"><h2>Control checks</h2>');
+        expect(block('market-detail', 'defi-detail')).toContain('<section id="checks-market"><h2>Market checks</h2>');
+        expect(block('defi-detail', 'risks')).toContain('<section id="checks-composability"><h2>DeFi composability checks</h2>');
+        // Every rule is printed exactly once, in its dimension's block.
+        for (const rule of aaplx.health.rules) {
+            const own = html.slice(html.indexOf(`<section id="checks-${rule.dimension}">`), html.indexOf('</section>', html.indexOf(`<section id="checks-${rule.dimension}">`)));
+            expect(own).toContain(`<tr><td>${rule.label}</td>`);
+            expect(html.split(`<tr><td>${rule.label}</td>`)).toHaveLength(2);
+        }
+        expect(html).not.toContain('<section id="rules">');
+        for (const [dimension, target] of [['market', 'market-detail'], ['control', 'control-detail'], ['legal', 'legal-control'], ['composability', 'defi-detail']]) {
+            expect(html).toMatch(new RegExp(`<a class="health-dimension health-dimension-\\w+" href="#${target}">`));
+            expect(html).toContain(`href="#${target}"`);
+            void dimension;
+        }
+        expect(html.indexOf('<details id="market-detail"')).toBeLessThan(html.indexOf('<details id="defi-detail"'));
+    });
+
+    it('shows the answer on a phone under the title instead of hiding it', () => {
+        const css = fs.readFileSync(path.join(REPO_ROOT, 'card.css'), 'utf8');
+        expect(css).toMatch(/@media \(max-width: 480px\) \{\s*\.card-disclosure > summary \{ flex-wrap: wrap;/);
+        expect(css).not.toMatch(/summary small \{ display: none/);
     });
 });

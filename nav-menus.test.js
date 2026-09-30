@@ -2,7 +2,7 @@
 // header dropdown loads it (a <details> menu otherwise ignores Escape and outside clicks).
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
-const { menusToClose } = require('./nav-menus.js');
+const { MENU_SELECTOR, menusToClose } = require('./nav-menus.js');
 
 const fakeMenu = (inside) => ({ contains: (node) => inside.includes(node) });
 
@@ -11,6 +11,14 @@ test('a click closes the menus it landed outside of and keeps the one it landed 
     const b = fakeMenu(['b-link']);
     expect(menusToClose([a, b], 'b-link')).toEqual([a]);
     expect(menusToClose([a, b], 'page-body')).toEqual([a, b]);
+});
+
+test('closes only the site header\'s menus, never a page\'s own <header> blocks (a token card\'s top blocks)', () => {
+    expect(MENU_SELECTOR).toBe('.app-header details[open]');
+    // The card builder puts its open blocks in a <header> of its own, next to the site header.
+    const builder = readFileSync(join(__dirname, 'stocks', 'lib', 'cards.mjs'), 'utf8');
+    expect(builder).toContain('<header class="card-head">');
+    expect(readFileSync(join(__dirname, 'stocks', 'lib', 'site-nav.js'), 'utf8')).toContain('<header class="app-header">');
 });
 
 test('every page with a header dropdown loads nav-menus.js, and a hidden header link is in its menu', () => {

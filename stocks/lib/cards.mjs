@@ -1411,13 +1411,14 @@ function section(id, title, body) {
 
 /**
  * One collapsible block of the card body. Every block below the decision summary uses this, so each
- * reads the same: a title, an optional one-line hint, and a +/− toggle. `body`, `titleHtml` and
- * `attrs` (extra attributes, with their leading space) are trusted markup;
+ * reads the same: a title, an optional one-line hint (the block's answer, blockAnswers), and a +/−
+ * toggle; `open` starts it expanded. `body`, `titleHtml`, `hintHtml` and `attrs` (extra attributes,
+ * with their leading space) are trusted markup;
  * a deep link into the block opens it (card.js revealHashTarget).
  */
-function disclosure({ id = null, cls = '', attrs = '', title, titleHtml = null, hint = null, body }) {
-    return `<details${id ? ` id="${id}"` : ''} class="card-disclosure${cls ? ` ${cls}` : ''}"${attrs}><summary>`
-        + `<span>${titleHtml ?? escapeHtml(title)}</span>${hint ? `<small>${escapeHtml(hint)}</small>` : ''}`
+function disclosure({ id = null, cls = '', attrs = '', title, titleHtml = null, hint = null, hintHtml = null, open = false, body }) {
+    return `<details${id ? ` id="${id}"` : ''} class="card-disclosure${cls ? ` ${cls}` : ''}"${attrs}${open ? ' open' : ''}><summary>`
+        + `<span>${titleHtml ?? escapeHtml(title)}</span>${hintHtml ? `<small>${hintHtml}</small>` : hint ? `<small>${escapeHtml(hint)}</small>` : ''}`
         + `</summary><div>${body}</div></details>`;
 }
 
@@ -1548,6 +1549,11 @@ export function indexEntry(card) {
     };
 }
 
+/**
+ * The ownership dossier in two parts: `terms` (the instrument as documented: form, issuer, law,
+ * regulation, transfer restrictions, how official the token record is) and `rights` (what the
+ * holder owns, the shareholder rights passed through, and whether a holder can redeem).
+ */
 function whatYouOwnBody(card) {
     const o = card.ownership;
     // Both ladders in a buyer's words; the technical name and its definition stay in the title.
@@ -1571,15 +1577,17 @@ function whatYouOwnBody(card) {
 
     const summary = kv([
         [issuerLabels.CLAIM_DEPTH_QUESTION, rung],
-        ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm)), 'legalForm'],
         ['What the holder owns', o.holderClaim === null ? null : escapeHtml(o.holderClaim), 'holderClaim'],
+        // Full redemption terms and their direct sources appear once in the usability disclosure
+        // below. Do not repeat the same four claim popovers beside this summary line.
+        ['Redemption', redemption]
+    ], card.evidence);
+    const terms = kv([
+        ['Legal form', o.legalForm === null ? null : text(humanizeSlug(o.legalForm)), 'legalForm'],
         ['Issuing entity', o.issuingEntity === null ? null : escapeHtml(o.issuingEntity), 'issuingEntity'],
         ['Jurisdiction', o.entityJurisdiction === null ? null : escapeHtml(o.entityJurisdiction), 'entityJurisdiction'],
         ['Governing law', o.governingLaw === null ? null : escapeHtml(o.governingLaw), 'governingLaw'],
         ['Regulatory status', o.regulatoryStatus === null ? null : escapeHtml(o.regulatoryStatus), 'regulatoryStatus'],
-        // Full redemption terms and their direct sources appear once in the usability disclosure
-        // below. Do not repeat the same four claim popovers beside this summary line.
-        ['Redemption', redemption],
         ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
             ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
                 'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
@@ -1620,8 +1628,11 @@ function whatYouOwnBody(card) {
         ? '<p class="redemption-observation"><strong>Documented, but not independently observed.</strong> Contract terms do not prove that an eligible holder can complete the route today.</p>'
         : '';
     const rights = holderRightsLib.holderRightsDetailHtml(holderRightsLib.holderRightsRows(o.holderRights));
-    return summary + rights + `<div class="redemption-usability"><h3>Can a holder redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`
-        + redemptionSchematicHtml(card);
+    return {
+        terms,
+        rights: summary + rights + `<div class="redemption-usability"><h3>Can a holder redeem?</h3>${banner}<dl>${usabilityRows.join('')}</dl></div>`
+            + redemptionSchematicHtml(card)
+    };
 }
 
 /**
@@ -2247,8 +2258,6 @@ function controlBody(card) {
     const attributed = groupedAuthorityFacts(authorities, (row) => [row.governance.controller,
         row.governance.signerThreshold, row.governance.upgradeAuthority, row.governance.lastRotatedAt]
         .filter(Boolean).join(' · '));
-    const circumstances = authorities.filter((row) => row.governance.contractualCircumstances)
-        .map((row) => `${row.label}: ${row.governance.contractualCircumstances}`).join(' · ') || 'Not established';
     // One RPC observation commonly proves several capabilities (for example, a multisig vault
     // controlling both freeze and pause). Print its date and source once per observation, while
     // retaining each capability's distinct technical note.
@@ -2281,7 +2290,6 @@ function controlBody(card) {
             ['Capabilities unknown', escapeHtml(capabilityList('unknown'))],
             ['Recorded key governance', escapeHtml(governed)],
             ['Controller / threshold / rotation', escapeHtml(attributed)],
-            ['Contractual circumstances', escapeHtml(circumstances)],
             ['Technical control notes', escapeHtml(technicalNotes)],
             ['Technical observations', technicalEvidence]]) + '</div>';
 }
@@ -2446,8 +2454,10 @@ function whatIfBody(card) {
         + 'Full answers, with the quotes, notes and primary-document register, in the issuer dossier</a></p>';
 }
 
-function rulesBody(card) {
-    const rows = card.health.rules.map((rule) => `<tr><td>${escapeHtml(rule.label)}</td>` +
+/** The checks of one health dimension (or all of them), each with its value, thresholds and inputs. */
+function rulesBody(card, dimension = null) {
+    const rules = card.health.rules.filter((rule) => dimension === null || rule.dimension === dimension);
+    const rows = rules.map((rule) => `<tr><td>${escapeHtml(rule.label)}</td>` +
         `<td>${chip(rule.status)}</td>` +
         `<td class="n">${rule.value === null ? DASH : escapeHtml(String(roundSignificant(rule.value, TABLE_DIGITS)))}</td>` +
         `<td class="s">${text(rule.threshold)}</td>` +
@@ -2673,6 +2683,9 @@ function healthLevelsHtml(card) {
         + `Legal evidence, authority keys and DeFi enforceability — the same for every ${escapeHtml(issuerName)} token.${programmeText}</p>`;
 }
 
+/** The block each health dimension's checks sit in, so a tile in Risks leads to them. */
+const DIMENSION_BLOCKS = { market: 'market-detail', control: 'control-detail', legal: 'legal-control', composability: 'defi-detail' };
+
 function healthDimensionsHtml(card) {
     return `<div class="health-dimensions" aria-label="Health by dimension">${HEALTH_DIMENSIONS.map((dimension) => {
         const result = card.health.dimensions?.[dimension.id] ?? { status: 'unknown', worstRuleId: null };
@@ -2682,9 +2695,9 @@ function healthDimensionsHtml(card) {
         const judged = Number.isInteger(result.judged) ? result.judged : total - unknown;
         const worst = card.health.rules.find((rule) => rule.id === result.worstRuleId) ?? null;
         const detail = worst === null ? 'not measured' : worst.label;
-        return `<div class="health-dimension health-dimension-${escapeHtml(result.status)}">`
+        return `<a class="health-dimension health-dimension-${escapeHtml(result.status)}" href="#${DIMENSION_BLOCKS[dimension.id]}">`
             + `<span>${escapeHtml(dimension.label)}</span>${chip(result.status)}`
-            + `<small>${escapeHtml(detail)} · ${judged}/${total} checks judged; ${unknown} unknown</small></div>`;
+            + `<small>${escapeHtml(detail)} · ${judged}/${total} checks judged; ${unknown} unknown</small></a>`;
     }).join('')}</div>`;
 }
 
@@ -2882,8 +2895,8 @@ export function largestRisk(card) {
     const redemption = redemptionRisk(card);
     if (redemption !== null) return { value: redemption, href: '#own', link: 'Inspect redemption terms' };
     const health = healthRisk(card);
-    if (health !== null) return { value: health, href: '#rules', link: 'Inspect the health checks' };
-    return { value: 'The current checks measured no material risk; what they could not measure is unknown.', href: '#rules', link: 'Inspect the health checks' };
+    if (health !== null) return { value: health, href: '#risks', link: 'Inspect the health checks' };
+    return { value: 'The current checks measured no material risk; what they could not measure is unknown.', href: '#risks', link: 'Inspect the health checks' };
 }
 
 /**
@@ -2949,14 +2962,13 @@ export function assetDecisionFacts(card) {
 
 function assetDecisionHtml(card) {
     const rows = assetDecisionFacts(card);
-    return '<section class="asset-decision" aria-label="Holder decision summary">'
-        + '<p class="asset-decision-kicker">The five things to know first</p>'
-        + `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}"${row.title ? ` title="${escapeHtml(row.title)}"` : ''}>`
+    return disclosure({ id: 'five-things', cls: 'asset-decision', title: 'The five things to know first', open: true,
+        hint: 'Ownership, intervention, exit, DeFi and the largest risk',
+        body: `<div class="asset-decision-grid">${rows.map((row) => `<article class="asset-decision-${escapeHtml(row.id)}"${row.title ? ` title="${escapeHtml(row.title)}"` : ''}>`
             + `<small>${escapeHtml(row.label)}</small><strong>${escapeHtml(row.value)}</strong>`
             + `<a href="${escapeHtml(row.href)}">${escapeHtml(row.link)} →</a></article>`).join('')}</div>`
         + `<div class="asset-rights"><small>Shareholder rights you get</small>`
-        + `${holderRightsLib.holderRightsStripHtml(holderRightsLib.holderRightsRows(card?.ownership?.holderRights), { href: '#holder-rights', legend: true })}</div>`
-        + '</section>';
+        + `${holderRightsLib.holderRightsStripHtml(holderRightsLib.holderRightsRows(card?.ownership?.holderRights), { href: '#holder-rights', legend: true })}</div>` });
 }
 
 /**
@@ -3059,9 +3071,10 @@ export function materialChangesHtml(card) {
         body: `<q>${escapeHtml(item.assessment ?? '')}</q>`
             + `${item.id === null ? '' : ` <a href="../watch.html?material=true#change-${encodeURIComponent(item.id)}">Diff →</a>`}`
     })));
-    return `<div class="model-changes"><strong>${escapeHtml(MATERIAL_CHANGE_TITLE)}</strong>${items}`
-        + `<p>A model's reading of each document diff. It is not a legal conclusion. <a href="${href}">`
-        + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p></div>`;
+    return disclosure({ id: 'material-changes', cls: 'model-changes', title: MATERIAL_CHANGE_TITLE, open: true,
+        hint: `${block.count} in the last ${block.windowDays} days`,
+        body: `${items}<p>A model's reading of each document diff. It is not a legal conclusion. <a href="${href}">`
+            + `${block.count} in the last ${block.windowDays} days, with the diffs →</a></p>` });
 }
 
 /**
@@ -3073,11 +3086,89 @@ export function materialChangesHtml(card) {
 export function tokenEventsHtml(card) {
     const issuer = card.issuer?.slug ?? '';
     return disclosure({
-        id: 'events', cls: 'token-events', title: 'Latest events', hint: 'Last 30 days',
+        id: 'events', cls: 'token-events', title: 'Events', hint: 'Last 30 days',
         attrs: ` data-mint="${escapeHtml(card.mint)}" data-issuer="${escapeHtml(issuer)}" data-symbol="${escapeHtml(card.symbol ?? '')}"`,
         body: '<ul class="token-events-list"><li class="event-empty">Loading events…</li></ul>'
             + `<p class="token-events-foot">This token, and its programme’s filings, terms and fees. <a href="../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(issuer)}">All changes →</a></p>`
     });
+}
+
+/** The four authority keys' governance types in words (MODEL.md §2.7); unknown and none say nothing. */
+const KEY_WORDS = { 'hot-key': 'hot key', multisig: 'multisig', 'single-signer-multisig': 'one-signer multisig', program: 'program-controlled' };
+const GOVERNED_KEYS = ['mint', 'freeze', 'delegate', 'rebase'];
+
+/**
+ * The one-line answer each topic block's header carries (its summary hint), with the health
+ * dimension's status where checks apply, so a reader scanning the closed blocks already has the
+ * token's picture: what it is, what it gives, who holds the asset, what the keys can do, how it
+ * trades, which protocols take it, how many what-ifs are answered. Every part is built from the
+ * card record; a fact the record does not hold is left out, never guessed.
+ */
+export function blockAnswers(card) {
+    const o = card.ownership ?? {};
+    const status = (dimension) => chip(card.health?.dimensions?.[dimension]?.status ?? 'unknown');
+    // A dossier fact's first clause, when it is short and says something ("Jersey (Channel Islands)" → "Jersey").
+    const shortFact = (value, max = 40) => {
+        const t = str(value);
+        if (t === null || /^(unknown|not named|not stated|undisclosed)\b/i.test(t)) return null;
+        const head = t.split(/[,;(]/)[0].trim();
+        return head.length > 0 && head.length <= max ? head : null;
+    };
+    const join = (parts) => parts.filter(Boolean).map(escapeHtml).join(' · ');
+
+    const terms = join([o.legalForm ? humanizeSlug(o.legalForm) : null, shortFact(o.entityJurisdiction)]) || 'Not documented';
+
+    const rightsRows = holderRightsLib.holderRightsRows(o.holderRights);
+    const passed = rightsRows.filter((row) => row.status === 'yes' || row.status === 'value').map((row) => row.label.toLowerCase());
+    const rightsWords = rightsRows.every((row) => row.status === 'unknown') ? 'shareholder rights not stated'
+        : passed.length === 0 ? 'no shareholder rights' : `${passed.join(', ')} pass through`;
+    const redemption = o.redemption?.available === true ? 'redeemable through the issuer'
+        : o.redemption?.available === false ? 'no redemption' : null;
+    const rights = join([issuerLabels.claimDepthWords(o.claimRung), rightsWords, redemption]) || 'Not documented';
+
+    // A party is a name on the published record and {name, …} on the build card (lib/trustchain.js).
+    const custodians = (card.trustChain?.nodes?.find((node) => node.actor === 'custodian')?.parties ?? [])
+        .map((party) => (typeof party === 'string' ? party : str(party?.name ?? party?.label))).filter(Boolean);
+    const custody = card.trustChain === null || card.trustChain === undefined ? null
+        : custodians.length === 0 ? 'no custodian named' : `custody: ${custodians[0]}${custodians.length > 1 ? ` +${custodians.length - 1}` : ''}`;
+    const v = card.verification ?? {};
+    const reserves = isNum(v.strength) && v.strength > 0
+        ? `reserves: ${v.label ?? humanizeSlug(v.type ?? 'verified')} (${v.strength} of 5)` : 'reserves not verified';
+    const legalControl = `${status('legal')} ${join([custody, reserves])}`;
+
+    const c = card.control ?? {};
+    const powers = [
+        c.freezeAuthority ? 'freeze' : null, c.pausable ? 'pause' : null,
+        c.permanentDelegate || c.clawback ? 'move or burn' : null,
+        typeof card.keyGovernance?.rebase === 'string' ? 'rebase' : null,
+        isNum(c.transferFeeBps) && c.transferFeeBps > 0 ? 'transfer fee' : null,
+        c.allowlist ? 'allowlist' : null
+    ].filter(Boolean);
+    // Only the four keys' types: the record also carries the evidence sentence they were read from.
+    const keys = [...new Set(GOVERNED_KEYS.map((key) => KEY_WORDS[card.keyGovernance?.[key]] ?? null).filter(Boolean))];
+    const control = `${status('control')} ${join([powers.length ? `can ${powers.join(', ')}` : 'no holder-affecting power found', keys.length ? `keys: ${keys.join(', ')}` : null])}`;
+
+    const r = card.reference ?? {};
+    const markets = `${status('market')} ${join([
+        isNum(r.usdPrice) ? fmtPrice(r.usdPrice) : null,
+        isNum(r.premiumPct) ? `${fmtSignedPct(r.premiumPct)} vs ${card.underlyingTicker ?? referenceLabel(r.source) ?? 'reference'}` : null,
+        isNum(card.depth?.liquidityUsd) ? `${fmtMoney(card.depth.liquidityUsd)} liquidity` : null
+    ]) || 'no market measured'}`;
+
+    const integrations = Array.isArray(card.defiUsage?.integrations) ? card.defiUsage.integrations : [];
+    const protocols = [...new Set(integrations.map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
+    const actions = integrations.flatMap((entry) => (Array.isArray(entry.actions) ? entry.actions : []));
+    const use = actions.some((action) => /collateral|borrow|lend/i.test(String(action))) ? 'as collateral'
+        : actions.length ? 'for swaps and liquidity' : null;
+    const defi = `${status('composability')} ${protocols.length
+        ? join([`${protocols.slice(0, 3).join(', ')}${protocols.length > 3 ? ` +${protocols.length - 3}` : ''}`, use])
+        : 'no protocol lists this exact token'}`;
+
+    const counts = card.whatIf?.counts ?? null;
+    const total = counts ? Object.values(counts).reduce((sum, n) => sum + (Number(n) || 0), 0) : 0;
+    const risks = total > 0 ? escapeHtml(`${total} what-if scenarios: ${counts.documented ?? 0} documented, ${counts.unknown ?? 0} unknown`) : 'What if a party fails';
+
+    return { terms, rights, legalControl, control, markets, defi, risks };
 }
 
 /** The footer's per-input timestamps, named for a reader rather than by their record keys. */
@@ -3088,18 +3179,38 @@ const SOURCE_WORDS = {
 };
 
 function footerBody(card) {
-    const sources = Object.entries(card.sources)
-        .filter(([, value]) => value !== null)
-        .map(([key, value]) => `${escapeHtml(SOURCE_WORDS[key] ?? labelize(key))} ${time(value)}`)
-        .join(' · ');
-    const evidence = evidenceLine(card.evidence);
-    return `<footer><h2>Data</h2>` +
-        `${evidence ? `<p class="ev-line">${escapeHtml(evidence)}</p>` : ''}` +
-        `<p class="src">${sources}</p>` +
+    return `<footer>` +
         `<p class="mint">Mint <code id="mint">${escapeHtml(card.mint ?? '')}</code> ` +
         `<button type="button" id="copy-mint" data-mint="${escapeHtml(card.mint ?? '')}">Copy</button> · ` +
         `<a href="../watch.html?type=token&amp;mint=${encodeURIComponent(card.mint ?? '')}">Watch this exact token</a></p>` +
         `<p class="built">Card built ${time(card.builtAt)}.</p>${contactFooterHtml('../', { inner: true })}</footer>`;
+}
+
+/**
+ * Which inputs each block of the card is built from (keys of card.sources), so each block says at
+ * its foot when its own data was read instead of one list for the whole card. Every input appears
+ * in at least one block (cards.test.js).
+ */
+export const BLOCK_SOURCES = {
+    discrepancies: ['issuers'],
+    terms: ['issuers'],
+    rights: ['issuers'],
+    legalControl: ['issuers'],
+    control: ['tokens'],
+    defi: ['defiUsage', 'closedMarket', 'pythOnchain', 'issuers'],
+    markets: ['referencePrices', 'trades', 'venues', 'meteora', 'holders', 'issuerApi'],
+    risks: ['tokens', 'referencePrices', 'venues', 'holders', 'issuers']
+};
+
+/** A block's "Data as of" line: its inputs' read times, and on Legal control the dossier's sourced-fields count (the legal evidence check's input). */
+export function blockFreshnessHtml(card, block) {
+    const parts = (BLOCK_SOURCES[block] ?? [])
+        .filter((key) => typeof card.sources?.[key] === 'string')
+        .map((key) => `${escapeHtml(SOURCE_WORDS[key] ?? labelize(key))} ${time(card.sources[key])}`);
+    const evidence = block === 'legalControl' ? evidenceLine(card.evidence) : null;
+    if (parts.length === 0 && !evidence) return '';
+    return `<p class="block-src">${evidence ? `<span class="ev-line">${escapeHtml(evidence)}</span>` : ''}`
+        + `${parts.length ? `Data as of: ${parts.join(' · ')}` : ''}</p>`;
 }
 
 /** The site-wide 1200×630 link-preview image (rendered from design/og/og.html). */
@@ -3169,52 +3280,69 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         priceLineHtml(card) +
         whoCanBuyHtml(card) +
         assetDecisionHtml(card) +
-        `${card.discrepancies.length ? `<a class="discrepancy-banner" href="#discrepancies"><strong>Claim ≠ observed reality</strong><span>${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}.</span><b>Review ↓</b></a>` : ''}` +
+        // Discrepancies sit where a reader looks first, open and tinted red; no banner linking below.
+        (card.discrepancies.length ? disclosure({ id: 'discrepancy-detail', cls: 'discrepancy-block', open: true,
+            title: `Claim ≠ observed reality (${card.discrepancies.length})`, hint: 'Where the documents and the chain disagree',
+            body: section('discrepancies', `${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}`, discrepanciesBody(card)) + blockFreshnessHtml(card, 'discrepancies') }) : '') +
         `${card.underReview.length ? `<div class="under-review-banner" title="${card.underReview.length} priority-zero (P0) item${card.underReview.length === 1 ? '' : 's'} in the evidence review queue"><strong>Legal conclusions under review</strong><span>${escapeHtml(underReviewWords(card.underReview.length))}</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         materialChangesHtml(card) +
         '</header>';
 
-    const health = disclosure({ id: 'health', cls: 'decision-health',
-        titleHtml: `Why the health checks say: this token ${escapeHtml(levelWord(card.health.levels.token))}, `
-            + `programme ${escapeHtml(levelWord(card.health.levels.programme))}`,
-        hint: 'What holds each level back', body: healthLevelsHtml(card) + healthDimensionsHtml(card) });
+    const fresh = (block) => blockFreshnessHtml(card, block);
+    const own = whatYouOwnBody(card);
+    const answers = blockAnswers(card);
+    const checks = (dimension) => section(`checks-${dimension}`, `${HEALTH_DIMENSIONS.find((d) => d.id === dimension).label} checks`, rulesBody(card, dimension));
+    // The big topics, in the order a holder asks: what is it, what does it give me, who holds the
+    // asset, what can the keys do to my tokens, how does it trade, does DeFi take it, what can go
+    // wrong. Each block's header states its answer, the block opens with the health checks behind
+    // that answer and carries the evidence for it; there is no separate evidence block.
+    const terms = disclosure({ id: 'terms', title: 'Terms', hintHtml: answers.terms,
+        body: section('terms-detail', 'The instrument as documented', own.terms) + fresh('terms') });
+
+    const rights = disclosure({ id: 'rights', title: 'Legal rights', hintHtml: answers.rights,
+        body: section('own', 'What you own', own.rights + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>') + fresh('rights') });
+
+    const legalControl = disclosure({ id: 'legal-control', title: 'Legal control', hintHtml: answers.legalControl,
+        body: checks('legal') +
+            section('trust-chain', 'Who holds the asset', trustChainBody(card)) +
+            section('verification', 'Is the backing verified?', verificationBody(card)) + fresh('legalControl') });
+
+    const control = disclosure({ id: 'control-detail', title: 'Onchain control', hintHtml: answers.control,
+        body: checks('control') + section('control', 'Observed issuer powers', controlBody(card)) + '<nav class="concept-links"><a href="../learn/issuer-control.html">What issuer intervention means →</a></nav>' + fresh('control') });
+
+    const markets = disclosure({ id: 'market-detail', title: 'Markets', hintHtml: answers.markets,
+        body: checks('market') +
+            section('reference', 'Reference & premium', referenceBody(card)) +
+            `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
+            section('depth', 'Depth, volume, activity', depthBody(card)) +
+            section('holders', 'Holder concentration', holdersBody(card)) +
+            section('venues', 'Venues', venuesBody(card)) +
+            (card.issuerApi === null ? '' : section('issuer-api', 'The issuer’s own numbers', issuerApiBody(card))) + fresh('markets') });
+
+    const defi = disclosure({ id: 'defi-detail', title: 'DeFi', hintHtml: answers.defi,
+        body: checks('composability') +
+            section('defi-usage', 'Support available now', defiUsageBody(card)) + '<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav>'
+            + section('composability', 'What could work', composabilityBody(card))
+            + section('closed-market', 'When the market is closed', closedMarketBody(card))
+            + section('pyth', 'Where prices come from', pythBody(card)) + fresh('defi') });
+
+    // The verdict is in the title, not the hint: hints are the answers, and this block's answer is the verdict.
+    const risks = disclosure({ id: 'risks', cls: 'decision-health', hintHtml: answers.risks,
+        title: `Risks: token ${levelWord(card.health.levels.token)} · programme ${levelWord(card.health.levels.programme)}`,
+        body: healthLevelsHtml(card) + healthDimensionsHtml(card) + section('what-if', 'What if a party fails', whatIfBody(card)) + fresh('risks') });
 
     const siteHeader = siteNav.siteHeaderHtml('../');
 
-    const localNav = `<nav class="card-local-nav" aria-label="On this token"><a href="#events">Events</a><a href="#health">Health</a><a href="#own">Rights</a>` +
-        `<a href="#control">Control</a><a href="#defi-usage">DeFi</a><a href="#market-detail">Markets</a>` +
-        `<a href="#evidence-detail">Evidence</a></nav>`;
-
-    const markets = `<details id="market-detail" class="card-disclosure"><summary><span>Markets, premium &amp; holders</span><small>Reference price, history, depth and holders</small></summary><div>` +
-        section('reference', 'Reference & premium', referenceBody(card)) +
-        `<section id="history" class="card-section history-panel" data-mint="${escapeHtml(card.mint)}"><header><h2>History</h2><label>Metric <select class="history-metric"></select></label></header><p class="history-method">Daily observations from RWA Sonar’s snapshots. A gap is a missing measurement, not a zero. Vertical markers are recorded evidence or control changes.</p><div class="history-chart" role="status">Loading daily history…</div></section>` +
-        section('closed-market', 'When the market is closed', closedMarketBody(card)) +
-        section('pyth', 'Where prices come from', pythBody(card)) +
-        section('depth', 'Depth, volume, activity', depthBody(card)) +
-        section('holders', 'Holder concentration', holdersBody(card)) + `</div></details>`;
-
-    const evidenceAndTechnical = `<details id="evidence-detail" class="card-disclosure"><summary><span>Evidence, scenarios &amp; technical detail</span><small>Verification, venues, trust chain and rules</small></summary><div>` +
-        section('verification', 'Verification', verificationBody(card)) +
-        section('venues', 'Venues', venuesBody(card)) +
-        (card.issuerApi === null ? '' : section('issuer-api', 'Issuer API', issuerApiBody(card))) +
-        section('trust-chain', 'Trust chain', trustChainBody(card)) +
-        section('what-if', 'What if…', whatIfBody(card)) +
-        section('rules', 'Health rules', rulesBody(card)) + `</div></details>`;
-
     const body = [
         header,
-        localNav,
         tokenEventsHtml(card),
-        health,
-        card.discrepancies.length ? disclosure({ title: 'Claim vs observed reality', hint: 'Where the documents and the chain disagree',
-            body: section('discrepancies', 'Source-backed discrepancies', discrepanciesBody(card)) }) : '',
-        disclosure({ title: 'What you own', hint: 'Legal claim, holder rights and redemption',
-            body: section('own', 'Ownership and redemption', whatYouOwnBody(card) + '<nav class="concept-links" aria-label="Learn about holder rights"><a href="../learn/beneficial-ownership.html">Beneficial ownership</a><a href="../learn/bankruptcy-remoteness.html">Bankruptcy remoteness</a><a href="../learn/redemption.html">Redemption rights</a></nav>') }),
+        terms,
+        rights,
+        legalControl,
+        control,
         markets,
-        `<details class="card-disclosure"><summary><span>Control surface &amp; key governance</span><small>Freeze, pause, forced transfer and authority keys</small></summary><div>${section('control', 'Observed issuer powers', controlBody(card))}<nav class="concept-links"><a href="../learn/issuer-control.html">What issuer intervention means →</a></nav></div></details>`,
-        `<details class="card-disclosure"><summary><span>Exact-token protocol support</span><small>Source listings, observed markets and proof limits</small></summary><div>${section('defi-usage', 'Evidence available now', defiUsageBody(card))}<nav class="concept-links"><a href="../learn/defi-custody.html">Why custody may not mean enforceable collateral →</a></nav></div></details>`,
-        `<details class="card-disclosure"><summary><span>What could work in DeFi?</span><small>Composability by protocol type</small></summary><div>${section('composability', 'DeFi composability', composabilityBody(card))}</div></details>`,
-        evidenceAndTechnical,
+        defi,
+        risks,
         footerBody(card)
     ].join('');
 
