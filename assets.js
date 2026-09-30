@@ -25,14 +25,14 @@ const TABLE_COLUMNS = [
     { key: 'blockchain', label: '' },
     { key: 'asset_image', label: '' },
     { key: 'name', label: 'Name' },
-    { key: '_maturityStage', label: 'Maturity Stage', computed: true },
+    { key: '_maturityStage', label: 'Official record', computed: true },
     { key: 'type', label: 'Type' },
     { key: '_links', label: 'Links', computed: true },
-    { key: '_maturityScore', label: 'Maturity Score', computed: true },
-    { key: 'blockchainIsMainLedger', label: 'Blockchain is Main Ledger' },
-    { key: 'unconditionalTransfers', label: 'Unconditional Transfers' },
-    { key: 'bearerRedemption', label: 'Bearer Redemption' },
-    { key: 'forcedTransfers', label: 'Forced Transfers' }
+    { key: '_maturityScore', label: 'Net score', computed: true },
+    { key: 'blockchainIsMainLedger', label: 'Chain is the official record' },
+    { key: 'unconditionalTransfers', label: 'Moves without approval' },
+    { key: 'bearerRedemption', label: 'Token alone redeems' },
+    { key: 'forcedTransfers', label: 'Court can move tokens' }
 ];
 
 let currentSort = { key: '_maturityStage', ascending: true };
@@ -115,7 +115,7 @@ function sortByColumn(key) {
 
 function renderTableBody(tbody) {
     tbody.innerHTML = assetsData.map(row => `<tr${row?.status === 'defunct' ? ' class="asset-defunct"' : ''}>${TABLE_COLUMNS.map(col => {
-        if (col.key === '_maturityStage') return `<td>${formatMaturityStageCell(computeMaturityStage(row))}</td>`;
+        if (col.key === '_maturityStage') return `<td>${formatMaturityStageCell(computeMaturityStageNum(row))}</td>`;
         if (col.key === '_maturityScore') return `<td>${formatMaturityScoreCell(row)}</td>`;
         if (col.key === '_links') return `<td>${formatLinksCell(row)}</td>`;
         if (col.key === 'blockchain') return `<td>${formatBlockchainCell(row)}</td>`;
@@ -151,7 +151,7 @@ function formatImageCell(row) {
     const src = row?.asset_image;
     if (!src || !isSafeUrl(src)) return '';
     const stage = computeMaturityStageNum(row);
-    const badge = stage > 0 ? `<span class="stage-badge">${stage}</span>` : '';
+    const badge = stage > 0 ? `<span class="stage-badge" title="${escapeHtml(LADDER.LEDGER_AXIS_WORDS[stage])}">${stage}</span>` : '';
     const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
     const needsLightBg = row?.asset_image_background === 'light';
     const imageClass = row?.asset_image_background === 'light'
@@ -234,9 +234,8 @@ function computeMaturityStageNum(row) {
     return 4;
 }
 
-function computeMaturityStage(row) {
-    return `Level ${computeMaturityStageNum(row)}`;
-}
+// The same plain words the stocks grid uses for these steps (stocks/lib/issuer-labels.js).
+const LADDER = window.__rwaIssuerLabels;
 
 function computeMaturityScore(row) {
     if (!row || typeof row !== 'object') return 0;
@@ -260,10 +259,9 @@ function getYesNoCounts(row) {
     return { yes, no };
 }
 
-function formatMaturityStageCell(stage) {
-    const num = parseInt(stage.replace('Level ', ''), 10) || 0;
+function formatMaturityStageCell(num) {
     const cls = `level-${Math.min(num, 4)}`;
-    return `<span class="maturity-pill ${cls}">${escapeHtml(stage)}</span>`;
+    return `<span class="maturity-pill ${cls}" title="${escapeHtml(LADDER.maturityLevelTooltip(num))}">${escapeHtml(LADDER.LEDGER_AXIS_WORDS[num])}</span>`;
 }
 
 function formatMaturityScoreCell(row) {

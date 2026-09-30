@@ -352,10 +352,15 @@ describeDb('the API against the real sonar schema', () => {
 
     test.each([
         ['FGDL', ['xstocks-backed']],
-        ['SPCX', ['backpack-securities', 'ondo-global-markets', 'shift', 'xstocks-backed']]
+        ['SPCX', ['backpack-securities', 'ondo-global-markets', 'shift', 'xstocks-backed']],
+        // Pre-IPO wrappers have no listed ticker: they match on the company they reference (company_key).
+        ['OPENAI', ['prestocks', 'tessera']],
+        ['KALSHI', ['prestocks', 'tessera']],
+        ['SPCX', ['prestocks', 'tessera']]
     ])('a %s watch survives the API/database round-trip without a pair-only constraint', async (ticker, issuers) => {
         const created = await jsonRequest('/api/watchlists', {
-            method: 'POST', body: { ticker, issuers, title: 'Cardinality integration test' }
+            // One client per case: the create rate limit (five per hour per IP) is not under test here.
+            method: 'POST', body: { ticker, issuers, title: 'Cardinality integration test' }, ip: `case-${ticker}-${issuers.join('+')}`
         });
         try {
             expect(created.status).toBe(201);
@@ -505,6 +510,15 @@ describeDb('the API against the real sonar schema', () => {
             for (const r of body.items) expect(r.modelAssessment.material).toBe(true);
             const notMaterial = await get('/api/changes?material=false&limit=500');
             expect(notMaterial.body.items.some((r) => Number(r.id) === eventId)).toBe(false);
+
+            // A covered event (stored as a numeric string, as older runs wrote them) gets the same reading.
+            const { body: two } = await get('/api/changes?limit=2');
+            const coveredId = Number(two.items.find((r) => Number(r.id) !== eventId).id);
+            await query(`UPDATE sonar.change_judgment SET covers_event_ids = jsonb_build_array($1::bigint, $2::text)
+                WHERE model = $3 AND prompt_version = 'jest-valid'`, [eventId, String(coveredId), model]);
+            const { body: covered } = await get('/api/changes?material=true&limit=500');
+            expect(covered.items.find((r) => Number(r.id) === coveredId)?.modelAssessment)
+                .toMatchObject({ status: 'valid', promptVersion: 'jest-valid' });
 
             // With only the invalid judgment left, the event shows the status and none of its text.
             await query("DELETE FROM sonar.change_judgment WHERE model = $1 AND prompt_version = 'jest-valid'", [model]);

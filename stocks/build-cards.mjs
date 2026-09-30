@@ -401,6 +401,8 @@ async function main() {
     const aboveTarget = [];
     const overLimit = [];
     const counts = { good: 0, caution: 0, warning: 0, unknown: 0 };
+    // What titles and preview images show (health.mjs holderHeadline), next to the worst-of status.
+    const headlineCounts = { good: 0, caution: 0, warning: 0, unknown: 0, noMarket: 0 };
 
     // Each token's share of its underlying's tokenized shares on Solana, on outstanding supply.
     const shares = solanaShares(tokenDb.tokens.map((token) => ({
@@ -465,6 +467,8 @@ async function main() {
         if (bytes > CARD_BYTE_TARGET) aboveTarget.push({ slug, bytes });
         if (bytes > CARD_BYTE_LIMIT) overLimit.push({ slug, bytes });
         if (card.health.status in counts) counts[card.health.status] += 1;
+        if (card.health.headline.status in headlineCounts) headlineCounts[card.health.headline.status] += 1;
+        if (card.health.headline.basis === 'no-market') headlineCounts.noMarket += 1;
     }
 
     index.sort((a, b) => byString(a.slug, b.slug));
@@ -489,7 +493,9 @@ async function main() {
     const compressedMedian = compressed.length ? compressed[Math.floor(compressed.length / 2)].gzipBytes : 0;
     log(`wrote ${index.length} card(s) to ${outDir}${pruned ? ` (pruned ${pruned} stale file(s))` : ''}` +
         `${collisions ? ` — ${collisions} slug(s) needed a mint suffix` : ''}`);
-    log(`status: ${counts.good} good, ${counts.caution} caution, ${counts.warning} warning, ${counts.unknown} unknown`);
+    log(`status (worst of all checks): ${counts.good} good, ${counts.caution} caution, ${counts.warning} warning, ${counts.unknown} unknown`);
+    log(`holder headline (titles, preview images): ${headlineCounts.good} good, ${headlineCounts.caution} caution, ${headlineCounts.warning} warning, `
+        + `${headlineCounts.unknown} unknown (${headlineCounts.noMarket} with no market data)`);
     if (sizes.length > 0) {
         log(`card HTML: min ${kb(sizes[0].bytes)} (${sizes[0].slug}) · median ${kb(median)} · ` +
             `max ${kb(sizes[sizes.length - 1].bytes)} (${sizes[sizes.length - 1].slug}) · ` +

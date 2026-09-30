@@ -583,6 +583,34 @@ export function newFindings(checks, stored) {
     return checks.filter((c) => FINDING_VERDICTS.has(c.verdict) && stored.get(`${c.mint}|${c.checkKey}`) !== c.verdict);
 }
 
+/**
+ * sonar.change_event rows (kind `corporate-action`) for the warning-level findings only: a split
+ * the programme should have applied and did not, a wrong ratio, or a large multiplier step with no
+ * corporate action behind it. Caution-level ones (a small dividend step, a missed dividend) stay in
+ * sonar.corporate_action_check and the Telegram summary: most come from gaps in the price source's
+ * dividend coverage, not from the issuer. Dated by when the finding was first stored, so a re-run
+ * writes nothing twice and a finding standing when this was added still gets its event; a finding
+ * whose verdict just changed is dated `now`. `stored` holds the STORED_VERDICTS_QUERY rows.
+ */
+export function actionEvents(checks, stored, now) {
+    const before = new Map((Array.isArray(stored) ? stored : []).map((r) => [`${r.mint}|${r.checkKey}`, r]));
+    const out = [];
+    for (const c of checks) {
+        if (!FINDING_VERDICTS.has(c.verdict) || c.severity !== 'warning') continue;
+        const prev = before.get(`${c.mint}|${c.checkKey}`);
+        const detectedAt = prev && prev.verdict === c.verdict && prev.firstCheckedAt ? isoOf(Date.parse(prev.firstCheckedAt)) : now;
+        out.push({
+            detectedAt, kind: 'corporate-action', subjectType: 'token', subjectId: c.mint,
+            field: `${c.checkKey}:${c.verdict}`, before: null, after: c.verdict, severity: c.severity, summary: c.detail,
+            evidence: {
+                symbol: c.symbol, issuer: c.issuer, ticker: c.ticker, verdict: c.verdict, actionKind: c.actionKind, exDate: c.exDate,
+                expectedRatio: c.expectedRatio, stepBefore: c.stepBefore, stepAfter: c.stepAfter, stepRatio: c.stepRatio, stepAt: c.stepAt
+            }
+        });
+    }
+    return out;
+}
+
 // ---------------------------------------------------------------------------------------------
 // SQL. Rows travel as one jsonb literal (dollar tag proven safe by db-load.mjs) and are unpacked
 // with jsonb_to_recordset, so no value is ever spliced into SQL text.
@@ -708,7 +736,7 @@ SELECT coalesce(json_agg(json_build_object(
  WHERE prev_observed_at IS NULL OR ui_multiplier IS DISTINCT FROM pm
     OR ui_multiplier_next IS DISTINCT FROM pn OR ui_multiplier_effective_at IS DISTINCT FROM pt;`;
 
-export const STORED_VERDICTS_QUERY = `SELECT coalesce(json_agg(json_build_object('mint', mint, 'checkKey', check_key, 'verdict', verdict)), '[]'::json)
+export const STORED_VERDICTS_QUERY = `SELECT coalesce(json_agg(json_build_object('mint', mint, 'checkKey', check_key, 'verdict', verdict, 'firstCheckedAt', first_checked_at)), '[]'::json)
   FROM sonar.corporate_action_check;`;
 
 /** Group the runs query's rows by mint. */

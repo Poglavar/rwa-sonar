@@ -2910,3 +2910,11 @@ body[data-workspace-view="defi"] [data-view]:not([data-view~="defi"]) { display:
 :where(html[data-theme="dark"]) .global-discovery,
 :where(html[data-theme="dark"]) .workspace-shell > section[data-view]:not(.global-discovery):not(.overview-guide),
 :where(html[data-theme="dark"]) .analysis-disclosure { background: rgba(37, 45, 67, .88); }
+
+/* The side labels are words, not "Level N": let them wrap so the pinned column stays narrow on a phone. */
+.grid-axis-y .maturity-pill {
+    white-space: normal;
+    max-width: 7.5em;
+    font-size: 0.78rem;
+    padding: 3px 8px;
+}

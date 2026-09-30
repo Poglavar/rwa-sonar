@@ -44,7 +44,7 @@ errors are `no-store` and use the same JSON error envelope.
 
 | Route | Returns |
 |---|---|
-| `/api` | The route list |
+| `/api`, `/api/` | The route list (`{name, docs, routes}`) |
 | `/api/health` | `{ok, now, counts:{issuers,tokens,snapshots,trades}, latestSnapshotDate, latestTradeAt, latestBuildAt}` |
 | `/api/history/overview` | Daily catalogue, active-address, underlying, supply, holder-account, market value, volume, liquidity, confirmed DeFi-support and four-dimension health series, plus exact added/removed-address annotations between consecutive snapshots |
 | `/api/history/underlyings/:ticker?days=` | Daily rows for every product tracking one underlying, plus relevant evidence/control events for chart overlays |

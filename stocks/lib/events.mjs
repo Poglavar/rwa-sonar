@@ -38,7 +38,9 @@ export const SOURCES = {
     registry: 'registry watcher',
     regulator: 'regulator watcher',
     journal: 'change journal',
-    lending: 'lending watcher'
+    lending: 'lending watcher',
+    reserves: 'reserves watcher',
+    corporateActions: 'corporate-action watcher'
 };
 /** A token's liquidations in one market on one day are news from this much collateral (USD)… */
 export const LIQUIDATION_FLOOR_USD = 1000;
@@ -63,7 +65,7 @@ const SAME_FACT_MS = { doc: 7 * DAY_MS, other: 36 * HOUR_MS };
 
 /** The change_event kinds the feed can use; everything else (supply, treasury, metadata) is routine. */
 export const CHANGE_ROW_KINDS = ['authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term',
-    'entity-status', 'insolvency', 'regulator-notice'];
+    'entity-status', 'insolvency', 'regulator-notice', 'reserve', 'corporate-action'];
 const DOC_KINDS = new Set(['quote-lost', 'document-gone', 'legal-term']);
 
 /** DeFi uses that change what a holder can do with the token; DEX pool listings churn daily. */
@@ -806,6 +808,79 @@ function regulatorEvent(row, ctx) {
     });
 }
 
+const wholeUnits = (v) => {
+    const n = typeof v === 'string' && v.trim() !== '' ? Number(v) : v;
+    return num(n) === null ? null : Math.round(n).toLocaleString('en-US');
+};
+
+/**
+ * The reserves watcher: the issuer's published reserve against what is outstanding. The row's
+ * evidence carries the figures of the reading that raised it; the title states them, and says
+ * whose figure each is, because a Solana-only shortfall depends on which wallets we attribute to
+ * the issuer.
+ */
+function reserveEvent(row, ctx) {
+    const mint = row.subjectId;
+    const symbol = symbolOf(row.symbol, mint);
+    const issuer = issuerOf(row.issuer, ctx);
+    const ev = row.evidence;
+    const reserve = wholeUnits(ev.reserve);
+    let title;
+    if (row.after === 'covered') {
+        title = `${symbol}: reserve again covers the tokens outstanding`;
+    } else if (row.after === 'stale') {
+        const at = text(ev.sourceTime);
+        const d = at ? new Date(at) : null;
+        title = `${symbol}: the issuer's proof of reserves not updated since ${d && Number.isFinite(d.getTime()) ? `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}` : 'an unknown date'}`;
+    } else if (ev.basis === 'issuer' || ev.basis === 'both') {
+        title = `${symbol}: reserve of ${reserve ?? 'unknown'} shares below the issuer's own circulating figure of ${wholeUnits(ev.issuerCirculating) ?? 'unknown'}`;
+    } else {
+        title = `${symbol}: ${wholeUnits(ev.outstanding) ?? 'more'} on Solana outside known issuer wallets vs ${reserve ?? 'fewer'} shares in reserve`;
+    }
+    const url = text(ev.url);
+    return makeEvent({
+        id: `reserve-${row.id}`,
+        at: row.at, kind: 'reserve', category: 'legal', title,
+        subject: { type: 'token', id: mint, name: symbol },
+        severity: row.severity,
+        href: cardHref(mint, ctx, row.cardSlug) ?? (url && url.startsWith('https://') ? url : null) ?? issuerHref(issuer),
+        source: SOURCES.reserves,
+        keys: [`reserve|${mint}|${row.after}`],
+        origin: 'db'
+    });
+}
+
+/**
+ * The corporate-action watcher: a multiplier step with no split or dividend behind it, a split
+ * not applied, or one applied at the wrong ratio. The chain watcher's own event reports the step
+ * itself; this one says what the reconciliation found about it.
+ */
+function corporateActionEvent(row, ctx) {
+    const mint = row.subjectId;
+    const symbol = symbolOf(row.symbol, mint);
+    const issuer = issuerOf(row.issuer, ctx);
+    const ev = row.evidence;
+    const ratio = num(ev.stepRatio);
+    const step = ratio === null ? 'balance restatement' : `×${ratio.toFixed(ratio >= 10 ? 1 : 3).replace(/\.?0+$/, '')} balance restatement`;
+    const exDate = text(ev.exDate);
+    const what = text(ev.actionKind) === 'split' ? 'split' : 'dividend';
+    const title = row.after === 'unexplained'
+        ? `${symbol}: ${step} with no ${text(ev.ticker) ? `${text(ev.ticker)} ` : ''}split or dividend on record behind it`
+        : row.after === 'wrong-ratio'
+            ? `${symbol}: ${what}${exDate ? ` of ${exDate}` : ''} applied at a different ratio than the underlying's`
+            : `${symbol}: ${what}${exDate ? ` of ${exDate}` : ''} not applied to token balances`;
+    return makeEvent({
+        id: `corporate-action-${row.id}`,
+        at: row.at, kind: 'corporate-action', category: 'market', title,
+        subject: { type: 'token', id: mint, name: symbol },
+        severity: row.severity,
+        href: cardHref(mint, ctx, row.cardSlug) ?? issuerHref(issuer),
+        source: SOURCES.corporateActions,
+        keys: [`corporate-action|${mint}|${row.field}`],
+        origin: 'db'
+    });
+}
+
 /** A regulator notice's type in words (stocks/lib/regulators.mjs `noticeType`). */
 const NOTICE_TYPE_WORDS = {
     enforcement: 'enforcement action', warning: 'warning', suspension: 'trading suspension', sanction: 'sanction',
@@ -880,6 +955,10 @@ export function changeRowEvents(rows, ctx, tally = null) {
             out.push(registryEvent(row, ctx));
         } else if (row.kind === 'regulator-notice') {
             out.push(regulatorEvent(row, ctx));
+        } else if (row.kind === 'reserve') {
+            out.push(reserveEvent(row, ctx));
+        } else if (row.kind === 'corporate-action') {
+            out.push(corporateActionEvent(row, ctx));
         } else if (DOC_KINDS.has(row.kind)) {
             // A document row reaches the public feed only through its reviewed change-journal entry
             // (handled above). An unreviewed row stays on the changes page: a lost quote is as often

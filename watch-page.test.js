@@ -23,7 +23,7 @@ const EVIDENCE_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-eviden
 const CLAIM_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-claims.sql'), 'utf8');
 // The source status check as it stands now: 2026-09-24 re-declares it with `reachable-unverified`,
 // then with `unreadable` (the file the watcher applies).
-const SOURCE_STATUS_DDL = readFileSync(join(__dirname, 'db', '2026-09-24-sonar-source-unreadable.sql'), 'utf8');
+const SOURCE_STATUS_DDL = readFileSync(join(__dirname, 'db', '2026-10-02-sonar-source-retired.sql'), 'utf8');
 
 test('watch intro uses a small intrinsic patrol illustration and preserves monitoring details', () => {
     expect(HTML).toContain('patrol-v1-256.webp');
@@ -98,7 +98,7 @@ describe('the five vocabularies this page holds a copy of', () => {
         expect(W.SOURCE_KINDS).toEqual(checkValues(EVIDENCE_DDL, 'source_kind_check'));
         expect(W.SOURCE_STATUSES.slice().sort())
             .toEqual(checkValues(SOURCE_STATUS_DDL, 'source_status_check').slice().sort());
-        expect(W.SOURCE_STATUSES).toHaveLength(8);
+        expect(W.SOURCE_STATUSES).toHaveLength(9);
     });
 
     test('CHANGE_KINDS and SEVERITIES are exactly the change_event CHECK constraints', () => {
@@ -297,7 +297,7 @@ describe('the source tiles', () => {
         expect(totals.byKind.map((tile) => [tile.key, tile.count]))
             .toEqual([['pdf', 1], ['html', 4], ['api', 1], ['onchain', 0]]);
         expect(totals.byStatus.map((tile) => [tile.key, tile.count]))
-            .toEqual([['new', 0], ['ok', 3], ['changed', 1], ['gone', 1], ['blocked', 1], ['unreadable', 0], ['reachable-unverified', 0], ['error', 0]]);
+            .toEqual([['new', 0], ['ok', 3], ['changed', 1], ['gone', 1], ['blocked', 1], ['unreadable', 0], ['reachable-unverified', 0], ['retired', 0], ['error', 0]]);
         expect(totals.total).toBe(6);
     });
 

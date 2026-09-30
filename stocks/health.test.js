@@ -17,6 +17,7 @@ const {
     TRADING_RULE_IDS,
     topSharePctExcludingLabels,
     evaluateHealth,
+    holderHeadline,
     worstStatus
 } = require('./lib/health.mjs');
 const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib/composability.mjs');
@@ -1431,5 +1432,41 @@ describe('build-health levels', () => {
         expect(summary.byTokenWorstRule.tracking).toBe(1);
         expect(Object.values(summary.byTokenWorstRule).reduce((a, b) => a + b, 0)).toBe(1);
         expect(summary.byWorstRule.verification).toBe(2);
+    });
+});
+
+// --- The holder headline (card titles and preview images) -----------------------------------------
+
+describe('holderHeadline', () => {
+    const rules = (statuses) => HEALTH_RULES.map((rule) => ({ id: rule.id, status: statuses[rule.id] ?? 'unknown' }));
+    const programmeCaution = { verification: 'caution', defiComposability: 'caution', keyControl: 'caution' };
+
+    it('ignores programme cautions every token of an issuer shares, and bot-trading checks', () => {
+        const r = rules({ ...programmeCaution, tracking: 'good', liquidity: 'good', paused: 'good', frozen: 'good',
+            organic: 'warning', failedTx: 'warning', defiComposability: 'warning' });
+        expect(worstStatus(r.map((rule) => rule.status))).toBe('warning');
+        expect(holderHeadline(r)).toEqual({ status: 'good', ruleId: null, basis: 'measured' });
+    });
+
+    it('names the first holder check that fails, in display order', () => {
+        expect(holderHeadline(rules({ ...programmeCaution, tracking: 'caution', liquidity: 'warning', concentration: 'warning' })))
+            .toEqual({ status: 'warning', ruleId: 'liquidity', basis: 'measured' });
+        expect(holderHeadline(rules({ tracking: 'good', paused: 'warning' }))).toMatchObject({ status: 'warning', ruleId: 'paused' });
+    });
+
+    it('counts legal evidence only when nothing independent verifies the backing', () => {
+        expect(holderHeadline(rules({ tracking: 'good', verification: 'warning' })))
+            .toEqual({ status: 'warning', ruleId: 'verification', basis: 'measured' });
+    });
+
+    it('never calls a token with no market good', () => {
+        expect(holderHeadline(rules({ paused: 'good', frozen: 'good', concentration: 'good' })))
+            .toEqual({ status: 'unknown', ruleId: null, basis: 'no-market' });
+        // A fault still stands without a market.
+        expect(holderHeadline(rules({ paused: 'warning' }))).toEqual({ status: 'warning', ruleId: 'paused', basis: 'no-market' });
+    });
+
+    it('is carried on every evaluateHealth verdict', () => {
+        expect(evaluateHealth({}).headline).toEqual({ status: 'unknown', ruleId: null, basis: 'no-market' });
     });
 });

@@ -96,7 +96,7 @@
     function defiUsageCompactHtml(item) {
         const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
         if (integrations.length === 0) {
-            return '<span class="defi-none" title="No exact-token integration was found in the sources checked">None source-listed</span>';
+            return '<span class="defi-none" title="None of the protocol lists, pools and products we checked names this exact token">No protocol found</span>';
         }
         return `<div class="defi-chips">${integrations.map((entry) => {
             const title = `${entry.protocolName || entry.protocolId || 'Protocol'}: ${defiActionText(entry.actions)}`;
@@ -354,8 +354,8 @@
         let exitReason = 'The legal/control template or an exit route has not been sufficiently established.';
         if (collateral.length === 0) {
             exitRating = 'unavailable';
-            exitLabel = 'No source-listed collateral route';
-            exitReason = 'No checked protocol source currently lists this exact token as programmatic collateral.';
+            exitLabel = 'No protocol lists it as collateral';
+            exitReason = 'No protocol we checked lists this exact token as collateral.';
         } else if (['issuer-mediated', 'weak-claim'].includes(defaultOutcome)) {
             exitRating = 'issuer-dependent';
             exitLabel = 'Issuer-dependent exit';
@@ -364,11 +364,11 @@
             && !['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)) {
             exitRating = 'autonomous';
             exitLabel = 'Autonomous exit appears structurally available';
-            exitReason = 'A source-listed lending market names the exact token, the reviewed template says seizure is onchain-enforceable, and an observed pool supplies a smart-contract sale route without a reviewed issuer override. Execution was not independently tested.';
+            exitReason = 'A lending protocol’s own list names the exact token, the reviewed template says seizure is onchain-enforceable, and an observed pool supplies a smart-contract sale route without a reviewed issuer override. Execution was not independently tested.';
         } else if (dex.length > 0) {
             exitRating = 'conditional';
             exitLabel = 'Conditional market exit';
-            exitReason = 'A source-listed collateral market and observed on-chain pool indicate a possible route, but execution was not independently tested and issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
+            exitReason = 'A lending protocol that lists it as collateral and a live on-chain pool indicate a possible route, but execution was not independently tested and issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
         } else if (issuer?.redemption?.available === true) {
             exitRating = 'issuer-dependent';
             exitLabel = 'Issuer-dependent exit';
@@ -389,10 +389,10 @@
             cashExit,
             exitQuality: { rating: exitRating, label: exitLabel, reason: exitReason },
             confirmedLending: collateral.length
-                ? `Source-listed for this exact token: ${names(collateral).join(', ')}. No successful borrow is independently evidenced.`
+                ? `Listed as collateral for this exact token by ${names(collateral).join(', ')}. We have not seen a successful borrow against it.`
                 : integrations.length
-                    ? 'Trading or vault support is source-listed, but no checked protocol currently lists this exact token as programmatic collateral.'
-                    : 'No checked protocol currently lists this exact token as programmatic collateral.',
+                    ? 'Protocols list it for trading or vaults, but none we checked lists this exact token as collateral.'
+                    : 'No protocol we checked lists this exact token as collateral.',
             marketExit: dex.length
                 ? `Observed exact-token pools: ${names(dex).join(', ')}. Pool presence does not guarantee enough liquidity for liquidation.`
                 : 'No exact-token DEX pool is confirmed in the checked sources; an autonomous sale route is not established.'
@@ -457,7 +457,7 @@
         const integrations = Array.isArray(item?.integrations) ? item.integrations : [];
         if (integrations.length === 0) {
             return '<section class="detail-section defi-usage-detail"><h4>Exact-token protocol support</h4>' +
-                dataStateHtml('none-source-listed', 'No exact-token protocol support source-listed', 'The checked protocol registries, live pools and reviewed products contain no supported use for this token address. Private or unindexed contracts may still exist.', [
+                dataStateHtml('none-source-listed', 'No protocol found that accepts this exact token', 'None of the protocol lists, live pools and products we checked names this token address. Private or unlisted contracts may still use it.', [
                     { label: 'Review DeFi coverage', href: './stocks.html?view=defi' }
                 ]) +
                 `${defiCustodyHtml(template, item, issuer)}</section>`;
@@ -471,7 +471,7 @@
                 .map((market) => market?.name).filter(Boolean))];
             const capabilities = (Array.isArray(entry.capabilities) ? entry.capabilities : []).map((capability) =>
                 `<li><strong>${escapeHtml(capability.label || humanizeSlug(capability.action))}</strong>` +
-                `<span>${escapeHtml(capability.custody || 'unknown')} custody · ${escapeHtml(capability.enforcement || 'unknown')} enforcement</span>` +
+                `<span>${escapeHtml(protocolProof.capabilityWords(capability))}</span>` +
                 `<small>${escapeHtml(capability.consequence || '')}</small></li>`).join('');
             const corroboration = entry.corroboration;
             const accounts = (Array.isArray(corroboration?.accounts) ? corroboration.accounts : [])
@@ -479,13 +479,11 @@
                 .map((account) => `<a href="https://solscan.io/account/${escapeHtml(account.address)}" target="_blank" rel="noopener noreferrer">${escapeHtml(humanizeSlug(account.role))} ↗</a>`).join(' ');
             const proof = entry.proof || {};
             const proofModel = protocolProof.protocolProofModel({ integration: entry, proof, fetchedAt });
-            const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
-                ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
-                : 'No published Solana account address was available to check';
+            const accountCheck = protocolProof.accountCheckWords(proof, corroboration);
             const proofSteps = `${proofModel.detail} ${accountCheck}. ${proofModel.activityStatement}`;
             return `<article class="defi-use defi-use-${escapeHtml(entry.status || 'available')}">` +
                 `<header><h5>${escapeHtml(entry.protocolName || entry.protocolId || 'Protocol')}</h5>` +
-                `<span>Source reports: ${escapeHtml(entry.status || 'status not recorded')}</span></header>` +
+                `<span>Status the protocol reports: ${escapeHtml(entry.status || 'not recorded')}</span></header>` +
                 `<p class="defi-actions">${escapeHtml(defiActionText(entry.actions))}</p>` +
                 `<p>${escapeHtml(proofModel.headline)}</p>` +
                 `${metrics ? `<p class="defi-metrics">${escapeHtml(metrics)}</p>` : ''}` +
@@ -499,7 +497,7 @@
                 '</article>';
         }).join('');
         return `<section class="detail-section defi-usage-detail"><h4>Exact-token protocol support <span class="detail-count">${integrations.length}</span></h4>` +
-            `<p class="detail-note">Observed for this exact token address${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Structural compatibility is assessed separately.</p>` +
+            `<p class="detail-note">Protocols that accept this exact token address, and how we know${fetchedAt ? ` · checked ${escapeHtml(fmtRelativeTime(fetchedAt))}` : ''}. Whether a lender could enforce a default is covered separately.</p>` +
             `<div class="defi-use-grid">${rows}</div>${defiCustodyHtml(template, item, issuer)}</section>`;
     }
 

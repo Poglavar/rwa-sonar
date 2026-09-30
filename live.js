@@ -618,6 +618,8 @@
     /** The tape geometry the SVG is drawn in; CSS scales it, so these are not screen pixels. */
     const CHART = { width: 960, height: 170, gap: 3, axisHeight: 26 };
     const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+    // Which rows the tape shows (routed trades hidden by default): stocks/lib/live-tape.js.
+    const tapeLib = (typeof __rwaLiveTape !== 'undefined') ? __rwaLiveTape : null;
     const apiBase = apiLib === null ? '' : apiLib.apiBase();
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -631,6 +633,9 @@
             freshness: document.getElementById('freshness'),
             tape: document.getElementById('tape'),
             tapeNote: document.getElementById('tapeNote'),
+            showRouted: document.getElementById('showRouted'),
+            showRoutedLabel: document.getElementById('showRoutedLabel'),
+            routedNote: document.getElementById('routedNote'),
             tapePager: document.getElementById('tapePager'),
             tapePrev: document.getElementById('tapePrev'),
             tapeNext: document.getElementById('tapeNext'),
@@ -666,6 +671,10 @@
             nextTradeCursor: null,
             tradeUnavailable: false,
             tradeRequestSeq: 0,
+            /** Routed trades are hidden unless the reader turned them on (remembered per browser). */
+            showRouted: readShowRouted(),
+            /** Routed rows skipped to fill the page on screen. */
+            hiddenRouted: 0,
             /** The newest trade time on API page one, for the freshness line. */
             pageOneNewest: null,
             seen: new Set(),
@@ -679,6 +688,7 @@
         };
 
         wireEvents();
+        renderRoutedToggle();
         watchReplayScale();
         loadPage();
         window.setInterval(onTick, TICK_MS);
@@ -755,6 +765,7 @@
                 els.dataAsOf.textContent = fmtDateTime(db.generatedAt);
                 els.dataAsOf.setAttribute('datetime', typeof db.generatedAt === 'string' ? db.generatedAt : '');
                 els.collectionLine.textContent = collectionLine(db);
+                els.routedNote.textContent = tapeLib.routedNote(tapeLib.routedSummary(db.trades));
                 renderPoolChips();
                 renderVenueLegend();
                 state.cursorStep = Math.min(state.cursorStep, replaySteps() - 1);
@@ -797,10 +808,14 @@
                 els.tapeNote.textContent = 'Loading this page of trade history…';
             }
 
+            const pickOptions = { showRouted: state.showRouted, limit: TAPE_LIMIT };
             if (state.sample) {
-                const start = (state.tradePage - 1) * TAPE_LIMIT;
-                state.trades = state.replayTrades.slice(start, start + TAPE_LIMIT);
-                state.nextTradeCursor = start + TAPE_LIMIT < state.replayTrades.length ? String(start + TAPE_LIMIT) : null;
+                // The sample pages by offset into the capture; the cursor is that offset.
+                const start = Number(state.tradeCursors[state.tradePage - 1] ?? 0);
+                const pick = tapeLib.pickTapePage(state.replayTrades.slice(start), pickOptions);
+                state.trades = pick.shown;
+                state.hiddenRouted = pick.hidden;
+                state.nextTradeCursor = start + pick.scanned < state.replayTrades.length ? String(start + pick.scanned) : null;
                 state.tradeUnavailable = false;
                 renderTape();
                 return;
@@ -810,18 +825,21 @@
                 if (apiLib === null) throw new Error('API URL helper unavailable');
                 const cursor = state.tradeCursors[state.tradePage - 1] ?? null;
                 const url = apiLib.apiUrl('/api/trades/recent', {
-                    limit: TAPE_LIMIT,
+                    limit: tapeLib.batchSize(TAPE_LIMIT, state.showRouted),
                     before: cursor
                 }, apiBase);
                 const res = await fetch(url, { cache: 'no-store' });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const body = await res.json();
                 if (request !== state.tradeRequestSeq) return;
-                const trades = (Array.isArray(body?.items) ? body.items : []).map(tradeFromApiRow);
-                if (state.tradePage === 1) state.pageOneNewest = trades.length > 0 ? trades[0].time : null;
-                if (background && !state.tradeUnavailable && sameTrades(trades, state.trades)) return;
+                const batch = (Array.isArray(body?.items) ? body.items : []).map(tradeFromApiRow);
+                if (state.tradePage === 1) state.pageOneNewest = batch.length > 0 ? batch[0].time : null;
+                const pick = tapeLib.pickTapePage(batch, pickOptions);
+                const trades = pick.shown;
+                if (background && !state.tradeUnavailable && sameTrades(trades, state.trades) && pick.hidden === state.hiddenRouted) return;
                 state.trades = trades;
-                state.nextTradeCursor = body?.nextBefore ?? null;
+                state.hiddenRouted = pick.hidden;
+                state.nextTradeCursor = tapeLib.nextApiCursor(batch, pick, body?.nextBefore ?? null);
                 state.tradeUnavailable = false;
             } catch (err) {
                 if (request !== state.tradeRequestSeq) return;
@@ -830,6 +848,7 @@
                     return;
                 }
                 state.trades = [];
+                state.hiddenRouted = 0;
                 state.nextTradeCursor = null;
                 state.tradeUnavailable = true;
                 console.error(`[${new Date().toISOString()}] live: /api/trades/recent unavailable`, err);
@@ -866,13 +885,16 @@
         // --- the tape ------------------------------------------------------
 
         function renderTape() {
+            renderRoutedToggle();
             const rows = state.trades.slice(0, TAPE_LIMIT).map((trade) => tapeRow(trade, Date.now()));
             if (rows.length === 0) {
                 els.tape.innerHTML = '';
                 els.tapeNote.hidden = false;
                 els.tapeNote.textContent = state.tradeUnavailable
                     ? 'Trade history is unavailable because the API request failed.'
-                    : 'No decoded trades on this page.';
+                    : (state.hiddenRouted > 0
+                        ? 'Every trade on this page was routed. Tick the box above to show them, or page older.'
+                        : 'No decoded trades on this page.');
                 renderTapePager();
                 return;
             }
@@ -893,6 +915,29 @@
                 el.addEventListener('animationend', () => el.classList.remove('tape-row-new'), { once: true });
             }
             renderTapePager();
+        }
+
+        /** The routed-trades checkbox: its state and the count it hid on this page. */
+        function renderRoutedToggle() {
+            els.showRouted.checked = state.showRouted;
+            els.showRoutedLabel.textContent = tapeLib.toggleLabel(state.hiddenRouted, state.showRouted);
+        }
+
+        /** The remembered choice; a browser that blocks storage just gets the default (hidden). */
+        function readShowRouted() {
+            try {
+                return tapeLib.parseShowRouted(window.localStorage.getItem(tapeLib.STORAGE_KEY));
+            } catch (err) {
+                return false;
+            }
+        }
+
+        function saveShowRouted(value) {
+            try {
+                window.localStorage.setItem(tapeLib.STORAGE_KEY, value ? '1' : '0');
+            } catch (err) {
+                // Storage blocked: the choice lasts for this page view only.
+            }
         }
 
         function renderTapePager() {
@@ -1156,6 +1201,15 @@
                 setPlaying(false);
                 stepHours(1);
             });
+            els.showRouted.addEventListener('change', () => {
+                state.showRouted = els.showRouted.checked;
+                saveShowRouted(state.showRouted);
+                // A different filter makes different pages, so paging starts over from the newest.
+                state.tradePage = 1;
+                state.tradeCursors = [null];
+                state.hiddenRouted = 0;
+                loadTradePage(false);
+            });
             els.tapePrev.addEventListener('click', () => {
                 if (state.tradePage === 1) return;
                 state.tradePage -= 1;
@@ -1163,7 +1217,7 @@
             });
             els.tapeNext.addEventListener('click', () => {
                 if (state.nextTradeCursor === null) return;
-                state.tradeCursors[state.tradePage] = state.sample ? null : state.nextTradeCursor;
+                state.tradeCursors[state.tradePage] = state.nextTradeCursor;
                 state.tradePage += 1;
                 loadTradePage(false);
             });

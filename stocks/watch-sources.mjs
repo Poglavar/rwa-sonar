@@ -35,12 +35,14 @@ import {
     looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
-    quoteVerdicts, quotelessRefusal, readProvenance, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
-    storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion
+    quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
+    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
 } from './lib/watch.mjs';
+import { buildRows, nextState, settleExtractorUpgrade } from './lib/watch-rows.mjs';
 import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
 import {
-    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, archivedProvenance, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
+    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
     parseCdxNewest, waybackNote, wantsWaybackFallback
 } from './lib/wayback.mjs';
 
@@ -72,8 +74,17 @@ const HOST_PACE_MS = 1500;
 const ARCHIVE_PACE_MS = 15_000;
 const ARCHIVE_REUSE_WITHIN = '1d';
 const BACKOFF_MS = [5000, 15_000];
+/**
+ * archive.org's refusals last minutes, not seconds (prod logs, 2026-09-19 to 09-30: Save Page Now
+ * waits 60 s between refused submits and the next one is often refused too), so a read it pushes
+ * back on waits longer before its retries — and once those fail too, the run stops reading from the
+ * archive (`archiveTraffic.pausedBy`): the rest wait for the next run instead of each walking into
+ * the same refusal. Every archive.org read, cited capture, CDX lookup and fallback read alike, keeps
+ * one gap of WAYBACK_PACE_MS from the last archive.org request of any kind, Save Page Now included
+ * (`archiveSlot`).
+ */
+const ARCHIVE_BACKOFF_MS = [30_000, 90_000];
 const KEEP_VERSIONS = 5;
-const CHECK_EVERY = '1 day';
 
 function usage() {
     console.log(`watch-sources.mjs — fetch, normalise, hash and diff every source we rely on
@@ -121,7 +132,8 @@ WHAT A RUN DOES
   A Next.js page rendered in the browser (an empty body, its words in \`self.__next_f\` flight
   payloads) is read from those payloads when the markup alone yields a short text.
 
-  A host that refuses us outright (401/403 or a bot wall) is read from its newest Wayback Machine
+  A host that refuses us outright (401/403, a bot wall, an expired certificate, or a region block
+  served as a 200) is read from its newest Wayback Machine
   capture instead (CDX, then the \`id_\` raw capture; ${WAYBACK_PACE_MS / 1000} s apart, at most ${WAYBACK_FALLBACK_CAP} per run). The
   result says so: \`read_via = 'wayback'\` and \`capture_at\` (the capture's own CDX timestamp)
   on sonar.source and sonar.source_version, with http_status still the live refusal — an archived
@@ -147,8 +159,20 @@ WHAT A RUN DOES
   event, the last readable version stays the baseline and the quotes are "not checkable") ·
   reachable-unverified (a refusal or an unreadable read on a source NO dossier quote relies on — a
   homepage, a listing, a folder: the host answered, which is all such a citation needs; content not
-  read) · error (5xx, timeout, reset). A run with ANY error does not report success and exits
-  non-zero; gone, blocked, unreadable and reachable-unverified are recorded findings, not failures.
+  read) · throttled (archive.org — a cited web.archive.org capture or CDX query — refused OUR
+  traffic: connection refused/reset, timeout, 429/5xx after a 30 s + 90 s backoff; not a look at
+  the source, so nothing is written and it is retried next run; after the first such refusal the run
+  reads nothing more from the archive) · error (5xx, timeout, reset, or a source archive.org has
+  throttled on ${THROTTLE_PERSISTS_AFTER} runs in a row). A run with ANY error does not report success and exits
+  non-zero; gone, blocked, unreadable, reachable-unverified and throttled are recorded, not failures.
+
+  A URL listed in stocks/data/retired-sources.json (gone for good) is not fetched; its row and state
+  say \`retired\`, with the date and reason.
+
+  The first read under a newer extractor generation (lib/watch.mjs publisherNormalizerVersion,
+  HTML_EXTRACTOR_VERSION) whose text differs from the stored one is a silent RE-BASELINE: the new
+  text is recorded as a version, with no legal-term or quote-lost event; the log counts them. A real
+  change on a later run diffs against that baseline as usual.
 
   A read that contains every dossier quote registered on it is the cited document, whatever it
   looks like (a cited region-block page quoted verbatim is read as a document).
@@ -276,8 +300,32 @@ async function extraCaList(host) {
     return extraCaCache.get(file);
 }
 
+/**
+ * All of this run's archive.org traffic: when the last request went out (reads and Save Page Now
+ * alike) and, once the archive has refused a read through its backoffs, why the run stopped reading
+ * from it (`pausedBy`).
+ */
+const archiveTraffic = { lastMs: 0, pausedBy: null, paused: 0 };
+
+/** Wait for this run's next archive.org slot (WAYBACK_PACE_MS after the last request of any kind). */
+async function archiveSlot() {
+    const gap = WAYBACK_PACE_MS - (Date.now() - archiveTraffic.lastMs);
+    if (gap > 0) await sleep(gap);
+    archiveTraffic.lastMs = Date.now();
+}
+
+/** A request that was never sent, because archive.org pushed back earlier this run. */
+function archivePausedResponse(url) {
+    archiveTraffic.paused += 1;
+    return { httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: ARCHIVE_PAUSED };
+}
+
 /** One GET, with the conditional headers the stored version allows. Never throws. */
 async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
+    if (isArchiveHost(hostOf(url))) {
+        if (archiveTraffic.pausedBy) return archivePausedResponse(url);
+        await archiveSlot();
+    }
     // A cited Wayback capture is read as its raw `id_` bytes, never with the toolbar around it.
     const cited = citedCapture(url);
     if (cited) {
@@ -322,13 +370,21 @@ async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
     }
 }
 
-/** Rate limits, temporary outages and connection failures get two backoffs before classification. */
+/**
+ * Rate limits, temporary outages and connection failures get two backoffs before classification;
+ * archive.org pushing back gets the longer ARCHIVE_BACKOFF_MS, and when it is still refusing after
+ * them, archive reads pause for the rest of the run (`archiveTraffic.pausedBy`).
+ */
 async function fetchWithBackoff(url, conditional, timeoutMs) {
+    const host = hostOf(url);
+    const archive = isArchiveHost(host);
     let response = await fetchOnce(url, conditional, timeoutMs);
+    if (response.networkErrorCode === ARCHIVE_PAUSED) return { ...response, retriedAfterBackoff: false };
     let retried = false;
-    for (const wait of BACKOFF_MS) {
+    for (const wait of archive ? ARCHIVE_BACKOFF_MS : BACKOFF_MS) {
+        const pushback = archivePushback({ host, httpStatus: response.httpStatus, networkErrorCode: response.networkErrorCode });
         const transientNetwork = ['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN'].includes(response.networkErrorCode);
-        if (response.httpStatus !== 429 && response.httpStatus !== 503 && !transientNetwork) break;
+        if (!pushback && response.httpStatus !== 429 && response.httpStatus !== 503 && !transientNetwork) break;
         // A challenge page served as 429/503 (Vercel's Security Checkpoint) is a wall, not a rate
         // limit: waiting 20 s cannot change it, so it goes straight to classification.
         if (challengeInBody(response.buffer.subarray(0, 4000).toString('utf8'))) break;
@@ -338,6 +394,12 @@ async function fetchWithBackoff(url, conditional, timeoutMs) {
         await sleep(pause);
         response = await fetchOnce(url, conditional, timeoutMs);
         retried = true;
+    }
+    if (archive && !archiveTraffic.pausedBy
+        && archivePushback({ host, httpStatus: response.httpStatus, networkErrorCode: response.networkErrorCode })) {
+        archiveTraffic.pausedBy = `${response.networkErrorCode ?? `http-${response.httpStatus}`} on ${url}`;
+        logWarn(`archive.org still pushing back after ${ARCHIVE_BACKOFF_MS.map((ms) => `${ms / 1000}s`).join(' + ')} of backoff`
+            + ` (${archiveTraffic.pausedBy}) — no more archive reads this run; the rest are retried next run`);
     }
     return { ...response, retriedAfterBackoff: retried };
 }
@@ -438,6 +500,8 @@ async function archiveUrlAuthenticated(url) {
                 signal: AbortSignal.timeout(60_000)
             });
             submitted = await submit.json().catch(() => null);
+            // Save Page Now shares the archive's rate limit with our reads (`archiveSlot`).
+            archiveTraffic.lastMs = Date.now();
             if (submitted?.job_id) break;
             const msg = submitted?.message || submitted?.status_ext || `http ${submit.status}`;
             if (spnBusy(msg) && attempt < SPN_BUSY_RETRIES) {
@@ -452,6 +516,7 @@ async function archiveUrlAuthenticated(url) {
             await sleep(SPN_POLL_MS);
             const poll = await fetch(`https://web.archive.org/save/status/${submitted.job_id}`, { headers, signal: AbortSignal.timeout(30_000) });
             const parsed = parseSpnStatus(await poll.json().catch(() => null), url);
+            archiveTraffic.lastMs = Date.now();
             if (parsed.done) return { archiveUrl: parsed.archiveUrl, httpStatus: poll.status, error: parsed.error };
         }
         return { archiveUrl: null, httpStatus: 202, error: `save-page-now still pending after ${SPN_WAIT_MS / 1000}s (job ${submitted.job_id})` };
@@ -768,7 +833,8 @@ async function watchOne(source, prev, options) {
         if (read) return read;
     }
     if (options.wayback && wantsWaybackFallback({
-        status: result.status, httpStatus: res.httpStatus, botWall: blocked, tlsExpired: res.networkErrorCode === 'CERT_HAS_EXPIRED', url: source.url
+        status: result.status, httpStatus: res.httpStatus, botWall: blocked, tlsExpired: res.networkErrorCode === 'CERT_HAS_EXPIRED',
+        unreadableCode: result.unreadableCode ?? null, url: source.url
     })) {
         const archived = await readFromWayback(source, prev, result, options);
         if (archived) return archived;
@@ -926,7 +992,8 @@ async function archiveTodayMemento(url, pace) {
 }
 
 /**
- * The live host refused us (401/403 or a bot wall): read the newest Wayback capture instead
+ * The live host refused us (401/403, a bot wall, an expired certificate or a region block —
+ * lib/wayback.mjs `wantsWaybackFallback`): read the newest Wayback capture instead
  * (lib/wayback.mjs). On success the result is `ok`/`changed` against the stored hash like any
  * read, but `via: 'wayback'`, `captureTimestamp` and `captureUrl` say where the words came from,
  * `httpStatus` stays the LIVE answer, and `reason` carries the live refusal plus the capture date;
@@ -948,11 +1015,7 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback, quote
         return null;
     }
     wayback.used += 1;
-    const pace = async () => {
-        const gap = WAYBACK_PACE_MS - (Date.now() - wayback.lastMs);
-        if (gap > 0) await sleep(gap);
-        wayback.lastMs = Date.now();
-    };
+    const pace = archiveSlot;
     const giveUp = (why) => {
         wayback.failed += 1;
         result.reason = `${liveReason}; wayback: ${why}`;
@@ -963,9 +1026,11 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback, quote
 
     // The CDX API is slow and intermittently overloaded (a 30 s timeout on thedefiant.io,
     // 2026-09-23), so a timeout or 5xx gets one more paced attempt before the source stays blocked.
+    // While archive reads are paused (archive.org pushed back earlier this run), the index is not
+    // asked at all: that is the same "index unavailable" as a timeout, and handled the same way.
     let capture;
-    let cdxFailure = null;
-    for (let attempt = 0; attempt < 2; attempt += 1) {
+    let cdxFailure = archiveTraffic.pausedBy ? `archive reads paused this run (${archiveTraffic.pausedBy})` : null;
+    for (let attempt = 0; attempt < 2 && !archiveTraffic.pausedBy; attempt += 1) {
         await pace();
         try {
             const cdx = await fetch(cdxQueryUrl(source.url), {
@@ -1022,9 +1087,15 @@ async function readFromWayback(source, prev, result, { timeoutMs, wayback, quote
         wayback.read += 1;
     };
 
-    // The same capture we read last time: nothing new to fetch, and the stored text is still it.
+    // The same capture we read last time: nothing new to fetch, and the stored text is still it —
+    // unless the extractor changed since, when the capture is read again so the baseline is re-read
+    // with it (only standing on it, with the index down, keeps the older generation for now).
     if (prev?.via === 'wayback' && prev.captureTimestamp === captureIso(capture.timestamp)
-        && prev.contentHash && prev.textPath) {
+        && prev.contentHash && prev.textPath && (!result.normalizerUpgrade || standing)) {
+        if (result.normalizerUpgrade) {
+            result.normalizerVersion = prev.normalizerVersion ?? 1;
+            result.normalizerUpgrade = false;
+        }
         result.contentHash = prev.contentHash;
         result.kind = prev.kind ?? result.kind;
         if (standing) wayback.standing += 1;
@@ -1240,135 +1311,6 @@ async function reviewStoredCopy(result, prev, { needQuotes, quotes = [] }) {
     return needQuotes ? readStoredText() : null;
 }
 
-/** The rows for Postgres: sources always, versions and events only for what actually happened. */
-function buildRows(results, previousState) {
-    const sources = [];
-    const versions = [];
-    const events = [];
-    for (const result of results) {
-        const prev = previousState[result.url] ?? null;
-        const changed = result.status === 'changed';
-        // A read from an archived capture says so wherever it surfaces (lib/wayback.mjs).
-        const { evidence: archived, prefix: archivedPrefix } = archivedProvenance(result);
-        const versionRecorded = changed || result.versionRecorded === true;
-        const { readVia, captureAt } = readProvenance(result, prev);
-        sources.push({
-            id: result.id,
-            url: result.url,
-            kind: result.kind,
-            title: result.title,
-            issuer: result.issuer,
-            foundIn: result.foundIn,
-            firstSeenAt: prev?.firstSeenAt ?? result.fetchedAt,
-            lastCheckedAt: result.fetchedAt,
-            lastChangedAt: changed ? result.fetchedAt : (prev?.lastChangedAt ?? null),
-            checkEvery: CHECK_EVERY,
-            // A result reused from the day's checkpoint predates an archive made since
-            // (--archive-missing-only), so the stored one fills in rather than being nulled.
-            archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
-            status: result.status,
-            contentHash: result.contentHash,
-            httpStatus: result.httpStatus,
-            error: result.error,
-            readVia,
-            captureAt
-        });
-        if (versionRecorded) {
-            versions.push({
-                sourceId: result.id,
-                fetchedAt: result.fetchedAt,
-                contentHash: result.contentHash,
-                bytes: result.bytes,
-                textChars: result.textChars,
-                textPath: result.textPath,
-                rawPath: result.rawPath,
-                archiveUrl: result.archiveUrl,
-                etag: result.etag,
-                lastModified: result.lastModified,
-                diffSummary: result.diff?.summary == null ? (archived ? archivedPrefix.trim() : null) : `${archivedPrefix}${result.diff.summary}`,
-                diffSeverity: result.diff?.severity ?? null,
-                diffMethod: result.diff?.method ?? 'none',
-                diffAdded: result.diff?.added ?? null,
-                diffRemoved: result.diff?.removed ?? null,
-                readVia,
-                captureAt
-            });
-            if (changed && result.diff?.severity === 'caution') {
-                events.push({
-                    detectedAt: result.fetchedAt,
-                    kind: 'legal-term',
-                    subjectType: 'source',
-                    subjectId: result.id,
-                    field: null,
-                    before: prev?.contentHash ?? null,
-                    after: result.contentHash,
-                    severity: 'caution',
-                    summary: `${archivedPrefix}${result.title ?? result.url}: ${result.diff.summary}`,
-                    evidence: {
-                        ...(archived ?? {}),
-                        url: result.url,
-                        issuer: result.issuer,
-                        foundIn: result.foundIn,
-                        versionFetchedAt: result.fetchedAt,
-                        contentHash: result.contentHash,
-                        textPath: result.textPath,
-                        diffExcerpt: (result.diff.unified ?? '').slice(0, 4000)
-                    }
-                });
-            }
-        }
-        // Only the TRANSITION into `gone` is an event; a citation that has been dead for a month
-        // must not write one event per run.
-        // A quote that stops being verbatim in its source is the strongest signal the watcher has
-        // (EVIDENCE.md §2.3); only the TRANSITION into lost is an event, one per claim.
-        const previouslyLost = new Set(Array.isArray(prev?.quotesLost) ? prev.quotesLost : []);
-        for (const item of result.quotes?.lost ?? []) {
-            if (previouslyLost.has(item.id)) continue;
-            events.push({
-                detectedAt: result.fetchedAt,
-                kind: 'quote-lost',
-                subjectType: item.kind,
-                subjectId: item.id,
-                field: item.ref,
-                before: null,
-                after: result.contentHash,
-                severity: 'warning',
-                summary: `${archivedPrefix}${item.slug}: the quoted words for ${item.kind} ${item.ref} are no longer in ${result.title ?? result.url}`,
-                evidence: {
-                    ...(archived ?? {}),
-                    url: result.url,
-                    issuer: result.issuer,
-                    quote: item.quote,
-                    versionFetchedAt: result.fetchedAt,
-                    contentHash: result.contentHash,
-                    textPath: result.textPath ?? prev?.textPath ?? null
-                }
-            });
-        }
-        if (result.status === 'gone' && prev?.status !== 'gone') {
-            events.push({
-                detectedAt: result.fetchedAt,
-                kind: 'document-gone',
-                subjectType: 'source',
-                subjectId: result.id,
-                field: null,
-                before: prev?.contentHash ?? null,
-                after: null,
-                severity: 'warning',
-                summary: `${result.title ?? result.url} is gone (${result.reason})`,
-                evidence: {
-                    url: result.url,
-                    issuer: result.issuer,
-                    foundIn: result.foundIn,
-                    httpStatus: result.httpStatus,
-                    reason: result.reason
-                }
-            });
-        }
-    }
-    return { sources, versions, events };
-}
-
 async function loadToPostgres(rows, { url }) {
     const source = buildSourceSql(rows.sources);
     log(`db: ${source.rows} source rows`);
@@ -1506,6 +1448,10 @@ async function main() {
         sources = sources.filter((s) => s.issuer === flags.only);
         if (sources.length === 0) throw new Error(`no sources for issuer ${flags.only}`);
     }
+    // A retired source (stocks/data/retired-sources.json, via extract-sources.mjs) is gone for good:
+    // it is not fetched, and its row and state say `retired` with the reason and date.
+    const retiredSources = sources.filter((s) => s.retired);
+    sources = sources.filter((s) => !s.retired);
     if (onlyBlocked) {
         const before = sources.length;
         sources = previouslyBlocked(sources, await readJson(STATE_FILE, {}));
@@ -1555,7 +1501,7 @@ async function main() {
     let archiveGaveUp = null;
     let lastArchiveMs = 0;
     // Wayback fallback for hosts that refuse us (lib/wayback.mjs): paced and capped per run.
-    const wayback = { used: 0, read: 0, failed: 0, skipped: 0, standing: 0, lastMs: 0, capLogged: false };
+    const wayback = { used: 0, read: 0, failed: 0, skipped: 0, standing: 0, capLogged: false };
 
     for (const source of ordered) {
         done += 1;
@@ -1580,6 +1526,9 @@ async function main() {
         const { result, text, quoteText, raw, previousTextPath } = await watchOne(source, prev,
             { timeoutMs: TIMEOUT_MS, wayback, quotes: registered });
         results.push(result);
+        // archive.org pushing back on our traffic: not a look at the source, retried next run —
+        // unless it has refused this source on THROTTLE_PERSISTS_AFTER runs in a row (lib/watch.mjs).
+        settleThrottle(result, prev);
         // No fresh text: the read stands on the stored version, which may itself be unreadable.
         const storedQuoteText = text === null && result.status === 'ok'
             ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0, quotes: registered })
@@ -1600,13 +1549,8 @@ async function main() {
             // The raw bytes only exist in memory, so the version files are written here, before
             // the checkpoint records the paths.
             await recordChange(result, { text, raw, previousTextPath, prev, quotes: registered });
-            if (result.normalizerUpgrade) {
-                result.versionRecorded = true;
-                result.status = 'ok';
-                // A capture read keeps saying it is one (its `error` carries the Wayback note).
-                result.reason = `normalizer upgraded to v${result.normalizerVersion}; baseline refreshed without an external-change event`
-                    + (result.via === 'wayback' ? ` — ${result.waybackNote}` : '');
-            }
+            // Changed only because the extractor did: a silent re-baseline (lib/watch-rows.mjs).
+            settleExtractorUpgrade(result);
         }
         if (registered.length) {
             // Unfiltered text (quoteText) when this run read the document, the stored copy re-read
@@ -1617,7 +1561,9 @@ async function main() {
                 quotes: registered,
                 // The page-number rule of the quote key applies to PDF text only; a stored copy
                 // was read as whatever kind it was when it was stored.
-                kind: typeof quoteText === 'string' ? result.kind : (prev?.kind ?? result.kind)
+                kind: typeof quoteText === 'string' ? result.kind : (prev?.kind ?? result.kind),
+                // A capture only speaks for its own date (lib/watch.mjs quoteVerdicts).
+                capturedAt: result.via === 'wayback' ? (result.captureTimestamp ?? null) : null
             });
             if (checked !== null) {
                 result.quotes = {
@@ -1628,7 +1574,10 @@ async function main() {
                     notCheckable: checked.notCheckable,
                     lost: checked.lost.map((q) => ({ id: q.id, kind: q.kind, ref: q.ref, slug: q.slug, quote: q.quote }))
                 };
-                for (const q of checked.lost) logWarn(`quote lost in ${source.url}: ${q.slug} ${q.kind} ${q.ref}`);
+                for (const q of checked.lost) {
+                    logWarn(`quote ${result.rebaselined ? 'missing from the re-baseline of' : 'lost in'} ${source.url}: ${q.slug} ${q.kind} ${q.ref}`
+                        + (result.rebaselined ? ' — no event now; the next run\'s read decides' : ''));
+                }
                 if (checked.notCheckable) log(`${checked.notCheckable} quote(s) not checkable in ${source.url}: the source is ${result.status} (${result.reason})`);
             }
         }
@@ -1640,7 +1589,7 @@ async function main() {
         // the next run reads this week's page rather than re-confirming a months-old one.
         const staleCapture = result.via === 'wayback' && captureIsStale(result.captureTimestamp, Date.now());
         const wantsArchive = flags.archive && !archiveGaveUp && result.status !== 'gone'
-            && result.status !== 'error' && archivableUrl(result.url)
+            && result.status !== 'error' && result.status !== 'throttled' && archivableUrl(result.url)
             && (result.status === 'changed' || !result.archiveUrl || staleCapture);
         if (wantsArchive) {
             const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
@@ -1677,66 +1626,55 @@ async function main() {
         await writeJson(checkpointFile, { ...(await readJson(checkpointFile, {})), [source.url]: result });
     }
 
-    // State for the next run: what we now know per URL.
-    const state = {};
-    for (const result of results) {
-        const prev = previous[result.url] ?? null;
-        const read = result.status === 'ok' || result.status === 'changed';
-        // An unreadable read (lib/unreadable.mjs) produced no text: the hash, the text files and
-        // their provenance are still the last readable version's, so they are carried over whole.
-        const standsOnStored = Boolean(result.unreadableCode) && !read;
-        state[result.url] = {
-            id: result.id,
-            kind: result.kind,
-            status: result.status,
-            httpStatus: result.httpStatus,
-            contentHash: result.contentHash,
-            etag: result.etag,
-            lastModified: result.lastModified,
-            validatorStatus: result.validatorStatus ?? null,
-            firstSeenAt: prev?.firstSeenAt ?? result.fetchedAt,
-            lastCheckedAt: result.fetchedAt,
-            lastChangedAt: result.status === 'changed' ? result.fetchedAt : (prev?.lastChangedAt ?? null),
-            textPath: result.textPath ?? prev?.textPath ?? null,
-            rawPath: result.rawPath ?? prev?.rawPath ?? null,
-            archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
-            versions: (prev?.versions ?? 0)
-                + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
-            // Only a read that produced text is read by the new extraction generation; a refusal or an
-            // unreadable read on the upgrade day leaves the upgrade (and its event-free baseline
-            // refresh) for the first real read.
-            normalizerVersion: read
-                ? (result.normalizerVersion ?? prev?.normalizerVersion ?? 1)
-                : (prev?.normalizerVersion ?? result.normalizerVersion ?? 1),
-            // Provenance of the stored text: `wayback` means the live host refused us and the text
-            // is from the capture dated `captureTimestamp` — never a live read. A 304 keeps the
-            // reader of the text it confirmed.
-            via: standsOnStored ? (prev?.via ?? null) : (result.via ?? (result.httpStatus === 304 ? (prev?.via ?? null) : null)),
-            readVia: standsOnStored ? (prev?.readVia ?? null) : readProvenance(result, prev).readVia,
-            captureTimestamp: standsOnStored ? (prev?.captureTimestamp ?? null) : (result.via === 'wayback' ? result.captureTimestamp : null),
-            captureUrl: standsOnStored ? (prev?.captureUrl ?? null) : (result.via === 'wayback' ? result.captureUrl : null),
-            // The publisher's API the text was read from when the cited page gave us nothing.
-            companionUrl: standsOnStored ? (prev?.companionUrl ?? null) : (result.companionUrl ?? null),
-            // Why the last look did not read the document (null when it did): lib/unreadable.mjs.
-            unreadableCode: read ? null : (result.unreadableCode ?? null),
-            archiveTodayUrl: result.archiveTodayUrl ?? null,
-            quotesLost: result.quotes ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? [])
-        };
+    // Retired sources were not fetched; they are written as `retired` (lib/watch-rows.mjs).
+    const retiredResults = retiredSources.map((source) => ({
+        id: sourceId(source.url),
+        url: source.url,
+        issuer: source.issuer ?? null,
+        title: source.title ?? null,
+        foundIn: source.foundIn ?? [],
+        kind: source.kind,
+        status: 'retired',
+        retiredAt: source.retired.at,
+        retiredReason: source.retired.reason
+    }));
+    if (retiredResults.length) {
+        log(`watch-sources: ${retiredResults.length} retired source(s) not fetched (stocks/data/retired-sources.json):`);
+        for (const r of retiredResults) log(`    ${r.url} — retired ${r.retiredAt}: ${r.retiredReason}`);
     }
+    // State for the next run: what we now know per URL (lib/watch-rows.mjs).
+    const state = nextState([...results, ...retiredResults], previous);
     // Merged into the state file as it is NOW, not as it was when this run started, so a concurrent
     // run's entries for other sources survive (same reason as the checkpoint write above).
     await writeJson(STATE_FILE, { ...(await readJson(STATE_FILE, {})), ...state });
 
-    const rows = buildRows(results, previous);
+    const rows = buildRows([...results, ...retiredResults], previous);
     const byStatus = {};
     for (const result of results) byStatus[result.status] = (byStatus[result.status] ?? 0) + 1;
     log(`watch-sources: ${Object.entries(byStatus).map(([k, v]) => `${k}=${v}`).join(' ')}`
         + ` · ${rows.versions.length} new version(s) · ${rows.events.length} change event(s)`);
+    // The first read under a newer extractor (lib/watch.mjs `publisherNormalizerVersion`) of a
+    // source that already had a stored text: a changed text there is a re-baseline, recorded as a
+    // version with no change event (lib/watch-rows.mjs). A first sight has nothing to re-baseline.
+    const hadBaseline = (r) => typeof previous[r.url]?.textPath === 'string';
+    const upgradedReads = results.filter((r) => r.normalizerUpgrade && hadBaseline(r) && (r.status === 'ok' || r.status === 'changed'));
+    const rebaselined = upgradedReads.filter((r) => r.rebaselined);
+    if (upgradedReads.length) {
+        log(`watch-sources: extractor upgrade — ${upgradedReads.length} source(s) read under a newer extractor for the first time,`
+            + ` ${rebaselined.length} re-baselined silently (text changed, version recorded, no change event),`
+            + ` ${upgradedReads.length - rebaselined.length} unchanged`);
+    }
+    const throttled = results.filter((r) => r.status === 'throttled');
+    if (throttled.length) {
+        logWarn(`${throttled.length} source(s) throttled — archive.org pushed back on our traffic; not looked at, retried next run`
+            + ` (an error after ${THROTTLE_PERSISTS_AFTER} runs in a row):`);
+        for (const r of throttled) logWarn(`    ${r.url} (run ${r.throttledRuns} of ${THROTTLE_PERSISTS_AFTER}): ${r.reason}`);
+    }
     const quoteTotals = results.reduce((acc, r) => {
         if (!r.quotes) return acc;
         acc.checked += r.quotes.checked;
         acc.found += r.quotes.found;
-        acc.lost += r.quotes.lost.length;
+        acc.lost += r.rebaselined ? 0 : r.quotes.lost.length;
         acc.notCheckable += r.quotes.notCheckable ?? 0;
         acc.sources += 1;
         return acc;
@@ -1757,7 +1695,7 @@ async function main() {
         + ` ${quoteTotals.found} found, ${quoteTotals.lost} lost, ${quoteTotals.notCheckable} not checkable (source blocked or unreadable)`);
     if (quoteTotals.lost) {
         logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
-        for (const r of results) for (const q of r.quotes?.lost ?? []) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
+        for (const r of results) for (const q of r.rebaselined ? [] : (r.quotes?.lost ?? [])) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
     }
     if (flags.archive) {
         log(`watch-sources: archived ${archived}, archive failures ${archiveFailures}`
@@ -1817,7 +1755,8 @@ async function main() {
                 if (!r.quotes) continue;
                 // Only a quote that got a verdict is written back: a not-checkable one (blocked
                 // source) or one too short to check was not looked for, so it is neither found nor lost.
-                const lostIds = new Set(r.quotes.lost.map((q) => q.id));
+                // A re-baseline's missing quote is not written back as lost: the next run decides.
+                const lostIds = new Set(r.rebaselined ? [] : r.quotes.lost.map((q) => q.id));
                 const foundIds = new Set(r.quotes.foundIds ?? []);
                 for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
                     if (q.kind !== 'claim' || (!lostIds.has(q.id) && !foundIds.has(q.id))) continue;
@@ -1867,6 +1806,11 @@ async function main() {
         quotesNotCheckable: quoteTotals.notCheckable,
         archived,
         archiveFailures,
+        extractorUpgrade: { firstReads: upgradedReads.length, rebaselined: rebaselined.length },
+        throttled: throttled.length,
+        throttledSources: throttled.slice(0, 20).map((result) => ({ url: result.url, runs: result.throttledRuns, reason: result.reason })),
+        archiveReadsPausedBy: archiveTraffic.pausedBy,
+        retired: retiredResults.length,
         waybackFallback: { tried: wayback.used, read: wayback.read, failed: wayback.failed, skippedAtCap: wayback.skipped, stoodOnPrevious: wayback.standing },
         readVia: viaCounts,
         failures: failures.length,

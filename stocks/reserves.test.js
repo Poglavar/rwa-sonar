@@ -4,7 +4,7 @@
 // coverage/status rules, null-never-zero, the unchanged-reading dedupe and the SQL it writes.
 const {
     PROGRAMMES, assessReading, buildWriteSql, chainOutstanding, decimalOrNull, formatSummary, mintSupply, parseLatest,
-    parseSuperstateInstruments, parseXstocksPor, planWrites, readingHash, transitions, xstocksHasNextPage
+    parseStreaks, parseSuperstateInstruments, parseXstocksPor, planWrites, readingHash, reserveEvents, transitions, xstocksHasNextPage
 } = require('./lib/reserves.mjs');
 const por = require('./fixtures/reserves/xstocks-por.sample.json');
 const superstate = require('./fixtures/reserves/superstate-instruments.sample.json');
@@ -169,6 +169,44 @@ describe('storage', () => {
         expect(sql).toMatch(/'O''x'/);
         expect(sql).not.toMatch(/NaN/);
         expect(sql).toMatch(/UPDATE sonar\.reserve_observation SET last_seen_at = '2026-09-30T12:33:30Z'.*WHERE id = 42;/);
+    });
+});
+
+describe('change events', () => {
+    const streaks = parseStreaks('M1,xstocks-por-api,shortfall,covered,2026-09-30T13:42:40.000Z\n'
+        + 'M2,xstocks-por-api,shortfall,,2026-09-30T13:42:40.000Z\n'
+        + 'M3,xstocks-por-api,covered,shortfall,2026-10-02T13:52:00.000Z\n'
+        + 'M4,xstocks-por-api,stale,covered,2026-10-01T13:52:00.000Z\n'
+        + 'M5,xstocks-por-api,covered,,2026-09-30T13:42:40.000Z\n'
+        + 'M6,chainlink-data-streams,unreadable,,2026-09-30T13:42:40.000Z\n');
+    const row = (mint, over) => ({ mint, symbol: `${mint}x`, issuer: 'xstocks-backed', source: over.source ?? 'xstocks-por-api', sourceUrl: 'https://api.xstocks.fi/p', ...over });
+    const events = reserveEvents([
+        row('M1', { status: 'shortfall', shortfallBasis: 'both', reserve: '90', issuerCirculating: '100', outstanding: 95 }),
+        row('M2', { status: 'shortfall', shortfallBasis: 'chain', reserve: '9978', issuerCirculating: '9875', outstanding: 180093.9 }),
+        row('M3', { status: 'covered' }),
+        row('M4', { status: 'stale', sourceTime: '2026-09-25T00:36:00.880Z' }),
+        row('M5', { status: 'covered' }),
+        row('M6', { status: 'unreadable', source: 'chainlink-data-streams' })
+    ], streaks);
+
+    test('shortfalls, a stale proof and a recovery raise events dated by the onset of their status; covered and unreadable do not', () => {
+        expect(events.map((e) => [e.subjectId, e.after, e.severity, e.detectedAt])).toEqual([
+            ['M1', 'shortfall', 'warning', '2026-09-30T13:42:40.000Z'],
+            ['M2', 'shortfall', 'caution', '2026-09-30T13:42:40.000Z'],
+            ['M3', 'covered', 'info', '2026-10-02T13:52:00.000Z'],
+            ['M4', 'stale', 'info', '2026-10-01T13:52:00.000Z']
+        ]);
+        expect(events[0]).toMatchObject({ kind: 'reserve', subjectType: 'token', field: 'xstocks-por-api:shortfall', before: 'covered' });
+        expect(events[1].before).toBeNull();
+    });
+
+    test('a Solana-only shortfall says whose figure each number is', () => {
+        expect(events[1].summary).toBe('M2x: 180,094 tokens on Solana outside the wallets we attribute to the issuer, against 9,978 shares in its reserve report');
+        expect(events[0].summary).toBe("M1x: reserve of 90 shares is below the issuer's own circulating figure of 100");
+    });
+
+    test('a row whose stored status differs from this run (the write failed) raises nothing', () => {
+        expect(reserveEvents([row('M5', { status: 'shortfall', shortfallBasis: 'chain' })], streaks)).toEqual([]);
     });
 });
 

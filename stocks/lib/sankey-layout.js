@@ -16,12 +16,12 @@
     /** Proof stages from strongest to weakest (stocks/lib/protocol-proof.js). */
     const STAGES = ['simulated', 'decoded', 'source-listed', 'observed-market', 'account-observed', 'not-established'];
     const STAGE_LABELS = {
-        simulated: 'Simulated',
-        decoded: 'Configuration-decoded',
-        'source-listed': 'Source-listed',
-        'observed-market': 'Market-observed',
-        'account-observed': 'Account observed on-chain',
-        'not-established': 'Not established'
+        simulated: 'Transaction simulated',
+        decoded: 'Settings read on-chain',
+        'source-listed': 'Named in the protocol’s list',
+        'observed-market': 'Live market seen',
+        'account-observed': 'Protocol account seen on-chain',
+        'not-established': 'No proof found'
     };
     const ACTIONS = ['collateral', 'loan', 'liquidity', 'vault'];
     const ACTION_LABELS = { collateral: 'Collateral', loan: 'Loan (observed position)', liquidity: 'DEX liquidity', vault: 'Yield vault' };

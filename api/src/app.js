@@ -113,7 +113,11 @@ app.use('/api/*', cors({
     maxAge: 86400
 }));
 
-app.get('/api', (c) => c.json({ name: 'rwa-sonar-api', routes: ROUTES }));
+// The index answers on both spellings: nginx redirects the bare `/api` to `/api/` (its location
+// is `/api/`), and Hono's strict routing treats the two as different paths, so `/api/` was a 404.
+const apiIndex = (c) => c.json({ name: 'rwa-sonar-api', docs: 'https://github.com/Poglavar/rwa-sonar/blob/colosseum-worlds-fair/api/README.md', routes: ROUTES });
+app.get('/api', apiIndex);
+app.get('/api/', apiIndex);
 
 app.route('/api', healthRoutes);
 app.route('/api', historyRoutes);

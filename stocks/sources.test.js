@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs';
 
 import {
-    buildRegistry, classifyKind, countBy, extractUrls, hostOf, kindFromContentType, labelPath,
+    applyRetirements, buildRegistry, classifyKind, countBy, extractUrls, hostOf, kindFromContentType, labelPath,
     isDocumentWatchable, normaliseUrl, topHosts, trimUrl, walkUrls
 } from './lib/sources.mjs';
 
@@ -306,5 +306,41 @@ describe('against a real dossier', () => {
         // `sources[6]` is `https://api.mainnet-beta.solana.com (getAccountInfo …)`: prose.
         expect(items.map((i) => i.url)).toContain('https://api.mainnet-beta.solana.com/');
         expect(items.find((i) => i.url === 'https://prestocks.com/api/prestocks').kind).toBe('api');
+    });
+});
+
+describe('retired sources', () => {
+    const items = [
+        { url: 'https://remoramarkets.xyz/proof-of-reserves', kind: 'html', issuer: 'remora-markets', title: 't', foundIn: ['remora-markets:x'] },
+        { url: 'https://assets.backed.fi/legal-documentation', kind: 'html', issuer: 'xstocks-backed', title: 't', foundIn: ['xstocks-backed:y'] }
+    ];
+
+    test('a retirement marks the registry item, which stays in the registry', () => {
+        const got = applyRetirements(items, [
+            { url: 'https://REMORAMARKETS.xyz/proof-of-reserves#top', retiredAt: '2026-09-30', reason: 'wound down; DNS SERVFAIL' }
+        ]);
+        expect(got.items).toHaveLength(2);
+        expect(got.items[0].retired).toEqual({ at: '2026-09-30', reason: 'wound down; DNS SERVFAIL' });
+        expect(got.items[1].retired).toBeUndefined();
+        expect(got.retired).toBe(1);
+        expect(got.unmatched).toEqual([]);
+    });
+
+    test('a retirement nobody cites any more is reported, and one without a date or reason is refused', () => {
+        expect(applyRetirements(items, [{ url: 'https://gone.example/', retiredAt: '2026-09-30', reason: 'x' }]).unmatched)
+            .toEqual(['https://gone.example/']);
+        expect(() => applyRetirements(items, [{ url: items[0].url, reason: 'x' }])).toThrow(/retiredAt/);
+        expect(() => applyRetirements(items, [{ url: items[0].url, retiredAt: '2026-09-30', reason: ' ' }])).toThrow(/reason/);
+    });
+
+    test('every entry in stocks/data/retired-sources.json is dated, reasoned and still cited', () => {
+        const file = JSON.parse(readFileSync(new URL('./data/retired-sources.json', import.meta.url), 'utf8'));
+        const registry = JSON.parse(readFileSync(new URL('./data/sources.json', import.meta.url), 'utf8'));
+        const got = applyRetirements(registry.items.map(({ retired, ...item }) => item), file.items);
+        expect(got.unmatched).toEqual([]);
+        expect(got.retired).toBe(file.items.length);
+        // The committed registry is the one extract-sources.mjs writes from these entries.
+        expect(registry.items.filter((item) => item.retired).map((item) => item.url).sort())
+            .toEqual(file.items.map((entry) => entry.url).sort());
     });
 });

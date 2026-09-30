@@ -130,6 +130,9 @@
 
     const DATA_STATE_KINDS = new Set(['loading', 'none-exists', 'none-confirmed', 'none-source-listed', 'not-collected', 'stale', 'failed', 'filtered-empty']);
 
+    /** A state's visible tag where its id is not already plain words. */
+    const DATA_STATE_LABELS = { 'none-source-listed': 'No protocol found', 'filtered-empty': 'Nothing matches' };
+
     function dataStateHtml(kind, title, detail, actions = []) {
         const stateKind = DATA_STATE_KINDS.has(kind) ? kind : 'not-collected';
         const controls = (Array.isArray(actions) ? actions : []).map((action) => {
@@ -142,7 +145,7 @@
             }
             return '';
         }).join('');
-        return `<div class="data-state data-state-${stateKind}" role="status"><span>${escapeHtml(humanizeSlug(stateKind))}</span>`
+        return `<div class="data-state data-state-${stateKind}" role="status"><span>${escapeHtml(DATA_STATE_LABELS[stateKind] ?? humanizeSlug(stateKind))}</span>`
             + `<strong>${escapeHtml(title || 'Status unavailable')}</strong>`
             + `<p>${escapeHtml(detail || '')}</p>${controls ? `<nav>${controls}</nav>` : ''}</div>`;
     }

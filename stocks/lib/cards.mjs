@@ -32,7 +32,7 @@ import { PYTH_SHARDS, feedPageUrl, freshestReading, premiumOverPyth, tokenStockG
 import { breadcrumbLd, contactFooterHtml, contactStylesheet, ldGraph, organizationLd, reportLd, seoHeadTags } from './site-seo.mjs';
 import { foldAnchor, foldListHtml, foldPlain, foldWhen } from './fold-rows.mjs';
 
-const { protocolProofModel } = protocolProof;
+const { accountCheckWords, capabilityWords, protocolProofModel } = protocolProof;
 const { pairLegLabel } = activityRowsLib;
 
 const {
@@ -442,6 +442,8 @@ export function buildCard(input) {
         health: {
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            // What the title and preview image lead with (health.mjs holderHeadline).
+            headline: verdict.headline,
             levels: verdict.levels,
             dimensions: verdict.dimensions,
             rules: verdict.rules.map((rule) => ({
@@ -1108,6 +1110,7 @@ export function publicCard(card) {
         health: {
             status: card.health.status,
             worstRuleId: card.health.worstRuleId,
+            headline: card.health.headline,
             levels: card.health.levels,
             dimensions: card.health.dimensions,
             rules: card.health.rules.map((rule) => ({
@@ -1520,10 +1523,24 @@ function inputPairs(inputs) {
     return parts.length ? escapeHtml(parts.join(' · ')) : DASH;
 }
 
-/** "SPACEX — caution · tokenized private-company on Solana" and the ≤ 200-character description. */
+/**
+ * The holder headline (health.mjs holderHeadline) in words: "good", "warning: price tracking"
+ * ("warning (price tracking)" with `inline`, for use after another colon), "no market data".
+ * Titles and preview images lead with this, not the worst of all eleven checks.
+ */
+export function headlinePhrase(card, { inline = false } = {}) {
+    const headline = card.health.headline;
+    if (headline.status === 'unknown') return headline.basis === 'no-market' ? 'no market data' : STATUS_WORDS.unknown;
+    const rule = card.health.rules.find((row) => row.id === headline.ruleId) ?? null;
+    if (rule === null) return STATUS_WORDS[headline.status];
+    const label = rule.label.toLowerCase();
+    return inline ? `${STATUS_WORDS[headline.status]} (${label})` : `${STATUS_WORDS[headline.status]}: ${label}`;
+}
+
+/** "NVDAx — warning: price tracking · tokenized NVDA on Solana" and the ≤ 200-character description. */
 export function ogTitle(card) {
     const what = card.underlyingTicker ? `tokenized ${card.underlyingTicker}` : 'tokenized';
-    return `${card.symbol ?? card.mint} — ${STATUS_WORDS[card.health.status] ?? 'not measured'} · ${what} on Solana`;
+    return `${card.symbol ?? card.mint} — ${headlinePhrase(card)} · ${what} on Solana`;
 }
 
 export function pageTitle(card) {
@@ -1541,15 +1558,13 @@ export function ogDescription(card) {
     const parts = [];
     const issuer = card.issuer.name ?? card.issuer.slug;
     if (issuer) parts.push(`${issuer}'s ${card.name ?? card.symbol ?? 'token'}`);
-    if (card.ownership.claimLabel) parts.push(`holder claim: ${card.ownership.claimLabel}`);
+    const owned = issuerLabels.claimDepthWords(card.ownership.claimRung);
+    if (owned !== null) parts.push(`what you own: ${owned.replace(/^\d+ of \d+ — /, '')}`);
     if (card.reference.premiumPct !== null) {
         parts.push(`${fmtSignedPct(card.reference.premiumPct)} vs ${card.underlyingTicker ?? referenceLabel(card.reference.source) ?? 'reference'}`);
     }
     if (card.depth.liquidityUsd !== null) parts.push(`${fmtMoney(card.depth.liquidityUsd)} liquidity`);
-    if (card.health.worstRuleId) {
-        const worst = card.health.rules.find((rule) => rule.id === card.health.worstRuleId);
-        if (worst) parts.push(`worst check: ${worst.label.toLowerCase()} ${STATUS_WORDS[worst.status]}`);
-    }
+    parts.push(`for a holder: ${headlinePhrase(card, { inline: true })}`);
     const line = parts.join('. ').replace(/\s+/g, ' ').trim();
     if (line.length <= OG_DESCRIPTION_MAX) return line ? `${line}.`.slice(0, OG_DESCRIPTION_MAX) : '';
     return `${line.slice(0, OG_DESCRIPTION_MAX - 1).replace(/[\s.,;:]+$/, '')}…`;
@@ -1571,22 +1586,52 @@ export function indexEntry(card) {
  * regulation, transfer restrictions, how official the token record is) and `rights` (what the
  * holder owns, the shareholder rights passed through, and whether a holder can redeem).
  */
+/** How a documented transfer-restriction mechanism works, in a holder's words. */
+const RESTRICTION_MECHANISM_WORDS = {
+    'permanent-delegate': 'an issuer key can move or burn tokens in any wallet',
+    'freeze-authority': 'an issuer key can freeze any wallet',
+    'program-mediated': 'a program must approve each wallet before it can hold the token',
+    none: 'nothing on-chain restricts transfers'
+};
+
+/**
+ * The dossier's transfer-restriction flags as one plain sentence ("Any wallet can hold it; no
+ * identity check to hold; not for US persons; enforced by: an issuer key can freeze any wallet"),
+ * or null when nothing is recorded. A flag we do not hold is left out, never read as open. A
+ * mechanism written as prose keeps its prose after the plain words for its leading term.
+ */
+export function transferRestrictionWords(tr) {
+    const r = tr ?? {};
+    const mechanism = typeof r.mechanism === 'string' && r.mechanism.trim() ? r.mechanism.trim() : null;
+    let how = null;
+    if (mechanism !== null) {
+        const lead = Object.keys(RESTRICTION_MECHANISM_WORDS).find((key) => mechanism === key || mechanism.startsWith(`${key} `) || mechanism.startsWith(`${key},`));
+        const rest = lead === undefined ? mechanism : mechanism.slice(lead.length).replace(/^[\s,—–-]+/, '');
+        how = lead === undefined ? `how it is enforced: ${rest}`
+            : `enforced by: ${RESTRICTION_MECHANISM_WORDS[lead]}${rest ? `. ${rest.charAt(0).toUpperCase()}${rest.slice(1)}` : ''}`;
+    }
+    const parts = [
+        r.allowlist === true ? 'only wallets the issuer has approved can hold it' : r.allowlist === false ? 'any wallet can hold it' : null,
+        r.kycToHold === true ? 'holders must pass the issuer’s identity check (KYC)' : r.kycToHold === false ? 'no identity check to hold' : null,
+        r.usPersonsExcluded === true ? 'not for US persons' : r.usPersonsExcluded === false ? 'US persons may hold it' : null,
+        how
+    ].filter((part) => part !== null);
+    if (parts.length === 0) return null;
+    const line = parts.join('; ');
+    return line.charAt(0).toUpperCase() + line.slice(1);
+}
+
 function whatYouOwnBody(card) {
     const o = card.ownership;
-    // Both ladders in a buyer's words; the technical name and its definition stay in the title.
+    // Both ladders in a buyer's words, with a one-sentence definition in the title.
     const depthWords = issuerLabels.claimDepthWords(o.claimRung);
     const rung = depthWords === null ? null
-        : `<span title="${escapeHtml(`Claim depth: rung ${o.claimRung} of 4. ${issuerLabels.claimRungTooltip(o.claimRung)}`)}">${escapeHtml(depthWords)}</span>`;
-    const restrictions = [
-        o.transferRestrictions.allowlist === null ? null : `allowlist ${yesNo(o.transferRestrictions.allowlist)}`,
-        o.transferRestrictions.kycToHold === null ? null : `KYC to hold ${yesNo(o.transferRestrictions.kycToHold)}`,
-        o.transferRestrictions.usPersonsExcluded === null ? null : `US persons excluded ${yesNo(o.transferRestrictions.usPersonsExcluded)}`,
-        o.transferRestrictions.mechanism === null ? null : `mechanism ${o.transferRestrictions.mechanism}`
-    ].filter((part) => part !== null);
+        : `<span title="${escapeHtml(issuerLabels.claimRungTooltip(o.claimRung))}">${escapeHtml(depthWords)}</span>`;
+    const restrictions = transferRestrictionWords(o.transferRestrictions);
     const recordWords = issuerLabels.ledgerRecordWords(o.maturityStageNum);
     const maturity = recordWords === null ? null
-        : `<span title="${escapeHtml(`Ledger maturity: ${o.maturityStage ?? `Level ${o.maturityStageNum}`}`
-            + `${o.maturityScore === null ? '' : `, score ${o.maturityScore}`}. ${issuerLabels.maturityLevelTooltip(o.maturityStageNum)}`)}">${escapeHtml(recordWords)}</span>`;
+        : `<span title="${escapeHtml(issuerLabels.maturityLevelTooltip(o.maturityStageNum)
+            + (o.maturityScore === null ? '' : ` Score ${o.maturityScore > 0 ? '+' : ''}${o.maturityScore} from ten yes/no checks on the record and transfers (+1 for each yes, −1 for each no).`))}">${escapeHtml(recordWords)}</span>`;
     const usability = card.ownership.redemptionUsability;
     const redemption = o.redemption.available === null && !usability.fields.some((field) => field.value !== null)
         ? null
@@ -1605,7 +1650,7 @@ function whatYouOwnBody(card) {
         ['Jurisdiction', o.entityJurisdiction === null ? null : escapeHtml(o.entityJurisdiction), 'entityJurisdiction'],
         ['Governing law', o.governingLaw === null ? null : escapeHtml(o.governingLaw), 'governingLaw'],
         ['Regulatory status', o.regulatoryStatus === null ? null : escapeHtml(o.regulatoryStatus), 'regulatoryStatus'],
-        ['Transfer restrictions', restrictions.length ? escapeHtml(restrictions.join(' · ')) : null,
+        ['Who may hold and move it', restrictions === null ? null : escapeHtml(restrictions),
             ['transferRestrictions.allowlist', 'transferRestrictions.kycToHold',
                 'transferRestrictions.usPersonsExcluded', 'transferRestrictions.mechanism']],
         [issuerLabels.LEDGER_RECORD_QUESTION, maturity]
@@ -2538,7 +2583,7 @@ function defiUsageBody(card) {
     const usage = card.defiUsage;
     const integrations = Array.isArray(usage?.integrations) ? usage.integrations : [];
     if (integrations.length === 0) {
-        return '<p class="no"><strong>None source-listed.</strong> No exact-mint integration was found in the protocol registries, live pools and asset-specific products checked. This is not proof that private or unindexed contracts do not use the token.</p>';
+        return '<p class="no"><strong>No protocol found that accepts this exact token.</strong> None of the protocol lists, live pools and token-specific products we checked names it. Private or unlisted contracts may still use it.</p>';
     }
     // Proof wording that is the same for every integration at one proof stage (what the stage
     // means, and the caveat on metrics with no observed activity) is printed ONCE in a key under
@@ -2572,7 +2617,7 @@ function defiUsageBody(card) {
             && (Array.isArray(entry.evidence) ? entry.evidence : []).some((row) => row?.url && row.url === entry.links?.use);
         const capabilityGroups = new Map();
         for (const capability of Array.isArray(entry.capabilities) ? entry.capabilities : []) {
-            const mechanism = `${capability.custody ?? 'unknown'} custody · ${capability.enforcement ?? 'unknown'} enforcement`;
+            const mechanism = capabilityWords(capability);
             if (!capabilityGroups.has(mechanism)) capabilityGroups.set(mechanism, []);
             capabilityGroups.get(mechanism).push(capability.label ?? humanizeSlug(capability.action));
         }
@@ -2584,9 +2629,7 @@ function defiUsageBody(card) {
             .map((account) => link(`https://solscan.io/account/${account.address}`, `${humanizeSlug(account.role)} ↗`)).join(' ');
         const proof = entry.proof ?? {};
         const proofModel = protocolProofModel({ proof, integration: entry, fetchedAt: card.sources?.defiUsage ?? null });
-        const accountCheck = (proof.accountCount ?? corroboration?.accountCount) > 0
-            ? `${proof.existingAccountCount ?? corroboration?.verifiedCount ?? 'unknown'}/${proof.accountCount ?? corroboration?.accountCount} published accounts existed; existence only`
-            : 'No published Solana account address was available to check';
+        const accountCheck = accountCheckWords(proof, corroboration);
         keyed(`${proofModel.headline}: ${proofModel.detail}`);
         // An observed-activity statement keeps its own basis; its closing caveat is shared.
         let activity = '';
@@ -2598,7 +2641,7 @@ function defiUsageBody(card) {
             keyed(proofModel.activityStatement);
         }
         const proofSteps = `${accountCheck}.${activity}`;
-        const status = entry.status === 'live' ? (proof.sourceStatus === 'onchain-position' ? 'on-chain observed' : 'source-reported') : entry.status ?? proofModel.stage;
+        const status = entry.status === 'live' ? (proof.sourceStatus === 'onchain-position' ? 'seen on-chain' : 'reported by the protocol') : entry.status ?? proofModel.stage;
         return `<article class="defi-use defi-use-${escapeHtml(entry.status ?? 'available')}">` +
             `<header><h3>${escapeHtml(entry.protocolName ?? entry.protocolId ?? 'Protocol')}</h3>` +
             `<strong>${escapeHtml(status)}</strong></header>` +
@@ -2612,7 +2655,7 @@ function defiUsageBody(card) {
             `<p class="defi-links"><a href="../protocols/${encodeURIComponent(protocolDossierSlug(card, entry, index))}.html">Open RWA Sonar dossier →</a>${entry.links?.use ? link(entry.links.use, `Open market / product${evidenceIsMarket ? ' (evidence)' : ''} ↗`) : ''}${evidence}</p>` +
             '</article>';
     }).join('');
-    return '<p class="note">Each exact-token integration states whether it is source-listed, market-observed, decoded or simulated. Structural compatibility is assessed separately below.</p>' +
+    return '<p class="note">Each protocol below says how we know it accepts this exact token: its own list names it, we saw a live market, we read its settings on-chain, or we simulated a transaction. Whether a lender could actually enforce a default is covered separately below.</p>' +
         `<ul class="note defi-proof-key">${proofKey.map((sentence) => `<li>${escapeHtml(sentence)}</li>`).join('')}</ul>` +
         `<div class="defi-use-grid">${rows}</div>`;
 }
@@ -2638,8 +2681,8 @@ function composabilityBody(card) {
     const dex = [...new Set(integrations.filter((entry) => entry?.category === 'dex')
         .map((entry) => entry.protocolName ?? entry.protocolId).filter(Boolean))];
     const lending = collateral.length
-        ? `Source-listed for this exact token: ${collateral.join(', ')}. No successful borrow is independently evidenced.`
-        : 'No checked protocol currently lists this exact token as programmatic collateral.';
+        ? `Listed as collateral for this exact token by ${collateral.join(', ')}. We have not seen a successful borrow against it.`
+        : 'No protocol we checked lists this exact token as collateral.';
     const cashExit = card.ownership.redemption.available === true && card.ownership.redemption.kyc === true
         ? 'Conditional: issuer redemption requires KYC/AML, so a smart contract cannot redeem on its own.'
         : card.ownership.redemption.available === true
@@ -2947,7 +2990,7 @@ export function assetDecisionFacts(card) {
         proof: entry?.proof ?? {}, integration: entry, fetchedAt: card?.sources?.defiUsage ?? null
     }));
     const proofStages = new Set(proofModels.map((model) => model.stage));
-    // The strongest proof stage reached, in words; the stage's own name rides along as the fact's title.
+    // The strongest proof stage reached, in words.
     const proofStage = PROOF_STAGE_ORDER.find((stage) => proofStages.has(stage)) ?? null;
     const proofScope = proofStage === null ? 'no check beyond finding the protocol' : PROOF_STAGE_WORDS[proofStage];
     const proofAsOf = proofModels.map((model) => model.asOf).filter(Boolean).sort().at(-1) ?? null;
@@ -2974,8 +3017,7 @@ export function assetDecisionFacts(card) {
         { id: 'exit', label: 'How can you exit?', value: `${verdict.redemption} ${marketExit}`,
             href: '#own', link: 'Inspect this token’s redemption terms' },
         { id: 'defi', label: 'What works in DeFi now?', value: defi,
-            href: '#defi-usage', link: 'See which protocols list it',
-            title: protocols.length ? `Proof stage: ${proofStage ?? 'none established'}` : null },
+            href: '#defi-usage', link: 'See which protocols list it' },
         { id: 'risk', label: 'Largest unresolved risk', value: risk.value.charAt(0).toUpperCase() + risk.value.slice(1),
             href: risk.href, link: risk.link }
     ];
@@ -3097,10 +3139,8 @@ export function whoCanBuy(card) {
 function whoCanBuyHtml(card) {
     const { buy, redeem } = whoCanBuy(card);
     const tr = card?.ownership?.transferRestrictions ?? {};
-    const flag = (value) => value === true ? 'yes' : value === false ? 'no' : 'unknown';
-    const title = `Transfer restrictions: allowlist ${flag(tr.allowlist)} · KYC to hold ${flag(tr.kycToHold)} · `
-        + `US persons excluded ${flag(tr.usPersonsExcluded)} · redemption KYC ${flag(card?.ownership?.redemption?.kyc)}`;
-    return `<p class="who-can-buy" title="${escapeHtml(title)}"><b>Who can buy:</b> ${escapeHtml(buy)}. `
+    const title = transferRestrictionWords({ allowlist: tr.allowlist, kycToHold: tr.kycToHold, usPersonsExcluded: tr.usPersonsExcluded }) ?? '';
+    return `<p class="who-can-buy"${title ? ` title="${escapeHtml(title)}"` : ''}><b>Who can buy:</b> ${escapeHtml(buy)}. `
         + `<span>Redeeming with the issuer: ${escapeHtml(redeem)}.</span> <a href="#own">Terms →</a></p>`;
 }
 

@@ -35,7 +35,7 @@
     <link rel="stylesheet" href="./site-contact.css?v=20260924i" />
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="live.css?v=20260924y" />
+    <link rel="stylesheet" href="live.css?v=20260930a" />
     <link rel="stylesheet" href="app-shell.css?v=20260929b" />
 </head>
 
@@ -71,13 +71,20 @@
             side is read from the pool's own balance change; transaction labels are ignored. Price is
             USD where the pool's quote token has a USD rate, otherwise the price in the quote token itself.
             <strong>routed</strong> marks a transaction that moved more than two mints: an aggregator or
-            arbitrage path in which this pool was one leg.</p>
+            arbitrage path in which this pool was one leg. Routed trades are mostly bots, so the tape hides
+            them unless you tick the box below; the replay and every total still count them.</p>
 
         <p id="collectionLine" class="collection-line">&hellip;</p>
 
         <div id="poolChips" class="chips" aria-label="Sampled pools"></div>
 
         <p id="freshness" class="freshness-line">&hellip;</p>
+
+        <div class="routed-toggle">
+            <label class="routed-toggle-label"><input type="checkbox" id="showRouted" />
+                <span id="showRoutedLabel">Show automated routed trades</span></label>
+            <p id="routedNote" class="routed-note">Routed trades moved more than two tokens in one transaction: one leg of an arbitrage bot or aggregator path.</p>
+        </div>
 
         <ol id="tape" class="tape" aria-label="Newest decoded trades"></ol>
         <p id="tapeNote" class="status">No decoded trades in this capture yet.</p>
@@ -148,6 +155,12 @@
                 an instruction name or a log line, so a swap routed through an aggregator is decoded exactly
                 like a direct one, and marked <strong>routed</strong> when the transaction moved more than
                 two mints.</li>
+            <li><strong>Why routed trades are hidden by default.</strong> In a 24-hour sample of 2,762 decoded
+                trades (30 September 2026), 69% were routed, and about 4 in 5 of those ran through arbitrage or
+                bot trading programs rather than a public aggregator such as Jupiter; their median size was
+                about $24, against about $350 for a direct swap. The tape hides them so the trades people place
+                are readable; the checkbox above the tape shows them again. The page does not see which
+                program ran a trade, so a routed swap a person placed through an aggregator is hidden too.</li>
             <li><strong>Why failed transactions are shown.</strong> Most signatures on a busy Solana pool
                 never trade: they are bots racing each other and losing, and they fail. They have to be counted
                 to read the tape correctly: a pool with a 90% failure rate has heavy competition to trade,
@@ -182,7 +195,8 @@
 <!-- seo:contact:end --></footer>
 
     <script src="stocks/lib/api-base.js?v=20260920a"></script>
-    <script src="live.js?v=20260924e"></script>
+    <script src="stocks/lib/live-tape.js?v=20260930a"></script>
+    <script src="live.js?v=20260930a"></script>
     <script src="nav-menus.js?v=20260930a" defer></script>
 </body>
 

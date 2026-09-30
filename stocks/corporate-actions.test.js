@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 
 import {
     ACTION_COLUMNS, CHECK_COLUMNS, FINDING_VERDICTS, PROGRAMME_POLICY, TOLERANCES, VERDICTS,
-    buildActionUpsertSql, buildCheckSql, expectedRange, formatTelegramSummary, groupRuns, localDate,
+    actionEvents, buildActionUpsertSql, buildCheckSql, expectedRange, formatTelegramSummary, groupRuns, localDate,
     multiplierSteps, netFraction, newFindings, num, parseYahooChart, programmePolicy, reconcileToken,
     snapshotSteps, summarise, yahooChartUrl, yahooSymbolFor
 } from './lib/corporate-actions.mjs';
@@ -366,6 +366,21 @@ describe('outcome, summary and SQL', () => {
         const missing = sample.find((c) => c.verdict === 'missing');
         stored.delete(`${missing.mint}|${missing.checkKey}`);
         expect(newFindings(sample, stored)).toHaveLength(1);
+    });
+
+    test('change events only for warning findings, dated by when the finding was first stored', () => {
+        const warnings = sample.filter((c) => FINDING_VERDICTS.has(c.verdict) && c.severity === 'warning');
+        expect(warnings.length).toBeGreaterThan(0);
+        const fresh = actionEvents(sample, [], '2026-10-01T05:13:00Z');
+        expect(fresh.map((e) => e.subjectId)).toEqual(warnings.map((c) => c.mint));
+        expect(fresh[0]).toMatchObject({ kind: 'corporate-action', subjectType: 'token', severity: 'warning', detectedAt: '2026-10-01T05:13:00Z',
+            field: `${warnings[0].checkKey}:${warnings[0].verdict}`, after: warnings[0].verdict, summary: warnings[0].detail });
+        const stored = warnings.map((c) => ({ mint: c.mint, checkKey: c.checkKey, verdict: c.verdict, firstCheckedAt: '2026-09-30T13:51:04.491031+00:00' }));
+        expect(actionEvents(sample, stored, '2026-10-01T05:13:00Z')[0].detectedAt).toBe('2026-09-30T13:51:04Z');
+        // A stored row with another verdict is a new finding: dated now.
+        expect(actionEvents(sample, stored.map((r) => ({ ...r, verdict: 'matched' })), '2026-10-01T05:13:00Z')[0].detectedAt).toBe('2026-10-01T05:13:00Z');
+        // A caution-level finding (a small unexplained step, a missed dividend) stays off the feed.
+        expect(actionEvents([{ ...warnings[0], severity: 'caution' }], [], '2026-10-01T05:13:00Z')).toEqual([]);
     });
 
     test('ONE message, warnings first, capped', () => {

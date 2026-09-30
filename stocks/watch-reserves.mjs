@@ -16,11 +16,12 @@ import { readEnvFile } from './lib/env.mjs';
 import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import {
-    LATEST_QUERY, PROGRAMMES, assessReading, buildWriteSql, chainOutstanding, formatSummary, mintSupply, parseLatest,
-    parseSuperstateInstruments, parseXstocksPor, planWrites, readingHash, round, transitions, xstocksHasNextPage
+    LATEST_QUERY, PROGRAMMES, STREAK_QUERY, assessReading, buildWriteSql, chainOutstanding, formatSummary, mintSupply, parseLatest,
+    parseStreaks, parseSuperstateInstruments, parseXstocksPor, planWrites, readingHash, reserveEvents, round, transitions, xstocksHasNextPage
 } from './lib/reserves.mjs';
 import { DEFAULT_RPC, chunk, getAccountsWithContext, getTokenAccountsByOwner, rpcCall } from './lib/solana-rpc.mjs';
 import { postTelegram } from './lib/telegram.mjs';
+import { buildChangeEventSql } from './lib/watch.mjs';
 import { XSTOCKS_ISSUER_WALLETS, sumInventory } from './lib/xstocks-float.mjs';
 
 const HERE = import.meta.dirname;
@@ -285,12 +286,16 @@ async function main() {
 
     // 4. Store ----------------------------------------------------------------------------------
     let plan = { inserts: rows, touches: [] };
+    let events = [];
     if (dbUrl) {
         const latest = parseLatest(await psql(dbUrl, LATEST_QUERY, 'reserve_observation latest'));
         plan = planWrites(rows, latest);
         const sql = buildWriteSql(plan, { seenAt: RUN_STARTED_AT });
         if (sql) await psql(dbUrl, wrapTransaction(sql), 'reserve_observation write');
         log(`db: ${plan.inserts.length} new reading(s), ${plan.touches.length} unchanged (last_seen_at moved)`);
+        events = reserveEvents(rows, parseStreaks(await psql(dbUrl, STREAK_QUERY, 'reserve_observation streaks')));
+        if (events.length) await psql(dbUrl, wrapTransaction(buildChangeEventSql(events).sql), 'reserve change events');
+        log(`db: ${events.length} reserve event(s) current (already stored ones are skipped)`);
     } else {
         log('db: --no-db — nothing written');
     }
@@ -317,7 +322,7 @@ async function main() {
         lastRunStartedAt: RUN_STARTED_AT,
         lastRunEndedAt: ts(),
         durationMs,
-        counts: { tokens: rows.length, ...counts, restricted, newReadings: plan.inserts.length, unchanged: plan.touches.length, transitions: trans.length },
+        counts: { tokens: rows.length, ...counts, restricted, newReadings: plan.inserts.length, unchanged: plan.touches.length, transitions: trans.length, events: events.length },
         // Flat fields for the alerts-server outcome check (minValues/maxValues read top-level keys).
         tokensCompared: rows.filter((r) => ['covered', 'shortfall', 'stale', 'nothing-outstanding'].includes(r.status)).length,
         shortfallCount: counts.shortfall ?? 0,

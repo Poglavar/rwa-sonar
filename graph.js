@@ -446,9 +446,9 @@
 
             const grades = meta.grades || null;
             if (grades) {
-                if (grades.maturityStage) facts.push(['Ledger maturity', grades.maturityStage]);
+                if (isNum(grades.maturityStageNum)) facts.push(['How far the token is the official record', `${grades.maturityStageNum} of 4`]);
                 if (isNum(grades.claimRung)) {
-                    facts.push(['Claim depth', `rung ${grades.claimRung}${grades.claimLabel ? ` · ${grades.claimLabel}` : ''}`]);
+                    facts.push(['How close to owning the share', `${grades.claimRung} of 4${grades.claimLabel ? ` — ${grades.claimLabel}` : ''}`]);
                 }
                 if (isNum(grades.verificationStrength)) {
                     facts.push(['Verification', `${grades.verificationStrength}${grades.verificationLabel ? ` · ${grades.verificationLabel}` : ''}`]);

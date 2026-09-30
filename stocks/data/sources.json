@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-24T15:45:08Z",
-  "count": 621,
+  "generatedAt": "2026-09-30T14:19:51Z",
+  "count": 627,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -11,7 +11,11 @@
         "remora-markets:claims[1].url",
         "remora-markets:whatIf[defrauded].searched[5]",
         "remora-markets:whatIf[redemption-refused].searched[6]"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); remora.markets serves an empty page ('nothing readable was left') since 2026-09-19. Its 2025 pages are watched as web.archive.org captures."
+      }
     },
     {
       "url": "https://0xmacro.com/",
@@ -2085,6 +2089,15 @@
       ]
     },
     {
+      "url": "https://docs.nestusd.com/deployments/mainnet.json",
+      "kind": "api",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[12].evidence",
+      "foundIn": [
+        "xstocks-backed:findings[12].evidence"
+      ]
+    },
+    {
       "url": "https://docs.ondo.finance/api-reference/assets/get-all-contract-addresses-across-networks",
       "kind": "html",
       "issuer": "ondo-global-markets",
@@ -3992,6 +4005,15 @@
       ]
     },
     {
+      "url": "https://history.pyth-lazer.dourolabs.app/history/v1/symbols",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[12].quoteNote",
+      "foundIn": [
+        "xstocks-backed:findings[12].quoteNote"
+      ]
+    },
+    {
       "url": "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/",
       "kind": "html",
       "issuer": "remora-markets",
@@ -4286,6 +4308,15 @@
       "title": "shared:[9].website",
       "foundIn": [
         "shared:[9].website"
+      ]
+    },
+    {
+      "url": "https://kamino.com/docs/security/oracles.md",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[15].evidence",
+      "foundIn": [
+        "xstocks-backed:findings[15].evidence"
       ]
     },
     {
@@ -5331,7 +5362,11 @@
         "remora-markets:claims[3].locator",
         "remora-markets:claims[3].note",
         "remora-markets:whatIf[defrauded].locator"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); its public token-metadata object answers HTTP 404 on every run since it was first watched on 2026-09-19 (document-gone recorded); its only Wayback capture (2026-09-23) replays the same 404."
+      }
     },
     {
       "url": "https://remora.markets/",
@@ -5340,7 +5375,11 @@
       "title": "remora-markets:claims[1].note",
       "foundIn": [
         "remora-markets:claims[1].note"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); remora.markets serves an expired TLS certificate and, read anyway, an empty page ('nothing readable was left') since 2026-09-19. Its 2025 pages are watched as web.archive.org captures."
+      }
     },
     {
       "url": "https://remoramarkets.xyz/",
@@ -5349,7 +5388,11 @@
       "title": "shared:[94].website",
       "foundIn": [
         "shared:[94].website"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); remoramarkets.xyz answers DNS SERVFAIL (EAI_AGAIN) on every run since it was first watched on 2026-09-23 and never produced a readable version. Its archived pages are watched as web.archive.org captures."
+      }
     },
     {
       "url": "https://remoramarkets.xyz/legal-documentation/terms-of-use",
@@ -5362,7 +5405,11 @@
         "remora-markets:whatIf[dispute-forum].searched[2]",
         "remora-markets:whatIf[keys-stolen].searched[2]",
         "remora-markets:whatIf[terms-changed].searched[2]"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); remoramarkets.xyz answers DNS SERVFAIL (EAI_AGAIN) on every run since 2026-09-23 and the page never produced a readable version. The 2026 Terms of Use was never archived."
+      }
     },
     {
       "url": "https://remoramarkets.xyz/proof-of-reserves",
@@ -5375,7 +5422,11 @@
         "remora-markets:whatIf[attestation-wrong].searched[3]",
         "remora-markets:whatIf[backing-shortfall].searched[5]",
         "remora-markets:whatIf[custodian-insolvency].searched[4]"
-      ]
+      ],
+      "retired": {
+        "at": "2026-09-30",
+        "reason": "Remora Markets is wound down (dossier status 'defunct'); remoramarkets.xyz answers DNS SERVFAIL (EAI_AGAIN) on every run since it was first watched on 2026-09-17 and the page never produced a readable version."
+      }
     },
     {
       "url": "https://republic.com/",
@@ -7042,6 +7093,15 @@
       ]
     },
     {
+      "url": "https://solscan.io/tx/26SQ52zVUSYVT3VajhK8fMg8aqYYMVaqRfbNGwWJ1k73GBZpimYjRHzD68PBYbngGjiZp7dMmawdqVtMUYePiXRw",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[13].evidence",
+      "foundIn": [
+        "xstocks-backed:findings[13].evidence"
+      ]
+    },
+    {
       "url": "https://solscan.io/tx/2HNZpvEP3fxHcBbDF8jCGyhx2BpL81W72pMJzc9ZB8WMZmZiqXxqAm5GuVjzahmWoXfMV6di7pqeEqQfvABKL9Sf",
       "kind": "html",
       "issuer": "xstocks-backed",
@@ -7052,6 +7112,15 @@
         "xstocks-backed:claims[131].url",
         "xstocks-backed:claims[132].sources[0]",
         "xstocks-backed:redemption.successfulRedemptionEvidence.accepted[2].legs[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/2fsSorcbFFBozdHyiJ81AhxQ2SqShg21hKU3WSMZgfwjSToYc62chad28k1NJ1sgxpTa1j5My7JTRuy6GLyau8xk",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[13].quoteNote",
+      "foundIn": [
+        "xstocks-backed:findings[13].quoteNote"
       ]
     },
     {
@@ -7176,6 +7245,15 @@
       "foundIn": [
         "ondo-global-markets:claims[110].url",
         "ondo-global-markets:redemption.successfulRedemptionEvidence.accepted[0].url"
+      ]
+    },
+    {
+      "url": "https://solscan.io/tx/4yhWfLvG9sYD4JQaSE3pCuGqxsBqvt1ptt28KMgiFsoKRat59FXEowcvq8DjNPDvPMUjFC9HTa8iQzoJyYTpbWWV",
+      "kind": "html",
+      "issuer": "xstocks-backed",
+      "title": "xstocks-backed:findings[13].quoteNote",
+      "foundIn": [
+        "xstocks-backed:findings[13].quoteNote"
       ]
     },
     {

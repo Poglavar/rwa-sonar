@@ -142,6 +142,8 @@ const TOKEN_COLUMNS = [
     ['name', "r->>'name'"],
     ['issuer_slug', "r->>'issuer'"],
     ['underlying_ticker', "r->>'underlyingTicker'"],
+    // The pre-IPO company a token references (db/2026-09-17-sonar-stocks.sql).
+    ['company_key', "r->>'companyKey'"],
     ['instrument_type', "r->>'instrumentType'"],
     ['token_program', "r->>'tokenProgram'"],
     ['recipe_label', "r->'recipe'->>'label'"],

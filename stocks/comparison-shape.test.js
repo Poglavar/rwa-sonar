@@ -56,9 +56,9 @@ describe('confirmed DeFi usage', () => {
         const models = sameStockComparisonModels(group, new Map(issuers.map((row) => [row.slug, row])), index, templates);
         expect(models).toHaveLength(2);
         expect(models.find((row) => row.issuerSlug === 'xstocks-backed').outcome.confirmedLending)
-            .toContain('Source-listed for this exact token');
+            .toContain('Listed as collateral for this exact token by');
         expect(models.find((row) => row.issuerSlug === 'ondo-global-markets').outcome.confirmedLending)
-            .toContain('No checked protocol');
+            .toContain('No protocol we checked');
         const html = sameStockComparisonHtml(group, models);
         for (const label of ['What do you own?', 'Redeem for cash', 'Smart-contract custody', 'Borrower default',
             'Listed as loan collateral', 'Secondary-market exit', 'If the protocol is hacked', 'If access is lost']) {

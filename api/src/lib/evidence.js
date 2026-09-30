@@ -150,17 +150,26 @@ export const CHANGE_COLUMNS = `e.id, e.detected_at, e.kind, e.subject_type, e.su
 
 export const JUDGMENT_TABLE = 'sonar.change_judgment';
 
-export const CHANGE_JUDGMENT_JOIN = `LEFT JOIN LATERAL (
-    SELECT j.id, j.status, j.model, j.prompt_version, j.material, j.severity, j.affects, j.summary,
-           j.quoted_change, j.confidence, j.cost_usd, j.updated_at
+// The latest judgment per event is computed ONCE over the (small) judgment table and hash-joined,
+// not as a LATERAL per event: the per-event form re-read and re-detoasted every judgment's
+// covers_event_ids for each of ~4k events and was /api/changes' whole 1.3 s. Each judgment is
+// expanded into (event, judgment) pairs — its representative event plus every covered id, stored as
+// JSON numbers or numeric strings — and DISTINCT ON keeps the best per event.
+export const CHANGE_JUDGMENT_JOIN = `LEFT JOIN (
+    SELECT DISTINCT ON (je.event_id) je.event_id, j.id, j.status, j.model, j.prompt_version, j.material,
+           j.severity, j.affects, j.summary, j.quoted_change, j.confidence, j.cost_usd, j.updated_at
       FROM ${JUDGMENT_TABLE} j
+      CROSS JOIN LATERAL (
+          SELECT j.change_event_id AS event_id
+          UNION
+          SELECT (c #>> '{}')::bigint
+            FROM jsonb_array_elements(CASE WHEN jsonb_typeof(j.covers_event_ids) = 'array'
+                                           THEN j.covers_event_ids ELSE '[]'::jsonb END) c
+           WHERE (c #>> '{}') ~ '^[0-9]{1,18}$'
+      ) je
      WHERE j.status IN ('valid', 'invalid')
-       AND (j.change_event_id = e.id
-            OR j.covers_event_ids @> jsonb_build_array(e.id)
-            OR j.covers_event_ids @> jsonb_build_array(e.id::text))
-     ORDER BY (j.status = 'valid') DESC, j.updated_at DESC, j.id DESC
-     LIMIT 1
-  ) mj ON true`;
+     ORDER BY je.event_id, (j.status = 'valid') DESC, j.updated_at DESC, j.id DESC
+  ) mj ON mj.event_id = e.id`;
 
 export const MODEL_ASSESSMENT_COLUMN = `CASE
       WHEN mj.status IS NULL THEN NULL

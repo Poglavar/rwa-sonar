@@ -103,6 +103,7 @@ export function buildItems({ tokens, issuers, holders, pools, composabilityTempl
             issuer: token.issuer ?? null,
             status: verdict.status,
             worstRuleId: verdict.worstRuleId,
+            headline: verdict.headline,
             levels: verdict.levels,
             dimensions: verdict.dimensions,
             rules,

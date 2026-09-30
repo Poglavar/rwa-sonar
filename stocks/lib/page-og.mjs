@@ -211,7 +211,7 @@ export function issuerOgModel({ issuer, tokenCount = null, powerRow = null, ques
     return pageOgModel({
         kicker: `Issuer dossier${status}`,
         title: issuer?.name ?? issuer?.slug ?? 'Issuer',
-        subtitle: `Holder claim${Number.isInteger(rung) ? ` (rung ${rung} of 4)` : ''}: ${claimPhrase(rung) ?? 'not established'}`,
+        subtitle: `What you own: ${claimPhrase(rung) ?? 'not established'}`,
         stats: [
             { value: documented === null ? null : total === null ? String(documented) : `${documented}/${total}`, label: 'failure scenarios answered from documents' },
             { value: fmtCount(tokenCount), label: `exact Solana token${tokenCount === 1 ? '' : 's'}` },
@@ -236,7 +236,7 @@ export function templateOgModel(template) {
     });
 }
 
-/** A protocol dossier: token × protocol and the proof ladder, each rung yes / no. */
+/** A protocol dossier: token × protocol and how we know the protocol accepts it, each step yes / no. */
 export function protocolOgModel(dossier) {
     const i = dossier?.integration ?? {};
     const p = dossier?.proof ?? {};
@@ -247,12 +247,12 @@ export function protocolOgModel(dossier) {
     return pageOgModel({
         kicker: 'Protocol dossier',
         title: `${dossier?.symbol ?? 'Token'} × ${i.protocolName ?? 'protocol'}`,
-        subtitle: Array.isArray(i.actions) && i.actions.length ? `Source-described use: ${i.actions.join(', ')}` : null,
+        subtitle: Array.isArray(i.actions) && i.actions.length ? `What the protocol says it supports: ${i.actions.join(', ')}` : null,
         facts: [
-            { text: listed ? 'Exact token named by the protocol source' : observed ? 'Exact-token market observed' : 'No exact-token source listing', state: listed || observed ? 'yes' : 'no' },
+            { text: listed ? 'The protocol’s own list names this exact token' : observed ? 'Live market seen for this exact token' : 'No protocol list names this exact token', state: listed || observed ? 'yes' : 'no' },
             { text: accounts, state: Number.isInteger(p.accountCount) && p.accountCount > 0 && p.existingAccountCount === p.accountCount ? 'yes' : 'no' },
-            { text: p.configurationDecoded ? 'Market configuration decoded' : 'Configuration not decoded', state: p.configurationDecoded ? 'yes' : 'no' },
-            { text: p.readOnlyExecutionSimulated ? 'Read-only execution simulated' : 'No execution simulated', state: p.readOnlyExecutionSimulated ? 'yes' : 'no' }
+            { text: p.configurationDecoded ? 'Market settings read on-chain' : 'Market settings not read', state: p.configurationDecoded ? 'yes' : 'no' },
+            { text: p.readOnlyExecutionSimulated ? 'Transaction simulated, not sent' : 'No transaction simulated', state: p.readOnlyExecutionSimulated ? 'yes' : 'no' }
         ],
         path: `protocols/${dossier?.slug ?? ''}`
     });

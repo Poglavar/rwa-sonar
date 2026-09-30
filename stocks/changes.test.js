@@ -79,7 +79,7 @@ function kindsOf(prevRow, nextRow) {
 describe('snapshotTokenRow', () => {
     test('keeps exactly the diffable fields, and keeps supply and the multiplier as strings', () => {
         const out = snapshotTokenRow(token(), {
-            mint: 'MINT_A', status: 'caution', worstRuleId: 'liquidity',
+            mint: 'MINT_A', status: 'caution', worstRuleId: 'liquidity', headline: { status: 'warning', ruleId: 'tracking', basis: 'measured' },
             dimensions: {
                 market: { status: 'warning' }, control: { status: 'good' },
                 legal: { status: 'caution' }, composability: { status: 'unknown' }
@@ -91,7 +91,7 @@ describe('snapshotTokenRow', () => {
             'paused', 'pausable', 'clawback', 'allowlist', 'transferFeeBps', 'hookActive',
             'liquidity', 'vol24', 'marketValueUsd', 'holderCount', 'premiumPct', 'venueSpreadPct',
             'top1SharePct', 'top20SharePct', 'frozenAccountsTop20', 'health', 'worstRuleId',
-            'marketHealth', 'controlHealth', 'legalHealth', 'composabilityHealth',
+            'holderHealth', 'holderRuleId', 'marketHealth', 'controlHealth', 'legalHealth', 'composabilityHealth',
             'defiProtocolCount', 'defiIntegrationCount'
         ]);
         // A 20-digit supply and a 17-significant-digit multiplier both lose precision as doubles.
@@ -101,6 +101,7 @@ describe('snapshotTokenRow', () => {
         expect(typeof out.uiMultiplier).toBe('string');
         expect(out.health).toBe('caution');
         expect(out.worstRuleId).toBe('liquidity');
+        expect([out.holderHealth, out.holderRuleId]).toEqual(['warning', 'tracking']);
         expect(out.active).toBe(true);
         expect(out.marketHealth).toBe('warning');
         expect(out.defiProtocolCount).toBe(2);
@@ -370,25 +371,30 @@ describe('rebase, reverse-split and multiplier-change', () => {
 
 describe('health-worse and health-better', () => {
     test('the ordering is good < caution < warning in both directions', () => {
-        expect(kindsOf(row({ health: 'good' }), row({ health: 'caution' }))).toEqual(['health-worse']);
-        expect(kindsOf(row({ health: 'caution' }), row({ health: 'warning' }))).toEqual(['health-worse']);
-        expect(kindsOf(row({ health: 'warning' }), row({ health: 'good' }))).toEqual(['health-better']);
-        expect(kindsOf(row({ health: 'good' }), row({ health: 'good' }))).toEqual([]);
+        expect(kindsOf(row({ holderHealth: 'good' }), row({ holderHealth: 'caution' }))).toEqual(['health-worse']);
+        expect(kindsOf(row({ holderHealth: 'caution' }), row({ holderHealth: 'warning' }))).toEqual(['health-worse']);
+        expect(kindsOf(row({ holderHealth: 'warning' }), row({ holderHealth: 'good' }))).toEqual(['health-better']);
+        expect(kindsOf(row({ holderHealth: 'good' }), row({ holderHealth: 'good' }))).toEqual([]);
     });
 
     test('a transition into or out of unknown is ignored — not measuring is not a health move', () => {
-        expect(kindsOf(row({ health: 'unknown' }), row({ health: 'warning' }))).toEqual([]);
-        expect(kindsOf(row({ health: 'good' }), row({ health: 'unknown' }))).toEqual([]);
-        expect(kindsOf(row({ health: null }), row({ health: 'warning' }))).toEqual([]);
+        expect(kindsOf(row({ holderHealth: 'unknown' }), row({ holderHealth: 'warning' }))).toEqual([]);
+        expect(kindsOf(row({ holderHealth: 'good' }), row({ holderHealth: 'unknown' }))).toEqual([]);
+        expect(kindsOf(row({ holderHealth: null }), row({ holderHealth: 'warning' }))).toEqual([]);
     });
 
     test('the note names the rule the new status sits on', () => {
         const diff = diffSnapshots(
-            snap('2026-09-16', [row({ health: 'good', worstRuleId: null })]),
-            snap('2026-09-17', [row({ health: 'warning', worstRuleId: 'spread' })])
+            snap('2026-09-16', [row({ holderHealth: 'good', holderRuleId: null })]),
+            snap('2026-09-17', [row({ holderHealth: 'warning', holderRuleId: 'spread' })])
         );
-        expect(diff.changes[0]).toMatchObject({ kind: 'health-worse', field: 'health', before: 'good', after: 'warning' });
-        expect(diff.changes[0].note).toMatch(/spread rule/);
+        expect(diff.changes[0]).toMatchObject({ kind: 'health-worse', field: 'holderHealth', before: 'good', after: 'warning' });
+        expect(diff.changes[0].note).toMatch(/spread check/);
+    });
+
+    test('the worst of all eleven checks no longer moves it, and a snapshot without the holder headline reports nothing', () => {
+        expect(kindsOf(row({ health: 'good', holderHealth: 'good' }), row({ health: 'warning', holderHealth: 'good' }))).toEqual([]);
+        expect(kindsOf(row({ health: 'good' }), row({ health: 'warning', holderHealth: 'warning' }))).toEqual([]);
     });
 });
 
@@ -447,8 +453,8 @@ describe('control-change', () => {
 
 describe('ordering and counts', () => {
     test('several kinds on one mint come out in CHANGE_KINDS order', () => {
-        const prev = row({ paused: false, uiMultiplier: '1', health: 'good', liquidity: 10000, venueSpreadPct: 1, frozenAccountsTop20: 0, clawback: false });
-        const next = row({ paused: true, uiMultiplier: '1.2', health: 'warning', liquidity: 100, venueSpreadPct: 9, frozenAccountsTop20: 2, clawback: true });
+        const prev = row({ paused: false, uiMultiplier: '1', holderHealth: 'good', liquidity: 10000, venueSpreadPct: 1, frozenAccountsTop20: 0, clawback: false });
+        const next = row({ paused: true, uiMultiplier: '1.2', holderHealth: 'warning', liquidity: 100, venueSpreadPct: 9, frozenAccountsTop20: 2, clawback: true });
         const kinds = kindsOf(prev, next);
         expect(kinds).toEqual(['paused', 'rebase', 'health-worse', 'liquidity-drop', 'spread-wide', 'frozen-appeared', 'control-change']);
         // And that order is exactly the declared one, not an accident of the call sequence.

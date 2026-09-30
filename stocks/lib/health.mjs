@@ -4,7 +4,8 @@
 // pause, frozen accounts and cross-venue spread — plus the roll-ups that the stock cards and the
 // health monitor display: the conservative worst-of-everything `status`, and the two LEVELS the
 // headline uses (a programme verdict shared by every token of an issuer, and a verdict for this one
-// token with a count of the checks it passes). A check whose inputs are missing is reported as
+// token with a count of the checks it passes), and the holder `headline` card titles and preview
+// images lead with (holderHeadline). A check whose inputs are missing is reported as
 // `unknown` and is NEVER counted as bad, so "we did not measure this" can never read as "this is
 // fine" or as a fault. Unit-tested in ../health.test.js.
 
@@ -625,6 +626,50 @@ function spreadRule(token) {
     return { status, value, inputs, note };
 }
 
+/**
+ * The headline a card title and preview image carry: what matters to someone HOLDING the token,
+ * rather than the worst of all eleven checks. Measured on 1,418 tokens (2026-09-30): the worst-of
+ * status read caution or warning for every token (0 good), because three programme checks give
+ * the same verdict to every token of an issuer — legal evidence review (a caution for any gap in
+ * OUR review coverage), DeFi enforceability (a lender's question) and authority keys (a caution
+ * for 1,343 tokens, since almost every issuer holds some key hot). A headline that never varies
+ * tells a holder nothing about the token in front of them.
+ *
+ * The rule:
+ * - counted in full: trading pause, frozen accounts (can I move it?), price tracking, pool
+ *   liquidity, venue spread (can I sell it near the share price?) and holder concentration
+ *   (can one unknown wallet swamp the market?);
+ * - counted only when it is a WARNING: legal evidence review, whose warning means reserve
+ *   verification strength 0 (nothing independent says the backing exists);
+ * - not counted: organic flow and failed swaps (who else trades and whether bots' swaps revert
+ *   cost traders, not holders), DeFi enforceability (a lender's question) and authority keys
+ *   (issuer-wide, never a warning; the card's programme line and control section show it);
+ * - `good` needs at least one price or liquidity check judged: a token with no market to measure
+ *   is `unknown` with `basis: 'no-market'`, never a clean bill of health.
+ * The eleven checks, their thresholds and the worst-of `status` are unchanged.
+ */
+export const HEADLINE_RULE_IDS = ['paused', 'frozen', 'tracking', 'liquidity', 'spread', 'concentration'];
+export const HEADLINE_WARNING_ONLY_RULE_IDS = ['verification'];
+const HEADLINE_MARKET_RULE_IDS = ['tracking', 'liquidity', 'spread'];
+
+/**
+ * `{status, ruleId, basis}` for a list of evaluated rules: `ruleId` is the first counted rule (in
+ * display order) carrying a caution or warning, null otherwise; `basis` is 'no-market' when no
+ * price or liquidity check could be judged, else 'measured'.
+ */
+export function holderHeadline(rules) {
+    const list = Array.isArray(rules) ? rules : [];
+    const counted = list.filter((rule) => HEADLINE_RULE_IDS.includes(rule?.id)
+        || (HEADLINE_WARNING_ONLY_RULE_IDS.includes(rule?.id) && rule.status === 'warning'));
+    const marketJudged = list.some((rule) => HEADLINE_MARKET_RULE_IDS.includes(rule?.id) && rule.status in SEVERITY);
+    let status = worstStatus(counted.map((rule) => rule.status));
+    if (status === 'good' && !marketJudged) status = 'unknown';
+    const ruleId = status === 'caution' || status === 'warning'
+        ? (counted.find((rule) => rule.status === status)?.id ?? null)
+        : null;
+    return { status, ruleId, basis: marketJudged ? 'measured' : 'no-market' };
+}
+
 /** Band order for the token rank: healthiest first. */
 const RANK_BAND = { good: 0, caution: 1, warning: 2 };
 
@@ -667,11 +712,12 @@ function levelVerdict(memberRules, { requireTrading = false } = {}) {
 }
 
 /**
- * The health verdict for one token: `{status, worstRuleId, levels, dimensions, rules}` with `rules`
+ * The health verdict for one token: `{status, worstRuleId, headline, levels, dimensions, rules}` with `rules`
  * always the eleven HEALTH_RULES in their fixed order. `levels` is the headline: the programme's
  * verdict (the same for every token of the issuer) and this token's, each with `passed` of `judged`
  * checks. `dimensions` keeps market, control, legal/evidence and DeFi composability separate, while
- * the top-level status remains the conservative worst-of summary of all eleven.
+ * the top-level status remains the conservative worst-of summary of all eleven. `headline` is the
+ * holder-facing status card titles and preview images show (holderHeadline).
  *
  * Every field of the input is optional and may be null — a token with nothing known comes back
  * `status: 'unknown'` with eleven unknown rules, and can never come back `warning`. `status` is the
@@ -737,5 +783,5 @@ export function evaluateHealth(input = {}) {
         const judged = memberRules.filter((rule) => rule.status !== 'unknown').length;
         return [dimension.id, { status: dimensionStatus, worstRuleId: dimensionWorstRuleId, judged, unknown: memberRules.length - judged, total: memberRules.length }];
     }));
-    return { status, worstRuleId, levels, dimensions, rules };
+    return { status, worstRuleId, headline: holderHeadline(rules), levels, dimensions, rules };
 }

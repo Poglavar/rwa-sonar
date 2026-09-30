@@ -160,6 +160,10 @@ export function snapshotTokenRow(token, health = null, context = {}) {
         frozenAccountsTop20: record(holders.frozenAccountsTop20),
         health: stringOrNull(health?.status),
         worstRuleId: stringOrNull(health?.worstRuleId),
+        // What the card title and preview carry (lib/health.mjs holderHeadline). Snapshots before
+        // 2026-10-01 have none, so no health move is reported across that boundary.
+        holderHealth: stringOrNull(health?.headline?.status),
+        holderRuleId: stringOrNull(health?.headline?.ruleId),
         marketHealth: stringOrNull(dimensions?.market?.status),
         controlHealth: stringOrNull(dimensions?.control?.status),
         legalHealth: stringOrNull(dimensions?.legal?.status),
@@ -296,16 +300,21 @@ function spreadChanges(prev, next) {
         + `from ${sides.a.toFixed(2)} % to ${sides.b.toFixed(2)} %.`)];
 }
 
-/** The health kinds. A transition into or out of `unknown` is measurement noise, not a health move. */
+/**
+ * The health kinds, on the holder headline the cards show (paused, frozen, price tracking,
+ * liquidity, spread, concentration, and a reserve-verification warning), not the worst of all
+ * eleven checks, which moved with issuer-wide review coverage. A transition into or out of
+ * `unknown` is measurement noise, not a health move.
+ */
 function healthChanges(prev, next) {
-    const before = HEALTH_SEVERITY[prev.health];
-    const after = HEALTH_SEVERITY[next.health];
+    const before = HEALTH_SEVERITY[prev.holderHealth];
+    const after = HEALTH_SEVERITY[next.holderHealth];
     if (before === undefined || after === undefined || before === after) return [];
     const kind = after > before ? 'health-worse' : 'health-better';
-    const rule = stringOrNull(next.worstRuleId);
-    const note = `Worst health status went from ${prev.health} to ${next.health}`
-        + (rule === null ? '.' : `, now on the ${rule} rule.`);
-    return [change(kind, next, 'health', prev.health, next.health, note)];
+    const rule = stringOrNull(next.holderRuleId);
+    const note = `Health for a holder went from ${prev.holderHealth} to ${next.holderHealth}`
+        + (rule === null ? '.' : `, now on the ${rule} check.`);
+    return [change(kind, next, 'holderHealth', prev.holderHealth, next.holderHealth, note)];
 }
 
 /** `frozen-appeared`: none frozen in the top 20 yesterday, at least one today. */

@@ -605,3 +605,32 @@ describe('the page never talks to Solana from the browser', () => {
         expect(html).toContain('id="freshness"');
     });
 });
+
+// ---------------------------------------------------------------- routed-trades toggle wiring
+
+describe('the routed-trades toggle is wired into live.html', () => {
+    const html = fs.readFileSync(path.join(__dirname, 'live.html'), 'utf8');
+    const js = fs.readFileSync(path.join(__dirname, 'live.js'), 'utf8');
+
+    test('the checkbox exists and starts unticked, so routed trades are hidden by default', () => {
+        const box = /<input[^>]*id="showRouted"[^>]*>/.exec(html);
+        expect(box).not.toBeNull();
+        expect(box[0]).toContain('type="checkbox"');
+        expect(box[0]).not.toMatch(/\bchecked\b/);
+        expect(html).toContain('id="showRoutedLabel"');
+    });
+
+    test('live-tape.js loads, cache-busted, before live.js reads it', () => {
+        const tapeAt = html.search(/<script src="stocks\/lib\/live-tape\.js\?v=\w+"><\/script>/);
+        const liveAt = html.search(/<script src="live\.js\?v=\w+"><\/script>/);
+        expect(tapeAt).toBeGreaterThan(-1);
+        expect(liveAt).toBeGreaterThan(tapeAt);
+    });
+
+    test('live.js filters every tape page through the module and sizes the API batch with it', () => {
+        expect(js).toMatch(/tapeLib\.pickTapePage\(batch,/);
+        expect(js).toMatch(/tapeLib\.pickTapePage\(state\.replayTrades/);
+        expect(js).toMatch(/limit: tapeLib\.batchSize\(TAPE_LIMIT, state\.showRouted\)/);
+        expect(js).toMatch(/tapeLib\.nextApiCursor\(batch, pick,/);
+    });
+});

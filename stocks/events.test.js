@@ -176,8 +176,26 @@ describe('watcher rows: registers and regulators (30 Sep)', () => {
         expect(event).toMatchObject({ category: 'legal', source: 'regulator watcher', href: 'https://www.finra.org/x.pdf' });
     });
 
+    test('a reserve shortfall on Solana alone names whose figure each number is, and links the card', () => {
+        const [event] = changeRowEvents([row(3601, 'reserve', {
+            subject_id: 'MINTX', field: 'xstocks-por-api:shortfall', before: null, after: 'shortfall', severity: 'caution',
+            evidence: { symbol: 'BOTx', url: 'https://api.xstocks.fi/p', basis: 'chain', reserve: '9978', issuerCirculating: '9875', outstanding: 180093.9 }
+        })], context());
+        expect(event.title).toBe('BOTx: 180,094 on Solana outside known issuer wallets vs 9,978 shares in reserve');
+        expect(event).toMatchObject({ category: 'legal', source: 'reserves watcher', severity: 'caution', mints: ['MINTX'] });
+    });
+
+    test('an unexplained restatement says no corporate action is on record behind it', () => {
+        const [event] = changeRowEvents([row(3602, 'corporate-action', {
+            subject_id: 'MINTX', field: 'step:2026-09-03T08:45:00.000Z:2:unexplained', after: 'unexplained',
+            evidence: { symbol: 'APHx', ticker: 'APH', verdict: 'unexplained', stepRatio: 2 }
+        })], context());
+        expect(event.title).toBe('APHx: ×2 balance restatement with no APH split or dividend on record behind it');
+        expect(event).toMatchObject({ category: 'market', source: 'corporate-action watcher', href: './cards/APHx.html' });
+    });
+
     test('the watcher rows query reads the new kinds', () => {
-        expect(CHANGE_ROW_KINDS).toEqual(expect.arrayContaining(['entity-status', 'insolvency', 'regulator-notice']));
+        expect(CHANGE_ROW_KINDS).toEqual(expect.arrayContaining(['entity-status', 'insolvency', 'regulator-notice', 'reserve', 'corporate-action']));
     });
 });
 
@@ -505,7 +523,7 @@ describe('the watcher rows query', () => {
     test('reads only the kinds the rules use, public rows only, and inlines nothing but a checked instant', () => {
         const sql = changeRowsPsql({ since: '2026-08-25T00:00:00Z', judgments: true });
         expect(sql).toContain("e.detected_at >= '2026-08-25T00:00:00Z'::timestamptz");
-        expect(sql).toContain("e.kind IN ('authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term', 'entity-status', 'insolvency', 'regulator-notice')");
+        expect(sql).toContain("e.kind IN ('authority-key', 'extension-toggle', 'rebase', 'litigation', 'quote-lost', 'document-gone', 'legal-term', 'entity-status', 'insolvency', 'regulator-notice', 'reserve', 'corporate-action')");
         expect(sql).toContain('sonar.change_judgment');
         expect(sql).toContain("NOT (e.kind = 'status'");
         expect(() => changeRowsPsql({ since: "2026-08-25'; DROP TABLE x; --", judgments: true })).toThrow('ISO UTC instant');

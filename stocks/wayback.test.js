@@ -71,6 +71,15 @@ describe('which blocked sources fall back', () => {
         expect(wantsWaybackFallback({ status: 'blocked', httpStatus: 200, botWall: true, url })).toBe(true);
     });
 
+    test('a region block qualifies: the archive crawls from elsewhere (assets.backed.fi, eight Backed claims)', () => {
+        const url = 'https://assets.backed.fi/products/tesla-xstock';
+        expect(wantsWaybackFallback({ status: 'unreadable', httpStatus: 200, unreadableCode: 'geoblock', url })).toBe(true);
+        // Any other unreadable read — a script-only shell, an RPC info page — would be the same in the archive.
+        expect(wantsWaybackFallback({ status: 'unreadable', httpStatus: 200, unreadableCode: 'js-shell', url })).toBe(false);
+        expect(wantsWaybackFallback({ status: 'unreadable', httpStatus: 200, url })).toBe(false);
+        expect(wantsWaybackFallback({ status: 'unreadable', unreadableCode: 'geoblock', url: 'https://web.archive.org/web/2026/https://x.com/' })).toBe(false);
+    });
+
     test('rate limits, bad requests, JS-only pages, readable pages and the archive itself do not', () => {
         expect(wantsWaybackFallback({ status: 'blocked', httpStatus: 429, url })).toBe(false);
         expect(wantsWaybackFallback({ status: 'blocked', httpStatus: 400, url })).toBe(false);

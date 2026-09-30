@@ -18,7 +18,8 @@ const {
     GRID_FIRST_DATA_COLUMN,
     chipSize,
     gridCell,
-    claimAxisLabels,
+    CLAIM_AXIS_WORDS,
+    LEDGER_AXIS_WORDS,
     claimLabel,
     verificationLabel,
     coverageLabel,
@@ -99,29 +100,16 @@ describe('gridCell', () => {
     });
 });
 
-describe('claimAxisLabels', () => {
-    it('prefers the label the data carries for each rung', () => {
-        const labels = claimAxisLabels([
-            { grades: { claimRung: 4, claimLabel: 'registered share' } },
-            { grades: { claimRung: 0, claimLabel: 'synthetic exposure (perp)' } }
-        ]);
-        expect(labels[0]).toBe('synthetic exposure (perp)');
-        expect(labels[4]).toBe('registered share');
-    });
-
-    it('falls back to the canonical label for an unoccupied rung', () => {
-        const labels = claimAxisLabels([]);
-        expect(labels).toHaveLength(5);
-        expect(labels[2]).toBe('secured claim on collateral');
-    });
-
-    it('ignores issuers with no usable rung or label', () => {
-        const labels = claimAxisLabels([
-            { grades: { claimRung: null, claimLabel: null } },
-            { grades: { claimRung: 3, claimLabel: '  ' } },
-            null
-        ]);
-        expect(labels[3]).toBe('beneficial interest in the security');
+describe('grid axis words', () => {
+    it('names each step in plain words, with no numbers or ladder names', () => {
+        expect(CLAIM_AXIS_WORDS).toHaveLength(5);
+        expect(LEDGER_AXIS_WORDS).toHaveLength(5);
+        expect(CLAIM_AXIS_WORDS[0]).toBe('Price only');
+        expect(CLAIM_AXIS_WORDS[4]).toBe('Registered share');
+        expect(LEDGER_AXIS_WORDS[0]).toBe('Record kept off-chain');
+        for (const words of [...CLAIM_AXIS_WORDS, ...LEDGER_AXIS_WORDS]) {
+            expect(words).not.toMatch(/\d|\brung\b|\blevel\b|synthetic exposure/i);
+        }
     });
 });
 
@@ -304,23 +292,29 @@ describe('sortIssuersForDisplay', () => {
 describe('ladder tooltips', () => {
     it('has one definition per ledger-maturity level, naming the pillar that level adds', () => {
         expect(MATURITY_LEVEL_TOOLTIPS).toHaveLength(5);
-        expect(maturityLevelTooltip(0)).toMatch(/none of the four pillars/i);
-        expect(maturityLevelTooltip(1)).toMatch(/blockchainIsMainLedger/);
-        expect(maturityLevelTooltip(2)).toMatch(/Tokenized/);
-        expect(maturityLevelTooltip(2)).toMatch(/unconditionalTransfers/);
-        expect(maturityLevelTooltip(3)).toMatch(/Issuer independent/);
-        expect(maturityLevelTooltip(3)).toMatch(/bearerRedemption/);
-        expect(maturityLevelTooltip(4)).toMatch(/Legally integrated/);
-        expect(maturityLevelTooltip(4)).toMatch(/forcedTransfers/);
+        expect(maturityLevelTooltip(0)).toMatch(/not the official record/i);
+        expect(maturityLevelTooltip(1)).toMatch(/is the official record/);
+        expect(maturityLevelTooltip(2)).toMatch(/without approval/);
+        expect(maturityLevelTooltip(3)).toMatch(/issuer does not need to take part/);
+        expect(maturityLevelTooltip(4)).toMatch(/theft or a lost key can be corrected/);
+        // Plain words only: no ladder names and no field names.
+        for (let stage = 0; stage <= 4; stage++) {
+            expect(maturityLevelTooltip(stage)).not.toMatch(/\bLevel\b|pillar|[a-z][A-Z]/);
+            expect(maturityLevelTooltip(stage).startsWith(`${LEDGER_AXIS_WORDS[stage]}:`)).toBe(true);
+        }
     });
 
     it('has one definition per claim-depth rung, naming what the holder owns', () => {
         expect(CLAIM_RUNG_TOOLTIPS).toHaveLength(5);
-        expect(claimRungTooltip(0)).toMatch(/synthetic exposure/i);
+        expect(claimRungTooltip(0)).toMatch(/price exposure/i);
         expect(claimRungTooltip(1)).toMatch(/unsecured creditor/i);
         expect(claimRungTooltip(2)).toMatch(/security interest/i);
-        expect(claimRungTooltip(3)).toMatch(/beneficial interest/i);
+        expect(claimRungTooltip(3)).toMatch(/holds the share/i);
         expect(claimRungTooltip(4)).toMatch(/registered/i);
+        for (let rung = 0; rung <= 4; rung++) {
+            expect(claimRungTooltip(rung)).not.toMatch(/\brung\b|SPV/i);
+            expect(claimRungTooltip(rung).startsWith(`${CLAIM_AXIS_WORDS[rung]}:`)).toBe(true);
+        }
     });
 
     it('returns nothing at all for a level or rung that is not one of the five', () => {

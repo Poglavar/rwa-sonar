@@ -317,3 +317,32 @@ export function hostOf(url) {
 export function topHosts(items, limit = 10) {
     return Object.entries(countBy(items, (item) => hostOf(item.url))).slice(0, limit);
 }
+
+/**
+ * Mark the registry items that stocks/data/retired-sources.json retires: the item stays in the
+ * registry (its citations still exist, and the dossiers and the evidence history still point at it)
+ * but carries `retired: {at, reason}`, so the document watcher stops fetching it and records it as
+ * retired instead. An entry must name a date and a reason; one that matches no registry item is
+ * returned in `unmatched`, so a stale retirement is reported rather than silently kept.
+ */
+export function applyRetirements(items, retirements = []) {
+    const byUrl = new Map();
+    for (const entry of Array.isArray(retirements) ? retirements : []) {
+        const url = normaliseUrl(entry?.url);
+        if (!url) throw new Error(`retired source without a usable url: ${JSON.stringify(entry)}`);
+        if (typeof entry.retiredAt !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(entry.retiredAt)) {
+            throw new Error(`retired source ${url} needs retiredAt as YYYY-MM-DD`);
+        }
+        if (typeof entry.reason !== 'string' || entry.reason.trim() === '') throw new Error(`retired source ${url} needs a reason`);
+        byUrl.set(url, entry);
+    }
+    const matched = new Set();
+    const out = items.map((item) => {
+        const entry = byUrl.get(item.url);
+        if (!entry) return item;
+        matched.add(item.url);
+        return { ...item, retired: { at: entry.retiredAt, reason: entry.reason } };
+    });
+    const unmatched = [...byUrl.keys()].filter((url) => !matched.has(url));
+    return { items: out, retired: matched.size, unmatched };
+}

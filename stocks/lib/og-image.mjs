@@ -243,13 +243,29 @@ export function redemptionFact(card) {
 }
 
 /**
+ * The panel's big word and the line under it for the holder headline (health.mjs holderHeadline):
+ * the status, then the check behind a caution or warning, what a good verdict covers, or why
+ * nothing could be judged.
+ */
+export function headlineWords(headline, rules) {
+    const status = headline?.status in STATUS_STYLE ? headline.status : 'unknown';
+    const rule = (Array.isArray(rules) ? rules : []).find((row) => row?.id === headline?.ruleId) ?? null;
+    if (status === 'unknown') {
+        return headline?.basis === 'no-market'
+            ? { status, word: 'No market data', detail: 'No price or liquidity to judge yet' }
+            : { status, word: STATUS_STYLE.unknown.word, detail: 'No holder check could be measured' };
+    }
+    if (status === 'good') return { status, word: STATUS_STYLE.good.word, detail: 'Price, liquidity, pause and freezes all good' };
+    return { status, word: STATUS_STYLE[status].word, detail: str(rule?.label) ?? 'A holder check' };
+}
+
+/**
  * The image's whole input. Everything here is drawn; nothing here moves with prices or clocks
- * except the health status and its worst check, which the image is meant to show.
+ * except the holder headline and the check behind it, which the image is meant to show.
  */
 export function ogImageModel(card) {
-    const status = card?.health?.status in STATUS_STYLE ? card.health.status : 'unknown';
-    const rules = Array.isArray(card?.health?.rules) ? card.health.rules : [];
-    const worst = rules.find((rule) => rule?.id === card?.health?.worstRuleId) ?? null;
+    const words = headlineWords(card?.health?.headline, card?.health?.rules);
+    const status = words.status;
     const rung = Number.isInteger(card?.ownership?.claimRung) ? card.ownership.claimRung : null;
     const verdict = discovery.laypersonVerdict({ claimRung: rung });
     const facts = [];
@@ -268,8 +284,8 @@ export function ogImageModel(card) {
         underlyingTicker: str(card?.underlyingTicker),
         issuer: str(card?.issuer?.name) ?? str(card?.issuer?.slug),
         status,
-        worstRule: str(worst?.label),
-        claimRung: rung,
+        statusWord: words.word,
+        statusDetail: words.detail,
         // "You own X." → "X", capitalised: the headline reads as a statement on its own.
         claim: rung === null ? 'Legal claim not established yet'
             : verdict.headline.replace(/^You own /, '').replace(/\.$/, '').replace(/^./, (c) => c.toUpperCase()),
@@ -280,11 +296,10 @@ export function ogImageModel(card) {
 /** Plain-text description of the image for og:image:alt / twitter:image:alt. */
 export function ogImageAlt(model) {
     const what = [model.name, model.underlyingTicker ? `tracks ${model.underlyingTicker}` : null].filter(Boolean).join(', ');
-    const health = `${STATUS_STYLE[model.status].word.toLowerCase()}${model.worstRule ? ` (worst check: ${model.worstRule.toLowerCase()})` : ''}`;
     return [
         `RWA Sonar card for ${model.symbol}${what ? ` (${what})` : ''}${model.issuer ? ` issued by ${model.issuer}` : ''}`,
-        `health ${health}`,
-        `holder claim${model.claimRung === null ? '' : ` rung ${model.claimRung} of 4`}: ${model.claim.toLowerCase()}`,
+        `for a holder: ${model.statusWord.toLowerCase()} (${model.statusDetail.toLowerCase()})`,
+        `what you own: ${model.claim.toLowerCase()}`,
         ...model.facts
     ].map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('. ').replace(/\s+/g, ' ') + '.';
 }
@@ -354,17 +369,15 @@ export function renderOgSvg(model, fonts) {
     const rightX = PAD_X + leftW + gap;
     const rightW = CONTENT_W - leftW - gap;
     parts.push(`<rect x="${PAD_X}" y="${top}" width="${leftW}" height="${height}" rx="18" fill="${style.bg}" stroke="${style.ink}" stroke-opacity=".45" stroke-width="2"/>`);
-    parts.push(text(PAD_X + 26, top + 40, 18, 800, MUTED, 'HEALTH CHECKS', ' letter-spacing="1.6"'));
+    parts.push(text(PAD_X + 26, top + 40, 18, 800, MUTED, 'FOR A HOLDER', ' letter-spacing="1.6"'));
     parts.push(`<circle cx="${PAD_X + 38}" cy="${top + 81}" r="12" fill="${style.ink}"/>`);
-    parts.push(text(PAD_X + 62, top + 94, 38, 800, style.ink, style.word, ' letter-spacing="-0.8"'));
-    const worst = model.status === 'good' ? 'Every measured check is good'
-        : model.status !== 'unknown' && model.worstRule ? `Worst: ${model.worstRule}` : 'No check could be measured';
-    const worstSize = fitSize(m[700], worst, leftW - 52, 24, 18);
-    parts.push(text(PAD_X + 26, top + 136, worstSize, 700, INK, truncateToWidth(m[700], worst, worstSize, leftW - 52)));
+    const wordSize = fitSize(m[800], model.statusWord, leftW - 88, 38, 28, -0.02);
+    parts.push(text(PAD_X + 62, top + 94, wordSize, 800, style.ink, model.statusWord, ' letter-spacing="-0.8"'));
+    const detailSize = fitSize(m[700], model.statusDetail, leftW - 52, 24, 18);
+    parts.push(text(PAD_X + 26, top + 136, detailSize, 700, INK, truncateToWidth(m[700], model.statusDetail, detailSize, leftW - 52)));
 
     parts.push(`<rect x="${rightX}" y="${top}" width="${rightW}" height="${height}" rx="18" fill="${PANEL}" stroke="${LINE}" stroke-width="2"/>`);
-    const kicker = model.claimRung === null ? 'WHAT YOU OWN' : `WHAT YOU OWN · CLAIM RUNG ${model.claimRung} OF 4`;
-    parts.push(text(rightX + 26, top + 40, 18, 800, MUTED, kicker, ' letter-spacing="1.6"'));
+    parts.push(text(rightX + 26, top + 40, 18, 800, MUTED, 'WHAT YOU OWN', ' letter-spacing="1.6"'));
     const claimSize = model.claim.length > 70 ? 28 : 30;
     wrapToWidth(m[800], model.claim, claimSize, rightW - 52, 3).forEach((line, index) => {
         parts.push(text(rightX + 26, top + 82 + (claimSize + 8) * index, claimSize, 800, INK, line, ' letter-spacing="-0.4"'));

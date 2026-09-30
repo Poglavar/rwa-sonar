@@ -322,6 +322,85 @@ export function parseLatest(text) {
     return out;
 }
 
+/**
+ * Per (mint, source): the latest status, the status before it and when the current run of that
+ * status began (the first_seen_at of its first reading). Readings change daily while the status
+ * holds, so the onset — not the latest reading — dates a status change.
+ */
+export const STREAK_QUERY = `COPY (WITH o AS (
+        SELECT mint, source, status, first_seen_at, id,
+               lag(status) OVER (PARTITION BY mint, source ORDER BY first_seen_at, id) AS prev
+          FROM sonar.reserve_observation),
+    g AS (SELECT *, sum(CASE WHEN prev IS DISTINCT FROM status THEN 1 ELSE 0 END)
+                      OVER (PARTITION BY mint, source ORDER BY first_seen_at, id) AS grp FROM o),
+    s AS (SELECT mint, source, grp, status, min(first_seen_at) AS onset,
+                 (array_agg(prev ORDER BY first_seen_at, id))[1] AS before
+            FROM g GROUP BY mint, source, grp, status)
+    SELECT DISTINCT ON (mint, source) mint, source, status, before,
+           to_char(onset AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+      FROM s ORDER BY mint, source, grp DESC) TO STDOUT WITH (FORMAT csv)`;
+
+/** psql CSV of STREAK_QUERY → Map("mint|source" → {status, before, onset}). */
+export function parseStreaks(text) {
+    const out = new Map();
+    for (const line of String(text).split('\n')) {
+        if (!line.trim()) continue;
+        const [mint, source, status, before, onset] = line.split(',');
+        out.set(`${mint}|${source}`, { status, before: before || null, onset });
+    }
+    return out;
+}
+
+const BAD = new Set(['shortfall', 'stale']);
+/** A figure (a decimal string from a feed, or a number) as whole units, or 'an unknown number'. */
+const units = (x) => {
+    const n = typeof x === 'string' && DECIMAL.test(x) ? Number(x) : x;
+    return finite(n) ? Math.round(n).toLocaleString('en-US') : 'an unknown number of';
+};
+
+/**
+ * sonar.change_event rows (kind `reserve`) for every token whose current status is a shortfall or
+ * a stale proof, and for one that returned to covered from either, dated by the status's onset —
+ * so a re-run writes nothing twice (lib/watch.mjs dedupes on subject, kind, field and time) and
+ * a shortfall already standing when this was added still gets its event. A shortfall against the
+ * issuer's own circulating figure is a warning; one only against Solana's outstanding supply is a
+ * caution, because that figure depends on which wallets we attribute to the issuer. Unreadable is
+ * our failure, not the issuer's, and raises nothing here.
+ */
+export function reserveEvents(rows, streaks) {
+    const out = [];
+    for (const row of rows) {
+        const streak = streaks.get(`${row.mint}|${row.source}`);
+        if (!streak || streak.status !== row.status || !streak.onset) continue;
+        const restored = row.status === 'covered' && BAD.has(streak.before);
+        if (!BAD.has(row.status) && !restored) continue;
+        const symbol = row.symbol ?? row.mint;
+        let severity = 'info';
+        let summary;
+        if (restored) {
+            summary = `${symbol}: reserve again covers the tokens outstanding (was ${streak.before})`;
+        } else if (row.status === 'stale') {
+            summary = `${symbol}: the issuer's proof of reserves has not been updated since ${row.sourceTime ? row.sourceTime.slice(0, 10) : 'an unknown date'}`;
+        } else if (row.shortfallBasis === 'issuer' || row.shortfallBasis === 'both') {
+            severity = 'warning';
+            summary = `${symbol}: reserve of ${units(row.reserve)} shares is below the issuer's own circulating figure of ${units(row.issuerCirculating)}`;
+        } else {
+            severity = 'caution';
+            summary = `${symbol}: ${units(row.outstanding)} tokens on Solana outside the wallets we attribute to the issuer, against ${units(row.reserve)} shares in its reserve report`;
+        }
+        out.push({
+            detectedAt: streak.onset, kind: 'reserve', subjectType: 'token', subjectId: row.mint,
+            field: `${row.source}:${row.status}`, before: streak.before, after: row.status, severity, summary,
+            evidence: {
+                symbol: row.symbol, issuer: row.issuer, source: row.source, url: row.sourceUrl, basis: row.shortfallBasis ?? null,
+                reserve: row.reserve, issuerCirculating: row.issuerCirculating, outstanding: round(row.outstanding),
+                coverageIssuer: round(row.coverageIssuer), coverageChain: round(row.coverageChain), sourceTime: row.sourceTime, reasons: row.reasons ?? []
+            }
+        });
+    }
+    return out;
+}
+
 /** The single Telegram summary, or null when there is nothing to say. */
 export function formatSummary({ rows, failures, restricted, transitionsList, durationMs }) {
     const short = rows.filter((r) => r.status === 'shortfall');

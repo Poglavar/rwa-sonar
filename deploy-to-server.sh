@@ -163,8 +163,17 @@ rsync -a --delete \
 	--exclude 'package.json' \
 	--exclude 'package-lock.json' \
 	--exclude 'placeholder-db.json' \
+	--exclude '*.mjs' \
+	--exclude '*.cjs' \
+	--exclude '*.sh' \
+	--exclude 'stocks/fixtures' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
 rm -f "$RELEASE_EXCLUDES"
+# Build scripts, jobs and test fixtures are not part of the site (no page loads a .mjs; the
+# browser modules are .js). rsync never deletes what it excludes, so remove copies an earlier
+# mirror left behind; release artifacts are data files, never scripts.
+find "$REMOTE_DOCROOT" \( -name '*.mjs' -o -name '*.cjs' -o -name '*.sh' \) -type f -delete
+rm -rf "$REMOTE_DOCROOT/stocks/fixtures"
 # Generated datasets and dossiers are deliberately outside the general mirror.  This shared
 # publisher stages the entire manifest first, so a failed required artifact cannot replace the
 # last complete public release.
@@ -181,6 +190,7 @@ grep -Fq 'id="comparisonView"' "$REMOTE_DOCROOT/stocks.html"
 test -s "$REMOTE_DOCROOT/cards/index.json"
 test -s "$REMOTE_DOCROOT/protocols/index.json"
 test -s "$REMOTE_DOCROOT/stocks-discovery.json"
+! test -e "$REMOTE_DOCROOT/stocks/build-cards.mjs"
 # Publication is complete. Release the shared lock before restarting the scheduled refresh;
 # otherwise its immediate run exits on our own lock instead of collecting with the new code.
 flock -u 9

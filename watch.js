@@ -58,11 +58,12 @@
     const SOURCE_KINDS = ['pdf', 'html', 'api', 'onchain'];
 
     /**
-     * `sonar.source.status` — all eight: EVIDENCE.md §1's four, the watcher's `new` and `error`,
-     * `reachable-unverified` (db/2026-09-24-sonar-source-reachable.sql) and `unreadable`
-     * (db/2026-09-24-sonar-source-unreadable.sql, stocks/lib/unreadable.mjs).
+     * `sonar.source.status` — all nine: EVIDENCE.md §1's four, the watcher's `new` and `error`,
+     * `reachable-unverified` (db/2026-09-24-sonar-source-reachable.sql), `unreadable`
+     * (db/2026-09-24-sonar-source-unreadable.sql, stocks/lib/unreadable.mjs) and `retired`
+     * (db/2026-10-02-sonar-source-retired.sql, stocks/data/retired-sources.json).
      */
-    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'error'];
+    const SOURCE_STATUSES = ['new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'retired', 'error'];
 
     /**
      * Which colour band a source status belongs in. `changed` is not a fault — it is the watcher
@@ -70,7 +71,7 @@
      */
     const SOURCE_STATUS_TONE = {
         new: 'info', ok: 'good', changed: 'caution', gone: 'critical', blocked: 'warning', unreadable: 'warning',
-        'reachable-unverified': 'info', error: 'warning'
+        'reachable-unverified': 'info', retired: 'info', error: 'warning'
     };
 
     /**
@@ -88,6 +89,7 @@
         blocked: 'the host blocks our fetch (403, bot wall, paywall)',
         unreadable: 'the host answered, but not with the document (a region block, a script-only page, an RPC info page); no change is recorded from it',
         'reachable-unverified': 'the host answers but blocks our fetch; no quote relies on this page',
+        retired: 'gone for good (a wound-down issuer\'s dead site); no longer fetched, its stored versions and history kept',
         error: 'the fetch failed for another reason'
     };
 

@@ -8,12 +8,13 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { buildRegistry, countBy, topHosts } from './lib/sources.mjs';
+import { applyRetirements, buildRegistry, countBy, topHosts } from './lib/sources.mjs';
 import { log, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
 const ISSUER_DIR = join(HERE, 'data', 'issuers');
 const PARTIES_FILE = join(HERE, 'data', 'canonical-parties.json');
+const RETIRED_FILE = join(HERE, 'data', 'retired-sources.json');
 const DEFAULT_OUT = join(HERE, 'data', 'sources.json');
 
 function usage() {
@@ -39,6 +40,10 @@ WHAT IT DOES
   every other query parameter kept, because \`?alt=media&token=…\` IS the document), classified
   \`pdf\` (by extension), \`api\` (api.* host, /api/ path, .json) or \`html\`, and given a title: the
   \`documents[].title\` when that is where the URL came from, otherwise the field path itself.
+
+  A URL listed in stocks/data/retired-sources.json (gone for good: a wound-down issuer's dead
+  domain) stays in the registry with \`retired: {at, reason}\`; the watcher does not fetch it and
+  records it as retired. A retirement that matches no cited URL is reported.
 
   A citation written with an ellipsis (\`…/solana/token...\`) is NOT a URL anyone can fetch, so it
   is reported separately instead of being guessed at.
@@ -72,7 +77,9 @@ async function main() {
     log(`extract-sources: ${files.length} dossiers${dossiers.length > files.length ? ' + canonical-parties.json' : ''}`);
 
     const registry = buildRegistry(dossiers, { generatedAt: ts() });
-    const { items, truncated } = registry;
+    const { truncated } = registry;
+    const retirements = await readJson(RETIRED_FILE, { items: [] });
+    const { items, retired, unmatched } = applyRetirements(registry.items, retirements.items);
 
     await writeJson(out, {
         generatedAt: registry.generatedAt,
@@ -88,6 +95,8 @@ async function main() {
     log(`  by issuer: ${Object.entries(issuers).map(([k, n]) => `${k}=${n}`).join(' ')}`);
     log('  top hosts:');
     for (const [host, n] of topHosts(items, 10)) log(`    ${String(n).padStart(3)} ${host}`);
+    log(`  ${retired} URL(s) retired (stocks/data/retired-sources.json) — kept in the registry, not fetched`);
+    for (const url of unmatched) logWarn(`retired-sources.json names ${url}, which no dossier cites any more`);
     const shared = items.filter((i) => new Set(i.foundIn.map((p) => p.split(':')[0])).size > 1).length;
     log(`  ${shared} URL(s) cited by more than one dossier`);
     if (truncated.length) {

@@ -69,7 +69,7 @@ describe('confirmed DeFi usage', () => {
         expect(index.size).toBe(tokens.length);
         const noResult = [...index.values()].find((item) => item.integrations.length === 0);
         expect(noResult).toBeDefined();
-        expect(defiUsageCompactHtml(null)).toContain('None source-listed');
+        expect(defiUsageCompactHtml(null)).toContain('No protocol found');
     });
 
     it('renders exact protocols, actions, live metrics and evidence links for NVDAx', () => {
@@ -173,9 +173,10 @@ describe('confirmed DeFi usage', () => {
         const template = composabilityTemplateForToken(templates, token);
         const issuer = issuers.find((row) => row.slug === token.issuer);
         const html = defiUsageDetailHtml(index.get(token.mint), db.fetchedAt, template, issuer);
-        expect(html).toContain('None source listed');
+        expect(html).toContain('No protocol found');
+        expect(html.replace(/<[^>]+>/g, ' ')).not.toMatch(/source.listed/i);
         expect(html).toContain('What protocol custody means for this token');
-        expect(html).toContain('No checked protocol currently lists this exact token as programmatic collateral');
+        expect(html).toContain('No protocol we checked lists this exact token as collateral');
     });
 
     it('escapes protocol-controlled and curated prose', () => {
@@ -185,7 +186,7 @@ describe('confirmed DeFi usage', () => {
         }] });
         expect(html).not.toContain('<img');
         expect(html).not.toContain('<script>');
-        expect(html).toContain('No exact-token support was established');
+        expect(html).toContain('We found no proof that this protocol accepts this exact token');
         expect(html).toContain('&lt;b&gt;no&lt;/b&gt;');
     });
 });

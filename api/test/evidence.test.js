@@ -355,9 +355,13 @@ describe('model assessments on the change feed (sonar.change_judgment)', () => {
         expect(text).toContain(CHANGE_JUDGMENT_JOIN);
         expect(text).toContain('AS "modelAssessment"');
         expect(CHANGE_JUDGMENT_JOIN).toContain("j.status IN ('valid', 'invalid')");
-        expect(CHANGE_JUDGMENT_JOIN).toContain("ORDER BY (j.status = 'valid') DESC, j.updated_at DESC");
+        expect(CHANGE_JUDGMENT_JOIN).toContain("ORDER BY je.event_id, (j.status = 'valid') DESC, j.updated_at DESC");
         // A judgment covers every event of its change, not only the representative one.
-        expect(CHANGE_JUDGMENT_JOIN).toContain('j.covers_event_ids @> jsonb_build_array(e.id)');
+        expect(CHANGE_JUDGMENT_JOIN).toContain('jsonb_array_elements(');
+        expect(CHANGE_JUDGMENT_JOIN).toContain('j.covers_event_ids');
+        // Computed once and hash-joined: a per-event LATERAL re-read every judgment for every event.
+        expect(CHANGE_JUDGMENT_JOIN).not.toContain('LATERAL (\n    SELECT j.id');
+        expect(CHANGE_JUDGMENT_JOIN).toMatch(/\) mj ON mj\.event_id = e\.id$/);
     });
 
     test('an invalid judgment is exposed as its status only, never with its text', () => {
@@ -371,7 +375,7 @@ describe('model assessments on the change feed (sonar.change_judgment)', () => {
     });
 
     test('every judgment column the join reads exists in the DDL', () => {
-        const cols = CHANGE_JUDGMENT_JOIN.match(/SELECT ([\s\S]*?)\n\s+FROM/)[1]
+        const cols = CHANGE_JUDGMENT_JOIN.match(/SELECT DISTINCT ON \(je\.event_id\) je\.event_id, ([\s\S]*?)\n\s+FROM/)[1]
             .split(',').map((c) => c.trim().replace(/^j\./, ''));
         for (const col of cols) expect(JUDGMENT_DDL).toMatch(new RegExp(`\\n\\s+${col}\\s`));
     });

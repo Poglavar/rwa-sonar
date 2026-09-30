@@ -147,10 +147,17 @@ describe('classifyRead: real reads that must stay readable', () => {
 });
 
 describe('classifyRead: near-empty only against the last readable version', () => {
-    const raw = fixture('backed-fi-news-proof-of-reserve.html');
+    const page = fixture('backed-fi-news-proof-of-reserve.html');
+    // The same page with its two article <header>s gone: what extractor v2 read of it (it dropped
+    // every <header>), 555 characters of chrome — the near-empty shape these tests need.
+    const raw = page.replace(/<header\b[\s\S]*?<\/header>/g, '');
     const text = htmlDocumentText(raw).text;
 
-    test('the Webflow article reads as 555 characters of chrome from 60 kB of markup', () => {
+    test('extractor v3 reads the Webflow article in full; without its article it is 555 characters of chrome', () => {
+        const full = htmlDocumentText(page).text;
+        expect(full).toContain('The Network Firm operates our attestation API.');
+        expect(full.length).toBeGreaterThan(10_000);
+        expect(needsPreviousChars({ text: full, raw: page })).toBe(false);
         expect(text.length).toBe(555);
         expect(needsPreviousChars({ text, raw })).toBe(true);
     });
@@ -163,7 +170,7 @@ describe('classifyRead: near-empty only against the last readable version', () =
     test('a collapse to a third or less of the last readable version is near-empty', () => {
         const verdict = htmlRead(raw, { previousChars: 4200 });
         expect(verdict).toMatchObject({ readable: false, code: 'near-empty', label: 'almost no readable text' });
-        expect(verdict.reason).toBe('couldn\'t read (almost no readable text): 555 characters of text from 60 kB of markup; the last readable version had 4200');
+        expect(verdict.reason).toBe('couldn\'t read (almost no readable text): 555 characters of text from 37 kB of markup; the last readable version had 4200');
         expect(htmlRead(raw, { previousChars: 1600 })).toEqual({ readable: true });
     });
 

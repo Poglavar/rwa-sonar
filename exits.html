@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="./site-contact.css?v=20260924i" />
     <!-- seo:head:end -->
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
-    <link rel="stylesheet" href="stocks.css?v=20260924r" />
+    <link rel="stylesheet" href="stocks.css?v=20260930nc" />
     <link rel="stylesheet" href="app-shell.css?v=20260929b" />
     <link rel="stylesheet" href="motion.css?v=20260924u" />
     <link rel="stylesheet" href="exits.css?v=20260924y" />
@@ -111,11 +111,11 @@
     <section id="sankeySection" aria-labelledby="sankeyHeading">
         <h2 id="sankeyHeading">Where the tokens are used in DeFi</h2>
         <p class="section-note">Issuer &rarr; protocol &rarr; action, from exact-token protocol integrations.
-            Each ribbon is one evidence stage: <em>source-listed</em> means the protocol's own registry names the
-            exact token, <em>market-observed</em> means market-data collection saw the exact pool,
-            <em>configuration-decoded</em> means we read the market's on-chain configuration, and
-            <em>simulated</em> would mean a read-only execution was run. None of them proves that a
-            particular transaction succeeded. Ribbon width is USD where the source reports it (pool
+            Each ribbon says how we know the protocol accepts the token: <em>named in the protocol’s list</em>
+            means its own registry names the exact token, <em>live market seen</em> means our market data
+            saw the exact pool, <em>settings read on-chain</em> means we read the market’s settings, and
+            <em>transaction simulated</em> would mean we ran a transaction without sending it. None of them
+            proves that a particular transaction succeeded. Ribbon width is USD where the source reports it (pool
             liquidity for DEX pools, the protocol-reported market size for lending markets). A thin
             dashed ribbon means no USD figure was reported; the value is unknown.</p>
         <ul id="stageKey" class="ex-key" aria-label="Proof stage colours"></ul>
@@ -146,7 +146,7 @@
     <script src="stocks/lib/fmt.js?v=20260924a"></script>
     <script src="stocks/lib/sort-values.js?v=20260923r"></script>
     <script src="stocks/lib/exits-view.js?v=20260925a"></script>
-    <script src="stocks/lib/sankey-layout.js?v=20260924e"></script>
+    <script src="stocks/lib/sankey-layout.js?v=20260930nc"></script>
     <script src="exits.js?v=20260930u"></script>
     <script src="stocks/lib/flow-diagram.js?v=20260930u"></script>
     <script src="stocks/lib/schematics.js?v=20260930u"></script>

@@ -105,9 +105,9 @@ describe('font metrics and fitting', () => {
 });
 
 describe('the image model', () => {
-    it('draws the token, issuer, health, claim rung and key facts from the real NVDAx card', () => {
+    it('draws the token, issuer, holder headline, what you own and key facts from the real NVDAx card', () => {
         const model = ogImageModel(cardFor('NVDAx'));
-        expect(model).toMatchObject({ symbol: 'NVDAx', underlyingTicker: 'NVDA', issuer: 'Kraken xStocks', claimRung: 2 });
+        expect(model).toMatchObject({ symbol: 'NVDAx', underlyingTicker: 'NVDA', issuer: 'Kraken xStocks' });
         expect(['good', 'caution', 'warning', 'unknown']).toContain(model.status);
         expect(model.claim).toBe('A claim secured over collateral; you do not own the underlying share');
         expect(model.facts[0]).toMatch(/^Freeze key: \d+-of-\d+ multisig · clawback enabled$/);
@@ -115,7 +115,22 @@ describe('the image model', () => {
         expect(model.facts.length).toBeLessThanOrEqual(3);
         const alt = ogImageAlt(model);
         expect(alt).toContain('NVDAx');
-        expect(alt).toContain('rung 2 of 4');
+        expect(alt).toContain('What you own: a claim secured over collateral');
+        expect(alt).not.toMatch(/rung|of 4/);
+        expect(renderOgSvg(model, fonts)).not.toMatch(/RUNG/);
+    });
+
+    it('leads with the holder headline, not the worst of all eleven checks', () => {
+        const rules = [{ id: 'tracking', label: 'Price tracking' }, { id: 'verification', label: 'Legal evidence review' }];
+        const card = (headline) => ({ health: { status: 'warning', worstRuleId: 'verification', headline, rules } });
+        expect(ogImageModel(card({ status: 'good', ruleId: null, basis: 'measured' })))
+            .toMatchObject({ status: 'good', statusWord: 'Good', statusDetail: 'Price, liquidity, pause and freezes all good' });
+        expect(ogImageModel(card({ status: 'warning', ruleId: 'tracking', basis: 'measured' })))
+            .toMatchObject({ status: 'warning', statusWord: 'Warning', statusDetail: 'Price tracking' });
+        expect(ogImageModel(card({ status: 'unknown', ruleId: null, basis: 'no-market' })))
+            .toMatchObject({ status: 'unknown', statusWord: 'No market data' });
+        const alt = ogImageAlt(ogImageModel(card({ status: 'warning', ruleId: 'tracking', basis: 'measured' })));
+        expect(alt).toContain('For a holder: warning (price tracking)');
     });
 
     it('describes freeze-key governance and redemption evidence in plain words', () => {
@@ -134,7 +149,7 @@ describe('the image model', () => {
         expect(ogImageModel({ ...own(null), control: { paused: true } }).facts[0]).toBe('Paused right now: transfers are halted');
     });
 
-    it('keeps the hash when only prices move, and changes it when the health status does', () => {
+    it('keeps the hash when only prices move, and changes it when the holder headline does', () => {
         const card = cardFor('SPYx');
         const hashOf = (c) => ogImageHash(renderOgSvg(ogImageModel(c), fonts), fonts.digest);
         const moved = structuredClone(card);
@@ -143,7 +158,7 @@ describe('the image model', () => {
         moved.builtAt = '2030-01-01T00:00:00Z';
         expect(hashOf(moved)).toBe(hashOf(card));
         const flipped = structuredClone(card);
-        flipped.health.status = card.health.status === 'warning' ? 'good' : 'warning';
+        flipped.health.headline = { ...card.health.headline, status: card.health.headline.status === 'warning' ? 'good' : 'warning' };
         expect(hashOf(flipped)).not.toBe(hashOf(card));
         expect(ogImageHash('<svg/>', 'other fonts')).not.toBe(ogImageHash('<svg/>', fonts.digest));
     });

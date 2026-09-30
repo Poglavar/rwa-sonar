@@ -709,11 +709,15 @@ describe('the funnel graphic', () => {
             expect(js).not.toContain(jargon);
         }
         expect(js).toContain('claimDepthWords(grades.claimRung)');
+        expect(js).toContain('escapeHtml(LEDGER_AXIS_WORDS[stage])');
+        expect(js).toContain('escapeHtml(CLAIM_AXIS_WORDS[rung])');
+        expect(js).not.toMatch(/`Level \$\{stage\}<\/span>|Claim depth \$\{rung\}|Claim depth: rung/);
         expect(js).toContain('ledgerRecordWords(stage)');
         expect(outsideCompare).not.toContain('<h2>Ledger maturity and claim depth</h2>');
         expect(outsideCompare).not.toContain('“None source-listed”');
-        expect(outsideCompare).toContain('title="Ledger maturity"');
-        expect(outsideCompare).toContain('title="Claim depth"');
+        expect(outsideCompare).not.toMatch(/Level 4 top|Level 0 bottom|0 left &rarr; 4 right/);
+        expect(outsideCompare).toContain('(furthest at the top)');
+        expect(outsideCompare).toContain('(closest on the right)');
     });
 
     it('paints "Find a stock" before the script runs, the view a first-time visitor gets', () => {

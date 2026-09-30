@@ -66,25 +66,63 @@ export function rawExtension(kind) {
 // are not available in the United States or to U.S. persons…", the MiFID distributor line), and
 // stripping it cost a sourced claim its words on 2026-09-18. Copyright years and cookie lines
 // in a footer are churn the line filter already removes.
-const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|header|form|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+const DROP_BLOCKS = /<(script|style|noscript|template|svg|iframe|nav|select|button)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
 
 /**
- * The same, keeping `<header>`: what the QUOTE check reads. A `<header>` is usually page chrome
- * (logo, menu), which is why the hashed text drops it, but a page can put content there too —
- * republic.com/rspax renders its offering-summary strip (status "Closed", price per token, the
- * minimum investment) inside a `<header>`, so quotes of those words read as lost (2026-09-23).
- * Chrome kept in the quote text costs nothing: a quote is looked FOR, extra lines cannot lose it.
+ * The same for what the QUOTE check reads, which also keeps `<button>` text (dropped above only for
+ * the hash: "Get", "Invest" are chrome). Extra text in the quote reading cannot lose a quote.
  */
-const DROP_BLOCKS_KEEP_HEADER = /<(script|style|noscript|template|svg|iframe|nav|form|select)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
+const DROP_BLOCKS_FOR_QUOTES = /<(script|style|noscript|template|svg|iframe|nav|select)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
 
 /**
- * The quote reading also keeps `<button>` text (dropped above only for the hash: "Get", "Invest"
- * are chrome) and appends every inline `<script>` body. A server-rendered page can carry the words
+ * `<header>` and `<form>` are USUALLY chrome — a logo and a menu, a search box, a newsletter
+ * sign-up — but either can wrap the document itself, so neither is dropped by its tag alone:
+ *  - an ASP.NET WebForms site wraps its whole page in one `<form id="aspnetForm">`, so dropping
+ *    forms left www.cysec.gov.cy's announcements as the 71 characters of its title (2026-09-30);
+ *  - a Webflow site can put the article in a `<header>`: backed.fi/news-updates/* renders the whole
+ *    Chainlink proof-of-reserve announcement inside `<header class="section_content30">`.
+ * The hashed reading keeps one only when it holds the DOCUMENT: the page's own heading or landmark
+ * (`<h1>`, `<h2>`, `<main>`, `<article>`) and at least `WRAPPER_MIN_CHARS` of text. A logo-and-menu
+ * header, a search box, a newsletter sign-up or backed.fi's cookie-preference form (whose option
+ * descriptions run to 135 characters a line) has neither. The quote reading keeps both always
+ * (republic.com/rspax prints its offering-summary strip, status "Closed" and the minimum
+ * investment, in a short `<header>`; 2026-09-23).
+ * Changing this rule changes the text every HTML source hashes to: bump `HTML_EXTRACTOR_VERSION`.
+ */
+const WRAPPER_BLOCK = /<(header|form)\b[^>]*>([\s\S]*?)<\/\1\s*>/gi;
+const WRAPPER_MIN_CHARS = 400;
+const DOCUMENT_LANDMARK = /<(h1|h2|main|article)\b/i;
+
+/** Whether a `<header>`/`<form>`'s inner markup is the document rather than chrome. */
+function wrapperHoldsProse(inner) {
+    if (!DOCUMENT_LANDMARK.test(inner)) return false;
+    const text = decodeEntities(inner.replace(/<br\s*\/?>/gi, '\n').replace(BLOCK_END, '\n').replace(TAG, ' '));
+    return normaliseLines(text).replace(/\n/g, '').length >= WRAPPER_MIN_CHARS;
+}
+
+/**
+ * Drop every `<header>`/`<form>` that holds no prose; keep the inner markup of those that do. Two
+ * passes, so a site header inside a kept page-wide form is judged on its own.
+ */
+function dropChromeWrappers(html) {
+    const pass = (markup) => markup.replace(WRAPPER_BLOCK, (whole, tag, inner) => (wrapperHoldsProse(inner) ? ` ${inner} ` : ' '));
+    return pass(pass(html));
+}
+
+/**
+ * The quote reading also appends every inline `<script>` body. A server-rendered page can carry the words
  * it renders as a data payload: superstate.com/assets/fwdi ships its holdings breakdown as a
  * SvelteKit object inside a `<script>`, and a quote of it read as lost (2026-09-24). Like the
  * header rule above, extra text in the quote reading cannot lose a quote; the hash never sees it.
  */
 const INLINE_SCRIPT = /<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script\s*>/gi;
+
+/**
+ * A tag, with its attribute values read as quoted strings: an attribute may legally hold a raw `>`,
+ * and www.cysec.gov.cy's menu images carry `alt="Expand &lt;a href=…>About us&lt;/a>"`, which a
+ * plain `<[^>]*>` cut at the first `>` and spilled into the text as `About us</a>" style=…`.
+ */
+const TAG = /<[^>"']*(?:"[^"]*"[^>"']*|'[^']*'[^>"']*)*>/g;
 
 /** Elements that end a line of text. */
 const BLOCK_END = /<\/(p|div|li|tr|td|th|h[1-6]|section|article|blockquote|pre|table|thead|tbody|ul|ol|dl|dd|dt|figure|figcaption|main|aside|address|details|summary)\s*>/gi;
@@ -207,18 +245,20 @@ export function normaliseLines(text, { htmlWidgets = false, keepChurn = false } 
 
 /**
  * HTML -> readable text: chrome elements removed, tags stripped, entities decoded. `forQuotes`
- * is the quote check's reading: churn lines kept (see `normaliseLines`) and `<header>` content
- * kept (see `DROP_BLOCKS_KEEP_HEADER`). The default is the reading that is hashed and diffed.
+ * is the quote check's reading: churn lines kept (see `normaliseLines`) and every `<header>` and
+ * `<form>` kept (see `WRAPPER_BLOCK`). The default is the reading that is hashed and diffed.
  */
 export function htmlToText(html, { forQuotes = false } = {}) {
     let text = String(html);
     text = text.replace(/<!--[\s\S]*?-->/g, ' ');
     const payloads = forQuotes ? [...text.matchAll(INLINE_SCRIPT)].map((m) => m[1].trim()).filter((body) => body !== '') : [];
-    // Two passes: a <nav> inside a <header> only disappears once its parent has gone.
-    const drop = forQuotes ? DROP_BLOCKS_KEEP_HEADER : DROP_BLOCKS;
+    // Two passes: an element nested in one of its own kind only disappears once its parent has.
+    const drop = forQuotes ? DROP_BLOCKS_FOR_QUOTES : DROP_BLOCKS;
     text = text.replace(drop, ' ').replace(drop, ' ');
+    // After the nav is gone, so a header's menu does not count as its prose (`dropChromeWrappers`).
+    if (!forQuotes) text = dropChromeWrappers(text);
     text = text.replace(/<br\s*\/?>/gi, '\n').replace(BLOCK_END, '\n');
-    text = text.replace(/<[^>]*>/g, ' ');
+    text = text.replace(TAG, ' ');
     text = decodeEntities(text);
     if (payloads.length) text = `${text}\n${payloads.join('\n')}`;
     return normaliseLines(text, { htmlWidgets: true, keepChurn: forQuotes });
@@ -362,14 +402,21 @@ export function stripPublisherChrome(url, text) {
 }
 
 /**
+ * The HTML extraction generation. 2 was the Next.js flight reader (`htmlDocumentText`): without the
+ * bump a page stored as a title would keep answering 304 to its old etag and never be read again.
+ * 3 keeps a `<header>`/`<form>` that holds prose and reads quoted attribute values as part of their
+ * tag (`WRAPPER_BLOCK`, `TAG`): CySEC's ASP.NET page-wide form and backed.fi's article header.
+ */
+export const HTML_EXTRACTOR_VERSION = 3;
+
+/**
  * The text-extraction generation a source is read with; a rise drops the conditional headers once
- * and refreshes the baseline without an external-change event (watch-sources.mjs). Increment when
- * an extraction rule changes. PDF and JSON extraction are generation 1. HTML is 2 since the
- * Next.js flight reader (`htmlDocumentText`): without the bump a page stored as a title would keep
- * answering 304 to its old etag and never be read again. The host-scoped publisher rules add one.
+ * and refreshes the baseline without an external-change event (watch-sources.mjs,
+ * `settleExtractorUpgrade`). Increment when an extraction rule changes. PDF and JSON extraction
+ * are generation 1, HTML is `HTML_EXTRACTOR_VERSION`; the host-scoped publisher rules add one.
  */
 export function publisherNormalizerVersion(url, kind = 'html') {
-    const base = kind === 'html' ? 2 : 1;
+    const base = kind === 'html' ? HTML_EXTRACTOR_VERSION : 1;
     try {
         const host = new URL(url).hostname.toLowerCase();
         return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io', 'msb.fincen.gov'].includes(host) ? base + 1 : base;
@@ -743,14 +790,14 @@ export function dossierQuotes(slug, dossier) {
         if (retiredByConfirmedSuccessor(claim) && confirmedAt.has(`${claim.field}\u0000${claim.url}`)) continue;
         out.push({
             url: verificationUrlFor(claim, dossier), id: claimId(slug, claim.field, claim.url, claim.quote),
-            kind: 'claim', ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url
+            kind: 'claim', ref: claim.field, slug, quote: claim.quote, citedUrl: claim.url, accessedAt: claim.accessedAt ?? null
         });
     }
     for (const entry of Array.isArray(dossier?.whatIf) ? dossier.whatIf : []) {
         if (typeof entry?.quote !== 'string' || typeof entry?.url !== 'string') continue;
         out.push({
             url: verificationUrlFor(entry, dossier), id: whatIfId(slug, entry.mode),
-            kind: 'what-if', ref: entry.mode, slug, quote: entry.quote, citedUrl: entry.url
+            kind: 'what-if', ref: entry.mode, slug, quote: entry.quote, citedUrl: entry.url, accessedAt: entry.accessedAt ?? null
         });
     }
     return out;
@@ -782,11 +829,20 @@ export function checkQuotes(text, quotes, { pdf = false } = {}) {
  * counted in `notCheckable`, never `lost`. Other outcomes with no text (gone, error) return null —
  * nothing was checked and the previous verdicts stand.
  */
-export function quoteVerdicts({ status, text, quotes, kind = 'html' }) {
+export function quoteVerdicts({ status, text, quotes, kind = 'html', capturedAt = null }) {
     const items = Array.isArray(quotes) ? quotes : [];
     if (status === 'blocked' || status === 'unreadable') return { checked: 0, found: [], lost: [], skipped: 0, notCheckable: items.length };
     if (typeof text !== 'string' || (status !== 'ok' && status !== 'changed')) return null;
-    return { ...checkQuotes(text, items, { pdf: kind === 'pdf' }), notCheckable: 0 };
+    const check = checkQuotes(text, items, { pdf: kind === 'pdf' });
+    // Text read from an archived capture (`capturedAt`, the capture's own time) cannot contradict a
+    // quote read live AFTER the capture was taken: assets.backed.fi's legal-documentation capture of
+    // 2026-09-18 predates the "…, X Layer, Optimism" chain list the dossier quoted on 2026-09-23.
+    // Such a quote, missing from the older capture, is not checkable against it — never lost.
+    const captured = Date.parse(capturedAt ?? '');
+    if (!Number.isFinite(captured)) return { ...check, notCheckable: 0 };
+    const newer = (item) => Date.parse(item?.accessedAt ?? '') > captured;
+    const lost = check.lost.filter((item) => !newer(item));
+    return { ...check, checked: check.found.length + lost.length, lost, notCheckable: check.lost.length - lost.length };
 }
 
 /**
@@ -865,18 +921,62 @@ export function extraCaFor(host) {
     return EXTRA_CA_HOSTS.find(([h]) => h === name)?.[1] ?? null;
 }
 
-/**
- * Hosts whose 503 is their own outage rather than a fault in our watch. archive.org's availability
- * and CDX APIs were answering 503 "temporarily offline" on 2026-09-17; the dossiers cite six
- * `web.archive.org` URLs, and one third-party maintenance window must not turn the daily verdict
- * red. Such a 503 (after the two backoffs) is recorded as `blocked` with the reason, exactly like
- * any other host that will not serve us today.
- */
-const FLAKY_503_HOSTS = ['web.archive.org', 'archive.org'];
+/** web.archive.org and the rest of archive.org: one operator, one rate limiter for all our traffic. */
+const ARCHIVE_HOSTS = ['web.archive.org', 'archive.org'];
 
-export function tolerates503(host) {
+export function isArchiveHost(host) {
     const name = String(host ?? '').toLowerCase();
-    return FLAKY_503_HOSTS.some((h) => name === h || name.endsWith(`.${h}`));
+    return ARCHIVE_HOSTS.some((h) => name === h || name.endsWith(`.${h}`));
+}
+
+/**
+ * Our own code for "not requested: archive.org pushed back earlier in this run" (watch-sources.mjs
+ * pauses its archive reads for the rest of the run rather than walking into the same refusal).
+ */
+export const ARCHIVE_PAUSED = 'EARCHIVE_PAUSED';
+
+/**
+ * How archive.org pushes back on OUR traffic, as opposed to a cited capture being broken. Measured
+ * on prod 2026-09-19 to 09-30: while the `--archive` pass submits Save Page Now jobs, the archive
+ * refuses connections outright (ECONNREFUSED) for minutes at a time, and every cited
+ * `web.archive.org/web/<ts>/…` capture read in that window failed the run (7 of 11 failures on
+ * 09-24, 4 of 9 on 09-26, 7 of 10 on 09-27); its CDX API times out under load and answered 503
+ * "temporarily offline" on 2026-09-17. None of that says anything about a capture, which is
+ * immutable.
+ */
+const ARCHIVE_PUSHBACK_CODES = ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET', ARCHIVE_PAUSED];
+const ARCHIVE_PUSHBACK_STATUSES = [429, 502, 503, 504];
+
+export function archivePushback({ host = null, httpStatus = null, networkErrorCode = null } = {}) {
+    if (!isArchiveHost(host)) return false;
+    if (networkErrorCode) return ARCHIVE_PUSHBACK_CODES.includes(networkErrorCode);
+    return ARCHIVE_PUSHBACK_STATUSES.includes(httpStatus);
+}
+
+/**
+ * A throttled source (`decideOutcome` status `throttled`) was not looked at: the run keeps its last
+ * known state and retries it next run. Only when the archive has refused the SAME source on this
+ * many consecutive runs does it stop being our transient throttle and become an `error`, which
+ * fails the run like any other persistent failure.
+ */
+export const THROTTLE_PERSISTS_AFTER = 3;
+
+/**
+ * Settle a `throttled` result against the stored state: count the consecutive throttled runs
+ * (`throttledRuns`, carried in sources-state.json) and turn the result into an `error` once it
+ * reaches `persistAfter`. Any other result is returned untouched (it carries no `throttledRuns`, so
+ * the count restarts at the next throttle). Mutates and returns `result`.
+ */
+export function settleThrottle(result, prev = null, { persistAfter = THROTTLE_PERSISTS_AFTER } = {}) {
+    if (result?.status !== 'throttled') return result;
+    const runs = (Number.isInteger(prev?.throttledRuns) ? prev.throttledRuns : 0) + 1;
+    result.throttledRuns = runs;
+    if (runs >= persistAfter) {
+        result.status = 'error';
+        result.reason = `${result.reason} — on ${runs} consecutive runs, so no longer treated as a transient throttle`;
+        result.error = result.reason;
+    }
+    return result;
 }
 
 /**
@@ -1027,6 +1127,13 @@ export function apiAnswerIsDocument({ httpStatus = null, contentType = null, url
 export function decideOutcome({ httpStatus = null, networkErrorCode = null, blocked = false,
     sameHash = false, retriedAfterBackoff = false, unreadable = null, vendor = null,
     host = null, apiAnswer = false } = {}) {
+    // archive.org refusing OUR traffic is not a finding about the capture (`archivePushback`): the
+    // source is not looked at this run and is retried next run (`settleThrottle`).
+    if (archivePushback({ host, httpStatus, networkErrorCode })) {
+        const what = networkErrorCode === ARCHIVE_PAUSED ? 'not requested: archive.org pushed back earlier this run'
+            : `archive.org pushed back (${networkErrorCode ?? `http-${httpStatus}`}${retriedAfterBackoff ? ' after backoff' : ''})`;
+        return { status: 'throttled', reason: `${what} — our traffic, not the source; retried next run` };
+    }
     if (networkErrorCode) {
         if (networkErrorCode === 'ENOTFOUND') {
             return { status: 'gone', reason: 'dns: host does not resolve' };
@@ -1040,9 +1147,6 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
         // so it is a refusal with the reason rather than an error that fails every run.
         if (networkErrorCode === 'UNABLE_TO_VERIFY_LEAF_SIGNATURE') {
             return { status: 'blocked', reason: 'tls: incomplete certificate chain (the server omits its intermediate certificate)' };
-        }
-        if (networkErrorCode === 'ETIMEDOUT' && retriedAfterBackoff && tolerates503(host)) {
-            return { status: 'blocked', reason: 'network timeout after backoff (host temporarily unavailable)' };
         }
         return { status: 'error', reason: `network: ${networkErrorCode}` };
     }
@@ -1077,11 +1181,6 @@ export function decideOutcome({ httpStatus = null, networkErrorCode = null, bloc
         }
         return sameHash ? { status: 'ok', reason: 'same hash' } : { status: 'changed', reason: 'new hash' };
     }
-    // A host that is simply down today (archive.org's APIs were, on 2026-09-17) is recorded, not
-    // counted as a fault in our watch — see `tolerates503`.
-    if (httpStatus === 503 && retriedAfterBackoff && tolerates503(host)) {
-        return { status: 'blocked', reason: 'http-503 after backoff (host temporarily unavailable)' };
-    }
     if (httpStatus !== null) return { status: 'error', reason: `http-${httpStatus}` };
     return { status: 'error', reason: 'no response' };
 }
@@ -1108,14 +1207,18 @@ export function quotelessRefusal({ status, httpStatus = null, reason = '', quote
     };
 }
 
-/** A run fails on `error` only: `gone` is a finding about the citation, `blocked` is the host. */
+/**
+ * A run fails on `error` only: `gone` is a finding about the citation, `blocked` is the host, and
+ * `throttled` is archive.org pushing back on our own traffic — until it persists, when
+ * `settleThrottle` has already made it an `error`.
+ */
 export function runFailed(results) {
     return results.some((r) => r.status === 'error');
 }
 
-/** A restart can reuse completed outcomes, but transient errors must make a real request again. */
+/** A restart can reuse completed outcomes, but transient errors and throttles must make a real request again. */
 export function reusableCheckpoint(result) {
-    return Boolean(result) && result.status !== 'error';
+    return Boolean(result) && result.status !== 'error' && result.status !== 'throttled';
 }
 
 /**

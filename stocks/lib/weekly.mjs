@@ -301,6 +301,9 @@ export function weekSnapshotMoves(diffs, week, { slugs = {} } = {}) {
                 issuer: str(change.issuer),
                 cardSlug: str(slugs[change.mint]) ?? str(cardSlug(change.symbol, change.mint)),
                 note: str(change.note),
+                field: str(change.field),
+                before: change.before ?? null,
+                after: change.after ?? null,
                 date: diff.to,
                 previousDate: diff.from
             };
@@ -548,54 +551,261 @@ function sum(list, key) {
     return list.reduce((total, row) => total + (num(row[key]) ?? 0), 0);
 }
 
-function moveCount(digest, kind) {
-    return digest.moves.get(kind)?.length ?? 0;
+/** Severity words used by the journal, discrepancies and the change judge, worst highest. */
+const SEVERITY_RANK = { critical: 4, high: 3, warning: 3, caution: 2, medium: 2, low: 1, info: 1 };
+
+function severityRank(value) {
+    return SEVERITY_RANK[str(value)?.toLowerCase() ?? ''] ?? 0;
 }
 
-/** The headline lines, in reading order, each `{anchor, text, empty}`. Used by the page and og:description. */
-export function weekHeadlines(digest) {
-    const lines = [];
-    const material = digest.material;
-    lines.push({
-        anchor: 'material',
-        text: material === null ? 'Material changes: model assessments not available in this build'
-            : `${plural(material.length, 'material change')} (model assessment)`,
-        empty: material === null || material.length === 0
+/** How many named items one headline carries before the rest become "and N more". */
+const HEADLINE_ITEMS = 2;
+/** Characters one quoted item may take: two of them plus the frame stay readable on a phone. */
+const ITEM_CHARS = 80;
+
+/**
+ * The first sentence of a longer text, cut at a word boundary to `max` characters. Headlines name
+ * the thing; the section below carries the full reading.
+ */
+export function briefText(text, max = 100) {
+    // A long on-chain address is shortened the way wallets show it, so it cannot eat the line.
+    const clean = str(text)?.replace(/\s+/g, ' ').trim()
+        .replace(/\b[1-9A-HJ-NP-Za-km-z]{32,}\b|\b[a-z]{2,10}1[02-9ac-hj-np-z]{30,}\b/g, (addr) => `${addr.slice(0, 6)}…${addr.slice(-4)}`) ?? null;
+    if (clean === null) return null;
+    const sentence = (clean.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? clean).replace(/[.!?]$/, '');
+    if (sentence.length <= max) return sentence;
+    const cut = sentence.slice(0, max - 1);
+    const whole = /\s/.test(sentence[max - 1]) ? cut : cut.replace(/\s+\S*$/, '');
+    return `${whole.replace(/[\s,;:—–-]+$/, '')}…`;
+}
+
+/** " — and 3 more material changes", or '' when nothing is left over. */
+function andMore(n, one, many = `${one}s`) {
+    return n > 0 ? ` — and ${fmtNumber(n, 0)} more ${n === 1 ? one : many}` : '';
+}
+
+/** "a", "a and b", "a, b and c". */
+function listJoin(items) {
+    if (items.length <= 1) return items[0] ?? '';
+    return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+}
+
+/** "25 %" from a ratio 0.25; one decimal below 10 %. Null for a missing ratio. */
+function pctText(ratio) {
+    if (num(ratio) === null) return null;
+    const p = Math.abs(ratio) * 100;
+    return `${p >= 10 ? Math.round(p) : Math.round(p * 10) / 10} %`;
+}
+
+/** "$188.2k" / "$450"; null for a missing amount (never "$0"). */
+function usdText(value) {
+    if (num(value) === null) return null;
+    if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+    if (Math.abs(value) >= 1000) return `$${(value / 1000).toFixed(1)}k`;
+    return `$${Math.round(value)}`;
+}
+
+/** A stored number that may be a numeric string (`uiMultiplier`), or null. */
+function numeric(value) {
+    if (typeof value === 'string' && value.trim() !== '') return num(Number(value));
+    return num(value);
+}
+
+/**
+ * The status moves of the week as ranked stories, most significant first: pauses, frozen holders,
+ * control flips and balance restatements first; health slides grouped per level they fell to;
+ * liquidity by dollars moved; routine multiplier drift last. Each story says which moves it covers.
+ */
+export function rankStatusMoves(moves) {
+    const stories = [];
+    const rows = (kind) => moves?.get?.(kind) ?? [];
+    const sym = (row) => row.symbol ?? row.mint ?? 'a token';
+    for (const row of rows('paused')) stories.push({ score: 100, covers: 1, text: `${sym(row)} transfers or trading paused` });
+    for (const row of rows('frozen-appeared')) {
+        const frozen = numeric(row.after);
+        stories.push({ score: 90, covers: 1, text: frozen === null ? `${sym(row)}: frozen accounts appeared in the top 20 holders`
+            : `${sym(row)}: ${fmtNumber(frozen, 0)} of the top 20 holder accounts frozen` });
+    }
+    for (const row of rows('control-change')) {
+        const flag = row.field ?? 'a control';
+        const to = row.after === true ? 'switched on' : row.after === false ? 'switched off' : 'flipped';
+        stories.push({ score: 80, covers: 1, text: `${sym(row)}: issuer ${flag} control ${to}` });
+    }
+    for (const kind of ['rebase', 'reverse-split']) {
+        for (const row of rows(kind)) {
+            const before = numeric(row.before);
+            const after = numeric(row.after);
+            const ratio = before !== null && after !== null && before !== 0 ? after / before : null;
+            const move = ratio === null ? null : pctText(ratio - 1);
+            stories.push({ score: 70 + (ratio === null ? 0 : Math.min(Math.abs(ratio - 1), 9)), covers: 1,
+                text: `${sym(row)} holder balances restated ${kind === 'rebase' ? 'up' : 'down'}${move === null ? '' : ` ${move}`} without a transfer` });
+        }
+    }
+    for (const row of rows('unpaused')) stories.push({ score: 60, covers: 1, text: `${sym(row)} transfers or trading resumed` });
+    const health = new Map();
+    for (const row of rows('health-worse')) {
+        const level = str(row.after) ?? 'a worse level';
+        if (!health.has(level)) health.set(level, []);
+        health.get(level).push(row);
+    }
+    for (const [level, list] of health) {
+        const named = list.slice(0, 2).map(sym);
+        const text = list.length <= 2 ? `health fell to ${level} on ${listJoin(named)}`
+            : `health fell to ${level} on ${named.join(', ')} and ${plural(list.length - 2, 'other token')}`;
+        stories.push({ score: (level === 'warning' ? 55 : 35) + Math.min(list.length, 999) / 1000, covers: list.length, text });
+    }
+    for (const kind of ['liquidity-drop', 'liquidity-rise']) {
+        for (const row of rows(kind)) {
+            const before = numeric(row.before);
+            const after = numeric(row.after);
+            const moved = before !== null && after !== null ? Math.abs(after - before) : null;
+            const share = moved !== null && before > 0 ? pctText(moved / before) : null;
+            const verb = kind === 'liquidity-drop' ? 'fell' : 'rose';
+            const range = moved === null ? '' : ` (${usdText(before)} → ${usdText(after)})`;
+            stories.push({ score: (kind === 'liquidity-drop' ? 45 : 20) + (moved === null ? 0 : 9 * moved / (moved + 1e5)), covers: 1,
+                text: `${sym(row)} pool liquidity ${verb}${share === null ? '' : ` ${share}`}${range}` });
+        }
+    }
+    for (const row of rows('spread-wide')) {
+        const after = numeric(row.after);
+        stories.push({ score: 30 + (after === null ? 0 : Math.min(after, 100) / 100), covers: 1,
+            text: `${sym(row)} price gap between venues widened${after === null ? ' past 5 %' : ` to ${after.toFixed(1)} %`}` });
+    }
+    const better = rows('health-better');
+    if (better.length > 0) {
+        const named = better.slice(0, 2).map(sym);
+        stories.push({ score: 10, covers: better.length, text: better.length <= 2 ? `health improved on ${listJoin(named)}`
+            : `health improved on ${named.join(', ')} and ${plural(better.length - 2, 'other token')}` });
+    }
+    const drift = rows('multiplier-change');
+    if (drift.length > 0) {
+        const named = drift.slice(0, 2).map(sym);
+        stories.push({ score: 5, covers: drift.length, text: `displayed balances drifted (scaled-UI multiplier) on ${drift.length <= 2 ? listJoin(named)
+            : `${named.join(', ')} and ${plural(drift.length - 2, 'other token')}`}` });
+    }
+    // Stable: equal scores keep the snapshot diff's own (mint) order.
+    return stories.map((story, i) => ({ ...story, i })).sort((a, b) => b.score - a.score || a.i - b.i)
+        .map(({ i, ...story }) => story);
+}
+
+/** Watcher event kinds in plain English, most telling first; kinds not listed come after these. */
+const EVENT_KINDS = [
+    ['litigation', 'litigation filing'], ['insolvency', 'insolvency notice'], ['regulator-notice', 'regulator notice'],
+    ['entity-status', 'company-register status change'], ['authority-key', 'token key change'],
+    ['extension-toggle', 'token feature toggle'], ['document-gone', 'source document taken down', 'source documents taken down'],
+    ['quote-lost', 'quoted claim no longer found', 'quoted claims no longer found'], ['legal-term', 'legal-wording change'],
+    ['rebase', 'multiplier update'], ['treasury', 'treasury movement'], ['supply', 'token supply change']
+];
+
+function eventsPhrase(events) {
+    const order = new Map(EVENT_KINDS.map(([kind], i) => [kind, i]));
+    const kinds = Object.entries(events.byKind).filter(([, n]) => num(n) !== null && n > 0)
+        .sort(([a], [b]) => (order.get(a) ?? 99) - (order.get(b) ?? 99) || byText(a, b));
+    const shown = kinds.slice(0, HEADLINE_ITEMS).map(([kind, n]) => {
+        const entry = EVENT_KINDS.find(([k]) => k === kind);
+        const one = entry?.[1] ?? `${humanizeSlug(kind).toLowerCase()} event`;
+        return plural(n, one, entry?.[2] ?? `${one}s`);
     });
-    const journal = digest.journal.length;
-    lines.push({ anchor: 'journal', text: `${plural(journal, 'issuer, venue or protocol change')} in the change journal`, empty: journal === 0 });
-    const added = sum(digest.newTokens, 'count');
-    const removed = digest.removed.length;
-    lines.push({
-        anchor: 'tokens',
-        text: `${plural(added, 'token')} joined the universe, ${fmtNumber(removed, 0)} removed`,
-        empty: added === 0 && removed === 0
+    const rest = kinds.slice(HEADLINE_ITEMS).reduce((total, [, n]) => total + n, 0);
+    return `watchers logged ${listJoin(rest > 0 ? [...shown, `${fmtNumber(rest, 0)} other changes`] : shown)}`;
+}
+
+function materialHeadline(digest) {
+    const rows = digest.material;
+    if (rows === null) return { text: 'Material changes: model assessments not available in this build', empty: true };
+    if (rows.length === 0) return { text: 'No change this week was read as material (model assessment)', empty: true };
+    // Worst first, newest first within a severity (rows arrive newest first); one story per issuer.
+    const ranked = rows.map((row, i) => ({ row, i })).sort((a, b) => severityRank(b.row.assessmentSeverity) - severityRank(a.row.assessmentSeverity) || a.i - b.i);
+    const seen = new Set();
+    const picked = [];
+    for (const { row } of ranked) {
+        const who = issuerName(row.issuerSlug, digest.issuerNames);
+        const key = who ?? `row:${row.id}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const what = briefText(row.assessment, ITEM_CHARS) ?? briefText(row.change, ITEM_CHARS) ?? row.kind ?? 'a change';
+        picked.push(`${who ? `${who}: ` : ''}${what}${row.assessmentSeverity ? ` (${row.assessmentSeverity})` : ''}`);
+        if (picked.length === HEADLINE_ITEMS) break;
+    }
+    return { text: `Material (model assessment): ${picked.join('; ')}${andMore(rows.length - picked.length, 'material change')}`, empty: false };
+}
+
+const JOURNAL_WEIGHT = { 'actor-change': 3, 'protocol-change': 2, catalogue: 0 };
+
+function journalHeadline(digest) {
+    const rows = digest.journal;
+    if (rows.length === 0) return { text: 'The change journal recorded no issuer, venue or protocol change', empty: true };
+    const ranked = rows.map((item, i) => ({ item, i })).sort((a, b) => severityRank(b.item.severity) - severityRank(a.item.severity)
+        || (JOURNAL_WEIGHT[b.item.category] ?? 1) - (JOURNAL_WEIGHT[a.item.category] ?? 1)
+        || (Array.isArray(b.item.assets) ? b.item.assets.length : 0) - (Array.isArray(a.item.assets) ? a.item.assets.length : 0)
+        || a.i - b.i);
+    const picked = ranked.map(({ item }) => briefText(item.title, ITEM_CHARS) ?? briefText(item.summary, ITEM_CHARS)).filter((text) => text !== null).slice(0, HEADLINE_ITEMS);
+    return { text: `${picked.join('; ')}${andMore(rows.length - picked.length, 'issuer, venue or protocol change')}`, empty: false };
+}
+
+function tokensHeadline(digest) {
+    const groups = digest.newTokens;
+    const removed = digest.removed;
+    const addedParts = groups.slice(0, 3).map((group) => {
+        const symbols = group.tokens.map((row) => row.symbol).filter((symbol) => symbol !== null);
+        return group.count <= 3 && symbols.length === group.count ? `${listJoin(symbols)} (${group.issuerName})`
+            : `${plural(group.count, `${group.issuerName} token`)}`;
     });
-    const covered = digest.redemptions.observed.filter((row) => row.redemptions !== null);
-    const redeemed = sum(covered, 'redemptions');
-    lines.push({
-        anchor: 'redemptions',
-        text: covered.length === 0 ? 'Redemptions: no observation feed covered this week'
-            : `${plural(redeemed, 'redemption')} observed on-chain across ${plural(covered.length, 'watched issuer')}`,
-        empty: covered.length === 0
-    });
-    const worse = moveCount(digest, 'health-worse');
-    const better = moveCount(digest, 'health-better');
-    const otherMoves = [...digest.moves.values()].reduce((total, list) => total + list.length, 0) - worse - better;
-    lines.push({
-        anchor: 'status',
-        text: digest.pairs.length === 0 ? 'Health moves: no snapshot comparison in this week'
-            : `Health: ${fmtNumber(worse, 0)} worse, ${fmtNumber(better, 0)} better · ${plural(otherMoves, 'other status move')}`,
-        empty: digest.pairs.length === 0
-    });
+    const moreIssuers = groups.slice(3).reduce((total, group) => total + group.count, 0);
+    if (moreIssuers > 0) addedParts.push(`${plural(moreIssuers, 'token')} from ${plural(groups.length - 3, 'other issuer')}`);
+    const gone = removed.map((row) => row.symbol ?? row.mint).filter((name) => name !== null);
+    const removedText = removed.length === 0 ? 'none removed'
+        : `removed: ${gone.slice(0, 3).join(', ')}${removed.length > 3 ? ` and ${fmtNumber(removed.length - 3, 0)} more` : ''}`;
+    if (groups.length === 0) {
+        return { text: removed.length === 0 ? 'No token joined or left the universe' : `No token joined the universe; ${removedText}`, empty: removed.length === 0 };
+    }
+    return { text: `New in the universe: ${listJoin(addedParts)}; ${removedText}`, empty: false };
+}
+
+function redemptionHeadline(digest) {
+    const covered = digest.redemptions.observed.filter((row) => num(row.redemptions) !== null && num(row.coveredHours) !== null && row.coveredHours > 0);
+    if (covered.length === 0) return { text: 'Redemptions: no observation feed covered this week', empty: true };
+    const ranked = [...covered].sort((a, b) => b.redemptions - a.redemptions || byText(a.issuer, b.issuer));
+    const parts = ranked.slice(0, 3).map((row) => `${fmtNumber(row.redemptions, 0)} for ${row.issuerName} (${fmtNumber(row.coveredHours, 1)} of 168 h scanned)`);
+    return { text: `Redemptions observed on-chain: ${listJoin(parts)}${andMore(ranked.length - parts.length, 'watched issuer')}`, empty: false };
+}
+
+function statusHeadline(digest) {
+    if (digest.pairs.length === 0) return { text: 'Health moves: no snapshot comparison in this week', empty: true };
+    const stories = rankStatusMoves(digest.moves);
+    if (stories.length === 0) return { text: 'No health or status move between this week\'s snapshots', empty: true };
+    const shown = stories.slice(0, HEADLINE_ITEMS);
+    const rest = stories.slice(HEADLINE_ITEMS).reduce((total, story) => total + story.covers, 0);
+    const text = shown.map((story) => story.text).join('; ');
+    return { text: `${text.charAt(0).toUpperCase()}${text.slice(1)}${andMore(rest, 'status move')}`, empty: false };
+}
+
+function evidenceHeadline(digest) {
+    const rows = digest.discrepancies;
     const events = digest.events;
-    lines.push({
-        anchor: 'evidence',
-        text: `${plural(digest.discrepancies.length, 'new discrepancy', 'new discrepancies')}`
-            + (events === null ? '' : ` · ${plural(events.total, 'watcher change event')}`),
-        empty: digest.discrepancies.length === 0 && (events === null || events.total === 0)
-    });
-    return lines;
+    const ranked = rows.map((row, i) => ({ row, i })).sort((a, b) => severityRank(b.row.severity) - severityRank(a.row.severity) || a.i - b.i);
+    const top = ranked[0]?.row ?? null;
+    const disc = top === null ? 'No new claim-versus-reality discrepancy'
+        : `${top.issuerName ?? top.issuer}: ${briefText(top.title, ITEM_CHARS) ?? 'a claim differs from the record'}`
+            + ` (new discrepancy${rows.length > 1 ? `, ${fmtNumber(rows.length - 1, 0)} more this week` : ''})`;
+    const watched = events === null || events.total === 0 ? '' : `; ${eventsPhrase(events)}`;
+    return { text: `${disc}${watched}`, empty: rows.length === 0 && (events === null || events.total === 0) };
+}
+
+/**
+ * The headline lines, in reading order, each `{anchor, text, empty}`. Each names the week's most
+ * significant items — the token, issuer, what changed and by how much — with the rest of the section
+ * as a trailing "and N more". Used by the page, the weekly index and og:description.
+ */
+export function weekHeadlines(digest) {
+    return [
+        { anchor: 'material', ...materialHeadline(digest) },
+        { anchor: 'journal', ...journalHeadline(digest) },
+        { anchor: 'tokens', ...tokensHeadline(digest) },
+        { anchor: 'redemptions', ...redemptionHeadline(digest) },
+        { anchor: 'status', ...statusHeadline(digest) },
+        { anchor: 'evidence', ...evidenceHeadline(digest) }
+    ];
 }
 
 export function ogTitle(digest) {

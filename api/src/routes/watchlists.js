@@ -69,10 +69,13 @@ async function validateProducts(payload) {
         }
         return;
     }
+    // A comparison is keyed as the pages key it (stocks/lib/discovery.js comparisonKey): the listed
+    // ticker, else the pre-IPO company the token references (OPENAI, KALSHI), which has no ticker.
     const { rows } = await query(`
         SELECT DISTINCT issuer_slug
         FROM sonar.stock_token
-        WHERE upper(underlying_ticker) = $1 AND issuer_slug = ANY($2::text[])
+        WHERE upper(COALESCE(NULLIF(btrim(underlying_ticker), ''), company_key)) = $1
+          AND issuer_slug = ANY($2::text[])
         ORDER BY issuer_slug`, [payload.ticker, payload.issuers]);
     const found = rows.map((row) => row.issuer_slug);
     if (found.length !== payload.issuers.length) {

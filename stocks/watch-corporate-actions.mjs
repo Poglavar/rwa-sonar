@@ -19,7 +19,7 @@ import { join, relative } from 'node:path';
 
 import {
     MINT_STATE_RUNS_QUERY, STORED_VERDICTS_QUERY, TOLERANCES, buildActionUpsertSql, buildCheckSql,
-    formatTelegramSummary, groupRuns, multiplierSteps, newFindings, parseYahooChart,
+    actionEvents, formatTelegramSummary, groupRuns, multiplierSteps, newFindings, parseYahooChart,
     programmePolicy, reconcileToken, snapshotSteps, summarise, yahooChartUrl, yahooSymbolFor
 } from './lib/corporate-actions.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
@@ -27,6 +27,7 @@ import { readEnvFile } from './lib/env.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { postTelegram } from './lib/telegram.mjs';
+import { buildChangeEventSql } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
@@ -236,6 +237,7 @@ async function main() {
     const tokensByMint = new Map(tokens.map((t) => [t.mint, t]));
     let history;
     let stored = new Map();
+    let storedRows = [];
     if (noDb) {
         history = await historyFromSnapshots();
     } else {
@@ -243,6 +245,7 @@ async function main() {
         log(`db: ${describeUrl(dbUrl)}`);
         history = await historyFromDb(dbUrl, tokensByMint);
         const rows = JSON.parse((await psql(dbUrl, STORED_VERDICTS_QUERY, 'stored verdicts', ['-t', '-A'])).trim() || '[]');
+        storedRows = rows;
         stored = new Map(rows.map((r) => [`${r.mint}|${r.checkKey}`, r.verdict]));
         log(`db: ${stored.size} stored verdict(s)`);
     }
@@ -347,6 +350,9 @@ async function main() {
     // --- store -------------------------------------------------------------------------------------------
     if (!noDb) {
         await psql(dbUrl, wrapTransaction(buildCheckSql(checks, { mints: reconciledMints, since, checkedAt: nowIso })), 'corporate action checks');
+        const events = actionEvents(checks, storedRows, nowIso);
+        if (events.length) await psql(dbUrl, wrapTransaction([buildChangeEventSql(events).sql]), 'corporate-action change events');
+        log(`db: ${events.length} corporate-action event(s) current (already stored ones are skipped)`);
         const back = (await psql(dbUrl, `SELECT (SELECT count(*) FROM sonar.corporate_action) || '|' || (SELECT count(*) FROM sonar.corporate_action_check)
             || '|' || (SELECT count(*) FROM sonar.corporate_action_check WHERE verdict IN ('late','wrong-ratio','missing','unexplained'));`, 'counts', ['-t', '-A'])).trim().split('|');
         log(`db: ${back[0]} corporate action(s), ${back[1]} check(s) stored, ${back[2]} of them findings`);

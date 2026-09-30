@@ -5,8 +5,8 @@
 // labelled as such and link to their diff, and that an unreadable database shows as not read.
 
 import {
-    LIST_LIMIT, WEEKLY_OG_IMAGE, buildWeek, dataAsOf, inWeek, isoWeekOf, issuerPageSlug, ogDescription, parseTableProbe,
-    renderWeekPage, renderWeeklyIndex, summariseSnapshot, weekFromId, weekHeadlines, weekMaterialChanges,
+    LIST_LIMIT, WEEKLY_OG_IMAGE, briefText, buildWeek, dataAsOf, inWeek, isoWeekOf, issuerPageSlug, ogDescription, parseTableProbe,
+    rankStatusMoves, renderWeekPage, renderWeeklyIndex, summariseSnapshot, weekFromId, weekHeadlines, weekMaterialChanges,
     weekNewTokens, weekRange, weekRedemptions, weeklyDbSql, weeksBetween
 } from './lib/weekly.mjs';
 
@@ -177,7 +177,7 @@ describe('page', () => {
         expect(html).toContain('weekly.css?v=20260924d');
         expect(renderWeekPage(digest)).not.toContain('rel="canonical"');
         expect(ogDescription(digest).length).toBeLessThanOrEqual(200);
-        expect(ogDescription(digest)).toMatch(/^21–27 Sep 2026, in progress: 1 material change \(model assessment\)/);
+        expect(ogDescription(digest)).toMatch(/^21–27 Sep 2026, in progress: Material \(model assessment\): Kraken xStocks: Redemption now needs issuer consent \(warning\);/);
     });
 
     test('the week carries its own preview image, Report + breadcrumb JSON-LD and the contact footer', () => {
@@ -185,7 +185,7 @@ describe('page', () => {
         const html = renderWeekPage(digest, { baseUrl: 'https://rwasonar.com', ogImage: image });
         expect(html).toContain(`<meta property="og:image" content="${image.url}" />`);
         expect(html).toContain(`<meta name="twitter:image" content="${image.url}" />`);
-        const description = html.match(/<meta name="description" content="([^"]*)"/)[1];
+        const description = html.match(/<meta name="description" content="([^"]*)"/)[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
         expect(description.length).toBeLessThanOrEqual(160);
         const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
         expect(ld['@graph'].map((node) => node['@type'])).toEqual(['Organization', 'Report', 'BreadcrumbList']);
@@ -315,5 +315,97 @@ describe('issuerPageSlug', () => {
         expect(issuerPageSlug('unknown-co', names)).toBeNull();
         expect(issuerPageSlug('securitizer', names)).toBeNull();
         expect(issuerPageSlug(null, names)).toBeNull();
+    });
+});
+
+describe('headlines name the concrete thing, most significant first', () => {
+    const issuers = [
+        { slug: 'xstocks-backed', name: 'Kraken xStocks', status: 'live', redemption: { observationFeed: { daily: { '2026-09-22': { redemptions: 44, coveredHours: 70.5 } } } },
+            discrepancies: [{ id: 'd1', title: 'Reserves cover fewer tokens', severity: 'caution', observedAt: '2026-09-23' }] },
+        { slug: 'ondo-global-markets', name: 'Ondo Global Markets', status: 'live', redemption: { observationFeed: { daily: { '2026-09-22': { redemptions: 1002, coveredHours: 116.9 } } } },
+            discrepancies: [{ id: 'd2', title: 'README implies Pyth validates prices. The code does not.', severity: 'warning', observedAt: '2026-09-22' }] },
+        { slug: 'tessera', name: 'Tessera', status: 'live', redemption: { observationFeed: { daily: { '2026-09-22': { redemptions: 3, coveredHours: 0 } } } } }
+    ];
+    const lines = (overrides) => Object.fromEntries(weekHeadlines(buildWeek(W39, W38, '2026-09-28T00:00:00Z', inputs({ issuers, ...overrides })))
+        .map((line) => [line.anchor, line]));
+
+    test('material: worst severity first, one story per issuer, the rest as "and N more"', () => {
+        const material = [
+            { id: '1', detectedAt: '2026-09-26T00:00:00Z', material: true, assessmentSeverity: 'info', assessmentSummary: 'Fee page reworded.', issuerSlug: 'ondo-global-markets' },
+            { id: '2', detectedAt: '2026-09-24T00:00:00Z', material: true, assessmentSeverity: 'warning', assessmentSummary: 'Dividends are now paid. Before they were not.', issuerSlug: 'xstocks-backed' },
+            { id: '3', detectedAt: '2026-09-22T00:00:00Z', material: true, assessmentSeverity: 'critical', assessmentSummary: 'The platform announced it is shutting down.', issuerSlug: 'tessera' },
+            { id: '4', detectedAt: '2026-09-21T00:00:00Z', material: true, assessmentSeverity: 'critical', assessmentSummary: 'Second Tessera reading.', issuerSlug: 'tessera' }
+        ];
+        expect(lines({ material }).material).toEqual({ anchor: 'material', empty: false,
+            text: 'Material (model assessment): Tessera: The platform announced it is shutting down (critical); '
+                + 'Kraken xStocks: Dividends are now paid (warning) — and 2 more material changes' });
+        expect(lines({ material: [] }).material).toMatchObject({ empty: true, text: 'No change this week was read as material (model assessment)' });
+    });
+
+    test('journal: the most severe issuer change is named before routine catalogue additions', () => {
+        const journal = [
+            { id: 'a', date: '2026-09-25', category: 'catalogue', severity: 'info', title: '98 Kraken xStocks token addresses entered the tracked catalogue', assets: new Array(98).fill({}) },
+            { id: 'b', date: '2026-09-24', category: 'actor-change', severity: 'warning', title: 'PreStocks scheduled a 3 % transfer fee on 7 of its 8 tokens', assets: [] },
+            { id: 'c', date: '2026-09-23', category: 'protocol-change', severity: 'warning', title: 'BACx left Meteora', assets: [{}] }
+        ];
+        expect(lines({ journal }).journal.text).toBe('PreStocks scheduled a 3 % transfer fee on 7 of its 8 tokens; BACx left Meteora — and 1 more issuer, venue or protocol change');
+    });
+
+    test('tokens: small groups by symbol, large groups by count, removals by symbol', () => {
+        const tokens = [
+            ...Array.from({ length: 5 }, (_, i) => ({ mint: `x${i}`, symbol: `X${i}x`, issuer: 'xstocks-backed', firstSeenAt: '2026-09-22T00:00:00Z' })),
+            { mint: 'n1', symbol: 'NOK', issuer: 'tessera', firstSeenAt: '2026-09-23T00:00:00Z' }
+        ];
+        const diffs = [{ from: '2026-09-21', to: '2026-09-22', changes: [{ kind: 'removed-mint', mint: 'o1', symbol: 'OLDx', issuer: 'xstocks-backed' }] }];
+        expect(lines({ tokens, diffs }).tokens.text).toBe('New in the universe: 5 Kraken xStocks tokens and NOK (Tessera); removed: OLDx');
+    });
+
+    test('redemptions: largest first with the hours scanned; an uncovered feed is left out, never 0', () => {
+        const text = lines({}).redemptions.text;
+        expect(text).toBe('Redemptions observed on-chain: 1,002 for Ondo Global Markets (116.9 of 168 h scanned) and 44 for Kraken xStocks (70.5 of 168 h scanned)');
+        expect(text).not.toContain('Tessera');
+    });
+
+    test('status: a pause outranks a liquidity drop, which carries its dollars; health slides are grouped', () => {
+        const diffs = [{ from: '2026-09-21', to: '2026-09-22', changes: [
+            { kind: 'multiplier-change', mint: 'm0', symbol: 'VTIon', issuer: 'ondo-global-markets', field: 'uiMultiplier', before: '1.0', after: '1.002' },
+            { kind: 'health-worse', mint: 'm1', symbol: 'AAPLx', issuer: 'xstocks-backed', field: 'health', before: 'caution', after: 'warning' },
+            { kind: 'health-worse', mint: 'm2', symbol: 'TSLAx', issuer: 'xstocks-backed', field: 'health', before: 'caution', after: 'warning' },
+            { kind: 'health-worse', mint: 'm3', symbol: 'NVDAx', issuer: 'xstocks-backed', field: 'health', before: 'caution', after: 'warning' },
+            { kind: 'liquidity-drop', mint: 'm4', symbol: 'BABA', issuer: 'backpack-securities', field: 'liquidity', before: 188200, after: 79600 },
+            { kind: 'paused', mint: 'm5', symbol: 'SPYx', issuer: 'xstocks-backed', field: 'paused', before: false, after: true }
+        ] }];
+        // Two stories at most: the rest (the liquidity drop, the multiplier drift) are counted.
+        expect(lines({ diffs }).status.text).toBe('SPYx transfers or trading paused; health fell to warning on AAPLx, TSLAx and 1 other token'
+            + ' — and 2 more status moves');
+    });
+
+    test('a move with a missing measurement names the move but never prints 0', () => {
+        const moves = new Map([
+            ['liquidity-drop', [{ kind: 'liquidity-drop', symbol: 'GPRO', before: null, after: 27400 }]],
+            ['rebase', [{ kind: 'rebase', symbol: 'APHx', before: '1', after: null }]],
+            ['frozen-appeared', [{ kind: 'frozen-appeared', symbol: 'AMC', before: 0, after: null }]],
+            ['spread-wide', [{ kind: 'spread-wide', symbol: 'DKNG', before: 1.97, after: undefined }]]
+        ]);
+        const texts = rankStatusMoves(moves).map((story) => story.text);
+        expect(texts).toEqual(['AMC: frozen accounts appeared in the top 20 holders', 'APHx holder balances restated up without a transfer',
+            'GPRO pool liquidity fell', 'DKNG price gap between venues widened past 5 %']);
+        expect(texts.join(' ')).not.toMatch(/\b0\b|\$0|NaN|null/);
+        const full = new Map([['rebase', [{ kind: 'rebase', symbol: 'APHx', before: '1', after: '2' }]]]);
+        expect(rankStatusMoves(full)[0].text).toBe('APHx holder balances restated up 100 % without a transfer');
+    });
+
+    test('evidence: the worst new discrepancy is named, watcher events in plain English, telling kinds first', () => {
+        const events = [{ week: '2026-09-21', kind: 'supply', events: 1800 }, { week: '2026-09-21', kind: 'litigation', events: 4 },
+            { week: '2026-09-21', kind: 'extension-toggle', events: 1 }, { week: '2026-09-21', kind: 'rebase', events: 261 }];
+        expect(lines({ events }).evidence.text).toBe('Ondo Global Markets: README implies Pyth validates prices (new discrepancy, 1 more this week); '
+            + 'watchers logged 4 litigation filings, 1 token feature toggle and 2,061 other changes');
+        expect(lines({ events: null, issuers: [] }).evidence).toMatchObject({ empty: true, text: 'No new claim-versus-reality discrepancy' });
+    });
+
+    test('briefText keeps the first sentence, shortens long addresses and cuts at a word', () => {
+        expect(briefText('The API now returns ALTP6gug9wv5mFtx2tSU1YYZ1NrEc2chDdMPoJA8f8pu as not tradable. More text.')).toBe('The API now returns ALTP6g…f8pu as not tradable');
+        expect(briefText('one two three four five', 12)).toBe('one two…');
+        expect(briefText(null)).toBeNull();
     });
 });

@@ -296,12 +296,12 @@ describe('change events and model assessments in a digest', () => {
     test('the target query matches the watch\'s exact target and reads the judgment only where the table exists', () => {
         const issuer = buildTargetChangesSql(ISSUER_WATCH, '2026-09-20T00:00:00Z', '2026-09-24T07:30:00Z', { judgments: true });
         expect(issuer.values).toEqual(['tessera', '2026-09-20T00:00:00Z', '2026-09-24T07:30:00Z']);
-        expect(issuer.text).toContain('LEFT JOIN LATERAL');
+        expect(issuer.text).toContain('sonar.change_judgment');
         expect(issuer.text).toContain('mj.id AS judgment_id');
         expect(issuer.text).toContain("e.evidence->>'issuer'");
         const token = buildTargetChangesSql(marketWatch(), 'a', 'b', { judgments: false });
         expect(token.values[0]).toBe(MINT);
-        expect(token.text).not.toContain('LATERAL');
+        expect(token.text).not.toContain('change_judgment');
         expect(token.text).toContain('NULL::jsonb AS "modelAssessment"');
         const comparison = buildTargetChangesSql({ watch_type: 'comparison', target: {}, issuer_slugs: ['a', 'b'] }, 'x', 'y');
         expect(comparison.values[0]).toEqual(['a', 'b']);

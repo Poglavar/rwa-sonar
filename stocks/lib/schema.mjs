@@ -21,7 +21,7 @@ export const SCHEMA_FILES = [
     '2026-09-23-sonar-caselaw.sql',
     '2026-09-23-sonar-change-judgment.sql',
     '2026-09-24-sonar-lending.sql',
-    '2026-09-24-sonar-source-unreadable.sql',
+    '2026-10-02-sonar-source-retired.sql',
     '2026-10-01-sonar-reserves.sql',
     '2026-10-01-sonar-entities.sql',
     '2026-10-01-sonar-corporate-actions.sql',
@@ -34,5 +34,7 @@ export const SCHEMA_FILES = [
 /** Files kept for the record but never applied again, with the reason. */
 export const SUPERSEDED_SCHEMA_FILES = {
     '2026-09-24-sonar-source-reachable.sql': 'its narrower source status list would fail against `unreadable` rows; '
-        + '2026-09-24-sonar-source-unreadable.sql states the same list plus `unreadable`'
+        + '2026-09-24-sonar-source-unreadable.sql states the same list plus `unreadable`',
+    '2026-09-24-sonar-source-unreadable.sql': 'its source status list would fail against `retired` rows; '
+        + '2026-10-02-sonar-source-retired.sql states the same list plus `retired`'
 };

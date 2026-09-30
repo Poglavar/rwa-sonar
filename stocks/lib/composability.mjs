@@ -16,7 +16,7 @@ export const EXIT_QUALITY_LABELS = {
     conditional: 'Conditional market exit',
     'issuer-dependent': 'Issuer-dependent exit',
     fragile: 'Fragile exit',
-    unavailable: 'No source-listed collateral route',
+    unavailable: 'No protocol lists it as collateral',
     unknown: 'Exit quality unknown'
 };
 
@@ -52,16 +52,16 @@ export function lenderExitQuality(template, integrations = [], redemption = null
     let reason = 'The legal/control template or an exit route has not been sufficiently established.';
     if (collateral.length === 0) {
         rating = 'unavailable';
-        reason = 'No checked protocol source currently lists this exact token as programmatic collateral.';
+        reason = 'No protocol we checked lists this exact token as collateral.';
     } else if (['issuer-mediated', 'weak-claim'].includes(defaultOutcome)) {
         rating = 'issuer-dependent';
         reason = 'Code can hold the balance, but seizure or realisation still depends on issuer recognition, allowlisting, or a claim weaker than possession suggests.';
     } else if (defaultOutcome === 'onchain-enforceable' && dex.length > 0 && !['issuer-can-freeze', 'issuer-may-recover'].includes(hackOutcome)) {
         rating = 'autonomous';
-        reason = 'A source-listed lending market names the exact token, the reviewed template says seizure is onchain-enforceable, and an observed pool supplies a smart-contract sale route without a reviewed issuer override. Execution was not independently tested.';
+        reason = 'A lending protocol’s own list names the exact token, the reviewed template says seizure is onchain-enforceable, and an observed pool supplies a smart-contract sale route without a reviewed issuer override. Execution was not independently tested.';
     } else if (dex.length > 0) {
         rating = 'conditional';
-        reason = 'A source-listed collateral market and observed on-chain pool indicate a possible route, but execution was not independently tested and issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
+        reason = 'A lending protocol that lists it as collateral and a live on-chain pool indicate a possible route, but execution was not independently tested and issuer controls, transfer conditions, or thin liquidity may prevent full realisation.';
     } else if (redemptionAvailable) {
         rating = 'issuer-dependent';
         reason = redemptionKyc

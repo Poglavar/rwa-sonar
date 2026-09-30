@@ -30,6 +30,7 @@ const {
     indexEntry,
     ogDescription,
     ogTitle,
+    transferRestrictionWords,
     publicCard,
     renderCard,
     shortAddress,
@@ -291,6 +292,26 @@ describe('truncate and shortAddress', () => {
 
 // --- OpenGraph --------------------------------------------------------------------------------
 
+describe('transferRestrictionWords', () => {
+    it('says who may hold and move the token in plain words, leaving unknown flags out', () => {
+        expect(transferRestrictionWords({ allowlist: false, kycToHold: false, usPersonsExcluded: true, mechanism: 'permanent-delegate' }))
+            .toBe('Any wallet can hold it; no identity check to hold; not for US persons; enforced by: an issuer key can move or burn tokens in any wallet');
+        expect(transferRestrictionWords({ allowlist: true, kycToHold: true, usPersonsExcluded: false, mechanism: 'program-mediated — accounts are born frozen.' }))
+            .toBe('Only wallets the issuer has approved can hold it; holders must pass the issuer’s identity check (KYC); US persons may hold it; '
+                + 'enforced by: a program must approve each wallet before it can hold the token. Accounts are born frozen.');
+        expect(transferRestrictionWords({ allowlist: null, kycToHold: null, usPersonsExcluded: null, mechanism: 'Twelve-month lock-up.' }))
+            .toBe('How it is enforced: Twelve-month lock-up.');
+        expect(transferRestrictionWords({ allowlist: null, kycToHold: null, usPersonsExcluded: null, mechanism: null })).toBeNull();
+        expect(transferRestrictionWords(null)).toBeNull();
+    });
+
+    it('replaces the raw flags row on the card', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(html).toContain('Who may hold and move it');
+        expect(html).not.toMatch(/allowlist (yes|no)|KYC to hold (yes|no)|US persons excluded (yes|no)/);
+    });
+});
+
 describe('ogDescription', () => {
     it('stays inside the OpenGraph limit on every real token', () => {
         for (const token of tokenDb.tokens) {
@@ -304,8 +325,19 @@ describe('ogDescription', () => {
     it('names the issuer, the claim, the premium and the depth', () => {
         const description = ogDescription(cardFor('NVDAx'));
         expect(description).toMatch(/xStocks/i);
-        expect(description).toMatch(/holder claim/);
+        expect(description).toMatch(/what you own: a secured claim on collateral/);
+        expect(description).toMatch(/for a holder: (good|no market data|(caution|warning) \([a-z ]+\))/);
         expect(description).toMatch(/liquidity/);
+    });
+
+    it('titles the card with the holder headline, not the worst of all eleven checks', () => {
+        const rules = [{ id: 'tracking', label: 'Price tracking' }, { id: 'verification', label: 'Legal evidence review' }];
+        const card = (headline) => ({ symbol: 'TEST', underlyingTicker: 'TST', health: { status: 'warning', worstRuleId: 'verification', headline, rules } });
+        expect(ogTitle(card({ status: 'good', ruleId: null, basis: 'measured' }))).toBe('TEST — good · tokenized TST on Solana');
+        expect(ogTitle(card({ status: 'caution', ruleId: 'tracking', basis: 'measured' }))).toBe('TEST — caution: price tracking · tokenized TST on Solana');
+        expect(ogTitle(card({ status: 'unknown', ruleId: null, basis: 'no-market' }))).toBe('TEST — no market data · tokenized TST on Solana');
+        expect(ogDescription(cardFor('NVDAx'))).toMatch(/for a holder: /);
+        expect(ogDescription(cardFor('NVDAx'))).not.toMatch(/worst check/);
     });
 
     it('escapes the description and the title into their meta tags', () => {
@@ -358,8 +390,8 @@ describe('renderCard', () => {
         expect(html).toContain('../learn/redemption.html');
         expect(html).toContain('../learn/defi-custody.html');
         expect(html).toContain('class="card-disclosure decision-health"');
-        expect(html).toContain('Exact-token support is source-listed.');
-        expect(html).toContain('No configuration decoding or read-only execution simulation was performed');
+        expect(html).toContain('The protocol’s own list names this exact token.');
+        expect(html).toContain('We have not read its settings or simulated a transaction');
     });
 
     it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
@@ -469,10 +501,10 @@ describe('renderCard', () => {
         // integration keeps its own stage and account check (the 96 kB target, 2026-09-23).
         const usage = html.slice(html.indexOf('<section id="defi-usage">'), html.indexOf('</section>', html.indexOf('<section id="defi-usage">')));
         const count = (needle) => usage.split(needle).length - 1;
-        expect(count('No configuration decoding or read-only execution simulation was performed.')).toBe(new Set(card.defiUsage.integrations
+        expect(count('We have not read its settings or simulated a transaction.')).toBe(new Set(card.defiUsage.integrations
             .map((entry) => entry.proof?.sourceStatus === 'observed-market' ? 'market' : 'listed')).size);
         expect(count('<p class="defi-proof"><strong>')).toBe(card.defiUsage.integrations.length);
-        expect(count('published accounts existed') + count('No published Solana account address')).toBe(card.defiUsage.integrations.length);
+        expect(count('accounts the protocol publishes exist on-chain') + count('The protocol publishes no Solana account')).toBe(card.defiUsage.integrations.length);
         expect(count('Issuer eligibility and the protocol’s geographic restrictions apply')).toBe(1);
         expect(usage).toContain('<strong>Access:</strong> as for Kamino above.');
 
@@ -481,7 +513,7 @@ describe('renderCard', () => {
         expect(emptyUsage).toBeDefined();
         const none = cardFor(emptyUsage.symbol);
         expect(none.defiUsage.integrations).toEqual([]);
-        expect(renderCard(none, { version: 'test' })).toContain('None source-listed.');
+        expect(renderCard(none, { version: 'test' })).toContain('No protocol found that accepts this exact token.');
     });
 
     it('separates documented redemption terms from route and successful-use evidence', () => {
@@ -1795,7 +1827,7 @@ describe('plain words at the top of a card and in "What you own"', () => {
     const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details id="events"'));
     // Terms and legal rights: the instrument as documented, then what it gives the holder.
     const ownOf = (html) => html.slice(html.indexOf('<section id="terms-detail">'), html.indexOf('<details id="legal-control"'));
-    const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis/i;
+    const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis|\bLevel \d|allowlist (yes|no)|\bmechanism\b/i;
 
     it('says claim depth and ledger maturity as questions with "N of 4" answers, the terms kept as titles', () => {
         const html = renderCard(cardFor('AAPLx'), { version: 'v' });
@@ -1803,8 +1835,9 @@ describe('plain words at the top of a card and in "What you own"', () => {
         expect(visibleText(own)).toContain('How close to owning the share 2 of 4 — a secured claim on collateral');
         expect(visibleText(own)).toContain('How far the token is the official record 2 of 4 — the chain is the official record and the token moves without anyone’s approval');
         expect(visibleText(own)).not.toMatch(JARGON);
-        expect(own).toContain('title="Claim depth: rung 2 of 4');
-        expect(own).toContain('title="Ledger maturity: Level 2');
+        expect(own).toContain('title="Secured claim: ');
+        expect(own).toContain('title="Moves freely: ');
+        expect(own).not.toMatch(/title="[^"]*(\brung\b|Level \d|Ledger maturity)/);
     });
 
     it('keeps the five facts and the review banner free of jargon, with the proof stage in a title', () => {
@@ -1816,8 +1849,7 @@ describe('plain words at the top of a card and in "What you own"', () => {
         const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
         expect(defi.value).toMatch(/^Listed for this exact token by /);
         expect(defi.value).toContain('Furthest we checked: we read the market’s settings on chain.');
-        expect(defi.title).toBe('Proof stage: decoded');
-        expect(renderCard(card, { version: 'v' })).toContain('<article class="asset-decision-defi" title="Proof stage: decoded">');
+        expect(renderCard(card, { version: 'v' })).not.toMatch(/title="Proof stage/);
         expect(visibleText(topOf(renderCard(reviewed, { version: 'v' }))))
             .toContain('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
     });

@@ -34,7 +34,7 @@
     <link rel="icon" type="image/svg+xml" href="./images/variant3.svg" />
     <link rel="stylesheet" href="app-shell.css?v=20260929b" />
     <link rel="stylesheet" href="styles.css?v=20260924y">
-    <link rel="stylesheet" href="assets.css?v=20260924y">
+    <link rel="stylesheet" href="assets.css?v=20260930nc">
 </head>
 
 <body>
@@ -102,8 +102,8 @@
                 <ul class="definitions" aria-label="The four pillars">
                     <li>
                         <details open>
-                            <summary>blockchainIsMainLedger<span class="term-badge pillar">pillar</span></summary>
-                            <div class="term-content">Is the blockchain the primary ledger of ownership? If there is an
+                            <summary>The chain is the official record<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content"><code class="term-key">blockchainIsMainLedger</code> Is the blockchain the primary ledger of ownership? If there is an
                                 alternative authoritative ledger, such as a government land registry, then this is "no".
                                 Typically "yes" for RWAs whose ownership is not centrally tracked, for example cars.
                                 Typically "no" for RWAs whose ownership is centrally tracked, for example real
@@ -112,16 +112,16 @@
                     </li>
                     <li>
                         <details open>
-                            <summary>unconditionalTransfers<span class="term-badge pillar">pillar</span></summary>
-                            <div class="term-content">Can the token be transferred freely, without requiring approval
+                            <summary>It moves without anyone’s approval<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content"><code class="term-key">unconditionalTransfers</code> Can the token be transferred freely, without requiring approval
                                 from a gatekeeper (issuer, platform, or regulator)? This implies reactive compliance:
                                 any compliance requirements are enforced after the transfer instead of by blocking it.</div>
                         </details>
                     </li>
                     <li>
                         <details open>
-                            <summary>bearerRedemption<span class="term-badge pillar">pillar</span></summary>
-                            <div class="term-content">Can the token holder redeem the underlying asset from a third
+                            <summary>The token alone redeems the asset<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content"><code class="term-key">bearerRedemption</code> Can the token holder redeem the underlying asset from a third
                                 party custodian simply by presenting (bearing) the token? This means there is no
                                 vendor/issuer lock-in: the token alone is sufficient proof of the right to
                                 claim the asset.</div>
@@ -129,8 +129,8 @@
                     </li>
                     <li>
                         <details open>
-                            <summary>forcedTransfers<span class="term-badge pillar">pillar</span></summary>
-                            <div class="term-content">Can tokens be moved without the holder's consent? This is
+                            <summary>Tokens can be moved by court order<span class="term-badge pillar">pillar</span></summary>
+                            <div class="term-content"><code class="term-key">forcedTransfers</code> Can tokens be moved without the holder's consent? This is
                                 necessary for legal compliance and loss recovery. Tokens can be sent to unreachable
                                 addresses (e.g. 0x00) but the underlying RWA still exists, so there must be a
                                 mechanism to correct this. This also enables theft recovery, loss recovery, and
@@ -139,25 +139,25 @@
                     </li>
                 </ul>
 
-                <h3 style="margin:0">Maturity Stage</h3>
-                <p style="margin:0 0 4px;line-height:1.5">An asset that has not reached a higher level is considered
-                    Level 0. Each level requires all previous levels.</p>
-                <ul class="definitions" aria-label="Maturity stage levels">
-                    <li style="display:flex;align-items:center;gap:10px">
-                        <span class="maturity-pill level-1">Level 1</span>
-                        <span>blockchainIsMainLedger</span>
+                <h3 style="margin:0">How far the token is the official record</h3>
+                <p style="margin:0 0 4px;line-height:1.5">Four steps, each needing all the ones before it. An asset
+                    that has not reached the first is recorded off-chain.</p>
+                <ul class="definitions" aria-label="How far the token is the official record">
+                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                        <span class="maturity-pill level-1">Chain is the record</span>
+                        <span>the chain is the official record</span>
                     </li>
-                    <li style="display:flex;align-items:center;gap:10px">
-                        <span class="maturity-pill level-2">Level 2</span>
-                        <span>Level 1 + unconditionalTransfers</span>
+                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                        <span class="maturity-pill level-2">Moves freely</span>
+                        <span>and it moves without anyone’s approval</span>
                     </li>
-                    <li style="display:flex;align-items:center;gap:10px">
-                        <span class="maturity-pill level-3">Level 3</span>
-                        <span>Level 2 + bearerRedemption</span>
+                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                        <span class="maturity-pill level-3">Redeem without the issuer</span>
+                        <span>and the token alone redeems the asset</span>
                     </li>
-                    <li style="display:flex;align-items:center;gap:10px">
-                        <span class="maturity-pill level-4">Level 4</span>
-                        <span>Level 3 + forcedTransfers</span>
+                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                        <span class="maturity-pill level-4">Theft can be reversed</span>
+                        <span>and tokens can be moved by court order</span>
                     </li>
                 </ul>
 
@@ -168,68 +168,68 @@
                 <ul class="definitions" aria-label="Other vocabulary definitions">
                     <li>
                         <details>
-                            <summary>titleDeed<span class="term-badge ownership">ownership</span></summary>
-                            <div class="term-content">Is the ownership of the token meant to record the full ownership
+                            <summary>The token is the full title<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content"><code class="term-key">titleDeed</code> Is the ownership of the token meant to record the full ownership
                                 rights and obligations for the underlying asset? This is in contrast to the token
                                 representing a derived or partial right.</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>assetSelfCustody<span class="term-badge ownership">ownership</span></summary>
-                            <div class="term-content">Can the asset represented by the token be custodied by the owner
+                            <summary>The owner can hold the asset<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content"><code class="term-key">assetSelfCustody</code> Can the asset represented by the token be custodied by the owner
                                 without third parties? A token could represent a tangible thing which can be in
                                 possession of the owner, or something intangible which cannot be physically held.</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>tokenSelfCustody<span class="term-badge ownership">ownership</span></summary>
-                            <div class="term-content">Can the token holder hold the token in their own wallet without
+                            <summary>The holder keeps the token in their own wallet<span class="term-badge ownership">ownership</span></summary>
+                            <div class="term-content"><code class="term-key">tokenSelfCustody</code> Can the token holder hold the token in their own wallet without
                                 relying on a third-party custodian?</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>issuerIndependent<span class="term-badge maturity">maturity</span></summary>
-                            <div class="term-content">If the issuer company/platform/protocol goes bankrupt or
+                            <summary>It keeps working if the issuer disappears<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content"><code class="term-key">issuerIndependent</code> If the issuer company/platform/protocol goes bankrupt or
                                 disappears offline, will the token continue to function and retain its meaning?</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>reflectLegalDecisions<span class="term-badge compliance">compliance</span>
+                            <summary>Court decisions can be enforced on-chain<span class="term-badge compliance">compliance</span>
                             </summary>
-                            <div class="term-content">Can court decisions (e.g. reverting ownership, seizing assets) be
+                            <div class="term-content"><code class="term-key">reflectLegalDecisions</code> Can court decisions (e.g. reverting ownership, seizing assets) be
                                 enforced on-chain? If not, the token is insufficient as a representation of
                                 ownership.</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>presetJurisdiction<span class="term-badge compliance">compliance</span></summary>
-                            <div class="term-content">Is there a defined legal jurisdiction governing the token, so that
+                            <summary>The governing law is set<span class="term-badge compliance">compliance</span></summary>
+                            <div class="term-content"><code class="term-key">presetJurisdiction</code> Is there a defined legal jurisdiction governing the token, so that
                                 the applicable legal framework is unambiguous?</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>meetingOfMinds<span class="term-badge transfers">transfers</span></summary>
-                            <div class="term-content">Is the transfer considered valid on the basis of the agreement
+                            <summary>Buyer and seller agreeing is enough<span class="term-badge transfers">transfers</span></summary>
+                            <div class="term-content"><code class="term-key">meetingOfMinds</code> Is the transfer considered valid on the basis of the agreement
                                 between buyer and seller alone, without requiring third-party sign-off?</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>thirdPartyAttestations<span class="term-badge maturity">maturity</span></summary>
-                            <div class="term-content">Can independent third-party (non-issuer) attestations be attached
+                            <summary>Independent attestations can be attached<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content"><code class="term-key">thirdPartyAttestations</code> Can independent third-party (non-issuer) attestations be attached
                                 to the token, verifying the link between the token and the underlying asset?</div>
                         </details>
                     </li>
                     <li>
                         <details>
-                            <summary>aiReady<span class="term-badge maturity">maturity</span></summary>
-                            <div class="term-content">We consider a token AI-ready if there is no KYC in the transfer
+                            <summary>No identity check in the transfer (AI-ready)<span class="term-badge maturity">maturity</span></summary>
+                            <div class="term-content"><code class="term-key">aiReady</code> We consider a token AI-ready if there is no KYC in the transfer
                                 loop. AI agents cannot pass humanity tests, so KYC requirements exclude them from
                                 participation.</div>
                         </details>
@@ -241,7 +241,7 @@
         <section id="panel-howto" class="tab-panel" role="tabpanel" aria-labelledby="tab-howto" hidden>
             <div class="vocab-layout">
                 <p>Our definitions and grades are our own choice, and we have a stake: we built a tool that,
-                    as far as we know, is the only one that lets you tokenize RWAs up to "Level 4". It is here: <a href="https://attestify.network" target="_blank"
+                    as far as we know, is the only one that lets you tokenize RWAs all the way to the last step, where a court can reverse a theft on-chain. It is here: <a href="https://attestify.network" target="_blank"
                         rel="noopener noreferrer">https://attestify.network</a></p>
             </div>
         </section>
@@ -260,7 +260,11 @@
 
     <div id="descTooltip" role="tooltip" aria-hidden="true"></div>
 
-    <script src="assets.js?v=20260924u"></script>
+    <script src="stocks/lib/fmt.js?v=20260924a"></script>
+    <script src="stocks/lib/sort-values.js?v=20260923r"></script>
+    <script src="stocks/lib/catalogue-counts.js?v=20260923b"></script>
+    <script src="stocks/lib/issuer-labels.js?v=20260930nc"></script>
+    <script src="assets.js?v=20260930nc"></script>
 
     <!-- Asset Modal -->
     <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">

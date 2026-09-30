@@ -351,6 +351,13 @@ th.sort-active {
 .definitions details[open]>summary {
     margin-bottom: 8px;
 }
+/* The dataset's field name beside its plain-English name (rwa-assets-db.json keys). */
+.definitions .term-key {
+    font-size: 0.72rem;
+    font-weight: normal;
+    color: var(--muted-text);
+    margin-right: 4px;
+}
 .definitions .term-badge {
     font-size: 0.7rem;
     padding: 2px 6px;

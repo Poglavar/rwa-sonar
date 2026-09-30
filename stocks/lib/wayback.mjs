@@ -8,8 +8,8 @@ import { gunzipSync } from 'node:zlib';
 
 /** At most this many fallbacks per run: each costs two paced archive requests. */
 export const WAYBACK_FALLBACK_CAP = 40;
-/** Minimum gap between two requests to web.archive.org during the fallback pass. */
-export const WAYBACK_PACE_MS = 2000;
+/** Minimum gap between two requests to archive.org, of any kind (watch-sources.mjs `archiveSlot`). */
+export const WAYBACK_PACE_MS = 3000;
 
 /** `https://web.archive.org/cdx/search/cdx?…` asking for the single newest 200 capture of `url`. */
 export function cdxQueryUrl(url) {
@@ -109,18 +109,24 @@ export function captureIsStale(captureIsoTime, nowMs, days = WAYBACK_STALE_DAYS)
 }
 
 /**
- * Only a host that REFUSES us qualifies: a 401/403, a bot wall (including one served as 429), or an
- * expired TLS certificate. Not a plain 429 (the host will talk to us later), not a 400 (a malformed API call is not a document), not a JavaScript-only page (the
- * archive would hold the same empty shell), and never a URL that is already on web.archive.org.
+ * Only a host that REFUSES us qualifies: a 401/403, a bot wall (including one served as 429), an
+ * expired TLS certificate, or a region block (`unreadable` with lib/unreadable.mjs code `geoblock`):
+ * assets.backed.fi serves the server's region an 869-character "restricted country" notice while
+ * the archive's captures of the same pages carry the full legal-documentation and product pages
+ * (captures of 2026-09-18 and 2026-09-29, checked 2026-09-30), and eight Backed claims sat
+ * `changed` on the notice. Not a plain 429 (the host will talk to us later), not a 400 (a malformed
+ * API call is not a document), not a JavaScript-only page or any other unreadable read (the archive
+ * would hold the same empty shell), and never a URL that is already on web.archive.org.
  */
-export function wantsWaybackFallback({ status, httpStatus = null, botWall = false, tlsExpired = false, url = '' } = {}) {
-    if (status !== 'blocked') return false;
+export function wantsWaybackFallback({ status, httpStatus = null, botWall = false, tlsExpired = false, unreadableCode = null, url = '' } = {}) {
+    if (status !== 'blocked' && !(status === 'unreadable' && unreadableCode === 'geoblock')) return false;
     try {
         const host = new URL(url).hostname.toLowerCase();
         if (host === 'archive.org' || host.endsWith('.archive.org')) return false;
     } catch {
         return false;
     }
+    if (status === 'unreadable') return true;
     // An expired certificate is a host that can no longer serve anyone safely (remora.markets);
     // the TLS check is never switched off, so an archived capture is the only readable copy.
     return httpStatus === 401 || httpStatus === 403 || botWall === true || tlsExpired === true;

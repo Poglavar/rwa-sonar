@@ -648,3 +648,31 @@ a.tab-button {
         font-size: 0.82rem;
     }
 }
+
+/* --- routed-trades toggle (above the tape) ----------------------------- */
+
+.routed-toggle {
+    margin: 0 0 10px;
+}
+
+.routed-toggle-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
+.routed-toggle-label input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--accent);
+}
+
+.routed-note {
+    margin: 4px 0 0 26px;
+    font-size: 0.78rem;
+    color: var(--muted-text);
+}

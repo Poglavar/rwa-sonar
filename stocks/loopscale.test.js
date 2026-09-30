@@ -119,7 +119,7 @@ describe('Loopscale Loan scan and integration record', () => {
         expect(usage.counts.withLending).toBe(1);
         expect(protocolProofModel({ proof: integration.proof })).toMatchObject({ stage: 'decoded' });
         expect(protocolProofModel({ proof: { ...integration.proof, configurationDecoded: false } }))
-            .toMatchObject({ stage: 'account-observed', headline: 'A protocol account holding this exact token was observed on-chain' });
+            .toMatchObject({ stage: 'account-observed', headline: 'We saw a protocol account holding this exact token on-chain' });
         applyOnchainCorroboration(usage, new Map([[FIXTURE.loan.address, { exists: true, owner: LOOPSCALE_PROGRAM_ID }]]), '2026-09-23T10:00:01Z');
         expect(integration.corroboration.accounts[0]).toMatchObject({ role: 'loan-account', owner: LOOPSCALE_PROGRAM_ID, expectedOwner: LOOPSCALE_PROGRAM_ID });
     });

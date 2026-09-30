@@ -6,7 +6,7 @@
 -- Writers: chain watcher (authority-key, extension-toggle, rebase, supply, treasury, metadata, status),
 -- document watcher (legal-term, document-gone, quote-lost), refresh (holder-concentration, venue,
 -- float, liquidity), case law (litigation), entities (entity-status, insolvency), regulators
--- (regulator-notice). stocks/schema.test.js checks every kind a watcher writes is listed.
+-- (regulator-notice), reserves (reserve), corporate actions (corporate-action). stocks/schema.test.js checks every kind a watcher writes is listed.
 
 SET client_min_messages = warning;
 
@@ -24,6 +24,6 @@ ALTER TABLE sonar.change_event DROP CONSTRAINT IF EXISTS change_event_kind_check
 ALTER TABLE sonar.change_event ADD CONSTRAINT change_event_kind_check CHECK (kind IN (
     'legal-term', 'document-gone', 'quote-lost', 'authority-key', 'extension-toggle', 'rebase',
     'supply', 'treasury', 'holder-concentration', 'venue', 'float', 'liquidity', 'metadata', 'status',
-    'litigation', 'entity-status', 'insolvency', 'regulator-notice'));
+    'litigation', 'entity-status', 'insolvency', 'regulator-notice', 'reserve', 'corporate-action'));
 
 COMMIT;

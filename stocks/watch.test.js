@@ -28,7 +28,8 @@ import {
     driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     emptyPublishedPage, jsOnlyShell, jsonToText, looksLikeText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
-    sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, tolerates503,
+    sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, archivePushback, isArchiveHost, settleThrottle,
+    ARCHIVE_PAUSED, HTML_EXTRACTOR_VERSION, THROTTLE_PERSISTS_AFTER,
     verificationUrlFor,
     dossierQuotes,
     previouslyBlocked,
@@ -107,14 +108,16 @@ describe('identity and paths', () => {
             'Headline\nArticle.\nCrypto Connections\nLatest rotating story'))
             .toBe('Headline\nArticle.');
         expect(stripPublisherChrome('https://issuer.example/legal', coindesk)).toBe(coindesk);
-        expect(publisherNormalizerVersion('https://www.coindesk.com/policy/story')).toBe(3);
-        expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(2);
+        expect(publisherNormalizerVersion('https://www.coindesk.com/policy/story')).toBe(HTML_EXTRACTOR_VERSION + 1);
+        expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(HTML_EXTRACTOR_VERSION);
     });
 
-    test('the Next.js flight reader is a new HTML extraction generation; PDF and JSON stay at 1', () => {
-        // Generation 2 drops the stored etag once, so a page stored as a bare title (ventuals.com
-        // answered 304 to it every day) is actually read again with the flight reader.
-        expect(publisherNormalizerVersion('https://ventuals.com/terms', 'html')).toBe(2);
+    test('each HTML extraction rule is a new generation; PDF and JSON stay at 1', () => {
+        // Generation 2 (the Next.js flight reader) dropped the stored etag once, so a page stored as a
+        // bare title (ventuals.com answered 304 to it every day) was read again; generation 3 keeps
+        // prose-holding <header>/<form> wrappers (CySEC, backed.fi news).
+        expect(HTML_EXTRACTOR_VERSION).toBe(3);
+        expect(publisherNormalizerVersion('https://ventuals.com/terms', 'html')).toBe(3);
         expect(publisherNormalizerVersion('https://issuer.example/prospectus.pdf', 'pdf')).toBe(1);
         expect(publisherNormalizerVersion('https://api.example/v1/x', 'api')).toBe(1);
         expect(publisherNormalizerVersion('https://www.coindesk.com/x', 'pdf')).toBe(2);
@@ -545,21 +548,48 @@ describe('decideOutcome', () => {
         });
     });
 
-    test("archive.org's own outage is recorded, not counted as our failure", () => {
-        // Its availability and CDX APIs answered 503 "temporarily offline" on 2026-09-17, and six
-        // dossier URLs point at web.archive.org. One maintenance window must not redden the run.
-        expect(tolerates503('web.archive.org')).toBe(true);
-        expect(tolerates503('archive.org')).toBe(true);
-        expect(tolerates503('docs.ondo.finance')).toBe(false);
-        expect(decideOutcome({ httpStatus: 503, retriedAfterBackoff: true, host: 'web.archive.org' }))
-            .toEqual({ status: 'blocked', reason: 'http-503 after backoff (host temporarily unavailable)' });
-        // Any other host's 503 is still a failure the run must report.
-        expect(decideOutcome({ httpStatus: 503, retriedAfterBackoff: true, host: 'docs.ondo.finance' }).status)
-            .toBe('error');
-        // And a first 503 from the tolerated host, before any backoff, is not yet written off.
-        expect(decideOutcome({ httpStatus: 503, host: 'web.archive.org' }).status).toBe('error');
-        expect(decideOutcome({ networkErrorCode: 'ETIMEDOUT', retriedAfterBackoff: true, host: 'web.archive.org' }))
-            .toEqual({ status: 'blocked', reason: 'network timeout after backoff (host temporarily unavailable)' });
+    test("archive.org pushing back on our traffic is a throttle, not a finding about the capture", () => {
+        // Prod, 2026-09-24/26/27: while --archive submitted Save Page Now jobs the archive refused
+        // connections, and every cited web.archive.org capture read in that window failed the run.
+        expect(isArchiveHost('web.archive.org')).toBe(true);
+        expect(isArchiveHost('archive.org')).toBe(true);
+        expect(isArchiveHost('docs.ondo.finance')).toBe(false);
+        for (const networkErrorCode of ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'UND_ERR_CONNECT_TIMEOUT', ARCHIVE_PAUSED]) {
+            expect(archivePushback({ host: 'web.archive.org', networkErrorCode })).toBe(true);
+            expect(decideOutcome({ networkErrorCode, retriedAfterBackoff: true, host: 'web.archive.org' }).status).toBe('throttled');
+        }
+        for (const httpStatus of [429, 502, 503, 504]) {
+            expect(decideOutcome({ httpStatus, retriedAfterBackoff: true, host: 'web.archive.org' }))
+                .toEqual({ status: 'throttled', reason: `archive.org pushed back (http-${httpStatus} after backoff) — our traffic, not the source; retried next run` });
+        }
+        expect(decideOutcome({ networkErrorCode: ARCHIVE_PAUSED, host: 'web.archive.org' }).reason)
+            .toMatch(/^not requested: archive\.org pushed back earlier this run/);
+        // A capture the archive answers 404 for is gone like any other document, and a dead DNS
+        // name is the source's own fault: neither is our throttle.
+        expect(decideOutcome({ httpStatus: 404, host: 'web.archive.org' }).status).toBe('gone');
+        expect(archivePushback({ host: 'web.archive.org', networkErrorCode: 'CERT_HAS_EXPIRED' })).toBe(false);
+        // The same refusals from any other host are still errors the run must report.
+        expect(decideOutcome({ httpStatus: 503, retriedAfterBackoff: true, host: 'docs.ondo.finance' }).status).toBe('error');
+        expect(decideOutcome({ networkErrorCode: 'ECONNREFUSED', retriedAfterBackoff: true, host: 'continentalstock.com' }).status).toBe('error');
+        expect(decideOutcome({ networkErrorCode: 'ETIMEDOUT', retriedAfterBackoff: true, host: 'rmiparliament.org' }).status).toBe('error');
+    });
+
+    test('a throttle is retried next run, and only a persistent one fails the run', () => {
+        const throttled = () => ({ status: 'throttled', reason: 'archive.org pushed back (ECONNREFUSED after backoff) — our traffic, not the source; retried next run' });
+        const first = settleThrottle(throttled(), { status: 'ok' });
+        expect(first).toMatchObject({ status: 'throttled', throttledRuns: 1 });
+        expect(runFailed([first, { status: 'ok' }])).toBe(false);
+        expect(reusableCheckpoint(first)).toBe(false);
+        const second = settleThrottle(throttled(), { status: 'ok', throttledRuns: 1 });
+        expect(second).toMatchObject({ status: 'throttled', throttledRuns: 2 });
+        const third = settleThrottle(throttled(), { status: 'ok', throttledRuns: THROTTLE_PERSISTS_AFTER - 1 });
+        expect(third.status).toBe('error');
+        expect(third.throttledRuns).toBe(THROTTLE_PERSISTS_AFTER);
+        expect(third.error).toMatch(/on 3 consecutive runs, so no longer treated as a transient throttle$/);
+        expect(runFailed([third])).toBe(true);
+        // Anything that is not a throttle passes through untouched.
+        const ok = { status: 'ok', reason: 'same hash' };
+        expect(settleThrottle(ok, { throttledRuns: 2 })).toEqual({ status: 'ok', reason: 'same hash' });
     });
 
     test('a Save Page Now outage reads as archive-unavailable, not as a per-source failure', () => {
@@ -768,15 +798,22 @@ describe('quotelessRefusal: a refusal nothing quotes is reachability, not a bloc
         expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'reachable-unverified', 'error'\)\)/);
     });
 
-    test('the unreadable status file is a superset, and it is the one the watcher applies', () => {
+    test('the unreadable status file is a superset of the reachable one', () => {
         const ddl = readFileSync(new URL('../db/2026-09-24-sonar-source-unreadable.sql', import.meta.url), 'utf8');
         expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'error'\)\)/);
         expect(ddl).toMatch(/DROP CONSTRAINT IF EXISTS source_status_check/);
-        // Re-applying the narrower reachable list after an `unreadable` row exists would fail the
-        // whole load, so the schema step applies the superset INSTEAD of it, never after it.
+    });
+
+    test('the retired status file is the superset of both, and the only status list the schema step applies', () => {
+        const ddl = readFileSync(new URL('../db/2026-10-02-sonar-source-retired.sql', import.meta.url), 'utf8');
+        expect(ddl).toMatch(/CHECK \(status IN \('new', 'ok', 'changed', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'retired', 'error'\)\)/);
+        expect(ddl).toMatch(/DROP CONSTRAINT IF EXISTS source_status_check/);
+        // Re-applying a narrower list after a `retired` (or `unreadable`) row exists would fail the
+        // whole load, so the schema step applies the superset INSTEAD of them, never after them.
         const list = readFileSync(new URL('./lib/schema.mjs', import.meta.url), 'utf8');
         const applied = list.slice(list.indexOf('export const SCHEMA_FILES = ['), list.indexOf('];', list.indexOf('export const SCHEMA_FILES = [')));
-        expect(applied).toContain("'2026-09-24-sonar-source-unreadable.sql'");
+        expect(applied).toContain("'2026-10-02-sonar-source-retired.sql'");
+        expect(applied).not.toContain("'2026-09-24-sonar-source-unreadable.sql'");
         expect(applied).not.toContain("'2026-09-24-sonar-source-reachable.sql'");
     });
 });
@@ -1280,5 +1317,66 @@ describe('readProvenance for a companion read', () => {
         const result = { status: 'ok', via: 'api', companionReader: 'npm-registry', resolvedUrl: 'https://registry.npmjs.org/x', url: 'https://www.npmjs.com/package/x' };
         expect(readProvenance(result)).toEqual({ readVia: 'companion', captureAt: null });
         expect(READ_VIA).toContain('companion');
+    });
+});
+
+describe('extractor v3: a <form> or <header> that holds the document is read', () => {
+    const fixture = (name) => readFileSync(new URL(`./fixtures/sources/${name}`, import.meta.url), 'utf8');
+
+    test('an ASP.NET page wrapped in one <form> is read, not left as its title (CySEC: 71 characters)', () => {
+        const read = htmlDocumentText(fixture('cysec-announcements-aspnet-form.html'));
+        expect(read.via).toBe('html');
+        expect(read.text).toContain('Withdrawal of Investors Compensation Fund (ICF) membership');
+        expect(read.text).toContain('Announcement on the end of the MiCA Regulation transitional period and warning to the public');
+        expect(read.text.length).toBeGreaterThan(400);
+        // The side menu's alt text holds a raw ">" inside a quoted attribute; it must not spill.
+        expect(read.text).not.toMatch(/<\/a>|style=|onmousedown/);
+        // The site header inside the page-wide form is still chrome: no search box, no button text.
+        expect(read.text).not.toMatch(/^Search$/m);
+        expect(read.quoteText).toContain('Press Release – New Appointments at CySEC');
+    });
+
+    test('an article rendered inside <header> is read; the newsletter and cookie forms around it are not', () => {
+        const read = htmlDocumentText(fixture('backed-fi-news-header-article.html'));
+        expect(read.text).toContain('Chainlink Proof of Reserve (PoR) Is Now Active for Backed’s Tokenized Real-World Assets (RWAs)');
+        expect(read.text).toContain('The Network Firm operates our attestation API. They have read-only access to our custody bank accounts');
+        expect(read.text).not.toMatch(/Cookies allowing the website to remember/);
+        expect(read.text).not.toMatch(/^Email address$|^Subscribe$/m);
+        // The quote reading keeps every form and header, as before.
+        expect(read.quoteText).toContain('Cookies allowing the website to remember choices you make');
+    });
+
+    test('a logo-and-menu header and a long form without the page heading are still dropped from the hash', () => {
+        const menu = '<body><header><a href="/">Issuer</a><div>Products</div><div>About</div></header>'
+            + '<main><p>Redemption fee: 0 bps.</p></main></body>';
+        expect(htmlToText(menu)).toBe('Redemption fee: 0 bps.');
+        // A long run of text alone is not the document: it needs the page's heading or landmark.
+        const cookieForm = `<body><form>${'<div>Cookies helping understand how this website performs, and whether there may be technical issues.</div>'.repeat(6)}</form>`
+            + '<main><p>Redemption fee: 0 bps.</p></main></body>';
+        expect(htmlToText(cookieForm)).toBe('Redemption fee: 0 bps.');
+    });
+});
+
+describe('a capture only speaks for its own date', () => {
+    const quotes = [
+        { id: 'a', kind: 'claim', ref: 'chains', quote: 'Supported Blockchains xStocks Ethereum, Solana, X Layer, Optimism', accessedAt: '2026-09-23T09:51:55Z' },
+        { id: 'b', kind: 'claim', ref: 'token', quote: 'Token Solana SPL and ERC-20 tokens without technical transfer restrictions', accessedAt: '2026-09-17T15:12:01Z' },
+        { id: 'c', kind: 'claim', ref: 'law', quote: 'Applicable Law for the Products Swiss law', accessedAt: '2026-09-17T15:12:01Z' }
+    ];
+    // The 2026-09-18 capture of assets.backed.fi/legal-documentation predates Optimism.
+    const capture = 'Supported Blockchains\nxStocks\nEthereum, Solana, X Layer\nToken\nSolana SPL and ERC-20 tokens without technical transfer restrictions';
+
+    test('a quote read live after the capture was taken is not checkable against it; an older one can be lost', () => {
+        const got = quoteVerdicts({ status: 'changed', text: capture, quotes, capturedAt: '2026-09-18T12:04:49Z' });
+        expect(got.found.map((q) => q.id)).toEqual(['b']);
+        expect(got.lost.map((q) => q.id)).toEqual(['c']);
+        expect(got.notCheckable).toBe(1);
+        expect(got.checked).toBe(2);
+    });
+
+    test('a live read judges every quote', () => {
+        const got = quoteVerdicts({ status: 'changed', text: capture, quotes });
+        expect(got.lost.map((q) => q.id)).toEqual(['a', 'c']);
+        expect(got.notCheckable).toBe(0);
     });
 });

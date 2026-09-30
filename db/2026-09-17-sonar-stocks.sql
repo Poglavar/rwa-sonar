@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS sonar.stock_token (
     name                  text,
     issuer_slug           text REFERENCES sonar.stock_issuer(slug),
     underlying_ticker     text,
+    company_key           text,
     instrument_type       text,
     token_program         text,
     recipe_label          text,
@@ -148,6 +149,14 @@ CREATE INDEX IF NOT EXISTS stock_token_programme_health_idx ON sonar.stock_token
 CREATE INDEX IF NOT EXISTS stock_token_token_health_idx ON sonar.stock_token (token_health);
 CREATE INDEX IF NOT EXISTS stock_token_token_worst_rule_idx ON sonar.stock_token (token_worst_rule);
 CREATE INDEX IF NOT EXISTS stock_token_token_health_rank_idx ON sonar.stock_token (token_health_rank);
+-- 2026-09-30: the pre-IPO company a token references (`companyKey`, stocks/lib/private-companies.mjs),
+-- so a comparison of pre-IPO wrappers, which have no listed ticker, can be matched the way the pages
+-- group it: listed ticker, else company (stocks/lib/discovery.js comparisonKey). Loaded by
+-- stocks/load-db.mjs; the backfill fills it from the stored record until the next load, and matches
+-- nothing once filled. Same upgrade guard as above.
+ALTER TABLE sonar.stock_token ADD COLUMN IF NOT EXISTS company_key text;
+UPDATE sonar.stock_token SET company_key = record->>'companyKey'
+ WHERE company_key IS NULL AND record->>'companyKey' IS NOT NULL;
 
 -- ---------------------------------------------------------------------------------------------
 -- Daily snapshots. The slim per-day rows written by stocks/snapshot.mjs into

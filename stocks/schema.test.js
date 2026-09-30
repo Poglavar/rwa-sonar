@@ -25,7 +25,7 @@ describe('the schema is applied once, at deploy, and never by a scheduled job', 
         const kinds = read('db', '2026-10-01-sonar-change-event-kinds.sql');
         expect(kinds).toMatch(/^BEGIN;$[\s\S]*DROP CONSTRAINT IF EXISTS change_event_kind_check;[\s\S]*^COMMIT;$/m);
         // Each watcher's own kind, and every kind the events feed reads.
-        for (const kind of ['litigation', 'entity-status', 'insolvency', 'regulator-notice', 'quote-lost', 'rebase', 'authority-key']) {
+        for (const kind of ['litigation', 'entity-status', 'insolvency', 'regulator-notice', 'reserve', 'corporate-action', 'quote-lost', 'rebase', 'authority-key']) {
             expect(kinds).toContain(`'${kind}'`);
         }
         // No file keeps an ad-hoc way of changing the list.
@@ -36,7 +36,7 @@ describe('the schema is applied once, at deploy, and never by a scheduled job', 
         const at = (name) => SCHEMA_FILES.indexOf(name);
         // sonar.source (evidence) before the claim and what-if foreign keys and the source status lists;
         // the chain watcher's change_event before the files that extend it.
-        for (const later of ['2026-09-18-sonar-claims.sql', '2026-09-18-sonar-whatif.sql', '2026-09-23-sonar-source-provenance.sql', '2026-09-24-sonar-source-unreadable.sql']) {
+        for (const later of ['2026-09-18-sonar-claims.sql', '2026-09-18-sonar-whatif.sql', '2026-09-23-sonar-source-provenance.sql', '2026-10-02-sonar-source-retired.sql']) {
             expect(at('2026-09-18-sonar-evidence.sql')).toBeLessThan(at(later));
         }
         for (const later of ['2026-09-23-sonar-caselaw.sql', '2026-09-23-sonar-change-judgment.sql']) {

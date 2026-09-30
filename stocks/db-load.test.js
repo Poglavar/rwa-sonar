@@ -257,6 +257,12 @@ describe('buildTokenSql', () => {
         expect(sql).toContain('ELSE NULL END AS recipe_extensions');
     });
 
+    test('the pre-IPO company key is loaded, so a watch can match a token with no listed ticker', () => {
+        const { sql } = buildTokenSql({ tokensDoc, healthDoc });
+        expect(sql).toContain("r->>'companyKey' AS company_key");
+        expect(updatedColumns(sql)).toContain('company_key');
+    });
+
     test('supply is read exactly and floats are read as floats', () => {
         const { sql } = buildTokenSql({ tokensDoc, healthDoc });
         expect(sql).toContain("(r->>'supplyRaw')::numeric AS supply_raw");

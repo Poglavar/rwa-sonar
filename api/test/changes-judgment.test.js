@@ -73,7 +73,7 @@ describe('/api/changes with sonar.change_judgment', () => {
         expect(status).toBe(200);
         expect(body.modelAssessmentNote).toBeUndefined();
         const list = statements.find((s) => s.text.includes('AS "modelAssessment"'));
-        expect(list.text).toContain('LEFT JOIN LATERAL');
+        expect(list.text).toContain('sonar.change_judgment');
         expect(list.values[0]).toBe(false);
     });
 });

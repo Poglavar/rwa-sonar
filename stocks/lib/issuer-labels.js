@@ -84,23 +84,6 @@
         };
     }
 
-    /** The x-axis labels, preferring each rung's own claimLabel from the data. */
-    function claimAxisLabels(issuers) {
-        const labels = CLAIM_LABELS.slice();
-        if (!Array.isArray(issuers)) return labels;
-        for (const issuer of issuers) {
-            const grades = issuer && issuer.grades;
-            if (!grades) continue;
-            const rung = grades.claimRung;
-            const label = grades.claimLabel;
-            if (Number.isInteger(rung) && rung >= 0 && rung < labels.length &&
-                typeof label === 'string' && label.trim()) {
-                labels[rung] = label.trim();
-            }
-        }
-        return labels;
-    }
-
     /** Canonical label for a claim rung, for cards and detail panels. */
     function claimLabel(rung, given) {
         if (typeof given === 'string' && given.trim()) return given.trim();
@@ -239,39 +222,56 @@
     }
 
     // ---------------------------------------------------------------------------
-    // Ladder wording (vocabulary.md, MODEL §2.2 and §3.1/§3.2) — the grid's axis tooltips. The grid
-    // shows "Level 2" and "2 secured claim on collateral" and nothing else fits in a cell, so the
-    // definition itself lives in the title/aria-label of the label, next to the axis captions that
-    // already explain the two axes in prose.
+    // Ladder wording — the grid's axis labels and their tooltips, in a holder's words. The methodology
+    // keeps the technical names (ledger maturity levels, claim-depth rungs, the pillar field names);
+    // nothing shown to a reader here says "rung" or "Level". The grid cell has room for a few words
+    // only, so the one-sentence definition sits in the label's title/aria-label.
     // ---------------------------------------------------------------------------
 
-    /** Ledger maturity, indexed by stage 0–4 (MODEL §3.1, vocabulary.md "Maturity Stage"). */
-    const MATURITY_LEVEL_TOOLTIPS = [
-        'Level 0: none of the four pillars. The blockchain is not the main ledger of ownership, so the ' +
-        'authoritative record is somewhere else (a share register, a transfer agent, a broker’s books).',
-        'Level 1: the blockchain is the main ledger of ownership (blockchainIsMainLedger). There is no ' +
-        'other authoritative record of who owns the asset.',
-        'Level 2, Tokenized: Level 1 plus unconditional transfers (unconditionalTransfers). The token ' +
-        'moves to any address without approval from the issuer, a platform or a regulator.',
-        'Level 3, Issuer independent: Level 2 plus bearer redemption (bearerRedemption). Presenting the ' +
-        'token is enough to redeem the underlying from the custodian, so the issuer is not a required party.',
-        'Level 4, Legally integrated: Level 3 plus a forced-transfer mechanism (forcedTransfers). Tokens ' +
-        'can be moved without the holder’s consent, so a court order, a theft or a lost key can be ' +
-        'corrected on the ledger.'
+    /** Short axis labels for how far the token is the official record, indexed 0–4. */
+    const LEDGER_AXIS_WORDS = [
+        'Record kept off-chain',
+        'Chain is the record',
+        'Moves freely',
+        'Redeem without the issuer',
+        'Theft can be reversed'
     ];
 
-    /** Claim depth, indexed by rung 0–4 (MODEL §3.2). */
+    /** Short axis labels for how close the holder is to owning the share, indexed 0–4. */
+    const CLAIM_AXIS_WORDS = [
+        'Price only',
+        'Unsecured claim',
+        'Secured claim',
+        'Share held for you',
+        'Registered share'
+    ];
+
+    /** How far the token is the official record, one sentence per step 0–4 (MODEL §3.1). */
+    const MATURITY_LEVEL_TOOLTIPS = [
+        'Record kept off-chain: the blockchain is not the official record of who owns it; that record ' +
+        'is kept elsewhere (a share register, a transfer agent or a broker’s books).',
+        'Chain is the record: the blockchain is the official record of who owns it, and no other record ' +
+        'overrides it.',
+        'Moves freely: the chain is the record, and the token moves to any wallet without approval from ' +
+        'the issuer, a platform or a regulator.',
+        'Redeem without the issuer: all of the above, and presenting the token is enough to get the ' +
+        'share from the custodian; the issuer does not need to take part.',
+        'Theft can be reversed: all of the above, and tokens can be moved without the holder’s consent ' +
+        'under a court order, so a theft or a lost key can be corrected on the ledger.'
+    ];
+
+    /** How close the holder is to owning the share, one sentence per step 0–4 (MODEL §3.2). */
     const CLAIM_RUNG_TOOLTIPS = [
-        'Rung 0, synthetic exposure: the holder has price exposure only (a derivative or a synthetic SPV ' +
-        'position), with no claim on the security.',
-        'Rung 1, unsecured claim on the issuer: a structured note, tracker certificate or debt note with ' +
-        'no security interest. If the issuer fails, the holder is an unsecured creditor.',
-        'Rung 2, secured claim on collateral: the same note, but a security interest over the collateral ' +
-        'exists and is granted to a named security holder.',
-        'Rung 3, beneficial interest in the security: an SPV holds the share and the token is a claim on ' +
-        'that share, redeemable against it.',
-        'Rung 4, registered share: the holder is the registered owner of the share itself, the same class ' +
-        'as the listed security.'
+        'Price only: the holder gets price exposure (a derivative or a synthetic position) with no claim ' +
+        'on the share.',
+        'Unsecured claim: a note or certificate with no security. If the issuer fails, the holder is an ' +
+        'unsecured creditor.',
+        'Secured claim: the same kind of note, but backed by a security interest over the collateral, ' +
+        'held for holders by a named security agent.',
+        'Share held for you: a separate company holds the share and the token is a claim on that share, ' +
+        'redeemable against it.',
+        'Registered share: the holder is the registered owner of the share itself, the same class as the ' +
+        'listed security.'
     ];
 
     /** The definition of each market word, for the headers that cannot spell it out (MODEL §11.1). */
@@ -303,7 +303,7 @@
         return MATURITY_LEVEL_TOOLTIPS[stage];
     }
 
-    /** The definition of a claim-depth rung, or "" when the rung is not one of 0–4. */
+    /** How close to owning the share, as one plain sentence, or "" outside 0–4. */
     function claimRungTooltip(rung) {
         if (!Number.isInteger(rung) || rung < 0 || rung >= CLAIM_RUNG_TOOLTIPS.length) return '';
         return CLAIM_RUNG_TOOLTIPS[rung];
@@ -468,7 +468,8 @@
         KEY_GOVERNANCE_ROLES,
         chipSize,
         gridCell,
-        claimAxisLabels,
+        CLAIM_AXIS_WORDS,
+        LEDGER_AXIS_WORDS,
         claimLabel,
         verificationLabel,
         coverageLabel,

@@ -61,7 +61,7 @@ const {
 const {
     CLAIM_DEPTH_QUESTION, GRID_FIRST_DATA_COLUMN, GRID_LABEL_ROW, GRID_RUNGS, GRID_STAGES, LEDGER_RECORD_QUESTION,
     MARKET_TOOLTIPS, cardLinkHtml,
-    chipSize, claimAxisLabels, claimDepthReason, claimDepthWords, claimRungTooltip, coverageClass, coverageLabel, displayName,
+    CLAIM_AXIS_WORDS, LEDGER_AXIS_WORDS, chipSize, claimDepthReason, claimDepthWords, claimRungTooltip, coverageClass, coverageLabel, displayName,
     fmtFeeBps, gridCell, indexTypes, isControlOn, issuerDossierHref, issuerHeadline, labelForSchema,
     ledgerRecordWords, maturityLevelTooltip, newMintChipHtml, newMintChips, newMintsWindowDays, severityClass,
     sortIssuersForDisplay, transferFeeCapabilityLabel, verificationLabel, worstSeverity
@@ -775,7 +775,7 @@ if (typeof document !== 'undefined') {
             if (els.defiProtocolGrid) {
                 const visible = filterDefiProtocols(protocols, state.defiAction);
                 els.defiProtocolGrid.innerHTML = defiProtocolDirectoryHtml(visible) || dataStateHtml(
-                    'none-source-listed', 'No checked protocol source lists this action',
+                    'none-source-listed', 'No protocol we checked lists this action',
                     'The reviewed registries and products contain no exact-token support for this action. This does not mean every protocol was checked.',
                     [{ label: 'Show every protocol that lists these tokens', action: 'clear-defi-filter' }]
                 );
@@ -1386,7 +1386,6 @@ if (typeof document !== 'undefined') {
         // --- the grid ------------------------------------------------------
 
         function renderGrid(issuers) {
-            const labels = claimAxisLabels(issuers);
             const parts = [];
 
             // The row and column labels carry the ladder definition itself: role="img" plus
@@ -1397,7 +1396,7 @@ if (typeof document !== 'undefined') {
                 parts.push(
                     `<div class="grid-axis grid-axis-y" style="grid-column:1;grid-row:${GRID_STAGES - stage}">` +
                     `<span class="maturity-pill level-${stage}" role="img" title="${tip}" aria-label="${tip}">` +
-                    `Level ${stage}</span></div>`
+                    `${escapeHtml(LEDGER_AXIS_WORDS[stage])}</span></div>`
                 );
             }
 
@@ -1406,7 +1405,7 @@ if (typeof document !== 'undefined') {
                 parts.push(
                     `<div class="grid-axis grid-axis-x" style="grid-column:${rung + GRID_FIRST_DATA_COLUMN};grid-row:${GRID_LABEL_ROW}" ` +
                     `role="img" title="${tip}" aria-label="${tip}">` +
-                    `<span class="grid-axis-rung">${rung}</span> ${escapeHtml(labels[rung])}</div>`
+                    `<span class="grid-axis-rung">${escapeHtml(CLAIM_AXIS_WORDS[rung])}</span></div>`
                 );
             }
 
@@ -1434,7 +1433,7 @@ if (typeof document !== 'undefined') {
                     parts.push(
                         `<div class="grid-cell${bucket ? ' grid-cell-filled' : ''}" ` +
                         `style="grid-column:${cell.column};grid-row:${cell.row}" ` +
-                        `title="Claim depth ${rung} · Ledger maturity Level ${stage}">${chips}</div>`
+                        `title="${escapeHtml(`${CLAIM_AXIS_WORDS[rung]} · ${LEDGER_AXIS_WORDS[stage]}`)}">${chips}</div>`
                     );
                 }
             }
@@ -1641,8 +1640,8 @@ if (typeof document !== 'undefined') {
     </div>
     <p class="review-status ${review.pending ? 'review-pending' : 'review-complete'}" title="${escapeHtml(review.detail)}">${escapeHtml(review.label)} · ${escapeHtml(review.detail)}</p>
     <div class="grade-row">
-        <span class="claim-rung" title="${escapeHtml(`Claim depth: rung ${Number.isInteger(grades.claimRung) ? grades.claimRung : DASH} of 4. ${claimRungTooltip(grades.claimRung)}`)}">${escapeHtml(`${CLAIM_DEPTH_QUESTION}: ${claimDepthWords(grades.claimRung) ?? 'not established'}`)}</span>
-        <span class="claim-rung" title="${escapeHtml(`Ledger maturity: ${grades.maturityStage || (stage === null ? DASH : 'Level ' + stage)}, score ${isNum(grades.maturityScore) ? (grades.maturityScore > 0 ? '+' : '') + grades.maturityScore : DASH} (ten site booleans, +1 yes, -1 no). ${maturityLevelTooltip(stage)}`)}">${escapeHtml(`${LEDGER_RECORD_QUESTION}: ${ledgerRecordWords(stage) ?? 'not established'}`)}</span>
+        <span class="claim-rung" title="${escapeHtml(claimRungTooltip(grades.claimRung))}">${escapeHtml(`${CLAIM_DEPTH_QUESTION}: ${claimDepthWords(grades.claimRung) ?? 'not established'}`)}</span>
+        <span class="claim-rung" title="${escapeHtml(`${maturityLevelTooltip(stage)}${isNum(grades.maturityScore) ? ` Score ${(grades.maturityScore > 0 ? '+' : '') + grades.maturityScore} from ten yes/no checks on the record and transfers (+1 for each yes, −1 for each no).` : ''}`.trim())}">${escapeHtml(`${LEDGER_RECORD_QUESTION}: ${ledgerRecordWords(stage) ?? 'not established'}`)}</span>
     </div>
     <p class="claim-rung-explainer"><strong>What that means</strong> ${escapeHtml(claimDepthReason(grades.claimRung) || 'The available evidence does not establish what the holder legally owns.')}</p>
     ${conceptGuideRowHtml(['claim', 'control', 'insolvency', 'redemption', 'defi'])}
