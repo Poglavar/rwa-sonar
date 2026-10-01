@@ -1,5 +1,6 @@
 // Behavioral checks for issuer scoping, shared sources and proportional mission time-lapse.
 const model = require('../rwa/lib/monitoring-map.js');
+const fleet = require('../rwa/lib/research-fleet.js');
 const fixture = {
     issuers: [{ id: 'a', label: 'Issuer A' }, { id: 'b', label: 'Issuer B' }],
     jobs: [{ id: 'court', label: 'Court scout' }, { id: 'feed', label: 'Shared feed' }],
@@ -81,6 +82,26 @@ test('source layout stays inside both narrow and wide maps and is deterministic'
 test('quadratic route positions start at the station and finish at the source', () => {
     expect(model.curvePoint({ x: 1, y: 2 }, { x: 4, y: 8 }, 0.2, 0)).toMatchObject({ x: 1, y: 2 });
     expect(model.curvePoint({ x: 1, y: 2 }, { x: 4, y: 8 }, 0.2, 1)).toMatchObject({ x: 4, y: 8 });
+});
+test('fleet sprites preserve separate issuer missions while bundling repeated URLs in one mission', () => {
+    const data = { ...fixture, routes: [...fixture.routes, { ...fixture.routes[0], id: 'second-a-document' }] };
+    const scene = fleet.buildFleet(model.groupRoutes(model.selectInventory(data)), 1026, 575);
+    expect(scene.flights.map((flight) => flight.route.issuerIds)).toEqual([['a'], ['b']]);
+    expect(scene.flights.every((flight) => flight.route.state === 'configured')).toBe(true);
+    expect(scene.nodes[0].routes).toHaveLength(4);
+});
+test('the research spaceship faces the source outbound and the station on its return journey', () => {
+    const route = { id: 'nose-direction', state: 'configured', cadenceHours: 1 };
+    const flight = { route, start: { x: 0, y: 0 }, node: { x: 100, y: 0 }, bend: 0 };
+    const period = 4, travel = period * .82;
+    const offset = model.hash(route.id) % 100000 / 100000 * period;
+    const timeFor = (phase) => (phase * travel - offset + period) % period;
+    const outbound = fleet.shipPose(flight, timeFor(.25));
+    const returning = fleet.shipPose(flight, timeFor(.75));
+    expect(outbound.x).toBeCloseTo(returning.x, 8);
+    expect(Math.cos(outbound.angle)).toBeCloseTo(1, 8);
+    expect(Math.cos(returning.angle)).toBeCloseTo(-1, 8);
+    expect(returning.returning).toBe(true);
 });
 test('visible labels stay inside the map, avoid each other and leave room for the station', () => {
     const groups = Array.from({ length: 180 }, (_, n) => ({ id: String(n), label: `Source ${n}`, category: model.CATEGORIES[n % 7].id, configured: 1, routes: Array(1 + n % 40).fill({}) }));

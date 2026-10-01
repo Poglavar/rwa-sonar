@@ -68,7 +68,8 @@
 .map-legend i { display: block; width: 7px; height: 7px; border-radius: 50%; }
 .legend-source { background: #e9b979; box-shadow: 0 0 6px #e9b97933; }
 .map-legend .legend-issuer { border: 1px solid #a1adbf; }
-.map-legend .legend-ship { border-radius: 0; background: #d1e6e9; clip-path: polygon(0 0, 100% 50%, 0 100%, 25% 50%); width: 10px; }
+.map-legend .legend-ship { border-radius: 0; background: url('./images/research-fleet/research-ship-v1.webp') center / contain no-repeat; width: 20px; height: 11px; }
+.research-station-image { filter: drop-shadow(0 0 10px #76c5d62e); }
 .motion-controls { display: flex; align-items: center; gap: 7px; }
 .motion-controls select { background: transparent; border: 0; color: #acb6c6; font: 9px ui-monospace, monospace; min-height: 36px; padding: 4px 20px 4px 3px; }
 .icon-control { display: grid; place-items: center; background: #172130; color: #dae0e8; border: 1px solid #344151; border-radius: 7px; width: 36px; height: 36px; font-size: 15px; }

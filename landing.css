@@ -34,6 +34,22 @@ main, footer { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
 
 /* Starts close under the header rule: the hero used to centre itself in a 650 px box below a 68 px pad. */
 .hero { display: grid; grid-template-columns: minmax(0, .88fr) minmax(460px, 1.12fr); align-items: start; gap: 72px; padding: 28px 0 72px; }
+/* A decorative fleet behind the existing stock search and comparison. */
+.hero[data-research-hero] { position: relative; isolation: isolate; padding-top: 38px; }
+.research-backdrop { position: absolute; z-index: -1; top: 0; bottom: 24px; left: min(-20px, calc((1180px - 100vw) / 2)); right: min(-20px, calc((1180px - 100vw) / 2)); overflow: hidden; background: #071323; }
+.research-backdrop video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.research-backdrop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,19,35,.82), rgba(7,19,35,.22) 75%), linear-gradient(0deg, rgba(7,19,35,.38), transparent 45%); }
+.hero[data-research-hero] .hero-copy { color: #f0f4ff; }
+.hero[data-research-hero] .hero-copy > .eyebrow { color: #c4d0f3; }
+.hero[data-research-hero] h1 span { color: #abbcff; }
+.hero[data-research-hero] .hero-lede, .hero[data-research-hero] .hero-proof { color: #c4d0e2; }
+.hero[data-research-hero] #snapshotTokens { color: #f0f4ff; }
+.hero[data-research-hero] .hero-actions .button { background: rgba(19,37,65,.94); color: #eef3ff; border-color: #7386b0; }
+.hero[data-research-hero] .hero-actions .button-primary { background: #4764df; border-color: #8096ff; }
+.hero[data-research-hero] .hero-actions .button-planets { border-color: #cbb576; }
+.hero[data-research-hero] .hero-actions .button:hover { background: #294671; }
+.research-backdrop-toggle { position: absolute; right: 0; top: 6px; z-index: 1; min-height: 28px; padding: 4px 10px; border: 1px solid #65768e; border-radius: 20px; background: #0d1b2de8; color: #d3deef; font: inherit; font-size: .65rem; cursor: pointer; }
+.research-backdrop-toggle[hidden] { display: none; }
 h1, h2, h3, p { text-wrap: pretty; }
 h1 { margin: 0; max-width: 680px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.4rem, 6.5vw, 6.1rem); font-weight: 500; letter-spacing: -.065em; line-height: .94; }
 h1 span { color: var(--violet); }
@@ -323,6 +339,10 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 @media (max-width: 560px) {
     .hero { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
     .hero-copy { display: contents; }
+    .research-backdrop { left: -12px; right: -12px; }
+    .research-backdrop::after { background: linear-gradient(180deg, rgba(7,19,35,.72), rgba(7,19,35,.46) 45%, rgba(7,19,35,.8)); }
+    .research-backdrop video { height: min(100%, 900px); object-position: center top; }
+    .hero[data-research-hero] #heroTitle { color: #f0f4ff; }
     .hero-copy > .eyebrow { order: 1; }
     #heroTitle { order: 2; }
     .hero-lede { order: 3; }

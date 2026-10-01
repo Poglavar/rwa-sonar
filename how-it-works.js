@@ -2,6 +2,7 @@
 (function () {
     'use strict';
     const M = window.__rwaMonitoringMap;
+    const F = window.__rwaResearchFleet;
     const $ = (id) => document.getElementById(id);
     const escape = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
     const format = (number) => number.toLocaleString('en');
@@ -13,6 +14,9 @@
     let directoryMode = 'sources', directoryLimit = 24, paused = reducedMotion.matches || params.has('reduceMotion');
     let secondsPerHour = 4, elapsed = 0, lastFrame = null, frameId = null, inView = true;
     const canvas = $('shipsCanvas'), ctx = canvas.getContext('2d');
+    const shipSprite = new Image();
+    shipSprite.addEventListener('load', () => drawShips(elapsed));
+    shipSprite.src = F.ASSETS.ship;
     const defaultInspector = $('missionInspector').innerHTML;
 
     function updateUrl() {
@@ -72,7 +76,7 @@
         if (!width || !height) return;
         const focus = document.activeElement?.closest('[data-source], [data-issuer]')?.dataset;
         const focusId = focus?.source || focus?.issuer, focusKind = focus?.source ? 'source' : 'issuer';
-        layout = M.layoutSources(groups, width, height);
+        layout = F.buildFleet(groups, width, height);
         const { center, nodes } = layout;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = width * dpr; canvas.height = height * dpr;
@@ -81,9 +85,7 @@
         const grad = M.CATEGORIES.map((c) => `<radialGradient id="planet-${c.id}" cx="28%" cy="25%" r="78%"><stop offset="0" stop-color="#f2f0e3"/><stop offset=".2" stop-color="${c.color}"/><stop offset=".8" stop-color="${c.color}" stop-opacity=".25"/><stop offset="1" stop-color="#14202f"/></radialGradient>`).join('');
         const paths = nodes.map((node) => {
             const color = category(node.category).color;
-            const bend = ((M.hash(node.id) % 7) - 3) * 0.032;
-            const start = { x: center.x + Math.cos(node.angle) * 49, y: center.y + Math.sin(node.angle) * 49 };
-            node.start = start; node.bend = bend;
+            const { start, bend } = node;
             const mid = M.curvePoint(start, node, bend, 0.5);
             const control = { x: 2 * mid.x - (start.x + node.x) / 2, y: 2 * mid.y - (start.y + node.y) / 2 };
             const cls = `route-line${selectedSource === node.id ? ' is-highlighted' : ''}${node.configured ? '' : ' is-prepared'}`;
@@ -106,47 +108,28 @@
             const x = center.x + Math.cos(angle) * orbitRadius, y = center.y + Math.sin(angle) * orbitRadius * 0.77;
             return `<g class="issuer-node${filters.issuer === issuer.id ? ' is-selected' : ''}" data-issuer="${escape(issuer.id)}" transform="translate(${x} ${y})" role="button" tabindex="0" aria-label="Follow ${escape(issuer.label)}"><circle class="node-hit" r="9" style="fill:transparent;stroke:none"/><circle r="${filters.issuer === issuer.id ? 4.5 : 2.7}"/></g>`;
         }).join('');
-        const station = `<g transform="translate(${center.x} ${center.y})" aria-hidden="true">`
-            + '<circle r="72" fill="url(#station-glow)"/><circle r="49" fill="#0c1725" stroke="#415771" stroke-width=".8"/>'
-            + '<ellipse rx="37" ry="17" transform="rotate(-30)" fill="none" stroke="#b7c9db" stroke-width=".75"/>'
-            + '<ellipse rx="37" ry="17" transform="rotate(30)" fill="none" stroke="#b7c9db" stroke-width=".75"/>'
-            + '<circle r="21" fill="url(#station-core)" stroke="#e5d3ac" stroke-width=".5"/>'
-            + '<path d="M-10 3a11 11 0 0 1 20 0M-7-2a8 8 0 0 1 14 0M-3-6a4 4 0 0 1 6 0" fill="none" stroke="#f3dfba" stroke-width="1.4"/>'
-            + '<circle cy="6" r="2" fill="#f3dfba"/><circle cx="31" cy="-18" r="2.4" fill="#dce3ea"/>'
-            + `<text class="station-label" y="${width < 600 ? 83 : 112}" text-anchor="middle">RWA SONAR</text><text class="station-subtitle" y="${width < 600 ? 97 : 126}" text-anchor="middle">RESEARCH STATION</text></g>`;
-        svg.innerHTML = `<defs>${grad}<radialGradient id="station-glow"><stop stop-color="#e5b879" stop-opacity=".17"/><stop offset="1" stop-color="#e5b879" stop-opacity="0"/></radialGradient><radialGradient id="station-core" cx="30%" cy="20%"><stop stop-color="#d7b687"/><stop offset=".25" stop-color="#765841"/><stop offset="1" stop-color="#192030"/></radialGradient></defs>`
+        const station = F.stationSvg(layout);
+        svg.innerHTML = `<defs>${grad}<radialGradient id="station-glow"><stop stop-color="#76c5d6" stop-opacity=".2"/><stop offset="1" stop-color="#76c5d6" stop-opacity="0"/></radialGradient></defs>`
             + `<ellipse class="orbit-ring" cx="${center.x}" cy="${center.y}" rx="${Math.max(90, width / 2 - 75)}" ry="${height / 2 - 63}"/>`
             + `<ellipse class="orbit-ring" cx="${center.x}" cy="${center.y}" rx="${orbitRadius}" ry="${orbitRadius * .77}"/>${paths}${sourceNodes}${issuerNodes}${station}${sourceLabels}`;
         if (focusId) svg.querySelector(`[data-${focusKind}="${CSS.escape(focusId)}"]`)?.focus({ preventScroll: true });
-        flights = nodes.flatMap((node) => {
-            // Every line bundles one destination. Keep separate mission/issuer scopes inside that
-            // bundle; the complete query/URL list is always available in the manifest below.
-            const bundles = new Map();
-            for (const route of node.routes.filter((r) => r.state === 'configured')) {
-                const key = `${route.jobId}:${route.cadenceHours}:${route.issuerIds.join(',')}`;
-                if (!bundles.has(key)) bundles.set(key, route);
-            }
-            return [...bundles.values()].map((route, index) => ({ route, node, start: node.start,
-                bend: node.bend + (index % 5 - 2) * .02, color: category(route.category).color }));
-        });
+        flights = layout.flights;
         drawShips(elapsed);
     }
     function drawShips(time) {
         if (!ctx || !layout) return;
         ctx.clearRect(0, 0, $('mapStage').clientWidth, $('mapStage').clientHeight);
+        if (!shipSprite.complete || !shipSprite.naturalWidth) return;
         for (const flight of flights) {
             if (selectedSource && flight.node.id !== selectedSource) continue;
-            const phase = M.shipPhase(flight.route, time, secondsPerHour);
-            if (!phase) continue;
-            const point = M.curvePoint(flight.start, flight.node, flight.bend, phase.progress);
-            const angle = point.angle + (phase.returning ? Math.PI : 0);
-            ctx.save(); ctx.translate(point.x, point.y); ctx.rotate(angle);
-            const alpha = selectedSource ? .9 : .62;
-            ctx.globalAlpha = alpha; ctx.strokeStyle = flight.color; ctx.lineWidth = .85;
-            ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-13, 0); ctx.stroke();
-            ctx.fillStyle = phase.returning ? '#e9e9d8' : flight.color;
-            ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(-3, -2.5); ctx.lineTo(-1, 0); ctx.lineTo(-3, 2.5); ctx.closePath(); ctx.fill();
-            if (phase.returning) { ctx.globalAlpha = .5; ctx.fillStyle = flight.color; ctx.fillRect(-6, -1, 2, 2); }
+            const pose = F.shipPose(flight, time, secondsPerHour);
+            if (!pose) continue;
+            ctx.save(); ctx.translate(pose.x, pose.y); ctx.rotate(pose.angle);
+            ctx.globalAlpha = selectedSource ? .8 : .42; ctx.strokeStyle = flight.color; ctx.lineWidth = .85;
+            ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-20, 0); ctx.stroke();
+            ctx.globalAlpha = selectedSource ? 1 : .88;
+            const shipWidth = selectedSource ? 25 : 22, shipHeight = shipWidth * shipSprite.naturalHeight / shipSprite.naturalWidth;
+            ctx.drawImage(shipSprite, -shipWidth / 2, -shipHeight / 2, shipWidth, shipHeight);
             ctx.restore();
         }
     }
