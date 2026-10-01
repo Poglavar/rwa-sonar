@@ -294,6 +294,47 @@ export function buildRegistry(dossiers, { generatedAt } = {}) {
     return { generatedAt, count: items.length, items, truncated };
 }
 
+/**
+ * Add curated RWA research citations to the public-source registry. `foundIn` carries a stable,
+ * explicit attribution because the existing source table has no product columns and issuer is
+ * correctly nullable for these non-issuer dossiers. A citation is tagged once per applicable
+ * holder context, so a shared URL remains filterable by product without assigning it to an issuer.
+ */
+export function addResearchSources(items, research, { generatedAt } = {}) {
+    if (!generatedAt) throw new Error('addResearchSources needs generatedAt');
+    const byUrl = new Map((Array.isArray(items) ? items : []).map((item) => [normaliseUrl(item.url), { ...item, foundIn: [...(item.foundIn ?? [])] }]));
+    for (const product of research?.products ?? []) {
+        const productId = product?.id;
+        const instrumentId = product?.instrument?.id;
+        if (typeof productId !== 'string' || typeof instrumentId !== 'string') continue;
+        const contexts = Array.isArray(product.contexts) ? product.contexts : [];
+        for (const source of product.sources ?? []) {
+            const url = normaliseUrl(source?.url);
+            if (!url || typeof source.id !== 'string' || !source.id || typeof source.title !== 'string' || !source.title.trim()) continue;
+            let item = byUrl.get(url);
+            if (!item) {
+                item = { url, kind: classifyKind(url), issuer: null, title: source.title.trim(), foundIn: [] };
+                byUrl.set(url, item);
+            }
+            for (const context of contexts) {
+                if (typeof context?.id !== 'string' || typeof context?.termsId !== 'string') continue;
+                const tag = `product=${encodeURIComponent(productId)}|instrument=${encodeURIComponent(instrumentId)}|context=${encodeURIComponent(context.id)}|terms=${encodeURIComponent(context.termsId)}|source=${encodeURIComponent(source.id)}`;
+                if (!item.foundIn.includes(tag)) item.foundIn.push(tag);
+            }
+        }
+    }
+    const merged = [...byUrl.values()].map((item) => ({ ...item, foundIn: [...item.foundIn].sort(byString) }))
+        .sort((a, b) => byString(a.url, b.url));
+    return { generatedAt, count: merged.length, items: merged };
+}
+
+/** Find registry citations for one curated research product id. */
+export function matchesResearchProduct(item, productId) {
+    if (typeof productId !== 'string' || productId === '') return false;
+    const prefix = `product=${encodeURIComponent(productId)}|`;
+    return Array.isArray(item?.foundIn) && item.foundIn.some((label) => typeof label === 'string' && label.startsWith(prefix));
+}
+
 /** `{key: n}` sorted by count then key, for the run summary. */
 export function countBy(items, pick) {
     const counts = new Map();

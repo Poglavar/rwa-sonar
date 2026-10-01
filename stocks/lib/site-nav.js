@@ -24,6 +24,7 @@
 
     /** The dropdown, grouped by question: meaning first, then evidence, then live monitoring, then about. */
     const RESEARCH = [
+        { href: 'how-it-works.html', label: 'How it works' },
         { href: 'methodology.html', label: 'Methodology' },
         { id: 'nav-graph', href: 'graph.html', label: 'Trust map' },
         { href: 'powers.html', label: 'Who holds the keys' },

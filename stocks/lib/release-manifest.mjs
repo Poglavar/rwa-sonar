@@ -2,6 +2,7 @@
 // their own payloads; this only says which complete set is published together.
 export const RELEASE_ARTIFACTS = [
     'release-evidence.json',
+    'monitoring-map.json',
     'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
     'stocks-graph.json', 'stocks-health.json', 'stocks-collector-status.json', 'stocks-review-queue.json',
     'stocks-closed-market.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
@@ -60,6 +61,7 @@ export const RELEASE_BUILD_STAGES = {
         // Last: reads the finished catalogue, templates and health. index.html and pitch/index.html
         // are ordinary site files, not manifest families; refresh-on-server.sh installs them itself.
         'stocks/build-static-snapshot.mjs',
+        'rwa/build-monitoring-map.mjs',
         // After the snapshot: writes each page's head block, preview image and the sitemaps.
         'stocks/build-site-seo.mjs'
     ]

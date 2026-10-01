@@ -12,7 +12,7 @@ const learnPages = fs.readdirSync(path.join(ROOT, 'learn')).filter((f) => f.ends
 /** Hand-written pages with the site header: [file, link root, own nav entry]. */
 const PAGES = [
     ['index.html', './', null], ['stocks.html', './', null], ['assets.html', './', 'assets.html'],
-    ...['powers', 'flows', 'tracking', 'exits', 'whatif', 'watch', 'monitor', 'live', 'graph', 'economics', 'methodology', 'review']
+    ...['powers', 'flows', 'tracking', 'exits', 'whatif', 'watch', 'monitor', 'live', 'graph', 'economics', 'how-it-works', 'methodology', 'review']
         .map((name) => [`${name}.html`, './', `${name}.html`]),
     ...learnPages.map((file) => [file, '../', 'learn/']),
     ['404.html', '/', null]

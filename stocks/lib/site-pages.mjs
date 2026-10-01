@@ -207,6 +207,15 @@ export const SITE_PAGES = [
         lastmod: () => null
     },
     {
+        key: 'how-it-works', file: 'how-it-works.html', path: 'how-it-works.html',
+        title: 'How RWA Sonar works — RWA Sonar',
+        description: 'Explore how RWA Sonar discovers real-world asset tokens, gathers legal and on-chain evidence, and monitors changes across issuer programmes and exact assets.',
+        kicker: 'How it works', subtitle: 'From sources and collection to evidence, review and published monitoring status.',
+        schema: 'dataset', dataset: { name: 'RWA Sonar monitoring map', files: ['monitoring-map.json'] },
+        facts: ['Shows data collection and monitoring coverage across RWA products and issuer programmes.', 'Coverage, providers and schedules vary by collection job.'],
+        lastmod: () => null
+    },
+    {
         key: 'methodology', file: 'methodology.html', path: 'methodology.html',
         title: 'Methodology — how RWA Sonar evaluates tokenized stocks',
         description: 'How RWA Sonar discovers tokenized stocks on Solana, verifies legal and on-chain claims, monitors changes, grades evidence and reports data gaps.',

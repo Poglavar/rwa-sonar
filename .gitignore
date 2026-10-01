@@ -137,3 +137,5 @@ stocks/data/cmc-tokenized.json
 
 # Private open-work list, kept local only
 next-steps.md
+
+/monitoring-map.json
