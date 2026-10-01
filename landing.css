@@ -38,9 +38,9 @@ h1, h2, h3, p { text-wrap: pretty; }
 h1 { margin: 0; max-width: 680px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.4rem, 6.5vw, 6.1rem); font-weight: 500; letter-spacing: -.065em; line-height: .94; }
 h1 span { color: var(--violet); }
 .hero-lede { max-width: 650px; margin: 28px 0 0; color: var(--muted); font-size: 1.14rem; line-height: 1.65; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-/* The shared .button / .button-primary (app-shell.css), a little taller in the hero. */
-.hero-actions .button { min-height: 48px; }
+.hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 12px; margin-top: 30px; }
+/* Equal tiles keep all four entry points aligned, including wrapped labels. */
+.hero-actions .button { min-width: 0; min-height: 56px; padding: 12px 16px; text-align: center; text-wrap: balance; }
 .hero-actions .button-primary { box-shadow: 0 10px 24px rgba(49,84,216,.2); }
 /* The way into the universe view (universe.html), flagged as new. */
 .button-planets { gap: 8px; border-color: var(--rwa-new-line); background: var(--rwa-new-soft); }
@@ -226,7 +226,7 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
     .hero { gap: 34px; padding: 24px 0 58px; }
     h1 { font-size: 2.75rem; }
     .hero-lede { margin-top: 20px; font-size: .96rem; line-height: 1.55; }
-    .hero-actions { margin-top: 22px; }
+    .hero-actions { grid-template-columns: 1fr; margin-top: 22px; }
     .hero-proof { margin-top: 15px; }
     .comparison-preview { padding: 21px 18px; }
     .preview-title-row { display: block; }
