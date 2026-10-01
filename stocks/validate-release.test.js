@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 
 import { validateRelease } from './validate-release.mjs';
 import { buildResearch } from '../rwa/lib/build-research.mjs';
+import structureMap from '../rwa/lib/structure-map.js';
 import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 import { releaseRsyncExcludes } from './lib/release-manifest.mjs';
@@ -76,7 +77,7 @@ async function fixture() {
     await writeFile(join(root, 'cards/NVDAx.html'), '<h1>NVDAx</h1><p>Kraken xStocks · secured claim on collateral</p>'
         + `<link rel="canonical" href="${ORIGIN}/cards/NVDAx.html" />`);
     await writeFile(join(root, 'issuers/xstocks-backed.html'), '<h1>Kraken xStocks</h1>'
-        + '<p>secured claim on collateral</p><p>Unknown means not established, never “no”</p>'
+        + '<p>secured claim on collateral</p><p>Missing evidence: we could not verify this answer from the sources reviewed. This does not mean the protection is absent.</p>'
         + `<link rel="canonical" href="${ORIGIN}/issuers/xstocks-backed.html" />`);
     await writeFile(join(root, 'templates/xstocks-backed--template.html'), '<h1>xStocks template</h1>'
         + '<p>xstocks-backed--template</p><p>caution</p><h3>Recorded external source changes</h3>');
@@ -123,6 +124,9 @@ async function refreshCatalogue(root) {
         JSON.parse(await readFile(join(root, 'stocks-issuers.json'), 'utf8')),
         JSON.parse(await readFile(join(root, 'stocks-tokens.json'), 'utf8')),
         JSON.parse(await readFile(join(root, 'rwa-research.json'), 'utf8')))));
+    await writeFile(join(root, 'rwa-structure-map.json'), JSON.stringify(structureMap.buildMap(
+        JSON.parse(await readFile(join(root, 'rwa-research.json'), 'utf8')),
+        JSON.parse(await readFile(join(root, 'rwa-catalogue.json'), 'utf8')))));
 }
 
 describe('release artifact validation', () => {
@@ -130,6 +134,17 @@ describe('release artifact validation', () => {
 
     afterEach(async () => {
         if (root) await rm(root, { recursive: true, force: true });
+    });
+
+    test('rejects a missing or drifted structure map', async () => {
+        root = await fixture();
+        const file=join(root,'rwa-structure-map.json');
+        const map=JSON.parse(await readFile(file,'utf8'));
+        map.counts.deployments++;
+        await writeFile(file,JSON.stringify(map));
+        await expect(validateRelease({root,baseUrl:ORIGIN})).rejects.toThrow('structure map disagrees');
+        await unlink(file);
+        await expect(validateRelease({root,baseUrl:ORIGIN})).rejects.toThrow('rwa-structure-map.json');
     });
 
     test('accepts one generated card per token and route-specific canonicals', async () => {

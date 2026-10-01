@@ -95,3 +95,25 @@
 - Unification Phase 2 uses an explicit programme → instrument → deployment identity model. Findings carry holder context, terms set and applicability period; live deployment checks never refresh legal dates. Public-source reviews for USDC, PAXG, BUIDL, FOBXX, USDY, ACRED and HLSCOPE show unknown/conflicting evidence rather than filling gaps from issuer marketing. Confidential agreements, period-specific reserve assurance and live authorities remain separate evidence scopes.
 
 - Unification completion: adapt stock dossiers as programme subjects with unresolved per-token legal binding; index-build dates never become identity or legal checks. Publish source-scoped reviews with unknown private terms and preserve exact observation dates. Monitoring scope is configured reads, not a guarantee that the production scheduler has been activated.
+
+- 2026-10-01: The visual redesign will lead with a clickable collapsing structure map, stable issuer identity colors and evidence-scoped five-feature profiles (ownership, backing, controls, exit, failure), followed by explanatory failure scenarios, so readers can judge specific strengths and limitations without a composite maturity score; implementation steps are in `plan.md`, with the earlier plan preserved in `docs/unification-plan.md`.
+
+- 2026-10-01: The visual experience uses one scoped profile model across explorer/reports/comparisons/generated pages and a compact typed structure-map artifact; source changes invalidate curated display labels, identity colors stay separate from finding judgments, and hypothetical scenarios retain programme/exact-token scope.
+
+- 2026-10-01: Owner prefers a stable structure-map overview: clicking a programme or structure changes branch highlights and details without reordering or shifting the columns; explicit search/filter/view/expansion controls may change layout.
+
+- 2026-10-01: Token clusters select their issuer; a selected issuer or group keeps the same programme membership across Legal structures and Contract controls. The profile headline is a plain “At a glance” summary, with evidence links only on feature cards; holder-context duplication and internal terms IDs are removed from the branch summary.
+
+- 2026-10-01: Finding colors must explain their meaning: amber names a concrete restriction/dependency with a visible reason, gray names a specific evidence gap, and a mere issuer description is not itself a warning. Caution/problem annotations without a visible explanation fail research validation.
+
+- Use one all-catalogue search inside the structure map; remove the duplicated explorer entry/detail browser and homepage hero search, while linking search matches directly to reports.
+
+- Keep map caveat immediately below the chart, center search above view toggles, omit profile headline labels and branch/self-links; animations enabled without a manual toggle while respecting reduced-motion preferences.
+
+- Single-product map branches use “See full report” and label feature cards “Summary”; legal and controls chart views use blue and purple backgrounds while issuer identity and finding colors remain consistent.
+
+- Keep the explorer concise: remove chart instructions, visible search label, lengthy review-scope introduction, workspace links and overview count text; center contact footer content. The search retains its accessible name.
+
+- Map branch details contain Summary feature cards without the duplicate scope/conclusion prose. Cluster glyphs grow with inventory size (exact dots for small clusters, logarithmic density for large ones); numeric counts remain exact.
+
+- Latest chart positioning decision supersedes stable rows: promote a selected programme/group and its connections to the top, expand the compact row budget to fit all matching members, and keep other visible rows dimmed and clickable. Explicit search filters remain in effect.

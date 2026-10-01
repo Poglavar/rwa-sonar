@@ -109,14 +109,14 @@ describe('the landing page box', () => {
     const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
     const css = readFileSync(join(ROOT, 'landing.css'), 'utf8');
 
-    test('sits in the hero after the search and the comparison card, on a phone and on a wide screen', () => {
-        const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="tradeTicker"'));
-        expect(hero.indexOf('id="heroSearch"')).toBeGreaterThan(-1);
-        expect(hero.indexOf('id="latestEvents"')).toBeGreaterThan(hero.indexOf('id="heroSearch"'));
+    test('sits in the hero after the map and the comparison card, on a phone and on a wide screen', () => {
+        const hero = html.slice(html.indexOf('<section class="hero '), html.indexOf('id="tradeTicker"'));
+        expect(hero.indexOf('data-structure-map')).toBeGreaterThan(-1);
+        expect(hero.indexOf('id="latestEvents"')).toBeGreaterThan(hero.indexOf('data-structure-map'));
         // The search is its own hero area (25 Sep), and heads the right column above the card on a wide
         // screen too since 28 Sep, as it already did below 900 px.
-        expect(css).toContain('grid-template-areas: "copy search" "copy preview" "copy events"');
-        expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "search" "preview" "events"; \}/);
+        expect(css).toContain('grid-template-areas: "copy preview" "copy events"');
+        expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "preview" "events"; \}/);
     });
 
     test('is a plain list with a visible pause control and a link to every change; no live region', () => {

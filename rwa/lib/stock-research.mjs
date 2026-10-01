@@ -1,5 +1,6 @@
 // Pure adapter from the stock issuer/token indexes into programme-scoped research records.
 // It preserves legacy token observations but does not bind them to legal instruments.
+import { dossierFileFor } from '../../stocks/lib/issuer-whatif.mjs';
 const DIMENSIONS = ['rights', 'ledger', 'backing', 'controls', 'access', 'exit', 'failure'];
 const FIELD_PATTERNS = {
     rights: [/^holderClaim$/, /^holderRights(?:\.|$)/, /^legalForm$/, /^securityInterest\./, /^bankruptcyRemote$/],
@@ -68,7 +69,8 @@ function stockResearch(issuerDb, tokenDb, dossiers = {}) {
         if (!programmeId) throw new Error('Stock issuer is missing a programme slug');
         const contextId = 'programme';
         const termsId = `programme:dossier:${programmeId}`;
-        const dossier = dossiers[programmeId] || {};
+        const dossierFile = dossierFileFor(programmeId, Object.keys(dossiers).map((key) => key + '.json'));
+        const dossier = dossierFile ? dossiers[dossierFile.slice(0, -5)] : {};
         const merged = { ...dossier, ...issuer, redemption: { ...(dossier.redemption || {}), ...(issuer.redemption || {}), termScopes: dossier.redemption?.termScopes || issuer.redemption?.termScopes } };
         const sources = [];
         const sourceIndex = new Map();
@@ -193,7 +195,10 @@ function stockResearch(issuerDb, tokenDb, dossiers = {}) {
                 sourceIds: reserveSourceIds, sourcePeriod: null, checkedAt: issuer.evidence?.lastCheckedAt || null }
         ];
         const identity = array(merged.products).map((v) => clip(v, 260)).filter(Boolean).slice(0, 8).join(' | ');
-        return { id: `stock:${programmeId}`, kind: 'programme', name: issuer.name, ticker: null, originalName: issuer.name, programmeId,
+        for (const claim of claims) { claim.id = `stock:${programmeId}:${contextId}:${claim.dimension}`; claim.display = dossier.visualFindings?.[claim.dimension] || null; }
+        const scenarioAnswers = array(dossier.whatIf).filter((w) => w.mode === 'custodian-insolvency').map((w) => ({ mode: 'custodian-fails', contextId, termsId, status: w.status || 'unknown', outcome: w.outcome || 'Outcome not established.', sourceIds: [addSource({ ...w, field: `whatIf.${w.mode}` }, w.mode)].filter(Boolean), checkedAt: w.accessedAt || null, routes: { claim: 'unknown', custody: w.status === 'not-applicable' ? 'not-applicable' : w.status === 'documented' ? 'conditional' : 'unknown', exit: 'unknown' } }));
+        const scenarioActors = array(dossier.parties?.custodians).map((a) => ({ name: a.name, role: a.role, note: a.note || '', sourceIds: [addSource({ url: a.source, locator: a.note || 'Legacy party catalogue; instrument-specific roles require terms verification', field: 'parties.custodians' }, a.name)].filter(Boolean) })).filter((a) => a.name);
+        return { scenarioIssuer: array(dossier.parties?.tokenIssuers).map((a) => a.name).filter(Boolean).join(' · ') || null, scenarioActors, structure: dossier.visualStructure || null, scenarios: scenarioAnswers, id: `stock:${programmeId}`, kind: 'programme', name: issuer.name, ticker: null, originalName: issuer.name, programmeId,
             exposure: { id: 'equities', label: 'Equity, ETF or private-company exposure; this programme record does not identify every token instrument.' },
             instrument: null,
             programme: { id: `programme:${programmeId}`, legalForm: merged.legalForm || 'Not established in the issuer dossier', issuer: merged.issuingEntity || issuer.issuerText || 'Not identified in the issuer dossier',

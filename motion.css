@@ -227,3 +227,8 @@
     opacity: .45;
     transform: translate(-50%, -50%) scale(1.02);
 }
+
+/* The shared motion toggle also stops the illustration lamps without hiding the illustration. */
+@media (prefers-reduced-motion: no-preference) {
+    :root.reduce-motion .lamp-glow i { animation: none; }
+}

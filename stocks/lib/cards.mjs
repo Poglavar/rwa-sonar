@@ -1,3 +1,5 @@
+import visualProfile from '../../rwa/lib/visual-profile.js';
+import structureMap from '../../rwa/lib/structure-map.js';
 // PURE shaping and rendering for the per-token stock cards (no fs, no network, no clock, no DOM):
 // the card slug rules, the published companion .json record, the ≤ 200-character OpenGraph description and the whole
 // static HTML page. Everything a card shows is rendered here at build time, so a card is readable
@@ -3354,7 +3356,7 @@ export const OG_IMAGE_ALT = 'RWA Sonar: tokenized stocks on Solana, compared by 
  * @param {{path: string, alt: string}|null} options.ogImage this token's own 1200×630 preview
  *     (repo-relative, e.g. cards/og/NVDAx.<hash>.png, from stocks/lib/og-image.mjs); null keeps the site image
  */
-export function renderCard(card, { baseUrl = null, version = '', ogImage = null } = {}) {
+export function renderCard(card, { baseUrl = null, version = '', ogImage = null, programmeProfile = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const pageUrl = origin === null ? null : `${origin}/cards/${card.slug}.html`;
     const description = ogDescription(card);
@@ -3393,6 +3395,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
         `<link rel="stylesheet" href="../card.css${v}" />`,
         `<link rel="stylesheet" href="../trustchain.css${v}" />`,
         `<link rel="stylesheet" href="../app-shell.css${v}" />`,
+        `<link rel="stylesheet" href="../visual-experience.css?v=20261001i" />`,
         contactStylesheet('../')
     // Whitespace between head elements is not user-facing content. Keep the rendered document
     // compact rather than spending the card budget on indentation repeated in every card.
@@ -3410,6 +3413,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
             body: section('discrepancies', `${card.discrepancies.length} source-backed discrepanc${card.discrepancies.length === 1 ? 'y' : 'ies'}`, discrepanciesBody(card)) + blockFreshnessHtml(card, 'discrepancies') }) : '') +
         `${card.underReview.length ? `<div class="under-review-banner" title="${card.underReview.length} priority-zero (P0) item${card.underReview.length === 1 ? '' : 's'} in the evidence review queue"><strong>Legal conclusions under review</strong><span>${escapeHtml(underReviewWords(card.underReview.length))}</span><a href="../review.html?priority=P0&issuer=${encodeURIComponent(card.issuer.slug)}">See review queue →</a></div>` : ''}` +
         materialChangesHtml(card) +
+        (programmeProfile ? `<div class="card-programme-profile" style="--issuer-color:var(--issuer-${structureMap.colorSlot(programmeProfile.programmeId)})">${visualProfile.render(programmeProfile, {compact:true, report:`../report.html?product=${encodeURIComponent(programmeProfile.productId)}`})}</div>` : '') +
         '</header>';
 
     const fresh = (block) => blockFreshnessHtml(card, block);

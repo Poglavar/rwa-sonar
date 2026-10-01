@@ -1,3 +1,5 @@
+import visualProfile from '../../rwa/lib/visual-profile.js';
+import structureMap from '../../rwa/lib/structure-map.js';
 // Static canonical issuer dossiers. The builder passes reviewed records; this module performs no
 // I/O, reads no clock and never turns an unknown into a negative conclusion.
 
@@ -55,7 +57,7 @@ function dataContext(issuer, builtAt) {
         <span><small>Observed</small><strong>${esc(fmtDateTime(evidence.lastCheckedAt || builtAt))}</strong></span>
         <span><small>Coverage</small><strong>${esc(fmtNumber(coverage.sourced))} of ${esc(fmtNumber(coverage.needed))} required fields sourced</strong></span>
         <span><small>Basis</small><strong>${esc(fmtNumber(evidence.claims))} structured claims · current reviewed understanding</strong></span>
-        <span><small>Limit</small><strong>Unknown means not established, never “no”</strong></span>
+        <span><small>Limit</small><strong>${escapeHtml(visualProfile.EVIDENCE_GAP_NOTE)}</strong></span>
     </div>`;
 }
 
@@ -231,7 +233,7 @@ function issuerHead({ issuer, tokens, origin, canonical, ogImage }) {
  *  `whatIf` is the programme's dossier `whatIf[]` (null when no dossier file exists) and `whatIfQuestions` the
  *  catalogue's question count, so an unanswered question is counted rather than silently absent.
  *  `ogImage` is the page's own absolute `{url, alt, width, height}` preview, null for the site image. */
-export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt = null, whatIf = null, whatIfQuestions = null, schematics = null, primaryMarket = null },
+export function renderIssuerPage({ issuer, researchProduct = null, tokens = [], templates = [], builtAt = null, whatIf = null, whatIfQuestions = null, schematics = null, primaryMarket = null },
     { baseUrl = null, version = '', cardSlugs = null, ogImage = null } = {}) {
     const origin = typeof baseUrl === 'string' && baseUrl.trim() ? baseUrl.trim().replace(/\/+$/, '') : null;
     const canonical = origin ? `${origin}/issuers/${encodeURIComponent(issuer.slug)}.html` : null;
@@ -270,11 +272,12 @@ ${issuerHead({ issuer, tokens, origin, canonical, ogImage })}
 ${contactStylesheet('../')}
 <link rel="stylesheet" href="../app-shell.css${v}" />
 <link rel="stylesheet" href="../templates.css${v}" />
-<link rel="stylesheet" href="../flow-diagram.css${v}" /></head><body>
+<link rel="stylesheet" href="../visual-experience.css?v=20261001i" /><link rel="stylesheet" href="../flow-diagram.css${v}" /></head><body>
 ${siteNav.siteHeaderHtml('../', 'issuers/')}
 <main class="issuer-dossier"><p class="eyebrow">Issuer programme dossier</p><h1>${esc(issuer.name)}</h1>
 <p class="lede">${esc(firstSentence(issuer.holderClaim))}</p>
-<div class="hero-facts"><span>${esc(issuer.status)}</span><span>${esc(issuer.legalForm, 'legal form not established')}</span><span>${fmtNumber(tokens.length)} exact Solana token${tokens.length === 1 ? '' : 's'}</span><span>claim rung ${esc(grades.claimRung)} · ${esc(grades.claimLabel)}</span></div>
+${researchProduct ? `<div style="--issuer-color:var(--issuer-${structureMap.colorSlot(issuer.slug)})">${visualProfile.render(visualProfile.profile(researchProduct, researchProduct.contexts[0].id), {report:`../report.html?product=${encodeURIComponent(researchProduct.id)}`})}</div>` : ''}
+<div class="hero-facts"><span>${esc(issuer.status)}</span><span>${esc(issuer.legalForm, 'legal form not established')}</span><span>${fmtNumber(tokens.length)} exact Solana token${tokens.length === 1 ? '' : 's'}</span><span>Programme research; individual terms may differ</span></div>
 ${dataContext(issuer, builtAt)}
 <section><h2>The short answer</h2><div class="issuer-verdict-grid">
 <article><small>What do you own?</small><strong>${esc(grades.claimLabel, 'Claim not established')}</strong><p>${esc(firstSentence(issuer.holderClaim))}</p><a class="concept-link" href="../learn/beneficial-ownership.html">Understand ownership →</a></article>

@@ -4,7 +4,7 @@
     else root.__rwaResearch = factory();
 })(this, function () {
     const DIMENSIONS = { rights: 'What do I own?', ledger: 'Which record counts?', backing: 'What backs it?', controls: 'Who can intervene?', access: 'Who can hold and use it?', exit: 'How can I exit?', failure: 'What happens if it fails?' };
-    const STATES = { supported: 'Documented', unknown: 'Not established', 'not-applicable': 'Not applicable', stale: 'Historical evidence', conflicting: 'Unresolved source conflict' };
+    const STATES = { supported: 'Documented', unknown: 'Missing evidence', 'not-applicable': 'Not applicable', stale: 'Historical evidence', conflicting: 'Unresolved source conflict' };
     const BASES = { 'source-statement': 'Source statement', analysis: 'Research interpretation', observed: 'Observed' };
     const unavailable = (reason) => ({ state: 'unknown', basis: 'analysis', summary: reason, sourceIds: [] });
     function applies(scope, target) {
@@ -52,6 +52,8 @@
             if (new Set(p.contexts.map((c) => c.id)).size !== p.contexts.length) throw new Error(`Duplicate context: ${p.id}`);
             for (const c of p.contexts) if (!c.termsId) throw new Error(`Missing terms: ${p.id}`);
             for (const c of p.claims) {
+                if (c.display && (!['strength','condition','problem','unknown','not-applicable'].includes(c.display.tone) || !c.display.label || !c.display.reason || typeof c.display.basis !== 'string')) throw new Error(`Invalid visual annotation: ${p.id}`);
+                if (c.display && ['condition','problem'].includes(c.display.tone) && (typeof c.display.note !== 'string' || !c.display.note.trim())) throw new Error(`Caution lacks explanation: ${p.id}/${c.dimension}`);
                 if (!DIMENSIONS[c.dimension] || !STATES[c.state] || !BASES[c.basis] || !c.summary) throw new Error(`Invalid claim: ${p.id}`);
                 if ((programme ? c.scope?.programmeId !== p.programmeId || Boolean(c.scope?.instrumentId || c.scope?.deploymentId) : c.scope?.instrumentId !== p.instrument.id) || !p.contexts.some((x) => x.id === c.scope.contextId && x.termsId === c.scope.termsId)) throw new Error(`Unbound claim: ${p.id}`);
                 if (c.scope.from && c.scope.through && c.scope.from > c.scope.through) throw new Error(`Invalid claim period: ${p.id}`);
@@ -61,6 +63,14 @@
             }
             for (const c of p.contexts) for (const dimension of Object.keys(DIMENSIONS)) {
                 if (!p.claims.some((claim) => claim.dimension === dimension && claim.scope.contextId === c.id)) throw new Error(`Missing dimension: ${p.id}/${c.id}/${dimension}`);
+            }
+            const scenarioKeys = new Set();
+            for (const a of p.scenarios || []) {
+                const key = `${a.mode}:${a.contextId}:${a.termsId}`;
+                if (scenarioKeys.has(key) || !['issuer-unavailable', 'custodian-fails'].includes(a.mode) || !p.contexts.some((c) => c.id === a.contextId && c.termsId === a.termsId)) throw new Error(`Unbound or duplicate scenario: ${p.id}`);
+                scenarioKeys.add(key);
+                if (!['documented', 'inferred', 'unknown', 'unanswered', 'not-applicable'].includes(a.status) || !a.outcome || !Array.isArray(a.sourceIds) || a.sourceIds.some((id) => !sources.has(id)) || (['documented', 'inferred'].includes(a.status) && !a.sourceIds.length)) throw new Error(`Missing scenario evidence: ${p.id}`);
+                if (!a.routes || ['claim','custody','exit'].some((route) => !['available','interrupted','conditional','unknown','not-applicable'].includes(a.routes[route]))) throw new Error(`Invalid scenario route: ${p.id}`);
             }
             for (const d of p.deployments) {
                 if (!d.id || deployments.has(d.id) || !d.network || !d.address || !STATES[d.controls.state]) throw new Error(`Invalid deployment: ${p.id}`);

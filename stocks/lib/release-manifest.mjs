@@ -2,7 +2,7 @@
 // their own payloads; this only says which complete set is published together.
 export const RELEASE_ARTIFACTS = [
     'release-evidence.json',
-    'rwa-catalogue.json', 'rwa-research.json', 'rwa/data/research.json', 'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
+    'rwa-structure-map.json', 'rwa-catalogue.json', 'rwa-research.json', 'rwa/data/research.json', 'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
     'stocks-graph.json', 'stocks-health.json', 'stocks-collector-status.json', 'stocks-review-queue.json',
     'stocks-closed-market.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
     'stocks-legal-templates.json',
@@ -33,7 +33,7 @@ export const RELEASE_CURATED = ['rwa/data/research.json', 'stocks/data/events.js
 // from retained raw inputs (including curated dossier changes); it never collects a source.
 export const RELEASE_BUILD_STAGES = {
     base: [
-        'stocks/build-stocks-db.mjs', 'rwa/build-research.mjs', 'stocks/build-rwa-catalogue.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
+        'stocks/build-stocks-db.mjs', 'rwa/build-research.mjs', 'stocks/build-rwa-catalogue.mjs', 'rwa/build-structure-map.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
         'stocks/build-discovery-index.mjs',
         // Read the catalogue build-stocks-db just wrote.
         'stocks/build-power-map.mjs', 'stocks/build-flows.mjs', 'stocks/build-schematics.mjs',

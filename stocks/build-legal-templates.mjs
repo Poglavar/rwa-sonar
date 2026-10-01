@@ -28,7 +28,7 @@ const REVIEW_QUEUE_PATH = join(ROOT, 'stocks-review-queue.json');
 const POWER_MAP_PATH = join(ROOT, 'stocks-power-map.json');
 const DEFAULT_OUT_DIR = 'templates';
 const DEFAULT_ISSUER_OUT_DIR = 'issuers';
-const ASSET_VERSION = '20260930honest';
+const ASSET_VERSION = '20261001g';
 
 function usage() {
     console.log(`build-legal-templates.mjs — reusable legal architectures and static pages
@@ -88,6 +88,7 @@ export async function main(argv = process.argv.slice(2)) {
 
     const issuerDb = await readJson(ISSUERS_PATH);
     const tokenDb = await readJson(TOKENS_PATH);
+    const sharedResearch = await readJson(join(ROOT, 'rwa-research.json'));
     const composability = await readJson(COMPOSABILITY_PATH);
     // Who can create and redeem at each issuer, for the issuer page's "Who keeps the price honest".
     const primaryMarket = await readJson(PRIMARY_MARKET_PATH, { issuers: {} });
@@ -188,6 +189,7 @@ export async function main(argv = process.argv.slice(2)) {
         }));
         await writeFile(join(issuerOutDir, name), renderIssuerPage({
             issuer,
+            researchProduct: sharedResearch.products.find((p) => p.id === `stock:${issuer.slug}`),
             tokens: issuerTokens,
             templates,
             builtAt: issuerDb.builtAt,

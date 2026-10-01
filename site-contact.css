@@ -11,7 +11,7 @@
     border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
     font-size: 0.9rem;
     line-height: 1.5;
-    text-align: left;
+    text-align: center;
 }
 
 .site-contact .site-contact-title {
@@ -22,6 +22,7 @@
 .site-contact ul {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 6px 22px;
     margin: 0;
     padding: 0;
@@ -96,6 +97,7 @@ body > .site-contact {
 .site-contact.site-contact-inner {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     align-items: baseline;
     gap: 4px 14px;
     max-width: none;

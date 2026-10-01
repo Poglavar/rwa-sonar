@@ -144,3 +144,6 @@ next-steps.md
 
 # Completion records for the new cross-asset deployment watcher.
 .last-rwa-deployment-watch-stats*.json
+
+# Built all-RWA structure-map navigation.
+/rwa-structure-map.json

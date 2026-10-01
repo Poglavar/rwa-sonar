@@ -564,3 +564,79 @@ body.app-page {
 .event-title { color: var(--rwa-ink); font-size: .86rem; font-weight: 650; line-height: 1.38; text-decoration: none; overflow-wrap: anywhere; }
 .event-title:hover, .event-title:focus-visible { color: var(--rwa-cobalt-dark); text-decoration: underline; }
 .event-empty { color: var(--rwa-muted); font-size: .8rem; }
+
+/* Finding semantics and stable programme identity colors used by the visual research layer. */
+:root {
+ --rwa-finding-strength: var(--rwa-green);
+ --rwa-finding-condition: var(--rwa-amber);
+ --rwa-finding-problem: var(--rwa-red);
+ --rwa-finding-unknown: var(--rwa-muted);
+ --issuer-0: hsl(225 58% 40%);
+ --issuer-1: hsl(278 58% 40%);
+ --issuer-2: hsl(195 58% 40%);
+ --issuer-3: hsl(248 58% 40%);
+ --issuer-4: hsl(205 58% 40%);
+ --issuer-5: hsl(290 58% 40%);
+ --issuer-6: hsl(185 58% 40%);
+ --issuer-7: hsl(263 58% 40%);
+ --issuer-8: hsl(235 58% 40%);
+ --issuer-9: hsl(301 58% 40%);
+ --issuer-10: hsl(214 58% 40%);
+ --issuer-11: hsl(283 58% 40%);
+ --issuer-12: hsl(191 58% 40%);
+ --issuer-13: hsl(259 58% 40%);
+ --issuer-14: hsl(242 58% 40%);
+ --issuer-15: hsl(310 58% 40%);
+ --issuer-16: hsl(202 58% 40%);
+ --issuer-17: hsl(272 58% 40%);
+ --issuer-18: hsl(218 58% 40%);
+ --issuer-19: hsl(252 58% 40%);
+ --issuer-20: hsl(188 58% 40%);
+ --issuer-21: hsl(295 58% 40%);
+ --issuer-22: hsl(231 58% 40%);
+ --issuer-23: hsl(280 58% 40%);
+ --issuer-24: hsl(199 58% 40%);
+ --issuer-25: hsl(266 58% 40%);
+ --issuer-26: hsl(305 58% 40%);
+ --issuer-27: hsl(221 58% 40%);
+ --issuer-28: hsl(287 58% 40%);
+ --issuer-29: hsl(194 58% 40%);
+ --issuer-30: hsl(254 58% 40%);
+ --issuer-31: hsl(207 58% 40%);
+ --issuer-32: hsl(274 58% 40%);
+}
+:root:where([data-theme="dark"]) {
+ --issuer-0: hsl(225 65% 74%);
+ --issuer-1: hsl(278 65% 74%);
+ --issuer-2: hsl(195 65% 74%);
+ --issuer-3: hsl(248 65% 74%);
+ --issuer-4: hsl(205 65% 74%);
+ --issuer-5: hsl(290 65% 74%);
+ --issuer-6: hsl(185 65% 74%);
+ --issuer-7: hsl(263 65% 74%);
+ --issuer-8: hsl(235 65% 74%);
+ --issuer-9: hsl(301 65% 74%);
+ --issuer-10: hsl(214 65% 74%);
+ --issuer-11: hsl(283 65% 74%);
+ --issuer-12: hsl(191 65% 74%);
+ --issuer-13: hsl(259 65% 74%);
+ --issuer-14: hsl(242 65% 74%);
+ --issuer-15: hsl(310 65% 74%);
+ --issuer-16: hsl(202 65% 74%);
+ --issuer-17: hsl(272 65% 74%);
+ --issuer-18: hsl(218 65% 74%);
+ --issuer-19: hsl(252 65% 74%);
+ --issuer-20: hsl(188 65% 74%);
+ --issuer-21: hsl(295 65% 74%);
+ --issuer-22: hsl(231 65% 74%);
+ --issuer-23: hsl(280 65% 74%);
+ --issuer-24: hsl(199 65% 74%);
+ --issuer-25: hsl(266 65% 74%);
+ --issuer-26: hsl(305 65% 74%);
+ --issuer-27: hsl(221 65% 74%);
+ --issuer-28: hsl(287 65% 74%);
+ --issuer-29: hsl(194 65% 74%);
+ --issuer-30: hsl(254 65% 74%);
+ --issuer-31: hsl(207 65% 74%);
+ --issuer-32: hsl(274 65% 74%);
+}

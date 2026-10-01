@@ -1,333 +1,333 @@
-<!-- Plan for unifying the original cross-chain RWA catalogue with the research, evidence and monitoring developed for Solana stocks. -->
-# RWA Sonar unification plan
+<!-- Implementation plan for making RWA Sonar's structure graphic the main entrance and using evidence-backed visual profiles and scenarios throughout the product. -->
+# RWA Sonar visual experience plan
 
 Date: 2026-10-01
 
-Branch: `unification`
+Working branch: `unification`
 
-Starting point: `universe` at `d922d0f`, containing the latest locally reviewed Solana implementation. The original catalogue remains available on `main` at `8f58030` for comparison.
+Status: core visual experience implemented locally on `unification`; validation and remaining review limits are recorded below.
 
-## Objective and timing
+The earlier unification plan and its implementation record are preserved in [docs/unification-plan.md](docs/unification-plan.md). This plan builds on that work. Implementation is recorded against the individual steps below; this work has not been published to production.
 
-After hackathon judging ends, restore RWA Sonar's public scope to all RWA asset classes and chains. Retain Solana stocks as a prominent, deeply researched part of that coverage. Use the newer research and monitoring system as the foundation of the unified site.
+## 1. Outcome
 
-Preserve the existing judging experience until judging is over. The user subsequently authorized implementation and completion of all phases on the unification worktree. This document now records the design and completed local implementation. Production publication and scheduler activation remain separate deployment actions.
+Make the collapsing graphic the main entrance to RWA Sonar. A visitor should quickly understand that many token addresses share issuers, legal structures, contract controls and dependencies, then investigate the parts that matter to them.
 
-The assessment behind this plan reviewed the original catalogue, the newer model and implementation, the live site and primary sources for representative products. It was a framework and data-quality assessment, not renewed legal diligence on every original token. Counts and findings below describe those reviewed snapshots and must be rechecked during migration.
+The reader journey is:
 
-## 1. Do Solana stocks fit the original framework?
+**Recognize the structure → notice its strengths and weaknesses → investigate the evidence.**
 
-Yes. The original framework asks whether a token actually carries the rights and operational properties its marketing implies. That question applies to gold, fund interests, shares, structured notes and other RWAs.
+The interface should feel alive through purposeful movement, consistent issuer colors, recurring icons and simple analogies. It should help a reader identify reasons for confidence and caution without a numerical maturity score or an overall issuer grade.
 
-The original 26-record catalogue already included xStocks, Ondo Global Markets, Opening Bell, Remora and Ventuals. The hackathon principally added depth, exact-token coverage and monitoring.
+Success means a reader can answer:
 
-### Original coverage
+- What interest would I hold, and who owes or records that right?
+- Which parts of the arrangement are established, conditional, problematic or unknown?
+- How would I get out, and what depends on another party continuing to act?
+- What changes if a particular party becomes unavailable?
+- Where is the evidence, and does it apply to my holder context and exact token?
 
-The original collection included:
+## 2. Product decisions
 
-- Cash: Circle USDC.
-- Products labelled as money-market funds: Superstate USTB, Circle USYC, Janus Henderson JTRSY, OpenEden TBILL, Spiko USTBL, WisdomTree WTGXX, Felix USDhl, Theo thBILL, BlackRock BUIDL, Franklin Templeton FOBXX, Ondo OUSG and VanEck VBILL.
-- Gold: TER Gold, Paxos Gold, Tether Gold and Oro GOLD.
-- Other commodities: Uranium Digital.
-- Private-market products: Apollo ACRED and Hamilton Lane SCOPE.
-- Stock-related products: Opening Bell, xStocks, Ondo Global Markets, Remora and Ventuals.
-- Yield-bearing notes: Ondo USDY.
+### The graphic is the navigation
 
-These are catalogue labels, not freshly validated classifications. The records assigned 12 entries to Solana, 11 to Ethereum and three to Hyperliquid. They were not comprehensive inventories of each product's deployments.
+The home page leads with a compact explanation and the interactive structure map. Selecting a branch reveals its products and a useful next action in the same view. Opening a report is a separate, explicit link, so exploration does not unexpectedly navigate away.
 
-### The original ladder needs revision
+Use the same map component at the top of `explore.html`, connected to its filters and results. Keep search and a straightforward list available beside or immediately below it. Detailed reports and comparisons remain ordinary, linkable pages.
 
-The four-step ladder is:
+The initial map has three primary columns:
 
-1. Blockchain is the authoritative ownership ledger.
-2. Transfers are unrestricted.
-3. Redemption is bearer-based.
-4. Forced transfers are possible.
+**Token clusters → issuer programmes → shared structures.**
 
-Each step requires every preceding step. These properties are useful, but their sequence does not establish overall maturity, legal strength or usefulness. Using the original stored flags, 21 of 26 records fall into Level 0.
+Use a two-option control for the final column:
 
-The newer stock classifications expose the problem:
+- **Legal structures** is the default: explain the interest the holder may have.
+- **Contract controls** shows the existing control-recipe idea: explain the technical powers different tokens share.
 
-| Product | Newer research identifies | Existing ladder |
+“Issuer programmes” is the accurate label for the current stock grouping. A programme, issuing entity, distributor and brand are not interchangeable. Show the actual issuing entity when established, and keep uncertain entity relationships explicit.
+
+Legal-form categories and exact shared terms must also remain distinct. Two fund shares can share a category while having different redemption rights. An exact terms-template grouping requires a reviewed identity and version; otherwise label the group as a structure type.
+
+### Identity and judgment have separate visual roles
+
+Issuer identity colors follow the same group across the map, product preview, report and comparison. They identify a branch; they do not rate it. Use a stable registry keyed by an explicit identity, not an array position or a display name. Existing programmes remain separate unless a reviewed mapping establishes a common issuer identity.
+
+Finding colors communicate a specific conclusion:
+
+| Meaning | Visual treatment | Example wording |
 | --- | --- | --- |
-| Opening Bell | Registered company shares | Level 0 |
-| xStocks | Tracker certificates with collateral protections | Level 2 |
-| Ondo stocks | Structured notes with collateral security | Level 2 |
-| PreStocks | Synthetic exposure with very limited stated holder rights | Level 2 |
-| Tessera | Unsecured contractual participation in eventual proceeds | Level 3 |
+| Established strength or capability | Green + check | “Direct redemption documented” |
+| Condition, restriction or dependency | Amber + gate | “Approval required” |
+| Demonstrated problem | Red + broken link | “Redemption suspended” |
+| Important uncertainty | Gray + question mark | “Priority not established” |
 
-These describe the model's output at review time, not a recommended quality ranking.
+These are examples of language, not new findings about any named product. Every production label needs scoped evidence.
 
-Two questions must become explicit:
+Always show text and an icon with the color. Keep “Not applicable” as a separate neutral treatment with a reason. Retain stale evidence and conflicting sources as explicit evidence qualifiers; neither is silently converted into an ordinary restriction or a demonstrated failure.
 
-- **Authoritative ledger of what?** A blockchain may establish ownership of a tracker certificate while the underlying shares remain recorded elsewhere. The instrument and its collateral are different objects.
-- **Which rights survive outside the token?** A transfer-agent master register and an off-chain conversion route can preserve actual shareholder rights even where the chain is not the sole authoritative record.
+Do not color an entire product or issuer green/red, count green icons into a hidden score, or rank products by the number of positive findings.
 
-## 2. Unified analytical framework
+### Five recurring questions
 
-Retain the original properties as searchable, sourced facts. Replace the headline maturity ladder with a common set of questions. Do not create a universal quality score by adding these dimensions together.
+Use the same order, labels and icons throughout the site:
 
-| Dimension | Required questions |
-| --- | --- |
-| Rights | What instrument or property interest does the holder own? Against whom? With what priority and recourse? |
-| Ownership record | Which record establishes ownership of that instrument? What happens when records disagree? |
-| Backing and dependencies | Who owns, holds and verifies the backing? Can it be lent, pledged or substituted? |
-| Controls and recovery | Who can freeze, move, burn, mint or alter balances? Under what technical governance and legal procedure? |
-| Access and exit | Who may acquire, hold, transfer and redeem? For what consideration, at what cost, and through which functioning route? |
-| Failure outcomes | What survives failure of the issuer, tokenization provider, custodian, bridge or holder's keys? |
-| Evidence | What supports each answer, what does it prove, and when was it last checked? |
+| Profile feature | Suggested icon | Existing research dimensions | Reader's question |
+| --- | --- | --- | --- |
+| Ownership | Document / claim | `rights` and `ledger` | What do I own, and which record establishes it? |
+| Backing | Vault | `backing` | What supports the claim, and who holds it? |
+| Controls | Key | `controls` | Who can freeze, move, change or recover the token? |
+| Exit | Door / route | `exit`, with relevant `access` conditions | Can I redeem or sell, through whom and on what terms? |
+| Failure | Lifebuoy / interrupted route | `failure` | What remains available if an intermediary fails? |
 
-### Separate exposure from legal form
+The five features are a presentation layer over the seven existing analytical dimensions. Preserve the full dimensions, including access and authoritative ledger, in the report and comparison. Keep holding/transfer eligibility visible near holder context; it must not disappear into redemption details.
 
-Economic exposure and legal instrument need separate classifications:
+A feature can contain both a strength and a limitation. Show both when material, for example “Claim defined” plus “Register precedence unclear.” Do not collapse a mixed finding into a single reassuring badge.
 
-- Exposure examples: gold, US equities, private credit, government debt.
-- Instrument examples: beneficial ownership, fund interest, secured note, unsecured note, derivative.
+Above the profile, write a concise editorial conclusion, for example:
 
-The stock-specific claim-depth ladder cannot be applied unchanged to every asset class. Show the legal form directly and assess rights, seniority and recourse within the relevant structure.
+> Clear claim. Access has gates. Failure terms need checking.
 
-Concrete correction to investigate during migration: the original catalogue calls Hamilton Lane SCOPE private equity. Hamilton Lane describes a private-credit strategy accessed through a distinct feeder vehicle. Identify the feeder separately from the underlying fund.
+Its clauses must point to the relevant findings. Describe why confidence or caution is warranted; avoid universal “safe,” “best” or “fully backed” claims that the evidence cannot establish.
 
-### Split bearer redemption into distinct facts
+### Analogy and movement explain something
 
-Record separately:
+Use **a vault, its key and the route out** as the recurring explanatory vocabulary. Label the real parties and legal interests alongside the analogy. A vault must not imply segregated custody, direct ownership or guaranteed recovery where those points are unresolved. For synthetic exposure or contractual claims, use a claim/document representation where a physical vault would mislead.
 
-- Whether a legal entitlement follows a token transfer to a subsequent holder.
-- Whether redemption requires identity checks, onboarding or other eligibility conditions.
-- Which entity owes performance and which entity processes the request.
-- Whether a third-party custodian or agent can perform without the tokenization operator.
-- Whether the route is discretionary, conditional on an event, or available on demand.
-- Settlement asset, minimums, fees, timing, suspension powers and expiry windows.
-- Whether a route is documented, operationally available or supported by observed successful execution.
+Motion has a job: show grouping, trace a relationship, reveal a control, or illustrate a consequence. Membership lines show association. Moving particles or arrows indicating value transfer belong only in a documented flow explanation.
 
-Tessera illustrates why this matters: its existing Level 3 coexists with payment contingent on proceeds received by the issuer, no proprietary interest in those proceeds and an expiring redemption window. Calling that level "issuer independent" is misleading.
+## 3. Existing implementation to build on
 
-Use `not applicable` where appropriate. An ordinary company share need not be redeemable on demand to be an effective share.
+| Area | Current files / data | Planned use |
+| --- | --- | --- |
+| Landing funnel | `index.html`, `funnel-figure.js`, `funnel-figure.css` | Promote and evolve the existing graphic into the main entrance |
+| Pure funnel data and geometry | `stocks/lib/funnel.mjs`, `stocks/lib/funnel-layout.js`, `stocks-funnel.json` | Reuse counting/layout concepts; preserve the explicitly Solana control view |
+| Shared discovery | `explore.html`, `explore.js`, `explore.css`, `stocks/lib/rwa-catalogue.js` | Connect map selection, filters, results and product preview |
+| Scoped research | `rwa/data/research.json`, `rwa/lib/research.js`, `rwa/lib/stock-research.mjs` | Resolve findings by programme/instrument, context, terms and deployment |
+| Research build | `rwa/lib/build-research.mjs`, `rwa/build-research.mjs` | Produce validated display profiles from retained research |
+| Reports and comparisons | `report.html`, `compare.html`, `research-page.js`, `research.css` | Render the same visual profile and evidence links |
+| Stock templates and reports | `stocks/lib/legal-templates.mjs`, `stocks/build-legal-templates.mjs`, `stocks/build-cards.mjs` | Reuse scoped source material and bring shared visuals into generated pages |
+| Scenarios and diagrams | `stocks/data/trust-chain.json`, issuer dossier `whatIf[]`, `stocks/lib/whatif-render.js`, `stocks/lib/schematics.js`, `stocks/lib/flow-diagram.js`, `trustchain.css` | Reuse actors, failure questions, sourced steps and diagram rendering |
+| Shared theme and motion | `app-shell.css`, `theme.js`, `motion.css`, `landing.js` | Shared colors, focus styles, light/dark themes and reduced-motion behavior |
+| Release boundary | `stocks/lib/release-manifest.mjs`, `stocks/validate-release.mjs` | Publish mutually consistent graph, profiles and research |
 
-### Separate technical intervention from legal recovery
+The current funnel is based on Solana stock addresses and technical recipes. Its programme count is not a count of distinct legal issuers, and its recipe column is not a legal-template column. The new all-RWA entrance needs explicit data shaping rather than changed labels over the existing stock-only totals.
 
-Do not award maturity points merely because a seizure or forced-transfer power exists. Record:
+The current research `state: supported` means a finding is documented. That finding can describe a restriction or a problem. It must never map automatically to green.
 
-- Capability and exact scope.
-- Controller and key governance, including thresholds, upgrade paths and delays where established.
-- Permitted legal circumstances and required procedure.
-- Safeguards, notice and holder remedies.
-- Evidence of actual use, distinguished from technical possibility.
+The existing what-if answer statuses describe evidence basis, including documented, inferred, litigated, unknown, not applicable and missing. They are not outcome ratings.
 
-A recovery mechanism can protect a holder and expose that holder to abuse. Legal recovery remains an important part of the original thesis, but a technical capability alone does not establish legal integration.
+## 4. Implementation sequence
 
-Replace the single `issuerIndependent` flag with separate failure scenarios. A bond can depend on its borrower paying while surviving disappearance of its tokenization provider.
+Implement the static, evidence-correct experience first, then animate it. Release A comprises phases 1–6: the entrance, profiles and coherent navigation. Release B adds the failure interactions in phase 7. Apply phase 8 verification to each release.
 
-### Replace verification rankings with evidence profiles
+### Phase 1 — Define the visual contract and representative examples
 
-The newer ordering of issuer statement, auditor, daily agent, on-chain proof of reserves and transfer-agent register is too universal. Those sources prove different propositions.
+- [x] Inventory existing issuer color assignments, icons, evidence badges, motion controls and generated report headers before adding new equivalents.
+- [x] Choose a small set of existing research records covering cash, fund shares, bullion, credit/feeder interests and stock wrappers. Include programme-only research, multiple holder contexts, unresolved token binding, stale evidence and conflicting sources.
+- [x] Write a reviewed example profile for each, using the existing sources and dates. Missing support becomes a visible gap rather than a research assumption.
+- [x] Create reusable light/dark theme tokens for issuer identity, four finding treatments, evidence qualifiers, selection and muted branches in `app-shell.css`.
+- [x] Choose one SVG icon treatment from the existing site assets, or a small local SVG set if there is no suitable shared set. Keep feature icons distinct from status icons.
+- [x] Define compact, expanded and comparison forms of the five-feature profile, including mixed findings and long labels.
+- [x] Establish layout examples at desktop, 375 px and 300 px, with keyboard focus and reduced motion.
 
-Record the named source, subject, scope, method, observation or reporting period, publication date, last check, limitations and availability of the underlying evidence. Distinguish promised, obtained, reviewed, current and contradicted evidence.
+**Acceptance:** The same issuer is recognizable across examples; positive findings, restrictions, known problems, unknowns and non-applicable cases can be distinguished without relying on color. Each profile retains a visible holder/research scope.
 
-Concrete issue found in the current implementation: PreStocks receives "auditor" verification strength even though the dossier describes a promised, unpublished attestation. A frequently updated feed also cannot establish title, absence of liens or enforceability merely by being on-chain.
+### Phase 2 — Add evidence-backed profiles and graph identities
 
-Keep unknown, not applicable, stale and conflicting answers distinguishable. Missing evidence must not become a negative fact or a reassuring zero.
+- [x] Add stable finding IDs and structured presentation annotations to the canonical research inputs. Store a short label, its strength/condition/problem/unknown meaning, rationale and the finding references behind it. Keep annotations with research or its existing adapter; do not create a second unsynchronized findings database.
+- [x] Add stable grouping IDs for issuer/programme identity, legal structure type, exact terms template where established, and contract-control recipe. Record the source and scope of each relationship.
+- [x] Keep descriptive family membership separate from verified instrument/deployment binding. A programme-level legal structure remains a programme description when individual terms are unresolved.
+- [x] Implement a pure profile builder, proposed as `rwa/lib/visual-profile.js`, using `resolveClaim()` and the existing applicability rules. Browser code should render its output rather than interpret legal prose.
+- [x] Return all material feature findings, their evidence states/bases, source references, applicable context and original dates. Add a reviewed editorial conclusion whose clauses reference those findings.
+- [x] Validate that each favorable or adverse assertion has adequate applicable evidence. An issuer statement must retain attribution where it cannot establish the stronger proposition. An interpretation remains labeled as analysis.
+- [x] Resolve stale/conflicting evidence before treating a conclusion as currently established. If unresolved, show the historical proposition or disputed claims with their qualifier and an uncertainty treatment.
+- [x] Invalidate or flag presentation annotations when their underlying claim, terms, scope or source version changes. A previously green phrase must not survive an incompatible research update unnoticed.
+- [x] Extend research validation and the stock adapter without inheriting programme rights into unresolved individual tokens. A chain read never refreshes a legal review date.
+- [x] Add meaningful unit tests for scope selection, mixed findings, missing data, conflicting evidence and annotation invalidation.
 
-Retain the distinction between source statements, observed facts and analytical conclusions, together with their provenance. Keep exact quotations and locators accessible without making them the default reading layer.
+**Required distinctions:** Legal right versus observed execution; reserves versus enforceable holder claim; technical freeze power versus lawful recovery route; ability to hold versus right to redeem; issuer redemption versus secondary-market sale; “not obtained” versus “does not exist.”
 
-### Add asset-specific modules
+**Acceptance:** Changing holder context or deployment produces only applicable findings. Documented restrictions stay amber, source conflicts remain visible, and an unknown finding cannot become positive through a default value or a keyword match.
 
-| Asset family | Additional analysis |
-| --- | --- |
-| Stocks and equity-linked products | Corporate actions, dividends, voting, reference security and conversion routes |
-| Funds and cash-management products | Share class, portfolio mandate, valuation, distributions, gates and redemption timetable |
-| Gold and other commodities | Allocation, custody, inspection, delivery rights, minimum delivery size and costs |
-| Credit | Obligor, security, priority, servicing, defaults and recovery waterfall |
+### Phase 3 — Build the all-RWA structure map data
 
-Broader asset families should reuse the core questions while adding their own requirements as coverage expands.
+- [x] Add a pure map builder, proposed as `rwa/lib/structure-map.js`, and a thin CLI, proposed as `rwa/build-structure-map.mjs`. Generate `rwa-structure-map.json` from the current catalogue/research and relevant stock recipe data.
+- [x] Build explicit nodes and typed edges for indexed deployments/token clusters, issuer programmes, legal structure types, reviewed terms templates and contract-control recipes.
+- [x] Give every edge a relationship type, provenance, scope and known/unknown status. Do not infer issuer identity from a matching ticker, similar name or shared contract code.
+- [x] Deduplicate deployments by network plus canonical address, respecting each network's address semantics. Count products, programmes, entities and deployments separately.
+- [x] Represent a programme with several structures or control recipes through multiple valid links. A shared category does not imply identical rights, collateral or counterparties.
+- [x] Keep unknown/unclassified groups and programmes without identified deployments visible. A zero-deployment programme is not an empty product universe.
+- [x] Separate counts for the selected scope from overall coverage. Explain that the universe is indexed coverage, not a complete market census.
+- [x] Use equal-width relationship lines initially. If node size encodes indexed deployment count, label that meaning. Any later count-weighted line needs a stated unit and deduplicated membership; neither area nor width implies value, volume or quality.
+- [x] Keep the payload compact: group addresses instead of creating an animated DOM node for every token. Expand an issuer/product branch or use a filtered list for exact addresses.
+- [x] Add the builder after its research/catalogue inputs in the release stages. Register the artifact, curated inputs and validation joins. Include it in the local research build command.
+- [x] Test conservation of deployment counts where applicable, explicit unassigned membership, multi-membership deduplication, stable IDs and deterministic ordering. Legal-category totals may overlap and must say so.
 
-### Generalize identity and inheritance
+**Acceptance:** Every visible count can be reconciled to its typed members, and every association can be explained. Missing legal bindings do not become implied rights merely because a connecting line exists.
 
-Distinguish the following objects:
+### Phase 4 — Make the map the main entrance
 
-```mermaid
-flowchart LR
-    Programme[Issuer programme] --> Instrument[Instrument or share class]
-    Instrument --> Deployment[Exact network deployment]
-    Instrument --> Exposure[Underlying exposure]
-    Instrument --> Collateral[Collateral pool]
-    Programme --> Parties[Service providers]
-    Deployment --> Markets[Markets and protocol integrations]
+- [x] Move the map into the main introductory area of `index.html`. Keep a short purpose statement, a visible instruction such as “Choose an issuer or structure to explore,” and direct access to search.
+- [x] Extend the existing funnel geometry/rendering where useful. Put selection, grouping and path-highlighting rules in pure modules; keep DOM events and rendering in a thin page controller.
+- [x] Default to the legal-structure view; make the contract-controls view one obvious switch away. Preserve the token-program detail within the relevant technical view, without adding a crowded fourth primary column on mobile.
+- [x] Make each meaningful node keyboard and touch operable. First activation selects and highlights the branch; the adjacent summary supplies “View products” and report links.
+- [x] On issuer selection, trace its products and structure/control links in its stable identity color, reduce emphasis on unrelated branches, and show the selected name plus typed counts.
+- [x] On structure selection, highlight all applicable programmes and explain whether this is a broad structure category, an exact terms template or a technical recipe.
+- [x] Show product previews with the five-feature profile only at a valid research scope. An issuer with several materially different products gets a product list, not a fabricated issuer-wide profile.
+- [x] Add “Show all” and a concise visible selection trail. Keep unrelated branches discoverable rather than permanently hiding them.
+- [x] Synchronize map selection with explorer filters/results through one state model. Preserve meaningful selection in URL parameters; support reload and browser Back/Forward. Invalid IDs should show an explicit unselected state rather than another product's report.
+- [x] Use a persistent overview and selected-branch detail on small screens. Avoid shrinking a 1,100 px diagram into illegibility or making sideways scrolling the only route to the content.
+- [x] Preserve the current explorer fixes: legible primary link, aligned selected row/detail, clear connector and no redundant Selected/Preview badges. Recalculate or replace the connector coherently if the layout changes.
+- [x] Build a useful static summary and direct report/search links for no-JavaScript and loading/error states. Display an unavailable state on failed data load; do not replace missing current data with invented values.
+- [x] Keep existing issuer, exact-token and Solana routes working. Update other funnel consumers deliberately and retain accurate scope labels where a view remains stock-only.
+
+**Acceptance:** A visitor can select an issuer or a shared structure, identify the highlighted membership, open a product and return to the same selection. This works with touch, keyboard and browser history at 300–400 px and desktop widths.
+
+### Phase 5 — Carry the profile through reports and comparisons
+
+- [x] Put the editorial conclusion and five-feature profile near the top of `report.html`, below an explicit holder context and instrument/programme scope.
+- [x] Give each feature a short primary statement and, where needed, a second material limitation. Expose evidence freshness and disputed/unknown status without forcing the reader to open a tooltip.
+- [x] Make selecting a feature open or move focus to the relevant evidence section. Use stable anchors; show source title, operative locator, evidence basis and relevant dates within one interaction.
+- [x] Preserve the full seven-dimension report, asset-specific analysis, wrapper dependencies and exact deployment observations beneath the concise profile.
+- [x] Add the compact profile to the explorer's selected product preview. Keep list rows quiet enough to scan; do not repeat five animated panels in every result row.
+- [x] Use the same pure profile builder and renderer on generated issuer/product reports where the research scope supports it. Label programme summaries and exact-token observations separately.
+- [x] In `compare.html`, align the five features and their material sub-findings across products. Preserve the existing comparison modes and each side's context/terms selection.
+- [x] Explain differences in plain language, including different exposures and conditions that are not directly comparable. Do not introduce a total score, green-count sort or “winner” badge.
+- [x] Check that top-line profiles, comparison cells, detail sections and source links agree after any filter/context change.
+
+**Acceptance:** The map preview, report and comparison give the same answer for the same scope. A reader can immediately name a supported strength and a material limitation, or see explicitly that the evidence does not establish them.
+
+### Phase 6 — Add purposeful animation
+
+Implement these as initial timing defaults, then refine in visual review:
+
+| Trigger | Motion | Starting duration | End state |
+| --- | --- | --- | --- |
+| First visible map load | Token clusters gather into their programme grouping | 600–800 ms, once | Stable, selectable map |
+| Select issuer/structure | Brief illumination of the relevant connections | 1–2 soft pulses, under 1.5 s total | Persistent branch highlight |
+| Switch grouping | Existing nodes move to their new positions | 250–400 ms | New labels, counts and selection agree |
+| Open a feature | Key, gate or evidence gap reveals the relevant relationship | 200–400 ms | The explanatory text and final diagram remain visible |
+| Change failure scenario | Affected party dims and dependent routes change | 300–500 ms | A readable, labeled consequence map |
+
+- [x] Animate stable node identities between layouts; do not briefly represent a token as changing issuer or legal owner when only the grouping changes.
+- [x] Cancel or retarget an interrupted transition on rapid selection. Update semantic state and accessible content immediately; correctness must not depend on an animation finishing.
+- [x] Add a visible motion toggle covering the affected experience. Remember the preference locally and integrate the existing `?reduceMotion` hook and `prefers-reduced-motion` behavior.
+- [x] In reduced/static mode, show the same relationships and conclusions in their final state with no travel, pulsing or auto-scrolling.
+- [x] Pause off-screen/hidden-tab activity and avoid idle animation loops. Use opacity/transforms and bounded transitions before considering a new animation dependency.
+- [x] Preserve contrast while dimming branches. The unselected state must remain readable and operable; selection cannot depend on glow alone.
+- [x] Reserve moving transaction particles for a separately labeled, sourced flow explanation. A pulse indicates selection, not live transactions, monitoring health or money moving.
+- [x] Reconcile existing decorative home-page movement with the new entrance so attention stays on the current interaction.
+
+**Acceptance:** Motion makes grouping and consequences easier to follow, leaves no perpetual work running when idle, and can be disabled without losing any information or navigation.
+
+### Phase 7 — Add failure scenarios as the next layer
+
+- [x] Start inside the product report with two explicit choices: “Issuer unavailable” and “Custodian fails.” Keep ordinary issuer unavailability distinct from legal insolvency; existing insolvency answers cannot silently answer an operational outage scenario.
+- [x] Reuse the trust-chain actor catalogue, issuer `whatIf[]` answers and sourced schematics where their scope matches. Add cross-asset scenario data within the existing research system where needed; do not create a competing set of answers.
+- [ ] Build each diagram from named parties and typed relationships: who holds assets, owes performance, processes redemption, maintains the record, holds a key or can enforce security.
+- [x] Label the normal route before the scenario is activated. Distinguish the custody path, legal-claim path and operational exit path where they differ.
+- [x] Define explicit scenario effects per relationship: available, interrupted, conditional or unknown. Dim the affected party, interrupt only routes supported as dependent on it, and leave documented alternatives visible.
+- [x] Render an unknown consequence as a labeled gap. Do not propagate failure automatically through every connected node or equate service interruption with asset loss.
+- [x] Label surviving legal routes as documented procedures/claims, with timing, eligibility and priority limits where known. A surviving route is not a guarantee of prompt payment or full recovery.
+- [x] Keep evidence basis visible for each outcome: documented terms, analysis/inference, relevant adjudication, unknown or unanswered. A judgment in another case must retain the basis for its claimed relevance.
+- [x] Separate hypothetical scenario styling from actual red problem findings. Activating a scenario must not make the product appear to have suffered a real current failure.
+- [x] Provide a plain-text consequence summary and a “Return to normal” action. Scenario links should preserve product/context and open with a clear hypothetical label.
+- [x] Add tests for scenario applicability, partial dependencies, alternative routes, unknown outcomes and restoration of the normal state.
+
+**Acceptance:** A reader can see what relies on the unavailable party, which routes have documented alternatives and which outcomes remain unresolved. Each consequence has a source or an explicit analytical/unknown basis.
+
+## 5. Verification and release steps
+
+### Phase 8 — Verify each release against the real experience
+
+- [x] Run focused headless tests for the new profile, map, selection and scenario rules. Tests must exercise observable outputs, including wrong-scope and missing-evidence cases.
+- [ ] Extend the relevant existing suites: `stocks/rwa-research.test.js`, `stocks/rwa-stock-research.test.js`, `stocks/rwa-catalogue.test.js`, `stocks/funnel.test.js`, `stocks/funnel-layout.test.js`, scenario/schematic tests and release validation tests.
+- [x] Run affected page/theme/global checks, including `landing-page.test.js`, `site-header.test.js`, `script-globals.test.js`, `theme-tokens.test.js`, `theme.test.js` and motion tests. Choose additional suites according to the files actually changed.
+- [x] Rebuild research/catalogue/map artifacts from retained inputs; verify their joins and typed totals against the source records. Check that unchanged inputs produce unchanged semantic results.
+- [x] Run the full fast headless test command before each release candidate. Report skipped database-dependent checks separately. No browser-driving test suite is part of the default workflow.
+- [ ] Inspect the actual UI in a dedicated headed browser, using a no-cache dev server. Check both themes; desktop, 400, 375, 320 and 300 px; keyboard; touch-sized targets; static motion; long labels; many programmes; empty results; failed loading; rapid repeated selection; and Back/Forward navigation.
+- [x] Verify link contrast, selected-row/detail alignment and connector placement against the earlier explorer issues. Check primary buttons after page-specific link styles apply.
+- [ ] Check that status, focus and selection remain understandable with color removed. Inspect keyboard order, accessible names, focus restoration and announcements; avoid announcing every animation frame.
+- [ ] Measure the map payload, initial rendering and a representative selection/grouping interaction on a quiet machine. Keep the initial view aggregated, with no per-address animation loop or off-screen recurring work.
+- [x] Validate the release manifest and generated artifact URLs with the existing release validator. A broken profile/source join or missing map artifact fails release validation.
+- [ ] Review every production profile's wording and provenance, rather than treating successful schema validation as an editorial review. Preserve original source, legal-review and chain-observation dates.
+- [ ] Conduct a short comprehension review with people unfamiliar with the product if available. Ask them to identify a claim, an exit condition, an evidence gap and a scenario consequence. Record actual observations; do not call an internal walkthrough user research.
+- [x] Provide local preview links and name the main elements consistently: **structure map**, **branch summary**, **product preview**, **five-feature profile**, **evidence detail**, **failure scenario**.
+
+Suggested existing commands, run from the implementation worktree after the relevant changes:
+
+```sh
+# Rebuild shared research and catalogue; extend this script to include the new map builder.
+npm run rwa:build
+
+# Full existing headless suite, after focused checks pass.
+npm test
+
+# Validate a prepared release using the established publication origin.
+node stocks/validate-release.mjs --run --base-url=https://rwasonar.com
+
+# Final patch hygiene.
+git diff --check
 ```
 
-Legal conclusions may be inherited only where the applicable instrument, terms, holder scope and effective period match. Chain controls, bridge dependencies, liquidity and protocol support require deployment-specific evidence. Do not inherit a Solana finding automatically onto an Ethereum version.
+The release validator needs the required release artifacts to exist; a partial local build is not evidence of a valid full release. Use the existing release pipeline when preparing that candidate.
 
-Keep instrument, programme, deployment and underlying counts separate. Thousands of token addresses do not represent thousands of independent legal analyses. Wrapped or bridged representations need explicit relationships to their backing so aggregate figures do not double-count it.
+Prepare commits as coherent changes: visual/data contract, map navigation, profiles/comparison, motion, then scenarios. Commit/push and production publication follow the user's instructions at that point; this planning request does not activate production jobs or publish changes.
 
-Keep the original "how completely has this asset been tokenized?" perspective as an advanced lens. Preserve historical methodology context where useful, while making the default reader experience show rights and trade-offs directly.
+## 6. Completion criteria
 
-## 3. Original-catalogue migration and research quality
+Release A is complete when all of the following are true:
 
-The original snapshot contained:
+- The collapsing graphic is the first useful interaction on the home page and a working entrance to the shared explorer.
+- Legal structures and contract controls are visibly distinguishable, with accurate coverage and grouping labels.
+- Issuer identity colors remain stable across the map, previews, reports and comparisons.
+- All currently reviewed products/programmes have applicable five-feature profiles, including explicit gaps where the evidence is insufficient.
+- Concrete findings use color, icon and text together; mixed findings and scope limitations survive the summary.
+- An editorial conclusion directs the reader to the reasons for confidence or caution, with evidence one interaction away.
+- Motion explains selection/grouping, remains bounded, and has an equally functional static version.
+- Existing report links, exact-token observations and comparison modes still work.
+- Desktop and 300–400 px layouts, keyboard navigation, both themes and relevant headless checks pass.
 
-- 17 of 26 records without an address.
-- 13 attestation records with `#` links.
-- 27 attestation records still marked `valid` despite stored expiry dates before 2026-10-01.
+Release B is complete when the two initial failure scenarios explain supported dependencies, documented alternatives and unknown outcomes at the selected product/context scope, with accessible static summaries and sourced consequences.
 
-These are problems with our research records, not findings that the products themselves are invalid.
+Neither release introduces a composite maturity score, an issuer-wide safety grade, inferred legal rights from common code, or a visual claim that is stronger than its evidence.
 
-During migration:
+## 7. Implementation record — 2026-10-01
 
-1. Identify each record as a programme, instrument, share class or exact deployment before merging it into the newer system.
-2. Recheck asset classification and distinguish underlying funds from tokenized feeder interests.
-3. Verify canonical addresses and network-specific controls from appropriate sources.
-4. Replace placeholder evidence with attributable sources or mark the claim unsupported.
-5. Review stored dates and expiry semantics; do not invent document dates or attestations to complete a record.
-6. Separate current conclusions from retained historical research and record corrections explicitly.
-7. Give migrated records honest coverage labels until their legal and technical review is complete.
+Implemented in `/Users/simun/Code/rwa-sonar-unification`, branch `unification`:
 
-## 4. Unified UX
+- The home page leads with the **structure map**: aggregated token clusters, stable programme colors, typed legal-structure and contract-control views, branch tracing, search, compact/all-programme views and **branch summaries**. Selection highlights related branches and uses shareable URLs, including browser history. The single catalogue search filters map membership and links directly to reports.
+- The pure map includes separate reviewed terms/context records and provenance. A terms record is not asserted to be a shared exact template; unresolved token bindings remain unresolved. No common code or broad structure family transfers holder rights.
+- A shared **five-feature profile** and evidence-backed editorial clauses appear in the **product preview**, reports, comparisons and generated programme/token pages. Icons and text accompany finding colors; no composite score is added. Display annotations invalidate when scoped claims or referenced sources change.
+- Bounded connection pulses and node movement explain selection and regrouping. Animations are enabled by default and honor system reduction and `?reduceMotion`. Static mode preserves relationships and navigation.
+- **Failure scenarios** offer normal arrangement, issuer unavailability and custodian failure, with explicit hypothetical labels, dated sources, separate claim/custody/exit outcomes and normal restoration. Existing stock dossier custody answers and party names retain their programme/sample caveats. An operational outage does not inherit an insolvency answer. Missing alternatives remain unknown.
+- The duplicate catalogue/detail browser has been removed. Map connectors use layout offsets so motion cannot move them across search results.
 
-### Positioning and navigation
+Verification: the final full headless command passed 4,519 tests (3,330 stock/model, 185 API and 1,004 page/theme tests). Database-dependent checks require a database (62 were skipped). Release validation passed for 33 research subjects, 1,183 cards, 185 protocol dossiers and 998 comparison bundles. The map covers 1,207 deduplicated indexed deployments. Generated card HTML remains below the existing size limit.
 
-Use an asset-led, question-led interface. Chain is a filter rather than the organizing premise.
+Headed browser review covered both themes, desktop, 400, 375, 320 and 300 px; report/comparison overflow, source anchors, programme scenarios, invalid context, keyboard selection, history restoration, explorer link contrast, connector alignment and static motion were inspected. At 300 px, token/issuer rows had matching positions and static mode had no running animations. This does not substitute for the entire comprehensive browser checklist or reader research.
 
-Retain the navigation:
+Remaining review/depth:
 
-**Explore · Compare · Changes · Learn**
+- Review every production short label against operative text, including source-attributed backing and sampled stock terms, before publication. This redesign does not obtain missing legal documents or refresh evidence dates.
+- Expand the scenario diagram beyond the current three separate dependencies when sourced product-specific actors, recordkeepers, security agents, intervention keys and enforceable procedures support it. Current custody names come from retained programme party catalogues, with full role notes available; exact-token roles are not inferred.
+- Complete the full keyboard/color-independent/accessibility and failed-loading/rapid-selection checklist, and measure rendering/interaction on a quiet machine. The map payload is 238,239 bytes. No performance timing claim is made: host load was 11.40/8.23/7.96 at the final check.
+- Conduct the optional comprehension review with unfamiliar readers. None has been performed.
 
-Explore becomes the unified catalogue. Solana stocks remain a prominent saved view within it. Retain the current visual identity; the main change is information organization.
+Local runtime gaps remain visible: current chain observations are older than their monitoring cadence; database material-change checks and some market/feed inputs are absent. The static snapshot refresh could not complete because `stocks-events.json` is absent locally; existing dated stock-only snapshot regions remain historical. The new map/profile artifacts and required release validation are complete.
 
-Suggested broad positioning: **Know what sits behind your token.** Explain that the site investigates rights, controls, backing, exit routes and changes across RWAs, with coverage depth stated explicitly.
+Preview: `http://localhost:8117/`, `http://localhost:8117/explore.html`, `http://localhost:8117/report.html?product=paxg`, and `http://localhost:8117/report.html?product=stock%3Axstocks-backed&scenario=custodian-fails`.
 
-### Explorer
+Interaction refinement: cluster boxes are native selection buttons. View switching retains a group's originating legal/control membership and highlights its relationships in the other view, including reload/history URLs. Manual pause controls have been removed; system/URL reduced motion remains supported. “Control pattern unknown” describes an unclassified pattern, not absence of issuer powers. Single-context terms disclosures are replaced by a direct scope note; the headline is a plain summary of the linked feature cards.
 
-- Search by asset, company, product, issuer or exact address.
-- Browse categories such as cash, Treasuries, stocks, credit and commodities.
-- Filter by chain, legal-claim type, access restrictions and research coverage.
-- Use compact product rows that show what the holder owns; nest network deployments beneath the relevant product.
-- Distinguish older catalogue entries, reviewed dossiers and actively monitored deployments.
-- Keep exact-address access available for readers who already know their token.
+Finding-language review: all 93 amber findings now carry visible explanations, and generic “described” labels are replaced by actual restrictions or named evidence gaps. Unsupported reserve/holdings checks and unreviewed investor terms are gray; direct-share products do not receive a reserve warning merely because their register is described. The dated Remora exit failure is explicitly dated. Research dates and source signatures are preserved. Full headless tests pass (4,519 tests; 62 database-dependent checks skipped), release validation passes, and the largest generated card is 126.5 kB, below the 128 kB target and 150 kB limit.
 
-Discovery should adapt to the asset class:
+- Search consolidation: one catalogue-wide search in the map on home and explore; removed the duplicate explorer entry/detail section and homepage search. Search filters map membership and links directly to product and exact-token reports.
 
-- Apple leads to competing wrappers and their different rights.
-- Gold leads to products with different allocation and delivery rights.
-- Treasuries leads to funds and notes with different duration, fees, eligibility and exits.
+- Map presentation refinement: center search over legal/control tabs, fix the shortened caveat below the chart, remove profile divider/At a glance/branch links/manual motion controls, and show all filtered programmes without a compact-overview control.
 
-Products sharing exposure must not be presented as interchangeable. Do not let the large stock-address count overwhelm category discovery for the rest of the catalogue.
+- Filtered token clusters show matching tickers and distinguish matched addresses from programme totals. Removed the map preamble and moved live index counts, including distinct indexed chains, above the page title.
 
-The concept reviewed in the discussion used a searchable product list and a selected-product panel. It showed the legal claim immediately, followed by exit information and expandable evidence. Older research appeared with an explicit refresh-pending label. This illustrates the information hierarchy rather than prescribing every final layout detail.
+- Final positioning decision: selected branches and connections move to the top; compact views expand beyond seven rows when needed to include every connected programme matching the current search. Other visible rows remain dimmed and clickable. This supersedes the earlier fixed-position refinement.
 
-### Product report
-
-Answer five questions near the top:
-
-1. What do I own?
-2. What can I do with it, and am I eligible?
-3. Who can intervene?
-4. How do I get out?
-5. What happens if something fails?
-
-Use progressive disclosure:
-
-**Answer → reasoning → evidence → technical details**
-
-Show legal-review dates separately from chain and market observation times. An hourly chain check must not make an old legal conclusion look freshly reviewed.
-
-Keep the current exact-token reports and shareable links useful. Provide access to the programme-level dossier without hiding deployment-specific differences.
-
-### Comparison
-
-Support three distinct comparison tasks:
-
-| Comparison | Main question |
-| --- | --- |
-| Same underlying, different products | How do rights, backing, controls and exits differ? |
-| Same instrument, different chains | What changes in controls, bridges, liquidity and usability? |
-| Similar economic exposure | How do structure, access, fees, valuation and redemption differ? |
-
-Default to two products on mobile and emphasize material differences. Preserve missing and not-applicable states. Avoid comparing unlike yields or valuations without explaining their basis.
-
-### Changes and advanced research
-
-Use the shared change journal for material changes to documents, controls, backing, exit routes and protocol support. Keep real-world changes separate from corrections to our own research.
-
-Keep the planets view, trust graph and attestation visualization as optional exploration tools. The normal product report must be understandable without them. Preserve confirmed protocol use as distinct from theoretical composability.
-
-## 5. Implementation sequence
-
-### Phase 1: Broaden the front door after judging
-
-- Update positioning and navigation to reflect all asset classes and chains.
-- Preserve the Solana landing route, judging experience and existing report links.
-- Make original assets discoverable with coverage and freshness labels.
-- Keep stale catalogue facts from appearing to have the same research depth as reviewed stock dossiers.
-
-### Phase 2: Introduce the framework and refresh representative products
-
-- Implement explicit exposure, instrument and deployment identities.
-- Introduce the common analytical dimensions and scoped evidence profiles.
-- Remove the universal maturity score from the default reader journey while retaining historical methodology context where appropriate.
-- Refresh USDC, PAXG, BUIDL, FOBXX, USDY, ACRED and SCOPE first. They exercise materially different structures.
-- Apply the shared product-report and comparison patterns to those records and existing stock research.
-
-### Phase 3: Complete migration and expand monitoring
-
-- Migrate and re-review the remaining original records.
-- Extend monitoring chain by chain, preserving the existing Solana capabilities.
-- Add deployment-specific controls, bridges, exits and protocol integrations only as evidence supports them.
-- Publish separate counts for reviewed products, identified deployments and monitored deployments.
-
-## 6. Acceptance criteria
-
-- An ordinary reader can identify the legal claim, principal dependencies and available exit route without learning the scoring vocabulary.
-- A registered share, a secured note and synthetic exposure cannot be confused merely because they share a ticker or asset category.
-- The same product on different networks shares only conclusions whose evidence scope supports inheritance.
-- Missing, not-applicable, stale and contradictory evidence remain visibly different states.
-- A fresh chain observation cannot refresh a legal-review date.
-- Existing Solana reports, comparisons and monitoring remain reachable through their existing links.
-- The original catalogue is searchable without implying that every old record has been re-reviewed or is actively monitored.
-- Mobile exploration works at 300–400 px, and the default two-product comparison makes material differences readable.
-- Broad coverage totals do not conflate products, programmes, deployments or duplicated backing.
-
-Use focused headless checks for identity, inheritance, evidence-state and comparison logic during implementation. Inspect actual desktop and mobile UI behavior. Do not treat a synthetic usability rehearsal as evidence of real-user comprehension.
-
-## 7. References
-
-- [Original catalogue at the reviewed main snapshot](https://github.com/Poglavar/rwa-sonar/blob/8f58030/rwa-assets-db.json)
-- [Original evidence database](https://github.com/Poglavar/rwa-sonar/blob/8f58030/attestations-db.json)
-- [Original vocabulary](https://github.com/Poglavar/rwa-sonar/blob/8f58030/vocabulary.md)
-- [Current grading implementation at the reviewed snapshot](https://github.com/Poglavar/rwa-sonar/blob/d922d0f/stocks/lib/grade.mjs)
-- [Issuer dossiers](https://rwasonar.com/issuers/)
-- [Current methodology](https://rwasonar.com/methodology.html)
-- [xStocks legal overview](https://docs.xstocks.fi/docs/product-legal-overview)
-- [Exodus–Superstate executed transfer-agency agreement](https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm)
-- [Tessera terms](https://terms.tessera.pe/)
-- [Hamilton Lane SCOPE feeder announcement](https://www.hamiltonlane.com/en-us/news/scope-available-via-securitize)
-- [Circle USDC terms](https://www.circle.com/legal/usdc-terms)
-- [PAX Gold terms](https://www.paxos.com/terms-and-conditions/pax-gold-terms-conditions)
-- [Ondo stock holder protections](https://docs.ondo.finance/ondo-stocks/trust-and-transparency)
-
-Relevant implementation context in this worktree: `stocks/MODEL.md`, `stocks/EVIDENCE.md`, `stocks/lib/grade.mjs`, `stocks/data/issuers/`, `UX-audit1.md` and `COMPREHENSION-REHEARSAL.md`. Their existing decisions and limitations should inform implementation; older descriptions may lag current artifacts.
-
-## 8. Implementation record — completed locally, 2026-10-01
-
-All three implementation phases are complete in this worktree. Production deployment and scheduler activation remain pending.
-
-- The shared explorer covers all 21 non-stock catalogue products and 12 stock programme dossiers. Existing Solana entry points, exact-token cards, comparisons and advanced research pages remain reachable.
-- The common report and comparison model separates instrument/product reviews from programme summaries. Stock programme findings are never inherited into an unresolved instrument or mint. Holder contexts, terms snapshots, effective periods, exact deployments and evidence states govern applicability.
-- All 21 non-stock entries were re-reviewed against accessible primary sources. A completed public-source review is not a claim that confidential offering documents, independent reserve reports or insolvency opinions were obtained. Unsupported rights remain unknown; USDY terms/vintage and thBILL composition conflicts remain visible. HLSCOPE is classified as credit and its feeder is distinguished from the underlying fund.
-- The three comparison tasks are implemented through exact deployment selection: competing wrappers of an underlying security, one instrument across networks, and similar exposure across products. Programme findings are labeled separately; deployment controls and market snapshots are never substituted for legal terms.
-- Native Ethereum and Solana observations use finalized blocks/slots, retain failed-read uncertainty and preserve the last successful read. Conventional proxy slots and ABI responses do not establish all upgrade paths or key governance. Solana scheduled multipliers and fees use the observed slot's time/epoch where available.
-- Official network listings are retained for additional networks without claiming technical review. Wrapped and portfolio-linked exposure is described explicitly; there is no aggregate reserve total that double-counts backing.
-- The existing source watcher includes all curated product sources with product/context/terms attribution. Only observed external control deltas enter the shared public journal; baseline reads and decoder/editorial corrections do not.
-- Historical attestation displays now distinguish expired research records, unavailable sources and recorded-but-unverified validity. Original evidence dates, links and stored records were not rewritten.
-- Release construction builds the shared report runtime before the catalogue and validates their source joins. Private watcher state is excluded from publication; its scoped observations are embedded in the generated report artifact.
-
-### Refinements to the original plan
-
-Programme-level research is useful without inventing individual instrument identities for thousands of stock addresses. Existing programme evidence is adapted at its original check dates; it is not stamped as a fresh legal review. The count of instrument research subjects is therefore distinct from a count of completely identified legal instruments.
-
-Monitoring starts with Ethereum and Solana read adapters, alongside the preserved stock monitoring system. Other networks remain source-listed until an appropriate adapter and evidence review are added. “Configured watch scope” and “recent successful observation” are separate counts; neither proves that a scheduler is currently running. This implementation prepares the hourly job and its outcome-check specification but does not activate production jobs.
-
-Access restrictions appear in the applicable holder context rather than as a universal eligible/ineligible badge. USDC EEA and non-EEA redemption contexts illustrate why a global restriction flag would be misleading. The explorer filters the legal form, chain and coverage; reports expose the relevant access and exit conditions directly.
-
-### Local operation and verification
-
-See `rwa/README.md` for rebuild, read-only polling, publication boundaries and the inactive central-monitor registration. Fast headless tests cover applicability, source joins, comparison modes, failure preservation, decoder baselines, legacy evidence display and release construction. The shared reports/comparisons, explorer and observation panel were inspected in a dedicated headed browser at desktop, 375 px and 300 px; this is visual verification, not a real-user comprehension study.
+Final verification after the branch-positioning revision: 4,525 fast tests passed, 62 database-dependent checks skipped; production-origin release validation passed. Headed selection checks confirmed selected issuers move first, the 24-member controls group expands fully, view switching retains its cohort, dimmed rows remain clickable, and mobile has no horizontal overflow.

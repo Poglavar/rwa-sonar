@@ -37,7 +37,7 @@ describe('canonical issuer dossiers', () => {
         const { sourced, needed } = issuer.evidence.coverage;
         expect(Number.isInteger(sourced) && Number.isInteger(needed) && needed > 0).toBe(true);
         expect(html).toContain(`${sourced} of ${needed} required fields sourced`);
-        expect(html).toContain('Unknown means not established, never “no”');
+        expect(html).toContain('Missing evidence: we could not verify this answer from the sources reviewed. This does not mean the protection is absent.');
         expect(html).toContain('Published claim ≠ observed reality');
         expect(html).toContain('Edits to RWA Sonar’s own research are not listed here');
     });

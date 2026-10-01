@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import visualProfile from '../rwa/lib/visual-profile.js';
 // Builds cards/<slug>.html + cards/<slug>.json + cards/index.json: one static, shareable page per
 // tokenized stock, rendered entirely at build time (readable with JavaScript off) from the seven
 // built files. It calls evaluateHealth itself rather than reading stocks-health.json, because a card
@@ -54,7 +55,7 @@ const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260930honest';
+const ASSET_VERSION = '20261001g';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock
@@ -325,6 +326,7 @@ async function main() {
     const tokenDb = await readJson(TOKENS_PATH);
     if (!Array.isArray(tokenDb?.tokens)) throw new Error(`${TOKENS_PATH}: expected {tokens:[...]}`);
     const issuerDb = await readJson(ISSUERS_PATH);
+    const sharedResearch = await readJson(join(REPO_ROOT, 'rwa-research.json'));
     if (!Array.isArray(issuerDb?.issuers)) throw new Error(`${ISSUERS_PATH}: expected {issuers:[...]}`);
     const holderDb = await readJson(HOLDERS_PATH, { fetchedAt: null, items: [] });
     const venueDb = await readJson(VENUES_PATH, { fetchedAt: null, items: [] });
@@ -468,7 +470,9 @@ async function main() {
             // When the Jupiter price on the card was read, so a premium over Pyth is drawn only between close instants.
             priceReadAt: tokenDb.sources?.universe?.fetchedAt ?? null
         });
-        const html = renderCard(card, { baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
+        const product = sharedResearch.products.find((p) => p.id === `stock:${card.issuer.slug}`);
+        const programmeProfile = product ? visualProfile.profile(product, product.contexts[0].id) : null;
+        const html = renderCard(card, { programmeProfile, baseUrl, version: ASSET_VERSION, ogImage: await cardOgImage(og, card) });
         const bytes = Buffer.byteLength(html, 'utf8');
         const gzipBytes = gzipSync(html).byteLength;
         await writeFile(join(outDir, `${slug}.html`), html, 'utf8');

@@ -112,14 +112,22 @@
     function groupEntries(entries) {
         return [...new Set(entries.map((e) => e.category))].map((key) => [CATEGORIES[key], entries.filter((e) => e.category === key)]);
     }
-    function quickSearchGroups(entries, search) {
-        const matches = filterEntries(entries, { search });
-        const link = (e) => ({ label: e.name, detail: `${COVERAGE[e.coverage]} · ${e.kind}`, href: `./explore.html?search=${encodeURIComponent(search)}&entry=${encodeURIComponent(e.id)}` });
-        return { order: ['stocks', 'issuers', 'tokens'],
-            stocks: matches.filter((e) => e.kind === 'product').slice(0, 4).map(link),
-            issuers: matches.filter((e) => e.kind === 'programme').slice(0, 4).map(link),
-            tokens: matches.flatMap((e) => matchingDeployments(e, search).filter((d) => d.report).map((d) => ({ label: d.symbol, detail: `${e.name} · ${d.network}`, href: `./${d.report}` }))).slice(0, 4),
-            allHref: `./explore.html?search=${encodeURIComponent(search)}` };
+    function clusterMatches(entries, entryIds, search) {
+        if (!search.trim()) return {symbols: [], count: 0};
+        const matchedEntries = filterEntries(entries.filter(e => entryIds.includes(e.id)), {search});
+        const deployments = matchedEntries.flatMap(e => matchingDeployments(e, search));
+        const symbols = [...new Set(deployments.map(d => d.symbol).filter(Boolean))];
+        if (!symbols.length) symbols.push(...matchedEntries.filter(e => e.kind === 'product' && e.ticker).map(e => e.ticker));
+        return {symbols: [...new Set(symbols)], count: deployments.length};
     }
-    return { CATEGORIES, COVERAGE, FORMS, buildCatalogue, matchingDeployments, filterEntries, groupEntries, quickSearchGroups };
+    function searchResults(entries, search, limit = 12) {
+        if (!search.trim()) return {entryIds: [], links: [], total: 0};
+        const matches = filterEntries(entries, {search});
+        const links = matches.flatMap(e => [
+            {label: e.name, detail: `${COVERAGE[e.coverage]} · ${e.kind === 'programme' ? 'Issuer programme' : 'Product'}`, href: `./${e.report}`},
+            ...matchingDeployments(e, search).filter(d => d.report).map(d => ({label: d.symbol || d.name, detail: `${e.name} · ${d.network} · ${d.address}`, href: `./${d.report}`}))
+        ]);
+        return {entryIds: matches.map(e => e.id), links: links.slice(0, limit), total: links.length};
+    }
+    return { CATEGORIES, COVERAGE, FORMS, buildCatalogue, matchingDeployments, filterEntries, groupEntries, searchResults, clusterMatches };
 });

@@ -129,7 +129,7 @@ describe('landing/app separation', () => {
     const assets = readFileSync(join(__dirname, 'assets.html'), 'utf8');
 
     test('the public root leads with the monitored story and links into the analytics app', () => {
-        for (const id of ['heroSearch', 'historyRange', 'holdersChart', 'volumeChart', 'updateFeed']) {
+        for (const id of ['historyRange', 'holdersChart', 'volumeChart', 'updateFeed']) {
             expect(html).toContain(`id="${id}"`);
         }
         expect(html).toContain('href="./stocks.html"');
@@ -140,9 +140,9 @@ describe('landing/app separation', () => {
         expect(html).toContain('Market size tells you what exists.');
         expect(html).toContain('RWA.xyz and DefiLlama');
         expect(html).toContain('L2BEAT, extended to RWAs');
-        expect(html).toContain('Claims versus reality');
+        expect(html).toContain('data-map-totals');
         expect(html).not.toContain('Why tokenize an asset at all?');
-        expect(html).toContain('Know what sits behind<br><span>your token.</span>');
+        expect(html).toContain('Find the promise<br><span>behind the token.</span>');
         expect(html).not.toContain('The token is not.');
         expect(html).not.toContain('not one score');
         expect(html).toContain('cannot tell us how many people own tokens');
@@ -152,7 +152,7 @@ describe('landing/app separation', () => {
         expect(html).toContain('Same stock reference.');
         expect(html).toContain('AAPLx');
         expect(html).toContain('AAPLon');
-        expect(html).toContain('name="search"');
+        expect(html).toContain('data-structure-map');
         expect(html).toContain('Market size tells you what exists.');
         expect(html).toMatch(/src="\.\/clarity\.js\?v=[0-9a-z]+"/);
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
@@ -164,22 +164,16 @@ describe('landing/app separation', () => {
         expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
 
-    // On a 375 px phone the search sat ~1,220 px down, inside the example card below the whole hero
-    // text (measured 25 Sep). It is its own hero item now: beside the text on a wide screen, and
-    // straight after the lede on a phone, inside the first screen.
-    test('puts the home search in the hero itself, right after the lede on a phone', () => {
-        const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="latestEvents"'));
-        const form = hero.indexOf('<form class="hero-search"');
-        expect(form).toBeGreaterThan(hero.indexOf('</div>', hero.indexOf('class="hero-copy"')));
-        expect(form).toBeLessThan(hero.indexOf('<article class="comparison-preview"'));
-        const css = readFileSync(join(__dirname, 'landing.css'), 'utf8');
-        expect(css).toMatch(/\.hero-search \{ grid-area: search;/);
-        // On a wide screen the search heads the right column, above the real example.
-        expect(css).toMatch(/\.hero \{ grid-template-areas: "copy search" "copy preview" "copy events"; \}/);
-        const phone = css.slice(css.indexOf('/* Phone hero order'));
-        expect(phone).toMatch(/\.hero-copy \{ display: contents; \}/);
-        expect(phone).toMatch(/\.hero-search \{ order: 4;/);
-        expect(phone).toMatch(/\.hero-lede \{ order: 3;/);
+    test('uses the shared map as the only search and removes duplicate explorer browsing', () => {
+        const ui = readFileSync(join(__dirname, 'structure-map-ui.js'), 'utf8');
+        const explorer = readFileSync(join(__dirname, 'explore.html'), 'utf8');
+        expect(html).not.toContain('heroSearch');
+        expect(ui).toContain('Search assets, issuers or exact addresses');
+        expect(ui).toContain('name="search"');
+        expect(explorer).not.toContain('catalogueFilters');
+        expect(explorer).not.toContain('Choose an entry');
+        expect(explorer).not.toContain('catalogueDetail');
+        expect(explorer).not.toContain('explore.js');
     });
 
     test('offers the universe view among the hero actions, marked new', () => {

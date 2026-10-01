@@ -1,5 +1,5 @@
 // Discovery contracts: identity, source scope, missing evidence and independent observation dates.
-const { buildCatalogue, filterEntries, matchingDeployments, groupEntries, quickSearchGroups } = require('./lib/rwa-catalogue.js');
+const { buildCatalogue, filterEntries, matchingDeployments, groupEntries, searchResults, clusterMatches } = require('./lib/rwa-catalogue.js');
 const assets = [
     { name: 'Paxos Gold', ticker: 'PAXG', issuer: 'Paxos', type: 'Tokenized Commodity (Gold)', blockchain: 'Ethereum', contractAddress: '0xGold', statusCheckedAt: '2026-09-16', titleDeed: 'yes' },
     { name: 'Kraken xStocks', type: 'Tokenized Equity', blockchain: 'Solana', contractAddress: 'programme-example' },
@@ -43,8 +43,8 @@ test('searches products, issuer names, underlyings and exact addresses while com
     const programme = filterEntries(entries, { search: 'exact-apple-mint' })[0];
     expect(matchingDeployments(programme, 'exact-apple-mint').map((d) => d.symbol)).toEqual(['AAPLx']);
     expect(filterEntries(entries, { search: 'AAPL', coverage: 'historical' })).toEqual([]);
-    expect(quickSearchGroups(entries, 'gold').stocks[0].href).toContain('explore.html?search=gold');
-    expect(quickSearchGroups(entries, 'exact-apple-mint').tokens[0].href).toBe('./cards/AAPLx.html');
+    expect(searchResults(entries, 'gold').links[0].href).toBe('./assets.html?search=Paxos%20Gold');
+    expect(searchResults(entries, 'exact-apple-mint').links[1].href).toBe('./cards/AAPLx.html');
 });
 test('fails on missing reconciled dossiers, orphan tokens and duplicate exact mints', () => {
     expect(() => buildCatalogue(assets, { issuers: [] }, tokens)).toThrow('Missing reconciled programme');
@@ -64,4 +64,24 @@ test('retains historical network discovery for a reconciled programme without in
     const entry = filterEntries(data.entries, { chain: 'Hyperliquid' })[0];
     expect(entry).toMatchObject({ chains: [], historicalNetworks: ['Hyperliquid'], deployments: [] });
     expect(filterEntries(data.entries, { chain: 'Solana' })).toEqual([]);
+});
+
+test('unified search filters map entries while linking directly to product and exact-token reports', () => {
+    const entries = build().entries;
+    const results = searchResults(entries, 'AAPL', 2);
+    expect(results.entryIds).toEqual(['programme:xstocks-backed']);
+    expect(results.total).toBe(3);
+    expect(results.links.map(l => l.href)).toEqual(['./issuers/xstocks-backed.html', './cards/AAPLx.html']);
+    expect(searchResults(entries, 'AAPL', Infinity).links).toHaveLength(3);
+    expect(searchResults(entries, 'does-not-exist')).toEqual({entryIds: [], links: [], total: 0});
+    expect(searchResults(entries, ' ')).toEqual({entryIds: [], links: [], total: 0});
+});
+
+test('cluster labels name matching tickers and deduplicate multiple deployments of one ticker', () => {
+    const entries = build().entries, ids = ['programme:xstocks-backed'];
+    expect(clusterMatches(entries, ids, 'aapl')).toEqual({symbols: ['AAPLx'], count: 2});
+    expect(clusterMatches(entries, ids, 'exact-apple-mint')).toEqual({symbols: ['AAPLx'], count: 1});
+    expect(clusterMatches(entries, ['product:paxos-gold'], 'gold')).toEqual({symbols: ['PAXG'], count: 1});
+    expect(clusterMatches(entries, ids, '')).toEqual({symbols: [], count: 0});
+    expect(clusterMatches(entries, ids, 'does-not-exist')).toEqual({symbols: [], count: 0});
 });

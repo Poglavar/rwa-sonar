@@ -32,3 +32,15 @@ The hourly `rwa-watch-deployments` PM2 entry runs at :11 before the existing :17
 Cross-asset source URLs are deduplicated with stock sources in the existing registry. Product, instrument, holder context, terms snapshot and source IDs remain in `foundIn`; research-only rows have no fabricated stock issuer. `stocks/watch-sources.mjs --run --product=usdc` narrows fetch scope. Changing our source attribution is not an external document-change event. Hash changes remain source-review signals until material legal meaning is established.
 
 Missing offering memoranda, constitutional documents, custodian contracts and current class bindings are stated as evidence gaps. Sources with inaccessible operative text are not promoted to verified legal rights. The historical catalogue and evidence database remain available as historical lenses with derived expiry/source-status labels.
+
+## Visual experience
+
+`npm run rwa:build` also produces `rwa-structure-map.json`, the compact navigation artifact. `lib/structure-map.js` shapes typed programme/structure/recipe/terms membership, deduplicates addresses with network-specific semantics and resolves selection without inferring legal bindings. The release manifest builds it after research and catalogue; release validation compares it with those retained inputs.
+
+`lib/visual-profile.js` resolves five features through the existing scoped claim model. Presentation annotations live on native claims or in stock dossier `visualFindings`, with stable finding IDs, labels, rationale and a serialized signature of the underlying claim and referenced sources. Review and replace an annotation deliberately when evidence changes; do not automatically regenerate its signature to bless changed text. Unsupported, historical and conflicting findings remain qualified. Issuer colors identify programmes; finding colors evaluate particular assertions.
+
+`lib/failure-scenario.js` resolves hypothetical outcomes only in their stated context and terms. Canonical `scenarios` carry mode, context/terms IDs, status, outcome, source IDs, original check date and separate claim/custody/exit route states. The stock adapter retains custody-insolvency answers and named party caveats from dossiers. Programme scenarios never bind unverified exact deployments, and issuer outage is distinct from insolvency.
+
+The page controllers render these models with local SVG icons. Map animations are enabled by default, respect system reduction and `?reduceMotion`, and give static mode the same final semantic state. Bounded animation never supplies evidence or indicates live asset flows.
+
+Caution and problem annotations require a nonempty `note` that explains the restriction, dependency or demonstrated issue in the card itself. A source merely describing a feature is not an adverse finding. Unreviewed offering terms, unchecked holdings and unresolved record priority use a specific evidence-gap label; the gap is a limit of this review rather than proof that a protection is absent.

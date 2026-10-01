@@ -9,6 +9,8 @@ import { log, logError, parseArgs } from './lib/io.mjs';
 import discoveryHelpers from './lib/discovery.js';
 import catalogueHelpers from './lib/rwa-catalogue.js';
 import researchModel from '../rwa/lib/research.js';
+import structureMap from '../rwa/lib/structure-map.js';
+import visualProfile from '../rwa/lib/visual-profile.js';
 import { buildResearch } from '../rwa/lib/build-research.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -159,6 +161,12 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
     if (JSON.stringify(catalogue) !== JSON.stringify(expectedCatalogue)) {
         throw new Error('unified RWA catalogue disagrees with shared product, programme or exact-deployment research');
     }
+    const map = await readJson(join(root, 'rwa-structure-map.json'));
+    if (JSON.stringify(map) !== JSON.stringify(structureMap.buildMap(runtimeResearch, catalogue))) throw new Error('RWA structure map disagrees with research or discovery');
+    for (const p of runtimeResearch.products) for (const context of p.contexts) {
+        const view = visualProfile.profile(p, context.id);
+        if (view.features.some((f) => f.findings.some((finding) => finding.needsReview))) throw new Error(`Visual profile needs evidence review: ${p.id}/${context.id}`);
+    }
     const representative = tokens.find((row) => row.symbol === REPRESENTATIVE_TOKEN_SYMBOL);
     if (!representative) throw new Error(`${REPRESENTATIVE_TOKEN_SYMBOL}: missing representative token`);
     const issuer = issuers.find((row) => row.slug === representative.issuer);
@@ -180,7 +188,7 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
     }
     requireHtmlIncludes(templateHtml, templateId, `templates/${templateId}.html`);
     requireHtmlIncludes(templateHtml, cardJson.composability.healthStatus, `templates/${templateId}.html`);
-    requireHtmlIncludes(issuerHtml, 'Unknown means not established', `issuers/${issuer.slug}.html`);
+    requireHtmlIncludes(issuerHtml, 'Missing evidence: we could not verify', `issuers/${issuer.slug}.html`);
     requireHtmlIncludes(templateHtml, 'Recorded external source changes', `templates/${templateId}.html`);
 
     return { tokenCount: tokens.length, cardCount: cards.length, representative: cardSlug,
