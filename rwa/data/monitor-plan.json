@@ -1,0 +1,1190 @@
+{
+  "schemaVersion": 1,
+  "preparedAt": "2026-10-01T19:47:16.217Z",
+  "active": false,
+  "scope": "21 original cross-asset products; no production activation",
+  "products": [
+    {
+      "productId": "usdc",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "terms",
+          "url": "https://www.circle.com/legal/usdc-terms",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure",
+            "backing"
+          ]
+        },
+        {
+          "sourceId": "eea",
+          "url": "https://www.circle.com/legal/mica-redemption-policy",
+          "purpose": [
+            "backing",
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+          "purpose": []
+        },
+        {
+          "sourceId": "reserves",
+          "url": "https://www.circle.com/transparency",
+          "purpose": []
+        },
+        {
+          "sourceId": "reserve-august-2026",
+          "url": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf",
+          "purpose": [
+            "backing",
+            "backing"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "network": "Ethereum",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "identityCheckedAt": "2026-09-30T22:03:31Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "solana:EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "network": "Solana",
+          "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "identityCheckedAt": "2026-09-30T22:03:31Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Court treatment, competing liens and holder-specific insolvency recourse remain unresolved."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "paxg",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "terms",
+          "url": "https://www.paxos.com/terms-and-conditions/pax-gold-terms-conditions",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "contract",
+          "url": "https://github.com/paxosglobal/paxos-gold-contract",
+          "purpose": []
+        },
+        {
+          "sourceId": "transparency",
+          "url": "https://www.paxos.com/paxg-transparency",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x45804880De22913dAFE09f4980848ECE6EcbAf78",
+          "network": "Ethereum",
+          "address": "0x45804880De22913dAFE09f4980848ECE6EcbAf78",
+          "identityCheckedAt": "2026-09-30T22:03:31Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Custodian agreement, current independent gold/circulation reconciliation and independent recovery rights are missing."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "buidl",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "ta",
+          "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026042685/ea026411904ex10-9.htm",
+          "purpose": [
+            "rights",
+            "ledger",
+            "controls",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2024/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network-03-20-2024/default.aspx",
+          "purpose": [
+            "backing",
+            "access"
+          ]
+        },
+        {
+          "sourceId": "solana",
+          "url": "https://investors.securitize.io/news/news-details/2025/BlackRock-and-Securitize-Debut-New-BUIDL-Share-Class-on-Solana-Network-03-25-2025/default.aspx",
+          "purpose": [
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "solana:GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr",
+          "network": "Solana",
+          "address": "GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr",
+          "identityCheckedAt": "2026-09-30T22:03:31Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Confidential offering memorandum, current class supplement, ordinary redemption limits and insolvency priority remain unavailable."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "fobxx",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "prospectus",
+          "url": "https://www.sec.gov/Archives/edgar/data/1786958/000165558926000970/c485bpos.htm",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "solana:5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1",
+          "network": "Solana",
+          "address": "5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1",
+          "identityCheckedAt": null,
+          "preparedObserver": null
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Exact official Solana mint binding and deployed key governance remain unresolved. Prospectus record-correction authority is distinct from bearer title."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "usdy",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "basics",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/basics",
+          "purpose": [
+            "rights",
+            "backing",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "notes",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/important-notes",
+          "purpose": [
+            "rights",
+            "ledger",
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://docs.ondo.finance/addresses",
+          "purpose": []
+        },
+        {
+          "sourceId": "wrapper",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/usdy-vs-rebasing-usdy",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "solana:A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6",
+          "network": "Solana",
+          "address": "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6",
+          "identityCheckedAt": "2026-09-30T22:03:31Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Obtain issuance-specific agreement and migration binding before assigning legacy security-agent, guarantor or creditor-ranking protections."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "acred",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/2056038/000205603825000001/xslFormDX01/primary_doc.xml",
+          "purpose": [
+            "rights"
+          ]
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2025/Apollo-and-Securitize-Announce-Partnership-and-Launch-Tokenized-Access-to-Credit-Fund-on-Aptos-Avalanche-Ethereum-Ink-Polygon-and-Solana-Networks-01-30-2025/default.aspx",
+          "purpose": [
+            "ledger",
+            "backing",
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "underlying",
+          "url": "https://www.sec.gov/Archives/edgar/data/1676197/000119312526192295/R1.htm",
+          "purpose": [
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Feeder memorandum, class terms and liquidity funding are missing; quarterly underlying repurchases are not the announced daily feeder route."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "hlscope",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/1976710/000197671025000002/xslFormDX01/primary_doc.xml",
+          "purpose": [
+            "rights"
+          ]
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://www.hamiltonlane.com/en-us/news/scope-available-via-securitize",
+          "purpose": [
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "portfolio",
+          "url": "https://www.hamiltonlane.com/en-us/strategies/evergreen/global/senior-credit-opportunities-fund",
+          "purpose": [
+            "backing"
+          ]
+        },
+        {
+          "sourceId": "current",
+          "url": "https://investors.securitize.io/news/news-details/2026/Securitize-Launches-Private-Credit-Fund-on-TRON-Blockchain/default.aspx",
+          "purpose": [
+            "backing",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "rlusd-facility",
+          "url": "https://investors.securitize.io/news/news-details/2025/Hamilton-Lane-and-Securitizes-SCOPE-Gains-Instant-RLUSD-Liquidity-by-integrating-with-VBILLs-Onchain-Facility-11-05-2025/default.aspx",
+          "purpose": []
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Current LPA, PPM, feeder NAV rules and facility capacity remain missing. Alta / KAIO SCOPE wrappers are different instruments."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "ustb",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "site",
+          "url": "https://superstate.com/assets/ustb",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/2004367/000094562126000632/xslFormDX08/primary_doc.xml",
+          "purpose": []
+        },
+        {
+          "sourceId": "instruments",
+          "url": "https://api.superstate.com/v2/instruments",
+          "purpose": [
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "current-docs",
+          "url": "https://docs.superstate.com/investors/tokenized-funds/available-funds/invesco-ustb",
+          "purpose": [
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e",
+          "network": "Ethereum",
+          "address": "0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e",
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "solana:CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2",
+          "network": "Solana",
+          "address": "CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2",
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": "official instrument registry (not reserves)",
+      "gaps": [
+        "Current PPM, trust instrument and subscription agreement remain gated; fast liquidity provider priority is not ordinary shareholder parity."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "usyc",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "product",
+          "url": "https://www.circle.com/usyc",
+          "purpose": [
+            "rights",
+            "backing",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "help",
+          "url": "https://help.circle.com/support/en/usyc-subscription-redemption-and-functionality-explained?id=kb_article_view&sysparm_article=KB0010561",
+          "purpose": [
+            "ledger",
+            "controls",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://usyc.docs.hashnote.com/overview/smart-contracts",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x136471a34f6ef19fE571EFFC1CA711fdb8E49f2b",
+          "network": "Ethereum",
+          "address": "0x136471a34f6ef19fE571EFFC1CA711fdb8E49f2b",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "bnb-smart-chain:0x8D0fA28f221eB5735BC71d3a0Da67EE5bC821311",
+          "network": "BNB Smart Chain",
+          "address": "0x8D0fA28f221eB5735BC71d3a0Da67EE5bC821311",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "solana:7LWanZteUKtvFjv4MHYgKXXdAuCQYFPJysL9pxxdRQGn",
+          "network": "Solana",
+          "address": "7LWanZteUKtvFjv4MHYgKXXdAuCQYFPJysL9pxxdRQGn",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Fund constitutional and offering documents, current custody agreement and disputed-register rules remain missing."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "jtrsy",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "anemoy",
+          "url": "https://www.anemoy.io/funds/jtrsy",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "centrifuge",
+          "url": "https://app.centrifuge.io/pool/281474976710662",
+          "purpose": [
+            "controls",
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "janus",
+          "url": "https://www.janushenderson.com/en-us/advisor/press-releases/janus-henderson-to-partner-with-anemoy-and-centrifuge-on-its-first-tokenized-fund/",
+          "purpose": []
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.centrifuge.io/developer/protocol/deployments/",
+          "purpose": []
+        },
+        {
+          "sourceId": "continuity",
+          "url": "https://www.anemoy.io/business-continuity",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "network": "Ethereum",
+          "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "base:0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "network": "Base",
+          "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "arbitrum:0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "network": "Arbitrum",
+          "address": "0x8c213ee79581ff4984583c6a801e5263418c4b86",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "avalanche:0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "network": "Avalanche",
+          "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "plume:0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "network": "Plume",
+          "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "bnb-smart-chain:0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "network": "BNB Smart Chain",
+          "address": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "solana:JTRu97Z4oduVwfVBWdf1fSAz8h7CBBPqEo4Jco9fZPj",
+          "network": "Solana",
+          "address": "JTRu97Z4oduVwfVBWdf1fSAz8h7CBBPqEo4Jco9fZPj",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "monad:0xc18e6f730896971a79d748e8dea61067a9bc6040",
+          "network": "Monad",
+          "address": "0xc18e6f730896971a79d748e8dea61067a9bc6040",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "pharos:0xc18e6f730896971a79d748e8dea61067a9bc6040",
+          "network": "Pharos",
+          "address": "0xc18e6f730896971a79d748e8dea61067a9bc6040",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Constitutional documents, custody terms, deployed control roles and independent recovery route are not established. Prima facie ownership evidence is not conclusive title."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "tbill",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "intro",
+          "url": "https://docs.openeden.com/tbill",
+          "purpose": [
+            "ledger",
+            "backing",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "struct",
+          "url": "https://docs.openeden.com/tbill/product-structuring",
+          "purpose": []
+        },
+        {
+          "sourceId": "faq",
+          "url": "https://docs.openeden.com/tbill/faq",
+          "purpose": []
+        },
+        {
+          "sourceId": "redemptions",
+          "url": "https://docs.openeden.com/tbill/redemptions",
+          "purpose": []
+        },
+        {
+          "sourceId": "controls",
+          "url": "https://docs.openeden.com/tbill/on-chain-governance-and-controls-i",
+          "purpose": [
+            "ledger",
+            "controls"
+          ]
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.openeden.com/tbill/smart-contract-addresses",
+          "purpose": []
+        },
+        {
+          "sourceId": "non-us-agreement",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af",
+          "purpose": [
+            "rights",
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "us-agreement",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c",
+          "purpose": [
+            "rights",
+            "access",
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0xdd50C053C096CB04A3e3362E2b622529EC5f2e8a",
+          "network": "Ethereum",
+          "address": "0xdd50C053C096CB04A3e3362E2b622529EC5f2e8a",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Full PPM, exact issuance binding, independent custody evidence and current controller governance remain unverified. US-linked agreement also contains inconsistent issuer names."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "ustbl",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "account",
+          "url": "https://docs.spiko.io/documentation/account_management/deposits_withdrawals/",
+          "purpose": []
+        },
+        {
+          "sourceId": "lifecycle",
+          "url": "https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/",
+          "purpose": [
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://www.spiko.io/blog/spiko-launches-the-worlds-first-tokenized-money-market-funds",
+          "purpose": []
+        },
+        {
+          "sourceId": "prospectus",
+          "url": "https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "transfers",
+          "url": "https://docs.spiko.io/documentation/tokenization/transfers/",
+          "purpose": [
+            "ledger",
+            "access"
+          ]
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://docs.spiko.io/documentation/tokenization/addresses/",
+          "purpose": [
+            "controls"
+          ]
+        },
+        {
+          "sourceId": "contract",
+          "url": "https://github.com/spiko-tech/contracts/blob/main/contracts/token/Token.sol",
+          "purpose": [
+            "controls"
+          ]
+        },
+        {
+          "sourceId": "nav",
+          "url": "https://docs.spiko.io/documentation/tokenization/nav",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0xe4880249745eAc5F1eD9d8F7DF844792D560e750",
+          "network": "Ethereum",
+          "address": "0xe4880249745eAc5F1eD9d8F7DF844792D560e750",
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": "official Chainlink NAV round (not reserves)",
+      "gaps": [
+        "Deposit-loss remedies, contested register resolution, deployed permissions and outage access need additional evidence."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "wtgxx",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "product",
+          "url": "https://www.wisdomtreeprime.com/digital-funds/wtgxx",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "regulatory",
+          "url": "https://www.wisdomtreeprime.com/prospectus-and-regulatory-information/",
+          "purpose": [
+            "rights",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "liquidity",
+          "url": "https://www.wisdomtreeprime.com/blog/commission-free-liquidity/",
+          "purpose": [
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "faq",
+          "url": "https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/",
+          "purpose": [
+            "controls",
+            "access",
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Current prospectus, transfer-agent record powers, exact deployments and current dealer capacity remain unverified."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "ousg",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "product",
+          "url": "https://ondo.finance/ousg",
+          "purpose": [
+            "backing",
+            "access",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "overview",
+          "url": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+          "purpose": [
+            "rights",
+            "ledger",
+            "controls",
+            "access",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "redeem",
+          "url": "https://docs.ondo.finance/qualified-access-products/ousg/redeeming",
+          "purpose": [
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.ondo.finance/addresses",
+          "purpose": []
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92",
+          "network": "Ethereum",
+          "address": "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "polygon:0xbA11C5effA33c4D6F8f593CFA394241CfE925811",
+          "network": "Polygon",
+          "address": "0xbA11C5effA33c4D6F8f593CFA394241CfE925811",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        },
+        {
+          "deploymentId": "solana:i7u4r16TcsJTgq1kAG8opmVZyVnAKBwLKu6ZPMwzxNc",
+          "network": "Solana",
+          "address": "i7u4r16TcsJTgq1kAG8opmVZyVnAKBwLKu6ZPMwzxNc",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        },
+        {
+          "deploymentId": "xrp-ledger:4F55534700000000000000000000000000000000.rHuiXXjHLpMP8ZE9sSQU5aADQVWDwv6h5p",
+          "network": "XRP Ledger",
+          "address": "4F55534700000000000000000000000000000000.rHuiXXjHLpMP8ZE9sSQU5aADQVWDwv6h5p",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": null
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Gated LP/constitutional documents and exact issuer legal name are still needed; underlying fund balances are not additive independent reserves."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "vbill",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2025/VanEck-Launches-First-Tokenized-Fund-VBILL-on-Securitize-05-13-2025/default.aspx",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "product",
+          "url": "https://securitize.io/primary-market/vaneck-vbill",
+          "purpose": []
+        },
+        {
+          "sourceId": "stablecoin",
+          "url": "https://investors.securitize.io/news/news-details/2025/Ripple-and-Securitize-Enable-RLUSD-Smart-Contract-Functionality-for-BlackRocks-BUIDL-and-VanEcks-VBILL-Tokenized-Funds-09-23-2025/default.aspx",
+          "purpose": [
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Current PPM, share-class terms, ordinary redemption rules, live authorities and capacity remain missing. RLUSD swap support is a separate off-ramp."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "ter",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "ter-site",
+          "url": "https://uat.ter.bt/",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "ter-terms",
+          "url": "https://drive.google.com/file/d/1_bou3Ek98xRQwX1kxNQ9lf_xme6m3AFI/view?usp=sharing",
+          "purpose": [
+            "rights",
+            "ledger",
+            "controls",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "ter-assets",
+          "url": "https://uat.ter.bt/reports/asset-statements",
+          "purpose": []
+        },
+        {
+          "sourceId": "ter-gold-audit",
+          "url": "https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view",
+          "purpose": [
+            "backing",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "statement-september",
+          "url": "https://drive.google.com/file/d/10dEK20M3mfscDh594rzVpzdO3KvC0VSg/view",
+          "purpose": [
+            "backing"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "solana:9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+          "network": "Solana",
+          "address": "9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Operative holder terms remain unreadable; custody ownership, recovery priority, token matching and live authority governance are unresolved."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "xaut",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "xaut-terms",
+          "url": "https://gold.tether.to/legal/",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "xaut-fees",
+          "url": "https://gold.tether.to/legal/",
+          "purpose": [
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "xaut-attestation",
+          "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.03.2026_RC187322026DV0089.pdf",
+          "purpose": [
+            "backing"
+          ]
+        },
+        {
+          "sourceId": "xaut-whitepaper",
+          "url": "https://gold.tether.to/Tether%20Gold%20Whitepaper.pdf",
+          "purpose": []
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://tether.io/news/xaut-update-upgrade-completed/",
+          "purpose": []
+        },
+        {
+          "sourceId": "xaut-june-assurance",
+          "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2026_RC187322026DV0170.pdf",
+          "purpose": [
+            "backing"
+          ]
+        },
+        {
+          "sourceId": "xaut-report-index",
+          "url": "https://gold.tether.to/",
+          "purpose": [
+            "report-discovery"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "ethereum:0x68749665FF8D2d112Fa859AA293F07A622782F38",
+          "network": "Ethereum",
+          "address": "0x68749665FF8D2d112Fa859AA293F07A622782F38",
+          "identityCheckedAt": "2026-09-30T23:11:00Z",
+          "preparedObserver": "rwa/watch-deployments.mjs"
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "June 30 reserve matching reviewed; current coverage, holder-funded custodian enforcement and insurance limits do not guarantee timely recovery."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "usdhl",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "usdhl-about",
+          "url": "https://usefelix.gitbook.io/usdhl/",
+          "purpose": [
+            "rights",
+            "backing",
+            "access"
+          ]
+        },
+        {
+          "sourceId": "usdhl-sunset",
+          "url": "https://usefelix.gitbook.io/usdhl/sunsetting-usdhl",
+          "purpose": [
+            "controls",
+            "access",
+            "exit"
+          ]
+        },
+        {
+          "sourceId": "usdhl-terms",
+          "url": "https://usefelix.gitbook.io/docs/terms/terms-and-conditions",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "usdhl-security",
+          "url": "https://usefelix.gitbook.io/usdhl/advanced/security",
+          "purpose": [
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "developers",
+          "url": "https://usefelix.gitbook.io/usdhl/advanced/developers",
+          "purpose": [
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [
+        {
+          "deploymentId": "hyperevm:0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+          "network": "HyperEVM",
+          "address": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "preparedObserver": null
+        }
+      ],
+      "fundData": null,
+      "gaps": [
+        "Wrapper/bridge liability matching, current portal operation, signers, fiat-redemption entitlement and post-sunset support remain unverified."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "thbill",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "thbill-site",
+          "url": "https://theo.xyz/thbill",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "libeara-ultra",
+          "url": "https://libeara.com/libeara-partners-with-wellington-and-fundbridge-capital-to-launch-a-u-s-treasuries-fund-tokenised-on-public-blockchain/",
+          "purpose": [
+            "backing",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "libeara-theo",
+          "url": "https://libeara.com/fundbridge-capital-and-libeara-bring-regulated-tokenized-treasury-fund-on-chain-with-arbitrum/",
+          "purpose": [
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "theo-docs",
+          "url": "https://docs.theo.xyz/",
+          "purpose": [
+            "rights",
+            "ledger",
+            "controls",
+            "access",
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Issuer legal identity, holder agreement, current basket reconciliation, controls and contractual redemption remain missing; site sections conflict on backing."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "uranium-digital",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "uranium-site",
+          "url": "https://www.uraniumdigital.com/",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "No holder contract, exact token, issuer legal identity, reserve report or settlement entitlement. uranium.io/xU3O8 is a different programme."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    },
+    {
+      "productId": "oro-gold",
+      "active": false,
+      "documents": [
+        {
+          "sourceId": "oro-terms",
+          "url": "https://app.oro.finance/terms-and-conditions",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing",
+            "controls",
+            "access",
+            "exit",
+            "failure"
+          ]
+        },
+        {
+          "sourceId": "oro-home",
+          "url": "https://app.oro.finance/",
+          "purpose": [
+            "rights",
+            "ledger",
+            "backing"
+          ]
+        },
+        {
+          "sourceId": "oro-redeem",
+          "url": "https://app.oro.finance/redeem",
+          "purpose": [
+            "rights",
+            "backing",
+            "exit"
+          ]
+        }
+      ],
+      "deployments": [],
+      "fundData": null,
+      "gaps": [
+        "Issuer agreement, named vault, full official mint binding, independent reserve matching and redemption obligor remain missing; OGold is a different programme."
+      ],
+      "governanceLimit": "Root authority/proxy/mint observations do not resolve controller multisig signers, thresholds, transaction history or holder-specific legal powers."
+    }
+  ]
+}

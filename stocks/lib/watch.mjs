@@ -1212,8 +1212,12 @@ export function quotelessRefusal({ status, httpStatus = null, reason = '', quote
  * `throttled` is archive.org pushing back on our own traffic — until it persists, when
  * `settleThrottle` has already made it an `error`.
  */
-export function runFailed(results) {
-    return results.some((r) => r.status === 'error');
+export function failedSourceReads(results, { requireContent = false } = {}) {
+    const statuses = requireContent ? ['error', 'gone', 'blocked', 'unreadable', 'reachable-unverified', 'throttled'] : ['error'];
+    return results.filter((r) => statuses.includes(r.status));
+}
+export function runFailed(results, options) {
+    return failedSourceReads(results, options).length > 0;
 }
 
 /** A restart can reuse completed outcomes, but transient errors and throttles must make a real request again. */

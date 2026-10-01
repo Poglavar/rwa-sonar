@@ -117,3 +117,8 @@
 - Map branch details contain Summary feature cards without the duplicate scope/conclusion prose. Cluster glyphs grow with inventory size (exact dots for small clusters, logarithmic density for large ones); numeric counts remain exact.
 
 - Latest chart positioning decision supersedes stable rows: promote a selected programme/group and its connections to the top, expand the compact row budget to fit all matching members, and keep other visible rows dimmed and clickable. Explicit search filters remain in effect.
+
+- 2026-10-01: The explorer defaults to indexed-address count descending; selection hides unrelated nodes, expands all connected rows, and puts one clear-selection action on the distinctly highlighted clicked card.
+- 2026-10-01: Research original non-stock products before deploying their monitors; reuse stock source monitoring and stage cross-asset observers/outcome registrations locally, with no production activation until requested.
+
+- 2026-10-02: Unify reports around a relationship overview and five findings, with persistent topic navigation, one spacious reading column, and evidence opened beside the answer; exact-token selection must not inherit unbound programme research.

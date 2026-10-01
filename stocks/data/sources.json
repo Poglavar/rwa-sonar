@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-30T14:19:51Z",
-  "count": 627,
+  "generatedAt": "2026-10-01T21:20:00Z",
+  "count": 713,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -39,6 +39,7 @@
         "superstate-opening-bell:documents[12].url",
         "superstate-opening-bell:parties.verificationAgents[0].source",
         "superstate-opening-bell:sources[28]",
+        "superstate-opening-bell:visualFindings.controls.basis",
         "superstate-opening-bell:whatIf[account-frozen].searched[6]",
         "superstate-opening-bell:whatIf[attestation-wrong].searched[7]",
         "superstate-opening-bell:whatIf[authority-key-compromised].searched[7]",
@@ -73,6 +74,24 @@
       "title": "superstate-opening-bell:whatIf[authority-key-compromised].searched[12]",
       "foundIn": [
         "superstate-opening-bell:whatIf[authority-key-compromised].searched[12]"
+      ]
+    },
+    {
+      "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "OpenEden Non-US user agreement and TBILL terms",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=non-us-agreement"
+      ]
+    },
+    {
+      "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "OpenEden US user agreement and TBILL terms",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=us-agreement"
       ]
     },
     {
@@ -113,6 +132,11 @@
         "shift:incidents[0].source",
         "shift:parties.parents[0].source",
         "shift:sources[5]",
+        "shift:visualFindings.backing.basis",
+        "shift:visualFindings.exit.basis",
+        "shift:visualFindings.failure.basis",
+        "shift:visualFindings.ledger.basis",
+        "shift:visualFindings.rights.basis",
         "shift:whatIf[company-acquired]",
         "shift:whatIf[death-inheritance]",
         "shift:whatIf[dispute-forum]",
@@ -148,6 +172,16 @@
       ]
     },
     {
+      "url": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "Deloitte examination of August USDC reserves",
+      "foundIn": [
+        "product=usdc|instrument=instrument%3Ausdc|context=eea|terms=usdc-mica-2026-09-15|source=reserve-august-2026",
+        "product=usdc|instrument=instrument%3Ausdc|context=non-eea|terms=usdc-terms-2025-12-12|source=reserve-august-2026"
+      ]
+    },
+    {
       "url": "https://8k2tqa6n.api.sanity.io/v2023-05-03/data/query/production",
       "kind": "html",
       "issuer": "ondo-global-markets",
@@ -163,6 +197,15 @@
       "title": "ventuals:claims[20].quote",
       "foundIn": [
         "ventuals:claims[20].quote"
+      ]
+    },
+    {
+      "url": "https://across.to/?from=hyperevm\\\\&inputToken=USDH\\\\&to=hypercore\\\\&outputToken=USDC-PERPS",
+      "kind": "html",
+      "issuer": "ventuals",
+      "title": "ventuals:visualFindings.exit.basis",
+      "foundIn": [
+        "ventuals:visualFindings.exit.basis"
       ]
     },
     {
@@ -214,7 +257,8 @@
       "issuer": "remora-markets",
       "title": "remora-markets:claims[67].url",
       "foundIn": [
-        "remora-markets:claims[67].url"
+        "remora-markets:claims[67].url",
+        "remora-markets:visualFindings.exit.basis"
       ]
     },
     {
@@ -238,6 +282,8 @@
         "backpack-securities-spcx:incidents[4].source",
         "backpack-securities-spcx:redemption.minimum",
         "backpack-securities-spcx:sources[28]",
+        "backpack-securities-spcx:visualFindings.exit.basis",
+        "backpack-securities-spcx:visualFindings.exit.reason",
         "backpack-securities-spcx:whatIf[defrauded].searched[7]",
         "backpack-securities-spcx:whatIf[liquidity-event].searched[7]"
       ]
@@ -369,6 +415,7 @@
         "backpack-securities-spcx:sources[20]",
         "backpack-securities-spcx:sources[51]",
         "backpack-securities-spcx:sources[52]",
+        "backpack-securities-spcx:visualFindings.controls.basis",
         "backpack-securities-spcx:whatIf[account-frozen].searched[6]",
         "backpack-securities-spcx:whatIf[authority-key-compromised].searched[6]",
         "backpack-securities-spcx:whatIf[change-jurisdiction].searched[8]",
@@ -381,6 +428,7 @@
         "backpack-securities-spcx:whatIf[tokens-seized].searched[6]",
         "bullish-blsh:claims[14].sources[1]",
         "bullish-blsh:claims[71].url",
+        "bullish-blsh:visualFindings.controls.basis",
         "bullish-blsh:whatIf[rebase-error]",
         "ondo-global-markets:authorityFactsSource",
         "ondo-global-markets:claims[104].url",
@@ -398,6 +446,8 @@
         "ondo-global-markets:claims[69].url",
         "ondo-global-markets:claims[70].url",
         "ondo-global-markets:sources[33]",
+        "ondo-global-markets:visualFindings.access.basis",
+        "ondo-global-markets:visualFindings.controls.basis",
         "prestocks:authorityFactsSource",
         "prestocks:claims[36].url",
         "prestocks:claims[40].url",
@@ -416,6 +466,9 @@
         "prestocks:claims[89].url",
         "prestocks:incidents[3].source",
         "prestocks:sources[8]",
+        "prestocks:visualFindings.access.basis",
+        "prestocks:visualFindings.controls.basis",
+        "prestocks:visualFindings.exit.basis",
         "remora-markets:claims[32].url",
         "remora-markets:claims[34].url",
         "remora-markets:claims[37].url",
@@ -433,6 +486,9 @@
         "remora-markets:claims[62].url",
         "remora-markets:claims[63].url",
         "remora-markets:claims[71].url",
+        "remora-markets:visualFindings.access.basis",
+        "remora-markets:visualFindings.controls.basis",
+        "remora-markets:visualFindings.exit.basis",
         "remora-markets:whatIf[account-frozen]",
         "remora-markets:whatIf[authority-key-compromised]",
         "remora-markets:whatIf[company-acquired]",
@@ -447,9 +503,11 @@
         "remora-markets:whatIf[tokens-seized]",
         "republic-mirror:claims[91].sources[1]",
         "republic-mirror:claims[91].url",
+        "republic-mirror:visualFindings.controls.basis",
         "securitize-secz:authorityFactsSource",
         "securitize-secz:claims[12].sources[1]",
         "securitize-secz:claims[71].url",
+        "securitize-secz:visualFindings.controls.basis",
         "securitize-secz:whatIf[account-frozen].searched[11]",
         "securitize-secz:whatIf[authority-key-compromised].searched[11]",
         "securitize-secz:whatIf[backing-shortfall].searched[11]",
@@ -476,6 +534,8 @@
         "shift:claims[99].url",
         "shift:sources[21]",
         "shift:sources[44]",
+        "shift:visualFindings.access.basis",
+        "shift:visualFindings.controls.basis",
         "shift:whatIf[account-frozen].searched[9]",
         "shift:whatIf[attestation-wrong].searched[11]",
         "shift:whatIf[authority-key-compromised]",
@@ -500,6 +560,7 @@
         "superstate-opening-bell:claims[94].url",
         "superstate-opening-bell:discrepancies[0].reality.sources[1].url",
         "superstate-opening-bell:sources[2]",
+        "superstate-opening-bell:visualFindings.controls.basis",
         "superstate-opening-bell:whatIf[account-frozen].searched[7]",
         "superstate-opening-bell:whatIf[attestation-wrong].searched[8]",
         "superstate-opening-bell:whatIf[authority-key-compromised].searched[8]",
@@ -520,11 +581,15 @@
         "tessera:incidents[5].source",
         "tessera:sources[12]",
         "tessera:sources[26]",
+        "tessera:visualFindings.access.basis",
+        "tessera:visualFindings.controls.basis",
+        "tessera:visualFindings.exit.basis",
         "tessera:whatIf[corporate-action-mirroring]",
         "tessera:whatIf[rebase-error]",
         "tessera:whatIf[tokens-seized]",
         "ventuals:claims[60].sources[1]",
         "ventuals:claims[60].url",
+        "ventuals:visualFindings.controls.basis",
         "xstocks-backed:authorityFactsSource",
         "xstocks-backed:claims[103].url",
         "xstocks-backed:claims[109].sources[2]",
@@ -542,7 +607,8 @@
         "xstocks-backed:claims[86].url",
         "xstocks-backed:claims[87].url",
         "xstocks-backed:claims[88].url",
-        "xstocks-backed:claims[89].url"
+        "xstocks-backed:claims[89].url",
+        "xstocks-backed:visualFindings.controls.basis"
       ]
     },
     {
@@ -582,6 +648,7 @@
       "issuer": "superstate-opening-bell",
       "title": "Public, unauthenticated instruments feed — CUSIP, per-chain mint, total/circulating supply, burn address, split multiplier",
       "foundIn": [
+        "product=ustb|instrument=instrument%3Austb|context=public-holder|terms=public-source-snapshot-2026-09-30|source=instruments",
         "superstate-opening-bell:attestations[13].link",
         "superstate-opening-bell:claims[1].url",
         "superstate-opening-bell:claims[56].url",
@@ -642,6 +709,15 @@
       ]
     },
     {
+      "url": "https://app.centrifuge.io/pool/281474976710662",
+      "kind": "html",
+      "issuer": null,
+      "title": "Centrifuge JTRSY pool page",
+      "foundIn": [
+        "product=jtrsy|instrument=instrument%3Ajtrsy|context=public-holder|terms=public-source-snapshot-2026-09-30|source=centrifuge"
+      ]
+    },
+    {
       "url": "https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/9406953",
       "kind": "html",
       "issuer": "backpack-securities-spcx",
@@ -699,6 +775,33 @@
       "title": "ondo-global-markets:sources[28]",
       "foundIn": [
         "ondo-global-markets:sources[28]"
+      ]
+    },
+    {
+      "url": "https://app.oro.finance/",
+      "kind": "html",
+      "issuer": null,
+      "title": "ORO official GOLD interface",
+      "foundIn": [
+        "product=oro-gold|instrument=instrument%3Aoro-gold|context=gold-holder|terms=oro-labs-terms-2025-06-19|source=oro-home"
+      ]
+    },
+    {
+      "url": "https://app.oro.finance/redeem",
+      "kind": "html",
+      "issuer": null,
+      "title": "ORO GOLD physical redemption interface",
+      "foundIn": [
+        "product=oro-gold|instrument=instrument%3Aoro-gold|context=gold-holder|terms=oro-labs-terms-2025-06-19|source=oro-redeem"
+      ]
+    },
+    {
+      "url": "https://app.oro.finance/terms-and-conditions",
+      "kind": "html",
+      "issuer": null,
+      "title": "ORO Labs Terms and Conditions",
+      "foundIn": [
+        "product=oro-gold|instrument=instrument%3Aoro-gold|context=gold-holder|terms=oro-labs-terms-2025-06-19|source=oro-terms"
       ]
     },
     {
@@ -850,6 +953,8 @@
         "xstocks-backed:findings[0].evidence",
         "xstocks-backed:parties.verificationAgents[2].source",
         "xstocks-backed:sources[1]",
+        "xstocks-backed:visualFindings.access.basis",
+        "xstocks-backed:visualFindings.controls.basis",
         "xstocks-backed:whatIf[change-jurisdiction].searched[4]",
         "xstocks-backed:whatIf[collateral-lent].searched[1]",
         "xstocks-backed:whatIf[issuer-wind-down].searched[3]",
@@ -874,6 +979,7 @@
         "xstocks-backed:parties.custodians[1].source",
         "xstocks-backed:parties.custodians[2].source",
         "xstocks-backed:sources[2]",
+        "xstocks-backed:visualFindings.backing.basis",
         "xstocks-backed:whatIf[collateral-lent].searched[2]"
       ]
     },
@@ -1038,6 +1144,7 @@
         "backpack-securities-spcx:parties.regulators[1].source",
         "backpack-securities-spcx:quoteVerificationSources[0].sourceUrl",
         "backpack-securities-spcx:sources[23]",
+        "backpack-securities-spcx:visualFindings.access.basis",
         "backpack-securities-spcx:whatIf[custodian-insolvency].searched[7]"
       ]
     },
@@ -1059,7 +1166,8 @@
         "backpack-securities-spcx:claims[17].url",
         "backpack-securities-spcx:documents[12].url",
         "backpack-securities-spcx:quoteVerificationSources[1].sourceUrl",
-        "backpack-securities-spcx:sources[24]"
+        "backpack-securities-spcx:sources[24]",
+        "backpack-securities-spcx:visualFindings.access.basis"
       ]
     },
     {
@@ -1199,6 +1307,12 @@
         "xstocks-backed:parties.tokenIssuers[0].source",
         "xstocks-backed:parties.tokenizationProviders[0].source",
         "xstocks-backed:sources[0]",
+        "xstocks-backed:visualFindings.access.basis",
+        "xstocks-backed:visualFindings.backing.basis",
+        "xstocks-backed:visualFindings.exit.basis",
+        "xstocks-backed:visualFindings.failure.basis",
+        "xstocks-backed:visualFindings.ledger.basis",
+        "xstocks-backed:visualFindings.rights.basis",
         "xstocks-backed:whatIf[account-frozen].searched[1]",
         "xstocks-backed:whatIf[attestation-wrong].searched[0]",
         "xstocks-backed:whatIf[authority-key-compromised]",
@@ -1459,6 +1573,7 @@
         "ondo-global-markets:parties.custodians[0].source",
         "ondo-global-markets:parties.custodians[1].source",
         "ondo-global-markets:sources[17]",
+        "ondo-global-markets:visualFindings.backing.basis",
         "ondo-global-markets:whatIf[account-frozen].searched[3]",
         "ondo-global-markets:whatIf[attestation-wrong].searched[3]",
         "ondo-global-markets:whatIf[authority-key-compromised].searched[3]",
@@ -1527,6 +1642,8 @@
         "ondo-global-markets:parties.parents[1].source",
         "ondo-global-markets:parties.regulators[0].source",
         "ondo-global-markets:sources[15]",
+        "ondo-global-markets:visualFindings.access.basis",
+        "ondo-global-markets:visualFindings.rights.basis",
         "ondo-global-markets:whatIf[account-frozen].searched[1]",
         "ondo-global-markets:whatIf[attestation-wrong].searched[1]",
         "ondo-global-markets:whatIf[authority-key-compromised].searched[1]",
@@ -1653,6 +1770,13 @@
         "ondo-global-markets:parties.tokenIssuers[0].source",
         "ondo-global-markets:parties.tokenizationProviders[0].source",
         "ondo-global-markets:sources[14]",
+        "ondo-global-markets:visualFindings.access.basis",
+        "ondo-global-markets:visualFindings.backing.basis",
+        "ondo-global-markets:visualFindings.controls.basis",
+        "ondo-global-markets:visualFindings.exit.basis",
+        "ondo-global-markets:visualFindings.failure.basis",
+        "ondo-global-markets:visualFindings.ledger.basis",
+        "ondo-global-markets:visualFindings.rights.basis",
         "ondo-global-markets:whatIf[account-frozen]",
         "ondo-global-markets:whatIf[account-frozen].searched[0]",
         "ondo-global-markets:whatIf[attestation-wrong]",
@@ -1722,6 +1846,15 @@
         "ondo-global-markets:whatIf[venue-insolvency].searched[0]",
         "ondo-global-markets:whatIf[voting-rights]",
         "ondo-global-markets:whatIf[voting-rights].searched[0]"
+      ]
+    },
+    {
+      "url": "https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "Spiko SICAV prospectus and articles",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=prospectus"
       ]
     },
     {
@@ -1885,7 +2018,8 @@
       "title": "bullish-blsh:claims[9].url",
       "foundIn": [
         "bullish-blsh:claims[9].url",
-        "bullish-blsh:sources[9]"
+        "bullish-blsh:sources[9]",
+        "bullish-blsh:visualFindings.access.basis"
       ]
     },
     {
@@ -1944,6 +2078,7 @@
         "republic-mirror:incidents[1].source",
         "republic-mirror:parties.regulators[0].source",
         "republic-mirror:sources[2]",
+        "republic-mirror:visualFindings.access.basis",
         "republic-mirror:whatIf[attestation-wrong].searched[5]",
         "republic-mirror:whatIf[authority-key-compromised].searched[5]",
         "republic-mirror:whatIf[backing-shortfall].searched[3]",
@@ -1987,6 +2122,15 @@
       "foundIn": [
         "bullish-blsh:claims[3].url",
         "bullish-blsh:sources[19]"
+      ]
+    },
+    {
+      "url": "https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/",
+      "kind": "html",
+      "issuer": null,
+      "title": "WisdomTree WTGXX fund FAQ",
+      "foundIn": [
+        "product=wtgxx|instrument=instrument%3Awtgxx|context=public-holder|terms=public-source-snapshot-2026-09-30|source=faq"
       ]
     },
     {
@@ -2047,6 +2191,16 @@
       ]
     },
     {
+      "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+      "kind": "html",
+      "issuer": null,
+      "title": "Circle native mainnet addresses",
+      "foundIn": [
+        "product=usdc|instrument=instrument%3Ausdc|context=eea|terms=usdc-mica-2026-09-15|source=addresses",
+        "product=usdc|instrument=instrument%3Ausdc|context=non-eea|terms=usdc-terms-2025-12-12|source=addresses"
+      ]
+    },
+    {
       "url": "https://developers.fireblocks.com/reference/interact-with-solana-programs",
       "kind": "html",
       "issuer": "bullish-blsh",
@@ -2089,12 +2243,31 @@
       ]
     },
     {
+      "url": "https://docs.centrifuge.io/developer/protocol/deployments/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Official deployment identifiers",
+      "foundIn": [
+        "product=jtrsy|instrument=instrument%3Ajtrsy|context=public-holder|terms=public-source-snapshot-2026-09-30|source=addresses-migration"
+      ]
+    },
+    {
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "kind": "api",
       "issuer": "xstocks-backed",
       "title": "xstocks-backed:findings[12].evidence",
       "foundIn": [
         "xstocks-backed:findings[12].evidence"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/addresses",
+      "kind": "html",
+      "issuer": null,
+      "title": "Ondo contract address registry",
+      "foundIn": [
+        "product=ousg|instrument=instrument%3Aousg|context=public-holder|terms=public-source-snapshot-2026-09-30|source=addresses-migration",
+        "product=usdy|instrument=instrument%3Ausdy|context=unresolved|terms=usdy-vintage-unresolved|source=addresses"
       ]
     },
     {
@@ -2123,7 +2296,9 @@
       "title": "ondo-global-markets:claims[18].url",
       "foundIn": [
         "ondo-global-markets:claims[18].url",
-        "ondo-global-markets:claims[42].url"
+        "ondo-global-markets:claims[42].url",
+        "ondo-global-markets:visualFindings.exit.basis",
+        "ondo-global-markets:visualFindings.rights.basis"
       ]
     },
     {
@@ -2147,6 +2322,33 @@
         "ondo-global-markets:sources[37]",
         "ondo-global-markets:whatIf[program-bug].note",
         "ondo-global-markets:whatIf[program-bug].searched[9]"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/general-access-products/usdy/basics",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDY Basics",
+      "foundIn": [
+        "product=usdy|instrument=instrument%3Ausdy|context=unresolved|terms=usdy-vintage-unresolved|source=basics"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/general-access-products/usdy/important-notes",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDY Important Notes",
+      "foundIn": [
+        "product=usdy|instrument=instrument%3Ausdy|context=unresolved|terms=usdy-vintage-unresolved|source=notes"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/general-access-products/usdy/usdy-vs-rebasing-usdy",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDY and rUSDY comparison",
+      "foundIn": [
+        "product=usdy|instrument=instrument%3Ausdy|context=unresolved|terms=usdy-vintage-unresolved|source=wrapper"
       ]
     },
     {
@@ -2366,6 +2568,8 @@
         "ondo-global-markets:parties.audience[1].source",
         "ondo-global-markets:sources[51]",
         "ondo-global-markets:sources[6]",
+        "ondo-global-markets:visualFindings.access.basis",
+        "ondo-global-markets:visualFindings.exit.basis",
         "ondo-global-markets:whatIf[redemption-refused].searched[11]",
         "ondo-global-markets:whatIf[venue-delists].searched[10]"
       ]
@@ -2382,6 +2586,7 @@
         "ondo-global-markets:claims[58].url",
         "ondo-global-markets:documents[10].url",
         "ondo-global-markets:sources[1]",
+        "ondo-global-markets:visualFindings.rights.basis",
         "ondo-global-markets:whatIf[company-acquired]",
         "ondo-global-markets:whatIf[company-bankrupt].searched[10]",
         "ondo-global-markets:whatIf[tax-withholding].searched[10]",
@@ -2422,6 +2627,7 @@
         "ondo-global-markets:claims[88].url",
         "ondo-global-markets:documents[12].url",
         "ondo-global-markets:sources[4]",
+        "ondo-global-markets:visualFindings.exit.basis",
         "ondo-global-markets:whatIf[change-jurisdiction]",
         "ondo-global-markets:whatIf[dispute-forum].searched[11]",
         "ondo-global-markets:whatIf[rebase-error]",
@@ -2505,12 +2711,129 @@
       ]
     },
     {
+      "url": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+      "kind": "html",
+      "issuer": null,
+      "title": "Ondo OUSG documentation overview",
+      "foundIn": [
+        "product=ousg|instrument=instrument%3Aousg|context=public-holder|terms=public-source-snapshot-2026-09-30|source=overview"
+      ]
+    },
+    {
+      "url": "https://docs.ondo.finance/qualified-access-products/ousg/redeeming",
+      "kind": "html",
+      "issuer": null,
+      "title": "Ondo OUSG redeeming",
+      "foundIn": [
+        "product=ousg|instrument=instrument%3Aousg|context=public-holder|terms=public-source-snapshot-2026-09-30|source=redeem"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill",
+      "kind": "html",
+      "issuer": null,
+      "title": "TBILL Fund introduction",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=intro"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill/faq",
+      "kind": "html",
+      "issuer": null,
+      "title": "TBILL FAQ",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=faq"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill/on-chain-governance-and-controls-i",
+      "kind": "html",
+      "issuer": null,
+      "title": "TBILL on-chain governance and controls (I)",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=controls"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill/product-structuring",
+      "kind": "html",
+      "issuer": null,
+      "title": "TBILL product structuring",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=struct"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill/redemptions",
+      "kind": "html",
+      "issuer": null,
+      "title": "TBILL redemptions",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=redemptions"
+      ]
+    },
+    {
+      "url": "https://docs.openeden.com/tbill/smart-contract-addresses",
+      "kind": "html",
+      "issuer": null,
+      "title": "Official deployment identifiers",
+      "foundIn": [
+        "product=tbill|instrument=instrument%3Atbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=addresses-migration"
+      ]
+    },
+    {
       "url": "https://docs.rs/superstate-allowlist-interface/0.1.0/superstate_allowlist_interface/instruction/fn.thaw.html",
       "kind": "html",
       "issuer": "superstate-opening-bell",
       "title": "superstate-opening-bell:claims[50].quote",
       "foundIn": [
         "superstate-opening-bell:claims[50].quote"
+      ]
+    },
+    {
+      "url": "https://docs.spiko.io/documentation/account_management/deposits_withdrawals/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko deposits and withdrawals",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=account"
+      ]
+    },
+    {
+      "url": "https://docs.spiko.io/documentation/tokenization/addresses/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko addresses and audits",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=addresses"
+      ]
+    },
+    {
+      "url": "https://docs.spiko.io/documentation/tokenization/nav",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko NAV data feed",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=nav"
+      ]
+    },
+    {
+      "url": "https://docs.spiko.io/documentation/tokenization/transfers/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko share transfers",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=transfers"
+      ]
+    },
+    {
+      "url": "https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko distributor API: order lifecycle",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=lifecycle"
       ]
     },
     {
@@ -2609,6 +2932,15 @@
       ]
     },
     {
+      "url": "https://docs.superstate.com/investors/tokenized-funds/available-funds/invesco-ustb",
+      "kind": "html",
+      "issuer": null,
+      "title": "Invesco USTB investor documentation",
+      "foundIn": [
+        "product=ustb|instrument=instrument%3Austb|context=public-holder|terms=public-source-snapshot-2026-09-30|source=current-docs"
+      ]
+    },
+    {
       "url": "https://docs.superstate.com/issuers/opening-bell",
       "kind": "html",
       "issuer": "superstate-opening-bell",
@@ -2641,6 +2973,9 @@
         "superstate-opening-bell:claims[80].url",
         "superstate-opening-bell:claims[82].url",
         "superstate-opening-bell:sources[15]",
+        "superstate-opening-bell:visualFindings.backing.basis",
+        "superstate-opening-bell:visualFindings.controls.basis",
+        "superstate-opening-bell:visualFindings.exit.basis",
         "superstate-opening-bell:whatIf[account-frozen].searched[2]",
         "superstate-opening-bell:whatIf[attestation-wrong].searched[2]",
         "superstate-opening-bell:whatIf[authority-key-compromised].searched[2]",
@@ -2725,6 +3060,7 @@
         "tessera:claims[16].url",
         "tessera:documents[15].url",
         "tessera:sources[23]",
+        "tessera:visualFindings.backing.basis",
         "tessera:whatIf[attestation-wrong].searched[7]",
         "tessera:whatIf[collateral-lent].searched[9]"
       ]
@@ -2842,6 +3178,11 @@
         "tessera:parties.audience[1].source",
         "tessera:quoteVerificationSources[0].sourceUrl",
         "tessera:sources[2]",
+        "tessera:visualFindings.access.basis",
+        "tessera:visualFindings.backing.basis",
+        "tessera:visualFindings.controls.basis",
+        "tessera:visualFindings.exit.basis",
+        "tessera:visualFindings.rights.basis",
         "tessera:whatIf[company-bankrupt]",
         "tessera:whatIf[company-bankrupt].searched[8]",
         "tessera:whatIf[dividend-missing]",
@@ -2856,7 +3197,8 @@
       "title": "tessera:claims[31].url",
       "foundIn": [
         "tessera:claims[31].url",
-        "tessera:claims[6].url"
+        "tessera:claims[6].url",
+        "tessera:visualFindings.access.basis"
       ]
     },
     {
@@ -2874,6 +3216,7 @@
         "tessera:parties.custodians[0].source",
         "tessera:quoteVerificationSources[2].sourceUrl",
         "tessera:sources[4]",
+        "tessera:visualFindings.controls.basis",
         "tessera:whatIf[custodian-insolvency].searched[9]",
         "tessera:whatIf[defrauded].searched[6]",
         "tessera:whatIf[program-bug].searched[7]"
@@ -2900,6 +3243,8 @@
         "tessera:parties.verificationAgents[0].source",
         "tessera:quoteVerificationSources[4].sourceUrl",
         "tessera:sources[3]",
+        "tessera:visualFindings.backing.basis",
+        "tessera:visualFindings.exit.basis",
         "tessera:whatIf[attestation-wrong]",
         "tessera:whatIf[attestation-wrong].searched[6]",
         "tessera:whatIf[backing-shortfall].searched[6]",
@@ -2948,8 +3293,19 @@
         "tessera:documents[13].url",
         "tessera:parties.verificationAgents[2].source",
         "tessera:sources[21]",
+        "tessera:visualFindings.access.basis",
+        "tessera:visualFindings.controls.basis",
         "tessera:whatIf[account-frozen]",
         "tessera:whatIf[authority-key-compromised]"
+      ]
+    },
+    {
+      "url": "https://docs.theo.xyz/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Theo product documentation index",
+      "foundIn": [
+        "product=thbill|instrument=instrument%3Athbill|context=thbill-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=theo-docs"
       ]
     },
     {
@@ -2959,7 +3315,8 @@
       "title": "superstate-opening-bell:claims[20].quote",
       "foundIn": [
         "superstate-opening-bell:claims[20].quote",
-        "superstate-opening-bell:claims[82].quote"
+        "superstate-opening-bell:claims[82].quote",
+        "superstate-opening-bell:visualFindings.backing.basis"
       ]
     },
     {
@@ -2987,6 +3344,9 @@
         "ventuals:parties.distributors[0].source",
         "ventuals:quoteVerificationSources[0].sourceUrl",
         "ventuals:sources[0]",
+        "ventuals:visualFindings.access.basis",
+        "ventuals:visualFindings.exit.basis",
+        "ventuals:visualFindings.rights.basis",
         "ventuals:whatIf[rebase-error]"
       ]
     },
@@ -3019,6 +3379,8 @@
         "ventuals:claims[10].url",
         "ventuals:claims[54].url",
         "ventuals:claims[9].url",
+        "ventuals:visualFindings.backing.basis",
+        "ventuals:visualFindings.failure.basis",
         "ventuals:whatIf[custodian-insolvency]"
       ]
     },
@@ -3041,6 +3403,8 @@
         "ventuals:quoteVerificationSources[2].verificationUrl",
         "ventuals:quoteVerificationSources[3].verificationUrl",
         "ventuals:sources[4]",
+        "ventuals:visualFindings.backing.basis",
+        "ventuals:visualFindings.exit.basis",
         "ventuals:whatIf[account-frozen].searched[1]",
         "ventuals:whatIf[attestation-wrong].searched[1]",
         "ventuals:whatIf[authority-key-compromised].searched[1]",
@@ -3122,6 +3486,8 @@
         "ventuals:parties.securitiesIssuers[2].source",
         "ventuals:quoteVerificationSources[1].sourceUrl",
         "ventuals:sources[2]",
+        "ventuals:visualFindings.ledger.basis",
+        "ventuals:visualFindings.rights.basis",
         "ventuals:whatIf[collateral-lent]",
         "ventuals:whatIf[company-bankrupt]",
         "ventuals:whatIf[corporate-action-mirroring]",
@@ -3220,6 +3586,10 @@
         "ventuals:incidents[4].source",
         "ventuals:quoteVerificationSources[3].sourceUrl",
         "ventuals:sources[1]",
+        "ventuals:visualFindings.access.basis",
+        "ventuals:visualFindings.backing.basis",
+        "ventuals:visualFindings.exit.basis",
+        "ventuals:visualFindings.failure.basis",
         "ventuals:whatIf[account-frozen].searched[2]",
         "ventuals:whatIf[attestation-wrong].searched[2]",
         "ventuals:whatIf[authority-key-compromised].searched[2]",
@@ -3400,7 +3770,8 @@
         "xstocks-backed:documents[7].url",
         "xstocks-backed:findings[1].evidence",
         "xstocks-backed:parties.audience[1].source",
-        "xstocks-backed:sources[4]"
+        "xstocks-backed:sources[4]",
+        "xstocks-backed:visualFindings.exit.basis"
       ]
     },
     {
@@ -3411,7 +3782,8 @@
       "foundIn": [
         "xstocks-backed:claims[1].url",
         "xstocks-backed:claims[57].url",
-        "xstocks-backed:sources[6]"
+        "xstocks-backed:sources[6]",
+        "xstocks-backed:visualFindings.exit.basis"
       ]
     },
     {
@@ -3434,7 +3806,8 @@
         "xstocks-backed:claims[133].sources[3]",
         "xstocks-backed:claims[134].sources[3]",
         "xstocks-backed:redemption.operationalEvidence.url",
-        "xstocks-backed:sources[5]"
+        "xstocks-backed:sources[5]",
+        "xstocks-backed:visualFindings.exit.basis"
       ]
     },
     {
@@ -3451,6 +3824,8 @@
         "xstocks-backed:claims[49].url",
         "xstocks-backed:documents[6].url",
         "xstocks-backed:sources[3]",
+        "xstocks-backed:visualFindings.backing.basis",
+        "xstocks-backed:visualFindings.rights.basis",
         "xstocks-backed:whatIf[attestation-wrong].searched[4]",
         "xstocks-backed:whatIf[authority-key-compromised].searched[4]",
         "xstocks-backed:whatIf[backing-shortfall].searched[2]",
@@ -3465,6 +3840,15 @@
         "xstocks-backed:whatIf[security-agent-fails].searched[1]",
         "xstocks-backed:whatIf[transfer-agent-fails].searched[1]",
         "xstocks-backed:whatIf[voting-rights].searched[1]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/10dEK20M3mfscDh594rzVpzdO3KvC0VSg/view",
+      "kind": "html",
+      "issuer": null,
+      "title": "TER asset statement to September 14",
+      "foundIn": [
+        "product=ter|instrument=instrument%3Ater|context=ter-user|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=statement-september"
       ]
     },
     {
@@ -3496,6 +3880,9 @@
         "backpack-securities-spcx:findings[2].evidence",
         "backpack-securities-spcx:incidents[1].source",
         "backpack-securities-spcx:sources[1]",
+        "backpack-securities-spcx:visualFindings.access.basis",
+        "backpack-securities-spcx:visualFindings.failure.basis",
+        "backpack-securities-spcx:visualFindings.ledger.basis",
         "backpack-securities-spcx:whatIf[authority-key-compromised]",
         "backpack-securities-spcx:whatIf[chain-outage]",
         "backpack-securities-spcx:whatIf[custodian-insolvency]",
@@ -3523,12 +3910,24 @@
         "backpack-securities-spcx:documents[2].url",
         "backpack-securities-spcx:sources[2]",
         "backpack-securities-spcx:sources[50]",
+        "backpack-securities-spcx:visualFindings.access.basis",
+        "backpack-securities-spcx:visualFindings.backing.basis",
+        "backpack-securities-spcx:visualFindings.rights.basis",
         "backpack-securities-spcx:whatIf[company-acquired]",
         "backpack-securities-spcx:whatIf[corporate-action-mirroring]",
         "backpack-securities-spcx:whatIf[liquidity-event]",
         "backpack-securities-spcx:whatIf[rebase-error]",
         "backpack-securities-spcx:whatIf[redemption-refused]",
         "backpack-securities-spcx:whatIf[venue-delists]"
+      ]
+    },
+    {
+      "url": "https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view",
+      "kind": "html",
+      "issuer": null,
+      "title": "TER Gold Verification Audit (DK Limited audit report PDF)",
+      "foundIn": [
+        "product=ter|instrument=instrument%3Ater|context=ter-user|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=ter-gold-audit"
       ]
     },
     {
@@ -3547,6 +3946,15 @@
       ]
     },
     {
+      "url": "https://drive.google.com/file/d/1_bou3Ek98xRQwX1kxNQ9lf_xme6m3AFI/view?usp=sharing",
+      "kind": "html",
+      "issuer": null,
+      "title": "Gelephu Mindfulness City Authority TER Token Terms and Conditions",
+      "foundIn": [
+        "product=ter|instrument=instrument%3Ater|context=ter-user|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=ter-terms"
+      ]
+    },
+    {
       "url": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
       "kind": "html",
       "issuer": "backpack-securities-spcx",
@@ -3561,7 +3969,8 @@
         "backpack-securities-spcx:claims[8].url",
         "backpack-securities-spcx:documents[3].url",
         "backpack-securities-spcx:parties.custodians[2].source",
-        "backpack-securities-spcx:sources[3]"
+        "backpack-securities-spcx:sources[3]",
+        "backpack-securities-spcx:visualFindings.backing.basis"
       ]
     },
     {
@@ -3627,6 +4036,13 @@
         "backpack-securities-spcx:findings[3].evidence",
         "backpack-securities-spcx:parties.tokenIssuers[0].source",
         "backpack-securities-spcx:sources[0]",
+        "backpack-securities-spcx:visualFindings.access.basis",
+        "backpack-securities-spcx:visualFindings.backing.basis",
+        "backpack-securities-spcx:visualFindings.controls.basis",
+        "backpack-securities-spcx:visualFindings.exit.basis",
+        "backpack-securities-spcx:visualFindings.failure.basis",
+        "backpack-securities-spcx:visualFindings.ledger.basis",
+        "backpack-securities-spcx:visualFindings.rights.basis",
         "backpack-securities-spcx:whatIf[account-frozen]",
         "backpack-securities-spcx:whatIf[attestation-wrong]",
         "backpack-securities-spcx:whatIf[backing-shortfall]",
@@ -3719,6 +4135,7 @@
       "foundIn": [
         "republic-mirror:claims[11].url",
         "republic-mirror:sources[3]",
+        "republic-mirror:visualFindings.access.basis",
         "republic-mirror:whatIf[authority-key-compromised].searched[9]",
         "republic-mirror:whatIf[issuer-change-of-control].searched[9]",
         "republic-mirror:whatIf[sanctioned].searched[13]"
@@ -4005,6 +4422,79 @@
       ]
     },
     {
+      "url": "https://github.com/paxosglobal/paxos-gold-contract",
+      "kind": "html",
+      "issuer": null,
+      "title": "Paxos official PAXG contract repository",
+      "foundIn": [
+        "product=paxg|instrument=instrument%3Apaxg|context=holder|terms=paxg-terms-2025-12-12|source=contract"
+      ]
+    },
+    {
+      "url": "https://github.com/spiko-tech/contracts/blob/main/contracts/token/Token.sol",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko published EVM token implementation",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=contract"
+      ]
+    },
+    {
+      "url": "https://gold.tether.to/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Tether Gold public reserve/report publication page",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-report-index"
+      ]
+    },
+    {
+      "url": "https://gold.tether.to/Tether%20Gold%20Whitepaper.pdf",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "Tether Gold Whitepaper",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-whitepaper"
+      ]
+    },
+    {
+      "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2026_RC187322026DV0170.pdf",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "BDO reasonable assurance on June 2026 Tether Gold reserves",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-june-assurance"
+      ]
+    },
+    {
+      "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.03.2026_RC187322026DV0089.pdf",
+      "kind": "pdf",
+      "issuer": null,
+      "title": "Independent reserves report, ISAE 3000R opinion as at 2026-03-31",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-attestation"
+      ]
+    },
+    {
+      "url": "https://gold.tether.to/legal/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Gold Token Terms of Sale and Service",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-fees",
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=xaut-terms"
+      ]
+    },
+    {
+      "url": "https://help.circle.com/support/en/usyc-subscription-redemption-and-functionality-explained?id=kb_article_view&sysparm_article=KB0010561",
+      "kind": "html",
+      "issuer": null,
+      "title": "Circle Help: USYC subscription, redemption and functionality",
+      "foundIn": [
+        "product=usyc|instrument=instrument%3Ausyc|context=public-holder|terms=public-source-snapshot-2026-09-30|source=help"
+      ]
+    },
+    {
       "url": "https://history.pyth-lazer.dourolabs.app/history/v1/symbols",
       "kind": "html",
       "issuer": "xstocks-backed",
@@ -4027,6 +4517,7 @@
         "remora-markets:documents[8].url",
         "remora-markets:parties.tokenizationProviders[0].source",
         "remora-markets:sources[9]",
+        "remora-markets:visualFindings.access.basis",
         "remora-markets:whatIf[change-jurisdiction]",
         "remora-markets:whatIf[issuer-change-of-control]",
         "remora-markets:whatIf[issuer-change-of-control].searched[0]",
@@ -4125,7 +4616,8 @@
       "issuer": "securitize-secz",
       "title": "securitize-secz:claims[73].url",
       "foundIn": [
-        "securitize-secz:claims[73].url"
+        "securitize-secz:claims[73].url",
+        "securitize-secz:visualFindings.backing.basis"
       ]
     },
     {
@@ -4149,6 +4641,10 @@
         "bullish-blsh:findings[0].evidence",
         "bullish-blsh:sources[17]",
         "bullish-blsh:sources[20]",
+        "bullish-blsh:visualFindings.backing.basis",
+        "bullish-blsh:visualFindings.controls.basis",
+        "bullish-blsh:visualFindings.failure.basis",
+        "bullish-blsh:visualFindings.ledger.basis",
         "bullish-blsh:whatIf[account-frozen].searched[0]",
         "bullish-blsh:whatIf[attestation-wrong].searched[0]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[0]",
@@ -4238,6 +4734,10 @@
         "bullish-blsh:findings[1].evidence",
         "bullish-blsh:sources[17]",
         "bullish-blsh:sources[21]",
+        "bullish-blsh:visualFindings.backing.basis",
+        "bullish-blsh:visualFindings.controls.basis",
+        "bullish-blsh:visualFindings.exit.basis",
+        "bullish-blsh:visualFindings.rights.basis",
         "bullish-blsh:whatIf[account-frozen].searched[1]",
         "bullish-blsh:whatIf[attestation-wrong].searched[1]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[1]",
@@ -4278,6 +4778,69 @@
         "bullish-blsh:whatIf[venue-delists].searched[1]",
         "bullish-blsh:whatIf[venue-insolvency].searched[1]",
         "bullish-blsh:whatIf[voting-rights].searched[1]"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2024/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network-03-20-2024/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "BUIDL launch announcement",
+      "foundIn": [
+        "product=buidl|instrument=instrument%3Abuidl|context=fund|terms=buidl-public-framework|source=launch"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2025/Apollo-and-Securitize-Announce-Partnership-and-Launch-Tokenized-Access-to-Credit-Fund-on-Aptos-Avalanche-Ethereum-Ink-Polygon-and-Solana-Networks-01-30-2025/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "Apollo and Securitize ACRED launch",
+      "foundIn": [
+        "product=acred|instrument=instrument%3Aacred|context=feeder|terms=acred-public-feeder-framework|source=launch"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2025/BlackRock-and-Securitize-Debut-New-BUIDL-Share-Class-on-Solana-Network-03-25-2025/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "BUIDL Solana share-class announcement",
+      "foundIn": [
+        "product=buidl|instrument=instrument%3Abuidl|context=fund|terms=buidl-public-framework|source=solana"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2025/Hamilton-Lane-and-Securitizes-SCOPE-Gains-Instant-RLUSD-Liquidity-by-integrating-with-VBILLs-Onchain-Facility-11-05-2025/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "HLSCOPE VBILL/RLUSD liquidity announcement",
+      "foundIn": [
+        "product=hlscope|instrument=instrument%3Ahlscope|context=feeder|terms=hlscope-public-feeder-framework|source=rlusd-facility"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2025/Ripple-and-Securitize-Enable-RLUSD-Smart-Contract-Functionality-for-BlackRocks-BUIDL-and-VanEcks-VBILL-Tokenized-Funds-09-23-2025/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "Securitize/Ripple RLUSD functionality announcement",
+      "foundIn": [
+        "product=vbill|instrument=instrument%3Avbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=stablecoin"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2025/VanEck-Launches-First-Tokenized-Fund-VBILL-on-Securitize-05-13-2025/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "VanEck launches VBILL tokenized fund (Securitize investor announcement)",
+      "foundIn": [
+        "product=vbill|instrument=instrument%3Avbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=launch"
+      ]
+    },
+    {
+      "url": "https://investors.securitize.io/news/news-details/2026/Securitize-Launches-Private-Credit-Fund-on-TRON-Blockchain/default.aspx",
+      "kind": "html",
+      "issuer": null,
+      "title": "Securitize SCOPE TRON launch",
+      "foundIn": [
+        "product=hlscope|instrument=instrument%3Ahlscope|context=feeder|terms=hlscope-public-feeder-framework|source=current"
       ]
     },
     {
@@ -4419,6 +4982,24 @@
       ]
     },
     {
+      "url": "https://libeara.com/fundbridge-capital-and-libeara-bring-regulated-tokenized-treasury-fund-on-chain-with-arbitrum/",
+      "kind": "html",
+      "issuer": null,
+      "title": "FundBridge Capital and Libeara Bring Regulated Tokenized Treasury Fund On-Chain with Arbitrum",
+      "foundIn": [
+        "product=thbill|instrument=instrument%3Athbill|context=thbill-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=libeara-theo"
+      ]
+    },
+    {
+      "url": "https://libeara.com/libeara-partners-with-wellington-and-fundbridge-capital-to-launch-a-u-s-treasuries-fund-tokenised-on-public-blockchain/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Libeara, Wellington, and FundBridge Capital launch ULTRA tokenized U.S. Treasuries fund",
+      "foundIn": [
+        "product=thbill|instrument=instrument%3Athbill|context=thbill-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=libeara-ultra"
+      ]
+    },
+    {
       "url": "https://lite-api.jup.ag/swap/v1/quote",
       "kind": "api",
       "issuer": "remora-markets",
@@ -4436,7 +5017,8 @@
       "title": "remora-markets:claims[65].url",
       "foundIn": [
         "remora-markets:claims[65].url",
-        "remora-markets:claims[66].url"
+        "remora-markets:claims[66].url",
+        "remora-markets:visualFindings.exit.basis"
       ]
     },
     {
@@ -4446,6 +5028,7 @@
       "title": "remora-markets:claims[64].url",
       "foundIn": [
         "remora-markets:claims[64].url",
+        "remora-markets:visualFindings.exit.basis",
         "remora-markets:whatIf[venue-delists]"
       ]
     },
@@ -4739,7 +5322,8 @@
       "title": "backpack-securities-spcx:claims[15].locator",
       "foundIn": [
         "backpack-securities-spcx:claims[15].locator",
-        "backpack-securities-spcx:claims[15].note"
+        "backpack-securities-spcx:claims[15].note",
+        "backpack-securities-spcx:visualFindings.access.basis"
       ]
     },
     {
@@ -4748,7 +5332,8 @@
       "issuer": "backpack-securities-spcx",
       "title": "backpack-securities-spcx:claims[15].url",
       "foundIn": [
-        "backpack-securities-spcx:claims[15].url"
+        "backpack-securities-spcx:claims[15].url",
+        "backpack-securities-spcx:visualFindings.access.basis"
       ]
     },
     {
@@ -4787,7 +5372,8 @@
       "title": "ondo-global-markets:claims[2].url",
       "foundIn": [
         "ondo-global-markets:claims[2].url",
-        "ondo-global-markets:sources[53]"
+        "ondo-global-markets:sources[53]",
+        "ondo-global-markets:visualFindings.exit.basis"
       ]
     },
     {
@@ -4812,7 +5398,8 @@
       "foundIn": [
         "ondo-global-markets:claims[1].url",
         "ondo-global-markets:redemption.operationalEvidence.url",
-        "ondo-global-markets:sources[52]"
+        "ondo-global-markets:sources[52]",
+        "ondo-global-markets:visualFindings.exit.basis"
       ]
     },
     {
@@ -4834,6 +5421,8 @@
         "ondo-global-markets:incidents[0].source",
         "ondo-global-markets:incidents[0].summary",
         "ondo-global-markets:openQuestions[2]",
+        "ondo-global-markets:visualFindings.access.basis",
+        "ondo-global-markets:visualFindings.ledger.basis",
         "ondo-global-markets:whatIf[attestation-wrong].note",
         "ondo-global-markets:whatIf[issuer-wind-down].note",
         "ondo-global-markets:whatIf[terms-changed].note"
@@ -4847,6 +5436,15 @@
       "foundIn": [
         "ondo-global-markets:claims[109].url",
         "ondo-global-markets:sources[60]"
+      ]
+    },
+    {
+      "url": "https://ondo.finance/ousg",
+      "kind": "html",
+      "issuer": null,
+      "title": "Ondo OUSG product page",
+      "foundIn": [
+        "product=ousg|instrument=instrument%3Aousg|context=public-holder|terms=public-source-snapshot-2026-09-30|source=product"
       ]
     },
     {
@@ -4870,6 +5468,7 @@
         "remora-markets:findings[0].evidence",
         "remora-markets:incidents[1].source",
         "remora-markets:sources[8]",
+        "remora-markets:visualFindings.rights.basis",
         "remora-markets:whatIf[backing-shortfall].searched[1]",
         "remora-markets:whatIf[collateral-lent].searched[4]",
         "remora-markets:whatIf[company-bankrupt].searched[3]",
@@ -4950,6 +5549,7 @@
         "prestocks:sampleMints[6].source",
         "prestocks:sampleMints[7].source",
         "prestocks:sources[3]",
+        "prestocks:visualFindings.backing.basis",
         "prestocks:whatIf[backing-shortfall].searched[2]",
         "prestocks:whatIf[collateral-lent].searched[5]",
         "prestocks:whatIf[company-acquired].searched[2]",
@@ -5007,6 +5607,10 @@
         "prestocks:parties.distributors[0].source",
         "prestocks:quoteVerificationSources[0].sourceUrl",
         "prestocks:sources[1]",
+        "prestocks:visualFindings.access.basis",
+        "prestocks:visualFindings.backing.basis",
+        "prestocks:visualFindings.exit.basis",
+        "prestocks:visualFindings.rights.basis",
         "prestocks:whatIf[account-frozen].searched[1]",
         "prestocks:whatIf[attestation-wrong].searched[1]",
         "prestocks:whatIf[authority-key-compromised].searched[1]",
@@ -5076,7 +5680,8 @@
         "prestocks:claims[8].url",
         "prestocks:documents[4].url",
         "prestocks:incidents[4].quote",
-        "prestocks:sources[4]"
+        "prestocks:sources[4]",
+        "prestocks:visualFindings.access.basis"
       ]
     },
     {
@@ -5128,6 +5733,8 @@
         "prestocks:claims[90].url",
         "prestocks:documents[7].url",
         "prestocks:sources[12]",
+        "prestocks:visualFindings.failure.basis",
+        "prestocks:visualFindings.rights.basis",
         "prestocks:whatIf[account-frozen]",
         "prestocks:whatIf[account-frozen].searched[0]",
         "prestocks:whatIf[attestation-wrong]",
@@ -5215,7 +5822,9 @@
         "ventuals:claims[24].quote",
         "ventuals:claims[25].quote",
         "ventuals:claims[42].quote",
-        "ventuals:claims[59].quote"
+        "ventuals:claims[59].quote",
+        "ventuals:visualFindings.access.basis",
+        "ventuals:visualFindings.exit.basis"
       ]
     },
     {
@@ -5446,6 +6055,7 @@
         "republic-mirror:claims[115].url",
         "republic-mirror:documents[11].url",
         "republic-mirror:sources[21]",
+        "republic-mirror:visualFindings.controls.basis",
         "republic-mirror:whatIf[account-frozen].searched[4]",
         "republic-mirror:whatIf[authority-key-compromised].searched[4]",
         "republic-mirror:whatIf[chain-outage].searched[5]",
@@ -5516,6 +6126,7 @@
         "republic-mirror:documents[5].url",
         "republic-mirror:findings[11].evidence",
         "republic-mirror:sources[18]",
+        "republic-mirror:visualFindings.controls.basis",
         "republic-mirror:whatIf[account-frozen].searched[2]",
         "republic-mirror:whatIf[attestation-wrong].searched[1]",
         "republic-mirror:whatIf[authority-key-compromised].searched[1]",
@@ -5573,6 +6184,7 @@
         "republic-mirror:openQuestions[13]",
         "republic-mirror:parties.custodians[1].source",
         "republic-mirror:sources[23]",
+        "republic-mirror:visualFindings.failure.basis",
         "republic-mirror:whatIf[account-frozen].searched[3]",
         "republic-mirror:whatIf[attestation-wrong].searched[2]",
         "republic-mirror:whatIf[authority-key-compromised].searched[2]",
@@ -5716,6 +6328,13 @@
         "republic-mirror:incidents[1].source",
         "republic-mirror:pricing.notes",
         "republic-mirror:sources[18]",
+        "republic-mirror:visualFindings.access.basis",
+        "republic-mirror:visualFindings.backing.basis",
+        "republic-mirror:visualFindings.controls.basis",
+        "republic-mirror:visualFindings.exit.basis",
+        "republic-mirror:visualFindings.failure.basis",
+        "republic-mirror:visualFindings.ledger.basis",
+        "republic-mirror:visualFindings.rights.basis",
         "republic-mirror:whatIf[account-frozen].searched[1]",
         "republic-mirror:whatIf[attestation-wrong]",
         "republic-mirror:whatIf[attestation-wrong].searched[0]",
@@ -5987,6 +6606,9 @@
         "securitize-secz:findings[8].evidence",
         "securitize-secz:parties.audience[1].source",
         "securitize-secz:sources[8]",
+        "securitize-secz:visualFindings.access.basis",
+        "securitize-secz:visualFindings.controls.basis",
+        "securitize-secz:visualFindings.exit.basis",
         "securitize-secz:whatIf[account-frozen].searched[10]",
         "securitize-secz:whatIf[attestation-wrong].searched[10]",
         "securitize-secz:whatIf[authority-key-compromised].searched[10]",
@@ -6094,6 +6716,7 @@
       "foundIn": [
         "securitize-secz:documents[11].url",
         "securitize-secz:sources[21]",
+        "securitize-secz:visualFindings.failure.basis",
         "securitize-secz:whatIf[account-frozen]",
         "securitize-secz:whatIf[account-frozen].searched[4]",
         "securitize-secz:whatIf[attestation-wrong].searched[4]",
@@ -6145,6 +6768,7 @@
       "foundIn": [
         "securitize-secz:documents[12].url",
         "securitize-secz:sources[22]",
+        "securitize-secz:visualFindings.failure.basis",
         "securitize-secz:whatIf[account-frozen].searched[6]",
         "securitize-secz:whatIf[attestation-wrong].searched[6]",
         "securitize-secz:whatIf[authority-key-compromised].searched[6]",
@@ -6194,6 +6818,7 @@
       "foundIn": [
         "securitize-secz:documents[10].url",
         "securitize-secz:sources[20]",
+        "securitize-secz:visualFindings.failure.basis",
         "securitize-secz:whatIf[account-frozen].searched[5]",
         "securitize-secz:whatIf[attestation-wrong].searched[5]",
         "securitize-secz:whatIf[authority-key-compromised].searched[5]",
@@ -6253,6 +6878,15 @@
       ]
     },
     {
+      "url": "https://securitize.io/primary-market/vaneck-vbill",
+      "kind": "html",
+      "issuer": null,
+      "title": "Securitize VBILL product page",
+      "foundIn": [
+        "product=vbill|instrument=instrument%3Avbill|context=public-holder|terms=public-source-snapshot-2026-09-30|source=product"
+      ]
+    },
+    {
       "url": "https://shift-rwa.vercel.app/",
       "kind": "html",
       "issuer": "shift",
@@ -6298,6 +6932,8 @@
         "shift:findings[17].evidence",
         "shift:parties.audience[1].source",
         "shift:quoteVerificationSources[0].sourceUrl",
+        "shift:visualFindings.access.basis",
+        "shift:visualFindings.rights.basis",
         "shift:whatIf[change-jurisdiction].searched[8]",
         "shift:whatIf[company-bankrupt]",
         "shift:whatIf[company-bankrupt].searched[13]",
@@ -6346,6 +6982,7 @@
         "shift:documents[0].url",
         "shift:findings[20].evidence",
         "shift:sources[1]",
+        "shift:visualFindings.access.basis",
         "shift:whatIf[chain-outage]",
         "shift:whatIf[defrauded]",
         "shift:whatIf[dispute-forum].searched[11]",
@@ -6503,6 +7140,11 @@
         "shift:parties.custodians[0].source",
         "shift:parties.custodians[1].source",
         "shift:sources[2]",
+        "shift:visualFindings.access.basis",
+        "shift:visualFindings.backing.basis",
+        "shift:visualFindings.exit.basis",
+        "shift:visualFindings.failure.basis",
+        "shift:visualFindings.rights.basis",
         "shift:whatIf[account-frozen]",
         "shift:whatIf[attestation-wrong]",
         "shift:whatIf[backing-shortfall]",
@@ -6728,6 +7370,9 @@
         "shift:claims[52].url",
         "shift:documents[11].url",
         "shift:sources[10]",
+        "shift:visualFindings.backing.basis",
+        "shift:visualFindings.exit.basis",
+        "shift:visualFindings.failure.basis",
         "shift:whatIf[company-bankrupt].searched[9]",
         "shift:whatIf[price-source-fails]",
         "shift:whatIf[provider-fails]"
@@ -6797,6 +7442,8 @@
         "shift:documents[10].url",
         "shift:findings[10].evidence",
         "shift:sources[11]",
+        "shift:visualFindings.backing.basis",
+        "shift:visualFindings.exit.basis",
         "shift:whatIf[backing-shortfall].searched[11]",
         "shift:whatIf[company-delisted].searched[9]",
         "shift:whatIf[corporate-action-mirroring]",
@@ -6842,6 +7489,7 @@
         "shift:documents[8].url",
         "shift:findings[0].evidence",
         "shift:sources[12]",
+        "shift:visualFindings.backing.basis",
         "shift:whatIf[attestation-wrong].searched[8]",
         "shift:whatIf[backing-shortfall].searched[11]",
         "shift:whatIf[custodian-insolvency].searched[9]"
@@ -6863,6 +7511,7 @@
         "shift:parties.distributors[2].source",
         "shift:parties.distributors[3].source",
         "shift:sources[13]",
+        "shift:visualFindings.exit.basis",
         "shift:whatIf[provider-fails].searched[9]"
       ]
     },
@@ -6933,6 +7582,8 @@
         "shift:claims[88].sources[1]",
         "shift:documents[7].url",
         "shift:sources[9]",
+        "shift:visualFindings.access.basis",
+        "shift:visualFindings.rights.basis",
         "shift:whatIf[company-acquired].searched[9]",
         "shift:whatIf[defrauded].searched[10]",
         "shift:whatIf[liquidity-event].searched[9]",
@@ -7027,6 +7678,10 @@
         "remora-markets:parties.distributors[0].source",
         "remora-markets:parties.distributors[1].source",
         "remora-markets:sources[6]",
+        "remora-markets:visualFindings.backing.basis",
+        "remora-markets:visualFindings.exit.basis",
+        "remora-markets:visualFindings.failure.basis",
+        "remora-markets:visualFindings.rights.basis",
         "remora-markets:whatIf[backing-shortfall]",
         "remora-markets:whatIf[backing-shortfall].searched[0]",
         "remora-markets:whatIf[chain-outage].searched[3]",
@@ -7444,6 +8099,8 @@
         "securitize-secz:documents[9].url",
         "securitize-secz:quoteVerificationSources[0].sourceUrl",
         "securitize-secz:sources[17]",
+        "securitize-secz:visualFindings.exit.basis",
+        "securitize-secz:visualFindings.rights.basis",
         "securitize-secz:whatIf[account-frozen].searched[9]",
         "securitize-secz:whatIf[attestation-wrong].searched[9]",
         "securitize-secz:whatIf[authority-key-compromised].searched[9]",
@@ -7552,6 +8209,10 @@
         "superstate-opening-bell:custodyVerification.link",
         "superstate-opening-bell:documents[14].url",
         "superstate-opening-bell:sources[22]",
+        "superstate-opening-bell:visualFindings.access.basis",
+        "superstate-opening-bell:visualFindings.backing.basis",
+        "superstate-opening-bell:visualFindings.exit.basis",
+        "superstate-opening-bell:visualFindings.rights.basis",
         "superstate-opening-bell:whatIf[attestation-wrong].searched[6]",
         "superstate-opening-bell:whatIf[backing-shortfall].searched[6]",
         "superstate-opening-bell:whatIf[change-jurisdiction].searched[5]",
@@ -7565,6 +8226,15 @@
         "superstate-opening-bell:whatIf[transfer-agent-fails].searched[7]",
         "superstate-opening-bell:whatIf[venue-delists].searched[7]",
         "superstate-opening-bell:whatIf[venue-insolvency].searched[8]"
+      ]
+    },
+    {
+      "url": "https://superstate.com/assets/ustb",
+      "kind": "html",
+      "issuer": null,
+      "title": "Invesco Short Duration US Government Securities Fund (USTB) product page",
+      "foundIn": [
+        "product=ustb|instrument=instrument%3Austb|context=public-holder|terms=public-source-snapshot-2026-09-30|source=site"
       ]
     },
     {
@@ -7621,6 +8291,11 @@
         "superstate-opening-bell:discrepancies[0].claim.sources[0].url",
         "superstate-opening-bell:documents[1].url",
         "superstate-opening-bell:sources[1]",
+        "superstate-opening-bell:visualFindings.access.basis",
+        "superstate-opening-bell:visualFindings.controls.basis",
+        "superstate-opening-bell:visualFindings.exit.basis",
+        "superstate-opening-bell:visualFindings.failure.basis",
+        "superstate-opening-bell:visualFindings.ledger.basis",
         "superstate-opening-bell:whatIf[account-frozen]",
         "superstate-opening-bell:whatIf[backing-shortfall]",
         "superstate-opening-bell:whatIf[change-jurisdiction]",
@@ -7692,6 +8367,7 @@
         "backpack-securities-spcx:parties.custodians[0].source",
         "backpack-securities-spcx:parties.custodians[1].source",
         "backpack-securities-spcx:sources[7]",
+        "backpack-securities-spcx:visualFindings.backing.basis",
         "backpack-securities-spcx:whatIf[attestation-wrong].searched[8]",
         "backpack-securities-spcx:whatIf[backing-shortfall].searched[6]",
         "backpack-securities-spcx:whatIf[collateral-lent].searched[8]",
@@ -7751,6 +8427,7 @@
         "backpack-securities-spcx:documents[22].url",
         "backpack-securities-spcx:incidents[4].source",
         "backpack-securities-spcx:sources[6]",
+        "backpack-securities-spcx:visualFindings.exit.basis",
         "backpack-securities-spcx:whatIf[defrauded].searched[6]",
         "backpack-securities-spcx:whatIf[redemption-refused].searched[6]"
       ]
@@ -7767,6 +8444,7 @@
         "backpack-securities-spcx:findings[1].evidence",
         "backpack-securities-spcx:incidents[0].source",
         "backpack-securities-spcx:sources[8]",
+        "backpack-securities-spcx:visualFindings.exit.basis",
         "backpack-securities-spcx:whatIf[company-acquired].searched[6]",
         "backpack-securities-spcx:whatIf[company-delisted].searched[6]",
         "backpack-securities-spcx:whatIf[dividend-missing].searched[6]",
@@ -7818,6 +8496,7 @@
         "backpack-securities-spcx:documents[14].url",
         "backpack-securities-spcx:parties.regulators[0].source",
         "backpack-securities-spcx:sources[25]",
+        "backpack-securities-spcx:visualFindings.access.basis",
         "backpack-securities-spcx:whatIf[law-changes].searched[8]",
         "backpack-securities-spcx:whatIf[regulator-action].searched[8]"
       ]
@@ -7848,6 +8527,8 @@
         "backpack-securities-spcx:claims[92].locator",
         "backpack-securities-spcx:incidents[0].quoteNote",
         "backpack-securities-spcx:sources[27]",
+        "backpack-securities-spcx:visualFindings.backing.basis",
+        "backpack-securities-spcx:visualFindings.exit.basis",
         "backpack-securities-spcx:whatIf[account-frozen].searched[5]",
         "backpack-securities-spcx:whatIf[attestation-wrong].searched[5]",
         "backpack-securities-spcx:whatIf[authority-key-compromised].searched[5]",
@@ -8141,6 +8822,12 @@
         "tessera:documents[11].url",
         "tessera:incidents[3].source",
         "tessera:sources[16]",
+        "tessera:visualFindings.access.basis",
+        "tessera:visualFindings.backing.basis",
+        "tessera:visualFindings.exit.basis",
+        "tessera:visualFindings.failure.basis",
+        "tessera:visualFindings.ledger.basis",
+        "tessera:visualFindings.rights.basis",
         "tessera:whatIf[backing-shortfall]",
         "tessera:whatIf[chain-outage]",
         "tessera:whatIf[change-jurisdiction]",
@@ -8224,6 +8911,15 @@
       ]
     },
     {
+      "url": "https://tether.io/news/xaut-update-upgrade-completed/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Official deployment identifiers",
+      "foundIn": [
+        "product=xaut|instrument=instrument%3Axaut|context=xaut-holder|terms=xaut-terms-2025-09-09|source=addresses-migration"
+      ]
+    },
+    {
       "url": "https://thedefiant.io/converge/defi/backpack-s-tokenized-spacex-token-on-solana-crosses-10-000-holders-nearly-double-xstocks-spcxx",
       "kind": "html",
       "issuer": "backpack-securities-spcx",
@@ -8250,6 +8946,15 @@
       "title": "shared:[39].website",
       "foundIn": [
         "shared:[39].website"
+      ]
+    },
+    {
+      "url": "https://theo.xyz/thbill",
+      "kind": "html",
+      "issuer": null,
+      "title": "Theo thBILL product page",
+      "foundIn": [
+        "product=thbill|instrument=instrument%3Athbill|context=thbill-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=thbill-site"
       ]
     },
     {
@@ -8291,6 +8996,24 @@
         "backpack-securities-spcx:documents[30].url",
         "backpack-securities-spcx:sampleMints[0].source",
         "backpack-securities-spcx:sources[18]"
+      ]
+    },
+    {
+      "url": "https://uat.ter.bt/",
+      "kind": "html",
+      "issuer": null,
+      "title": "TER official product site",
+      "foundIn": [
+        "product=ter|instrument=instrument%3Ater|context=ter-user|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=ter-site"
+      ]
+    },
+    {
+      "url": "https://uat.ter.bt/reports/asset-statements",
+      "kind": "html",
+      "issuer": null,
+      "title": "TER official Asset Statements index",
+      "foundIn": [
+        "product=ter|instrument=instrument%3Ater|context=ter-user|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=ter-assets"
       ]
     },
     {
@@ -8369,6 +9092,12 @@
         "prestocks:findings[9].evidence",
         "prestocks:parties.audience[0].source",
         "prestocks:sources[0]",
+        "prestocks:visualFindings.access.basis",
+        "prestocks:visualFindings.backing.basis",
+        "prestocks:visualFindings.controls.basis",
+        "prestocks:visualFindings.exit.basis",
+        "prestocks:visualFindings.ledger.basis",
+        "prestocks:visualFindings.rights.basis",
         "prestocks:whatIf[account-frozen].searched[0]",
         "prestocks:whatIf[attestation-wrong].searched[0]",
         "prestocks:whatIf[authority-key-compromised].searched[0]",
@@ -8422,6 +9151,60 @@
       ]
     },
     {
+      "url": "https://usefelix.gitbook.io/docs/terms/terms-and-conditions",
+      "kind": "html",
+      "issuer": null,
+      "title": "Felix Terms & Conditions",
+      "foundIn": [
+        "product=usdhl|instrument=instrument%3Ausdhl|context=usdhl-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=usdhl-terms"
+      ]
+    },
+    {
+      "url": "https://usefelix.gitbook.io/usdhl/",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDhl Documentation: About USDhl",
+      "foundIn": [
+        "product=usdhl|instrument=instrument%3Ausdhl|context=usdhl-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=usdhl-about"
+      ]
+    },
+    {
+      "url": "https://usefelix.gitbook.io/usdhl/advanced/developers",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDhl official deployment and bridge workflow",
+      "foundIn": [
+        "product=usdhl|instrument=instrument%3Ausdhl|context=usdhl-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=developers"
+      ]
+    },
+    {
+      "url": "https://usefelix.gitbook.io/usdhl/advanced/security",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDhl Documentation: Security",
+      "foundIn": [
+        "product=usdhl|instrument=instrument%3Ausdhl|context=usdhl-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=usdhl-security"
+      ]
+    },
+    {
+      "url": "https://usefelix.gitbook.io/usdhl/sunsetting-usdhl",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDhl Documentation: Sunsetting USDhl",
+      "foundIn": [
+        "product=usdhl|instrument=instrument%3Ausdhl|context=usdhl-holder|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=usdhl-sunset"
+      ]
+    },
+    {
+      "url": "https://usyc.docs.hashnote.com/overview/smart-contracts",
+      "kind": "html",
+      "issuer": null,
+      "title": "Official deployment identifiers",
+      "foundIn": [
+        "product=usyc|instrument=instrument%3Ausyc|context=public-holder|terms=public-source-snapshot-2026-09-30|source=addresses-migration"
+      ]
+    },
+    {
       "url": "https://ventuals.com/privacy",
       "kind": "html",
       "issuer": "ventuals",
@@ -8460,6 +9243,8 @@
         "ventuals:issuingEntity",
         "ventuals:openQuestions[4]",
         "ventuals:sources[12]",
+        "ventuals:visualFindings.access.basis",
+        "ventuals:visualFindings.failure.basis",
         "ventuals:vocabulary.presetJurisdiction.reason",
         "ventuals:whatIf[account-frozen]",
         "ventuals:whatIf[account-frozen].searched[0]",
@@ -8594,6 +9379,10 @@
         "remora-markets:findings[5].evidence",
         "remora-markets:parties.audience[0].source",
         "remora-markets:sources[0]",
+        "remora-markets:visualFindings.access.basis",
+        "remora-markets:visualFindings.backing.basis",
+        "remora-markets:visualFindings.failure.basis",
+        "remora-markets:visualFindings.rights.basis",
         "remora-markets:whatIf[account-frozen].searched[2]",
         "remora-markets:whatIf[attestation-wrong]",
         "remora-markets:whatIf[attestation-wrong].searched[0]",
@@ -8666,6 +9455,9 @@
         "remora-markets:documents[1].url",
         "remora-markets:parties.audience[1].source",
         "remora-markets:sources[1]",
+        "remora-markets:visualFindings.access.basis",
+        "remora-markets:visualFindings.exit.basis",
+        "remora-markets:visualFindings.ledger.basis",
         "remora-markets:whatIf[chain-outage].searched[2]",
         "remora-markets:whatIf[company-acquired].searched[2]",
         "remora-markets:whatIf[corporate-action-mirroring].searched[2]",
@@ -8846,6 +9638,7 @@
         "remora-markets:openQuestions[0]",
         "remora-markets:parties.tokenizationProviders[1].source",
         "remora-markets:sources[27]",
+        "remora-markets:visualFindings.rights.basis",
         "remora-markets:whatIf[dispute-forum]",
         "remora-markets:whatIf[dispute-forum].searched[0]",
         "remora-markets:whatIf[keys-stolen].searched[0]",
@@ -8901,7 +9694,8 @@
       "foundIn": [
         "remora-markets:claims[77].url",
         "remora-markets:claims[79].note",
-        "remora-markets:documents[15].url"
+        "remora-markets:documents[15].url",
+        "remora-markets:visualFindings.access.basis"
       ]
     },
     {
@@ -9049,6 +9843,8 @@
         "republic-mirror:incidents[3].source",
         "republic-mirror:incidents[4].source",
         "republic-mirror:incidents[5].source",
+        "republic-mirror:visualFindings.controls.basis",
+        "republic-mirror:visualFindings.exit.basis",
         "republic-mirror:whatIf[company-acquired].locator",
         "republic-mirror:whatIf[company-bankrupt].locator",
         "republic-mirror:whatIf[corporate-action-mirroring].locator",
@@ -9085,6 +9881,24 @@
       "title": "shared:[10].website",
       "foundIn": [
         "shared:[10].website"
+      ]
+    },
+    {
+      "url": "https://www.anemoy.io/business-continuity",
+      "kind": "html",
+      "issuer": null,
+      "title": "Anemoy business continuity notice",
+      "foundIn": [
+        "product=jtrsy|instrument=instrument%3Ajtrsy|context=public-holder|terms=public-source-snapshot-2026-09-30|source=continuity"
+      ]
+    },
+    {
+      "url": "https://www.anemoy.io/funds/jtrsy",
+      "kind": "html",
+      "issuer": null,
+      "title": "Janus Henderson Anemoy Treasury Fund (JTRSY)",
+      "foundIn": [
+        "product=jtrsy|instrument=instrument%3Ajtrsy|context=public-holder|terms=public-source-snapshot-2026-09-30|source=anemoy"
       ]
     },
     {
@@ -9173,6 +9987,12 @@
         "bullish-blsh:parties.transferAgents[0].source",
         "bullish-blsh:sampleMints[0].source",
         "bullish-blsh:sources[0]",
+        "bullish-blsh:visualFindings.access.basis",
+        "bullish-blsh:visualFindings.backing.basis",
+        "bullish-blsh:visualFindings.controls.basis",
+        "bullish-blsh:visualFindings.exit.basis",
+        "bullish-blsh:visualFindings.ledger.basis",
+        "bullish-blsh:visualFindings.rights.basis",
         "bullish-blsh:whatIf[account-frozen].searched[2]",
         "bullish-blsh:whatIf[attestation-wrong].searched[2]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[2]",
@@ -9248,6 +10068,45 @@
       "title": "prestocks:whatIf[regulator-action].searched[5]",
       "foundIn": [
         "prestocks:whatIf[regulator-action].searched[5]"
+      ]
+    },
+    {
+      "url": "https://www.circle.com/legal/mica-redemption-policy",
+      "kind": "html",
+      "issuer": null,
+      "title": "MiCA Redemption Policy",
+      "foundIn": [
+        "product=usdc|instrument=instrument%3Ausdc|context=eea|terms=usdc-mica-2026-09-15|source=eea",
+        "product=usdc|instrument=instrument%3Ausdc|context=non-eea|terms=usdc-terms-2025-12-12|source=eea"
+      ]
+    },
+    {
+      "url": "https://www.circle.com/legal/usdc-terms",
+      "kind": "html",
+      "issuer": null,
+      "title": "USDC Terms (non-EEA)",
+      "foundIn": [
+        "product=usdc|instrument=instrument%3Ausdc|context=eea|terms=usdc-mica-2026-09-15|source=terms",
+        "product=usdc|instrument=instrument%3Ausdc|context=non-eea|terms=usdc-terms-2025-12-12|source=terms"
+      ]
+    },
+    {
+      "url": "https://www.circle.com/transparency",
+      "kind": "html",
+      "issuer": null,
+      "title": "Circle reserve transparency",
+      "foundIn": [
+        "product=usdc|instrument=instrument%3Ausdc|context=eea|terms=usdc-mica-2026-09-15|source=reserves",
+        "product=usdc|instrument=instrument%3Ausdc|context=non-eea|terms=usdc-terms-2025-12-12|source=reserves"
+      ]
+    },
+    {
+      "url": "https://www.circle.com/usyc",
+      "kind": "html",
+      "issuer": null,
+      "title": "Circle USYC product page",
+      "foundIn": [
+        "product=usyc|instrument=instrument%3Ausyc|context=public-holder|terms=public-source-snapshot-2026-09-30|source=product"
       ]
     },
     {
@@ -9817,7 +10676,8 @@
       "foundIn": [
         "ondo-global-markets:claims[21].url",
         "ondo-global-markets:claims[23].url",
-        "ondo-global-markets:claims[30].url"
+        "ondo-global-markets:claims[30].url",
+        "ondo-global-markets:visualFindings.backing.basis"
       ]
     },
     {
@@ -9974,6 +10834,24 @@
       ]
     },
     {
+      "url": "https://www.hamiltonlane.com/en-us/news/scope-available-via-securitize",
+      "kind": "html",
+      "issuer": null,
+      "title": "Hamilton Lane SCOPE Securitize launch",
+      "foundIn": [
+        "product=hlscope|instrument=instrument%3Ahlscope|context=feeder|terms=hlscope-public-feeder-framework|source=launch"
+      ]
+    },
+    {
+      "url": "https://www.hamiltonlane.com/en-us/strategies/evergreen/global/senior-credit-opportunities-fund",
+      "kind": "html",
+      "issuer": null,
+      "title": "Hamilton Lane Senior Credit Opportunities Fund",
+      "foundIn": [
+        "product=hlscope|instrument=instrument%3Ahlscope|context=feeder|terms=hlscope-public-feeder-framework|source=portfolio"
+      ]
+    },
+    {
       "url": "https://www.harneys.com/media/frnjo420/guide-segregated-portfolio-companies-in-the-cayman-islands.pdf",
       "kind": "pdf",
       "issuer": "tessera",
@@ -10004,6 +10882,15 @@
         "republic-mirror:whatIf[transfer-agent-fails].searched[5]",
         "republic-mirror:whatIf[venue-delists].searched[3]",
         "republic-mirror:whatIf[venue-insolvency].searched[5]"
+      ]
+    },
+    {
+      "url": "https://www.janushenderson.com/en-us/advisor/press-releases/janus-henderson-to-partner-with-anemoy-and-centrifuge-on-its-first-tokenized-fund/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Janus Henderson announcement of Anemoy Treasury Fund",
+      "foundIn": [
+        "product=jtrsy|instrument=instrument%3Ajtrsy|context=public-holder|terms=public-source-snapshot-2026-09-30|source=janus"
       ]
     },
     {
@@ -10227,6 +11114,24 @@
       ]
     },
     {
+      "url": "https://www.paxos.com/paxg-transparency",
+      "kind": "html",
+      "issuer": null,
+      "title": "Paxos PAXG monthly attestation index",
+      "foundIn": [
+        "product=paxg|instrument=instrument%3Apaxg|context=holder|terms=paxg-terms-2025-12-12|source=transparency"
+      ]
+    },
+    {
+      "url": "https://www.paxos.com/terms-and-conditions/pax-gold-terms-conditions",
+      "kind": "html",
+      "issuer": null,
+      "title": "PAX Gold Terms and Conditions",
+      "foundIn": [
+        "product=paxg|instrument=instrument%3Apaxg|context=holder|terms=paxg-terms-2025-12-12|source=terms"
+      ]
+    },
+    {
       "url": "https://www.privy.io/terms-of-service",
       "kind": "html",
       "issuer": "ventuals",
@@ -10253,6 +11158,10 @@
         "securitize-secz:claims[9].url",
         "securitize-secz:documents[5].url",
         "securitize-secz:sources[7]",
+        "securitize-secz:visualFindings.access.basis",
+        "securitize-secz:visualFindings.backing.basis",
+        "securitize-secz:visualFindings.exit.basis",
+        "securitize-secz:visualFindings.rights.basis",
         "securitize-secz:whatIf[account-frozen].searched[3]",
         "securitize-secz:whatIf[attestation-wrong].searched[3]",
         "securitize-secz:whatIf[authority-key-compromised].searched[3]",
@@ -10357,11 +11266,21 @@
         "superstate-opening-bell:documents[3].url",
         "superstate-opening-bell:parties.securitiesIssuers[3].source",
         "superstate-opening-bell:sources[4]",
+        "superstate-opening-bell:visualFindings.access.basis",
         "superstate-opening-bell:whatIf[company-delisted].searched[6]",
         "superstate-opening-bell:whatIf[law-changes].searched[9]",
         "superstate-opening-bell:whatIf[price-source-fails].searched[9]",
         "superstate-opening-bell:whatIf[regulator-action]",
         "superstate-opening-bell:whatIf[tax-withholding].searched[6]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1676197/000119312526192295/R1.htm",
+      "kind": "html",
+      "issuer": null,
+      "title": "Underlying ADCF current SEC prospectus disclosure",
+      "foundIn": [
+        "product=acred|instrument=instrument%3Aacred|context=feeder|terms=acred-public-feeder-framework|source=underlying"
       ]
     },
     {
@@ -10371,6 +11290,15 @@
       "title": "securitize-secz:claims[85].note",
       "foundIn": [
         "securitize-secz:claims[85].note"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/1786958/000165558926000970/c485bpos.htm",
+      "kind": "html",
+      "issuer": null,
+      "title": "FOBXX prospectus effective August 1, 2026",
+      "foundIn": [
+        "product=fobxx|instrument=instrument%3Afobxx|context=fund|terms=fobxx-prospectus-2026-08-01|source=prospectus"
       ]
     },
     {
@@ -10455,6 +11383,12 @@
         "superstate-opening-bell:parties.audience[0].source",
         "superstate-opening-bell:parties.securitiesIssuers[2].source",
         "superstate-opening-bell:sources[0]",
+        "superstate-opening-bell:visualFindings.access.basis",
+        "superstate-opening-bell:visualFindings.backing.basis",
+        "superstate-opening-bell:visualFindings.controls.basis",
+        "superstate-opening-bell:visualFindings.failure.basis",
+        "superstate-opening-bell:visualFindings.ledger.basis",
+        "superstate-opening-bell:visualFindings.rights.basis",
         "superstate-opening-bell:whatIf[company-delisted]",
         "superstate-opening-bell:whatIf[death-inheritance]",
         "superstate-opening-bell:whatIf[dispute-forum].searched[5]",
@@ -10482,6 +11416,7 @@
         "superstate-opening-bell:parties.securitiesIssuers[1].source",
         "superstate-opening-bell:sampleMints[2].source",
         "superstate-opening-bell:sources[5]",
+        "superstate-opening-bell:visualFindings.rights.basis",
         "superstate-opening-bell:whatIf[company-acquired].searched[7]",
         "superstate-opening-bell:whatIf[company-bankrupt].searched[5]",
         "superstate-opening-bell:whatIf[defrauded]",
@@ -10506,6 +11441,8 @@
         "bullish-blsh:claims[75].url",
         "bullish-blsh:documents[12].url",
         "bullish-blsh:sources[22]",
+        "bullish-blsh:visualFindings.failure.basis",
+        "bullish-blsh:visualFindings.rights.basis",
         "bullish-blsh:whatIf[account-frozen].searched[5]",
         "bullish-blsh:whatIf[attestation-wrong].searched[5]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[5]",
@@ -10576,6 +11513,8 @@
         "bullish-blsh:incidents[0].source",
         "bullish-blsh:parties.securitiesIssuers[0].source",
         "bullish-blsh:sources[5]",
+        "bullish-blsh:visualFindings.access.basis",
+        "bullish-blsh:visualFindings.backing.basis",
         "bullish-blsh:whatIf[account-frozen].searched[4]",
         "bullish-blsh:whatIf[attestation-wrong].searched[4]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[4]",
@@ -10672,6 +11611,8 @@
         "bullish-blsh:parties.distributors[0].source",
         "bullish-blsh:parties.regulators[1].source",
         "bullish-blsh:sources[1]",
+        "bullish-blsh:visualFindings.access.basis",
+        "bullish-blsh:visualFindings.rights.basis",
         "bullish-blsh:whatIf[account-frozen].searched[3]",
         "bullish-blsh:whatIf[attestation-wrong].searched[3]",
         "bullish-blsh:whatIf[authority-key-compromised].searched[3]",
@@ -10713,6 +11654,24 @@
       ]
     },
     {
+      "url": "https://www.sec.gov/Archives/edgar/data/1976710/000197671025000002/xslFormDX01/primary_doc.xml",
+      "kind": "html",
+      "issuer": null,
+      "title": "HLSCOPE issuer Form D/A",
+      "foundIn": [
+        "product=hlscope|instrument=instrument%3Ahlscope|context=feeder|terms=hlscope-public-feeder-framework|source=formd"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2004367/000094562126000632/xslFormDX08/primary_doc.xml",
+      "kind": "html",
+      "issuer": null,
+      "title": "SEC Form D/A for the USTB offering",
+      "foundIn": [
+        "product=ustb|instrument=instrument%3Austb|context=public-holder|terms=public-source-snapshot-2026-09-30|source=formd"
+      ]
+    },
+    {
       "url": "https://www.sec.gov/Archives/edgar/data/2045370/000121390025048152/ea0243438-1012g_remora.htm",
       "kind": "html",
       "issuer": "remora-markets",
@@ -10731,7 +11690,17 @@
         "superstate-opening-bell:claims[11].url",
         "superstate-opening-bell:claims[2].url",
         "superstate-opening-bell:claims[86].url",
+        "superstate-opening-bell:visualFindings.access.basis",
         "superstate-opening-bell:whatIf[issuer-change-of-control].searched[5]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2056038/000205603825000001/xslFormDX01/primary_doc.xml",
+      "kind": "html",
+      "issuer": null,
+      "title": "ACRED issuer Form D",
+      "foundIn": [
+        "product=acred|instrument=instrument%3Aacred|context=feeder|terms=acred-public-feeder-framework|source=formd"
       ]
     },
     {
@@ -10753,7 +11722,10 @@
         "republic-mirror:findings[3].evidence",
         "republic-mirror:parties.audience[0].source",
         "republic-mirror:parties.tokenIssuers[0].source",
-        "republic-mirror:sources[0]"
+        "republic-mirror:sources[0]",
+        "republic-mirror:visualFindings.access.basis",
+        "republic-mirror:visualFindings.exit.basis",
+        "republic-mirror:visualFindings.rights.basis"
       ]
     },
     {
@@ -10765,6 +11737,15 @@
         "republic-mirror:documents[1].url",
         "republic-mirror:parties.parents[0].source",
         "republic-mirror:sources[1]"
+      ]
+    },
+    {
+      "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026042685/ea026411904ex10-9.htm",
+      "kind": "html",
+      "issuer": null,
+      "title": "BUIDL transfer-agent and registrar agreement",
+      "foundIn": [
+        "product=buidl|instrument=instrument%3Abuidl|context=fund|terms=buidl-public-framework|source=ta"
       ]
     },
     {
@@ -10874,6 +11855,12 @@
         "securitize-secz:parties.tokenizationProviders[0].source",
         "securitize-secz:parties.transferAgents[0].source",
         "securitize-secz:sources[0]",
+        "securitize-secz:visualFindings.access.basis",
+        "securitize-secz:visualFindings.backing.basis",
+        "securitize-secz:visualFindings.exit.basis",
+        "securitize-secz:visualFindings.failure.basis",
+        "securitize-secz:visualFindings.ledger.basis",
+        "securitize-secz:visualFindings.rights.basis",
         "securitize-secz:whatIf[account-frozen].searched[0]",
         "securitize-secz:whatIf[attestation-wrong].searched[0]",
         "securitize-secz:whatIf[authority-key-compromised]",
@@ -11048,6 +12035,8 @@
         "superstate-opening-bell:parties.distributors[1].source",
         "superstate-opening-bell:parties.securitiesIssuers[0].source",
         "superstate-opening-bell:sources[3]",
+        "superstate-opening-bell:visualFindings.access.basis",
+        "superstate-opening-bell:visualFindings.rights.basis",
         "superstate-opening-bell:whatIf[chain-outage]",
         "superstate-opening-bell:whatIf[company-acquired]",
         "superstate-opening-bell:whatIf[company-bankrupt]",
@@ -11398,6 +12387,15 @@
       ]
     },
     {
+      "url": "https://www.spiko.io/blog/spiko-launches-the-worlds-first-tokenized-money-market-funds",
+      "kind": "html",
+      "issuer": null,
+      "title": "Spiko launch announcement",
+      "foundIn": [
+        "product=ustbl|instrument=instrument%3Austbl|context=public-holder|terms=spiko-prospectus-2026-09-01|source=launch"
+      ]
+    },
+    {
       "url": "https://www.structuredretailproducts.com/insights/83837/direxion-diversifies-its-single-stock-leveraged-lineup-with-2x-spacex-etf",
       "kind": "html",
       "issuer": "shift",
@@ -11496,12 +12494,48 @@
       ]
     },
     {
+      "url": "https://www.uraniumdigital.com/",
+      "kind": "html",
+      "issuer": null,
+      "title": "Uranium Digital official site",
+      "foundIn": [
+        "product=uranium-digital|instrument=instrument%3Auranium-digital|context=planned|terms=unverified-holder-terms%3Apublic-snapshot-2026-09-30|source=uranium-site"
+      ]
+    },
+    {
       "url": "https://www.vara.ae/",
       "kind": "html",
       "issuer": null,
       "title": "shared:[66].website",
       "foundIn": [
         "shared:[66].website"
+      ]
+    },
+    {
+      "url": "https://www.wisdomtreeprime.com/blog/commission-free-liquidity/",
+      "kind": "html",
+      "issuer": null,
+      "title": "WisdomTree: commission-free liquidity",
+      "foundIn": [
+        "product=wtgxx|instrument=instrument%3Awtgxx|context=public-holder|terms=public-source-snapshot-2026-09-30|source=liquidity"
+      ]
+    },
+    {
+      "url": "https://www.wisdomtreeprime.com/digital-funds/wtgxx",
+      "kind": "html",
+      "issuer": null,
+      "title": "WisdomTree Treasury Money Market Digital Fund (WTGXX)",
+      "foundIn": [
+        "product=wtgxx|instrument=instrument%3Awtgxx|context=public-holder|terms=public-source-snapshot-2026-09-30|source=product"
+      ]
+    },
+    {
+      "url": "https://www.wisdomtreeprime.com/prospectus-and-regulatory-information/",
+      "kind": "html",
+      "issuer": null,
+      "title": "WisdomTree Prime prospectus and regulatory information",
+      "foundIn": [
+        "product=wtgxx|instrument=instrument%3Awtgxx|context=public-holder|terms=public-source-snapshot-2026-09-30|source=regulatory"
       ]
     },
     {
@@ -11616,6 +12650,16 @@
       "issuer": "remora-markets",
       "path": "whatIf[price-source-fails].searched[3]",
       "raw": "https://lite-api.jup.ag/price/v3?ids=…"
+    },
+    {
+      "issuer": "superstate-opening-bell",
+      "path": "visualFindings.controls.basis",
+      "raw": "https://docs.rs/superstate-allowlist-interface/0.1.0/superstate_allowlist_interface/instruction/fn.th…"
+    },
+    {
+      "issuer": "ventuals",
+      "path": "visualFindings.rights.basis",
+      "raw": "https://hyperliquid.gitbook.io/hyperliquid-docs/hyperliquid-improvement-proposals-hips/hip-3-builder-deployed-p…"
     }
   ]
 }

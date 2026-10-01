@@ -148,7 +148,7 @@ test('overview promotes the selected branch while preserving explicit filters an
     const before=structure.overview(map);
     expect(before.shown.map(p=>p.id)).toEqual(['circle-usdc','blackrock-buidl','paxos-gold']);
     const promoted = structure.overview(map,{selection:{kind:'programme',id:'paxos-gold'}});
-    expect(promoted.shown.map(p=>p.id)).toEqual(['paxos-gold','circle-usdc','blackrock-buidl']);
+    expect(promoted.shown.map(p=>p.id)).toEqual(['paxos-gold']);
     expect(promoted.groups[0].id).toBe('gold');
     expect(structure.overview(map)).toEqual(before);
     expect(structure.overview(map,{mode:'controls'}).shown).toEqual(before.shown);
@@ -212,16 +212,30 @@ test('cluster density distinguishes small and large inventories without drawing 
     expect(structure.clusterGlyph(100000).dots).toBe(100);
 });
 
-test('compact overview expands to show every connected programme and leaves other visible rows clickable', () => {
+test('selection shows every connected programme and hides unrelated rows', () => {
     const programmes=Array.from({length:12},(_,i)=>({id:`p${i}`,label:`Programme ${i}`,entity:'issuer',products:[{entryId:`e${i}`}],structureIds:[i<9?'fund':'gold'],recipeIds:[],deployments:[]}));
     const map={programmes,structures:[{id:'gold',programmes:['p9','p10','p11']},{id:'fund',programmes:programmes.slice(0,9).map(p=>p.id)}],recipes:[]};
     const selected={kind:'group',id:'fund',mode:'legal'};
     const view=structure.overview(map,{selection:selected});
     expect(view.shown.map(p=>p.id)).toEqual(programmes.slice(0,9).map(p=>p.id));
     expect(view.groups[0].id).toBe('fund');
-    expect(structure.overview(map,{expanded:true,selection:selected}).shown).toHaveLength(12);
+    expect(structure.overview(map,{expanded:true,selection:selected}).shown).toHaveLength(9);
     const small=structure.overview(map,{selection:{kind:'programme',id:'p11'}});
-    expect(small.shown[0].id).toBe('p11'); expect(small.shown).toHaveLength(7);
-    expect(structure.select(map,{kind:'programme',id:small.shown[1].id}).valid).toBe(true);
-    expect(structure.overview(map,{selection:selected,entryIds:['e2','e3','e11']}).shown.map(p=>p.id)).toEqual(['p2','p3','p11']);
+    expect(small.shown.map(p=>p.id)).toEqual(['p11']);
+    expect(structure.overview(map,{selection:selected,entryIds:['e2','e3','e11']}).shown.map(p=>p.id)).toEqual(['p2','p3']);
+});
+
+test('default rows sort by indexed address count descending with deterministic ties', () => {
+    const {research,catalogue}=mapFixture(),map=structure.buildMap(research,catalogue);
+    map.programmes.find(p=>p.id==='paxos-gold').deployments=Array.from({length:100},(_,i)=>`Ethereum:${i}`);
+    expect(structure.overview(map).shown.map(p=>p.id)).toEqual(['paxos-gold','circle-usdc','blackrock-buidl']);
+});
+
+test('arrival number reels preserve separators and settle on the actual counts', () => {
+    for (const count of [0, 12, 33, 1212]) {
+        const reels = structure.numberReels(count);
+        expect(reels.map(r => r.digits ? r.digits.at(-1) : r.char).join('')).toBe(count.toLocaleString('en-US'));
+        expect(reels.filter(r => !r.digits).every(r => r.char === ',')).toBe(true);
+    }
+    expect(() => structure.numberReels(NaN)).toThrow();
 });

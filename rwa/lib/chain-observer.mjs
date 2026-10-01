@@ -42,8 +42,8 @@ export async function observeEthereum(deployment, rpc) {
         catch (error) { fields[key] = unknown(error.message); }
     };
     for (const [key, slot] of Object.entries(SLOTS)) await read(key, 'eth_getStorageAt', [deployment.address, slot, tag], 'address');
-    for (const [key, selector, type] of [['owner', '0x8da5cb5b', 'address'], ['paused', '0x5c975abb', 'bool'], ['supplyRaw', '0x18160ddd', 'uint'], ['decimals', '0x313ce567', 'uint']]) await read(key, 'eth_call', [{ to: deployment.address, data: selector }, tag], type);
-    return { decoderVersion: 2, network: 'Ethereum', blockNumber: BigInt(block.number).toString(), blockHash: block.hash, blockTimestamp: new Date(Number(BigInt(block.timestamp)) * 1000).toISOString(), fields,
+    for (const [key, selector, type] of [['owner', '0x8da5cb5b', 'address'], ['authority', '0xbf7e214f', 'address'], ['paused', '0x5c975abb', 'bool'], ['supplyRaw', '0x18160ddd', 'uint'], ['decimals', '0x313ce567', 'uint']]) await read(key, 'eth_call', [{ to: deployment.address, data: selector }, tag], type);
+    return { decoderVersion: 3, network: 'Ethereum', blockNumber: BigInt(block.number).toString(), blockHash: block.hash, blockTimestamp: new Date(Number(BigInt(block.timestamp)) * 1000).toISOString(), fields,
         limitations: 'Observed code hash, conventional storage slots and read-only ABI responses. Empty conventional slots do not rule out other upgrade paths. Addresses do not establish key governance, legal powers or backing. SHA-256 code fingerprint is not Ethereum keccak.' };
 }
 export async function observeSolana(deployment, rpc) {

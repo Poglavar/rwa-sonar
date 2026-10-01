@@ -1,5 +1,7 @@
 // Thin shared report/comparison controller; applicability and evidence rules live in the pure model.
 (async function () {
+    const reportView = window.__rwaReportView;
+    let activeReportView;
     const model = window.__rwaResearch, monitor = window.__rwaMonitor, visual = window.__rwaVisualProfile, structure = window.__rwaStructureMap, scenarios = window.__rwaFailureScenario;
     let scenarioMode = new URLSearchParams(location.search).get('scenario') || 'normal';
     if (!scenarios.MODES[scenarioMode]) scenarioMode = 'normal';
@@ -31,26 +33,23 @@
         return `<dl><dt>Holder context</dt><dd>${esc(ctx.label)}</dd><dt>Legal interest</dt><dd>${esc(subject(p).legalForm)}</dd><dt>Issuer</dt><dd>${esc(subject(p).issuer)}</dd><dt>Identity coverage</dt><dd>${esc(subject(p).identity)}</dd><dt>Exposure</dt><dd>${esc(p.exposure.label)}</dd><dt>Legal review</dt><dd>${date(p.reviewedAt)}</dd>${p.evidenceCheckedAt ? `<dt>Dossier evidence</dt><dd>${date(p.evidenceCheckedAt)}</dd>` : ''}<dt>Review scope</dt><dd>${p.kind === 'programme' || ($('reportDeployment')?.value && !p.deployments.find((d) => d.id === $('reportDeployment').value)?.instrumentId) ? 'Programme only; individual terms unresolved' : 'Instrument / product'}</dd></dl>`;
     }
     function profileMarkup(p, ctx, deployment, prefix = 'finding-') {
-        return `<div style="--issuer-color:var(--issuer-${structure.colorSlot(p.programmeId)})">${visual.render(visual.profile(p, ctx.id, deployment ? { deploymentId: deployment } : {}), { prefix, compact: prefix !== 'finding-' })}</div>`;
-    }
-    function scenarioMarkup(p, ctx, deployment) {
-        const view = scenarios.scenario(p, ctx.id, scenarioMode, deployment ? { deploymentId: deployment } : {});
-        const routes = { described: 'Arrangement described; execution not established', conditional: 'Conditional; inspect the terms', unknown: 'Outcome not established', 'not-applicable': 'Not applicable' };
-        return `<section class="research-card scenario-card" id="failureScenario"><p class="eyebrow">A vault, its key and the route out</p><h2>What if a party becomes unavailable?</h2><p>Assets, your legal claim and your route out are different questions. These are hypothetical scenarios, not reports of current failures.</p><div class="scenario-controls" role="group" aria-label="Hypothetical scenario">${Object.entries(scenarios.MODES).map(([id,label]) => `<button class="button" type="button" data-scenario="${esc(id)}" aria-pressed="${id===scenarioMode}">${esc(label)}</button>`).join('')}</div><div class="scenario-diagram"><div class="scenario-party scenario-holder">${visual.icon('document')}Holder claim<small>${esc(ctx.label)}</small></div><div class="scenario-party" data-affected="${view.affected==='issuer'}" data-route="${esc(view.routes.claim)}">${visual.icon('document')}Issuer / programme<small>${esc(view.issuer)}</small><small>${esc(routes[view.routes.claim])}</small></div><div class="scenario-party" data-affected="${view.affected==='custodian'}" data-route="${esc(view.routes.custody)}">${visual.icon('vault')}Custody arrangement<small>${view.custodyActors.length ? esc(view.custodyActors.map((a) => a.name).join(' · ')) : 'Named parties not mapped here; inspect backing evidence'}</small><small>${esc(routes[view.routes.custody])}</small></div><div class="scenario-party">${visual.icon('door')}Route out<small>${esc(routes[view.routes.exit])}</small></div></div>${view.custodyActors.length ? `<details><summary>Named custody parties: scope and role caveats</summary><p>These are retained programme dossier roles, including sampled-product and source discrepancies. They do not identify the custodian for every token.</p>${view.custodyActors.map((a) => `<p><strong>${esc(a.name)} · ${esc(a.role)}</strong><br>${esc(a.note)}<br>${sources(p,a.sourceIds)}</p>`).join('')}</details>` : ''}<div class="scenario-note" role="status"><strong>${view.hypothetical?'Hypothetical · ':''}${esc(view.label)} · ${esc(view.state)}</strong><p>${esc(view.summary)}</p><small>${esc(view.scope)} · Evidence checked: ${date(view.checkedAt)}</small>${view.sourceIds.length ? `<p>${sources(p,view.sourceIds)}</p>` : view.hypothetical ? '<p>No applicable scenario source establishes the outcome.</p>' : '<p>Inspect the feature evidence below for the normal arrangement.</p>'}</div><p class="muted">The diagram is an analogy for separate dependencies, not a transaction sequence. A surviving legal claim does not guarantee timely or full recovery. Dashed borders mark unknown outcomes. Each branch answers a separate question for the holder.</p></section>`;
+        return `<div style="--issuer-color:var(--issuer-${structure.colorSlot(p.programmeId)})">${visual.render(visual.profile(p, ctx.id, deployment ? { deploymentId: deployment } : {}), { prefix, compact: prefix !== 'finding-', summaryOnly: true })}</div>`;
     }
     function report(p, ctx) {
+        const deploymentLabel = $('reportDeployment').closest('label');
+        // Move the persistent picker out before replacing topic content; its listeners survive.
+        $('reportPickers').append(deploymentLabel);
+        deploymentLabel.hidden = true;
+        const deploymentId = $('reportDeployment').value;
+        activeReportView = reportView.view(p, ctx.id, { deploymentId, hash: location.hash, scenarioMode });
         $('researchTitle').textContent = p.name;
         document.title = `${p.name}: holder rights — RWA Sonar`;
-        $('researchScope').textContent = subject(p).scope;
-        const exitLabels = { obligor: 'Legal obligor', processor: 'Route operator', onboarding: 'Onboarding', entitlementOnTransfer: 'Entitlement on transfer', settlement: 'Settlement and timetable', minimumAndFees: 'Minimum and fees', independentRoute: 'Route without issuer', availability: 'Operational evidence' };
-        $('researchContent').innerHTML = `<section class="research-profile">${profileMarkup(p,ctx,$('reportDeployment').value)}</section>${scenarioMarkup(p,ctx,$('reportDeployment').value)}<section class="research-card research-wide"><h2>What this review covers</h2>${identity(p, ctx)}${p.kind === 'programme' || (p.deployments.find((d) => d.id === $('reportDeployment').value)?.instrumentId === null) ? '<p class="research-notice">The answers below cover the stated programme or product review. The selected address has no verified binding to individual instrument terms; inspect its separate observations below.</p>' : ''}<details><summary>Instrument, programme and terms identifiers</summary><p class="muted">${esc(subject(p).id)} · ${esc(p.programmeId)}<br>${esc(ctx.termsId)}</p><p>${esc(subject(p).shareClass || 'Share class not specified by this review.')} ${esc(subject(p).issuanceVintage || '')}</p></details><p><a href="./compare.html?left=${esc(p.id)}&leftContext=${esc(ctx.id)}">Compare this interest →</a>${p.legacyReport ? ` · <a href="./${esc(p.legacyReport)}">Detailed stock dossier</a>` : ''}</p></section>
-            ${Object.entries(model.DIMENSIONS).map(([key, label]) => `<section class="research-card" id="finding-${esc(key)}" tabindex="-1"><h2>${esc(label)}</h2>${finding(p, model.resolveClaim(p, ctx.id, key))}</section>`).join('')}
-            <section class="research-card"><h2>Exit route in this context</h2><dl>${Object.entries(p.exitDetails[ctx.id] || {}).map(([key, value]) => `<dt>${esc(exitLabels[key] || key)}</dt><dd>${esc(value)}</dd>`).join('')}</dl></section>
-            ${p.assetModule ? `<section class="research-card research-wide"><h2>${esc(p.assetModule.label)}</h2><p>${esc(p.assetModule.summary)}</p><small>${sources(p, p.assetModule.sourceIds)}</small></section>` : ''}
-            <section class="research-card research-wide"><h2>Evidence profile</h2><p class="muted">Evidence methods answer different questions. Availability, scope and measurement dates are shown separately.</p>${p.evidenceProfiles.map((e) => `<article><h3>${esc(e.method)} · ${esc(e.availability.replaceAll('-', ' '))}</h3><p>${esc(e.scope)}. ${esc(e.limit)}</p><small>Measurement period: ${date(e.sourcePeriod)} · Reviewed: ${date(e.checkedAt)}${e.sourceIds.length ? '<br>' + sources(p, e.sourceIds) : ''}</small></article>`).join('<hr>')}</section>
-            ${p.relationships?.length ? `<section class="research-card research-wide"><h2>Wrapper and portfolio dependencies</h2>${p.relationships.map((r) => `<p><strong>${esc(r.kind)}: ${esc(r.target)}</strong><br>${esc(r.backingCountPolicy)}</p>`).join('')}</section>` : ''}
-            <section class="research-card research-wide"><h2>Exact deployment observations</h2><p class="muted">Fresh chain evidence leaves the legal review date unchanged. ${p.deployments.length} indexed deployment(s); select an address above.</p>${exact(p, $('reportDeployment').value)}</section>
-            <section class="research-card research-wide"><h2>Sources and dates</h2><ol>${p.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a><br><small>${esc(s.locator)}${s.quote ? `<details><summary>Retained quotation</summary><blockquote>${esc(s.quote)}</blockquote></details>` : ''}<br>Document date: ${date(s.documentDate)} · Effective: ${date(s.effectiveDate)} · Checked: ${date(s.checkedAt)}</small></li>`).join('')}</ol><p><a href="./rwa-research.json">Download scoped research data</a></p></section>`;
+        $('researchScope').textContent = `${activeReportView.scope} · ${p.deployments.length} indexed ${p.kind === 'programme' ? (p.deployments.length === 1 ? 'token' : 'tokens') : (p.deployments.length === 1 ? 'address' : 'addresses')}${activeReportView.deployment ? ' · ' + (activeReportView.deployment.symbol || activeReportView.deployment.network) : ''}`;
+        $('reportContext').closest('label').hidden = p.contexts.length === 1;
+        $('researchContent').innerHTML = reportView.render(activeReportView);
+        const slot = $('researchContent').querySelector('[data-report-deployment-slot]');
+        if (slot) { slot.append(deploymentLabel); deploymentLabel.hidden = false; }
+        if (!p.deployments.length && slot) deploymentLabel.hidden = true;
     }
     function comparison(left, lc, right, rc) {
         const ld = $('leftDeployment').value, rd = $('rightDeployment').value;
@@ -94,13 +93,49 @@
                 report(p, ctx);
                 history.replaceState(null, '', `report.html?${new URLSearchParams({ product: p.id, context: ctx.id, ...(selectedDeployment ? { deployment: selectedDeployment } : {}), ...(scenarioMode !== 'normal' ? {scenario: scenarioMode} : {}), ...(new URLSearchParams(location.search).has('reduceMotion') ? {reduceMotion:'1'} : {}) })}${location.hash}`);
             }
-            $('researchContent').addEventListener('click', (event) => { const b=event.target.closest('[data-scenario]'); if (!b) return; scenarioMode=b.dataset.scenario; render(); if (!document.documentElement.classList.contains('reduce-motion') && !document.hidden) $('failureScenario').querySelector('[data-affected="true"]')?.animate([{opacity:1},{opacity:.55}], {duration:350,easing:'ease-out'}); $('researchContent').querySelector(`[data-scenario="${scenarioMode}"]`).focus({preventScroll:true}); });
-            $('reportProduct').addEventListener('change', () => { p = lookup($('reportProduct').value, 0); ctx = p.contexts[0]; selectedDeployment = ''; render(); });
+            $('researchContent').addEventListener('click', (event) => {
+                const b = event.target.closest('button'); if (!b) return;
+                if (b.dataset.reportEvidence) {
+                    const dialog = $('reportEvidence');
+                    dialog.innerHTML = reportView.renderEvidence(activeReportView, b.dataset.reportEvidence);
+                    dialog.showModal();
+                } else if (b.hasAttribute('data-report-programme')) { selectedDeployment = ''; render(); }
+                else if (b.dataset.scenario) {
+                    scenarioMode = b.dataset.scenario; render();
+                    if (!document.documentElement.classList.contains('reduce-motion')) $('researchContent').querySelector('[data-affected="true"]')?.animate([{opacity:1},{opacity:.55}], {duration:350,easing:'ease-out'});
+                    $('researchContent').querySelector(`[data-scenario="${scenarioMode}"]`)?.focus({preventScroll:true});
+                }
+            });
+            $('researchContent').addEventListener('change', event => {
+                if (event.target.hasAttribute('data-report-topic-picker')) location.hash = event.target.value;
+            });
+            $('researchContent').addEventListener('input', event => {
+                if (event.target.hasAttribute('data-report-source-search')) $('researchContent').querySelector('[data-report-source-list]').innerHTML = reportView.sourceRows(p, event.target.value);
+                if (event.target.hasAttribute('data-report-case-search')) $('researchContent').querySelector('[data-report-cases]').innerHTML = reportView.casesMarkup(activeReportView, event.target.value);
+            });
+            $('reportEvidence').addEventListener('click', event => {
+                const dialog = $('reportEvidence'), bounds = dialog.getBoundingClientRect();
+                const backdrop = event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom);
+                if (event.target.closest('[data-report-close]') || backdrop) dialog.close();
+            });
+            window.addEventListener('hashchange', () => {
+                render();
+                $('researchContent').querySelector('.report-topic-title')?.focus({preventScroll:true});
+                $('reportPanel').scrollIntoView({block:'start'});
+            });
+            window.addEventListener('popstate', () => {
+                const current = new URLSearchParams(location.search);
+                p = lookup(current.get('product'), 0); ctx = context(p, current.get('context'));
+                selectedDeployment = current.get('deployment') || ''; scenarioMode = current.get('scenario') || 'normal';
+                $('reportProduct').value = p.id; render();
+            });
+            $('reportProduct').addEventListener('change', () => { p = lookup($('reportProduct').value, 0); ctx = p.contexts[0]; selectedDeployment = ''; scenarioMode = 'normal'; render(); $('reportSwitcher').open = false; window.scrollTo({top:0}); });
             $('reportDeployment').addEventListener('change', () => { selectedDeployment = $('reportDeployment').value; render(); });
             $('reportContext').addEventListener('change', () => { ctx = context(p, $('reportContext').value); render(); });
             render();
         }
-        $('researchStatus').textContent = visual.EVIDENCE_GAP_NOTE;
+        $('researchStatus').textContent = '';
+        $('researchStatus').hidden = true;
     } catch (error) {
         console.error(`[${new Date().toISOString()}] research unavailable`, error);
         $('researchStatus').textContent = error.message.startsWith('Unknown ') ? 'The selected product, holder context or deployment is not in this research scope.' : 'Research could not be loaded. Reload to retry.';

@@ -198,13 +198,25 @@ function stockResearch(issuerDb, tokenDb, dossiers = {}) {
         for (const claim of claims) { claim.id = `stock:${programmeId}:${contextId}:${claim.dimension}`; claim.display = dossier.visualFindings?.[claim.dimension] || null; }
         const scenarioAnswers = array(dossier.whatIf).filter((w) => w.mode === 'custodian-insolvency').map((w) => ({ mode: 'custodian-fails', contextId, termsId, status: w.status || 'unknown', outcome: w.outcome || 'Outcome not established.', sourceIds: [addSource({ ...w, field: `whatIf.${w.mode}` }, w.mode)].filter(Boolean), checkedAt: w.accessedAt || null, routes: { claim: 'unknown', custody: w.status === 'not-applicable' ? 'not-applicable' : w.status === 'documented' ? 'conditional' : 'unknown', exit: 'unknown' } }));
         const scenarioActors = array(dossier.parties?.custodians).map((a) => ({ name: a.name, role: a.role, note: a.note || '', sourceIds: [addSource({ url: a.source, locator: a.note || 'Legacy party catalogue; instrument-specific roles require terms verification', field: 'parties.custodians' }, a.name)].filter(Boolean) })).filter((a) => a.name);
+        const factFields = [['dividends','Dividends','ownership'],['voting','Voting','ownership'],['corporateActions','Corporate actions','ownership'],['keyGovernance','Authority governance','controls']];
+        const reportDetails = {
+            facts: factFields.map(([key,label,topic]) => {
+                const raw = dossier[key];
+                const summary = typeof raw === 'string' ? raw : raw?.note || raw?.evidence || null;
+                const sourceIds = array(dossier.claims).filter(c => c.field === key || c.field?.startsWith(key + '.')).map(c => addSource(c, label)).filter(Boolean);
+                return summary ? { id: key, topic, label, summary, sourceIds: [...new Set(sourceIds)] } : null;
+            }).filter(Boolean),
+            cases: array(dossier.whatIf).map(w => ({ id: w.mode, label: String(w.mode || '').replaceAll('-', ' ').replace(/^./, c => c.toUpperCase()),
+                status: w.status || 'unknown', outcome: w.outcome || 'Outcome not established', checkedAt: w.accessedAt || null,
+                sourceIds: [addSource({ ...w, field: `whatIf.${w.mode}` }, w.mode)].filter(Boolean) }))
+        };
         return { scenarioIssuer: array(dossier.parties?.tokenIssuers).map((a) => a.name).filter(Boolean).join(' · ') || null, scenarioActors, structure: dossier.visualStructure || null, scenarios: scenarioAnswers, id: `stock:${programmeId}`, kind: 'programme', name: issuer.name, ticker: null, originalName: issuer.name, programmeId,
             exposure: { id: 'equities', label: 'Equity, ETF or private-company exposure; this programme record does not identify every token instrument.' },
             instrument: null,
             programme: { id: `programme:${programmeId}`, legalForm: merged.legalForm || 'Not established in the issuer dossier', issuer: merged.issuingEntity || issuer.issuerText || 'Not identified in the issuer dossier',
                 identity: identity || issuer.name, scope: 'Programme-level issuer dossier. The existence of one product, disclosure or observed mint does not validate all products or confer a legal binding on indexed deployments.' },
             reviewedAt: null, evidenceCheckedAt: issuer.evidence?.lastCheckedAt || null, legacyReport: `issuers/${programmeId}.html`,
-            sources, contexts: [{ id: contextId, termsId, label: `${issuer.name} programme-level dossier` }], claims, deployments, evidenceProfiles,
+            reportDetails, sources, contexts: [{ id: contextId, termsId, label: `${issuer.name} programme-level dossier` }], claims, deployments, evidenceProfiles,
             exitDetails: { programme: { obligor: merged.issuingEntity || null, processor: null, onboarding: merged.redemption?.eligibility || null,
                 entitlementOnTransfer: null, settlement: merged.redemption?.rails || null, minimumAndFees: [merged.redemption?.minimum, merged.redemption?.fees].filter(Boolean).join('; ') || null,
                 independentRoute: null, availability: 'Legacy dossier description only; no route is promoted to currently operational by this adapter.' } } };

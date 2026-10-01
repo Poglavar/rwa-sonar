@@ -147,3 +147,6 @@ next-steps.md
 
 # Built all-RWA structure-map navigation.
 /rwa-structure-map.json
+
+/rwa/data/fund-observations.json
+.last-rwa-fund-watch-stats*.json

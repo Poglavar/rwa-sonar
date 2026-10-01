@@ -1,0 +1,904 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-01T19:55:56.915Z",
+  "scope": "Automated source accessibility, separate from substantive legal review and source-period freshness",
+  "products": [
+    {
+      "productId": "usdc",
+      "sources": [
+        {
+          "sourceId": "terms",
+          "url": "https://www.circle.com/legal/usdc-terms",
+          "checkedAt": "2026-10-01T19:52:34Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "7761b094b89cc2cf07ad9a8bf76a86b30f340fe1d2a5a38a4339b93730a8c54a"
+        },
+        {
+          "sourceId": "eea",
+          "url": "https://www.circle.com/legal/mica-redemption-policy",
+          "checkedAt": "2026-10-01T19:50:52Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "b60365e01b283655a4e2b3717fee699167fe5ea84fca12f4686146f3d7847541"
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+          "checkedAt": "2026-10-01T19:48:30Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "5d0136e76ca46274ae5564c1ccc1523cabf2f8287122326e0de6595162c06682"
+        },
+        {
+          "sourceId": "reserves",
+          "url": "https://www.circle.com/transparency",
+          "checkedAt": "2026-10-01T19:53:37Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "f45d26b3038d65c770f6edc01c5cdb77af38c67410c7d2172105cf1f9de7f795"
+        },
+        {
+          "sourceId": "reserve-august-2026",
+          "url": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf",
+          "checkedAt": "2026-10-01T19:48:01Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "62532c7d589715b0fe1535184d88fbade07d55fbf0e6d96e224b154cde2d49b2"
+        }
+      ]
+    },
+    {
+      "productId": "paxg",
+      "sources": [
+        {
+          "sourceId": "terms",
+          "url": "https://www.paxos.com/terms-and-conditions/pax-gold-terms-conditions",
+          "checkedAt": "2026-10-01T19:52:35Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "b7c0adf3ce4462a8b10de25af3d72c62749297bc74cb41ae40c421c4c0a28552"
+        },
+        {
+          "sourceId": "contract",
+          "url": "https://github.com/paxosglobal/paxos-gold-contract",
+          "checkedAt": "2026-10-01T19:50:02Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "6cf3adf785f87f4f9184c6cdc19a95d7f9319e6a44d6eae2993706aee9016edd"
+        },
+        {
+          "sourceId": "transparency",
+          "url": "https://www.paxos.com/paxg-transparency",
+          "checkedAt": "2026-10-01T19:50:53Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "c89e4bae96baeafc3779fe5226dd059108c36132234bec7f16a66848282ebe91"
+        }
+      ]
+    },
+    {
+      "productId": "buidl",
+      "sources": [
+        {
+          "sourceId": "ta",
+          "url": "https://www.sec.gov/Archives/edgar/data/2094496/000121390026042685/ea026411904ex10-9.htm",
+          "checkedAt": "2026-10-01T19:54:36Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "50df468252b9919e2fbd6785732a31d2122b848441b99c7dc829eca681bb353c"
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2024/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network-03-20-2024/default.aspx",
+          "checkedAt": "2026-10-01T19:50:04Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "solana",
+          "url": "https://investors.securitize.io/news/news-details/2025/BlackRock-and-Securitize-Debut-New-BUIDL-Share-Class-on-Solana-Network-03-25-2025/default.aspx",
+          "checkedAt": "2026-10-01T19:53:23Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        }
+      ]
+    },
+    {
+      "productId": "fobxx",
+      "sources": [
+        {
+          "sourceId": "prospectus",
+          "url": "https://www.sec.gov/Archives/edgar/data/1786958/000165558926000970/c485bpos.htm",
+          "checkedAt": "2026-10-01T19:52:35Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "95d5fe8fe7e14fa41001a434e3b411501c92a5589e51e206675d1ab86c796a19"
+        }
+      ]
+    },
+    {
+      "productId": "usdy",
+      "sources": [
+        {
+          "sourceId": "basics",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/basics",
+          "checkedAt": "2026-10-01T19:52:06Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "9c713b4defa5a901d62974b36c8d4808082c04bb408c5c1668dbaea6628d092b"
+        },
+        {
+          "sourceId": "notes",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/important-notes",
+          "checkedAt": "2026-10-01T19:52:47Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "aca7c9786dd3b4cbf139adefb06747a889312366b9acd28200e01e0879dc9199"
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://docs.ondo.finance/addresses",
+          "checkedAt": "2026-10-01T19:49:23Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "31daa6ccae1c8a459fe3a0cf1fd506a0c765a282fb89b8a151912267fd61807d"
+        },
+        {
+          "sourceId": "wrapper",
+          "url": "https://docs.ondo.finance/general-access-products/usdy/usdy-vs-rebasing-usdy",
+          "checkedAt": "2026-10-01T19:53:59Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "ea990f05a3300f7ef1764b1e63b4e1e56adaebf7068f3a12171b044a5bcb2d7c"
+        }
+      ]
+    },
+    {
+      "productId": "acred",
+      "sources": [
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/2056038/000205603825000001/xslFormDX01/primary_doc.xml",
+          "checkedAt": "2026-10-01T19:54:26Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "5ac45543a0794aa88cfd88f1f0cfbf8e62afceba29988a4fabaa9da4b30605ea"
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2025/Apollo-and-Securitize-Announce-Partnership-and-Launch-Tokenized-Access-to-Credit-Fund-on-Aptos-Avalanche-Ethereum-Ink-Polygon-and-Solana-Networks-01-30-2025/default.aspx",
+          "checkedAt": "2026-10-01T19:52:15Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "underlying",
+          "url": "https://www.sec.gov/Archives/edgar/data/1676197/000119312526192295/R1.htm",
+          "checkedAt": "2026-10-01T19:50:54Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "9cd45127144f40ef650bb4ce0347bc6d7b93e9d71c631c07369c3f8e949ae8f3"
+        }
+      ]
+    },
+    {
+      "productId": "hlscope",
+      "sources": [
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/1976710/000197671025000002/xslFormDX01/primary_doc.xml",
+          "checkedAt": "2026-10-01T19:53:37Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "6da975c703f01cc7424b486f27afa8a42911b361eec590153b146afdac951cf7"
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://www.hamiltonlane.com/en-us/news/scope-available-via-securitize",
+          "checkedAt": "2026-10-01T19:50:52Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "e4b58d9d140de05791bc931299d9263a7f0fde7ae93ea72ef3fe3da916bc8b11"
+        },
+        {
+          "sourceId": "portfolio",
+          "url": "https://www.hamiltonlane.com/en-us/strategies/evergreen/global/senior-credit-opportunities-fund",
+          "checkedAt": "2026-10-01T19:52:34Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "ee5ecacc0433021156a4569e0936363c2e338c62fa460562f2bc741d898704bf"
+        },
+        {
+          "sourceId": "current",
+          "url": "https://investors.securitize.io/news/news-details/2026/Securitize-Launches-Private-Credit-Fund-on-TRON-Blockchain/default.aspx",
+          "checkedAt": "2026-10-01T19:54:36Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "rlusd-facility",
+          "url": "https://investors.securitize.io/news/news-details/2025/Hamilton-Lane-and-Securitizes-SCOPE-Gains-Instant-RLUSD-Liquidity-by-integrating-with-VBILLs-Onchain-Facility-11-05-2025/default.aspx",
+          "checkedAt": "2026-10-01T19:54:00Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        }
+      ]
+    },
+    {
+      "productId": "ustb",
+      "sources": [
+        {
+          "sourceId": "site",
+          "url": "https://superstate.com/assets/ustb",
+          "checkedAt": "2026-10-01T19:50:47Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "76d035681860d3292f3e853207814b1272d746ebf0ce5062bd6c8d2d3ae87004"
+        },
+        {
+          "sourceId": "formd",
+          "url": "https://www.sec.gov/Archives/edgar/data/2004367/000094562126000632/xslFormDX08/primary_doc.xml",
+          "checkedAt": "2026-10-01T19:54:08Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "0f28e0e5bb5b2465ac1252ccebe027cb38b526c046bf5f92f2b90083f3296a95"
+        },
+        {
+          "sourceId": "instruments",
+          "url": "https://api.superstate.com/v2/instruments",
+          "checkedAt": "2026-10-01T19:48:02Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "api",
+          "contentHash": "f9510b7a556719463879d9715ee7e6193ee4248de555213a61fcf34840ea3465"
+        },
+        {
+          "sourceId": "current-docs",
+          "url": "https://docs.superstate.com/investors/tokenized-funds/available-funds/invesco-ustb",
+          "checkedAt": "2026-10-01T19:49:24Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "58b60735ced477f323e6991bbc70bdbc6a652accf10dad46c53172baf675caeb"
+        }
+      ]
+    },
+    {
+      "productId": "usyc",
+      "sources": [
+        {
+          "sourceId": "product",
+          "url": "https://www.circle.com/usyc",
+          "checkedAt": "2026-10-01T19:54:08Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "a918869905ae20a76ad5ffcf17604776fff1cc65501c7ffef883259f85ffc0b8"
+        },
+        {
+          "sourceId": "help",
+          "url": "https://help.circle.com/support/en/usyc-subscription-redemption-and-functionality-explained?id=kb_article_view&sysparm_article=KB0010561",
+          "checkedAt": "2026-10-01T19:50:03Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://usyc.docs.hashnote.com/overview/smart-contracts",
+          "checkedAt": "2026-10-01T19:50:52Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "ecaf1132d4e14e3bedb5e4308c13dae4dfacfc2c8ed17a35fd10119e852a7f2a"
+        }
+      ]
+    },
+    {
+      "productId": "jtrsy",
+      "sources": [
+        {
+          "sourceId": "anemoy",
+          "url": "https://www.anemoy.io/funds/jtrsy",
+          "checkedAt": "2026-10-01T19:52:34Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "6b9907cbe0fb325d83f77ef59279551aa0089c9f947eaffc328cae9bcdc67d90"
+        },
+        {
+          "sourceId": "centrifuge",
+          "url": "https://app.centrifuge.io/pool/281474976710662",
+          "checkedAt": "2026-10-01T19:48:03Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "janus",
+          "url": "https://www.janushenderson.com/en-us/advisor/press-releases/janus-henderson-to-partner-with-anemoy-and-centrifuge-on-its-first-tokenized-fund/",
+          "checkedAt": "2026-10-01T19:50:52Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "6a2c82e4e244fa372ef14c26353f8dca6ef570d511d03f41576551da0553cee9"
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.centrifuge.io/developer/protocol/deployments/",
+          "checkedAt": "2026-10-01T19:48:30Z",
+          "status": "ok",
+          "httpStatus": 403,
+          "readVia": "wayback",
+          "contentHash": "bbcde5a64c6de81bb237aa29a02f30e667555710889bb2af9b73634667869eb5"
+        },
+        {
+          "sourceId": "continuity",
+          "url": "https://www.anemoy.io/business-continuity",
+          "checkedAt": "2026-10-01T19:50:52Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "c4dffea97c9a34ae6c12e56fcb999fc9b4b4093e97b7a58aaeedd98f16e2b823"
+        }
+      ]
+    },
+    {
+      "productId": "tbill",
+      "sources": [
+        {
+          "sourceId": "intro",
+          "url": "https://docs.openeden.com/tbill",
+          "checkedAt": "2026-10-01T19:49:23Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "3ccc2930f13c9f926abbec94c08483f62f5ede18d57e517443af64528e42ff97"
+        },
+        {
+          "sourceId": "struct",
+          "url": "https://docs.openeden.com/tbill/product-structuring",
+          "checkedAt": "2026-10-01T19:53:59Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "432c4af47318a1f371bab8f44db75db41f3fb2678dfc80ccfc4c214fbe784014"
+        },
+        {
+          "sourceId": "faq",
+          "url": "https://docs.openeden.com/tbill/faq",
+          "checkedAt": "2026-10-01T19:52:06Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "92b039f97de8d173d95b37cab8c91d56e63f812ed261fca3a2856ac2bf6f7d16"
+        },
+        {
+          "sourceId": "redemptions",
+          "url": "https://docs.openeden.com/tbill/redemptions",
+          "checkedAt": "2026-10-01T19:54:08Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "7bc5d9096d32ac26a173b4d5e72514ea203ca6f00f7a7a233be07c8491e64868"
+        },
+        {
+          "sourceId": "controls",
+          "url": "https://docs.openeden.com/tbill/on-chain-governance-and-controls-i",
+          "checkedAt": "2026-10-01T19:52:47Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "62463ffaa57f39d800c944d31b715ecf9608a7331737b2eac6c2510e65f18dc0"
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.openeden.com/tbill/smart-contract-addresses",
+          "checkedAt": "2026-10-01T19:54:26Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "f0bb15d4643ed481a29e30decf8bf83dd7104abc867857982a2b22b3ec44c276"
+        },
+        {
+          "sourceId": "non-us-agreement",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af",
+          "checkedAt": "2026-10-01T19:48:01Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "60b473a564110813129462fec0a696f082bf0d106cac4b5ebecea541f73cfc58"
+        },
+        {
+          "sourceId": "us-agreement",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c",
+          "checkedAt": "2026-10-01T19:52:06Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "cf5aa3725ef6329c4ab45fc2b02bbc9928054fa308a959ea8c89ca69eed46b0d"
+        }
+      ]
+    },
+    {
+      "productId": "ustbl",
+      "sources": [
+        {
+          "sourceId": "account",
+          "url": "https://docs.spiko.io/documentation/account_management/deposits_withdrawals/",
+          "checkedAt": "2026-10-01T19:49:24Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "7e52d1d36ae212986922b8a40242e38aa2bf013325ab481d4ec0cbeab523bd79"
+        },
+        {
+          "sourceId": "lifecycle",
+          "url": "https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/",
+          "checkedAt": "2026-10-01T19:54:09Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "a138e3b70eb7a66323d04c45d83f41cb199285d3fdfd07d73d5b1c7825bd6f83"
+        },
+        {
+          "sourceId": "launch",
+          "url": "https://www.spiko.io/blog/spiko-launches-the-worlds-first-tokenized-money-market-funds",
+          "checkedAt": "2026-10-01T19:50:54Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "d2b2b19b6358b4b9eb44bbf2cf77cc66a7055df8c70d73f320aef62643e59f03"
+        },
+        {
+          "sourceId": "prospectus",
+          "url": "https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf",
+          "checkedAt": "2026-10-01T19:48:27Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "bf78cf44a58fd4fbf6b50525f10d1210f86c8e2eb2f7a5b99472845cc94410eb"
+        },
+        {
+          "sourceId": "transfers",
+          "url": "https://docs.spiko.io/documentation/tokenization/transfers/",
+          "checkedAt": "2026-10-01T19:54:00Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "26a6659c36f75c3a68653ed636497c53baaaf032c684025ced5ed2bc430fec3e"
+        },
+        {
+          "sourceId": "addresses",
+          "url": "https://docs.spiko.io/documentation/tokenization/addresses/",
+          "checkedAt": "2026-10-01T19:52:07Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "5aa51d7e3fe0df4f804057e4c0ad366a841c46031bacd9787c5862b1ab2c457f"
+        },
+        {
+          "sourceId": "contract",
+          "url": "https://github.com/spiko-tech/contracts/blob/main/contracts/token/Token.sol",
+          "checkedAt": "2026-10-01T19:52:13Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "5b92759510133423e0ef4658987d2dd34267c5aa403cd4bc495c34ac60095120"
+        },
+        {
+          "sourceId": "nav",
+          "url": "https://docs.spiko.io/documentation/tokenization/nav",
+          "checkedAt": "2026-10-01T19:52:47Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "6e01f74c92847419bc304df8fe6a618a60a4d6b4632db56aa5923378ddb3ce1b"
+        }
+      ]
+    },
+    {
+      "productId": "wtgxx",
+      "sources": [
+        {
+          "sourceId": "product",
+          "url": "https://www.wisdomtreeprime.com/digital-funds/wtgxx",
+          "checkedAt": "2026-10-01T19:52:36Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "regulatory",
+          "url": "https://www.wisdomtreeprime.com/prospectus-and-regulatory-information/",
+          "checkedAt": "2026-10-01T19:53:38Z",
+          "status": "ok",
+          "httpStatus": 403,
+          "readVia": "wayback",
+          "contentHash": "a7ee253f5d414dbe93779ff3188ed2fdf0cdaa52e3074ce91b29811346944e9b"
+        },
+        {
+          "sourceId": "liquidity",
+          "url": "https://www.wisdomtreeprime.com/blog/commission-free-liquidity/",
+          "checkedAt": "2026-10-01T19:50:55Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "faq",
+          "url": "https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/",
+          "checkedAt": "2026-10-01T19:48:28Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "51464115b0681ff0801caab05a2e92bb49be05997ac79769ba82db4c434bc1ee"
+        }
+      ]
+    },
+    {
+      "productId": "ousg",
+      "sources": [
+        {
+          "sourceId": "product",
+          "url": "https://ondo.finance/ousg",
+          "checkedAt": "2026-10-01T19:50:46Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "cdb070266592f43dd69bd177f2f8ba2c3d26d6d985ad0a73317ae8e9930a3593"
+        },
+        {
+          "sourceId": "overview",
+          "url": "https://docs.ondo.finance/qualified-access-products/ousg/overview",
+          "checkedAt": "2026-10-01T19:54:08Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "4decdb9f7ad40f357fdb21e700527b180004727d2b9144cd3b827c5430303bae"
+        },
+        {
+          "sourceId": "redeem",
+          "url": "https://docs.ondo.finance/qualified-access-products/ousg/redeeming",
+          "checkedAt": "2026-10-01T19:54:26Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "2fea2361e122b23bc8a52ae7fbb1ddf18f3d97a349794fc8d2a800509917a52c"
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://docs.ondo.finance/addresses",
+          "checkedAt": "2026-10-01T19:49:23Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "31daa6ccae1c8a459fe3a0cf1fd506a0c765a282fb89b8a151912267fd61807d"
+        }
+      ]
+    },
+    {
+      "productId": "vbill",
+      "sources": [
+        {
+          "sourceId": "launch",
+          "url": "https://investors.securitize.io/news/news-details/2025/VanEck-Launches-First-Tokenized-Fund-VBILL-on-Securitize-05-13-2025/default.aspx",
+          "checkedAt": "2026-10-01T19:54:26Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "product",
+          "url": "https://securitize.io/primary-market/vaneck-vbill",
+          "checkedAt": "2026-10-01T19:50:46Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "stablecoin",
+          "url": "https://investors.securitize.io/news/news-details/2025/Ripple-and-Securitize-Enable-RLUSD-Smart-Contract-Functionality-for-BlackRocks-BUIDL-and-VanEcks-VBILL-Tokenized-Funds-09-23-2025/default.aspx",
+          "checkedAt": "2026-10-01T19:54:09Z",
+          "status": "reachable-unverified",
+          "httpStatus": 403,
+          "readVia": null,
+          "contentHash": null
+        }
+      ]
+    },
+    {
+      "productId": "ter",
+      "sources": [
+        {
+          "sourceId": "ter-site",
+          "url": "https://uat.ter.bt/",
+          "checkedAt": "2026-10-01T19:50:51Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "0d48b64fbc87346cc484cf50effa46e9e739f0d58a0ed58edb7aaeef3f806356"
+        },
+        {
+          "sourceId": "ter-terms",
+          "url": "https://drive.google.com/file/d/1_bou3Ek98xRQwX1kxNQ9lf_xme6m3AFI/view?usp=sharing",
+          "checkedAt": "2026-10-01T19:52:48Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "ter-assets",
+          "url": "https://uat.ter.bt/reports/asset-statements",
+          "checkedAt": "2026-10-01T19:52:33Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "70f55222e332d380c8fb220f36f685d437817ada5a26b61e177600e180f3a5d3"
+        },
+        {
+          "sourceId": "ter-gold-audit",
+          "url": "https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view",
+          "checkedAt": "2026-10-01T19:52:08Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "statement-september",
+          "url": "https://drive.google.com/file/d/10dEK20M3mfscDh594rzVpzdO3KvC0VSg/view",
+          "checkedAt": "2026-10-01T19:49:59Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "1e66fd8eee5ba4f1e42b9cdf0962da411395bb54662da096712786321ba9a075"
+        }
+      ]
+    },
+    {
+      "productId": "xaut",
+      "sources": [
+        {
+          "sourceId": "xaut-terms",
+          "url": "https://gold.tether.to/legal/",
+          "checkedAt": "2026-10-01T19:53:22Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "xaut-fees",
+          "url": "https://gold.tether.to/legal/",
+          "checkedAt": "2026-10-01T19:53:22Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "xaut-attestation",
+          "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.03.2026_RC187322026DV0089.pdf",
+          "checkedAt": "2026-10-01T19:52:15Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "9e4024c3f4701c468af5e9c9c0485f269a9b998f55338574c5853141950bbd55"
+        },
+        {
+          "sourceId": "xaut-whitepaper",
+          "url": "https://gold.tether.to/Tether%20Gold%20Whitepaper.pdf",
+          "checkedAt": "2026-10-01T19:50:03Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        },
+        {
+          "sourceId": "addresses-migration",
+          "url": "https://tether.io/news/xaut-update-upgrade-completed/",
+          "checkedAt": "2026-10-01T19:50:50Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "acd263beb10cc9f2e073bcff024beef8a75c06ec1fd33b74aae90045b50a56f5"
+        },
+        {
+          "sourceId": "xaut-june-assurance",
+          "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2026_RC187322026DV0170.pdf",
+          "checkedAt": "2026-10-01T19:55:16Z",
+          "status": "changed",
+          "httpStatus": 200,
+          "readVia": "pdf",
+          "contentHash": "f0c1120d92b5c2c503c461fcc09a8cbeedb06b64d626a4f9e763f8db63bdcb65"
+        },
+        {
+          "sourceId": "xaut-report-index",
+          "url": "https://gold.tether.to/",
+          "checkedAt": "2026-10-01T19:55:15Z",
+          "status": "reachable-unverified",
+          "httpStatus": 200,
+          "readVia": null,
+          "contentHash": null
+        }
+      ]
+    },
+    {
+      "productId": "usdhl",
+      "sources": [
+        {
+          "sourceId": "usdhl-about",
+          "url": "https://usefelix.gitbook.io/usdhl/",
+          "checkedAt": "2026-10-01T19:52:34Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "7c2441239236376476fd535e26cc0b42a16dd27d8c7556aa4864176a2f9deef4"
+        },
+        {
+          "sourceId": "usdhl-sunset",
+          "url": "https://usefelix.gitbook.io/usdhl/sunsetting-usdhl",
+          "checkedAt": "2026-10-01T19:54:25Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "22ead848b9d81593ed03343914d3862079d331adde497fe0658451410cda254f"
+        },
+        {
+          "sourceId": "usdhl-terms",
+          "url": "https://usefelix.gitbook.io/docs/terms/terms-and-conditions",
+          "checkedAt": "2026-10-01T19:50:51Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "322a1321242246d73a979156fe00105f2bcd2a8a8cd4e70926444babf7ed8fb2"
+        },
+        {
+          "sourceId": "usdhl-security",
+          "url": "https://usefelix.gitbook.io/usdhl/advanced/security",
+          "checkedAt": "2026-10-01T19:54:08Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "15e8ccf8cb0f2d22fbff8655c65e65bd8e908707e2ae0cad478c23163725acfc"
+        },
+        {
+          "sourceId": "developers",
+          "url": "https://usefelix.gitbook.io/usdhl/advanced/developers",
+          "checkedAt": "2026-10-01T19:53:37Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "50c6a70b6b8f4225e3557fb2c342e23f3dea24b515b15ab7b0e84bca4cdd0e2f"
+        }
+      ]
+    },
+    {
+      "productId": "thbill",
+      "sources": [
+        {
+          "sourceId": "thbill-site",
+          "url": "https://theo.xyz/thbill",
+          "checkedAt": "2026-10-01T19:50:50Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "77418ce006063e87cfd0a320287104b1e37481ed38a72b1d6977e3f6ea2c0089"
+        },
+        {
+          "sourceId": "libeara-ultra",
+          "url": "https://libeara.com/libeara-partners-with-wellington-and-fundbridge-capital-to-launch-a-u-s-treasuries-fund-tokenised-on-public-blockchain/",
+          "checkedAt": "2026-10-01T19:52:33Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "f8591abce8add72b6fbd15b85476b58d2b8fc9d7f6e5b66241ae86fb2d9b827e"
+        },
+        {
+          "sourceId": "libeara-theo",
+          "url": "https://libeara.com/fundbridge-capital-and-libeara-bring-regulated-tokenized-treasury-fund-on-chain-with-arbitrum/",
+          "checkedAt": "2026-10-01T19:50:45Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "11e9b90c730fc493b147473dc8679f1999e02ba7997b90ef8e34924878d254c1"
+        },
+        {
+          "sourceId": "theo-docs",
+          "url": "https://docs.theo.xyz/",
+          "checkedAt": "2026-10-01T19:49:25Z",
+          "status": "ok",
+          "httpStatus": 403,
+          "readVia": "wayback",
+          "contentHash": "07cc37c9efb1170f970365725d88b4a80b2be834d5c145957478fc0c1d8a5bc8"
+        }
+      ]
+    },
+    {
+      "productId": "uranium-digital",
+      "sources": [
+        {
+          "sourceId": "uranium-site",
+          "url": "https://www.uraniumdigital.com/",
+          "checkedAt": "2026-10-01T19:50:54Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "f2397bcfeb0de9787a385676544615d31fc7d422c610ad99e382c16bb2313d63"
+        }
+      ]
+    },
+    {
+      "productId": "oro-gold",
+      "sources": [
+        {
+          "sourceId": "oro-terms",
+          "url": "https://app.oro.finance/terms-and-conditions",
+          "checkedAt": "2026-10-01T19:52:47Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "80eecd2b6b9439f06060c1203ef6ad042daa819cc248add1fd2d55dfac4450d3"
+        },
+        {
+          "sourceId": "oro-home",
+          "url": "https://app.oro.finance/",
+          "checkedAt": "2026-10-01T19:48:27Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "1f61eaa08cbc028f2886a0752b422c74ab4133d6ee7eced2ebf5155fcb5b4860"
+        },
+        {
+          "sourceId": "oro-redeem",
+          "url": "https://app.oro.finance/redeem",
+          "checkedAt": "2026-10-01T19:52:06Z",
+          "status": "ok",
+          "httpStatus": 200,
+          "readVia": "html",
+          "contentHash": "fed3bc2ebac492c64350faecb3598ec59aebccb04933b8ef2bc990b3e2a7b659"
+        }
+      ]
+    }
+  ]
+}

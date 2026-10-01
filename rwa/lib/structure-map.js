@@ -75,16 +75,10 @@
     function overview(map, {search = '', entryIds = null, expanded = false, mode = 'legal', selection = null} = {}) {
         const query = search.toLowerCase();
         const pool = map.programmes.filter(p => (!entryIds || p.products.some(r => entryIds.includes(r.entryId))) && `${p.label} ${p.entity}`.toLowerCase().includes(query));
-        const ordered = [], seen = new Set();
-        for (const family of ['cash','fund','gold','feeder','certificate','note','share','synthetic','derivative','unknown']) {
-            const p = pool.find(p => !seen.has(p.id) && p.structureIds.includes(family));
-            if (p) { seen.add(p.id); ordered.push(p); }
-        }
-        for (const p of pool) if (!seen.has(p.id)) { seen.add(p.id); ordered.push(p); }
+        const ordered = [...pool].sort((a,b) => b.deployments.length - a.deployments.length || a.id.localeCompare(b.id));
         const state = selection?.kind ? select(map, {...selection, mode}) : null;
         const connected = state ? ordered.filter(p => state.programmeIds.includes(p.id)) : [];
-        const ranked = state ? [...connected, ...ordered.filter(p => !state.programmeIds.includes(p.id))] : ordered;
-        const shown = expanded ? ranked : ranked.slice(0, Math.max(7, connected.length));
+        const shown = state ? connected : expanded ? ordered : ordered.slice(0,7);
         const groupIds = new Set(shown.flatMap(p => mode === 'controls' ? p.recipeIds : p.structureIds));
         const groups = (mode === 'controls' ? map.recipes : map.structures).filter(g => groupIds.has(g.id));
         if (state) {
@@ -97,6 +91,12 @@
     function clusterGlyph(count) {
         const dots = count <= 16 ? Math.max(0, count) : Math.min(100, Math.round(16 + Math.log2(count / 16) * 12));
         return {dots, columns: Math.max(1, Math.ceil(Math.sqrt(dots)))};
+    }
+    // Fixed-width digit reels finish on the real count; separators never move.
+    function numberReels(value) {
+        if (!Number.isSafeInteger(value) || value < 0) throw new Error('Expected a non-negative integer count');
+        return value.toLocaleString('en-US').split('').map(char => ({ char,
+            digits: /[0-9]/.test(char) ? Array.from({length:21 + Number(char)}, (_, i) => String(i % 10)) : null }));
     }
     function chainCount(map) {
         return new Set(map.programmes.flatMap(p => p.deployments.map(address => address.slice(0, address.indexOf(':'))))).size;
@@ -122,5 +122,5 @@
         return { mode, groupMode, valid, programmeIds: programmes.map((p) => p.id), productIds: programmes.flatMap((p) => p.products.map((p) => p.id)), entryIds: programmes.flatMap((p) => p.products.map((p) => p.entryId)), deploymentCount: new Set(programmes.flatMap((p) => p.deployments)).size,
             groupIds: [...new Set(programmes.flatMap((p) => mode === 'legal' ? p.structureIds : p.recipeIds))] };
     }
-    return { FAMILIES, IDENTITIES, colorSlot, addressKey, buildMap, select, overview, clusterGlyph, chainCount, connectionPath, movement };
+    return { FAMILIES, IDENTITIES, colorSlot, addressKey, buildMap, select, overview, clusterGlyph, numberReels, chainCount, connectionPath, movement };
 });

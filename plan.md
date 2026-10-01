@@ -294,7 +294,7 @@ Neither release introduces a composite maturity score, an issuer-wide safety gra
 
 ## 7. Implementation record — 2026-10-01
 
-Implemented in `/Users/simun/Code/rwa-sonar-unification`, branch `unification`:
+Implemented in the `rwa-sonar-unification` worktree, branch `unification`:
 
 - The home page leads with the **structure map**: aggregated token clusters, stable programme colors, typed legal-structure and contract-control views, branch tracing, search, compact/all-programme views and **branch summaries**. Selection highlights related branches and uses shareable URLs, including browser history. The single catalogue search filters map membership and links directly to reports.
 - The pure map includes separate reviewed terms/context records and provenance. A terms record is not asserted to be a shared exact template; unresolved token bindings remain unresolved. No common code or broad structure family transfers holder rights.

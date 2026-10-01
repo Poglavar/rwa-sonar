@@ -35,7 +35,7 @@ import {
     looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
-    quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, failedSourceReads, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
     ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
 } from './lib/watch.mjs';
@@ -95,6 +95,7 @@ USAGE
 OPTIONS
   --run              Actually fetch. Without it this help is printed and nothing runs.
   --only=<issuer>    Only sources attributed to this issuer slug (e.g. --only=prestocks).
+  --rwa              Only sources attributed to the original cross-asset research products.
   --product=<id>     Only sources attributed to this curated RWA product (e.g. --product=ousg).
   --limit=<n>        Only the first n sources after filtering (smoke test).
   --force            Ignore today's checkpoint and look at every source again. Conditional
@@ -1413,8 +1414,8 @@ async function main() {
     const onlyBlocked = Boolean(flags['only-blocked']);
     const productFilter = typeof flags.product === 'string' ? flags.product.trim() : null;
     if (flags.product !== undefined && (typeof flags.product !== 'string' || !productFilter)) throw new Error('--product needs a non-empty product id');
-    if (flags.only || productFilter || flags.limit || onlyBlocked) {
-        const scopedOnly = [flags.only ?? null, productFilter ? `product-${productFilter}` : null].filter(Boolean).join('-');
+    if (flags.rwa || flags.only || productFilter || flags.limit || onlyBlocked) {
+        const scopedOnly = [flags.rwa ? 'rwa' : null, flags.only ?? null, productFilter ? `product-${productFilter}` : null].filter(Boolean).join('-');
         runStatsFile = join(REPO, sourceWatchStatsFileName({ only: scopedOnly || null, limit: flags.limit, onlyBlocked }));
     }
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
@@ -1458,6 +1459,12 @@ async function main() {
     if (productFilter) {
         sources = sources.filter((s) => matchesResearchProduct(s, productFilter));
         if (sources.length === 0) throw new Error(`no sources for product ${productFilter}`);
+    }
+    if (flags.rwa) {
+        const native = await readJson(join(REPO, 'rwa/data/research.json'), null);
+        if (!native?.products?.length) throw new Error('Cross-asset research registry is empty');
+        sources = sources.filter((source) => native.products.some((p) => matchesResearchProduct(source, p.id)));
+        if (!sources.length) throw new Error('No cross-asset document sources matched');
     }
     // A retired source (stocks/data/retired-sources.json, via extract-sources.mjs) is gone for good:
     // it is not fetched, and its row and state say `retired` with the reason and date.
@@ -1747,9 +1754,9 @@ async function main() {
             logWarn(`    ${host}: ${reasons.length} (${[...new Set(reasons)].join(', ')})`);
         }
     }
-    const failures = results.filter((r) => r.status === 'error');
+    const failures = failedSourceReads(results, { requireContent: Boolean(flags.rwa) });
     if (failures.length) {
-        logError(`${failures.length} source(s) FAILED for a reason that is neither gone nor blocked:`);
+        logError(`${failures.length} source read(s) failed${flags.rwa ? ' or lacked substantive content' : ''}:`);
         for (const r of failures) logError(`    ${r.reason} ${r.url}`);
     }
 
@@ -1837,8 +1844,8 @@ async function main() {
     }
     log(`watch-sources: wrote ${relative(REPO, runStatsFile)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
 
-    if (runFailed(results)) {
-        logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`);
+    if (runFailed(results, { requireContent: Boolean(flags.rwa) })) {
+        logError(`watch-sources: run NOT successful — ${failures.length} source read(s) failed or unavailable`);
         process.exitCode = 1;
         return;
     }

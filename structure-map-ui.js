@@ -12,23 +12,30 @@
         }));
         return shared;
     }
-    const readSelection = () => { const p = new URLSearchParams(location.search); return { mode: p.get('mapMode') || 'legal', kind: p.get('mapKind') || '', id: p.get('mapId') || '', groupMode: p.get('mapGroupMode') || p.get('mapMode') || 'legal' }; };
+    const readSelection = () => { const p = new URLSearchParams(location.search); return { mode: p.get('mapMode') || 'legal', kind: p.get('mapKind') || '', id: p.get('mapId') || '', card: p.get('mapCard') || 'programme', groupMode: p.get('mapGroupMode') || p.get('mapMode') || 'legal' }; };
     async function mount(el) {
         try {
             const [map, catalogue] = await load();
             const chains = model.chainCount(map);
-            document.querySelectorAll('[data-map-totals]').forEach(node => { node.textContent = `${map.counts.deployments.toLocaleString()} indexed deployments · ${map.counts.programmes} issuer programmes · ${chains} chains`; });
-            let selection = readSelection(), search = new URLSearchParams(location.search).get('search') || '', all = false, searchExpanded = false;
+            const animateTotals = !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !new URLSearchParams(location.search).has('reduceMotion');
+            document.querySelectorAll('[data-map-totals]').forEach(node => {
+                node.innerHTML = [[map.counts.deployments, 'indexed deployments'], [map.counts.programmes, 'issuer programmes'], [chains, 'chains']].map(([count, label], group) => {
+                    const digits = model.numberReels(count).map(({char, digits}, index) => animateTotals && digits
+                        ? `<span class="structure-stat-digit"><span class="structure-stat-roll" style="--roll-end:-${digits.length - 1}em;--roll-duration:${2200 + group * 90 + index * 80}ms">${digits.map(d => `<i>${d}</i>`).join('')}</span></span>` : esc(char)).join('');
+                    return `<span class="structure-stat" role="img" aria-label="${count.toLocaleString('en-US')}" data-count="${count}"><span aria-hidden="true">${digits}</span></span> ${label}`;
+                }).join(' · ');
+            });
+            let selection = readSelection(), search = new URLSearchParams(location.search).get('search') || '', searchExpanded = false;
             const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
             const isStatic = () => reduced.matches || new URLSearchParams(location.search).has('reduceMotion');
-            el.innerHTML = `<div class="structure-toolbar"><div class="structure-search-row"><input aria-label="Search assets, issuers or exact addresses" type="search" data-map-search name="search" placeholder="Try gold, AAPL, USDC or a token address"></div><div class="structure-modes" role="group" aria-label="Shared structure view"><button type="button" data-map-mode="legal">Legal structures</button><button type="button" data-map-mode="controls">Contract controls</button></div></div><div class="structure-search-results" data-map-search-results hidden></div><div class="structure-canvas"><svg class="structure-lines" aria-hidden="true"></svg><div class="structure-columns"></div></div><p class="structure-footnote">Shared categories do not establish identical rights or bind every token to reviewed terms.</p><div class="structure-bottom"><button type="button" class="button" data-map-more>Show all programmes</button><button type="button" class="button" data-map-reset>Show all</button></div><div class="structure-summary" data-map-summary></div>`;
+            el.innerHTML = `<div class="structure-toolbar"><div class="structure-search-row"><input aria-label="Search assets, issuers or exact addresses" type="search" data-map-search name="search" placeholder="Try gold, AAPL, USDC or a token address"></div><div class="structure-modes" role="group" aria-label="Shared structure view"><button type="button" data-map-mode="legal">Legal structures</button><button type="button" data-map-mode="controls">Contract controls</button></div></div><div class="structure-search-results" data-map-search-results hidden></div><div class="structure-canvas"><svg class="structure-lines" aria-hidden="true"></svg><div class="structure-columns"></div></div><p class="structure-footnote">Shared categories do not establish identical rights or bind every token to reviewed terms.</p><div class="structure-summary" data-map-summary></div>`;
             const columns = el.querySelector('.structure-columns'), summary = el.querySelector('[data-map-summary]');
             function url(push) {
                 const p = new URLSearchParams(location.search);
                 p.delete('search'); if (search.trim()) p.set('search', search.trim());
-                for (const key of ['mapMode', 'mapKind', 'mapId', 'mapGroupMode']) p.delete(key);
+                for (const key of ['mapMode', 'mapKind', 'mapId', 'mapGroupMode', 'mapCard']) p.delete(key);
                 if (selection.mode === 'controls') p.set('mapMode', 'controls');
-                if (selection.kind) { p.set('mapKind', selection.kind); p.set('mapId', selection.id); if (selection.kind === 'group') p.set('mapGroupMode', selection.groupMode || selection.mode); }
+                if (selection.kind) { p.set('mapKind', selection.kind); p.set('mapId', selection.id); if (selection.card === 'cluster') p.set('mapCard', 'cluster'); if (selection.kind === 'group') p.set('mapGroupMode', selection.groupMode || selection.mode); }
                 history[push ? 'pushState' : 'replaceState'](null, '', `${location.pathname}${p.size ? '?' + p : ''}${location.hash}`);
             }
             function lines() {
@@ -77,14 +84,16 @@
                 const resultsEl = el.querySelector('[data-map-search-results]');
                 resultsEl.hidden = !search.trim();
                 resultsEl.innerHTML = search.trim() ? `<p role="status">${results.total ? `${results.total} matching reports` : 'No assets, issuers or addresses match this search.'}</p><div class="structure-search-links">${results.links.map(item => `<a href="${esc(item.href)}"><strong>${esc(item.label)}</strong><small>${esc(item.detail)}</small></a>`).join('')}</div>${results.total > results.links.length ? `<button type="button" class="button" data-map-search-more>Show all ${results.total} matches</button>` : ''}` : '';
-                const {pool,shown,groups} = model.overview(map, {entryIds:search.trim() ? results.entryIds : null,expanded:all || Boolean(search.trim()),mode:selection.mode,selection});
-                columns.innerHTML = `<section class="structure-clusters"><h3>Token clusters</h3>${shown.map((p) => { const glyph = model.clusterGlyph(p.deployments.length); const match = catalogueModel.clusterMatches(catalogue.entries, p.products.map(product => product.entryId), search); return `<button type="button" class="structure-cluster" aria-label="${esc(p.label)}: ${match.symbols.length ? esc(match.symbols.join(', ')) + '; ' : ''}${p.deployments.length} indexed addresses" aria-pressed="${selection.kind === 'programme' && selection.id === p.id}" data-map-cluster="${esc(p.id)}" data-traced="${Boolean(selection.kind && state.programmeIds.includes(p.id))}" data-muted="${selection.kind && !state.programmeIds.includes(p.id)}" style="--issuer-color:var(--issuer-${p.color})"><span class="structure-dots" data-empty="${!glyph.dots}" style="--cluster-columns:${glyph.columns}" aria-hidden="true">${Array.from({ length: glyph.dots }, () => '<i></i>').join('')}</span><span>${match.symbols.length ? `<strong class="structure-cluster-tickers" title="${esc(match.symbols.join(', '))}">${esc(match.symbols.slice(0,3).join(', '))}${match.symbols.length > 3 ? ` +${match.symbols.length - 3}` : ''}</strong>${match.count ? `<small>${match.count.toLocaleString()} matching address${match.count === 1 ? '' : 'es'}</small>` : ''}<small>${p.deployments.length.toLocaleString()} programme addresses</small>` : `${p.deployments.length.toLocaleString()}<small>${p.deployments.length ? 'indexed addresses' : 'no address indexed'}</small>`}</span></button>`; }).join('')}</section><section class="structure-programmes"><h3>Issuer programmes</h3>${shown.map((p) => `<button type="button" data-map-programme="${esc(p.id)}" data-traced="${Boolean(selection.kind && state.programmeIds.includes(p.id))}" aria-pressed="${selection.kind === 'programme' && selection.id === p.id}" data-muted="${selection.kind && !state.programmeIds.includes(p.id)}" style="--issuer-color:var(--issuer-${p.color})"><span>${esc(p.label)}</span></button>`).join('')}</section><section class="structure-groups"><h3>${selection.mode === 'controls' ? 'Contract controls' : 'Legal structures'}</h3>${groups.map((g) => `<button type="button" data-map-group="${esc(g.id)}" data-traced="${Boolean(selection.kind && state.groupIds.includes(g.id))}" style="--trace-color:${traceColor}" aria-pressed="${selection.kind === 'group' && (selection.groupMode || selection.mode) === selection.mode && selection.id === g.id}" data-muted="${selection.kind && !state.groupIds.includes(g.id)}"><span>${esc(g.label)}</span><small>${g.programmes.length} programme${g.programmes.length === 1 ? '' : 's'}</small></button>`).join('')}</section>`;
+                const {pool,shown,groups} = model.overview(map, {entryIds:search.trim() ? results.entryIds : null,expanded:Boolean(search.trim()),mode:selection.mode,selection});
+                const activeGroup = selection.kind === 'group' ? groups.find(g => g.id === selection.id)?.id || groups[0]?.id : null;
+                const activeProgramme = selection.kind === 'programme' && selection.card !== 'cluster' ? selection.id : null;
+                const activeCluster = selection.kind === 'programme' && selection.card === 'cluster' ? selection.id : null;
+                const card = (html, selected) => `<div class="structure-node" data-selected="${selected}">${html}${selected ? '<button type="button" class="structure-clear" data-map-clear>Clear selection</button>' : ''}</div>`;
+                columns.innerHTML = `<section class="structure-clusters"><h3>Token clusters</h3>${shown.map((p) => { const glyph = model.clusterGlyph(p.deployments.length); const match = catalogueModel.clusterMatches(catalogue.entries, p.products.map(product => product.entryId), search); return card(`<button type="button" class="structure-cluster" aria-label="${esc(p.label)}: ${match.symbols.length ? esc(match.symbols.join(', ')) + '; ' : ''}${p.deployments.length} indexed addresses" aria-pressed="${activeCluster === p.id}" data-map-cluster="${esc(p.id)}" data-traced="${Boolean(selection.kind && state.programmeIds.includes(p.id))}" data-muted="${selection.kind && !state.programmeIds.includes(p.id)}" style="--issuer-color:var(--issuer-${p.color})"><span class="structure-dots" data-empty="${!glyph.dots}" style="--cluster-columns:${glyph.columns}" aria-hidden="true">${Array.from({ length: glyph.dots }, () => '<i></i>').join('')}</span><span>${match.symbols.length ? `<strong class="structure-cluster-tickers" title="${esc(match.symbols.join(', '))}">${esc(match.symbols.slice(0,3).join(', '))}${match.symbols.length > 3 ? ` +${match.symbols.length - 3}` : ''}</strong>${match.count ? `<small>${match.count.toLocaleString()} matching address${match.count === 1 ? '' : 'es'}</small>` : ''}<small>${p.deployments.length.toLocaleString()} programme addresses</small>` : `${p.deployments.length.toLocaleString()}<small>${p.deployments.length ? 'indexed addresses' : 'no address indexed'}</small>`}</span></button>`, activeCluster === p.id); }).join('')}</section><section class="structure-programmes"><h3>Issuer programmes</h3>${shown.map((p) => card(`<button type="button" data-map-programme="${esc(p.id)}" data-traced="${Boolean(selection.kind && state.programmeIds.includes(p.id))}" aria-pressed="${activeProgramme === p.id}" data-muted="${selection.kind && !state.programmeIds.includes(p.id)}" style="--issuer-color:var(--issuer-${p.color})"><span>${esc(p.label)}</span></button>`, activeProgramme === p.id)).join('')}</section><section class="structure-groups"><h3>${selection.mode === 'controls' ? 'Contract controls' : 'Legal structures'}</h3>${groups.map((g) => card(`<button type="button" data-map-group="${esc(g.id)}" data-traced="${Boolean(selection.kind && state.groupIds.includes(g.id))}" style="--trace-color:${traceColor}" aria-pressed="${activeGroup === g.id}" data-muted="${selection.kind && !state.groupIds.includes(g.id)}"><span>${esc(g.label)}</span><small>${g.programmes.length} programme${g.programmes.length === 1 ? '' : 's'}</small></button>`, activeGroup === g.id)).join('')}</section>`;
                 el.classList.toggle('motion-off', isStatic());
                 for (const b of el.querySelectorAll('[data-map-mode]')) b.setAttribute('aria-pressed', String(b.dataset.mapMode === selection.mode));
-                el.querySelector('[data-map-more]').hidden = Boolean(search.trim()) || pool.length <= 7;
-                el.querySelector('[data-map-more]').textContent = all ? 'Compact overview' : `Show all ${pool.length} programmes`;
                 if (!pool.length) summary.innerHTML = '<p>No reviewed programmes match this search. Any matching catalogue reports appear above. Clear the search to return to the overview.</p>';
-                else if (!selection.kind) summary.innerHTML = '<p>Trace a branch to see the products and the claim behind their tokens.</p>';
+                else if (!selection.kind) summary.innerHTML = '';
                 else {
                     const groupMode = selection.groupMode || selection.mode;
                     const group = (groupMode === 'controls' ? map.recipes : map.structures).find((g) => g.id === selection.id);
@@ -98,28 +107,28 @@
                     for (const n of columns.querySelectorAll('[data-map-programme], [data-map-group], [data-map-cluster]')) {
                         const id=n.dataset.mapProgramme || n.dataset.mapGroup || 'cluster:'+n.dataset.mapCluster;
                         const delta=model.movement(before[id],after[id]);
-                        if (delta) moving.push(n.animate([{transform:`translate(${delta.x}px,${delta.y}px)`},{transform:'translate(0,0)'}], {duration:320,easing:'ease-out'}));
+                        if (delta) moving.push(n.parentElement.animate([{transform:`translate(${delta.x}px,${delta.y}px)`},{transform:'translate(0,0)'}], {duration:320,easing:'ease-out'}));
                     }
                 }
             }
             el.addEventListener('click', (event) => {
                 const b = event.target.closest('button'); if (!b) return;
                 let change = true;
-                if (b.dataset.mapProgramme) selection = { mode: selection.mode, kind: 'programme', id: b.dataset.mapProgramme };
-                else if (b.dataset.mapCluster) selection = {mode: selection.mode,kind:'programme',id:b.dataset.mapCluster};
+                if (b.dataset.mapProgramme) selection = { mode: selection.mode, kind: 'programme', card: 'programme', id: b.dataset.mapProgramme };
+                else if (b.dataset.mapCluster) selection = {mode: selection.mode,kind:'programme',card:'cluster',id:b.dataset.mapCluster};
                 else if (b.dataset.mapGroup) selection = { mode: selection.mode, groupMode: selection.mode, kind: 'group', id: b.dataset.mapGroup };
                 else if (b.dataset.mapMode) selection = { ...selection, groupMode: selection.groupMode || selection.mode, mode: b.dataset.mapMode };
-                else if (b.hasAttribute('data-map-reset')) { selection = { mode: selection.mode, kind: '', id: '' }; search = ''; el.querySelector('[data-map-search]').value = ''; searchExpanded = false; }
+                else if (b.hasAttribute('data-map-clear')) selection = { mode: selection.mode, kind: '', id: '' };
                 else if (b.hasAttribute('data-map-search-more')) { searchExpanded = true; change = false; }
-                else if (b.hasAttribute('data-map-more')) { all = !all; change = false; }
                 else return;
-                const focusId = b.dataset.mapProgramme || b.dataset.mapGroup || b.dataset.mapCluster;
+                const focusButton = b.hasAttribute('data-map-clear') ? b.parentElement.firstElementChild : b;
+                const focusId = focusButton.dataset.mapProgramme || focusButton.dataset.mapGroup || focusButton.dataset.mapCluster;
                 document.documentElement.classList.toggle('reduce-motion', isStatic());
                 render(); if (change) { url(true); notify(); }
-                if (b.dataset.mapCluster) columns.querySelector(`[data-map-cluster="${CSS.escape(focusId)}"]`)?.focus({preventScroll:true});
+                if (focusButton.dataset.mapCluster) columns.querySelector(`[data-map-cluster="${CSS.escape(focusId)}"]`)?.focus({preventScroll:true});
                 else if (focusId) columns.querySelector(`[data-map-programme="${CSS.escape(focusId)}"], [data-map-group="${CSS.escape(focusId)}"]`)?.focus({ preventScroll: true });
             });
-            el.querySelector('[data-map-search]').addEventListener('input', (e) => { search = e.target.value; all = false; searchExpanded = false; render(); url(false); });
+            el.querySelector('[data-map-search]').addEventListener('input', (e) => { search = e.target.value; selection = {mode:selection.mode,kind:'',id:''}; searchExpanded = false; render(); url(false); });
             const observer = new ResizeObserver(lines); observer.observe(el.querySelector('.structure-canvas'));
             window.addEventListener('popstate', () => { selection = readSelection(); search = new URLSearchParams(location.search).get('search') || ''; el.querySelector('[data-map-search]').value = search; searchExpanded = false; render(); notify(); });
             reduced.addEventListener('change', render);

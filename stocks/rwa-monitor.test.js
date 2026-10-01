@@ -20,7 +20,7 @@ describe('deployment observer RPC reads', () => {
         const result = await observeEthereum({ address: '0x' + '12'.repeat(20) }, rpc);
         const pinned = { blockHash: hash, requireCanonical: true };
         const stateReads = rpc.mock.calls.filter(([method]) => ['eth_getCode', 'eth_getStorageAt', 'eth_call'].includes(method));
-        expect(stateReads).toHaveLength(10);
+        expect(stateReads).toHaveLength(11);
         for (const [method, params] of stateReads) {
             expect(method === 'eth_getStorageAt' ? params[2] : params[1]).toEqual(pinned);
         }

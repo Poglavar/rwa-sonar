@@ -53,7 +53,9 @@
     "stocks:watch-caselaw": "node stocks/watch-caselaw.mjs --run",
     "stocks:sync": "node stocks/sync-assets-db.mjs",
     "stocks:watch-regulators": "node stocks/watch-regulators.mjs --run",
-    "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/'"
+    "stocks:test": "NODE_OPTIONS=--experimental-vm-modules npx jest --testPathPatterns='^stocks/'",
+    "rwa:watch-sources": "node stocks/watch-sources.mjs --run --rwa --no-db",
+    "rwa:watch-fund-data": "node rwa/watch-fund-data.mjs --run"
   },
   "devDependencies": {
     "jest": "^30.3.0"

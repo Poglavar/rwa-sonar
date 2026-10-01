@@ -21,7 +21,7 @@
         "shareClass": null,
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:03:31Z",
+      "reviewedAt": "2026-10-01T19:37:01.290Z",
       "sources": [
         {
           "id": "terms",
@@ -58,6 +58,15 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:03:31Z",
           "locator": "USDC reserves and assurance reporting"
+        },
+        {
+          "id": "reserve-august-2026",
+          "title": "Deloitte examination of August USDC reserves",
+          "url": "https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf",
+          "locator": "Accountants report p1; management assertion and circulation criteria p2",
+          "documentDate": "2026-09-29",
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -122,9 +131,11 @@
           "dimension": "backing",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Circle states reserves are segregated for users.",
+          "summary": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.",
           "sourceIds": [
-            "terms"
+            "reserve-august-2026",
+            "terms",
+            "eea"
           ],
           "scope": {
             "instrumentId": "instrument:usdc",
@@ -134,11 +145,11 @@
           },
           "id": "usdc:non-eea:backing",
           "display": {
-            "tone": "unknown",
-            "label": "Reserve segregation not independently verified",
-            "reason": "Circle states reserves are segregated for users.",
-            "basis": "[\"backing\",\"supported\",\"source-statement\",\"Circle states reserves are segregated for users.\",{\"instrumentId\":\"instrument:usdc\",\"contextId\":\"non-eea\",\"termsId\":\"usdc-terms-2025-12-12\",\"from\":null},[\"terms\"],[{\"id\":\"terms\",\"title\":\"USDC Terms (non-EEA)\",\"url\":\"https://www.circle.com/legal/usdc-terms\",\"documentDate\":\"2025-12-12\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:03:31Z\",\"locator\":\"Preamble; §§1–2, 8, 13, 17\"}]]",
-            "note": "Circle states that reserves are segregated for users; that statement alone is not independent verification."
+            "tone": "condition",
+            "label": "Dated reserve coverage examined",
+            "reason": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.",
+            "basis": "[\"backing\",\"supported\",\"source-statement\",\"Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.\",{\"instrumentId\":\"instrument:usdc\",\"contextId\":\"non-eea\",\"termsId\":\"usdc-terms-2025-12-12\",\"from\":null},[\"reserve-august-2026\",\"terms\",\"eea\"],[{\"id\":\"reserve-august-2026\",\"title\":\"Deloitte examination of August USDC reserves\",\"url\":\"https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf\",\"locator\":\"Accountants report p1; management assertion and circulation criteria p2\",\"documentDate\":\"2026-09-29\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"terms\",\"title\":\"USDC Terms (non-EEA)\",\"url\":\"https://www.circle.com/legal/usdc-terms\",\"documentDate\":\"2025-12-12\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:03:31Z\",\"locator\":\"Preamble; §§1–2, 8, 13, 17\"},{\"id\":\"eea\",\"title\":\"MiCA Redemption Policy\",\"url\":\"https://www.circle.com/legal/mica-redemption-policy\",\"documentDate\":\"2026-09-15\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:03:31Z\",\"locator\":\"§§2–5, 8\"}]]",
+            "note": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage."
           }
         },
         {
@@ -280,10 +291,14 @@
         },
         {
           "dimension": "backing",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Current reserve coverage was not independently tested in this review.",
-          "sourceIds": [],
+          "summary": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.",
+          "sourceIds": [
+            "reserve-august-2026",
+            "terms",
+            "eea"
+          ],
           "scope": {
             "instrumentId": "instrument:usdc",
             "contextId": "eea",
@@ -292,11 +307,11 @@
           },
           "id": "usdc:eea:backing",
           "display": {
-            "tone": "unknown",
-            "label": "Reserve segregation not independently verified",
-            "reason": "Current reserve coverage was not independently tested in this review.",
-            "basis": "[\"backing\",\"unknown\",\"analysis\",\"Current reserve coverage was not independently tested in this review.\",{\"instrumentId\":\"instrument:usdc\",\"contextId\":\"eea\",\"termsId\":\"usdc-mica-2026-09-15\",\"from\":null},[],[]]",
-            "note": "Circle states that reserves are segregated for users; that statement alone is not independent verification."
+            "tone": "condition",
+            "label": "Dated reserve coverage examined",
+            "reason": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.",
+            "basis": "[\"backing\",\"supported\",\"analysis\",\"Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage.\",{\"instrumentId\":\"instrument:usdc\",\"contextId\":\"eea\",\"termsId\":\"usdc-mica-2026-09-15\",\"from\":null},[\"reserve-august-2026\",\"terms\",\"eea\"],[{\"id\":\"reserve-august-2026\",\"title\":\"Deloitte examination of August USDC reserves\",\"url\":\"https://6778953.fs1.hubspotusercontent-na1.net/hubfs/6778953/USDCAttestationReports/2026/2026%20USDC_Examination%20Report%20August%2026.pdf\",\"locator\":\"Accountants report p1; management assertion and circulation criteria p2\",\"documentDate\":\"2026-09-29\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"terms\",\"title\":\"USDC Terms (non-EEA)\",\"url\":\"https://www.circle.com/legal/usdc-terms\",\"documentDate\":\"2025-12-12\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:03:31Z\",\"locator\":\"Preamble; §§1–2, 8, 13, 17\"},{\"id\":\"eea\",\"title\":\"MiCA Redemption Policy\",\"url\":\"https://www.circle.com/legal/mica-redemption-policy\",\"documentDate\":\"2026-09-15\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:03:31Z\",\"locator\":\"§§2–5, 8\"}]]",
+            "note": "Deloitte examined reserve coverage at August 11 and 31, 2026. At August 31, assets were $73,398,532,613 against 73,320,757,305 USDC in defined circulation. The definition excludes specified unissued, access-denied and pending-burn tokens; this is dated assurance, not current live coverage."
           }
         },
         {
@@ -449,6 +464,30 @@
           ],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Independent reserve examination",
+          "scope": "Aggregate USDC reserve assets and explicitly defined circulation at two August dates",
+          "limit": "Does not establish current coverage, disputed holder title or insolvency ranking. Raw chain supply is not the report denominator.",
+          "sourceIds": [
+            "reserve-august-2026"
+          ],
+          "sourcePeriod": "2026-08-11 and 2026-08-31",
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Circle co-issuers → segregated bank accounts / Circle Reserve Fund → Mint or EEA retail redemption",
+          "limit": "Court treatment, competing liens and holder-specific insolvency recourse remain unresolved.",
+          "sourceIds": [
+            "terms",
+            "eea",
+            "reserve-august-2026"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -521,6 +560,15 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:03:31Z",
           "locator": "README: deployed token address; V2 repository migration"
+        },
+        {
+          "id": "transparency",
+          "title": "Paxos PAXG monthly attestation index",
+          "url": "https://www.paxos.com/paxg-transparency",
+          "locator": "Monthly report buttons; KPMG identified as examination provider since February 2025",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -729,6 +777,29 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Attestation publication index",
+          "scope": "Monthly PAXG report availability and named examination provider",
+          "limit": "Index was reviewed; the August report contents and exact liability reconciliation were not obtained in this pass. An index is not a reserve examination.",
+          "sourceIds": [
+            "transparency"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Paxos Trust → allocated gold custody and bar allocation → verified Paxos conversion",
+          "limit": "Custodian agreement, current independent gold/circulation reconciliation and independent recovery rights are missing.",
+          "sourceIds": [
+            "terms",
+            "transparency"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -1015,6 +1086,17 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "BVI fund → BNY Mellon custody → Securitize issuer books and transfer agency",
+          "limit": "Confidential offering memorandum, current class supplement, ordinary redemption limits and insolvency priority remain unavailable.",
+          "sourceIds": [
+            "ta"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -1274,6 +1356,17 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Registered fund → JPMorgan custody → transfer-agent-maintained blockchain-integrated records",
+          "limit": "Exact official Solana mint binding and deployed key governance remain unresolved. Prospectus record-correction authority is distinct from bearer title.",
+          "sourceIds": [
+            "prospectus"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -1569,6 +1662,18 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Current BVI issuer / legacy LLC vintage → Treasury/deposit exposure → legacy and Global Markets exit routes",
+          "limit": "Obtain issuance-specific agreement and migration binding before assigning legacy security-agent, guarantor or creditor-ranking protections.",
+          "sourceIds": [
+            "basics",
+            "notes"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -1837,6 +1942,18 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "BVI Securitize feeder → Apollo Diversified Credit Fund → underlying credit assets",
+          "limit": "Feeder memorandum, class terms and liquidity funding are missing; quarterly underlying repurchases are not the announced daily feeder route.",
+          "sourceIds": [
+            "formd",
+            "underlying"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -1923,6 +2040,15 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:03:31Z",
           "locator": "Regulated feeder access; secondary-market limitations"
+        },
+        {
+          "id": "rlusd-facility",
+          "title": "HLSCOPE VBILL/RLUSD liquidity announcement",
+          "url": "https://investors.securitize.io/news/news-details/2025/Hamilton-Lane-and-Securitizes-SCOPE-Gains-Instant-RLUSD-Liquidity-by-integrating-with-VBILLs-Onchain-Facility-11-05-2025/default.aspx",
+          "locator": "NAV oracle, HLSCOPE-held VBILL swap and RLUSD wallet payout",
+          "documentDate": "2025-11-05",
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -2114,6 +2240,30 @@
           "sourceIds": [],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Announced auxiliary liquidity facility",
+          "scope": "HLSCOPE redemption uses RedStone NAV and swaps VBILL positions for RLUSD",
+          "limit": "Announcement does not establish current facility capacity, binding redemption entitlement or LPA restrictions. It is separate from the underlying SCOPE fund monthly liquidity.",
+          "sourceIds": [
+            "rlusd-facility"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Delaware LP feeder / Securitize GP → Hamilton Lane SCOPE → private credit",
+          "limit": "Current LPA, PPM, feeder NAV rules and facility capacity remain missing. Alta / KAIO SCOPE wrappers are different instruments.",
+          "sourceIds": [
+            "formd",
+            "portfolio",
+            "rlusd-facility"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -2157,13 +2307,13 @@
       "instrument": {
         "id": "instrument:ustb",
         "legalForm": "Delaware statutory trust series / pooled investment fund interests (SEC Form D notice)",
-        "issuer": "USTB series of the trust; exact current series name from offering materials not independently verified",
+        "issuer": "Invesco Short Duration US Government Securities Fund, a series of a Delaware statutory trust (public product identification; trust instrument unreviewed)",
         "identity": "Current product page identifies USTB, CUSIP 86851T204; current private offering memorandum not reviewed",
         "scope": "Specific USTB fund interest only; current legal terms not obtained",
         "shareClass": "USTB",
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:37:01.290Z",
       "sources": [
         {
           "id": "site",
@@ -2182,6 +2332,24 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:39:40Z",
           "locator": "Issuer identity, pooled investment fund interests, exemption and filing date"
+        },
+        {
+          "id": "instruments",
+          "title": "Superstate instrument registry",
+          "url": "https://api.superstate.com/v2/instruments",
+          "locator": "USTB entry: fund identity, completed deployments, provider roles and risk disclosures",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "id": "current-docs",
+          "title": "Invesco USTB investor documentation",
+          "url": "https://docs.superstate.com/investors/tokenized-funds/available-funds/invesco-ustb",
+          "locator": "Subscribe, redeem, allowlisting, current fund name and gated documents",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -2311,9 +2479,10 @@
           "dimension": "exit",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "The page describes market-day USD or USDC subscriptions and redemptions, with USDC redemption routed through Circle; applicable fund documents were not reviewed.",
+          "summary": "Current investor docs describe immediate USDC payouts including non-business days, subject to available liquidity; USD requests received before 1pm ET are described as same-day. Protocol Redeem has dynamic limits and is when-available; fund documents remain gated.",
           "sourceIds": [
-            "site"
+            "current-docs",
+            "instruments"
           ],
           "scope": {
             "instrumentId": "instrument:ustb",
@@ -2323,11 +2492,11 @@
           },
           "id": "ustb:public-holder:exit",
           "display": {
-            "tone": "unknown",
-            "label": "Applicable fund exit terms not reviewed",
-            "reason": "The page describes market-day USD or USDC subscriptions and redemptions, with USDC redemption routed through Circle; applicable fund documents were not reviewed.",
-            "basis": "[\"exit\",\"supported\",\"source-statement\",\"The page describes market-day USD or USDC subscriptions and redemptions, with USDC redemption routed through Circle; applicable fund documents were not reviewed.\",{\"instrumentId\":\"instrument:ustb\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"site\"],[{\"id\":\"site\",\"title\":\"Invesco Short Duration US Government Securities Fund (USTB) product page\",\"url\":\"https://superstate.com/assets/ustb\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Product overview; fees; subscription and redemption; service providers\"}]]",
-            "note": "A market-day USD/USDC route is described, but the applicable fund documents were not reviewed."
+            "tone": "condition",
+            "label": "Instant USDC subject to liquidity",
+            "reason": "Current investor docs describe immediate USDC payouts including non-business days, subject to available liquidity; USD requests received before 1pm ET are described as same-day. Protocol Redeem has dynamic limits and is when-available; fund documents remain gated.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Current investor docs describe immediate USDC payouts including non-business days, subject to available liquidity; USD requests received before 1pm ET are described as same-day. Protocol Redeem has dynamic limits and is when-available; fund documents remain gated.\",{\"instrumentId\":\"instrument:ustb\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"current-docs\",\"instruments\"],[{\"id\":\"current-docs\",\"title\":\"Invesco USTB investor documentation\",\"url\":\"https://docs.superstate.com/investors/tokenized-funds/available-funds/invesco-ustb\",\"locator\":\"Subscribe, redeem, allowlisting, current fund name and gated documents\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"instruments\",\"title\":\"Superstate instrument registry\",\"url\":\"https://api.superstate.com/v2/instruments\",\"locator\":\"USTB entry: fund identity, completed deployments, provider roles and risk disclosures\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "Current investor docs describe immediate USDC payouts including non-business days, subject to available liquidity; USD requests received before 1pm ET are described as same-day. Protocol Redeem has dynamic limits and is when-available; fund documents remain gated."
           }
         },
         {
@@ -2354,7 +2523,40 @@
           }
         }
       ],
-      "deployments": [],
+      "deployments": [
+        {
+          "id": "ethereum:0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e",
+          "instrumentId": null,
+          "network": "Ethereum",
+          "address": "0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e",
+          "identity": "Official product address; exact offering/class binding remains unresolved",
+          "sourceIds": [
+            "instruments"
+          ],
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Live authorities and controller governance have not been checked in this legal review."
+          }
+        },
+        {
+          "id": "solana:CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2",
+          "instrumentId": null,
+          "network": "Solana",
+          "address": "CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2",
+          "identity": "Official product address; exact offering/class binding remains unresolved",
+          "sourceIds": [
+            "instruments"
+          ],
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Live authorities and controller governance have not been checked in this legal review."
+          }
+        }
+      ],
       "evidenceProfiles": [
         {
           "method": "Official product page and SEC Form D notice",
@@ -2367,6 +2569,30 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Official instrument registry and current investor docs",
+          "scope": "Invesco fund branding, BNY Mellon custody, NAV Fund Services valuation, Superstate Services transfer agency and published deployment identities",
+          "limit": "Registry issuer_entity_name is a platform entity field, not an independent determination of the fund obligor. Supply and NAV metadata do not verify Treasury custody or insolvency recourse.",
+          "sourceIds": [
+            "instruments",
+            "current-docs"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Delaware trust series → Invesco management / BNY Mellon custody → Superstate transfer agency and Circle USDC",
+          "limit": "Current PPM, trust instrument and subscription agreement remain gated; fast liquidity provider priority is not ordinary shareholder parity.",
+          "sourceIds": [
+            "instruments",
+            "current-docs"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -2375,8 +2601,8 @@
           "processor": "Superstate Services / Circle for USDC redemption as described by issuer",
           "onboarding": "Accredited investor and qualified purchaser; onboarding details not reviewed",
           "entitlementOnTransfer": "Not established by public page alone",
-          "settlement": "USD or USDC on market days, subject to cutoffs",
-          "minimumAndFees": "Product page states 0.15% management fee; governing documents not reviewed",
+          "settlement": "USDC immediate including non-business days subject to liquidity; USD same-day before 1pm ET; Protocol Redeem dynamic limits",
+          "minimumAndFees": "Initial $100,000 unless waived; stated 0.15% management fee; actual fund documents remain gated",
           "independentRoute": "Not established",
           "availability": "Issuer describes route; no redemption was tested."
         }
@@ -2679,6 +2905,18 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Hashnote Cayman fund → short-duration Treasury / reverse-repo portfolio → administrator register and Circle route",
+          "limit": "Fund constitutional and offering documents, current custody agreement and disputed-register rules remain missing.",
+          "sourceIds": [
+            "product",
+            "help"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -2771,6 +3009,15 @@
           "documentDate": null,
           "effectiveDate": null,
           "checkedAt": "2026-09-30T23:11:00Z"
+        },
+        {
+          "id": "continuity",
+          "title": "Anemoy business continuity notice",
+          "url": "https://www.anemoy.io/business-continuity",
+          "locator": "Alternate sites, backup/access channels and non-guarantee of plan",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -3104,6 +3351,29 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Issuer business continuity plan",
+          "scope": "Backup, remote operations and alternate account-access channels",
+          "limit": "Plan is subject to change and no guarantee of execution; the notice still refers to LTF. It does not establish insolvency priority, independent redemption or an outage recovery time.",
+          "sourceIds": [
+            "continuity"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "BVI fund share → Treasury portfolio → fund service providers and Centrifuge integration",
+          "limit": "Constitutional documents, custody terms, deployed control roles and independent recovery route are not established. Prima facie ownership evidence is not conclusive title.",
+          "sourceIds": [
+            "anemoy",
+            "continuity"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -3189,7 +3459,7 @@
         "shareClass": "TBILL",
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:47:16.217Z",
       "sources": [
         {
           "id": "intro",
@@ -3244,6 +3514,24 @@
           "documentDate": null,
           "effectiveDate": null,
           "checkedAt": "2026-09-30T23:11:00Z"
+        },
+        {
+          "id": "non-us-agreement",
+          "title": "OpenEden Non-US user agreement and TBILL terms",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af",
+          "locator": "Preamble and Schedule 1 sections 1.1–1.6, 2.3; incorporates separate PPM and subscription agreement",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:47:16.217Z"
+        },
+        {
+          "id": "us-agreement",
+          "title": "OpenEden US user agreement and TBILL terms",
+          "url": "https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c",
+          "locator": "Preamble and Schedule 1 sections 1.1–1.6; preamble names International whereas Schedule 1 names Institutional",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:47:16.217Z"
         }
       ],
       "contexts": [
@@ -3258,9 +3546,10 @@
           "dimension": "rights",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "OpenEden says TBILL tokens represent an economic interest with a proportional NAV redemption entitlement; offering documents were not reviewed.",
+          "summary": "Both linked agreements provide TBILL redemption under the incorporated PPM, which remains unreviewed. The Non-US agreement names Treasury Bills Institutional Liquidity Limited; the US preamble names International while its TBILL schedule names Institutional. The applicable issuer and offering must be resolved for an individual holder.",
           "sourceIds": [
-            "struct"
+            "non-us-agreement",
+            "us-agreement"
           ],
           "scope": {
             "instrumentId": "instrument:tbill",
@@ -3270,11 +3559,11 @@
           },
           "id": "tbill:public-holder:rights",
           "display": {
-            "tone": "unknown",
-            "label": "Investor terms not reviewed",
-            "reason": "OpenEden says TBILL tokens represent an economic interest with a proportional NAV redemption entitlement; offering documents were not reviewed.",
-            "basis": "[\"rights\",\"supported\",\"source-statement\",\"OpenEden says TBILL tokens represent an economic interest with a proportional NAV redemption entitlement; offering documents were not reviewed.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"struct\"],[{\"id\":\"struct\",\"title\":\"TBILL product structuring\",\"url\":\"https://docs.openeden.com/tbill/product-structuring\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Tokenized economic interest and redemption description\"}]]",
-            "note": "The issuer describes a fund interest, but the applicable offering or constitutional documents were not reviewed."
+            "tone": "condition",
+            "label": "PPM governs; US issuer naming conflicts",
+            "reason": "Both linked agreements provide TBILL redemption under the incorporated PPM, which remains unreviewed. The Non-US agreement names Treasury Bills Institutional Liquidity Limited; the US preamble names International while its TBILL schedule names Institutional. The applicable issuer and offering must be resolved for an individual holder.",
+            "note": "Both linked agreements provide TBILL redemption under the incorporated PPM, which remains unreviewed. The Non-US agreement names Treasury Bills Institutional Liquidity Limited; the US preamble names International while its TBILL schedule names Institutional. The applicable issuer and offering must be resolved for an individual holder.",
+            "basis": "[\"rights\",\"supported\",\"source-statement\",\"Both linked agreements provide TBILL redemption under the incorporated PPM, which remains unreviewed. The Non-US agreement names Treasury Bills Institutional Liquidity Limited; the US preamble names International while its TBILL schedule names Institutional. The applicable issuer and offering must be resolved for an individual holder.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"non-us-agreement\",\"us-agreement\"],[{\"id\":\"non-us-agreement\",\"title\":\"OpenEden Non-US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6, 2.3; incorporates separate PPM and subscription agreement\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"},{\"id\":\"us-agreement\",\"title\":\"OpenEden US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6; preamble names International whereas Schedule 1 names Institutional\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"}]]"
           }
         },
         {
@@ -3351,10 +3640,10 @@
           "dimension": "access",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Issuer FAQ restricts access to accredited or professional investors following onboarding and whitelisting.",
+          "summary": "Linked TBILL terms require onboarding, KYC, whitelisted wallets and an initial $100,000 subscription. Transfers are limited to whitelisted wallets and remain subject to the PPM; US and Non-US agreements incorporate different offering documents.",
           "sourceIds": [
-            "faq",
-            "redemptions"
+            "non-us-agreement",
+            "us-agreement"
           ],
           "scope": {
             "instrumentId": "instrument:tbill",
@@ -3365,20 +3654,20 @@
           "id": "tbill:public-holder:access",
           "display": {
             "tone": "condition",
-            "label": "Accredited/professional investors; approval required",
-            "reason": "Issuer FAQ restricts access to accredited or professional investors following onboarding and whitelisting.",
-            "basis": "[\"access\",\"supported\",\"source-statement\",\"Issuer FAQ restricts access to accredited or professional investors following onboarding and whitelisting.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"faq\",\"redemptions\"],[{\"id\":\"faq\",\"title\":\"TBILL FAQ\",\"url\":\"https://docs.openeden.com/tbill/faq\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Eligibility, minimums, fees and operational details\"},{\"id\":\"redemptions\",\"title\":\"TBILL redemptions\",\"url\":\"https://docs.openeden.com/tbill/redemptions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"FIFO redemption queue, token burn and settlement\"}]]",
-            "note": "Investors must complete onboarding and wallet whitelisting."
+            "label": "KYC, allowlist and $100,000 minimum",
+            "reason": "Linked TBILL terms require onboarding, KYC, whitelisted wallets and an initial $100,000 subscription. Transfers are limited to whitelisted wallets and remain subject to the PPM; US and Non-US agreements incorporate different offering documents.",
+            "note": "Linked TBILL terms require onboarding, KYC, whitelisted wallets and an initial $100,000 subscription. Transfers are limited to whitelisted wallets and remain subject to the PPM; US and Non-US agreements incorporate different offering documents.",
+            "basis": "[\"access\",\"supported\",\"source-statement\",\"Linked TBILL terms require onboarding, KYC, whitelisted wallets and an initial $100,000 subscription. Transfers are limited to whitelisted wallets and remain subject to the PPM; US and Non-US agreements incorporate different offering documents.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"non-us-agreement\",\"us-agreement\"],[{\"id\":\"non-us-agreement\",\"title\":\"OpenEden Non-US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6, 2.3; incorporates separate PPM and subscription agreement\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"},{\"id\":\"us-agreement\",\"title\":\"OpenEden US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6; preamble names International whereas Schedule 1 names Institutional\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"}]]"
           }
         },
         {
           "dimension": "exit",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Issuer describes FIFO redemptions, typically processed the next US business day, less fees, subject to queue and whitelisted address.",
+          "summary": "Both linked TBILL schedules allow normal redemption up to T+3 US business days. Instant USDC redemption is experimental, chain-dependent and liquidity-limited; excess requests enter the normal queue. Applicable PPM restrictions remain unreviewed.",
           "sourceIds": [
-            "redemptions",
-            "faq"
+            "non-us-agreement",
+            "us-agreement"
           ],
           "scope": {
             "instrumentId": "instrument:tbill",
@@ -3389,10 +3678,10 @@
           "id": "tbill:public-holder:exit",
           "display": {
             "tone": "condition",
-            "label": "Redemption queue, fees and wallet approval",
-            "reason": "Issuer describes FIFO redemptions, typically processed the next US business day, less fees, subject to queue and whitelisted address.",
-            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Issuer describes FIFO redemptions, typically processed the next US business day, less fees, subject to queue and whitelisted address.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"redemptions\",\"faq\"],[{\"id\":\"redemptions\",\"title\":\"TBILL redemptions\",\"url\":\"https://docs.openeden.com/tbill/redemptions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"FIFO redemption queue, token burn and settlement\"},{\"id\":\"faq\",\"title\":\"TBILL FAQ\",\"url\":\"https://docs.openeden.com/tbill/faq\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Eligibility, minimums, fees and operational details\"}]]",
-            "note": "Requests are processed FIFO, typically next US business day, subject to fees and a whitelisted address."
+            "label": "Up to T+3; instant route limited",
+            "reason": "Both linked TBILL schedules allow normal redemption up to T+3 US business days. Instant USDC redemption is experimental, chain-dependent and liquidity-limited; excess requests enter the normal queue. Applicable PPM restrictions remain unreviewed.",
+            "note": "Both linked TBILL schedules allow normal redemption up to T+3 US business days. Instant USDC redemption is experimental, chain-dependent and liquidity-limited; excess requests enter the normal queue. Applicable PPM restrictions remain unreviewed.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Both linked TBILL schedules allow normal redemption up to T+3 US business days. Instant USDC redemption is experimental, chain-dependent and liquidity-limited; excess requests enter the normal queue. Applicable PPM restrictions remain unreviewed.\",{\"instrumentId\":\"instrument:tbill\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"non-us-agreement\",\"us-agreement\"],[{\"id\":\"non-us-agreement\",\"title\":\"OpenEden Non-US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2F2utWdyUynvlAJlEfLXbj%2FNON-US-User-Agreement.pdf?alt=media&token=01dacb6a-c5f0-4168-876d-27de6f4294af\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6, 2.3; incorporates separate PPM and subscription agreement\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"},{\"id\":\"us-agreement\",\"title\":\"OpenEden US user agreement and TBILL terms\",\"url\":\"https://1846699559-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FNjlMezbFeyn4pWdMN4xV%2Fuploads%2FmJjZrtF4wnT492qY1adh%2FUS-TBILL-User-Agreement.pdf?alt=media&token=8944d511-e50a-4bd8-b3c3-a26d5bb62e3c\",\"locator\":\"Preamble and Schedule 1 sections 1.1–1.6; preamble names International whereas Schedule 1 names Institutional\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:47:16.217Z\"}]]"
           }
         },
         {
@@ -3452,6 +3741,33 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "TBILL fund interest → licensed custody/brokerage → allowlisted vault and redemption queue",
+          "limit": "Full PPM, exact issuance binding, independent custody evidence and current controller governance remain unverified. US-linked agreement also contains inconsistent issuer names.",
+          "sourceIds": [
+            "struct",
+            "controls",
+            "redemptions",
+            "non-us-agreement",
+            "us-agreement"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Linked US and Non-US platform agreements and TBILL schedules",
+          "scope": "Subscription, allowlisted transfers, PPM-dependent rights and normal/experimental redemption",
+          "limit": "Full PPM and subscription agreements remain missing. US agreement uses inconsistent issuer names; do not assign one offering to all wallets. Neither document establishes independent custody or insolvency recourse.",
+          "sourceIds": [
+            "non-us-agreement",
+            "us-agreement"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:47:16.217Z"
         }
       ],
       "exitDetails": {
@@ -3460,7 +3776,7 @@
           "processor": "TBILL Vault / issuer workflow",
           "onboarding": "Accredited or professional investor KYC and whitelisted wallet",
           "entitlementOnTransfer": "Token is described as proportional economic interest; full governing terms not reviewed",
-          "settlement": "USDC via FIFO queue, typically next US business day",
+          "settlement": "Normal up to T+3 US business days; experimental atomic USDC route on selected chains subject to liquidity; excess requests queue",
           "minimumAndFees": "FAQ states $100,000 first deposit, $1 subsequent and 5bp redemption fee; docs state 30bp annual TER",
           "independentRoute": "Not established",
           "availability": "Issuer-documented queue only; no redemption tested."
@@ -3494,13 +3810,13 @@
       "instrument": {
         "id": "instrument:ustbl",
         "legalForm": "Share class of a French SICAV money-market fund (as named in Spiko docs)",
-        "issuer": "Spiko SICAV – Spiko US T-Bills Money Market Fund (beneficiary naming in official dealing documentation)",
+        "issuer": "Spiko SICAV – Spiko US T-Bills Money Market Fund",
         "identity": "USTBL is treated as share class, not separate feeder, based on Spiko dealing docs",
         "scope": "USTBL share class only; do not extend class-specific mechanics to other Spiko funds",
-        "shareClass": "USTBL",
+        "shareClass": "USD accumulating share; ISIN FR001400ODM9 (EUR class has a different ISIN)",
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:47:16.217Z",
       "sources": [
         {
           "id": "account",
@@ -3528,187 +3844,251 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:39:40Z",
           "locator": "Initial product structure and fund/share registry statements"
+        },
+        {
+          "id": "prospectus",
+          "title": "Spiko SICAV prospectus and articles",
+          "url": "https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf",
+          "locator": "pp5,8–10,12,21–24; Articles liquidation p79",
+          "documentDate": "2026-09-01",
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "id": "transfers",
+          "title": "Spiko share transfers",
+          "url": "https://docs.spiko.io/documentation/tokenization/transfers/",
+          "locator": "Allowlisted wallets and legal effect of secondary transfers",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "id": "addresses",
+          "title": "Spiko addresses and audits",
+          "url": "https://docs.spiko.io/documentation/tokenization/addresses/",
+          "locator": "USTBL row, permission manager and audit listings",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "id": "contract",
+          "title": "Spiko published EVM token implementation",
+          "url": "https://github.com/spiko-tech/contracts/blob/main/contracts/token/Token.sol",
+          "locator": "restricted mint/burn, pause, ownership reset and UUPS upgrade authorization",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "id": "nav",
+          "title": "Spiko NAV data feed",
+          "url": "https://docs.spiko.io/documentation/tokenization/nav",
+          "locator": "Official NAV definition and published oracle/provider tables",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
         {
           "id": "public-holder",
           "label": "Shareholder using Spiko published dealing workflow",
-          "termsId": "public-source-snapshot-2026-09-30"
+          "termsId": "spiko-prospectus-2026-09-01"
         }
       ],
       "claims": [
         {
           "dimension": "rights",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Official materials identify USTBL as a share class of a named money-market fund, but current constitutive and subscription documents were not reviewed.",
+          "summary": "The prospectus provides proportionate fund-asset ownership and one vote per share in the French UCITS SICAV. USTBL identifies the US T-bills sub-fund; USD and EUR classes must be distinguished.",
           "sourceIds": [
-            "lifecycle"
+            "prospectus"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:rights",
           "display": {
-            "tone": "unknown",
-            "label": "Legal claim not verified",
-            "reason": "Official materials identify USTBL as a share class of a named money-market fund, but current constitutive and subscription documents were not reviewed.",
-            "basis": "[\"rights\",\"unknown\",\"analysis\",\"Official materials identify USTBL as a share class of a named money-market fund, but current constitutive and subscription documents were not reviewed.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"lifecycle\"],[{\"id\":\"lifecycle\",\"title\":\"Spiko distributor API: order lifecycle\",\"url\":\"https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Share-class dealing and order timing; USTBL-specific passages\"}]]",
-            "note": "Official materials identify USTBL as a share class of a named money-market fund, but current constitutive and subscription documents were not reviewed."
+            "tone": "strength",
+            "label": "Fund share rights defined",
+            "reason": "The prospectus provides proportionate fund-asset ownership and one vote per share in the French UCITS SICAV. USTBL identifies the US T-bills sub-fund; USD and EUR classes must be distinguished.",
+            "basis": "[\"rights\",\"supported\",\"analysis\",\"The prospectus provides proportionate fund-asset ownership and one vote per share in the French UCITS SICAV. USTBL identifies the US T-bills sub-fund; USD and EUR classes must be distinguished.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]"
           }
         },
         {
           "dimension": "ledger",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Historical launch material describes tokenized share registration; current register precedence and legal effect were not established from reviewed current terms.",
+          "summary": "Spiko Finance maintains the shareholder register using public DLT; shares are registered on the designated chain rather than Euroclear France. Transfers between validated wallets transfer fund-share ownership. Disputed-record resolution was not independently tested.",
           "sourceIds": [
-            "launch"
+            "prospectus",
+            "transfers"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:ledger",
           "display": {
-            "tone": "unknown",
-            "label": "Which record prevails is unclear",
-            "reason": "Historical launch material describes tokenized share registration; current register precedence and legal effect were not established from reviewed current terms.",
-            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"Historical launch material describes tokenized share registration; current register precedence and legal effect were not established from reviewed current terms.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"launch\"],[{\"id\":\"launch\",\"title\":\"Spiko launch announcement\",\"url\":\"https://www.spiko.io/blog/spiko-launches-the-worlds-first-tokenized-money-market-funds\",\"documentDate\":\"2023-09-26\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Initial product structure and fund/share registry statements\"}]]",
-            "note": "Historical launch material describes tokenized share registration; current register precedence and legal effect were not established from reviewed current terms."
+            "tone": "strength",
+            "label": "DLT is the share register",
+            "reason": "Spiko Finance maintains the shareholder register using public DLT; shares are registered on the designated chain rather than Euroclear France. Transfers between validated wallets transfer fund-share ownership. Disputed-record resolution was not independently tested.",
+            "basis": "[\"ledger\",\"supported\",\"analysis\",\"Spiko Finance maintains the shareholder register using public DLT; shares are registered on the designated chain rather than Euroclear France. Transfers between validated wallets transfer fund-share ownership. Disputed-record resolution was not independently tested.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\",\"transfers\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"transfers\",\"title\":\"Spiko share transfers\",\"url\":\"https://docs.spiko.io/documentation/tokenization/transfers/\",\"locator\":\"Allowlisted wallets and legal effect of secondary transfers\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]"
           }
         },
         {
           "dimension": "backing",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "The product is described as a US T-bill money-market fund; current holdings were not independently verified.",
+          "summary": "The September 2026 prospectus defines a short-term US Treasury money-market strategy and names CACEIS as independent depositary. The investment mandate does not establish current holdings or coverage against outstanding shares.",
           "sourceIds": [
-            "lifecycle"
+            "prospectus"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:backing",
           "display": {
-            "tone": "unknown",
-            "label": "Current holdings not checked",
-            "reason": "The product is described as a US T-bill money-market fund; current holdings were not independently verified.",
-            "basis": "[\"backing\",\"supported\",\"source-statement\",\"The product is described as a US T-bill money-market fund; current holdings were not independently verified.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"lifecycle\"],[{\"id\":\"lifecycle\",\"title\":\"Spiko distributor API: order lifecycle\",\"url\":\"https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Share-class dealing and order timing; USTBL-specific passages\"}]]",
-            "note": "The issuer describes the portfolio, but this review did not independently verify current holdings."
+            "tone": "condition",
+            "label": "Treasury mandate; current holdings unchecked",
+            "reason": "The September 2026 prospectus defines a short-term US Treasury money-market strategy and names CACEIS as independent depositary. The investment mandate does not establish current holdings or coverage against outstanding shares.",
+            "note": "The September 2026 prospectus defines a short-term US Treasury money-market strategy and names CACEIS as independent depositary. The investment mandate does not establish current holdings or coverage against outstanding shares.",
+            "basis": "[\"backing\",\"supported\",\"source-statement\",\"The September 2026 prospectus defines a short-term US Treasury money-market strategy and names CACEIS as independent depositary. The investment mandate does not establish current holdings or coverage against outstanding shares.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]"
           }
         },
         {
           "dimension": "controls",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Current USTBL-specific transfer, freeze and register-control provisions were not established in reviewed public docs.",
+          "summary": "Holding and transfers require allowlisting. The published EVM token permits permission-controlled mint, burn, pause, ownership reset and upgrades. Current deployed permissions, signers and thresholds have not been verified.",
           "sourceIds": [
-            "account",
-            "lifecycle"
+            "prospectus",
+            "contract",
+            "addresses"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:controls",
           "display": {
-            "tone": "unknown",
-            "label": "Administrator powers not verified",
-            "reason": "Current USTBL-specific transfer, freeze and register-control provisions were not established in reviewed public docs.",
-            "basis": "[\"controls\",\"unknown\",\"analysis\",\"Current USTBL-specific transfer, freeze and register-control provisions were not established in reviewed public docs.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"account\",\"lifecycle\"],[{\"id\":\"account\",\"title\":\"Spiko deposits and withdrawals\",\"url\":\"https://docs.spiko.io/documentation/account_management/deposits_withdrawals/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Bank-account-holder matching and fiat funding/withdrawal rules\"},{\"id\":\"lifecycle\",\"title\":\"Spiko distributor API: order lifecycle\",\"url\":\"https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Share-class dealing and order timing; USTBL-specific passages\"}]]",
-            "note": "Current USTBL-specific transfer, freeze and register-control provisions were not established in reviewed public docs."
+            "tone": "condition",
+            "label": "Allowlist and administrator powers",
+            "reason": "Holding and transfers require allowlisting. The published EVM token permits permission-controlled mint, burn, pause, ownership reset and upgrades. Current deployed permissions, signers and thresholds have not been verified.",
+            "basis": "[\"controls\",\"supported\",\"analysis\",\"Holding and transfers require allowlisting. The published EVM token permits permission-controlled mint, burn, pause, ownership reset and upgrades. Current deployed permissions, signers and thresholds have not been verified.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\",\"contract\",\"addresses\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"contract\",\"title\":\"Spiko published EVM token implementation\",\"url\":\"https://github.com/spiko-tech/contracts/blob/main/contracts/token/Token.sol\",\"locator\":\"restricted mint/burn, pause, ownership reset and UUPS upgrade authorization\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"addresses\",\"title\":\"Spiko addresses and audits\",\"url\":\"https://docs.spiko.io/documentation/tokenization/addresses/\",\"locator\":\"USTBL row, permission manager and audit listings\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "Holding and transfers require allowlisting. The published EVM token permits permission-controlled mint, burn, pause, ownership reset and upgrades. Current deployed permissions, signers and thresholds have not been verified."
           }
         },
         {
           "dimension": "access",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Spiko docs require matching investor and bank-account identity for funding/withdrawal; full current investor eligibility rules were not reviewed.",
+          "summary": "Validated wallets and investor onboarding apply; US persons are excluded by the USTBL prospectus. USD and EUR share classes have separate currency and ISIN definitions.",
           "sourceIds": [
-            "account"
+            "prospectus",
+            "transfers"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:access",
           "display": {
             "tone": "condition",
-            "label": "Investor and bank identity must match",
-            "reason": "Spiko docs require matching investor and bank-account identity for funding/withdrawal; full current investor eligibility rules were not reviewed.",
-            "basis": "[\"access\",\"supported\",\"source-statement\",\"Spiko docs require matching investor and bank-account identity for funding/withdrawal; full current investor eligibility rules were not reviewed.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"account\"],[{\"id\":\"account\",\"title\":\"Spiko deposits and withdrawals\",\"url\":\"https://docs.spiko.io/documentation/account_management/deposits_withdrawals/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Bank-account-holder matching and fiat funding/withdrawal rules\"}]]",
-            "note": "Funding and withdrawals require matching identities; full current eligibility rules were not reviewed."
+            "label": "Approval required; US persons excluded",
+            "reason": "Validated wallets and investor onboarding apply; US persons are excluded by the USTBL prospectus. USD and EUR share classes have separate currency and ISIN definitions.",
+            "basis": "[\"access\",\"supported\",\"source-statement\",\"Validated wallets and investor onboarding apply; US persons are excluded by the USTBL prospectus. USD and EUR share classes have separate currency and ISIN definitions.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\",\"transfers\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"transfers\",\"title\":\"Spiko share transfers\",\"url\":\"https://docs.spiko.io/documentation/tokenization/transfers/\",\"locator\":\"Allowlisted wallets and legal effect of secondary transfers\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "Validated wallets and investor onboarding apply; US persons are excluded by the USTBL prospectus. USD and EUR share classes have separate currency and ISIN definitions."
           }
         },
         {
           "dimension": "exit",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Official workflow describes business-day subscriptions and redemptions for the USTBL class; timing and NAV details depend on the order lifecycle.",
+          "summary": "Orders clear by 11:30 Paris time on eligible business days at the next NAV. Stablecoin settlement may be refused or suspended in favour of bank transfer. A 10% net-redemption threshold can trigger gates; deferred orders are irrevocable.",
           "sourceIds": [
-            "lifecycle",
-            "account"
+            "prospectus",
+            "lifecycle"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:exit",
           "display": {
             "tone": "condition",
-            "label": "Fund redemptions use business days",
-            "reason": "Official workflow describes business-day subscriptions and redemptions for the USTBL class; timing and NAV details depend on the order lifecycle.",
-            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Official workflow describes business-day subscriptions and redemptions for the USTBL class; timing and NAV details depend on the order lifecycle.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"lifecycle\",\"account\"],[{\"id\":\"lifecycle\",\"title\":\"Spiko distributor API: order lifecycle\",\"url\":\"https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Share-class dealing and order timing; USTBL-specific passages\"},{\"id\":\"account\",\"title\":\"Spiko deposits and withdrawals\",\"url\":\"https://docs.spiko.io/documentation/account_management/deposits_withdrawals/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Bank-account-holder matching and fiat funding/withdrawal rules\"}]]",
-            "note": "Settlement timing and NAV depend on the order lifecycle."
+            "label": "Business-day dealing; gates possible",
+            "reason": "Orders clear by 11:30 Paris time on eligible business days at the next NAV. Stablecoin settlement may be refused or suspended in favour of bank transfer. A 10% net-redemption threshold can trigger gates; deferred orders are irrevocable.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Orders clear by 11:30 Paris time on eligible business days at the next NAV. Stablecoin settlement may be refused or suspended in favour of bank transfer. A 10% net-redemption threshold can trigger gates; deferred orders are irrevocable.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\",\"lifecycle\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"lifecycle\",\"title\":\"Spiko distributor API: order lifecycle\",\"url\":\"https://docs.spiko.io/embedded/distributor_api_recipes/order_lifecycle/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Share-class dealing and order timing; USTBL-specific passages\"}]]",
+            "note": "Orders clear by 11:30 Paris time on eligible business days at the next NAV. Stablecoin settlement may be refused or suspended in favour of bank transfer. A 10% net-redemption threshold can trigger gates; deferred orders are irrevocable."
           }
         },
         {
           "dimension": "failure",
           "state": "unknown",
           "basis": "analysis",
-          "summary": "Reviewed public materials do not establish shareholder recovery priority in a fund, depositary or tokenization-provider insolvency.",
+          "summary": "CACEIS Bank is the independent depositary/custodian and the articles describe liquidation, but recovery priority, depositary-loss remedies and continuity without Spiko have not been established for this holder.",
           "sourceIds": [
-            "launch"
+            "prospectus"
           ],
           "scope": {
             "instrumentId": "instrument:ustbl",
             "contextId": "public-holder",
-            "termsId": "public-source-snapshot-2026-09-30",
+            "termsId": "spiko-prospectus-2026-09-01",
             "from": null
           },
           "id": "ustbl:public-holder:failure",
           "display": {
             "tone": "unknown",
-            "label": "Recovery rights not verified",
-            "reason": "Reviewed public materials do not establish shareholder recovery priority in a fund, depositary or tokenization-provider insolvency.",
-            "basis": "[\"failure\",\"unknown\",\"analysis\",\"Reviewed public materials do not establish shareholder recovery priority in a fund, depositary or tokenization-provider insolvency.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"launch\"],[{\"id\":\"launch\",\"title\":\"Spiko launch announcement\",\"url\":\"https://www.spiko.io/blog/spiko-launches-the-worlds-first-tokenized-money-market-funds\",\"documentDate\":\"2023-09-26\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Initial product structure and fund/share registry statements\"}]]",
-            "note": "Reviewed public materials do not establish shareholder recovery priority in a fund, depositary or tokenization-provider insolvency."
+            "label": "Independent custody; recovery unverified",
+            "reason": "CACEIS Bank is the independent depositary/custodian and the articles describe liquidation, but recovery priority, depositary-loss remedies and continuity without Spiko have not been established for this holder.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"CACEIS Bank is the independent depositary/custodian and the articles describe liquidation, but recovery priority, depositary-loss remedies and continuity without Spiko have not been established for this holder.\",{\"instrumentId\":\"instrument:ustbl\",\"contextId\":\"public-holder\",\"termsId\":\"spiko-prospectus-2026-09-01\",\"from\":null},[\"prospectus\"],[{\"id\":\"prospectus\",\"title\":\"Spiko SICAV prospectus and articles\",\"url\":\"https://cdn.spiko.finance/legal_docs/EN/Prospectus_Spiko_SICAV_EN.pdf\",\"locator\":\"pp5,8–10,12,21–24; Articles liquidation p79\",\"documentDate\":\"2026-09-01\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "CACEIS Bank is the independent depositary/custodian and the articles describe liquidation, but recovery priority, depositary-loss remedies and continuity without Spiko have not been established for this holder."
           }
         }
       ],
-      "deployments": [],
+      "deployments": [
+        {
+          "id": "ethereum:0xe4880249745eAc5F1eD9d8F7DF844792D560e750",
+          "instrumentId": "instrument:ustbl",
+          "network": "Ethereum",
+          "address": "0xe4880249745eAc5F1eD9d8F7DF844792D560e750",
+          "identity": "USTBL USD class address in prospectus and official deployment table",
+          "sourceIds": [
+            "addresses",
+            "prospectus"
+          ],
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Live authorities and controller governance have not been checked in this legal review."
+          }
+        }
+      ],
       "evidenceProfiles": [
         {
           "method": "Official Spiko help and dealing documentation",
           "scope": "Instrument naming, account and class-level order workflow",
           "availability": "reviewed",
-          "limit": "Current prospectus, statutes and depositary documents not reviewed; launch article is historical and not relied on for current terms.",
+          "limit": "Historical launch material remains separate from the current prospectus reviewed below.",
           "sourceIds": [
             "account",
             "lifecycle",
@@ -3716,18 +4096,43 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Current fund prospectus and register documentation",
+          "scope": "Share rights, named independent custody, DLT register, USD class, eligibility and redemption gates",
+          "limit": "Published contract code is not proof of deployed key governance. Prospectus protections do not guarantee loss-free recovery.",
+          "sourceIds": [
+            "prospectus",
+            "transfers",
+            "contract"
+          ],
+          "sourcePeriod": "2026-09-01",
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "French SICAV sub-fund → CACEIS depositary / administrator → Spiko Finance DLT register and order clearing",
+          "limit": "Deposit-loss remedies, contested register resolution, deployed permissions and outage access need additional evidence.",
+          "sourceIds": [
+            "prospectus",
+            "contract"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
         "public-holder": {
-          "obligor": "SICAV/fund under governing documents; not reviewed",
-          "processor": "Spiko dealing workflow and fund service providers",
-          "onboarding": "Investor identity and matching bank-account checks described; other eligibility details not established",
-          "entitlementOnTransfer": "Current class-specific register terms were not reviewed",
-          "settlement": "Fiat bank-account dealing on business days; current USTBL order timetable needs governing fund documents",
-          "minimumAndFees": "Current fees/minimum not established from reviewed sources",
-          "independentRoute": "Not established",
-          "availability": "Official workflow described; no dealing request or redemption tested."
+          "obligor": "Spiko SICAV, US T-Bills sub-fund, under prospectus",
+          "processor": "Spiko Finance clears orders; CACEIS Bank custody; CACEIS Fund Administration accounting",
+          "onboarding": "Investor onboarding and allowlisted wallet; not US persons",
+          "entitlementOnTransfer": "DLT registered fund shares; transfers between approved wallets transfer ownership",
+          "settlement": "11:30 Paris cutoff; next NAV on eligible business day; bank transfer or eligible currency-matched stablecoins, subject to refusal/delay",
+          "minimumAndFees": "USD class initial/subsequent minimum $1; no prospectus subscription/redemption commission; investor bears chain costs",
+          "independentRoute": "Not established without transfer agent / management company",
+          "availability": "Documented dealing terms; no completed redemption observed. Gates may defer irrevocable requests."
         }
       },
       "assetModule": {
@@ -3764,7 +4169,7 @@
         "shareClass": "WTGXX",
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:37:01.290Z",
       "sources": [
         {
           "id": "product",
@@ -3792,6 +4197,15 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:39:40Z",
           "locator": "WT Connect secondary liquidity feature"
+        },
+        {
+          "id": "faq",
+          "title": "WisdomTree WTGXX fund FAQ",
+          "url": "https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/",
+          "locator": "pp1,3–6: fund structure, access, wallet transfers and primary/secondary liquidity; current prospectus still required",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -3874,11 +4288,11 @@
         },
         {
           "dimension": "controls",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Current fund share transfer restrictions and token control powers were not verified from the linked prospectus.",
+          "summary": "FAQ describes self-custody and transfers between verified, whitelisted wallets. Deployed administrators and legal register-correction provisions require contract checks and the current prospectus.",
           "sourceIds": [
-            "regulatory"
+            "faq"
           ],
           "scope": {
             "instrumentId": "instrument:wtgxx",
@@ -3888,20 +4302,20 @@
           },
           "id": "wtgxx:public-holder:controls",
           "display": {
-            "tone": "unknown",
-            "label": "Administrator powers not verified",
-            "reason": "Current fund share transfer restrictions and token control powers were not verified from the linked prospectus.",
-            "basis": "[\"controls\",\"unknown\",\"analysis\",\"Current fund share transfer restrictions and token control powers were not verified from the linked prospectus.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"regulatory\"],[{\"id\":\"regulatory\",\"title\":\"WisdomTree Prime prospectus and regulatory information\",\"url\":\"https://www.wisdomtreeprime.com/prospectus-and-regulatory-information/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Official prospectus access page; linked fund document not reviewed in this pass\"}]]",
-            "note": "Current fund share transfer restrictions and token control powers were not verified from the linked prospectus."
+            "tone": "condition",
+            "label": "Transfers require verified wallets",
+            "reason": "FAQ describes self-custody and transfers between verified, whitelisted wallets. Deployed administrators and legal register-correction provisions require contract checks and the current prospectus.",
+            "basis": "[\"controls\",\"supported\",\"analysis\",\"FAQ describes self-custody and transfers between verified, whitelisted wallets. Deployed administrators and legal register-correction provisions require contract checks and the current prospectus.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"faq\"],[{\"id\":\"faq\",\"title\":\"WisdomTree WTGXX fund FAQ\",\"url\":\"https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/\",\"locator\":\"pp1,3–6: fund structure, access, wallet transfers and primary/secondary liquidity; current prospectus still required\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "FAQ describes self-custody and transfers between verified, whitelisted wallets. Deployed administrators and legal register-correction provisions require contract checks and the current prospectus."
           }
         },
         {
           "dimension": "access",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "WisdomTree provides the digital-fund product through its Connect platform; investor eligibility and transfer conditions need the current prospectus/platform terms.",
+          "summary": "FAQ distinguishes US retail Prime accounts from institutional Connect onboarding; wallet self-custody remains permissioned. Stablecoins use a conversion service rather than direct stablecoin fund subscriptions.",
           "sourceIds": [
-            "product"
+            "faq"
           ],
           "scope": {
             "instrumentId": "instrument:wtgxx",
@@ -3911,19 +4325,20 @@
           },
           "id": "wtgxx:public-holder:access",
           "display": {
-            "tone": "unknown",
-            "label": "Current access rules not reviewed",
-            "reason": "WisdomTree provides the digital-fund product through its Connect platform; investor eligibility and transfer conditions need the current prospectus/platform terms.",
-            "basis": "[\"access\",\"supported\",\"source-statement\",\"WisdomTree provides the digital-fund product through its Connect platform; investor eligibility and transfer conditions need the current prospectus/platform terms.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"product\"],[{\"id\":\"product\",\"title\":\"WisdomTree Treasury Money Market Digital Fund (WTGXX)\",\"url\":\"https://www.wisdomtreeprime.com/digital-funds/wtgxx\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"Product overview, objective and current name\"}]]",
-            "note": "Connect platform access is described, but current investor and transfer terms were not reviewed."
+            "tone": "condition",
+            "label": "Verified investors and conversion service",
+            "reason": "FAQ distinguishes US retail Prime accounts from institutional Connect onboarding; wallet self-custody remains permissioned. Stablecoins use a conversion service rather than direct stablecoin fund subscriptions.",
+            "basis": "[\"access\",\"supported\",\"source-statement\",\"FAQ distinguishes US retail Prime accounts from institutional Connect onboarding; wallet self-custody remains permissioned. Stablecoins use a conversion service rather than direct stablecoin fund subscriptions.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"faq\"],[{\"id\":\"faq\",\"title\":\"WisdomTree WTGXX fund FAQ\",\"url\":\"https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/\",\"locator\":\"pp1,3–6: fund structure, access, wallet transfers and primary/secondary liquidity; current prospectus still required\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"}]]",
+            "note": "FAQ distinguishes US retail Prime accounts from institutional Connect onboarding; wallet self-custody remains permissioned. Stablecoins use a conversion service rather than direct stablecoin fund subscriptions."
           }
         },
         {
           "dimension": "exit",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "WisdomTree describes a Connect Instant Liquidity secondary-trading feature with 0 bps commission; this is a platform liquidity facility, not evidence of direct fund redemption.",
+          "summary": "FAQ describes primary dealing at daily 4pm ET NAV, 3:30pm funding cutoff and eligible-business-day T+0 settlement. Dealer secondary trading is available 24/7 only while inventory lasts; depleted inventory pauses that route. These public statements do not replace the current prospectus.",
           "sourceIds": [
+            "faq",
             "liquidity"
           ],
           "scope": {
@@ -3935,10 +4350,10 @@
           "id": "wtgxx:public-holder:exit",
           "display": {
             "tone": "condition",
-            "label": "Instant liquidity is resale, not fund redemption",
-            "reason": "WisdomTree describes a Connect Instant Liquidity secondary-trading feature with 0 bps commission; this is a platform liquidity facility, not evidence of direct fund redemption.",
-            "basis": "[\"exit\",\"supported\",\"source-statement\",\"WisdomTree describes a Connect Instant Liquidity secondary-trading feature with 0 bps commission; this is a platform liquidity facility, not evidence of direct fund redemption.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"liquidity\"],[{\"id\":\"liquidity\",\"title\":\"WisdomTree: commission-free liquidity\",\"url\":\"https://www.wisdomtreeprime.com/blog/commission-free-liquidity/\",\"documentDate\":\"2026-06-17\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"WT Connect secondary liquidity feature\"}]]",
-            "note": "The Connect secondary-trading facility does not establish a direct redemption right against the fund."
+            "label": "Fund dealing daily; dealer liquidity limited",
+            "reason": "FAQ describes primary dealing at daily 4pm ET NAV, 3:30pm funding cutoff and eligible-business-day T+0 settlement. Dealer secondary trading is available 24/7 only while inventory lasts; depleted inventory pauses that route. These public statements do not replace the current prospectus.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"FAQ describes primary dealing at daily 4pm ET NAV, 3:30pm funding cutoff and eligible-business-day T+0 settlement. Dealer secondary trading is available 24/7 only while inventory lasts; depleted inventory pauses that route. These public statements do not replace the current prospectus.\",{\"instrumentId\":\"instrument:wtgxx\",\"contextId\":\"public-holder\",\"termsId\":\"public-source-snapshot-2026-09-30\",\"from\":null},[\"faq\",\"liquidity\"],[{\"id\":\"faq\",\"title\":\"WisdomTree WTGXX fund FAQ\",\"url\":\"https://dataspanapi.wisdomtree.com/pdr/documents/WEBSITE_FUND_DETAILS/WDT/US/EN-US/WTGXX_3/\",\"locator\":\"pp1,3–6: fund structure, access, wallet transfers and primary/secondary liquidity; current prospectus still required\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"liquidity\",\"title\":\"WisdomTree: commission-free liquidity\",\"url\":\"https://www.wisdomtreeprime.com/blog/commission-free-liquidity/\",\"documentDate\":\"2026-06-17\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:39:40Z\",\"locator\":\"WT Connect secondary liquidity feature\"}]]",
+            "note": "FAQ describes primary dealing at daily 4pm ET NAV, 3:30pm funding cutoff and eligible-business-day T+0 settlement. Dealer secondary trading is available 24/7 only while inventory lasts; depleted inventory pauses that route. These public statements do not replace the current prospectus."
           }
         },
         {
@@ -3980,15 +4395,37 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Official fund FAQ",
+          "scope": "Primary fund dealing distinguished from inventory-funded dealer liquidity and permissioned wallet transfer",
+          "limit": "FAQ is not the controlling prospectus. Stated custody segregation and 1940 Act status do not establish every insolvency or record-dispute outcome. April AUM and example dealer inventory are dated, not current coverage.",
+          "sourceIds": [
+            "faq"
+          ],
+          "sourcePeriod": "AUM example 2026-04-30; FAQ document date not printed",
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Registered Treasury MMF → WisdomTree platform → primary NAV dealing or WisdomTree Securities inventory",
+          "limit": "Current prospectus, transfer-agent record powers, exact deployments and current dealer capacity remain unverified.",
+          "sourceIds": [
+            "faq"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
         "public-holder": {
           "obligor": "Fund under prospectus; not reviewed",
-          "processor": "WisdomTree Connect for secondary liquidity",
+          "processor": "Fund dealing via platform; WisdomTree Securities supplies secondary dealer inventory",
           "onboarding": "Platform eligibility and current prospectus terms not reviewed",
           "entitlementOnTransfer": "Not established",
-          "settlement": "Secondary platform liquidity feature described; fund redemption mechanics not verified",
+          "settlement": "Primary: daily NAV on eligible business days. Secondary: 24/7 dealer inventory, can pause when depleted",
           "minimumAndFees": "Current prospectus not read; 0 bps commission only applies to described Connect liquidity feature",
           "independentRoute": "Fund direct redemption not established in reviewed sources",
           "availability": "Marketing-described platform feature; no trade/redemption tested."
@@ -4319,6 +4756,19 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "OUSG fund vehicle → tokenized government-securities funds including BUIDL → Ondo / USDC route",
+          "limit": "Gated LP/constitutional documents and exact issuer legal name are still needed; underlying fund balances are not additive independent reserves.",
+          "sourceIds": [
+            "product",
+            "overview",
+            "redeem"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -4599,6 +5049,18 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:39:40Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "BVI VanEck fund → State Street custody → Securitize administration / transfer agency and third-party liquidity",
+          "limit": "Current PPM, share-class terms, ordinary redemption rules, live authorities and capacity remain missing. RLUSD swap support is a separate off-ramp.",
+          "sourceIds": [
+            "launch",
+            "stablecoin"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -4647,7 +5109,7 @@
         "shareClass": null,
         "issuanceVintage": "Current official product materials / terms attachment dated 2026-07-28 by filename; earlier-vintage status unresolved"
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:47:16.217Z",
       "sources": [
         {
           "id": "ter-site",
@@ -4680,10 +5142,19 @@
           "id": "ter-gold-audit",
           "title": "TER Gold Verification Audit (DK Limited audit report PDF)",
           "url": "https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view",
-          "documentDate": null,
+          "documentDate": "2026-09-07",
           "effectiveDate": null,
-          "checkedAt": "2026-09-30T22:40:39Z",
-          "locator": "Link on official TER site; Drive reader returned loading/sign-in shell, contents not reviewed"
+          "checkedAt": "2026-10-01T19:37:01.290Z",
+          "locator": "Independent report pp5–7; Appendix C p9; inspection dates June 17 and July 24, 2026"
+        },
+        {
+          "id": "statement-september",
+          "title": "TER asset statement to September 14",
+          "url": "https://drive.google.com/file/d/10dEK20M3mfscDh594rzVpzdO3KvC0VSg/view",
+          "locator": "p1 totals, vault inventories and unallocated bullion accounts",
+          "documentDate": "2026-09-14",
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -4744,13 +5215,13 @@
         },
         {
           "dimension": "backing",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Site represents TER as allocated gold and links periodic asset statements and a physical verification audit; the latest statement is listed, but neither statement nor audit was accessible for substantive review.",
+          "summary": "The September 14 statement reports 121 kg: 111 kg in vaults and 10 kg in unallocated London bullion accounts. The Royal Audit Authority physically inspected Bhutan gold at June/July dates, excluding overseas physical inspection and token issuance or reserve-to-token matching. Current fully allocated 1:1 coverage has not been established.",
           "sourceIds": [
-            "ter-site",
-            "ter-assets",
-            "ter-gold-audit"
+            "statement-september",
+            "ter-gold-audit",
+            "ter-site"
           ],
           "scope": {
             "instrumentId": "instrument:ter",
@@ -4760,11 +5231,11 @@
           },
           "id": "ter:ter-user:backing",
           "display": {
-            "tone": "unknown",
-            "label": "Current backing not verified",
-            "reason": "Site represents TER as allocated gold and links periodic asset statements and a physical verification audit; the latest statement is listed, but neither statement nor audit was accessible for substantive review.",
-            "basis": "[\"backing\",\"unknown\",\"analysis\",\"Site represents TER as allocated gold and links periodic asset statements and a physical verification audit; the latest statement is listed, but neither statement nor audit was accessible for substantive review.\",{\"instrumentId\":\"instrument:ter\",\"contextId\":\"ter-user\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"ter-site\",\"ter-assets\",\"ter-gold-audit\"],[{\"id\":\"ter-site\",\"title\":\"TER official product site\",\"url\":\"https://uat.ter.bt/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Product and How TER works sections; footer Transparency links; site lists mint A1KL…2iVkAzhVUZ\"},{\"id\":\"ter-assets\",\"title\":\"TER official Asset Statements index\",\"url\":\"https://uat.ter.bt/reports/asset-statements\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Index lists latest TER Asset Statement dated 2026-09-14; individual statement contents not reviewed\"},{\"id\":\"ter-gold-audit\",\"title\":\"TER Gold Verification Audit (DK Limited audit report PDF)\",\"url\":\"https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Link on official TER site; Drive reader returned loading/sign-in shell, contents not reviewed\"}]]",
-            "note": "Site represents TER as allocated gold and links periodic asset statements and a physical verification audit; the latest statement is listed, but neither statement nor audit was accessible for substantive review."
+            "tone": "condition",
+            "label": "Unallocated gold; audit excludes token matching",
+            "reason": "The September 14 statement reports 121 kg: 111 kg in vaults and 10 kg in unallocated London bullion accounts. The Royal Audit Authority physically inspected Bhutan gold at June/July dates, excluding overseas physical inspection and token issuance or reserve-to-token matching. Current fully allocated 1:1 coverage has not been established.",
+            "basis": "[\"backing\",\"supported\",\"analysis\",\"The September 14 statement reports 121 kg: 111 kg in vaults and 10 kg in unallocated London bullion accounts. The Royal Audit Authority physically inspected Bhutan gold at June/July dates, excluding overseas physical inspection and token issuance or reserve-to-token matching. Current fully allocated 1:1 coverage has not been established.\",{\"instrumentId\":\"instrument:ter\",\"contextId\":\"ter-user\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"statement-september\",\"ter-gold-audit\",\"ter-site\"],[{\"id\":\"statement-september\",\"title\":\"TER asset statement to September 14\",\"url\":\"https://drive.google.com/file/d/10dEK20M3mfscDh594rzVpzdO3KvC0VSg/view\",\"locator\":\"p1 totals, vault inventories and unallocated bullion accounts\",\"documentDate\":\"2026-09-14\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"ter-gold-audit\",\"title\":\"TER Gold Verification Audit (DK Limited audit report PDF)\",\"url\":\"https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view\",\"documentDate\":\"2026-09-07\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\",\"locator\":\"Independent report pp5–7; Appendix C p9; inspection dates June 17 and July 24, 2026\"},{\"id\":\"ter-site\",\"title\":\"TER official product site\",\"url\":\"https://uat.ter.bt/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Product and How TER works sections; footer Transparency links; site lists mint A1KL…2iVkAzhVUZ\"}]]",
+            "note": "The September 14 statement reports 121 kg: 111 kg in vaults and 10 kg in unallocated London bullion accounts. The Royal Audit Authority physically inspected Bhutan gold at June/July dates, excluding overseas physical inspection and token issuance or reserve-to-token matching. Current fully allocated 1:1 coverage has not been established."
           }
         },
         {
@@ -4841,7 +5312,7 @@
           "dimension": "failure",
           "state": "unknown",
           "basis": "analysis",
-          "summary": "Issuer, distributor and audit links are disclosed, but terms governing insolvency, gold custody ownership, priority, insurance, enforcement and independent recovery were not available for review.",
+          "summary": "Physical gold verification does not establish custody ownership, creditor priority, insurance, enforcement or an independent recovery route. Operative holder terms remain unavailable for substantive review.",
           "sourceIds": [
             "ter-site",
             "ter-terms",
@@ -4856,20 +5327,37 @@
           "id": "ter:ter-user:failure",
           "display": {
             "tone": "unknown",
-            "label": "Recovery rights not verified",
-            "reason": "Issuer, distributor and audit links are disclosed, but terms governing insolvency, gold custody ownership, priority, insurance, enforcement and independent recovery were not available for review.",
-            "basis": "[\"failure\",\"unknown\",\"analysis\",\"Issuer, distributor and audit links are disclosed, but terms governing insolvency, gold custody ownership, priority, insurance, enforcement and independent recovery were not available for review.\",{\"instrumentId\":\"instrument:ter\",\"contextId\":\"ter-user\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"ter-site\",\"ter-terms\",\"ter-gold-audit\"],[{\"id\":\"ter-site\",\"title\":\"TER official product site\",\"url\":\"https://uat.ter.bt/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Product and How TER works sections; footer Transparency links; site lists mint A1KL…2iVkAzhVUZ\"},{\"id\":\"ter-terms\",\"title\":\"Gelephu Mindfulness City Authority TER Token Terms and Conditions\",\"url\":\"https://drive.google.com/file/d/1_bou3Ek98xRQwX1kxNQ9lf_xme6m3AFI/view?usp=sharing\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Terms PDF linked from official TER site; Drive reader returned loading/sign-in shell, contents not reviewed\"},{\"id\":\"ter-gold-audit\",\"title\":\"TER Gold Verification Audit (DK Limited audit report PDF)\",\"url\":\"https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Link on official TER site; Drive reader returned loading/sign-in shell, contents not reviewed\"}]]",
-            "note": "Issuer, distributor and audit links are disclosed, but terms governing insolvency, gold custody ownership, priority, insurance, enforcement and independent recovery were not available for review."
+            "label": "Custody rights and recovery unverified",
+            "reason": "Physical gold verification does not establish custody ownership, creditor priority, insurance, enforcement or an independent recovery route. Operative holder terms remain unavailable for substantive review.",
+            "note": "Physical gold verification does not establish custody ownership, creditor priority, insurance, enforcement or an independent recovery route. Operative holder terms remain unavailable for substantive review.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"Physical gold verification does not establish custody ownership, creditor priority, insurance, enforcement or an independent recovery route. Operative holder terms remain unavailable for substantive review.\",{\"instrumentId\":\"instrument:ter\",\"contextId\":\"ter-user\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"ter-site\",\"ter-terms\",\"ter-gold-audit\"],[{\"id\":\"ter-site\",\"title\":\"TER official product site\",\"url\":\"https://uat.ter.bt/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Product and How TER works sections; footer Transparency links; site lists mint A1KL…2iVkAzhVUZ\"},{\"id\":\"ter-terms\",\"title\":\"Gelephu Mindfulness City Authority TER Token Terms and Conditions\",\"url\":\"https://drive.google.com/file/d/1_bou3Ek98xRQwX1kxNQ9lf_xme6m3AFI/view?usp=sharing\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Terms PDF linked from official TER site; Drive reader returned loading/sign-in shell, contents not reviewed\"},{\"id\":\"ter-gold-audit\",\"title\":\"TER Gold Verification Audit (DK Limited audit report PDF)\",\"url\":\"https://drive.google.com/file/d/1Nb9mhgqV57kDXFvIogCoWxDdXKiuduB8/view\",\"documentDate\":\"2026-09-07\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\",\"locator\":\"Independent report pp5–7; Appendix C p9; inspection dates June 17 and July 24, 2026\"}]]"
           }
         }
       ],
-      "deployments": [],
+      "deployments": [
+        {
+          "id": "solana:9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+          "instrumentId": null,
+          "network": "Solana",
+          "address": "9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+          "identity": "Contract address displayed by the official TER site; holder agreement binding unresolved",
+          "sourceIds": [
+            "ter-site"
+          ],
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Live authorities and controller governance have not been checked in this legal review."
+          }
+        }
+      ],
       "evidenceProfiles": [
         {
           "method": "Official product materials",
           "scope": "Issuer naming, marketed backing and primary access/exit route",
           "availability": "reviewed",
-          "limit": "Product page statements are not a substitute for operative terms; terms/audit/asset PDF contents could not be read.",
+          "limit": "The product page is not an operative holder agreement; the linked terms still restrict downloading and have not been substantively reviewed.",
           "sourceIds": [
             "ter-site",
             "ter-terms"
@@ -4878,16 +5366,29 @@
           "checkedAt": "2026-09-30T22:40:39Z"
         },
         {
-          "method": "Gold asset statement and physical verification audit",
-          "scope": "Gold stock versus circulating TER and independent verification",
-          "availability": "not-obtained",
-          "limit": "Official index lists dated statements and an audit, but actual files were inaccessible in browser tool.",
+          "method": "Royal Audit Authority physical verification and issuer asset statement",
+          "availability": "reviewed",
+          "scope": "July 24 gold asset report; June 17 / July 24 inspections; September 14 management inventory",
+          "limit": "Audit excludes token issuance, blockchain transactions and reserve adequacy against issued TER; overseas vaults not physically visited. September statement includes unallocated bullion claims and is not an independent current liability reconciliation.",
           "sourceIds": [
-            "ter-assets",
+            "ter-gold-audit",
+            "statement-september"
+          ],
+          "sourcePeriod": "2026-06-17 / 2026-07-24; management inventory 2026-09-14",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "GMCA named issuer → vault gold and unallocated bullion claims → DK Bank portal / physical collection",
+          "limit": "Operative holder terms remain unreadable; custody ownership, recovery priority, token matching and live authority governance are unresolved.",
+          "sourceIds": [
+            "ter-site",
+            "statement-september",
             "ter-gold-audit"
           ],
-          "sourcePeriod": "Latest listed asset statement dated 2026-09-14; audit period/date not established",
-          "checkedAt": null
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -4939,7 +5440,7 @@
         "shareClass": null,
         "issuanceVintage": null
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:52:37.466Z",
       "sources": [
         {
           "id": "xaut-terms",
@@ -4985,6 +5486,24 @@
           "documentDate": "2021-11-08",
           "effectiveDate": null,
           "checkedAt": "2026-09-30T23:11:00Z"
+        },
+        {
+          "id": "xaut-june-assurance",
+          "title": "BDO reasonable assurance on June 2026 Tether Gold reserves",
+          "url": "https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2026_RC187322026DV0170.pdf",
+          "locator": "PDF pp2–3 assurance; pp5–7 reserves and accounting policies",
+          "documentDate": "2026-07-31",
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:52:37.466Z"
+        },
+        {
+          "id": "xaut-report-index",
+          "title": "Tether Gold public reserve/report publication page",
+          "url": "https://gold.tether.to/",
+          "locator": "Transparency and reserves report links; dynamic content may not be readable automatically",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:52:37.466Z"
         }
       ],
       "contexts": [
@@ -5044,10 +5563,9 @@
           "dimension": "backing",
           "state": "supported",
           "basis": "source-statement",
-          "summary": "Issuer says custodian holds allocated London Good Delivery bars for holders; the 2026-03-31 independent report describes 707,747.139 fine oz held versus 707,747.09 XAUt in circulation. This is dated reporting, not current intraday proof.",
+          "summary": "BDO provided reasonable assurance on June 30, 2026 balances: 707,747.139 fine troy ounces against 707,747.090000 issued XAUT, including unsold inventory. Procedures included inventory and blockchain-liability reconciliation. This is a dated reserve report, not live coverage or an insolvency opinion.",
           "sourceIds": [
-            "xaut-terms",
-            "xaut-attestation"
+            "xaut-june-assurance"
           ],
           "scope": {
             "instrumentId": "instrument:xaut",
@@ -5057,11 +5575,11 @@
           },
           "id": "xaut:xaut-holder:backing",
           "display": {
-            "tone": "unknown",
-            "label": "Reserve report is from March 2026",
-            "reason": "Issuer says custodian holds allocated London Good Delivery bars for holders; the 2026-03-31 independent report describes 707,747.139 fine oz held versus 707,747.09 XAUt in circulation. This is dated reporting, not current intraday proof.",
-            "basis": "[\"backing\",\"supported\",\"source-statement\",\"Issuer says custodian holds allocated London Good Delivery bars for holders; the 2026-03-31 independent report describes 707,747.139 fine oz held versus 707,747.09 XAUt in circulation. This is dated reporting, not current intraday proof.\",{\"instrumentId\":\"instrument:xaut\",\"contextId\":\"xaut-holder\",\"termsId\":\"xaut-terms-2025-09-09\",\"from\":null},[\"xaut-terms\",\"xaut-attestation\"],[{\"id\":\"xaut-terms\",\"title\":\"Gold Token Terms of Sale and Service\",\"url\":\"https://gold.tether.to/legal/\",\"documentDate\":\"2025-09-09\",\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:52:00Z\",\"locator\":\"Gold Token Terms §§3,4.3–4.7,5.4–5.6; text read from official application bundle\"},{\"id\":\"xaut-attestation\",\"title\":\"Independent reserves report, ISAE 3000R opinion as at 2026-03-31\",\"url\":\"https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_31.03.2026_RC187322026DV0089.pdf\",\"documentDate\":\"2026-04-30\",\"effectiveDate\":\"2026-03-31\",\"checkedAt\":\"2026-09-30T22:52:45Z\",\"locator\":\"PDF pages2–3 assurance scope; pages5–6 reserve quantities and custody accounting policy\"}]]",
-            "note": "The 31 March report is a dated snapshot, not verification of today’s reserves."
+            "tone": "condition",
+            "label": "June reserve matching examined",
+            "reason": "BDO provided reasonable assurance on June 30, 2026 balances: 707,747.139 fine troy ounces against 707,747.090000 issued XAUT, including unsold inventory. Procedures included inventory and blockchain-liability reconciliation. This is a dated reserve report, not live coverage or an insolvency opinion.",
+            "note": "Assurance applies to June 30 only; current balances and custody recovery remain unverified.",
+            "basis": "[\"backing\",\"supported\",\"source-statement\",\"BDO provided reasonable assurance on June 30, 2026 balances: 707,747.139 fine troy ounces against 707,747.090000 issued XAUT, including unsold inventory. Procedures included inventory and blockchain-liability reconciliation. This is a dated reserve report, not live coverage or an insolvency opinion.\",{\"instrumentId\":\"instrument:xaut\",\"contextId\":\"xaut-holder\",\"termsId\":\"xaut-terms-2025-09-09\",\"from\":null},[\"xaut-june-assurance\"],[{\"id\":\"xaut-june-assurance\",\"title\":\"BDO reasonable assurance on June 2026 Tether Gold reserves\",\"url\":\"https://gold.tether.to/docs/reports/attestations/ISAE_3000R_-_Opinion_TGRR_30.06.2026_RC187322026DV0170.pdf\",\"locator\":\"PDF pp2–3 assurance; pp5–7 reserves and accounting policies\",\"documentDate\":\"2026-07-31\",\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:52:37.466Z\"}]]"
           }
         },
         {
@@ -5199,6 +5717,30 @@
           ],
           "sourcePeriod": "2026-03-31",
           "checkedAt": "2026-09-30T22:40:39Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "TG Commodities → allocated specific bars / custodian → verified Swiss delivery or sale",
+          "limit": "June 30 reserve matching reviewed; current coverage, holder-funded custodian enforcement and insurance limits do not guarantee timely recovery.",
+          "sourceIds": [
+            "xaut-terms",
+            "xaut-attestation",
+            "xaut-june-assurance"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
+        },
+        {
+          "method": "BDO reasonable reserve assurance",
+          "scope": "June 30, 2026 gold inventory and issued-token reconciliation, including unsold inventory",
+          "limit": "Point-in-time reserve report; no assurance at other dates. Not a full IFRS financial statement or legal recovery opinion.",
+          "sourceIds": [
+            "xaut-june-assurance"
+          ],
+          "sourcePeriod": "2026-06-30",
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:52:37.466Z"
         }
       ],
       "exitDetails": {
@@ -5268,7 +5810,7 @@
         "shareClass": null,
         "issuanceVintage": "Sunset announcement says deprecation planned early 2026; exact sunset date and remaining-token terms unresolved"
       },
-      "reviewedAt": "2026-09-30T22:53:00Z",
+      "reviewedAt": "2026-10-01T19:37:01.290Z",
       "sources": [
         {
           "id": "usdhl-about",
@@ -5305,6 +5847,15 @@
           "effectiveDate": null,
           "checkedAt": "2026-09-30T22:40:39Z",
           "locator": "Lists USDhl M0 extension audit and M0 protocol audits; individual report contents not reviewed"
+        },
+        {
+          "id": "developers",
+          "title": "USDhl official deployment and bridge workflow",
+          "url": "https://usefelix.gitbook.io/usdhl/advanced/developers",
+          "locator": "HyperEVM USDhl and Hyperlane portal; burn USDhl and unlock Wrapped M workflow",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "contexts": [
@@ -5437,12 +5988,12 @@
         },
         {
           "dimension": "exit",
-          "state": "unknown",
+          "state": "supported",
           "basis": "analysis",
-          "summary": "Terms mention issuance/redemption without fees and describe the M-wrapped product, but no current redemption process, minimum, timeline, pause conditions or exit for remaining holders after planned sunset was established.",
+          "summary": "Developer docs describe burning USDhl on HyperEVM and receiving Wrapped M on Ethereum through Hyperlane. This exits into another token, not bank dollars; message delivery, fees and portal operation remain dependencies. Execution after the maintenance sunset has not been tested.",
           "sourceIds": [
-            "usdhl-sunset",
-            "usdhl-terms"
+            "developers",
+            "usdhl-sunset"
           ],
           "scope": {
             "instrumentId": "instrument:usdhl",
@@ -5452,11 +6003,11 @@
           },
           "id": "usdhl:usdhl-holder:exit",
           "display": {
-            "tone": "unknown",
-            "label": "Redemption route not verified",
-            "reason": "Terms mention issuance/redemption without fees and describe the M-wrapped product, but no current redemption process, minimum, timeline, pause conditions or exit for remaining holders after planned sunset was established.",
-            "basis": "[\"exit\",\"unknown\",\"analysis\",\"Terms mention issuance/redemption without fees and describe the M-wrapped product, but no current redemption process, minimum, timeline, pause conditions or exit for remaining holders after planned sunset was established.\",{\"instrumentId\":\"instrument:usdhl\",\"contextId\":\"usdhl-holder\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"usdhl-sunset\",\"usdhl-terms\"],[{\"id\":\"usdhl-sunset\",\"title\":\"USDhl Documentation: Sunsetting USDhl\",\"url\":\"https://usefelix.gitbook.io/usdhl/sunsetting-usdhl\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Page states full sunset planned early 2026, last rewards date Dec 20 (year not explicit), protocol usable but no longer actively maintained, transition to USDH encouraged\"},{\"id\":\"usdhl-terms\",\"title\":\"Felix Terms & Conditions\",\"url\":\"https://usefelix.gitbook.io/docs/terms/terms-and-conditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"§10 USDhl Product and USDhl-specific fee/reward paragraphs; legal issuer not named\"}]]",
-            "note": "Terms mention issuance/redemption without fees and describe the M-wrapped product, but no current redemption process, minimum, timeline, pause conditions or exit for remaining holders after planned sunset was established."
+            "tone": "condition",
+            "label": "Bridge exit pays Wrapped M",
+            "reason": "Developer docs describe burning USDhl on HyperEVM and receiving Wrapped M on Ethereum through Hyperlane. This exits into another token, not bank dollars; message delivery, fees and portal operation remain dependencies. Execution after the maintenance sunset has not been tested.",
+            "basis": "[\"exit\",\"supported\",\"analysis\",\"Developer docs describe burning USDhl on HyperEVM and receiving Wrapped M on Ethereum through Hyperlane. This exits into another token, not bank dollars; message delivery, fees and portal operation remain dependencies. Execution after the maintenance sunset has not been tested.\",{\"instrumentId\":\"instrument:usdhl\",\"contextId\":\"usdhl-holder\",\"termsId\":\"unverified-holder-terms:public-snapshot-2026-09-30\",\"from\":null},[\"developers\",\"usdhl-sunset\"],[{\"id\":\"developers\",\"title\":\"USDhl official deployment and bridge workflow\",\"url\":\"https://usefelix.gitbook.io/usdhl/advanced/developers\",\"locator\":\"HyperEVM USDhl and Hyperlane portal; burn USDhl and unlock Wrapped M workflow\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-01T19:37:01.290Z\"},{\"id\":\"usdhl-sunset\",\"title\":\"USDhl Documentation: Sunsetting USDhl\",\"url\":\"https://usefelix.gitbook.io/usdhl/sunsetting-usdhl\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-09-30T22:40:39Z\",\"locator\":\"Page states full sunset planned early 2026, last rewards date Dec 20 (year not explicit), protocol usable but no longer actively maintained, transition to USDH encouraged\"}]]",
+            "note": "Developer docs describe burning USDhl on HyperEVM and receiving Wrapped M on Ethereum through Hyperlane. This exits into another token, not bank dollars; message delivery, fees and portal operation remain dependencies. Execution after the maintenance sunset has not been tested."
           }
         },
         {
@@ -5484,7 +6035,24 @@
           }
         }
       ],
-      "deployments": [],
+      "deployments": [
+        {
+          "id": "hyperevm:0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+          "instrumentId": null,
+          "network": "HyperEVM",
+          "address": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5",
+          "identity": "Official product address; exact offering/class binding remains unresolved",
+          "sourceIds": [
+            "developers"
+          ],
+          "identityCheckedAt": "2026-10-01T19:37:01.290Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Live authorities and controller governance have not been checked in this legal review."
+          }
+        }
+      ],
       "evidenceProfiles": [
         {
           "method": "Felix USDhl docs and platform terms",
@@ -5509,17 +6077,30 @@
           ],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "USDhl HyperEVM → Hyperlane → Wrapped M Ethereum → M infrastructure and Treasury collateral",
+          "limit": "Wrapper/bridge liability matching, current portal operation, signers, fiat-redemption entitlement and post-sunset support remain unverified.",
+          "sourceIds": [
+            "developers",
+            "usdhl-sunset",
+            "usdhl-terms"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
         "usdhl-holder": {
           "obligor": "Not established; Felix is the product operator and M0 Foundation is described as custodian of M collateral",
-          "processor": "Unclear for existing holders post-sunset announcement",
+          "processor": "Hyperlane Portal on HyperEVM and Ethereum",
           "onboarding": "Current mint/redemption eligibility not established",
           "entitlementOnTransfer": "Not established in holder-facing legal terms reviewed",
-          "settlement": "Not established for current remaining-token holders",
+          "settlement": "Documented burn/bridge route returns Wrapped M on Ethereum; bridge delivery required; no fiat payout established",
           "minimumAndFees": "Felix terms state no USDhl issue/redeem fee; minimum and any third-party/gas cost not specified",
-          "independentRoute": "Not established",
+          "independentRoute": "Contract workflow documented; dependence on bridge validators and live portal still unverified",
           "availability": "Felix announced planned sunset in early 2026 and perpetual but unmaintained protocol; present redemption availability not verified."
         }
       },
@@ -5810,6 +6391,19 @@
           ],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Theo strategy token → ULTRA / FILQ descriptions → underlying managers/custodians and DeFi venues",
+          "limit": "Issuer legal identity, holder agreement, current basket reconciliation, controls and contractual redemption remain missing; site sections conflict on backing.",
+          "sourceIds": [
+            "thbill-site",
+            "libeara-ultra",
+            "libeara-theo"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -6063,6 +6657,17 @@
           ],
           "sourcePeriod": null,
           "checkedAt": "2026-09-30T22:40:39Z"
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "Pre-launch official website → no identified issued instrument or custody chain",
+          "limit": "No holder contract, exact token, issuer legal identity, reserve report or settlement entitlement. uranium.io/xU3O8 is a different programme.",
+          "sourceIds": [
+            "uranium-site"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
@@ -6343,6 +6948,19 @@
           ],
           "sourcePeriod": null,
           "checkedAt": null
+        },
+        {
+          "method": "Dependency and recourse review",
+          "scope": "ORO Labs interface → unidentified independent issuer/provider → marketed vault and delivery route",
+          "limit": "Issuer agreement, named vault, full official mint binding, independent reserve matching and redemption obligor remain missing; OGold is a different programme.",
+          "sourceIds": [
+            "oro-terms",
+            "oro-home",
+            "oro-redeem"
+          ],
+          "sourcePeriod": null,
+          "availability": "reviewed",
+          "checkedAt": "2026-10-01T19:37:01.290Z"
         }
       ],
       "exitDetails": {
