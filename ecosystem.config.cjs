@@ -6,6 +6,22 @@
 module.exports = {
     apps: [
         {
+            // Cross-asset read-only checks precede :17 release refresh. Not active until explicitly deployed.
+            name: 'rwa-watch-deployments',
+            cwd: '/root/code/rwa-sonar',
+            script: 'rwa/watch-deployments.mjs',
+            args: '--run',
+            node_args: '--env-file=/root/code/rwa-sonar/.env',
+            cron_restart: '11 * * * *',
+            autorestart: false,
+            watch: false,
+            env: { TZ: 'UTC' },
+            error_file: './logs/rwa-watch-deployments-error.log',
+            out_file: './logs/rwa-watch-deployments-out.log',
+            merge_logs: true,
+            time: true
+        },
+        {
             // The trade tape: one pass every hour over the busiest pools (+ the pinned Meteora
             // DBC pool), publishing stocks-trades.json straight into the docroot after each pass.
             // live.html reads only this (and /api/trades/recent); no browser talks to an RPC.

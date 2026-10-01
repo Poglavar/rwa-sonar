@@ -34,6 +34,7 @@
   },
   "custodyVerification": {
     "type": "auditor-attestation",
+    "evidenceStatus": "promised-unpublished",
     "agent": "unnamed third-party attestor (promised, not identified)",
     "frequency": "\"published periodically or available on request if costs are covered\" (FAQ) - no cadence committed",
     "link": "https://prestocks.com/faq",

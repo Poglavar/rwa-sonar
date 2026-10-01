@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 import { validateRelease } from './validate-release.mjs';
+import { buildResearch } from '../rwa/lib/build-research.mjs';
 import { publishRelease } from './publish-release.mjs';
 import { hashArtifactFamily } from './release-evidence.mjs';
 import { releaseRsyncExcludes } from './lib/release-manifest.mjs';
@@ -55,6 +56,7 @@ async function fixture() {
     await mkdir(join(root, 'templates'), { recursive: true });
     await mkdir(join(root, 'protocols'), { recursive: true });
     await mkdir(join(root, 'comparisons'), { recursive: true });
+    await mkdir(join(root, 'stocks/data/issuers'), { recursive: true });
     const builtAt = '2026-09-22T00:00:00Z';
     await writeFile(join(root, 'stocks-tokens.json'), JSON.stringify({ builtAt, tokens: [{
         mint: 'one', symbol: 'NVDAx', issuer: 'xstocks-backed', cardSlug: 'NVDAx', underlyingTicker: 'NVDA'
@@ -93,8 +95,34 @@ async function fixture() {
         if (['cards/NVDAx.html', 'issuers/xstocks-backed.html'].includes(path)) continue;
         await writeFile(join(root, path), `<link rel="canonical" href="${ORIGIN}/${canonicalPath}" />`);
     }
+    await mkdir(join(root, 'rwa/data'), { recursive: true });
+    const sourceResearch = JSON.parse(await readFile(join(import.meta.dirname, '../rwa/data/research.json'), 'utf8'));
+    const curated = { ...sourceResearch, products: sourceResearch.products.filter((product) => product.kind !== 'programme') };
+    await writeFile(join(root, 'rwa/data/research.json'), JSON.stringify(curated));
+    const assets = JSON.parse(await readFile(join(import.meta.dirname, '../rwa-assets-db.json'), 'utf8'))
+        .filter((asset) => curated.products.some((product) => product.originalName === asset.name));
+    await writeFile(join(root, 'rwa-assets-db.json'), JSON.stringify(assets));
+    await refreshResearch(root);
+    await refreshCatalogue(root);
     await writeFile(join(root, 'release-evidence.json'), '{}\n');
     return root;
+}
+
+async function refreshResearch(root) {
+    const curated = JSON.parse(await readFile(join(root, 'rwa/data/research.json'), 'utf8'));
+    const issuerDb = JSON.parse(await readFile(join(root, 'stocks-issuers.json'), 'utf8'));
+    const tokenDb = JSON.parse(await readFile(join(root, 'stocks-tokens.json'), 'utf8'));
+    const runtime = buildResearch(curated, issuerDb, tokenDb, {}, { records: {} }, '2026-09-22T00:00:00Z');
+    await writeFile(join(root, 'rwa-research.json'), JSON.stringify(runtime));
+}
+
+async function refreshCatalogue(root) {
+    const catalogueHelpers = (await import('./lib/rwa-catalogue.js')).default;
+    await writeFile(join(root, 'rwa-catalogue.json'), JSON.stringify(catalogueHelpers.buildCatalogue(
+        JSON.parse(await readFile(join(root, 'rwa-assets-db.json'), 'utf8')),
+        JSON.parse(await readFile(join(root, 'stocks-issuers.json'), 'utf8')),
+        JSON.parse(await readFile(join(root, 'stocks-tokens.json'), 'utf8')),
+        JSON.parse(await readFile(join(root, 'rwa-research.json'), 'utf8')))));
 }
 
 describe('release artifact validation', () => {
@@ -108,8 +136,42 @@ describe('release artifact validation', () => {
         root = await fixture();
         await expect(validateRelease({ root, baseUrl: ORIGIN })).resolves.toMatchObject({
             tokenCount: 1,
-            cardCount: 1
+            cardCount: 1,
+            rwaResearchSubjectCount: 22, rwaProductReviewCount: 21, rwaProgrammeCount: 1, rwaInstrumentResearchSubjectCount: 21
         });
+    });
+
+    test('rejects a shared research report whose claim summary no longer matches its sources', async () => {
+        root = await fixture();
+        const runtime = JSON.parse(await readFile(join(root, 'rwa-research.json'), 'utf8'));
+        runtime.products[0].claims[0].summary += ' Fabricated drift.';
+        await writeFile(join(root, 'rwa-research.json'), JSON.stringify(runtime));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/shared RWA research report disagrees/);
+    });
+
+    test('rejects a fabricated instrument identity in the shared research report', async () => {
+        root = await fixture();
+        const runtime = JSON.parse(await readFile(join(root, 'rwa-research.json'), 'utf8'));
+        const product = runtime.products[0];
+        const priorId = product.instrument.id;
+        product.instrument.id = 'instrument:invented';
+        for (const claim of product.claims) if (claim.scope.instrumentId === priorId) claim.scope.instrumentId = product.instrument.id;
+        for (const deployment of product.deployments) if (deployment.instrumentId === priorId) deployment.instrumentId = product.instrument.id;
+        await writeFile(join(root, 'rwa-research.json'), JSON.stringify(runtime));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/shared RWA research report disagrees/);
+    });
+
+    test('rejects a broad catalogue whose dates or exact-address membership drift from its sources', async () => {
+        root = await fixture();
+        const catalogue = JSON.parse(await readFile(join(root, 'rwa-catalogue.json'), 'utf8'));
+        catalogue.entries[0].legalReviewedAt = '2026-10-01';
+        await writeFile(join(root, 'rwa-catalogue.json'), JSON.stringify(catalogue));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/unified RWA catalogue disagrees/);
+        await refreshCatalogue(root);
+        catalogue.entries[0].legalReviewedAt = null;
+        catalogue.entries[0].deployments = [];
+        await writeFile(join(root, 'rwa-catalogue.json'), JSON.stringify(catalogue));
+        await expect(validateRelease({ root, baseUrl: ORIGIN })).rejects.toThrow(/unified RWA catalogue disagrees/);
     });
 
     test('rejects a route whose bytes are a generic fallback page', async () => {
@@ -127,6 +189,8 @@ describe('release artifact validation', () => {
         await writeFile(join(root, 'stocks-discovery.json'), JSON.stringify({ ...discovery,
             tokens: [...discovery.tokens, { ...standalone, discoveryProfile: {} }] }));
         await writeFile(join(root, 'cards/index.json'), JSON.stringify([{ mint: 'one' }, { mint: 'unclassified' }]));
+        await refreshResearch(root);
+        await refreshCatalogue(root);
         await expect(validateRelease({ root, baseUrl: ORIGIN })).resolves.toMatchObject({
             tokenCount: 2, cardCount: 2, comparisonBundleCount: 1, ungroupedTokenCount: 1
         });
@@ -138,6 +202,8 @@ describe('release artifact validation', () => {
         root = await fixture();
         const tokens = JSON.parse(await readFile(join(root, 'stocks-tokens.json'), 'utf8'));
         const discovery = JSON.parse(await readFile(join(root, 'stocks-discovery.json'), 'utf8'));
+        const issuers = JSON.parse(await readFile(join(root, 'stocks-issuers.json'), 'utf8'));
+        await writeFile(join(root, 'stocks-issuers.json'), JSON.stringify({ ...issuers, issuers: [...issuers.issuers, { slug: 'prestocks', name: 'PreStocks' }] }));
         const openai = { mint: 'openai', issuer: 'prestocks', symbol: 'OPENAI', underlyingTicker: null, companyKey: 'OPENAI', instrumentType: 'private-company' };
         await writeFile(join(root, 'stocks-tokens.json'), JSON.stringify({ ...tokens, tokens: [...tokens.tokens, openai] }));
         await writeFile(join(root, 'stocks-discovery.json'), JSON.stringify({ ...discovery, tokens: [...discovery.tokens, { ...openai, discoveryProfile: {} }] }));
@@ -149,6 +215,8 @@ describe('release artifact validation', () => {
             issuerSlug: 'prestocks', tokens: [{ mint: 'openai', symbol: 'OPENAI', issuer: 'prestocks', underlyingTicker: null, companyKey: 'OPENAI', instrumentType: 'private-company' }]
         }] };
         await writeFile(join(root, 'comparisons/u-openai.json'), JSON.stringify(bundle));
+        await refreshResearch(root);
+        await refreshCatalogue(root);
         await expect(validateRelease({ root, baseUrl: ORIGIN })).resolves.toMatchObject({
             tokenCount: 2, comparisonBundleCount: 2, ungroupedTokenCount: 0
         });

@@ -25,7 +25,7 @@ import { companionFor, companionNote, companionText, currentNextChunk, wantsComp
 import { DEFAULT_RPC, rpcCall } from './lib/solana-rpc.mjs';
 import { archiveTodayTimemapUrl, parseTimemapNewest } from './lib/archive-today.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { hostOf, isDocumentWatchable, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
+import { hostOf, isDocumentWatchable, kindFromContentType, matchesResearchProduct, normaliseUrl } from './lib/sources.mjs';
 import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
@@ -95,6 +95,7 @@ USAGE
 OPTIONS
   --run              Actually fetch. Without it this help is printed and nothing runs.
   --only=<issuer>    Only sources attributed to this issuer slug (e.g. --only=prestocks).
+  --product=<id>     Only sources attributed to this curated RWA product (e.g. --product=ousg).
   --limit=<n>        Only the first n sources after filtering (smoke test).
   --force            Ignore today's checkpoint and look at every source again. Conditional
                      headers are still sent, so an unchanged document still answers 304.
@@ -1410,14 +1411,20 @@ async function main() {
     // outcome for diagnostics without overwriting the canonical full-run heartbeat consumed by
     // collector health and operations alerts.
     const onlyBlocked = Boolean(flags['only-blocked']);
-    if (flags.only || flags.limit || onlyBlocked) {
-        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: flags.only, limit: flags.limit, onlyBlocked }));
+    const productFilter = typeof flags.product === 'string' ? flags.product.trim() : null;
+    if (flags.product !== undefined && (typeof flags.product !== 'string' || !productFilter)) throw new Error('--product needs a non-empty product id');
+    if (flags.only || productFilter || flags.limit || onlyBlocked) {
+        const scopedOnly = [flags.only ?? null, productFilter ? `product-${productFilter}` : null].filter(Boolean).join('-');
+        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: scopedOnly || null, limit: flags.limit, onlyBlocked }));
     }
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
 
     const archiveMissingOnly = Boolean(flags['archive-missing-only']);
-    if (archiveMissingOnly) runStatsFile = join(REPO, '.last-source-archive-missing-stats.json');
+    if (archiveMissingOnly) {
+        const productSuffix = productFilter ? `-product-${productFilter.replace(/[^a-z0-9-]+/gi, '-').toLowerCase()}` : '';
+        runStatsFile = join(REPO, `.last-source-archive-missing-stats${productSuffix}.json`);
+    }
     if (flags.archive || archiveMissingOnly) {
         const env = await readEnvFile(join(REPO, '.env'));
         const access = process.env.ARCHIVE_ORG_ACCESS_KEY || env.ARCHIVE_ORG_ACCESS_KEY;
@@ -1447,6 +1454,10 @@ async function main() {
     if (typeof flags.only === 'string') {
         sources = sources.filter((s) => s.issuer === flags.only);
         if (sources.length === 0) throw new Error(`no sources for issuer ${flags.only}`);
+    }
+    if (productFilter) {
+        sources = sources.filter((s) => matchesResearchProduct(s, productFilter));
+        if (sources.length === 0) throw new Error(`no sources for product ${productFilter}`);
     }
     // A retired source (stocks/data/retired-sources.json, via extract-sources.mjs) is gone for good:
     // it is not fetched, and its row and state say `retired` with the reason and date.
@@ -1484,7 +1495,7 @@ async function main() {
         .filter(([url, result]) => reusableCheckpoint(result) && sources.some((s) => s.url === url)).length : 0;
 
     log(`watch-sources: ${sources.length} source(s), registry ${registry.generatedAt}`
-        + `${flags.only ? `, only ${flags.only}` : ''}${flags.archive ? ', archiving new versions' : ''}`);
+        + `${flags.only ? `, only ${flags.only}` : ''}${productFilter ? `, product ${productFilter}` : ''}${flags.archive ? ', archiving new versions' : ''}`);
     if (onchainLocatorCount) log(`watch-sources: ${onchainLocatorCount} on-chain locator(s) left to the chain watcher`);
     if (resumed) log(`watch-sources: resuming — ${resumed} source(s) already in ${relative(REPO, checkpointFile)}`);
     if (Object.keys(previous).length === 0) log('watch-sources: no stored state — every source is a first sight');

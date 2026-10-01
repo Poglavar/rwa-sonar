@@ -55,12 +55,76 @@ function evidenceSide(side) {
     };
 }
 
+function observedValue(value) {
+    if (typeof value === 'string') return value;
+    if (value === null || value === undefined) return String(value);
+    return typeof value === 'object' ? JSON.stringify(value) : String(value);
+}
+
+function sameValue(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function exactDeployment(event, products) {
+    const product = products.find((row) => row?.id === event?.productId && text(row?.instrument?.id));
+    if (!product) return null;
+    const deployment = (Array.isArray(product.deployments) ? product.deployments : []).find((row) => {
+        if (!row?.identityCheckedAt || row.id !== event.deploymentId || row.network !== event.network) return false;
+        return row.network === 'Ethereum'
+            ? String(row.address).toLowerCase() === String(event.address).toLowerCase()
+            : row.address === event.address;
+    });
+    return deployment ? { product, deployment } : null;
+}
+
+function deploymentJournalItems(events, researchProducts) {
+    const items = [];
+    for (const row of Array.isArray(events) ? events : []) {
+        if (!row || typeof row !== 'object' || !text(row.id) || !text(row.field)
+            || ['supply', 'supplyRaw', 'decimals'].includes(row.field)
+            || row.before === undefined || row.after === undefined
+            || sameValue(row.before, row.after)) continue;
+        const firstObservedAt = text(row.firstObservedAt);
+        if (!firstObservedAt || !Number.isFinite(Date.parse(firstObservedAt))) continue;
+        if (!['Ethereum', 'Solana'].includes(row.network) || !text(row.address)) continue;
+        const match = exactDeployment(row, researchProducts);
+        if (!match) continue;
+        const { product } = match;
+        const date = firstObservedAt.slice(0, 10);
+        const blockTimestamp = text(row.blockTimestamp);
+        const before = observedValue(row.before);
+        const after = observedValue(row.after);
+        const ticker = text(product.ticker);
+        const name = text(product.name) ?? text(row.productName) ?? product.id;
+        const address = row.address;
+        const blockRef = row.network === 'Ethereum' ? (row.blockNumber ? `block ${row.blockNumber}` : `block hash ${row.blockHash ?? 'unknown'}`) : `slot ${row.slot ?? 'unknown'}`;
+        const blockText = blockTimestamp ? `${blockRef}, timestamp ${blockTimestamp}` : `${blockRef}, timestamp unavailable`;
+        const report = `./report.html?product=${encodeURIComponent(product.id)}`;
+        items.push({
+            id: `deployment-control-${row.id}`, date, category: 'actor-change', kind: 'control-change',
+            eventAt: null, effectiveAt: null, firstObservedAt, blockTimestamp, blockHash: text(row.blockHash), blockNumber: text(row.blockNumber), slot: Number.isInteger(row.slot) ? row.slot : null, reviewedAt: null,
+            severity: 'caution', actor: name, issuer: null,
+            title: `${name}: on-chain control changed`,
+            summary: `${row.field} changed from ${before} to ${after} at the ${row.network} deployment. RWA Sonar first observed the changed state at ${firstObservedAt}; it was read at ${blockText}. The block timestamp dates the observed state, not the precise control-change time.`,
+            whyItMatters: `A change to ${row.field} may alter an observed control or transfer restriction. This read does not establish who holds the relevant keys, the legal effect of the change, or backing.`,
+            consequence: `The ${row.field} value changed on this exact ${row.network} deployment; the change time is unknown.`,
+            affectedHolders: [ticker ? `holders of ${ticker} at this ${row.network} deployment` : `holders of ${name} at this ${row.network} deployment`],
+            before, after,
+            deployment: { id: row.deploymentId, network: row.network, address, instrumentId: product.instrument.id, field: row.field },
+            assets: [{ mint: address, symbol: null, name: `${row.network} deployment ${address}`, issuer: null, operationalStatus: null, href: null, network: row.network, address }],
+            sources: [{ label: `RWA Sonar published monitoring snapshot — ${row.network} ${blockRef} (${blockText})`, url: './rwa-research.json', accessedAt: firstObservedAt }],
+            href: report
+        });
+    }
+    return items;
+}
+
 /**
  * `protocolDiscrepancies` are protocol-market docs-vs-chain findings as flattened by
  * discrepancy-view.js protocolDiscrepancyRecords. Each is dated by the day it was recorded
  * (`observedAt`); a record without that date is left out rather than given one.
  */
-export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolutions, identities, tokens, issuerNames, protocolDiscrepancies } = {}) {
+export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolutions, identities, tokens, issuerNames, protocolDiscrepancies, deploymentEvents, researchProducts } = {}) {
     const identityIndex = new Map();
     for (const row of Array.isArray(identities) ? identities : []) {
         if (text(row?.mint)) identityIndex.set(row.mint, row);
@@ -70,7 +134,7 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         identityIndex.set(row.mint, { ...(identityIndex.get(row.mint) ?? {}), ...row });
     }
 
-    const items = [];
+    const items = deploymentJournalItems(deploymentEvents, Array.isArray(researchProducts) ? researchProducts : []);
     for (const row of Array.isArray(resolutions) ? resolutions : []) {
         if (row?.public !== true || !text(row?.date) || !text(row?.title)) continue;
         const issuer = text(row.issuerSlug);

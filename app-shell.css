@@ -435,6 +435,8 @@ body.app-page {
 /* Too narrow for the brand, the links, the menu and the theme switch in one row (under 360px): the
    switch leaves the row and its text copy at the end of the Research menu takes its place. */
 @media (max-width: 359px) {
+    .app-header { gap: 8px; }
+    .app-nav { gap: 8px; }
     .app-header .app-nav > .theme-switch { display: none; }
     .app-header .theme-switch-menu { display: block; }
 }

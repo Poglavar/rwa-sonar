@@ -135,3 +135,50 @@ describe('assets.html modal images', () => {
         expect(html).toMatch(/<img id="modalChainImage" alt="Chain"/);
     });
 });
+
+
+describe('legacy attestation evidence status', () => {
+    const { classifyAttestation } = require('./stocks/lib/attestation-status.js');
+    const source = 'https://example.com/report.pdf';
+
+    it('treats a recorded valid status as expired on its stated expiry date', () => {
+        const result = classifyAttestation({ status: 'valid', expiryDate: '2026-04-11', link: source }, '2026-04-11');
+        expect(result).toMatchObject({ state: 'expired', label: 'Expired at stated expiry date 2026-04-11',
+            recordedStatus: 'valid', expiryDate: '2026-04-11', sourceAvailable: true, cssClass: 'expired' });
+    });
+
+    it.each([undefined, '', '#'])('marks a missing or placeholder source unavailable (%s)', (link) => {
+        const result = classifyAttestation({ status: 'valid', link }, '2026-10-01');
+        expect(result).toMatchObject({ state: 'evidence-unavailable', recordedStatus: 'valid', sourceAvailable: false, cssClass: 'warning' });
+        expect(result.label).toContain('recorded status: valid');
+    });
+
+    it('reports unavailable evidence separately when an expired record has a placeholder source', () => {
+        const result = classifyAttestation({ status: 'valid', expiryDate: '2026-04-11', link: '#' }, '2026-10-01');
+        expect(result.state).toBe('expired');
+        expect(result.label).toContain('Expired at stated expiry date 2026-04-11');
+        expect(result.label).toContain('evidence unavailable');
+        expect(result.sourceAvailable).toBe(false);
+    });
+
+    it('does not call an unexpired record current or permanent, including when no expiry is recorded', () => {
+        const result = classifyAttestation({ status: 'valid', link: source, expiryDate: '' }, '2026-10-01');
+        expect(result).toMatchObject({ state: 'recorded-unverified', label: 'Recorded as valid; current validity not verified',
+            expiryDate: null, sourceAvailable: true, cssClass: 'warning' });
+    });
+
+    it('retains recorded revoked and expired statuses without making claims about the asset', () => {
+        expect(classifyAttestation({ status: 'revoked', link: source }, '2026-10-01').state).toBe('revoked');
+        expect(classifyAttestation({ status: 'expired', link: source }, '2026-10-01').state).toBe('expired');
+    });
+
+    it('shows recorded and interpreted status separately and loads one shared classifier before the modal', () => {
+        const html = require('fs').readFileSync(require('path').join(__dirname, 'assets.html'), 'utf8');
+        const script = html.indexOf('stocks/lib/attestation-status.js?v=20261001b');
+        const modal = html.indexOf('asset-modal.js?v=20261001b');
+        expect(script).toBeGreaterThan(-1);
+        expect(modal).toBeGreaterThan(script);
+        expect(html).toContain('id="attRecordedStatus"');
+        expect(html).toContain('<strong>Evidence status:</strong>');
+    });
+});

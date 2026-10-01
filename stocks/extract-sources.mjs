@@ -8,12 +8,13 @@
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { applyRetirements, buildRegistry, countBy, topHosts } from './lib/sources.mjs';
+import { addResearchSources, applyRetirements, buildRegistry, countBy, topHosts } from './lib/sources.mjs';
 import { log, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 
 const HERE = import.meta.dirname;
 const ISSUER_DIR = join(HERE, 'data', 'issuers');
 const PARTIES_FILE = join(HERE, 'data', 'canonical-parties.json');
+const RESEARCH_FILE = join(HERE, '..', 'rwa', 'data', 'research.json');
 const RETIRED_FILE = join(HERE, 'data', 'retired-sources.json');
 const DEFAULT_OUT = join(HERE, 'data', 'sources.json');
 
@@ -30,8 +31,10 @@ OPTIONS
   --help         This text.
 
 WHAT IT DOES
-  Walks every dossier in stocks/data/issuers/*.json and stocks/data/canonical-parties.json,
-  string by string, and collects every http(s) URL with the field path it appeared in — so
+  Walks every dossier in stocks/data/issuers/*.json, stocks/data/canonical-parties.json and
+  curated rwa/data/research.json. Research citations are attributed by product, instrument, holder
+  context, terms snapshot and source id in foundIn; they do not acquire an issuer. It collects every
+  http(s) URL with the field path it appeared in — so
   \`documents[3].url\`, \`findings[2].evidence\` and a URL buried in \`redemption.fees\` prose are all
   picked up. A \`whatIf[]\` citation is labelled by its failure MODE rather than its array index
   (\`whatIf[issuer-wind-down]\`, \`whatIf[issuer-wind-down].cases[0]\`), because inserting one answer
@@ -62,7 +65,9 @@ async function loadDossiers() {
     const parties = await readJson(PARTIES_FILE, null);
     if (parties) dossiers.push({ slug: null, doc: parties });
     else logWarn(`${PARTIES_FILE} absent — its URLs are not in the registry`);
-    return { dossiers, files };
+    const research = await readJson(RESEARCH_FILE, null);
+    if (!research) logWarn(`${RESEARCH_FILE} absent — curated RWA product sources are not in the registry`);
+    return { dossiers, files, research };
 }
 
 async function main() {
@@ -73,22 +78,24 @@ async function main() {
     }
     const out = typeof flags.out === 'string' ? flags.out : DEFAULT_OUT;
 
-    const { dossiers, files } = await loadDossiers();
+    const { dossiers, files, research } = await loadDossiers();
     log(`extract-sources: ${files.length} dossiers${dossiers.length > files.length ? ' + canonical-parties.json' : ''}`);
 
-    const registry = buildRegistry(dossiers, { generatedAt: ts() });
+    const generatedAt = ts();
+    const registry = buildRegistry(dossiers, { generatedAt });
     const { truncated } = registry;
+    const combined = research ? addResearchSources(registry.items, research, { generatedAt }) : registry;
     const retirements = await readJson(RETIRED_FILE, { items: [] });
-    const { items, retired, unmatched } = applyRetirements(registry.items, retirements.items);
+    const { items, retired, unmatched } = applyRetirements(combined.items, retirements.items);
 
     await writeJson(out, {
-        generatedAt: registry.generatedAt,
-        count: registry.count,
+        generatedAt: combined.generatedAt,
+        count: combined.count,
         items,
         truncatedCitations: truncated
     });
 
-    log(`extract-sources: ${registry.count} distinct URLs -> ${out.replace(`${HERE}/`, 'stocks/')}`);
+    log(`extract-sources: ${combined.count} distinct URLs -> ${out.replace(`${HERE}/`, 'stocks/')}`);
     const kinds = countBy(items, (i) => i.kind);
     log(`  by kind:   ${Object.entries(kinds).map(([k, n]) => `${k}=${n}`).join(' ')}`);
     const issuers = countBy(items, (i) => i.issuer);
@@ -97,8 +104,14 @@ async function main() {
     for (const [host, n] of topHosts(items, 10)) log(`    ${String(n).padStart(3)} ${host}`);
     log(`  ${retired} URL(s) retired (stocks/data/retired-sources.json) — kept in the registry, not fetched`);
     for (const url of unmatched) logWarn(`retired-sources.json names ${url}, which no dossier cites any more`);
-    const shared = items.filter((i) => new Set(i.foundIn.map((p) => p.split(':')[0])).size > 1).length;
-    log(`  ${shared} URL(s) cited by more than one dossier`);
+    const origin = (label) => {
+        if (label.startsWith('product=')) return `product=${label.slice(8).split('|', 1)[0]}`;
+        return label.split(':', 1)[0];
+    };
+    const shared = items.filter((i) => new Set(i.foundIn.map(origin)).size > 1).length;
+    const productSources = items.filter((i) => i.foundIn.some((label) => label.startsWith('product='))).length;
+    log(`  ${shared} URL(s) cited by more than one issuer, shared dossier or product`);
+    log(`  ${productSources} URL(s) carry curated product attribution`);
     if (truncated.length) {
         logWarn(`${truncated.length} citation(s) are written truncated and cannot be fetched:`);
         for (const t of truncated) logWarn(`    ${t.issuer ?? 'shared'}:${t.path} -> ${t.raw}`);

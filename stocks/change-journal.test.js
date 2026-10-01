@@ -1,4 +1,5 @@
 import { buildChangeJournal } from './lib/change-journal.mjs';
+import watch from '../watch.js';
 
 describe('public change journal', () => {
     test('publishes real actor changes but never internal-only resolutions', () => {
@@ -94,5 +95,56 @@ describe('protocol docs-vs-chain discrepancies in the journal', () => {
 
     test('a record without its recorded date is left out, never dated now', () => {
         expect(buildChangeJournal({ protocolDiscrepancies: [{ ...record, observedAt: null }] })).toEqual([]);
+    });
+});
+
+
+describe('observed token-control deltas in the public journal', () => {
+    const address = '0x1234567890abcdef1234567890abcdef12345678';
+    const event = {
+        id: `ethereum:${address}:2026-09-30T23:00:00Z:owner`,
+        deploymentId: `ethereum:${address}`, productId: 'fund-one', productName: 'Fund One',
+        address, network: 'Ethereum', field: 'owner', before: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        after: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', firstObservedAt: '2026-09-30T23:00:00Z',
+        eventAt: null, blockTimestamp: '2026-09-30T22:58:00.000Z', blockHash: `0x${'12'.repeat(32)}`, slot: null
+    };
+    const researchProducts = [{
+        id: 'fund-one', name: 'Fund One', ticker: 'FUND', instrument: { id: 'instrument:fund-one' },
+        deployments: [{ id: event.deploymentId, network: 'Ethereum', address, identityCheckedAt: '2026-09-10T00:00:00Z' }]
+    }];
+
+    test('publishes only an actual changed control on a verified exact deployment with separate observation/block times', () => {
+        const [item] = buildChangeJournal({ deploymentEvents: [event], researchProducts });
+        expect(buildChangeJournal({ deploymentEvents: [event], researchProducts })[0].id).toBe(item.id);
+        expect(item).toMatchObject({
+            id: `deployment-control-${event.id}`, date: '2026-09-30', category: 'actor-change', kind: 'control-change',
+            eventAt: null, effectiveAt: null, firstObservedAt: '2026-09-30T23:00:00Z',
+            blockTimestamp: '2026-09-30T22:58:00.000Z', actor: 'Fund One', issuer: null,
+            href: './report.html?product=fund-one', before: event.before, after: event.after,
+            deployment: { id: event.deploymentId, network: 'Ethereum', address, instrumentId: 'instrument:fund-one', field: 'owner' }
+        });
+        expect(item.summary).toContain('The block timestamp dates the observed state, not the precise control-change time.');
+        expect(item.assets).toEqual([expect.objectContaining({ mint: address, name: `Ethereum deployment ${address}`, href: null, network: 'Ethereum', address })]);
+        expect(item.assets[0].href).toBeNull();
+        const [rendered] = watch.journalRows([item]);
+        expect(rendered).toMatchObject({ eventAt: null, firstObservedAt: item.firstObservedAt, href: item.href });
+        expect(rendered.assets[0]).toMatchObject({ mint: address, name: `Ethereum deployment ${address}`, href: null });
+        expect(rendered.sources[0]).toMatchObject({ url: './rwa-research.json', accessedAt: item.firstObservedAt });
+        expect(rendered.summary).toContain(item.blockTimestamp);
+    });
+
+    test('ignores baseline-like, internal, missing-field, supply and unverified-deployment rows', () => {
+        const bad = [
+            { ...event, id: 'supply', field: 'supply', before: '100', after: '101' },
+            { ...event, id: 'supply-raw', field: 'supplyRaw', before: '100000000', after: '101000000' },
+            { ...event, id: 'decimals', field: 'decimals', before: '6', after: '9' },
+            { ...event, id: 'unknown-product', productId: 'corrected-product' },
+            { ...event, id: 'unverified', deploymentId: 'ethereum:other', address: '0x' + '99'.repeat(20) },
+            { ...event, id: 'baseline-no-old-value', before: undefined },
+            { ...event, id: 'no-observed-time', firstObservedAt: null },
+            { ...event, id: 'not-a-delta', before: 'same', after: 'same' }
+        ];
+        expect(buildChangeJournal({ deploymentEvents: bad, researchProducts })).toEqual([]);
+        expect(buildChangeJournal({ deploymentEvents: [], researchProducts })).toEqual([]);
     });
 });

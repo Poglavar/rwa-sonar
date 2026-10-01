@@ -1,0 +1,14 @@
+{
+  "name": "RWA Sonar Cross-Asset Deployment Watcher",
+  "active": false,
+  "mutedReason": "Prepared on the unification branch; production deployment and schedule activation have not been authorized.",
+  "unmuteWhen": "Install this entry in alerts-server-telegram/bot-list.json and activate after the watcher and its output are verified on production.",
+  "description": "Hourly read-only observations of officially identified Ethereum and Solana deployments. Optional unsupported ABI fields remain unknown; failed required deployment reads poison the completion verdict.",
+  "machine": { "host": "67.205.138.129", "user": "root", "sshKey": "~/.ssh/id_ed25519", "workDir": "/root/code/rwa-sonar" },
+  "schedule": { "cron": "11 * * * *", "checkDelayMinutes": 5, "description": "Hourly at :11 UTC before the :17 publication refresh." },
+  "successCriteria": { "type": "run-stats", "field": "watchStatus", "equals": "ok", "timestampField": "lastRunEndedAt", "requireRecent": true, "useLastScheduledRunForRecency": true, "minValues": { "deploymentsRead": 13 }, "maxValues": { "failures": 0 } },
+  "runStatsCommand": "cat .last-rwa-deployment-watch-stats.json",
+  "entrypoint": "rwa/watch-deployments.mjs",
+  "logFile": "/root/code/rwa-sonar/logs/rwa-watch-deployments-out.log",
+  "errorLogFile": "/root/code/rwa-sonar/logs/rwa-watch-deployments-error.log"
+}

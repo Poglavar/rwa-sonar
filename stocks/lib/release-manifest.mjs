@@ -2,7 +2,7 @@
 // their own payloads; this only says which complete set is published together.
 export const RELEASE_ARTIFACTS = [
     'release-evidence.json',
-    'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
+    'rwa-catalogue.json', 'rwa-research.json', 'rwa/data/research.json', 'stocks-issuers.json', 'stocks-tokens.json', 'stocks-discovery.json', 'stocks-funnel.json',
     'stocks-graph.json', 'stocks-health.json', 'stocks-collector-status.json', 'stocks-review-queue.json',
     'stocks-closed-market.json', 'stocks-changes.json', 'stocks-change-journal.json', 'stocks-defi-changes.json',
     'stocks-legal-templates.json',
@@ -26,14 +26,14 @@ export const RELEASE_ARTIFACTS = [
 
 // Artifacts that are curated inputs, not job output: edited by hand and only read by the jobs, so they
 // stay tracked in git while every other artifact is ignored (.gitignore, "Job-owned runtime data").
-export const RELEASE_CURATED = ['stocks/data/events.json', 'stocks/data/defi-program-registry.json'];
+export const RELEASE_CURATED = ['rwa/data/research.json', 'stocks/data/events.json', 'stocks/data/defi-program-registry.json'];
 
 // Release construction has explicit phases because the review queue reads the database, while
 // cards/templates must be regenerated after that queue exists.  `base` rebuilds the catalogue
 // from retained raw inputs (including curated dossier changes); it never collects a source.
 export const RELEASE_BUILD_STAGES = {
     base: [
-        'stocks/build-stocks-db.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
+        'stocks/build-stocks-db.mjs', 'rwa/build-research.mjs', 'stocks/build-rwa-catalogue.mjs', 'stocks/build-graph.mjs', 'stocks/build-health.mjs',
         'stocks/build-discovery-index.mjs',
         // Read the catalogue build-stocks-db just wrote.
         'stocks/build-power-map.mjs', 'stocks/build-flows.mjs', 'stocks/build-schematics.mjs',

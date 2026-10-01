@@ -55,7 +55,8 @@ async function loadAssets() {
             return;
         }
 
-        assetsData = rows;
+        const query = new URLSearchParams(window.location.search).get('search')?.toLowerCase();
+        assetsData = query ? rows.filter((a) => [a.name, a.ticker, a.issuer].some((v) => String(v || '').toLowerCase().includes(query))) : rows;
 
         thead.innerHTML = `<tr>${TABLE_COLUMNS.map(col =>
             `<th style="cursor:pointer;user-select:none;" data-key="${escapeHtml(col.key)}">${escapeHtml(col.label)}<span class="sort-indicator"></span></th>`
@@ -66,7 +67,7 @@ async function loadAssets() {
         });
 
         sortByColumn('_maturityStage');
-        status.textContent = `Loaded ${rows.length} assets`;
+        status.textContent = `Loaded ${assetsData.length} historical records${query ? ` matching “${query}”` : ""}`;
         tableWrap.hidden = false;
         setupScrollHint();
     } catch (err) {

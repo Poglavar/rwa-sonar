@@ -93,9 +93,13 @@ stocks/data/event-first-seen.json
 
 # Job-owned runtime data: written by the prod jobs on every refresh (the release manifest's list,
 # stocks/lib/release-manifest.mjs), so never committed. A local copy comes from prod with
-# `./pull-prod-data.sh`; tests read the frozen copy in test-fixtures/catalogue/. Two files in the
+# `./pull-prod-data.sh`; tests read the frozen copy in test-fixtures/catalogue/. Three files in the
 # manifest are curated inputs, edited by hand and only read by the jobs, so they stay tracked:
-# stocks/data/events.json and stocks/data/defi-program-registry.json (RELEASE_CURATED in the manifest).
+# rwa/data/research.json, stocks/data/events.json and stocks/data/defi-program-registry.json (RELEASE_CURATED in the manifest).
+/rwa-catalogue.json
+/rwa-research.json
+# Runtime observations are retained for the deployment watcher; the release builder snapshots them into rwa-research.json.
+/rwa/data/deployment-observations.json
 /stocks-issuers.json
 /stocks-tokens.json
 /stocks-discovery.json
@@ -137,3 +141,6 @@ stocks/data/cmc-tokenized.json
 
 # Private open-work list, kept local only
 next-steps.md
+
+# Completion records for the new cross-asset deployment watcher.
+.last-rwa-deployment-watch-stats*.json

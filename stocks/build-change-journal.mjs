@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds the reader-facing change journal from public actor-change resolutions, curated incidents,
-// protocol docs-vs-chain discrepancies and named catalogue additions/removals. Internal research
-// corrections never enter this artifact.
+// exact deployment control deltas, protocol docs-vs-chain discrepancies and catalogue changes.
+// Internal research corrections never enter this artifact.
 
 import { join } from 'node:path';
 import { assignSlugs } from './lib/cards.mjs';
@@ -17,7 +17,7 @@ async function main() {
         console.log('Usage: node stocks/build-change-journal.mjs --run [--out=stocks-change-journal.json]');
         return;
     }
-    const [changes, defiChanges, events, resolutions, identities, tokenDb, marketResearch, defiUsage] = await Promise.all([
+    const [changes, defiChanges, events, resolutions, identities, tokenDb, marketResearch, defiUsage, deploymentObservations, rwaResearch] = await Promise.all([
         readJson(join(ROOT, 'stocks-changes.json'), {}),
         readJson(join(ROOT, 'stocks-defi-changes.json'), {}),
         readJson(join(ROOT, 'stocks/data/events.json'), {}),
@@ -25,7 +25,9 @@ async function main() {
         readJson(join(ROOT, 'stocks/data/mint-identities.json'), {}),
         readJson(join(ROOT, 'stocks-tokens.json'), {}),
         readJson(join(ROOT, 'stocks/data/protocol-market-research.json'), { markets: [] }),
-        readJson(join(ROOT, 'stocks/data/defi-usage.json'), {})
+        readJson(join(ROOT, 'stocks/data/defi-usage.json'), {}),
+        readJson(join(ROOT, 'rwa/data/deployment-observations.json'), { events: [] }),
+        readJson(join(ROOT, 'rwa/data/research.json'), { products: [] })
     ]);
     const tokens = Array.isArray(tokenDb.tokens) ? tokenDb.tokens : [];
     const slugs = assignSlugs(tokens);
@@ -42,6 +44,8 @@ async function main() {
         // Docs-vs-chain findings recorded on decoded protocol markets (the protocol dossiers show them too).
         protocolDiscrepancies: discrepancyView.protocolDiscrepancyRecords(marketResearch,
             { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsage) }),
+        deploymentEvents: deploymentObservations.events,
+        researchProducts: rwaResearch.products,
         issuerNames: Object.fromEntries((Array.isArray(tokenDb.issuerIndex) ? tokenDb.issuerIndex : [])
             .filter((issuer) => issuer?.slug && issuer?.name)
             .map((issuer) => [issuer.slug, issuer.name]))

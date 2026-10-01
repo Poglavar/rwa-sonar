@@ -2,11 +2,14 @@
 // Validates the deterministic generated pages before a release is mirrored to the public docroot.
 // It deliberately reads local artifacts only: collection freshness is a separate runtime concern.
 
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { log, logError, parseArgs } from './lib/io.mjs';
 import discoveryHelpers from './lib/discovery.js';
+import catalogueHelpers from './lib/rwa-catalogue.js';
+import researchModel from '../rwa/lib/research.js';
+import { buildResearch } from '../rwa/lib/build-research.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
 const REPRESENTATIVE_ROUTES = [
@@ -125,7 +128,37 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
         if (!workspace.includes(marker)) throw new Error(`stocks.html: missing release marker ${marker}`);
     }
 
-    const issuers = (await readJson(join(root, 'stocks-issuers.json'))).issuers;
+    const issuerDb = await readJson(join(root, 'stocks-issuers.json'));
+    const issuers = issuerDb.issuers;
+    const catalogue = await readJson(join(root, 'rwa-catalogue.json'));
+    const curatedResearch = researchModel.validateResearch(await readJson(join(root, 'rwa/data/research.json')));
+    const runtimeResearch = researchModel.validateResearch(await readJson(join(root, 'rwa-research.json')));
+    if (!runtimeResearch.monitoringRecords || typeof runtimeResearch.monitoringRecords !== 'object'
+        || Array.isArray(runtimeResearch.monitoringRecords)) {
+        throw new Error('shared RWA research report is missing embedded monitoring records');
+    }
+    const dossierDir = join(root, 'stocks/data/issuers');
+    const dossiers = {};
+    for (const file of (await readdir(dossierDir)).filter((name) => name.endsWith('.json'))) {
+        dossiers[file.slice(0, -5)] = await readJson(join(dossierDir, file));
+    }
+    const expectedResearch = buildResearch(curatedResearch, issuerDb, tokenDb, dossiers,
+        { records: runtimeResearch.monitoringRecords }, runtimeResearch.builtAt);
+    if (JSON.stringify(runtimeResearch) !== JSON.stringify(expectedResearch)) {
+        throw new Error('shared RWA research report disagrees with curated, programme, exact-deployment or embedded-monitor sources');
+    }
+    const expectedInstruments = new Set(curatedResearch.products.map((product) => product.instrument?.id).filter(Boolean)).size;
+    if (runtimeResearch.products.length !== curatedResearch.products.length + issuers.length
+        || runtimeResearch.counts.publicProductReviews !== curatedResearch.products.length
+        || runtimeResearch.counts.programmeDossiers !== issuers.length
+        || runtimeResearch.counts.instrumentResearchSubjects !== expectedInstruments) {
+        throw new Error('shared RWA research subject or instrument counts disagree with source identities');
+    }
+    const expectedCatalogue = catalogueHelpers.buildCatalogue(await readJson(join(root, 'rwa-assets-db.json')),
+        issuerDb, tokenDb, runtimeResearch);
+    if (JSON.stringify(catalogue) !== JSON.stringify(expectedCatalogue)) {
+        throw new Error('unified RWA catalogue disagrees with shared product, programme or exact-deployment research');
+    }
     const representative = tokens.find((row) => row.symbol === REPRESENTATIVE_TOKEN_SYMBOL);
     if (!representative) throw new Error(`${REPRESENTATIVE_TOKEN_SYMBOL}: missing representative token`);
     const issuer = issuers.find((row) => row.slug === representative.issuer);
@@ -152,7 +185,9 @@ export async function validateRelease({ root = ROOT, baseUrl }) {
 
     return { tokenCount: tokens.length, cardCount: cards.length, representative: cardSlug,
         routes: REPRESENTATIVE_ROUTES.map((row) => row.path), protocolDossierCount: protocolIndex.length,
-        comparisonBundleCount: comparisonIndex.groups.length, ungroupedTokenCount };
+        comparisonBundleCount: comparisonIndex.groups.length, ungroupedTokenCount,
+        rwaResearchSubjectCount: runtimeResearch.products.length, rwaProductReviewCount: runtimeResearch.counts.publicProductReviews,
+        rwaProgrammeCount: runtimeResearch.counts.programmeDossiers, rwaInstrumentResearchSubjectCount: runtimeResearch.counts.instrumentResearchSubjects };
 }
 
 async function main() {
@@ -163,7 +198,8 @@ async function main() {
     }
     const result = await validateRelease({ root: ROOT, baseUrl: flags['base-url'] });
     log(`release artifacts valid: ${result.cardCount} card(s), ${result.protocolDossierCount} protocol dossier(s), ${result.comparisonBundleCount} comparison bundle(s), ${result.routes.length} representative route(s), `
-        + `${result.representative} card/issuer/template consistency, search + comparison workspace`);
+        + `${result.representative} card/issuer/template consistency, search + comparison workspace, `
+        + `${result.rwaResearchSubjectCount} RWA research subject(s) across ${result.rwaProductReviewCount} product reviews and ${result.rwaProgrammeCount} programme dossiers (${result.rwaInstrumentResearchSubjectCount} instrument(s))`);
     return 0;
 }
 

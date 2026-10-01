@@ -41,10 +41,10 @@ const LEARN_ROOT = { name: 'Learn', url: 'learn/' };
 export const SITE_PAGES = [
     {
         key: 'home', file: 'index.html', path: '',
-        title: 'RWA Sonar — inspect tokenized stocks on Solana',
-        description: 'The ticker is familiar. The token is mysterious. Compare Solana stock wrappers: holder rights, issuer controls, exits and the evidence behind each.',
-        imageTitle: 'The ticker is familiar. The token is mysterious.',
-        kicker: 'Tokenized stocks on Solana', subtitle: 'What the holder owns, who can intervene, where it can be used and how to exit — with the evidence.',
+        title: 'RWA Sonar — know what sits behind your token',
+        description: 'Explore real-world asset tokens across assets and chains: holder rights, backing, controls, exit routes and evidence, with research coverage stated.',
+        imageTitle: 'Know what sits behind your token.',
+        kicker: 'Real-world asset tokens', subtitle: 'What the holder owns, who can intervene, where it can be used and how to exit — with the evidence.',
         schema: 'home',
         stats: (d) => [
             { value: fmtCount(tokenCount(d)), label: 'exact Solana token addresses' },
@@ -52,6 +52,36 @@ export const SITE_PAGES = [
             { value: fmtCount(arr(d.templates?.templates).length || null), label: 'legal + control templates' }
         ],
         lastmod: (d) => d.tokens?.builtAt
+    },
+    {
+        key: 'explore', file: 'explore.html', path: 'explore.html',
+        title: 'Explore real-world asset tokens — RWA Sonar',
+        description: 'Search cash, Treasury, stock, credit and commodity tokens. See what coverage exists, what the holder owns and where to find programme and exact-token research.',
+        kicker: 'All-RWA catalogue', subtitle: 'Product entries, stock programmes and exact addresses, with their research scope stated.',
+        schema: 'dataset', dataset: { name: 'RWA Sonar cross-asset discovery catalogue', files: ['rwa-catalogue.json'], keywords: ['real-world assets', 'tokenization', 'gold', 'Treasuries', 'tokenized stocks'] },
+        stats: (d) => [
+            { value: fmtCount(d.catalogue?.counts?.products), label: 'product entries, with coverage stated' },
+            { value: fmtCount(d.catalogue?.counts?.programmes), label: 'stock programme dossiers' },
+            { value: fmtCount(d.catalogue?.counts?.indexedStockDeployments), label: 'indexed Solana stock addresses' }
+        ],
+        lastmod: (d) => d.catalogue?.sources?.tokens
+    },
+    {
+        key: 'compare', file: 'compare.html', path: 'compare.html',
+        title: 'Compare RWA holder rights — RWA Sonar',
+        description: 'Compare RWA holder rights, backing, controls and exit routes across asset classes, with the holder context, sources and unresolved evidence beside each answer.',
+        kicker: 'Compare holder rights', subtitle: 'Cross-asset dimensions, with source coverage stated and no composite score.',
+        schema: 'webpage',
+        facts: ['Compare legal rights, redemption, transfer controls, custody and evidence.', 'Coverage varies across assets and chains.', 'No composite score is assigned.']
+    },
+    {
+        key: 'report', file: 'report.html', path: 'report.html',
+        title: 'RWA holder-rights reports — RWA Sonar',
+        description: 'Read scoped RWA product reviews and stock dossiers: rights, backing, controls, access, exits and failure, with sources and exact deployment observations.',
+        kicker: 'Holder-rights reports', subtitle: 'Seven shared questions with holder context, evidence states and source dates.',
+        schema: 'dataset', dataset: { name: 'Scoped RWA holder-rights research', files: ['rwa-research.json'] },
+        facts: ['21 product reviews and 12 stock programme dossiers; coverage and unresolved findings are explicit.', 'Documented rights, unresolved terms and live deployment checks have separate evidence scopes.'],
+        lastmod: (d) => d.catalogue?.entries?.filter((e) => e.coverage === 'reviewed').map((e) => e.legalReviewedAt).sort().at(-1)
     },
     {
         key: 'stocks', file: 'stocks.html', path: 'stocks.html',
@@ -156,7 +186,7 @@ export const SITE_PAGES = [
     {
         key: 'monitor', file: 'monitor.html', path: 'monitor.html',
         title: 'Health monitor — RWA Sonar',
-        description: 'Monitor tokenized-stock price tracking, liquidity, holder concentration, authority controls and source changes on Solana, token by token.',
+        description: 'Inspect Ethereum and Solana deployment observations, plus stock price tracking, liquidity, concentration, controls and source changes.',
         kicker: 'Health monitor', subtitle: 'Each token on its own checks and on its programme’s; unknown never counts as good.',
         schema: 'dataset', dataset: { name: 'Tokenized-stock health checks', files: ['stocks-health.json'] },
         stats: (d) => [

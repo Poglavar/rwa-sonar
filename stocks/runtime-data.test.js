@@ -4,7 +4,7 @@
 // artifact is added to the release manifest without being ignored.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { RELEASE_ARTIFACTS, RELEASE_CURATED } from './lib/release-manifest.mjs';
+import { RELEASE_ARTIFACTS, RELEASE_BUILD_STAGES, RELEASE_CURATED } from './lib/release-manifest.mjs';
 
 const ROOT = join(import.meta.dirname, '..');
 const ignored = new Set(readFileSync(join(ROOT, '.gitignore'), 'utf8').split('\n')
@@ -22,6 +22,18 @@ describe('job-owned runtime data stays out of git', () => {
     it('ignores every release artifact a job writes', () => {
         const missing = RELEASE_ARTIFACTS.filter((path) => !RELEASE_CURATED.includes(path) && !ignored.has(path));
         expect(missing).toEqual([]);
+    });
+
+    it('builds the unified RWA research report before the catalogue consumes it', () => {
+        const base = RELEASE_BUILD_STAGES.base;
+        expect(base.indexOf('stocks/build-stocks-db.mjs')).toBeLessThan(base.indexOf('rwa/build-research.mjs'));
+        expect(base.indexOf('rwa/build-research.mjs')).toBeLessThan(base.indexOf('stocks/build-rwa-catalogue.mjs'));
+        expect(RELEASE_ARTIFACTS).toContain('rwa-research.json');
+    });
+
+    it('keeps watcher observations private runtime state outside the public release', () => {
+        expect(RELEASE_ARTIFACTS).not.toContain('rwa/data/deployment-observations.json');
+        expect(ignored.has('rwa/data/deployment-observations.json')).toBe(true);
     });
 
     it('keeps the curated inputs tracked, and they exist in the checkout', () => {

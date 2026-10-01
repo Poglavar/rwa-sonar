@@ -288,6 +288,14 @@ describe('verificationStrength', () => {
             .toBe(false);
     });
 
+    test('a promised unpublished attestation is explicitly labelled but has no verification strength', () => {
+        expect(verificationStrength({ custodyVerification: {
+            type: 'auditor-attestation', evidenceStatus: 'promised-unpublished', machineReadable: false
+        } })).toEqual({
+            strength: null, label: 'promised, unpublished', machineReadable: false, type: 'auditor-attestation'
+        });
+    });
+
     test('an absent block is strength 0, an unrecognised type is null rather than a silent 0', () => {
         expect(verificationStrength({}).strength).toBe(0);
         expect(verificationStrength(null).strength).toBe(0);

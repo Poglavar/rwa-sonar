@@ -11,6 +11,7 @@ const learnPages = fs.readdirSync(path.join(ROOT, 'learn')).filter((f) => f.ends
 
 /** Hand-written pages with the site header: [file, link root, own nav entry]. */
 const PAGES = [
+    ['explore.html', './', 'explore.html'], ['compare.html', './', 'compare.html'], ['report.html', './', 'report.html'],
     ['index.html', './', null], ['stocks.html', './', null], ['assets.html', './', 'assets.html'],
     ...['powers', 'flows', 'tracking', 'exits', 'whatif', 'watch', 'monitor', 'live', 'graph', 'economics', 'methodology', 'review']
         .map((name) => [`${name}.html`, './', `${name}.html`]),
@@ -35,6 +36,8 @@ describe('the one site header', () => {
     test('the header has the four primary links, the Research menu, and a compact Learn copy', () => {
         const header = siteHeaderHtml('./', 'watch.html');
         expect(PRIMARY.map((item) => item.label)).toEqual(['Explore', 'Compare', 'Changes', 'Learn']);
+        expect(PRIMARY.find((item) => item.label === 'Compare').href).toBe('compare.html');
+        expect(RESEARCH.some((item) => item.href === 'stocks.html?view=compare')).toBe(true);
         expect(MENU_LABEL).toBe('Research');
         expect(header).toContain('<summary>Research</summary>');
         expect(header).toContain('<a class="nav-compact-only" href="./learn/">Learn</a>');

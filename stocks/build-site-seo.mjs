@@ -65,15 +65,15 @@ OUTPUTS
 async function readData(root) {
     const j = (path) => readJson(join(root, path), null);
     const [tokens, issuers, templates, health, defi, powerMap, flows, tracking, exits, graph, review, journal, trades,
-        assets, sources, trustChain, economics] = await Promise.all([
+        assets, sources, trustChain, economics, catalogue] = await Promise.all([
         j('stocks-tokens.json'), j('stocks-issuers.json'), j('stocks-legal-templates.json'), j('stocks-health.json'),
         j('stocks/data/defi-usage.json'), j('stocks-power-map.json'), j('stocks-flows.json'), j('stocks-tracking.json'),
         j('stocks-exits.json'), j('stocks-graph.json'), j('stocks-review-queue.json'), j('stocks-change-journal.json'),
         j('stocks-trades.json'), j('rwa-assets-db.json'), j('stocks/data/sources.json'), j('stocks/data/trust-chain.json'),
-        j('stocks/data/economics.json')
+        j('stocks/data/economics.json'), j('rwa-catalogue.json')
     ]);
     return { tokens, issuers, templates, health, defi, powerMap, flows, tracking, exits, graph, review, journal, trades,
-        assets, sources, trustChain, economics };
+        assets, sources, trustChain, economics, catalogue };
 }
 
 /** YYYY-MM-DD of an ISO timestamp, or null. */

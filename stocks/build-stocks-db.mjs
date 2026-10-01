@@ -680,7 +680,9 @@ async function main() {
         if (!Array.isArray(dossier.findings)) logWarn(`dossier ${file} has no "findings" — defaulting to []`);
         if (!dossier.keyGovernance) logWarn(`dossier ${file} has no "keyGovernance" — defaulting to all "unknown"`);
         const verification = verificationStrength(dossier);
-        if (verification.strength === null) {
+        if (verification.strength === null && dossier.custodyVerification?.evidenceStatus === 'promised-unpublished') {
+            logWarn(`dossier ${file}: custody evidence is promised but unpublished — verification strength is null`);
+        } else if (verification.strength === null) {
             logWarn(`dossier ${file} has custodyVerification.type "${verification.type}", which is not one of ${Object.keys(VERIFICATION_STRENGTH).join(' | ')} — verification strength is null`);
         }
 

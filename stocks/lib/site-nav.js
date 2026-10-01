@@ -13,8 +13,8 @@
 })(this, function () {
     /** The primary row. `id` is kept stable: tests and older links address the Changes link by it. */
     const PRIMARY = [
-        { id: 'nav-stocks', href: 'stocks.html?view=assets', label: 'Explore' },
-        { href: 'stocks.html?view=compare', label: 'Compare' },
+        { id: 'nav-stocks', href: 'explore.html', label: 'Explore' },
+        { href: 'compare.html', label: 'Compare' },
         { id: 'nav-watch', href: 'watch.html', label: 'Changes' },
         { href: 'learn/', label: 'Learn' }
     ];
@@ -38,7 +38,9 @@
         { id: 'nav-live', href: 'live.html', label: 'Live trades' },
         { id: 'nav-review', href: 'review.html', label: 'Review queue' },
         { href: 'weekly/latest.html', label: 'This week' },
-        { href: 'assets.html', label: 'All RWAs' },
+        { href: 'stocks.html?view=compare', label: 'Solana stock comparison' },
+        { href: 'stocks.html?view=assets', label: 'Solana stocks' },
+        { href: 'assets.html', label: 'Historical tokenization lens' },
         { href: 'pitch/', label: 'Pitch' },
         { href: 'https://github.com/Poglavar/rwa-sonar', label: 'Code', external: true }
     ];

@@ -142,7 +142,7 @@ describe('landing/app separation', () => {
         expect(html).toContain('L2BEAT, extended to RWAs');
         expect(html).toContain('Claims versus reality');
         expect(html).not.toContain('Why tokenize an asset at all?');
-        expect(html).toContain('The ticker is familiar.<br><span>The token is mysterious.</span>');
+        expect(html).toContain('Know what sits behind<br><span>your token.</span>');
         expect(html).not.toContain('The token is not.');
         expect(html).not.toContain('not one score');
         expect(html).toContain('cannot tell us how many people own tokens');

@@ -71,12 +71,12 @@ export function websiteLd(origin = SITE_ORIGIN) {
         '@id': `${origin}/#website`,
         name: SITE_NAME,
         url: `${origin}/`,
-        description: 'Public research on tokenized stocks on Solana: what the holder legally owns, who can intervene on-chain and off-chain, where the token can be used and how to exit, with cited evidence.',
+        description: 'Public research on real-world asset tokens across asset classes and chains: holder rights, backing, controls and exit routes, with cited evidence and research coverage stated.',
         publisher: { '@id': `${origin}/#organization` },
         inLanguage: 'en',
         potentialAction: {
             '@type': 'SearchAction',
-            target: { '@type': 'EntryPoint', urlTemplate: `${origin}/stocks.html?view=assets&search={search_term_string}` },
+            target: { '@type': 'EntryPoint', urlTemplate: `${origin}/explore.html?search={search_term_string}` },
             'query-input': 'required name=search_term_string'
         }
     };

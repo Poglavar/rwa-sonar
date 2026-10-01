@@ -121,6 +121,10 @@ export function verificationStrength(issuer) {
     const raw = typeof verification?.type === 'string' ? verification.type.trim() : '';
     const type = raw === '' ? 'unknown' : raw;
 
+    if (verification?.evidenceStatus === 'promised-unpublished') {
+        return { strength: null, label: 'promised, unpublished', machineReadable, type };
+    }
+
     if (!Object.hasOwn(VERIFICATION_STRENGTH, type)) {
         return { strength: null, label: null, machineReadable, type };
     }

@@ -3,6 +3,10 @@
  * @param {string} url The URL to check.
  * @returns {boolean} True if the URL is safe, false otherwise.
  */
+const attestationStatusLib = typeof module !== 'undefined' && module.exports
+    ? require('./stocks/lib/attestation-status.js')
+    : (typeof window !== 'undefined' ? window.__rwaAttestationStatus : null);
+
 function isSafeUrl(url) {
     if (!url) return false;
     const trimmedUrl = url.trim().toLowerCase();
@@ -518,6 +522,7 @@ if (typeof document !== 'undefined') {
             circle.className = 'attestation-circle';
 
             const isEmpty = !attestation;
+            let statusLabel = null;
 
             if (isEmpty) {
                 circle.classList.add('empty-attestation');
@@ -527,37 +532,29 @@ if (typeof document !== 'undefined') {
                 circle.style.setProperty('--attestor-color', getAttestorColor(attestor));
                 circle.dataset.attestor = attestor;
 
-                // Build SVG progress ring
+                // Expiry belongs to this evidence record, not the underlying asset.
+                const attestationStatus = attestationStatusLib.classifyAttestation(attestation, new Date());
+                statusLabel = attestationStatus.label;
+                circle.classList.add(attestationStatus.cssClass);
                 const now = new Date();
-                const attDate = new Date(attestation.attestationDate);
-                const expDate = attestation.expiryDate ? new Date(attestation.expiryDate) : null;
-
+                const attDate = new Date(attestation.attestationDate + 'T00:00:00Z');
+                const expiryDate = attestationStatus.expiryDate;
+                const expDate = expiryDate ? new Date(expiryDate + 'T00:00:00Z') : null;
                 let percentPassed = 0;
-                let isExpired = attestation.status === 'expired' || attestation.status === 'revoked';
 
-                if (expDate) {
-                    isExpired = isExpired || now > expDate;
-                    if (!isExpired) {
-                        const totalDuration = expDate - attDate;
-                        const elapsed = now - attDate;
-                        if (totalDuration > 0) {
-                            percentPassed = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
-                        }
-                    } else {
-                        percentPassed = 100;
+                if (expDate && attestationStatus.state === 'expired') {
+                    percentPassed = 100;
+                } else if (expDate && !Number.isNaN(attDate.getTime())) {
+                    const totalDuration = expDate - attDate;
+                    const elapsed = now - attDate;
+                    if (totalDuration > 0) {
+                        percentPassed = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100));
                     }
                 }
-                // No expiry = permanent attestation, show as full green
-                if (!expDate && !isExpired) {
-                    percentPassed = 0;
-                }
 
-                let color = '#48bb78'; // Green
-                if (isExpired) color = '#f56565';
-                else if (percentPassed > 75) color = '#f56565';
-                else if (percentPassed > 50) color = '#ecc94b';
-
-                if (attestation.status === 'revoked') color = '#f56565';
+                // Ring colors identify evidence status, never asset validity.
+                const color = attestationStatus.state === 'expired' || attestationStatus.state === 'revoked'
+                    ? '#f56565' : '#eccb4b';
 
                 const size = CIRCLE_SIZE;
                 const strokeWidth = 3;
@@ -598,25 +595,15 @@ if (typeof document !== 'undefined') {
                     svg.appendChild(fgCircle);
                 }
 
-                // For permanent attestations (no expiry), show full green ring
-                if (!expDate && !isExpired) {
-                    const fullCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    fullCircle.setAttribute('cx', size / 2);
-                    fullCircle.setAttribute('cy', size / 2);
-                    fullCircle.setAttribute('r', radius);
-                    fullCircle.setAttribute('fill', 'none');
-                    fullCircle.setAttribute('stroke', color);
-                    fullCircle.setAttribute('stroke-width', strokeWidth);
-                    svg.appendChild(fullCircle);
-                }
-
                 circle.appendChild(svg);
             }
 
             // Tooltip label
             const text = document.createElement('span');
-            text.textContent = label;
-            circle.title = attestation && attestation.attestor ? `${attestation.attestor}: ${label}` : label;
+            text.textContent = statusLabel || label;
+            circle.title = statusLabel
+                ? statusLabel + (attestation.attestor ? ' · ' + attestation.attestor + ': ' + label : '')
+                : label;
             circle.setAttribute('aria-label', circle.title);
             circle.appendChild(text);
 
@@ -643,9 +630,11 @@ if (typeof document !== 'undefined') {
             document.getElementById('attTitle').textContent = getAttestationLabel(att);
             document.getElementById('attSchema').textContent = att.schema;
             document.getElementById('attAttestor').textContent = att.attestor;
-            document.getElementById('attDate').textContent = att.attestationDate;
-            document.getElementById('attExpiry').textContent = att.expiryDate || 'Permanent';
-            document.getElementById('attStatus').textContent = att.status;
+            const status = attestationStatusLib.classifyAttestation(att, new Date());
+            document.getElementById('attDate').textContent = att.attestationDate || 'Not recorded';
+            document.getElementById('attExpiry').textContent = att.expiryDate || 'Not recorded';
+            document.getElementById('attRecordedStatus').textContent = status.recordedStatus || 'Not recorded';
+            document.getElementById('attStatus').textContent = status.label;
             document.getElementById('attType').textContent = att.onchain ? 'Onchain' : 'Offchain';
 
             const noteRow = document.getElementById('attNoteRow');
@@ -679,6 +668,7 @@ if (typeof document !== 'undefined') {
             document.getElementById('attAttestor').textContent = typeDef ? typeDef.attestorType : '—';
             document.getElementById('attDate').textContent = '—';
             document.getElementById('attExpiry').textContent = '—';
+            document.getElementById('attRecordedStatus').textContent = '—';
             document.getElementById('attStatus').textContent = 'Missing';
             document.getElementById('attType').textContent = recipeItem.required ? 'Required' : 'Optional';
 

@@ -206,7 +206,7 @@ if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
 	pm2 delete rwa-watch-first >/dev/null 2>&1 || true
 	APPS="rwa-trades rwa-sonar-api"
 	if [ -z "$PREV_SHA" ] || ! git diff --quiet "$PREV_SHA" HEAD -- ecosystem.config.cjs; then
-		APPS="$APPS rwa-watch rwa-refresh rwa-watch-chain rwa-watch-lending rwa-watch-caselaw rwa-judge rwa-redemptions"
+		APPS="$APPS rwa-watch rwa-refresh rwa-watch-deployments rwa-watch-chain rwa-watch-lending rwa-watch-caselaw rwa-judge rwa-redemptions"
 		APPS="$APPS rwa-watch-entities rwa-watch-corporate-actions rwa-watch-regulators rwa-watch-regulators-fca rwa-watch-reserves rwa-watch-powers"
 		echo "ecosystem.config.cjs changed: restarting the scheduled jobs too" >&2
 	fi

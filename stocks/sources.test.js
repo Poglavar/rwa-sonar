@@ -344,3 +344,39 @@ describe('retired sources', () => {
             .toEqual(file.items.map((entry) => entry.url).sort());
     });
 });
+
+describe('curated RWA research sources', () => {
+    test('adds sources with explicit product, instrument, context, terms and source attribution without inventing an issuer', async () => {
+        const { addResearchSources, matchesResearchProduct } = await import('./lib/sources.mjs');
+        const research = { products: [{
+            id: 'cash-one', instrument: { id: 'instrument:cash-one' },
+            contexts: [{ id: 'retail', termsId: 'terms-v1' }, { id: 'institutional', termsId: 'terms-v2' }],
+            sources: [{ id: 'terms', title: 'Official terms', url: 'https://issuer.example/terms?utm_source=x' }]
+        }] };
+        const { items, count } = addResearchSources([], research, { generatedAt: RUN });
+        expect(count).toBe(1);
+        expect(items[0].issuer).toBeNull();
+        expect(items[0].title).toBe('Official terms');
+        expect(items[0].foundIn).toEqual([
+            'product=cash-one|instrument=instrument%3Acash-one|context=institutional|terms=terms-v2|source=terms',
+            'product=cash-one|instrument=instrument%3Acash-one|context=retail|terms=terms-v1|source=terms'
+        ]);
+        expect(matchesResearchProduct(items[0], 'cash-one')).toBe(true);
+        expect(matchesResearchProduct(items[0], 'cash-two')).toBe(false);
+    });
+
+    test('merges product attribution onto a URL already cited by an issuer without changing the issuer', async () => {
+        const { addResearchSources, matchesResearchProduct } = await import('./lib/sources.mjs');
+        const stockSource = { url: 'https://issuer.example/terms', kind: 'html', issuer: 'issuer-one', title: 'Issuer terms', foundIn: ['issuer-one:documents[0].url'] };
+        const research = { products: [{
+            id: 'cash-one', instrument: { id: 'instrument:cash-one' }, contexts: [{ id: 'holder', termsId: 'snapshot' }],
+            sources: [{ id: 'terms', title: 'Curated terms', url: 'https://issuer.example/terms' }]
+        }] };
+        const result = addResearchSources([stockSource], research, { generatedAt: RUN });
+        expect(result.items).toHaveLength(1);
+        expect(result.items[0].issuer).toBe('issuer-one');
+        expect(result.items[0].title).toBe('Issuer terms');
+        expect(result.items[0].foundIn).toContain('issuer-one:documents[0].url');
+        expect(matchesResearchProduct(result.items[0], 'cash-one')).toBe(true);
+    });
+});

@@ -570,17 +570,17 @@
     countUpWhenSeen(document.getElementById('snapshotTokens'));
 
     /**
-     * Search as you type in the hero: each keystroke asks /api/search and shows the answer grouped
-     * (stocks/lib/quick-search.js), cancelling the request before it, so an older, slower answer can
-     * never overwrite a newer one. Arrows move, Enter opens the highlighted row or, with none, submits
-     * the form to the full catalogue search; Esc closes. Without the API the form still submits.
+     * Search the broad catalogue locally after loading its static index once. A request generation
+     * keeps an older query from overwriting a newer one. Arrows move, Enter opens the highlighted
+     * row or submits the full catalogue search; Esc closes. The form also works without suggestions.
      */
-    function wireHeroSearch(api, base) {
+    function wireHeroSearch() {
         const input = document.getElementById('heroSearch');
         const list = document.getElementById('heroSearchResults');
-        const quick = (typeof __rwaQuickSearch !== 'undefined') ? __rwaQuickSearch : null;
-        if (!input || !list || !api || !quick) return;
-        let pending = null;
+        const quick = (typeof __rwaCatalogue !== 'undefined') ? __rwaCatalogue : null;
+        if (!input || !list || !quick) return;
+        let request = 0;
+        let cataloguePromise = null;
         let rows = [];
         let active = -1;
 
@@ -604,10 +604,10 @@
                     return `<a id="heroSearchResult-${i}" role="option" aria-selected="false" href="${escapeHtml(item.href)}">`
                         + `<strong>${escapeHtml(item.label)}</strong><span>${escapeHtml(item.detail)}</span></a>`;
                 }).join('') : '');
-            const titles = { stocks: 'Underlying stocks', tokens: 'Exact tokens', issuers: 'Issuers' };
+            const titles = { stocks: 'Products', tokens: 'Exact tokens', issuers: 'Stock programmes' };
             const body = groups.order.map((key) => section(titles[key], groups[key])).join('');
-            list.innerHTML = (body || `<p class="quick-results-empty">No stock, token or issuer matches “${escapeHtml(query)}”.</p>`)
-                + `<a class="quick-results-all" href="${escapeHtml(groups.allHref)}">Search the whole universe for “${escapeHtml(query)}” →</a>`;
+            list.innerHTML = (body || `<p class="quick-results-empty">No asset, product or issuer matches “${escapeHtml(query)}”.</p>`)
+                + `<a class="quick-results-all" href="${escapeHtml(groups.allHref)}">Search the whole catalogue for “${escapeHtml(query)}” →</a>`;
             active = -1;
             list.hidden = false;
             input.setAttribute('aria-expanded', 'true');
@@ -615,21 +615,20 @@
 
         input.addEventListener('input', async () => {
             const query = input.value.trim();
-            pending?.abort();
+            const generation = ++request;
             if (!query) {
                 close();
                 return;
             }
-            const controller = new AbortController();
-            pending = controller;
             try {
-                const response = await fetch(api.apiUrl('/api/search', { q: query }, base),
-                    { headers: { accept: 'application/json' }, signal: controller.signal });
-                if (!response.ok) throw new Error(`/api/search: HTTP ${response.status}`);
-                const answer = await response.json();
-                if (pending === controller) render(quick.quickSearchGroups(answer, query), query);
+                cataloguePromise ||= fetch('./rwa-catalogue.json', { cache: 'no-store' }).then(async (response) => {
+                    if (!response.ok) throw new Error(`Catalogue HTTP ${response.status}`);
+                    return response.json();
+                });
+                const catalogue = await cataloguePromise;
+                if (generation === request) render(quick.quickSearchGroups(catalogue.entries, query), query);
             } catch (error) {
-                if (error.name === 'AbortError') return;
+                cataloguePromise = null;
                 console.error(`[${new Date().toISOString()}] landing: search suggestions unavailable`, error);
                 close();
             }
@@ -664,7 +663,7 @@
         const api = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
         wireChartRanges();
         const base = api ? api.apiBase(document, window.location) : '';
-        wireHeroSearch(api, base);
+        wireHeroSearch();
         if (api) afterLoad(() => loadTicker(api, base));
         try {
             const [overview, journal] = await Promise.all([
