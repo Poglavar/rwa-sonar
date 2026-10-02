@@ -1,0 +1,25 @@
+{
+  "list": [
+    {
+      "name": "Maerki Baumann & Co. AG",
+      "ehraid": 111320,
+      "uid": "CHE101015393",
+      "uidFormatted": "CHE-101.015.393",
+      "chid": "CH02039165740",
+      "chidFormatted": "CH-020-3916574-0",
+      "legalSeatId": 261,
+      "legalSeat": "Zürich",
+      "registerOfficeId": 20,
+      "legalFormId": 3,
+      "status": "EXISTIEREND",
+      "rabId": 0,
+      "shabDate": "2026-07-30",
+      "deleteDate": null,
+      "cantonalExcerptWeb": "https://zh.chregister.ch/cr-portal/auszug/auszug.xhtml?uid=CHE-101.015.393"
+    }
+  ],
+  "hasMoreResults": false,
+  "offset": 0,
+  "maxEntries": 20,
+  "maxOffset": 924038
+}

@@ -1,0 +1,44 @@
+{
+ "result": [
+  {
+   "type": "object",
+   "entry_type": "warning_entry",
+   "element_id": 1685,
+   "locale": "en",
+   "entity_published": true,
+   "detail_url": "https://www.fma-li.li/en/warning/warning-reclaim-vault-1685",
+   "title": "Warning: «Reclaim Vault»",
+   "category": 59,
+   "category_label": "Fraud",
+   "text": "The Liechtenstein Financial Market Authority (FMA) points out that «Reclaim Vault» (purported headquarters Aeulestrasse 51, 9490 Vaduz, Liechtenstein) as the operator of the website «reclaimvault[dot]com» and the email address «support&#64;reclaimvault[dot]com» is not licensed or registered by the FMA and therefore is not listed in the official register of the FMA (www.register.fma-li.li).   In particular, it is not permitted to provide services requiring authorization or registration in Liechtenstein.",
+   "release_date": 1790632800
+  },
+  {
+   "type": "object",
+   "entry_type": "warning_entry",
+   "element_id": 1684,
+   "locale": "en",
+   "entity_published": true,
+   "detail_url": "https://www.fma-li.li/en/warning/warning-website-https-newinvestmentsolution-dot-li-1684",
+   "title": "Warning: Website https://newinvestmentsolution[dot]li",
+   "category": 58,
+   "category_label": "Clone Firm",
+   "text": "The Financial Market Authority (FMA) Liechtenstein points out that there is no connection between the operators of the website “https://newinvestmentsolution[dot]li” and the Liechtenstein-based N.I.S. New Investment Solutions (Liechtenstein) AG, Marktgass 11, 9490 Vaduz (Registration number: FL-0002.469.525-7).   The operators of the website “https://newinvestmentsolution[dot]li” are unlawfully using the information of N.I.S. New Investment Solutions (Liechtenstein) AG. The operators of the website do not hold any regulatory license or registration from the FMA and are therefore not authorized to provide services in Liechtenstein that require a license or registration. They are not subject to supervision by the FMA.",
+   "release_date": 1790114400
+  },
+  {
+   "type": "object",
+   "entry_type": "warning_entry",
+   "element_id": 1683,
+   "locale": "en",
+   "entity_published": true,
+   "detail_url": "https://www.fma-li.li/en/warning/website-https-celsionbankag-dot-org-1683",
+   "title": "Website https://celsionbankag[dot]org ",
+   "category": 58,
+   "category_label": "Clone Firm",
+   "text": "The Liechtenstein Financial Market Authority (FMA) points out that the operator of the website https://celsionbankag[dot]org is not licensed or registered by the FMA and therefore is not listed in the official register of the FMA.  Furthermore, there is no connection between the operator of the website https://celsionbankag[dot]org and Celsion Bank AG, Austrasse 77, 9490 Vaduz, Liechtenstein (commercial register number: FL-0002.718.985-5).   The FMA urgently advises not to make any investments in connection with the website https://celsionbankag[dot]org.",
+   "release_date": 1789682400
+  }
+ ],
+ "total_count": 50
+}

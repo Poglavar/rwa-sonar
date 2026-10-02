@@ -1,0 +1,150 @@
+{
+ "blockTime": 1784721544,
+ "meta": {
+  "computeUnitsConsumed": 16369,
+  "costUnits": 18657,
+  "err": null,
+  "fee": 8031,
+  "innerInstructions": [],
+  "logMessages": [
+   "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+   "Program ComputeBudget111111111111111111111111111111 success",
+   "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+   "Program ComputeBudget111111111111111111111111111111 success",
+   "Program 11111111111111111111111111111111 invoke [1]",
+   "Program 11111111111111111111111111111111 success",
+   "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf invoke [1]",
+   "Program log: Instruction: ConfigTransactionExecute",
+   "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf consumed 15919 of 59550 compute units",
+   "Program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf success"
+  ],
+  "postBalances": [
+   7177479,
+   1196728,
+   2728320,
+   4050720,
+   1,
+   1,
+   12171440,
+   1712160
+  ],
+  "postTokenBalances": [],
+  "preBalances": [
+   7285510,
+   1096728,
+   2728320,
+   4050720,
+   1,
+   1,
+   12171440,
+   1712160
+  ],
+  "preTokenBalances": [],
+  "rewards": [],
+  "status": {
+   "Ok": null
+  }
+ },
+ "slot": 434505136,
+ "transaction": {
+  "message": {
+   "accountKeys": [
+    {
+     "pubkey": "82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN",
+     "signer": true,
+     "source": "transaction",
+     "writable": true
+    },
+    {
+     "pubkey": "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+     "signer": false,
+     "source": "transaction",
+     "writable": true
+    },
+    {
+     "pubkey": "Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot",
+     "signer": false,
+     "source": "transaction",
+     "writable": true
+    },
+    {
+     "pubkey": "7P4Q7KVqH2fpCuBiQ61jpKMwQXKmAESmjq2rAif4N9SK",
+     "signer": false,
+     "source": "transaction",
+     "writable": true
+    },
+    {
+     "pubkey": "ComputeBudget111111111111111111111111111111",
+     "signer": false,
+     "source": "transaction",
+     "writable": false
+    },
+    {
+     "pubkey": "11111111111111111111111111111111",
+     "signer": false,
+     "source": "transaction",
+     "writable": false
+    },
+    {
+     "pubkey": "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+     "signer": false,
+     "source": "transaction",
+     "writable": false
+    },
+    {
+     "pubkey": "2mxYmCJmv3SFLw1xCwwAV2DjMQ4WyrwtREFAFkMoeDRE",
+     "signer": false,
+     "source": "transaction",
+     "writable": false
+    }
+   ],
+   "addressTableLookups": [],
+   "instructions": [
+    {
+     "accounts": [],
+     "data": "GZk52X",
+     "programId": "ComputeBudget111111111111111111111111111111",
+     "stackHeight": 1
+    },
+    {
+     "accounts": [],
+     "data": "3R8R1K6tbV9Z",
+     "programId": "ComputeBudget111111111111111111111111111111",
+     "stackHeight": 1
+    },
+    {
+     "parsed": {
+      "info": {
+       "destination": "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+       "lamports": 100000,
+       "source": "82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN"
+      },
+      "type": "transfer"
+     },
+     "program": "system",
+     "programId": "11111111111111111111111111111111",
+     "stackHeight": 1
+    },
+    {
+     "accounts": [
+      "Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot",
+      "82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN",
+      "7P4Q7KVqH2fpCuBiQ61jpKMwQXKmAESmjq2rAif4N9SK",
+      "2mxYmCJmv3SFLw1xCwwAV2DjMQ4WyrwtREFAFkMoeDRE",
+      "82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN",
+      "11111111111111111111111111111111"
+     ],
+     "data": "LAWgcozcxsH",
+     "programId": "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+     "stackHeight": 1
+    }
+   ],
+   "recentBlockhash": "BECZfNRCtC3suJUqVr8nvzWzx8Bb2WJd3du7GKnJiSw2"
+  },
+  "signatures": [
+   "5agfY69ch4HfC7DrHf7TGgFvmBVdDfyrnXBH92rHVJ7a3d8jQjGjJpXLy7KBAxNhB8Frj8NK3wZkaU6dXTA2q5pV"
+  ]
+ },
+ "transactionIndex": 963,
+ "version": 0
+}

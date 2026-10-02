@@ -1,0 +1,923 @@
+{
+  "_comment": "Sample fixture for the parties graph page (stocks/MODEL.md §10.4): five issuer programmes with a hand-written set of party and venue nodes covering every node type and every edge type, so graph.html renders without a build. Programme names, legal forms, grades and mint counts are copied from the real stocks-issuers.json, and the party names are the canonical ones; every venue number (liquidity, volume, pair counts) is INVENTED for layout work. NOT DATA — do not cite any number from this file.",
+  "builtAt": "2026-09-16T18:00:00Z",
+  "nodes": [
+    {
+      "id": "allowlisted-wallets",
+      "label": "allowlisted wallets",
+      "type": "audience",
+      "meta": {
+        "note": "Only wallets the transfer agent has onboarded may hold or receive the token.",
+        "roles": [
+          "audience"
+        ]
+      }
+    },
+    {
+      "id": "alpaca-securities",
+      "label": "Alpaca Securities",
+      "type": "custodian",
+      "meta": {
+        "identifier": "CRD 298401",
+        "jurisdiction": "United States",
+        "roles": [
+          "custodians"
+        ],
+        "website": "https://alpaca.markets"
+      }
+    },
+    {
+      "id": "ankura-trust-company",
+      "label": "Ankura Trust Company",
+      "type": "verification-agent",
+      "meta": {
+        "jurisdiction": "United States",
+        "roles": [
+          "verificationAgents"
+        ],
+        "website": "https://ankura.com"
+      }
+    },
+    {
+      "id": "backed-assets-je-limited",
+      "label": "Backed Assets (JE) Limited",
+      "type": "token-issuer",
+      "meta": {
+        "identifier": "Jersey company 145471",
+        "jurisdiction": "Jersey (Channel Islands)",
+        "note": "Issues the tracker certificates as ledger-based bearer securities.",
+        "roles": [
+          "tokenIssuers"
+        ]
+      }
+    },
+    {
+      "id": "backpack-exchange",
+      "label": "Backpack Exchange",
+      "type": "distributor",
+      "meta": {
+        "jurisdiction": "United Arab Emirates (VARA)",
+        "roles": [
+          "distributors"
+        ],
+        "volume24Usd": 2140000,
+        "website": "https://backpack.exchange"
+      }
+    },
+    {
+      "id": "backpack-securities",
+      "label": "Backpack Securities SPCX",
+      "type": "programme",
+      "meta": {
+        "grades": {
+          "maturityStageNum": 0,
+          "maturityStage": "Level 0",
+          "maturityScore": 0,
+          "claimRung": 3,
+          "claimLabel": "beneficial interest in the security",
+          "verificationStrength": 0,
+          "verificationLabel": "none",
+          "machineReadableVerification": false
+        },
+        "legalForm": "spv-claim-redeemable",
+        "mints": 48,
+        "slug": "backpack-securities",
+        "status": "live"
+      }
+    },
+    {
+      "id": "bybit",
+      "label": "Bybit",
+      "type": "distributor",
+      "meta": {
+        "roles": [
+          "distributors"
+        ],
+        "volume24Usd": 880000,
+        "website": "https://bybit.com"
+      }
+    },
+    {
+      "id": "chainlink",
+      "label": "Chainlink",
+      "type": "verification-agent",
+      "meta": {
+        "note": "Proof-of-reserve feed operator; the feed is the machine-readable artefact.",
+        "roles": [
+          "verificationAgents"
+        ],
+        "website": "https://chain.link"
+      }
+    },
+    {
+      "id": "dekabank",
+      "label": "DekaBank",
+      "type": "custodian",
+      "meta": {
+        "identifier": "LEI 0W2PZJM8XOY22M4GG883",
+        "jurisdiction": "Germany",
+        "roles": [
+          "custodians"
+        ]
+      }
+    },
+    {
+      "id": "equity-stock-transfer",
+      "label": "Equity Stock Transfer",
+      "type": "transfer-agent",
+      "meta": {
+        "identifier": "SEC file 084-06388",
+        "jurisdiction": "United States",
+        "roles": [
+          "transferAgents"
+        ]
+      }
+    },
+    {
+      "id": "finra",
+      "label": "FINRA",
+      "type": "regulator",
+      "meta": {
+        "jurisdiction": "United States",
+        "roles": [
+          "regulators"
+        ],
+        "website": "https://finra.org"
+      }
+    },
+    {
+      "id": "fma-liechtenstein",
+      "label": "FMA Liechtenstein",
+      "type": "regulator",
+      "meta": {
+        "jurisdiction": "Liechtenstein",
+        "note": "Approved the Base Prospectus under the EEA prospectus regime.",
+        "roles": [
+          "regulators"
+        ],
+        "website": "https://www.fma-li.li"
+      }
+    },
+    {
+      "id": "forward-industries",
+      "label": "Forward Industries",
+      "type": "security-issuer",
+      "meta": {
+        "identifier": "SEC CIK 0000038264",
+        "jurisdiction": "Delaware, USA",
+        "note": "Nasdaq-listed FWDI; first Solana Opening Bell equity, register mirrored by Superstate as digital transfer agent.",
+        "roles": [
+          "securitiesIssuers"
+        ],
+        "website": "https://forwardindustries.com"
+      }
+    },
+    {
+      "id": "jfsc",
+      "label": "JFSC",
+      "type": "regulator",
+      "meta": {
+        "jurisdiction": "Jersey (Channel Islands)",
+        "roles": [
+          "regulators"
+        ],
+        "website": "https://www.jerseyfsc.org"
+      }
+    },
+    {
+      "id": "jupiter",
+      "label": "Jupiter",
+      "type": "dex",
+      "meta": {
+        "alsoRoles": [
+          "distributor"
+        ],
+        "liquidityUsd": 3120000,
+        "note": "Router and aggregator; also the venue most wallets quote through.",
+        "roles": [
+          "distributors"
+        ],
+        "volume24Usd": 6400000
+      }
+    },
+    {
+      "id": "kamino",
+      "label": "Kamino",
+      "type": "lending",
+      "meta": {}
+    },
+    {
+      "id": "kraken",
+      "label": "Kraken",
+      "type": "distributor",
+      "meta": {
+        "alsoRoles": [
+          "parent",
+          "tokenization-provider"
+        ],
+        "jurisdiction": "United States / Ireland",
+        "roles": [
+          "distributors"
+        ],
+        "volume24Usd": 5300000,
+        "website": "https://kraken.com"
+      }
+    },
+    {
+      "id": "kyc-verified-backpack-users",
+      "label": "KYC-verified Backpack users",
+      "type": "audience",
+      "meta": {
+        "note": "Holding requires an onboarded Backpack Exchange account.",
+        "roles": [
+          "audience"
+        ]
+      }
+    },
+    {
+      "id": "meteora",
+      "label": "Meteora",
+      "type": "dex",
+      "meta": {
+        "liquidityUsd": 410000,
+        "pairs": 6,
+        "volume24Usd": 190000
+      }
+    },
+    {
+      "id": "non-us-persons",
+      "label": "non-US persons",
+      "type": "audience",
+      "meta": {
+        "note": "US persons are excluded by the issuer terms; no KYC is required to hold.",
+        "roles": [
+          "audience"
+        ]
+      }
+    },
+    {
+      "id": "ondo-finance",
+      "label": "Ondo Finance",
+      "type": "tokenization-provider",
+      "meta": {
+        "alsoRoles": [
+          "parent"
+        ],
+        "jurisdiction": "United States",
+        "roles": [
+          "parents"
+        ],
+        "website": "https://ondo.finance"
+      }
+    },
+    {
+      "id": "ondo-global-markets",
+      "label": "Ondo Global Markets",
+      "type": "programme",
+      "meta": {
+        "grades": {
+          "maturityStageNum": 2,
+          "maturityStage": "Level 2",
+          "maturityScore": 2,
+          "claimRung": 2,
+          "claimLabel": "secured claim on collateral",
+          "verificationStrength": 3,
+          "verificationLabel": "daily agent",
+          "machineReadableVerification": false
+        },
+        "legalForm": "structured-note",
+        "mints": 212,
+        "slug": "ondo-global-markets",
+        "status": "live"
+      }
+    },
+    {
+      "id": "ondo-global-markets-bvi-limited",
+      "label": "Ondo Global Markets (BVI) Limited",
+      "type": "token-issuer",
+      "meta": {
+        "jurisdiction": "British Virgin Islands",
+        "roles": [
+          "tokenIssuers"
+        ]
+      }
+    },
+    {
+      "id": "orca",
+      "label": "Orca",
+      "type": "dex",
+      "meta": {
+        "liquidityUsd": 760000,
+        "pairs": 9,
+        "volume24Usd": 305000
+      }
+    },
+    {
+      "id": "payward-europe-kraken",
+      "label": "Payward Europe (Kraken)",
+      "type": "parent",
+      "meta": {
+        "jurisdiction": "Ireland",
+        "note": "Acquired Backed Finance AG; change of control announced 2026-01-05.",
+        "roles": [
+          "parents"
+        ]
+      }
+    },
+    {
+      "id": "raydium",
+      "label": "Raydium",
+      "type": "dex",
+      "meta": {
+        "liquidityUsd": 2480000,
+        "pairs": 21,
+        "volume24Usd": 1420000
+      }
+    },
+    {
+      "id": "remora-markets",
+      "label": "Remora Markets",
+      "type": "programme",
+      "meta": {
+        "grades": {
+          "maturityStageNum": 0,
+          "maturityStage": "Level 0",
+          "maturityScore": -1,
+          "claimRung": 3,
+          "claimLabel": "beneficial interest in the security",
+          "verificationStrength": 0,
+          "verificationLabel": "none",
+          "machineReadableVerification": false
+        },
+        "legalForm": "spv-claim-redeemable",
+        "mints": 0,
+        "slug": "remora-markets",
+        "status": "defunct"
+      }
+    },
+    {
+      "id": "sec",
+      "label": "SEC",
+      "type": "regulator",
+      "meta": {
+        "jurisdiction": "United States",
+        "roles": [
+          "regulators"
+        ],
+        "website": "https://sec.gov"
+      }
+    },
+    {
+      "id": "spacex",
+      "label": "SpaceX",
+      "type": "security-issuer",
+      "meta": {
+        "identifier": "SEC CIK 0001181412",
+        "jurisdiction": "US (Delaware)",
+        "note": "referenced, not participating — SpaceX (Nasdaq: SPCX since 2026-06-12) is not involved and its 424B4 never mentions the token",
+        "roles": [
+          "securitiesIssuers"
+        ]
+      }
+    },
+    {
+      "id": "step-finance",
+      "label": "Step Finance",
+      "type": "parent",
+      "meta": {
+        "roles": [
+          "parents"
+        ],
+        "website": "https://step.finance"
+      }
+    },
+    {
+      "id": "superstate",
+      "label": "Superstate",
+      "type": "tokenization-provider",
+      "meta": {
+        "alsoRoles": [
+          "transfer-agent"
+        ],
+        "jurisdiction": "United States",
+        "roles": [
+          "tokenizationProviders"
+        ],
+        "website": "https://superstate.com"
+      }
+    },
+    {
+      "id": "superstate-opening-bell",
+      "label": "Opening Bell by Superstate",
+      "type": "programme",
+      "meta": {
+        "grades": {
+          "maturityStageNum": 0,
+          "maturityStage": "Level 0",
+          "maturityScore": -2,
+          "claimRung": 4,
+          "claimLabel": "registered share",
+          "verificationStrength": 5,
+          "verificationLabel": "register",
+          "machineReadableVerification": true
+        },
+        "legalForm": "registered-share",
+        "mints": 4,
+        "slug": "superstate-opening-bell",
+        "status": "live"
+      }
+    },
+    {
+      "id": "the-network-firm",
+      "label": "The Network Firm",
+      "type": "verification-agent",
+      "meta": {
+        "jurisdiction": "United States",
+        "note": "Runs the attestation API behind the Chainlink proof-of-reserve feed.",
+        "roles": [
+          "verificationAgents"
+        ]
+      }
+    },
+    {
+      "id": "trek-labs",
+      "label": "Trek Labs",
+      "type": "parent",
+      "meta": {
+        "alsoRoles": [
+          "tokenization-provider"
+        ],
+        "jurisdiction": "United States",
+        "note": "Backpack's tokenization arm; also the parent of Trek Nexus Markets.",
+        "roles": [
+          "parents",
+          "tokenizationProviders"
+        ]
+      }
+    },
+    {
+      "id": "trek-nexus-markets",
+      "label": "Trek Nexus Markets",
+      "type": "token-issuer",
+      "meta": {
+        "jurisdiction": "Marshall Islands",
+        "roles": [
+          "tokenIssuers"
+        ]
+      }
+    },
+    {
+      "id": "xstocks-backed",
+      "label": "Kraken xStocks",
+      "type": "programme",
+      "meta": {
+        "grades": {
+          "maturityStageNum": 2,
+          "maturityStage": "Level 2",
+          "maturityScore": 4,
+          "claimRung": 2,
+          "claimLabel": "secured claim on collateral",
+          "verificationStrength": 4,
+          "verificationLabel": "on-chain PoR",
+          "machineReadableVerification": true
+        },
+        "legalForm": "tracker-certificate",
+        "mints": 156,
+        "slug": "xstocks-backed",
+        "status": "live"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "alpaca-securities",
+      "to": "ondo-global-markets",
+      "type": "custodies",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "Named as a regulated broker-dealer holding the underlying shares."
+    },
+    {
+      "from": "ankura-trust-company",
+      "to": "ondo-global-markets",
+      "type": "verifies",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "Daily verification agent over the registry."
+    },
+    {
+      "from": "backed-assets-je-limited",
+      "to": "xstocks-backed",
+      "type": "wraps",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Issues the tracker certificates as ledger-based bearer securities."
+    },
+    {
+      "from": "backpack-exchange",
+      "to": "backpack-securities",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "Primary market: two-way conversion in and out of the token."
+    },
+    {
+      "from": "backpack-securities",
+      "to": "backpack-exchange",
+      "type": "traded-on",
+      "weight": 2140000,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "3 mints, 4 pairs — weight is 24h volume, the venue reports no pool liquidity"
+    },
+    {
+      "from": "backpack-securities",
+      "to": "finra",
+      "type": "regulated-by",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "Broker-dealer affiliate is FINRA-registered."
+    },
+    {
+      "from": "backpack-securities",
+      "to": "kyc-verified-backpack-users",
+      "type": "offered-to",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "Holding requires an onboarded Backpack Exchange account."
+    },
+    {
+      "from": "backpack-securities",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 640000,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "2 mints, 3 pairs"
+    },
+    {
+      "from": "backpack-securities",
+      "to": "spacex",
+      "type": "references",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "referenced, not participating — SpaceX is not involved and its 424B4 never mentions the token"
+    },
+    {
+      "from": "backpack-securities",
+      "to": "trek-labs",
+      "type": "owned-by",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "Trek Labs is the Backpack entity behind the programme."
+    },
+    {
+      "from": "bybit",
+      "to": "xstocks-backed",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Lists the xStocks tokens as spot markets."
+    },
+    {
+      "from": "chainlink",
+      "to": "xstocks-backed",
+      "type": "verifies",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Proof-of-reserve feed operator; the feed is the machine-readable artefact."
+    },
+    {
+      "from": "dekabank",
+      "to": "xstocks-backed",
+      "type": "custodies",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Named per product Final Terms alongside InCore Bank AG."
+    },
+    {
+      "from": "equity-stock-transfer",
+      "to": "superstate-opening-bell",
+      "type": "keeps-register",
+      "weight": 1,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "SEC-registered transfer agent of record."
+    },
+    {
+      "from": "forward-industries",
+      "to": "superstate-opening-bell",
+      "type": "issues",
+      "weight": 1,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "The listed company whose registered Class A share the token is; legalForm registered-share, so the register is mirrored."
+    },
+    {
+      "from": "jupiter",
+      "to": "remora-markets",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "remora-markets"
+      ],
+      "note": "Aggregator; the rTokens no longer carry Jupiter's stocks tags."
+    },
+    {
+      "from": "jupiter",
+      "to": "xstocks-backed",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Router most wallets quote through."
+    },
+    {
+      "from": "kraken",
+      "to": "xstocks-backed",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Lists the xStocks tokens and is the parent group's own venue."
+    },
+    {
+      "from": "ondo-finance",
+      "to": "ondo-global-markets",
+      "type": "distributes",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "app.ondo.finance is the primary market (mint and redeem)."
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "jupiter",
+      "type": "traded-on",
+      "weight": 1980000,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "41 mints, 58 pairs"
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "non-us-persons",
+      "type": "offered-to",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "US persons are excluded by the terms."
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "ondo-finance",
+      "type": "owned-by",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "Ondo Finance is the group behind the BVI issuer."
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 420000,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "12 mints, 15 pairs"
+    },
+    {
+      "from": "ondo-global-markets",
+      "to": "sec",
+      "type": "regulated-by",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "Registered broker-dealers are named in the disclosures."
+    },
+    {
+      "from": "ondo-global-markets-bvi-limited",
+      "to": "ondo-global-markets",
+      "type": "wraps",
+      "weight": 1,
+      "via": [
+        "ondo-global-markets"
+      ],
+      "note": "The legal issuer of the token."
+    },
+    {
+      "from": "remora-markets",
+      "to": "meteora",
+      "type": "traded-on",
+      "weight": 11400,
+      "via": [
+        "remora-markets"
+      ],
+      "note": "2 mints, 2 pairs — weight is 24h volume, the venue reports no pool liquidity"
+    },
+    {
+      "from": "remora-markets",
+      "to": "step-finance",
+      "type": "owned-by",
+      "weight": 1,
+      "via": [
+        "remora-markets"
+      ],
+      "note": "Step Finance stood behind the programme before the wind-down."
+    },
+    {
+      "from": "step-finance",
+      "to": "remora-markets",
+      "type": "tokenizes-for",
+      "weight": 1,
+      "via": [
+        "remora-markets"
+      ],
+      "note": "Built and operated the rToken platform."
+    },
+    {
+      "from": "superstate",
+      "to": "superstate-opening-bell",
+      "type": "tokenizes-for",
+      "weight": 1,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "Operates the Opening Bell platform for the issuing company."
+    },
+    {
+      "from": "superstate-opening-bell",
+      "to": "allowlisted-wallets",
+      "type": "offered-to",
+      "weight": 1,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "Only wallets the transfer agent has onboarded may hold the token."
+    },
+    {
+      "from": "superstate-opening-bell",
+      "to": "kamino",
+      "type": "lends-on",
+      "weight": null,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "Kamino Finance (Solana) — borrowing/lending; FWDI usable as collateral."
+    },
+    {
+      "from": "superstate-opening-bell",
+      "to": "sec",
+      "type": "regulated-by",
+      "weight": 1,
+      "via": [
+        "superstate-opening-bell"
+      ],
+      "note": "Registered share, so the issuer's own SEC reporting applies."
+    },
+    {
+      "from": "the-network-firm",
+      "to": "xstocks-backed",
+      "type": "verifies",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Runs the attestation API behind the proof-of-reserve feed."
+    },
+    {
+      "from": "trek-labs",
+      "to": "backpack-securities",
+      "type": "tokenizes-for",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "Backpack's tokenization arm."
+    },
+    {
+      "from": "trek-nexus-markets",
+      "to": "backpack-securities",
+      "type": "wraps",
+      "weight": 1,
+      "via": [
+        "backpack-securities"
+      ],
+      "note": "The legal issuer of the SPCX token."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "fma-liechtenstein",
+      "type": "regulated-by",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Approved the Base Prospectus under the EEA prospectus regime."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "jfsc",
+      "type": "regulated-by",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Registrar of the Jersey issuing entity."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "jupiter",
+      "type": "traded-on",
+      "weight": 1140000,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "48 mints, 61 pairs"
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "kraken",
+      "type": "traded-on",
+      "weight": 5300000,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "34 mints, 34 pairs — weight is 24h volume, the venue reports no pool liquidity"
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "non-us-persons",
+      "type": "offered-to",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "US persons are excluded by the issuer terms."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "orca",
+      "type": "traded-on",
+      "weight": 340000,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "18 mints, 22 pairs"
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "payward-europe-kraken",
+      "type": "owned-by",
+      "weight": 1,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "Acquired Backed Finance AG; change of control announced 2026-01-05."
+    },
+    {
+      "from": "xstocks-backed",
+      "to": "raydium",
+      "type": "traded-on",
+      "weight": 1840000,
+      "via": [
+        "xstocks-backed"
+      ],
+      "note": "29 mints, 38 pairs"
+    }
+  ]
+}

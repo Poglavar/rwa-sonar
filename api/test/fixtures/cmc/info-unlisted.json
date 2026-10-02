@@ -1,0 +1,13 @@
+{
+ "httpStatus": 400,
+ "body": {
+  "status": {
+   "timestamp": "2026-09-30T12:36:40.151Z",
+   "error_code": 400,
+   "error_message": "Invalid value for 'slug': 'null'",
+   "elapsed": 3,
+   "credit_count": 0,
+   "notice": null
+  }
+ }
+}

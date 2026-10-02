@@ -1,0 +1,193 @@
+// Tests the reusable legal-template layer against the real issuer/token build and verifies that
+// its static pages expose scope, precedence, insolvency, corporate actions and redemption evidence.
+
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
+const {
+    DOCUMENT_PRECEDENCE,
+    EVIDENCE_LEVELS,
+    buildLegalTemplates,
+    documentAuthority
+} = require('./lib/legal-templates.mjs');
+const { renderTemplateIndex, renderTemplatePage } = require('./lib/template-pages.mjs');
+
+const read = (...parts) => JSON.parse(readFileSync(repoFile(join(__dirname, '..'), ...parts), 'utf8'));
+const issuerDb = read('stocks-issuers.json');
+const tokenDb = read('stocks-tokens.json');
+const composability = read('stocks', 'data', 'composability-templates.json');
+const templates = buildLegalTemplates({
+    templates: composability.templates.map((row) => ({ ...row, reviewedAt: composability.reviewedAt })),
+    issuers: issuerDb.issuers,
+    tokens: tokenDb.tokens,
+    archives: {}
+});
+
+describe('legal template records', () => {
+    it('covers every current mint exactly once across the nine reviewed issuer/recipe templates', () => {
+        expect(templates).toHaveLength(9);
+        expect(templates.reduce((sum, row) => sum + row.inheritance.count, 0)).toBe(tokenDb.tokens.length);
+        const mints = templates.flatMap((row) => row.inheritance.items.map((item) => item.mint));
+        expect(new Set(mints).size).toBe(tokenDb.tokens.length);
+    });
+
+    it('keeps inheritance explicit and does not manufacture asset exceptions', () => {
+        for (const template of templates) {
+            expect(template.inheritance.count).toBeGreaterThan(0);
+            expect(template.inheritance.underlyingCount).toBeGreaterThan(0);
+            expect(template.inheritance.exceptions).toEqual([]);
+            expect(template.technologyRecipe).toMatch(/^token-2022/);
+        }
+    });
+
+    it('carries a claim chain and all six independently graded evidence facets', () => {
+        for (const template of templates) {
+            expect(template.claimChain.nodes.length).toBeGreaterThan(0);
+            expect(template.claimChain.links.length).toBeGreaterThan(0);
+            expect(template.claimChain.ownershipPath.length).toBeGreaterThanOrEqual(2);
+            expect(template.claimChain.ownershipPath.at(-1).actor).toBe('holder');
+            expect(template.evidenceConfidence.map((row) => row.id)).toEqual([
+                'ownership', 'custody', 'eligibility', 'redemption', 'corporateActions', 'technicalControl'
+            ]);
+            expect(template.evidenceConfidence.find((row) => row.id === 'technicalControl').level)
+                .toBe('onchain-observation');
+        }
+        const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+        expect(ondo.claimChain.nodes.find((node) => node.actor === 'security-agent').parties[0].name)
+            .toMatch(/Ankura/);
+        expect(ondo.insolvency.operationalDetails.perfectionOrPriority).toMatch(/first-priority perfected/i);
+    });
+
+    it('keeps citations, authority, scope and review time attached to each legal conclusion', () => {
+        for (const template of templates) {
+            expect(template.conclusions.map((row) => row.id)).toEqual([
+                'ownership', 'issuer', 'insolvency', 'redemption', 'eligibility', 'corporate-actions', 'control'
+            ]);
+            for (const conclusion of template.conclusions) {
+                expect(['fact', 'issuer-assertion', 'interpretation', 'unresolved']).toContain(conclusion.kind);
+                expect(conclusion.reviewedAt).toBeTruthy();
+                expect(conclusion.governingLaw).toBeTruthy();
+                for (const evidence of conclusion.evidence) {
+                    expect(evidence).toHaveProperty('sourceAuthorityLabel');
+                    expect(evidence).toHaveProperty('locator');
+                    expect(evidence).toHaveProperty('checkedAt');
+                }
+            }
+        }
+        const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+        expect(ondo.conclusions.find((row) => row.id === 'ownership').evidence.some((row) => row.quote && row.locator)).toBe(true);
+    });
+
+    it('states document precedence and retains missing version/effective-date metadata as gaps', () => {
+        expect(DOCUMENT_PRECEDENCE).toHaveLength(6);
+        expect(DOCUMENT_PRECEDENCE[0].label).toMatch(/Mandatory law/);
+        expect(documentAuthority({ type: 'terms', title: 'Terms' })).toBe('binding-legal');
+        expect(documentAuthority({ type: 'press', title: 'Launch' })).toBe('third-party-claim');
+        expect(templates.some((template) => template.sourceAuthority.sources.some((source) => source.version === null)))
+            .toBe(true);
+    });
+
+    it('does not confuse a documented redemption route with an observed completed redemption', () => {
+        // Only an issuer whose record carries recorded on-chain redemption evidence may leave the
+        // documented-process state; the flag alone is never enough.
+        const observed = (template) => {
+            const record = issuerDb.issuers.find((row) => row.slug === template.issuer.slug);
+            return record?.redemption?.successfulRedemptionObserved === true
+                && Array.isArray(record?.redemption?.successfulRedemptionEvidence?.accepted)
+                && record.redemption.successfulRedemptionEvidence.accepted.length > 0;
+        };
+        for (const template of templates) {
+            expect(template.redemption.evidenceStatus).toBe(observed(template) ? 'observed-transaction' : 'documented-process');
+            expect(template.redemption.successfulRedemptionEvidenceStatus).toBe(observed(template) ? 'observed-transaction' : 'not-recorded');
+            if (!observed(template)) expect(template.redemption.evidenceLabel).toContain('no independently observed');
+        }
+        expect(templates.filter((template) => ['xstocks-backed', 'ondo-global-markets'].includes(template.issuer.slug))
+            .every((template) => template.redemption.operationalEvidenceStatus === 'official-current-source')).toBe(true);
+        expect(templates.find((template) => template.issuer.slug === 'prestocks').redemption.operationalEvidenceStatus)
+            .toBe('checked-no-public-route');
+        expect(templates.filter((template) => !['xstocks-backed', 'ondo-global-markets', 'prestocks'].includes(template.issuer.slug))
+            .every((template) => template.redemption.operationalEvidenceStatus === 'not-checked')).toBe(true);
+        expect(templates.every((template) => template.redemption.secondaryMarketEvidenceStatus === 'asset-specific')).toBe(true);
+    });
+
+    it('follows effective authority paths instead of stopping at a program or multisig label', () => {
+        const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+        expect(ondo.control).toMatchObject({ status: 'caution', direct: ['pause', 'rebase'] });
+        expect(ondo.control.headline).toContain('1 of 9');
+        expect(ondo.control.headline).toContain('UpdateMultiplierRole');
+        expect(ondo.conclusions.find((row) => row.id === 'control').conclusion).toBe(ondo.control.headline);
+
+        const prestocks = templates.find((row) => row.issuer.slug === 'prestocks');
+        expect(prestocks.control.headline).toContain('2 of 5 eligible voters (7 members; 2 initiate-only)');
+        expect(prestocks.control.headline).not.toContain('2 of 7');
+    });
+
+    it('uses only declared evidence levels', () => {
+        const allowed = new Set(EVIDENCE_LEVELS.map((row) => row.id));
+        for (const facet of templates.flatMap((template) => template.evidenceConfidence)) {
+            expect(allowed.has(facet.level)).toBe(true);
+        }
+    });
+
+    it('marks only the affected conclusions when an issuer has an open P0 review', () => {
+        const [flagged] = buildLegalTemplates({
+            templates: [composability.templates.find((row) => row.issuer === 'ondo-global-markets')],
+            issuers: issuerDb.issuers,
+            tokens: tokenDb.tokens,
+            reviewItems: [{ id: 'review-1', priority: 'P0', issuerSlug: 'ondo-global-markets', area: 'redemption', field: 'redemption.rails', title: 'Redemption terms changed', claimImpact: 'Exit may differ.' }]
+        });
+        expect(flagged.underReview).toHaveLength(1);
+        expect(flagged.conclusions.find((row) => row.id === 'redemption').underReview).toHaveLength(1);
+        expect(flagged.conclusions.find((row) => row.id === 'ownership').underReview).toBeUndefined();
+        expect(renderTemplatePage(flagged)).toContain('Legal conclusions under review');
+    });
+});
+
+describe('legal template pages', () => {
+    const ondo = templates.find((row) => row.issuer.slug === 'ondo-global-markets');
+    const page = renderTemplatePage(ondo, { baseUrl: 'https://rwasonar.com', version: 'test' });
+
+    it('renders every required legal-analysis section and canonical identity', () => {
+        for (const heading of [
+            'What this analysis covers', 'Traceable conclusions', 'Evidence confidence', 'Complete claim chain',
+            'Technical control', 'Jurisdiction and holder eligibility', 'Insolvency and enforcement',
+            'Corporate actions', 'Redemption path', 'Source authority and precedence'
+        ]) expect(page).toContain(heading);
+        expect(page).toContain(`<link rel="canonical" href="https://rwasonar.com/templates/${ondo.id}.html" />`);
+        expect(page).toContain('no independently observed completed redemption');
+        expect(page).toContain('Evidence and exact clauses');
+        expect(page).toContain('Parties that can interrupt or enforce the chain');
+        expect(page).toContain('Unattributed direct signer');
+        expect(page).toContain('(UpdateMultiplierRole)');
+        expect(page).toContain('differently privileged members are not treated as equivalent voters');
+        expect(page).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(page).toContain('href="https://x.com/RWASonar"');
+    });
+
+    it('escapes analysis and source text', () => {
+        const hostile = structuredClone(ondo);
+        hostile.summary = '<img src=x onerror=alert(1)>';
+        hostile.sourceAuthority.sources[0].title = '<script>alert(1)</script>';
+        const html = renderTemplatePage(hostile);
+        expect(html).not.toContain('<img src=x');
+        expect(html).not.toContain('<script>alert(1)</script>');
+        expect(html).toContain('&lt;img');
+        expect(html).toContain('&lt;script&gt;');
+    });
+
+    it('renders one catalogue card and stable detail link per template', () => {
+        const html = renderTemplateIndex(templates, { baseUrl: 'https://rwasonar.com' });
+        for (const template of templates) {
+            expect(html).toContain(`./${template.id}.html`);
+        }
+        expect(html.match(/class="template-card"/g)).toHaveLength(templates.length);
+    });
+
+    it('keeps a named product fee scoped on the programme template page', () => {
+        const xstocks = templates.find((row) => row.issuer.slug === 'xstocks-backed');
+        const html = renderTemplatePage(xstocks);
+        expect(html).toContain('Product example only (TSLAx); no programme-wide fee is confirmed.');
+        expect(html).toContain('<details class="redemption-term">');
+        expect(html).toContain('0.50%');
+    });
+});

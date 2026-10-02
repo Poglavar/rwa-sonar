@@ -1,0 +1,211 @@
+{
+ "capturedAt": "2026-09-25",
+ "url": "https://hermes.pyth.network/v2/price_feeds?asset_type=crypto",
+ "note": "verbatim entries from the keyless feed list: tokenized-stock feeds and three crypto feeds whose symbols collide with stock-token symbols (AMC, GMx, LIon)",
+ "body": [
+  {
+   "id": "b962539d0fcb272a494d65ea56f94851c2bcf8823935da05bd628916e2e9edbf",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "GMX / US DOLLAR",
+    "display_symbol": "GMXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.GMX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "a57e29fe0a3e6165a55a42675d94aaf27e1b0183e7dfa1b7e9e3514c70f622d0",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "LOADED LIONS / US DOLLAR",
+    "display_symbol": "LIONUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.LION/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "APPLE XSTOCK / US DOLLAR",
+    "display_symbol": "AAPLXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.AAPLX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "2817b78438c769357182c04346fddaad1178c82f4048828fe0997c3c64624e14",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "SP500 XSTOCK / US DOLLAR",
+    "display_symbol": "SPYXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.SPYX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "c09ef687ed07091c047da444f1499f2da52cdc1c085104643ec565a9eb1af514",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "TESLA ONDO TOKENIZED STOCK / US DOLLAR",
+    "display_symbol": "TSLAONUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.TSLAON/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "APPLE ONDO TOKENIZED STOCK / US DOLLAR",
+    "display_symbol": "AAPLONUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.AAPLON/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "e8e2234a06b288fedde43ae9450cb288886ecb3259ad2f41d0067f02244a0101",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "SPACE EXPLORATION TECHNOLOGY CORP XSTOCK / US DOLLAR",
+    "display_symbol": "SPCXXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.SPCXX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "725db18f84ea0d1c894e7223d603bae50541abca3922e198293073136b450b15",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "A MEME COIN / US DOLLAR",
+    "display_symbol": "AMCUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.AMC/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "4244d07890e4610f46bbde67de8f43a4bf8b569eebe904f136b469f148503b7f",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "NVIDIA XSTOCK / US DOLLAR",
+    "display_symbol": "NVDAXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.NVDAX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "178a6f73a5aede9d0d682e86b0047c9f333ed0efe5c6537ca937565219c4054d",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "NASDAQ XSTOCK / US DOLLAR",
+    "display_symbol": "QQQXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.QQQX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "47a156470288850a440df3a6ce85a55917b813a19bb5b31128a33a986566a362",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "TESLA XSTOCK / US DOLLAR",
+    "display_symbol": "TSLAXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.TSLAX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  },
+  {
+   "id": "c13184461c0c80d98ffcd89be627c2220b94a96c7c67f0c4b16bc12fd3b17758",
+   "market_hours": {
+    "is_open": true,
+    "next_open": null,
+    "next_close": null
+   },
+   "attributes": {
+    "asset_type": "Crypto",
+    "description": "CIRCLE XSTOCK / US DOLLAR",
+    "display_symbol": "CRCLXUSD",
+    "quote_currency": "USD",
+    "schedule": "America/New_York;O,O,O,O,O,O,O;",
+    "symbol": "Crypto.CRCLX/USD",
+    "min_channel": "fixed_rate@200ms"
+   }
+  }
+ ]
+}

@@ -1,0 +1,189 @@
+{
+ "count": 6,
+ "next": null,
+ "previous": null,
+ "results": [
+  {
+   "absolute_url": "/opinion/10128187/cure-assoc-v-lpl-financial/",
+   "attorney": "",
+   "caseName": "Cure & Assoc v. LPL Financial",
+   "caseNameFull": "",
+   "citation": [
+    "118 F.4th 663"
+   ],
+   "citeCount": 9,
+   "cluster_id": 10128187,
+   "court": "Court of Appeals for the Fifth Circuit",
+   "court_citation_string": "5th Cir.",
+   "court_id": "ca5",
+   "court_jurisdiction": null,
+   "dateArgued": "2024-05-01",
+   "dateFiled": "2024-10-01",
+   "dateReargued": null,
+   "dateReargumentDenied": null,
+   "docketNumber": "23-40519",
+   "docket_id": 68486383,
+   "judge": "",
+   "lexisCite": "",
+   "meta": {
+    "timestamp": "2025-11-17T21:38:06.057895Z",
+    "date_created": "2024-10-01T18:01:27.680443Z",
+    "score": {
+     "bm25": null
+    }
+   },
+   "neutralCite": "",
+   "non_participating_judge_ids": [],
+   "opinions": [
+    {
+     "author_id": null,
+     "download_url": "http://www.ca5.uscourts.gov/opinions/pub/23/23-40519-CV0.pdf",
+     "id": 10594788,
+     "joined_by_ids": [],
+     "local_path": "pdf/2024/10/01/cure__assoc_v._lpl_financial.pdf",
+     "meta": {
+      "timestamp": "2025-12-03T03:22:19.782714Z",
+      "date_created": "2024-10-01T18:01:27.682881Z"
+     },
+     "ordering_key": null,
+     "per_curiam": false,
+     "sha1": "74c09484146da71628de7a96257778fe9161a942",
+     "snippet": "Case: 23-40519      Document: 95-1     Page: 1    Date Filed: 10/01/2024\n\n\n\n\n        United States Court of Appeals\n             for the Fifth Circuit\n                                                 ",
+     "type": "combined-opinion"
+    }
+   ],
+   "panel_ids": [],
+   "panel_names": [],
+   "posture": "",
+   "procedural_history": "",
+   "scdb_id": "",
+   "sibling_ids": [
+    10594788
+   ],
+   "source": "C",
+   "status": "Published",
+   "suitNature": "Private Civil Diversity",
+   "syllabus": ""
+  },
+  {
+   "absolute_url": "/opinion/9409532/montemayor-v-ford-motor-co/",
+   "attorney": "",
+   "caseName": "Montemayor v. Ford Motor Co.",
+   "caseNameFull": "",
+   "citation": [],
+   "citeCount": 0,
+   "cluster_id": 9409532,
+   "court": "California Court of Appeal",
+   "court_citation_string": "Cal. Ct. App.",
+   "court_id": "calctapp",
+   "court_jurisdiction": null,
+   "dateArgued": null,
+   "dateFiled": "2023-06-26",
+   "dateReargued": null,
+   "dateReargumentDenied": null,
+   "docketNumber": "B320477",
+   "docket_id": 67529766,
+   "judge": "",
+   "lexisCite": "",
+   "meta": {
+    "timestamp": "2024-06-23T01:09:06.608322Z",
+    "date_created": "2023-06-26T22:03:44.160471Z",
+    "score": {
+     "bm25": null
+    }
+   },
+   "neutralCite": "",
+   "non_participating_judge_ids": [],
+   "opinions": [
+    {
+     "author_id": null,
+     "download_url": "http://www.courts.ca.gov/opinions/documents/B320477.PDF",
+     "id": 9405008,
+     "joined_by_ids": [],
+     "local_path": "pdf/2023/06/26/montemayor_v._ford_motor_co..pdf",
+     "meta": {
+      "timestamp": "2025-11-28T21:17:58.161962Z",
+      "date_created": "2023-06-26T22:03:44.163738Z"
+     },
+     "ordering_key": null,
+     "per_curiam": false,
+     "sha1": "85fa3b7409d812dd1d96e97d587266ae799bbe9c",
+     "snippet": "Filed 6/26/23\n                CERTIFIED FOR PUBLICATION\n\nIN THE COURT OF APPEAL OF THE STATE OF CALIFORNIA\n\n                SECOND APPELLATE DISTRICT\n\n                        DIVISION SEVEN\n\n\nROSANNA ",
+     "type": "combined-opinion"
+    }
+   ],
+   "panel_ids": [],
+   "panel_names": [],
+   "posture": "",
+   "procedural_history": "",
+   "scdb_id": "",
+   "sibling_ids": [
+    9405008
+   ],
+   "source": "C",
+   "status": "Published",
+   "suitNature": "",
+   "syllabus": ""
+  },
+  {
+   "absolute_url": "/opinion/9371643/murrey-v-superior-court/",
+   "attorney": "",
+   "caseName": "Murrey v. Superior Court",
+   "caseNameFull": "",
+   "citation": [],
+   "citeCount": 0,
+   "cluster_id": 9371643,
+   "court": "California Court of Appeal",
+   "court_citation_string": "Cal. Ct. App.",
+   "court_id": "calctapp",
+   "court_jurisdiction": null,
+   "dateArgued": null,
+   "dateFiled": "2023-01-30",
+   "dateReargued": null,
+   "dateReargumentDenied": null,
+   "docketNumber": "G061329",
+   "docket_id": 66771651,
+   "judge": "",
+   "lexisCite": "",
+   "meta": {
+    "timestamp": "2024-06-23T00:59:11.915425Z",
+    "date_created": "2023-01-31T00:02:11.761313Z",
+    "score": {
+     "bm25": null
+    }
+   },
+   "neutralCite": "",
+   "non_participating_judge_ids": [],
+   "opinions": [
+    {
+     "author_id": null,
+     "download_url": "http://www.courts.ca.gov/opinions/documents/G061329.PDF",
+     "id": 9367119,
+     "joined_by_ids": [],
+     "local_path": "pdf/2023/01/30/murrey_v._superior_court.pdf",
+     "meta": {
+      "timestamp": "2025-10-23T20:16:08.579071Z",
+      "date_created": "2023-01-31T00:02:11.762934Z"
+     },
+     "ordering_key": null,
+     "per_curiam": false,
+     "sha1": "4e90ccb89b26c92c51c7ce874c3020ee2a399619",
+     "snippet": "Filed 1/30/23\n\n\n\n\n                              CERTIFIED FOR PUBLICATION\n\n                IN THE COURT OF APPEAL OF THE STATE OF CALIFORNIA\n\n                               FOURTH APPELLATE DISTRICT\n\n",
+     "type": "combined-opinion"
+    }
+   ],
+   "panel_ids": [],
+   "panel_names": [],
+   "posture": "",
+   "procedural_history": "",
+   "scdb_id": "",
+   "sibling_ids": [
+    9367119
+   ],
+   "source": "C",
+   "status": "Published",
+   "suitNature": "",
+   "syllabus": ""
+  }
+ ]
+}

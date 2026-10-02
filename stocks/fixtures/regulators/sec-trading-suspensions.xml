@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0" xml:base="https://www.sec.gov/">
+  <channel>
+    <title>Trading Suspensions</title>
+    <link>https://www.sec.gov/</link>
+    <description>The latest Trading Suspensions from the Securities and Exchange Commission</description>
+    <language>en</language>
+    
+    <item>
+  <title>Happy City Holdings Limited</title>
+  <link>https://www.sec.gov/files/litigation/suspensions/2026/34-105675.pdf
+</link>
+  <description>Happy City Holdings Limited</description>
+  <pubDate>Thu, 11 Jun 2026 21:09:01 -0400</pubDate>
+    <dc:creator>34-105675</dc:creator>
+    <guid isPermaLink="false">8766e18e-24bb-4f44-b2e8-a9c1f1f07840</guid>
+    </item>
+<item>
+  <title>TechCreate Group Ltd.</title>
+  <link>https://www.sec.gov/files/litigation/suspensions/2026/34-104763.pdf
+</link>
+  <description>TechCreate Group Ltd.</description>
+  <pubDate>Sun, 01 Feb 2026 19:50:54 -0500</pubDate>
+    <dc:creator>34-104763</dc:creator>
+    <guid isPermaLink="false">a9809595-bc14-425e-899e-582b7ddc47cf</guid>
+    </item>
+<item>
+  <title>JM Group Limited</title>
+  <link>https://www.sec.gov/files/litigation/suspensions/2026/34-104613.pdf
+</link>
+  <description>JM Group Limited</description>
+  <pubDate>Wed, 14 Jan 2026 19:51:35 -0500</pubDate>
+    <dc:creator>34-104613</dc:creator>
+    <guid isPermaLink="false">563e21f8-d377-4e77-83f3-ace75a5181bf</guid>
+    </item>
+</channel>
+</rss>

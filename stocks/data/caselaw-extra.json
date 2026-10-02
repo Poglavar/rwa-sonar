@@ -1,0 +1,20 @@
+{
+  "note": "Manual additions to the case-law watcher's query set (stocks/watch-caselaw.mjs), for what the dossiers cannot derive. `queries` are extra exact phrases ({phrase, issuers[], note}); `dockets` are known cases followed by docket number ({name, courtId (CourtListener court id), docketNumber, issuers[], note}) — searched in their court every run, and their newest RECAP entry always checked.",
+  "queries": [],
+  "dockets": [
+    {
+      "name": "Securitize I, Inc. v. tZERO Group, Inc.",
+      "courtId": "ded",
+      "docketNumber": "1:26-cv-00722",
+      "issuers": ["securitize-secz"],
+      "note": "Declaratory-judgment action over tZERO patents US 11,216,802 and US 11,394,560 aimed at the DS Protocol and Vault Registrar; tZERO IP counterclaimed. Recorded as a watch candidate in securitize-secz whatIf[program-bug] and findings; no merits decision."
+    },
+    {
+      "name": "Liquid Rarity Exchange, LLC v. Securitize I, Inc.",
+      "courtId": "ded",
+      "docketNumber": "1:26-cv-00698",
+      "issuers": ["securitize-secz"],
+      "note": "Patent action naming Securitize I, Inc.; found through the same CourtListener RECAP search (securitize-secz whatIf[court-order].searched). No merits decision."
+    }
+  ]
+}

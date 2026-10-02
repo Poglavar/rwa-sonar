@@ -1,3 +1,51 @@
+/* A defunct asset's row in the main table: greyed, so an issuer that has wound down cannot be
+   mistaken for a live one. Set by renderTableBody when a record has status "defunct". */
+tr.asset-defunct td {
+    opacity: 0.55;
+}
+
+/* The shared site header (app-shell.css) sits inside this page's own 24px body gutter, so it
+   takes the body's width instead of its own centred column; the title follows it. */
+.app-header {
+    width: auto;
+    margin: 0 0 18px;
+}
+
+.assets-title {
+    margin: 0 0 14px;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+@media (max-width: 720px) {
+    .app-header {
+        width: auto;
+        margin-bottom: 14px;
+    }
+}
+
+@media (max-width: 400px) {
+    body {
+        margin-inline: 12px;
+    }
+
+    /* At 320px the header's 28px brand gap pushed "Research" onto two lines. */
+    .app-header {
+        gap: 12px;
+    }
+}
+
+/* This page's header sits inside its 24px body gutter, narrower than the shared column, so the theme
+   switch moves into the Research menu up to 420px here (app-shell.css does it under 360px). */
+@media (max-width: 420px) {
+    .app-header .app-nav > .theme-switch {
+        display: none;
+    }
+
+    .app-header .theme-switch-menu {
+        display: block;
+    }
+}
+
 /* Asset Modal Styles */
 .modal {
     position: fixed;
@@ -183,18 +231,16 @@
     height: 24px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .asset-logo--needs-light-bg {
-        background: rgba(255, 255, 255, 0.96);
-        border-radius: 16px;
-        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18);
-        padding: 6px;
-    }
+:where(html[data-theme="dark"]) .asset-logo--needs-light-bg {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18);
+    padding: 6px;
+}
 
-    .table-asset-logo.asset-logo--needs-light-bg {
-        border-radius: 12px;
-        padding: 4px;
-    }
+:where(html[data-theme="dark"]) .table-asset-logo.asset-logo--needs-light-bg {
+    border-radius: 12px;
+    padding: 4px;
 }
 
 .card-standard-badge a {
@@ -470,4 +516,9 @@
 
 .att-link-btn:hover {
     background: #2f855a;
+}
+
+/* The Stocks entry in the header is a link styled as a tab; tabs are buttons and never underline. */
+a.tab-button {
+    text-decoration: none;
 }

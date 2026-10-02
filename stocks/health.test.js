@@ -1,0 +1,1472 @@
+// Unit tests for the pure health rules (lib/health.mjs). Every band is pinned at its boundary from
+// both sides — 1.00 % is good and 1.01 % is not — because an off-by-a-hair comparison is exactly the
+// kind of change that silently repaints hundreds of cards. The synthetic fixtures use the real field
+// names of stocks-tokens.json / stocks-issuers.json / stocks/data/holders.json / stocks-trades.json,
+// and the last suite runs the rules over those four real files so a shape drift in any of them fails
+// here rather than on the page.
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
+const {
+    STATUSES,
+    HEALTH_DIMENSIONS,
+    HEALTH_LEVELS,
+    HEALTH_RULES,
+    TRADING_RULE_IDS,
+    topSharePctExcludingLabels,
+    evaluateHealth,
+    holderHeadline,
+    worstStatus
+} = require('./lib/health.mjs');
+const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib/composability.mjs');
+
+// --- Fixture builders -------------------------------------------------------------------------
+// Everything defaults to null, so each test states only the inputs its rule reads and every other
+// rule stays honestly unknown.
+
+function makeToken({ control, market, activity, reference, issuerApi } = {}) {
+    return {
+        mint: 'TestMint1111111111111111111111111111111111',
+        symbol: 'TEST',
+        control: { paused: null, rebase: null, ...control },
+        market: { usdPrice: null, liquidity: null, organicSharePct: null, ...market },
+        activity: {
+            trades24: null,
+            tradesPerTrader: null,
+            dexPairs: null,
+            venueSpreadPct: null,
+            venueSpreadLow: null,
+            venueSpreadHigh: null,
+            venuesPriced: null,
+            ...activity
+        },
+        reference: { source: null, price: null, premiumPct: null, marketOpen: null, ageSeconds: null, ...reference },
+        issuerApi: issuerApi === undefined ? null : issuerApi
+    };
+}
+
+function makeIssuer({ grades, custodyVerification, keyGovernance, evidence, authorityFacts } = {}) {
+    return {
+        slug: 'test-issuer',
+        grades: { verificationStrength: null, verificationLabel: null, ...grades },
+        custodyVerification: { type: null, machineReadable: null, ...custodyVerification },
+        keyGovernance: { mint: null, freeze: null, pause: null, delegate: null, transferFee: null, rebase: null, ...keyGovernance },
+        ...(authorityFacts === undefined ? {} : { authorityFacts }),
+        ...(evidence === undefined ? {} : { evidence })
+    };
+}
+
+/** One `top20[]` entry. `amountUi` defaults to the share so dedupeOwners' ordering is deterministic. */
+function holder({ owner, sharePct, amountUi, ownerLabel = null, state = 'initialized', tokenAccount }) {
+    return {
+        tokenAccount: tokenAccount ?? `${owner}-ata`,
+        owner,
+        amountUi: amountUi === undefined ? sharePct : amountUi,
+        sharePct,
+        state,
+        ownerLabel
+    };
+}
+
+function makeHolders({ top20 = [], top1SharePct = null, distinctOwnersTop20 = null, frozenAccountsTop20 = null } = {}) {
+    return { mint: 'TestMint1111111111111111111111111111111111', symbol: 'TEST', top20, top1SharePct, distinctOwnersTop20, frozenAccountsTop20 };
+}
+
+function ruleOf(result, id) {
+    const rule = result.rules.find((entry) => entry.id === id);
+    if (rule === undefined) throw new Error(`no rule ${id} in the result`);
+    return rule;
+}
+
+/** The status one rule reaches for a given input — the shorthand nearly every case below uses. */
+function statusOf(id, input) {
+    return ruleOf(evaluateHealth(input), id).status;
+}
+
+function makeComposability(healthStatus = 'good') {
+    return {
+        id: 'test-template',
+        healthStatus,
+        summary: 'A reviewed test template whose status is supplied by the fixture.',
+        scenarios: {
+            escrow: { outcome: 'permissionless' },
+            borrowerDefault: { outcome: 'onchain-enforceable' },
+            protocolHack: { outcome: 'final' },
+            accessLoss: { outcome: 'no-onchain-rescue' }
+        }
+    };
+}
+
+const RULE_IDS = [
+    'tracking',
+    'liquidity',
+    'organic',
+    'failedTx',
+    'concentration',
+    'verification',
+    'defiComposability',
+    'keyControl',
+    'paused',
+    'frozen',
+    'spread'
+];
+
+// --- Contract ---------------------------------------------------------------------------------
+
+describe('exported contract', () => {
+    test('STATUSES is the four statuses in severity order', () => {
+        expect(STATUSES).toEqual(['good', 'caution', 'warning', 'unknown']);
+    });
+
+    test('HEALTH_RULES has eleven entries whose ids are the rule ids in order', () => {
+        expect(HEALTH_RULES).toHaveLength(11);
+        expect(HEALTH_RULES.map((rule) => rule.id)).toEqual(RULE_IDS);
+    });
+
+    test('every rule describes either the programme or this one token', () => {
+        expect(HEALTH_LEVELS.map((level) => level.id)).toEqual(['programme', 'token']);
+        const byLevel = (id) => HEALTH_RULES.filter((rule) => rule.level === id).map((rule) => rule.id);
+        expect(byLevel('programme')).toEqual(['verification', 'defiComposability', 'keyControl']);
+        expect(byLevel('token')).toEqual(['tracking', 'liquidity', 'organic', 'failedTx', 'concentration', 'paused', 'frozen', 'spread']);
+        // The checks that need a market are all token checks.
+        expect(TRADING_RULE_IDS.every((id) => byLevel('token').includes(id))).toBe(true);
+    });
+
+    test('every rule belongs to one of the four health dimensions', () => {
+        expect(HEALTH_DIMENSIONS.map((dimension) => dimension.id)).toEqual(['market', 'control', 'legal', 'composability']);
+        expect(new Set(HEALTH_RULES.map((rule) => rule.dimension))).toEqual(new Set(['market', 'control', 'legal', 'composability']));
+    });
+
+    test('every HEALTH_RULES entry carries a label, a description and threshold strings', () => {
+        for (const rule of HEALTH_RULES) {
+            expect(typeof rule.label).toBe('string');
+            expect(rule.label.length).toBeGreaterThan(0);
+            expect(typeof rule.description).toBe('string');
+            expect(rule.description.length).toBeGreaterThan(10);
+            for (const band of ['good', 'caution', 'warning']) {
+                expect(band in rule.thresholds).toBe(true);
+                const value = rule.thresholds[band];
+                expect(value === null || (typeof value === 'string' && value.length > 0)).toBe(true);
+            }
+        }
+    });
+
+    test('the bands a rule can never reach are null, not invented text', () => {
+        const byId = Object.fromEntries(HEALTH_RULES.map((rule) => [rule.id, rule.thresholds]));
+        expect(byId.keyControl.warning).toBeNull();
+        expect(byId.frozen.warning).toBeNull();
+        expect(byId.paused.caution).toBeNull();
+        expect(byId.tracking.warning).not.toBeNull();
+    });
+
+    test('evaluateHealth returns the eleven rules in the fixed order with the full per-rule shape', () => {
+        const result = evaluateHealth({ token: makeToken() });
+        expect(result.rules).toHaveLength(11);
+        expect(result.rules.map((rule) => rule.id)).toEqual(RULE_IDS);
+        for (const rule of result.rules) {
+            expect(Object.keys(rule).sort()).toEqual(['dimension', 'id', 'inputs', 'label', 'level', 'note', 'status', 'threshold', 'value']);
+            expect(STATUSES).toContain(rule.status);
+            expect(rule.value === null || Number.isFinite(rule.value)).toBe(true);
+            expect(typeof rule.threshold).toBe('string');
+            expect(rule.threshold.length).toBeGreaterThan(0);
+            expect(typeof rule.note).toBe('string');
+            expect(rule.note.length).toBeGreaterThan(0);
+            expect(typeof rule.inputs).toBe('object');
+            expect(rule.inputs).not.toBeNull();
+        }
+    });
+
+    test('market, control, legal/evidence and composability are judged independently', () => {
+        const result = evaluateHealth({
+            token: makeToken({
+                market: { usdPrice: 100, liquidity: 500000 },
+                reference: { price: 100, premiumPct: 0 }
+            }),
+            issuer: {
+                grades: { verificationStrength: 0 },
+                evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 },
+                keyGovernance: { mint: 'multisig' }
+            },
+            holders: { top20: [{ owner: 'wallet', sharePct: 10, ownerLabel: null }], frozenAccountsTop20: 0 },
+            pools: [{ signaturesSeen: 10, failedTx: 0 }]
+        });
+        expect(result.dimensions.market.status).toBe('good');
+        expect(result.dimensions.control.status).toBe('good');
+        expect(result.dimensions.legal).toMatchObject({ status: 'warning', worstRuleId: 'verification', judged: 1, unknown: 0, total: 1 });
+        expect(result.dimensions.composability).toMatchObject({ status: 'unknown', worstRuleId: null, judged: 0, unknown: 1, total: 1 });
+        expect(result.status).toBe('warning');
+    });
+
+    test('the threshold string reads like the tracking example', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'tracking');
+        expect(rule.threshold).toBe('≤ 1 % good · ≤ 3 % caution · > 3 % warning');
+    });
+
+    test('a rule that cannot warn does not advertise a warning band in its threshold string', () => {
+        const result = evaluateHealth({ token: makeToken() });
+        expect(ruleOf(result, 'keyControl').threshold).not.toMatch(/warning/);
+        expect(ruleOf(result, 'frozen').threshold).not.toMatch(/warning/);
+        expect(ruleOf(result, 'paused').threshold).not.toMatch(/caution/);
+    });
+
+    test('evaluateHealth survives being called with nothing at all', () => {
+        for (const input of [undefined, {}, null]) {
+            const result = evaluateHealth(input);
+            expect(result.status).toBe('unknown');
+            expect(result.worstRuleId).toBeNull();
+            expect(result.rules).toHaveLength(11);
+        }
+    });
+});
+
+// --- worstStatus ------------------------------------------------------------------------------
+
+describe('worstStatus', () => {
+    test.each([
+        [['good', 'good'], 'good'],
+        [['good', 'caution'], 'caution'],
+        [['caution', 'warning', 'good'], 'warning'],
+        [['warning'], 'warning'],
+        [['good', 'unknown'], 'good'],
+        [['caution', 'unknown', 'good'], 'caution'],
+        [['unknown', 'unknown'], 'unknown'],
+        [[], 'unknown']
+    ])('%j → %s', (statuses, expected) => {
+        expect(worstStatus(statuses)).toBe(expected);
+    });
+
+    test('unknown is never counted as bad, however many there are', () => {
+        expect(worstStatus(['unknown', 'unknown', 'unknown', 'good'])).toBe('good');
+    });
+
+    test('an unrecognised status is ignored rather than ranked', () => {
+        expect(worstStatus(['good', 'catastrophic', null, undefined])).toBe('good');
+        expect(worstStatus(['nonsense'])).toBe('unknown');
+    });
+
+    test('a non-array is unknown rather than a crash', () => {
+        expect(worstStatus(null)).toBe('unknown');
+        expect(worstStatus('warning')).toBe('unknown');
+    });
+});
+
+// --- topSharePctExcludingLabels ---------------------------------------------------------------
+
+describe('topSharePctExcludingLabels', () => {
+    const ISSUER = holder({ owner: 'AuthorityOwner', sharePct: 60, amountUi: 600, ownerLabel: 'issuer-authority' });
+    const BURN = holder({ owner: 'BurnOwner', sharePct: 10, amountUi: 100, ownerLabel: 'burn-address' });
+    const WHALE = holder({ owner: 'WhaleOwner', sharePct: 18, amountUi: 180 });
+    const SECOND = holder({ owner: 'SecondOwner', sharePct: 7, amountUi: 70 });
+    const THIRD = holder({ owner: 'ThirdOwner', sharePct: 3, amountUi: 30 });
+
+    test('skips labelled rows and sums the biggest n unlabelled ones', () => {
+        const top20 = [ISSUER, WHALE, BURN, SECOND, THIRD];
+        expect(topSharePctExcludingLabels(top20, 1)).toBeCloseTo(18, 10);
+        expect(topSharePctExcludingLabels(top20, 2)).toBeCloseTo(25, 10);
+        expect(topSharePctExcludingLabels(top20, 3)).toBeCloseTo(28, 10);
+        // n beyond the number of unlabelled rows just sums them all.
+        expect(topSharePctExcludingLabels(top20, 20)).toBeCloseTo(28, 10);
+    });
+
+    test('the denominator is NOT renormalised — the labelled 70 % stays in the supply base', () => {
+        // Were the labelled rows' 70 % removed from the denominator, the whale's 18/30 would read 60 %.
+        expect(topSharePctExcludingLabels([ISSUER, BURN, WHALE], 1)).toBeCloseTo(18, 10);
+    });
+
+    test('one owner across two token accounts is one row, its shares summed', () => {
+        const top20 = [
+            holder({ owner: 'Split', sharePct: 12, amountUi: 120, tokenAccount: 'ata-a' }),
+            holder({ owner: 'Other', sharePct: 11, amountUi: 110 }),
+            holder({ owner: 'Split', sharePct: 9, amountUi: 90, tokenAccount: 'ata-b' })
+        ];
+        expect(topSharePctExcludingLabels(top20, 1)).toBeCloseTo(21, 10);
+    });
+
+    test('null (never 0) when there is nothing summable', () => {
+        expect(topSharePctExcludingLabels([], 1)).toBeNull();
+        expect(topSharePctExcludingLabels([ISSUER, BURN], 1)).toBeNull();
+        expect(topSharePctExcludingLabels(null, 1)).toBeNull();
+        expect(topSharePctExcludingLabels(undefined, 1)).toBeNull();
+        // A supply of 0 leaves every sharePct null; the answer must stay null, not become 0.
+        expect(topSharePctExcludingLabels([holder({ owner: 'Zero', sharePct: null, amountUi: 5 })], 1)).toBeNull();
+    });
+
+    test('a non-positive or non-integer n sums nothing', () => {
+        const top20 = [WHALE, SECOND];
+        expect(topSharePctExcludingLabels(top20, 0)).toBeNull();
+        expect(topSharePctExcludingLabels(top20, -1)).toBeNull();
+        expect(topSharePctExcludingLabels(top20, 1.5)).toBeNull();
+    });
+});
+
+describe('DeFi composability', () => {
+    test.each(['good', 'caution', 'warning'])('the reviewed template status %s becomes the dimension status', (status) => {
+        const result = evaluateHealth({ composabilityTemplate: makeComposability(status) });
+        const rule = ruleOf(result, 'defiComposability');
+        expect(rule.status).toBe(status);
+        expect(rule.inputs).toEqual({
+            templateId: 'test-template', escrow: 'permissionless',
+            borrowerDefault: 'onchain-enforceable', protocolHack: 'final', accessLoss: 'no-onchain-rescue'
+        });
+        expect(result.dimensions.composability).toMatchObject({ status, worstRuleId: 'defiComposability', judged: 1, unknown: 0, total: 1 });
+    });
+
+    test('missing review is unknown, never treated as non-composable', () => {
+        const result = evaluateHealth({});
+        expect(ruleOf(result, 'defiComposability').status).toBe('unknown');
+        expect(result.dimensions.composability).toMatchObject({ status: 'unknown', worstRuleId: null, judged: 0, unknown: 1, total: 1 });
+    });
+});
+
+// --- 1. tracking ------------------------------------------------------------------------------
+
+describe('tracking', () => {
+    const at = (premiumPct) => makeToken({ reference: { premiumPct, source: 'pyth', price: 100 }, market: { usdPrice: 101 } });
+
+    test.each([
+        [0, 'good'],
+        [0.99, 'good'],
+        [1, 'good'],
+        [1.01, 'caution'],
+        [2.99, 'caution'],
+        [3, 'caution'],
+        [3.01, 'warning'],
+        [40, 'warning']
+    ])('premium %p %% → %s', (premiumPct, expected) => {
+        expect(statusOf('tracking', { token: at(premiumPct) })).toBe(expected);
+    });
+
+    test('the band is on the absolute premium, so a discount grades like a premium', () => {
+        expect(statusOf('tracking', { token: at(-1) })).toBe('good');
+        expect(statusOf('tracking', { token: at(-1.01) })).toBe('caution');
+        expect(statusOf('tracking', { token: at(-3.01) })).toBe('warning');
+    });
+
+    test('value is the absolute premium and the note names the direction', () => {
+        expect(ruleOf(evaluateHealth({ token: at(-2.5) }), 'tracking').value).toBeCloseTo(2.5, 10);
+        expect(ruleOf(evaluateHealth({ token: at(-2.5) }), 'tracking').note).toMatch(/below/);
+        expect(ruleOf(evaluateHealth({ token: at(2.5) }), 'tracking').note).toMatch(/above/);
+    });
+
+    test('no reference premium → unknown with a null value', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'tracking');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(/cannot be measured/);
+    });
+
+    test('inputs carry the reference source, price, age, market state and on-chain price', () => {
+        const token = makeToken({
+            reference: { premiumPct: 0.5, source: 'ondo-implied', price: 333.335, ageSeconds: 42, marketOpen: false },
+            market: { usdPrice: 332.37 }
+        });
+        expect(ruleOf(evaluateHealth({ token }), 'tracking').inputs).toEqual({
+            referenceSource: 'ondo-implied',
+            referencePrice: 333.335,
+            ageSeconds: 42,
+            marketOpen: false,
+            usdPrice: 332.37
+        });
+    });
+
+    test('a closed underlying market is flagged in the note, not in the status', () => {
+        const token = makeToken({ reference: { premiumPct: 0.2, source: 'pyth', marketOpen: false } });
+        const rule = ruleOf(evaluateHealth({ token }), 'tracking');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/market closed/);
+    });
+});
+
+// --- 2. liquidity -----------------------------------------------------------------------------
+
+describe('liquidity', () => {
+    const at = (liquidity) => makeToken({ market: { liquidity } });
+
+    test.each([
+        [0, 'warning'],
+        [9999, 'warning'],
+        [10000, 'caution'],
+        [10001, 'caution'],
+        [99999, 'caution'],
+        [100000, 'good'],
+        [5000000, 'good']
+    ])('$%p of liquidity → %s', (liquidity, expected) => {
+        expect(statusOf('liquidity', { token: at(liquidity) })).toBe(expected);
+    });
+
+    test('no liquidity figure → unknown, and the note says so rather than reading as $0', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'liquidity');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toBe('no venue reports liquidity');
+    });
+
+    test('a reported liquidity of exactly 0 is a warning, not an unknown', () => {
+        const rule = ruleOf(evaluateHealth({ token: at(0) }), 'liquidity');
+        expect(rule.status).toBe('warning');
+        expect(rule.value).toBe(0);
+    });
+
+    test('inputs carry the liquidity and the DEX pair count', () => {
+        const token = makeToken({ market: { liquidity: 892.06 }, activity: { dexPairs: 3 } });
+        expect(ruleOf(evaluateHealth({ token }), 'liquidity').inputs).toEqual({ liquidityUsd: 892.06, dexPairs: 3 });
+    });
+});
+
+// --- 3. organic -------------------------------------------------------------------------------
+
+describe('organic', () => {
+    const at = ({ organicSharePct = null, tradesPerTrader = null, trades24 = 100 }) =>
+        makeToken({ market: { organicSharePct }, activity: { tradesPerTrader, trades24 } });
+
+    test.each([
+        [24, 'good'],
+        [25, 'good'],
+        [26, 'caution']
+    ])('%p trades per trader with a healthy organic share → %s', (tradesPerTrader, expected) => {
+        expect(statusOf('organic', { token: at({ organicSharePct: 40, tradesPerTrader }) })).toBe(expected);
+    });
+
+    // Recalibrated 2026-09-25: a low organic share alone no longer cautions. On the live universe
+    // only 4 of the 57 tokens with ≥ $100k liquidity reached 10 % organic (median 4 %) while most
+    // thinly traded tokens did, so the old "either input fails" band penalised exactly the markets
+    // arbitrage keeps on price. "A few bots" needs both signals; many wallets trading is not it.
+    test.each([
+        [0.5, 'good'],
+        [9.99, 'good'],
+        [10, 'good'],
+        [10.01, 'good']
+    ])('%p %% organic share with a healthy trades-per-trader → %s', (organicSharePct, expected) => {
+        expect(statusOf('organic', { token: at({ organicSharePct, tradesPerTrader: 2 }) })).toBe(expected);
+    });
+
+    test('bot-classified volume spread across many wallets is good, and the note says what it is', () => {
+        const rule = ruleOf(evaluateHealth({ token: at({ organicSharePct: 3.4, tradesPerTrader: 6, trades24: 2000 }) }), 'organic');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/3\.4 % organic share/);
+        expect(rule.note).toMatch(/spread across many wallets/);
+    });
+
+    test('a healthy organic share cannot rescue flow concentrated in a few wallets', () => {
+        expect(statusOf('organic', { token: at({ organicSharePct: 40, tradesPerTrader: 25.01 }) })).toBe('caution');
+    });
+
+    test('both failing is a warning', () => {
+        expect(statusOf('organic', { token: at({ organicSharePct: 9.99, tradesPerTrader: 25.01 }) })).toBe('warning');
+    });
+
+    test('both at their exact boundaries is good', () => {
+        expect(statusOf('organic', { token: at({ organicSharePct: 10, tradesPerTrader: 25 }) })).toBe('good');
+    });
+
+    test.each([
+        [null, /no 24 h trade count/],
+        [0, /no trades in 24 h/]
+    ])('trades24 %p → unknown', (trades24, noteMatch) => {
+        const token = at({ organicSharePct: 1, tradesPerTrader: 900, trades24 });
+        const rule = ruleOf(evaluateHealth({ token }), 'organic');
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(noteMatch);
+    });
+
+    test('the note groups the trade count ("411,206 trades", not "411206 trades")', () => {
+        const rule = ruleOf(evaluateHealth({ token: at({ organicSharePct: 40, tradesPerTrader: 2, trades24: 411206 }) }), 'organic');
+        expect(rule.note).toContain('over 411,206 trades');
+    });
+
+    test('with only the organic share known it is judged alone and the note says so', () => {
+        const pass = ruleOf(evaluateHealth({ token: at({ organicSharePct: 12 }) }), 'organic');
+        expect(pass.status).toBe('good');
+        expect(pass.note).toMatch(/trades per trader is not reported/);
+        expect(pass.value).toBeCloseTo(12, 10);
+
+        const fail = ruleOf(evaluateHealth({ token: at({ organicSharePct: 4 }) }), 'organic');
+        expect(fail.status).toBe('caution');
+        expect(fail.note).toMatch(/trades per trader is not reported/);
+    });
+
+    test('with only trades-per-trader known it is judged alone and the note says so', () => {
+        const pass = ruleOf(evaluateHealth({ token: at({ tradesPerTrader: 1.4 }) }), 'organic');
+        expect(pass.status).toBe('good');
+        expect(pass.note).toMatch(/organic share is not reported/);
+        expect(pass.value).toBeCloseTo(1.4, 10);
+
+        const fail = ruleOf(evaluateHealth({ token: at({ tradesPerTrader: 400 }) }), 'organic');
+        expect(fail.status).toBe('caution');
+        expect(fail.note).toMatch(/organic share is not reported/);
+    });
+
+    test('a single known input can never reach warning on its own', () => {
+        expect(statusOf('organic', { token: at({ tradesPerTrader: 10000 }) })).toBe('caution');
+        expect(statusOf('organic', { token: at({ organicSharePct: 0 }) })).toBe('caution');
+    });
+
+    test('trades happened but neither flow input is reported → unknown', () => {
+        const rule = ruleOf(evaluateHealth({ token: at({}) }), 'organic');
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/neither the organic share nor trades-per-trader/);
+    });
+
+    test('inputs carry all three raw numbers', () => {
+        const token = at({ organicSharePct: 33.3, tradesPerTrader: 1.4, trades24: 42 });
+        expect(ruleOf(evaluateHealth({ token }), 'organic').inputs).toEqual({
+            organicSharePct: 33.3,
+            tradesPerTrader: 1.4,
+            trades24: 42
+        });
+    });
+});
+
+// --- 4. failedTx ------------------------------------------------------------------------------
+
+describe('failedTx', () => {
+    const pool = (signaturesSeen, failedTx, extra = {}) => ({
+        pair: 'PoolPair1111',
+        dex: 'raydium',
+        signaturesSeen,
+        failedTx,
+        ...extra
+    });
+
+    test.each([
+        [0, 'good'],
+        [20, 'good'],
+        [21, 'caution'],
+        [49, 'caution'],
+        [50, 'caution'],
+        [51, 'warning'],
+        [100, 'warning']
+    ])('%p failed of 100 signatures → %s', (failed, expected) => {
+        expect(statusOf('failedTx', { pools: [pool(100, failed)] })).toBe(expected);
+    });
+
+    test('the ratio is pooled across pools, not averaged per pool', () => {
+        // 5/10 in one pool and 5/90 in another is 10/100 = 10 %, not the 27.8 % a per-pool mean gives.
+        const rule = ruleOf(evaluateHealth({ pools: [pool(10, 5), pool(90, 5)] }), 'failedTx');
+        expect(rule.value).toBeCloseTo(10, 10);
+        expect(rule.status).toBe('good');
+        expect(rule.inputs.signaturesSeen).toBe(100);
+        expect(rule.inputs.failedTx).toBe(10);
+    });
+
+    test('pools with no signatures are excluded from the denominator', () => {
+        const rule = ruleOf(evaluateHealth({ pools: [pool(0, 0), pool(50, 30)] }), 'failedTx');
+        expect(rule.value).toBeCloseTo(60, 10);
+        expect(rule.inputs.poolsCounted).toBe(1);
+        expect(rule.inputs.signaturesSeen).toBe(50);
+    });
+
+    test('a pool with signatures but no failure figure is not counted as having failed nothing', () => {
+        const rule = ruleOf(evaluateHealth({ pools: [pool(100, null), pool(10, 6)] }), 'failedTx');
+        expect(rule.value).toBeCloseTo(60, 10);
+        expect(rule.inputs.signaturesSeen).toBe(10);
+        expect(rule.inputs.poolsCounted).toBe(1);
+        // It is still listed, so the card can show the gap.
+        expect(rule.inputs.pools).toHaveLength(2);
+        expect(rule.inputs.pools[0].failedTx).toBeNull();
+    });
+
+    test.each([
+        [[], /no swap pool was sampled/],
+        [[pool(0, 0)], /no usable signature counts/],
+        [[pool(null, null)], /no usable signature counts/]
+    ])('%j → unknown', (pools, noteMatch) => {
+        const rule = ruleOf(evaluateHealth({ pools }), 'failedTx');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(noteMatch);
+    });
+
+    test('no pools field at all is unknown, not 0 %', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'failedTx');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+    });
+
+    test('inputs list each pool with its pair, dex and counts', () => {
+        const rule = ruleOf(evaluateHealth({ pools: [pool(50, 3, { pair: 'AbcPair', dex: 'orca', decoded: 17 })] }), 'failedTx');
+        expect(rule.inputs.pools).toEqual([{ pair: 'AbcPair', dex: 'orca', signaturesSeen: 50, failedTx: 3 }]);
+    });
+});
+
+// --- 5. concentration -------------------------------------------------------------------------
+
+describe('concentration', () => {
+    const AUTHORITY = holder({ owner: 'AuthorityOwner', sharePct: 60, amountUi: 6000, ownerLabel: 'issuer-authority' });
+    const BURN = holder({ owner: 'BurnOwner', sharePct: 12, amountUi: 1200, ownerLabel: 'burn-address' });
+
+    /** Both labelled rows sit ABOVE the unlabelled one, so a rule that forgot to skip them would grade 60 %. */
+    const withTop1 = (sharePct) => makeHolders({
+        top20: [
+            AUTHORITY,
+            BURN,
+            holder({ owner: 'BiggestWallet', sharePct, amountUi: sharePct * 10 }),
+            holder({ owner: 'SmallWallet', sharePct: 1, amountUi: 10 })
+        ],
+        top1SharePct: 60,
+        distinctOwnersTop20: 4,
+        frozenAccountsTop20: 0
+    });
+
+    test.each([
+        [1, 'good'],
+        [24, 'good'],
+        [25, 'good'],
+        [26, 'caution'],
+        [49, 'caution'],
+        [50, 'caution'],
+        [51, 'warning'],
+        [90, 'warning']
+    ])('%p %% held by the biggest unlabelled wallet → %s', (sharePct, expected) => {
+        expect(statusOf('concentration', { holders: withTop1(sharePct) })).toBe(expected);
+    });
+
+    test('the labelled issuer authority and burn address are excluded from the judged value', () => {
+        const rule = ruleOf(evaluateHealth({ holders: withTop1(25) }), 'concentration');
+        expect(rule.value).toBeCloseTo(25, 10);
+        expect(rule.status).toBe('good');
+        expect(rule.inputs.top1SharePct).toBeCloseTo(60, 10);
+        expect(rule.inputs.excluded).toEqual([
+            { ownerLabel: 'issuer-authority', sharePct: 60 },
+            { ownerLabel: 'burn-address', sharePct: 12 }
+        ]);
+    });
+
+    test('inputs carry the cumulative unlabelled shares and the distinct owner count', () => {
+        const rule = ruleOf(evaluateHealth({ holders: withTop1(30) }), 'concentration');
+        expect(rule.inputs.top1SharePctExcludingLabels).toBeCloseTo(30, 10);
+        expect(rule.inputs.top5SharePctExcludingLabels).toBeCloseTo(31, 10);
+        expect(rule.inputs.top20SharePctExcludingLabels).toBeCloseTo(31, 10);
+        expect(rule.inputs.distinctOwnersTop20).toBe(4);
+    });
+
+    test('no holder snapshot → unknown', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'concentration');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(/no holder snapshot/);
+    });
+
+    test('a snapshot of nothing but labelled rows → unknown, not 0 %', () => {
+        const rule = ruleOf(evaluateHealth({ holders: makeHolders({ top20: [AUTHORITY, BURN] }) }), 'concentration');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(/no unlabelled holder/);
+    });
+
+    test('a supply of 0 leaves every share null, so the rule stays unknown', () => {
+        const holders = makeHolders({ top20: [holder({ owner: 'Only', sharePct: null, amountUi: 12 })] });
+        expect(statusOf('concentration', { holders })).toBe('unknown');
+    });
+});
+
+// --- 6. verification --------------------------------------------------------------------------
+
+describe('verification', () => {
+    const at = (verificationStrength, extra = {}) => makeIssuer({
+        grades: { verificationStrength, verificationLabel: 'daily agent' },
+        custodyVerification: { type: 'daily-verification-agent', machineReadable: false },
+        evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 },
+        ...extra
+    });
+
+    test.each([
+        [0, 'warning'],
+        [1, 'caution'],
+        [2, 'caution'],
+        [3, 'good'],
+        [4, 'good'],
+        [5, 'good']
+    ])('verification strength %p → %s', (strength, expected) => {
+        expect(statusOf('verification', { issuer: at(strength) })).toBe(expected);
+    });
+
+    test('no issuer record → unknown, not a zero strength', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'verification');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(/coverage is not measured/);
+    });
+
+    test('an issuer with no strength recorded → unknown', () => {
+        expect(statusOf('verification', { issuer: makeIssuer() })).toBe('unknown');
+    });
+
+    test('coverage or review gaps keep strong reserve evidence from reading as complete legal health', () => {
+        const issuer = at(4, {
+            evidence: { coverage: { sourced: 47, needed: 50 }, unverified: 32, inference: 1 }
+        });
+        const rule = ruleOf(evaluateHealth({ issuer }), 'verification');
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toMatch(/3 required fields lack evidence/);
+        expect(rule.note).toMatch(/32 claims await re-checking/);
+    });
+
+    test('reviewed inference remains visible but is not itself a legal-review gap; legacy or unreviewed inference is', () => {
+        const complete = { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 1 };
+        const reviewed = at(4, { evidence: { ...complete, inferenceReviewed: 1, inferenceUnreviewed: 0 } });
+        const unreviewed = at(4, { evidence: { ...complete, inferenceReviewed: 0, inferenceUnreviewed: 1 } });
+        expect(ruleOf(evaluateHealth({ issuer: reviewed }), 'verification')).toMatchObject({ status: 'good', inputs: { inferenceReviewed: 1, inferenceUnreviewed: 0 } });
+        expect(ruleOf(evaluateHealth({ issuer: reviewed }), 'verification').note).toMatch(/remains inferential, not source-confirmed/);
+        expect(ruleOf(evaluateHealth({ issuer: unreviewed }), 'verification')).toMatchObject({ status: 'caution', inputs: { inferenceReviewed: 0, inferenceUnreviewed: 1 } });
+        // No split on an old record means the one inference remains conservatively unreviewed.
+        expect(ruleOf(evaluateHealth({ issuer: at(4, { evidence: complete }) }), 'verification')).toMatchObject({ status: 'caution', inputs: { inferenceUnreviewed: 1 } });
+    });
+
+    test('inputs carry reserve details and the legal-evidence review counts', () => {
+        const issuer = makeIssuer({
+            grades: { verificationStrength: 5, verificationLabel: 'register' },
+            custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
+            evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 }
+        });
+        const rule = ruleOf(evaluateHealth({ issuer }), 'verification');
+        expect(rule.inputs).toEqual({
+            custodyType: 'transfer-agent-register',
+            machineReadable: true,
+            verificationLabel: 'register',
+            requiredFields: 50,
+            sourcedFields: 50,
+            missingRequired: 0,
+            unverifiedClaims: 0,
+            inferentialConclusions: 0,
+            inferenceReviewed: 0,
+            inferenceUnreviewed: 0
+        });
+        expect(rule.note).toMatch(/machine-readable/);
+    });
+});
+
+// --- 7. keyControl ----------------------------------------------------------------------------
+
+describe('keyControl', () => {
+    const gov = (keyGovernance) => makeIssuer({ keyGovernance });
+
+    test('any hot key is a caution', () => {
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'hot-key', freeze: 'unknown', delegate: null }) })).toBe('caution');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'unknown', freeze: 'hot-key', delegate: 'unknown' }) })).toBe('caution');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'program', freeze: 'multisig', delegate: 'hot-key' }) })).toBe('caution');
+    });
+
+    test('a green verdict requires every relevant path to be multisig or a program with evidenced upgrade governance', () => {
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'unknown', delegate: null }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'program' }) })).toBe('unknown');
+        const evidenced = makeIssuer({ keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'program' }, authorityFacts: {
+            rebase: { upgradeGovernance: 'multisig' }
+        } });
+        expect(statusOf('keyControl', { issuer: evidenced })).toBe('good');
+    });
+
+    test('nothing judgeable is unknown — none/unknown/null say nothing either way', () => {
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'unknown', freeze: 'unknown', delegate: 'unknown' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({ mint: 'none', freeze: 'none', delegate: 'none' }) })).toBe('unknown');
+        expect(statusOf('keyControl', { issuer: gov({}) })).toBe('unknown');
+        expect(statusOf('keyControl', { token: makeToken() })).toBe('unknown');
+    });
+
+    test('this rule never warns, whatever the keys are', () => {
+        const combos = [
+            { mint: 'hot-key', freeze: 'hot-key', delegate: 'hot-key' },
+            { mint: 'none', freeze: 'hot-key', delegate: 'unknown' },
+            { mint: 'gibberish', freeze: 'gibberish', delegate: 'gibberish' }
+        ];
+        for (const combo of combos) {
+            expect(statusOf('keyControl', { issuer: gov(combo) })).not.toBe('warning');
+        }
+    });
+
+    test('value is null and inputs are the four authority values', () => {
+        const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'unknown', freeze: 'program', delegate: 'program', rebase: 'program' }) }), 'keyControl');
+        expect(rule.value).toBeNull();
+        expect(rule.inputs).toEqual({ mint: 'unknown', freeze: 'program', pause: null, delegate: 'program', transferFee: null, rebase: 'program' });
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/has not been recorded/);
+    });
+
+    test('the note names which authority is on a hot key', () => {
+        const rule = ruleOf(evaluateHealth({ issuer: gov({ mint: 'hot-key', freeze: 'hot-key', delegate: 'unknown' }) }), 'keyControl');
+        expect(rule.note).toMatch(/mint, freeze/);
+    });
+
+    // --- the fourth authority: rebase (MODEL.md §2.7) -----------------------------------------
+
+    test('a hot-key rebase authority alone is a caution, exactly like the other three', () => {
+        // xStocks: mint hot-key is already a caution, but Superstate is the case that matters —
+        // freeze and delegate are program-held and the rebase key is the weak one.
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: true } }) }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toBe('rebase authority held by a hot key');
+    });
+
+    test('a rebase authority is skipped for a mint KNOWN to carry no scaled-UI extension', () => {
+        // Tessera has no scaledUiAmountConfig on any mint, so an issuer-level rebase value says
+        // nothing about that mint and must not drag its verdict down.
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/has not been recorded/);
+        // The value is still reported in the inputs — the rule skipped it, it did not hide it.
+        expect(rule.inputs.rebase).toBe('hot-key');
+    });
+
+    test('an unread control block leaves the issuer-level rebase value standing', () => {
+        const issuer = gov({ mint: 'program', freeze: 'program', delegate: 'program', rebase: 'hot-key' });
+        expect(statusOf('keyControl', { issuer, token: makeToken({ control: { rebase: null } }) })).toBe('caution');
+        expect(statusOf('keyControl', { issuer })).toBe('caution');
+    });
+
+    test("a rebase of 'none' is not a governance credit and not a fault", () => {
+        const issuer = gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'none' });
+        const rule = ruleOf(evaluateHealth({ issuer, token: makeToken({ control: { rebase: false } }) }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/3 of 3/);
+    });
+
+    test('a strong rebase authority counts towards the good note', () => {
+        const rule = ruleOf(evaluateHealth({
+            issuer: gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'multisig' }),
+            token: makeToken({ control: { rebase: true } })
+        }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/4 of 4/);
+    });
+
+    test('a hot-key rebase authority still never warns', () => {
+        const issuer = gov({ mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'hot-key' });
+        expect(statusOf('keyControl', { issuer, token: makeToken({ control: { rebase: true } }) })).not.toBe('warning');
+    });
+
+    test('a direct multiplier signer is caution even where the mint PDA and issuer-level rebase label say program', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'multisig', rebase: 'program' }, authorityFacts: {
+            rebase: { effectiveGovernance: 'hot-key' }
+        } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: 'FreezeVault', permanentDelegate: false,
+            pausable: true, transferFeeBps: null, rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.inputs.rebase).toBe('hot-key');
+    });
+
+    test('a PDA authority behind a single-key-upgradable program is not stronger than the key itself', () => {
+        const control = { mintAuthority: 'ProgramPda', freezeAuthority: 'ProgramPda', permanentDelegate: false,
+            pausable: false, transferFee: false, rebase: false };
+        const viaProgram = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'program' }, authorityFacts: {
+            mint: { effectiveGovernance: 'program', upgradeGovernance: 'hot-key' },
+            freeze: { upgradeGovernance: 'hot-key' }
+        } });
+        const directKey = makeIssuer({ keyGovernance: { mint: 'hot-key', freeze: 'hot-key' } });
+        const rule = ruleOf(evaluateHealth({ issuer: viaProgram, token: makeToken({ control }) }), 'keyControl');
+        const direct = ruleOf(evaluateHealth({ issuer: directKey, token: makeToken({ control }) }), 'keyControl');
+        expect(direct.status).toBe('caution');
+        expect(rule.status).toBe(direct.status);
+        expect(rule.inputs).toMatchObject({ mint: 'hot-key', freeze: 'hot-key' });
+        expect(rule.note).toBe('mint, freeze authority held by a program whose upgrade authority is a single signer');
+        // Without upgrade evidence the same program path stays uncharacterised, not green and not caution.
+        const unreviewed = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'program' } });
+        expect(statusOf('keyControl', { issuer: unreviewed, token: makeToken({ control }) })).toBe('unknown');
+    });
+
+    test('a 1-of-9 emergency pause path is explicit caution, not an uncharacterised governance path', () => {
+        const issuer = makeIssuer({ authorityFacts: { pause: { effectiveGovernance: 'single-signer-multisig' } } });
+        const token = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: false
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule).toMatchObject({ status: 'caution', inputs: { pause: 'single-signer-multisig' } });
+        expect(rule.note).toBe('pause authority requires only one multisig signer');
+    });
+
+    test('a 1-of-9 pause and a direct rebase signer are both named in the caution', () => {
+        const issuer = makeIssuer({ authorityFacts: {
+            pause: { effectiveGovernance: 'single-signer-multisig' },
+            rebase: { effectiveGovernance: 'hot-key' }
+        } });
+        const token = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('caution');
+        expect(rule.note).toBe('rebase authority held by a hot key; pause authority requires only one multisig signer');
+    });
+
+    test('unknown installed control coverage prevents a green control verdict while retaining a known worst risk', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'program', freeze: 'multisig', rebase: 'program' } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: null, permanentDelegate: false,
+            pausable: false, transferFeeBps: null, rebase: true
+        } });
+        const result = evaluateHealth({ issuer, token });
+        expect(ruleOf(result, 'keyControl').status).toBe('unknown');
+        expect(result.dimensions.control).toMatchObject({ status: 'unknown', judged: 0, unknown: 3, total: 3 });
+    });
+
+    test('pause and transfer-fee authority never borrow the freeze governance label', () => {
+        const issuer = makeIssuer({ keyGovernance: { freeze: 'multisig' } });
+        const pauseOnly = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: true, transferFee: false, rebase: false
+        } });
+        const feeOnly = makeToken({ control: {
+            mintAuthority: false, freezeAuthority: false, permanentDelegate: false,
+            pausable: false, transferFee: true, rebase: false
+        } });
+        expect(ruleOf(evaluateHealth({ issuer, token: pauseOnly }), 'keyControl')).toMatchObject({ status: 'unknown', inputs: { pause: null } });
+        expect(ruleOf(evaluateHealth({ issuer, token: feeOnly }), 'keyControl')).toMatchObject({ status: 'unknown', inputs: { transferFee: null } });
+    });
+
+    test('a zero-bps fee with a withdraw authority remains an installed authority path', () => {
+        const issuer = makeIssuer({ keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', transferFee: 'multisig', rebase: 'multisig' } });
+        const token = makeToken({ control: {
+            mintAuthority: 'MintPda', freezeAuthority: 'FreezeVault', permanentDelegate: false,
+            pausable: false, transferFeeBps: 0, transferFeeConfigAuthority: false,
+            transferFeeWithdrawAuthority: 'FeeVault', rebase: true
+        } });
+        const rule = ruleOf(evaluateHealth({ issuer, token }), 'keyControl');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/4 of 4/);
+    });
+});
+
+// --- 8. paused --------------------------------------------------------------------------------
+
+describe('paused', () => {
+    test('an on-chain pause is a warning', () => {
+        expect(statusOf('paused', { token: makeToken({ control: { paused: true } }) })).toBe('warning');
+    });
+
+    test('an explicit not-paused is good', () => {
+        expect(statusOf('paused', { token: makeToken({ control: { paused: false } }) })).toBe('good');
+    });
+
+    test('neither source reporting → unknown, not good', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken({ control: { paused: null } }) }), 'paused');
+        expect(rule.status).toBe('unknown');
+        expect(rule.note).toMatch(/neither the mint nor an issuer API/);
+    });
+
+    test("the issuer API's isTradingPaused counts as paused on its own", () => {
+        const token = makeToken({ control: { paused: null }, issuerApi: { isTradingPaused: true } });
+        const rule = ruleOf(evaluateHealth({ token }), 'paused');
+        expect(rule.status).toBe('warning');
+        expect(rule.note).toMatch(/at the issuer/);
+    });
+
+    test('an issuer API pause outranks an on-chain not-paused', () => {
+        const token = makeToken({ control: { paused: false }, issuerApi: { isTradingPaused: true } });
+        expect(statusOf('paused', { token })).toBe('warning');
+    });
+
+    test('isTradingPaused false is enough to grade good even with no on-chain flag', () => {
+        const token = makeToken({ control: { paused: null }, issuerApi: { isTradingPaused: false } });
+        expect(statusOf('paused', { token })).toBe('good');
+    });
+
+    test('issuerApi is read off the token when it is not passed separately', () => {
+        const token = makeToken({ issuerApi: { isTradingPaused: true } });
+        expect(ruleOf(evaluateHealth({ token }), 'paused').inputs).toEqual({
+            controlPaused: null, issuerApiPaused: true, issuerPauseReason: null, issuerSession: null
+        });
+    });
+
+    // Ondo reports `isTradingPaused: true` with reason `unavailable_in_session` for every asset it
+    // does not offer in the current (overnight) session — 91 tokens at 01:04 UTC on 2026-09-25,
+    // none of them during US hours. That is the issuer's trading calendar, not a halt; read as a
+    // warning it flipped ~90 tokens between good and warning twice a day.
+    test('a session the issuer does not offer is not a pause', () => {
+        const token = makeToken({
+            control: { paused: false },
+            issuerApi: { isTradingPaused: true, tradingStatus: { assetPauseReason: 'unavailable_in_session', currentSession: 'overnight' } }
+        });
+        const rule = ruleOf(evaluateHealth({ token }), 'paused');
+        expect(rule.status).toBe('good');
+        expect(rule.note).toMatch(/not offered in the overnight session/);
+        expect(rule.inputs).toMatchObject({ issuerApiPaused: true, issuerPauseReason: 'unavailable_in_session', issuerSession: 'overnight' });
+    });
+
+    test('any other issuer pause reason, and any on-chain pause, still warns', () => {
+        const scheduled = makeToken({ issuerApi: { isTradingPaused: true, tradingStatus: { assetPauseReason: 'scheduled' } } });
+        expect(statusOf('paused', { token: scheduled })).toBe('warning');
+        const onChain = makeToken({
+            control: { paused: true },
+            issuerApi: { isTradingPaused: true, tradingStatus: { assetPauseReason: 'unavailable_in_session' } }
+        });
+        expect(statusOf('paused', { token: onChain })).toBe('warning');
+    });
+
+    test('an explicitly passed issuerApi is used', () => {
+        const token = makeToken({ control: { paused: false } });
+        expect(statusOf('paused', { token, issuerApi: { isTradingPaused: true } })).toBe('warning');
+    });
+
+    test('an issuer API without the field leaves it null rather than false', () => {
+        const token = makeToken({ issuerApi: { symbol: 'TEST' } });
+        const rule = ruleOf(evaluateHealth({ token }), 'paused');
+        expect(rule.inputs.issuerApiPaused).toBeNull();
+        expect(rule.status).toBe('unknown');
+    });
+
+    test('this rule never cautions', () => {
+        for (const paused of [true, false, null]) {
+            expect(statusOf('paused', { token: makeToken({ control: { paused } }) })).not.toBe('caution');
+        }
+    });
+
+    test('value is null and both sources are reported in inputs', () => {
+        const token = makeToken({ control: { paused: true }, issuerApi: { isTradingPaused: false } });
+        const rule = ruleOf(evaluateHealth({ token }), 'paused');
+        expect(rule.value).toBeNull();
+        expect(rule.inputs).toEqual({ controlPaused: true, issuerApiPaused: false, issuerPauseReason: null, issuerSession: null });
+    });
+});
+
+// --- 9. frozen --------------------------------------------------------------------------------
+
+describe('frozen', () => {
+    test.each([
+        [0, 'good'],
+        [1, 'caution'],
+        [9, 'caution']
+    ])('%p frozen accounts in the top 20 → %s', (frozenAccountsTop20, expected) => {
+        expect(statusOf('frozen', { holders: makeHolders({ frozenAccountsTop20 }) })).toBe(expected);
+    });
+
+    test('no snapshot → unknown, not a clean bill of health', () => {
+        const rule = ruleOf(evaluateHealth({ holders: makeHolders({ frozenAccountsTop20: null }) }), 'frozen');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toMatch(/no holder snapshot/);
+        expect(statusOf('frozen', { token: makeToken() })).toBe('unknown');
+    });
+
+    test('this rule never warns', () => {
+        for (const count of [0, 1, 20, null]) {
+            expect(statusOf('frozen', { holders: makeHolders({ frozenAccountsTop20: count }) })).not.toBe('warning');
+        }
+    });
+
+    test('inputs carry the frozen count and the snapshot size', () => {
+        const holders = makeHolders({ frozenAccountsTop20: 9, top20: [holder({ owner: 'A', sharePct: 1 })] });
+        expect(ruleOf(evaluateHealth({ holders }), 'frozen').inputs).toEqual({ frozenAccountsTop20: 9, top20Count: 1 });
+    });
+});
+
+// --- 10. spread -------------------------------------------------------------------------------
+
+describe('spread', () => {
+    const at = (venueSpreadPct, venuesPriced = 9) => makeToken({
+        activity: { venueSpreadPct, venuesPriced, venueSpreadLow: 'WEEX', venueSpreadHigh: 'Ondo Stocks' }
+    });
+
+    test.each([
+        [0, 'good'],
+        [1.99, 'good'],
+        [2, 'good'],
+        [2.01, 'caution'],
+        [5, 'caution'],
+        [5.01, 'warning'],
+        [40, 'warning']
+    ])('a %p %% venue spread → %s', (spread, expected) => {
+        expect(statusOf('spread', { token: at(spread) })).toBe(expected);
+    });
+
+    test('a spread needs two priced venues to mean anything', () => {
+        expect(statusOf('spread', { token: at(30, 2) })).toBe('warning');
+        for (const venuesPriced of [0, 1]) {
+            const rule = ruleOf(evaluateHealth({ token: at(30, venuesPriced) }), 'spread');
+            expect(rule.status).toBe('unknown');
+            expect(rule.value).toBeNull();
+            expect(rule.note).toMatch(/no spread to measure/);
+            // The raw figure is still reported for the card, it is just not graded.
+            expect(rule.inputs.venueSpreadPct).toBeCloseTo(30, 10);
+        }
+    });
+
+    test('no spread reported → unknown', () => {
+        const rule = ruleOf(evaluateHealth({ token: makeToken() }), 'spread');
+        expect(rule.status).toBe('unknown');
+        expect(rule.value).toBeNull();
+        expect(rule.note).toBe('no venue spread reported');
+    });
+
+    test('inputs carry the spread, both venue names and the priced-venue count', () => {
+        expect(ruleOf(evaluateHealth({ token: at(0.52) }), 'spread').inputs).toEqual({
+            venueSpreadPct: 0.52,
+            venueSpreadLow: 'WEEX',
+            venueSpreadHigh: 'Ondo Stocks',
+            venuesPriced: 9
+        });
+    });
+});
+
+// --- Roll-up ----------------------------------------------------------------------------------
+
+describe('roll-up', () => {
+    test('the overall status is the worst judged rule', () => {
+        const good = evaluateHealth({ token: makeToken({ reference: { premiumPct: 0.1 }, control: { paused: false } }) });
+        expect(good.status).toBe('good');
+
+        const caution = evaluateHealth({ token: makeToken({ reference: { premiumPct: 2 }, control: { paused: false } }) });
+        expect(caution.status).toBe('caution');
+
+        const warning = evaluateHealth({ token: makeToken({ reference: { premiumPct: 2 }, market: { liquidity: 5 }, control: { paused: false } }) });
+        expect(warning.status).toBe('warning');
+    });
+
+    test('worstRuleId names the FIRST rule in display order carrying the overall status', () => {
+        // tracking (index 0) and liquidity (index 1) both warn; tracking must win.
+        const both = evaluateHealth({ token: makeToken({ reference: { premiumPct: 9 }, market: { liquidity: 5 } }) });
+        expect(both.status).toBe('warning');
+        expect(both.worstRuleId).toBe('tracking');
+
+        // Only liquidity warns, so it is named even though tracking is a caution above it.
+        const onlyLiquidity = evaluateHealth({ token: makeToken({ reference: { premiumPct: 2 }, market: { liquidity: 5 } }) });
+        expect(onlyLiquidity.status).toBe('warning');
+        expect(onlyLiquidity.worstRuleId).toBe('liquidity');
+    });
+
+    test('worstRuleId points at a rule that really carries that status', () => {
+        const result = evaluateHealth({
+            token: makeToken({ reference: { premiumPct: 2 }, control: { paused: false } }),
+            holders: makeHolders({ frozenAccountsTop20: 3 })
+        });
+        expect(result.status).toBe('caution');
+        expect(result.worstRuleId).toBe('tracking');
+        expect(ruleOf(result, result.worstRuleId).status).toBe('caution');
+    });
+
+    test('one good rule among ten unknowns is good, not unknown', () => {
+        const result = evaluateHealth({ token: makeToken({ control: { paused: false } }) });
+        expect(result.status).toBe('good');
+        expect(result.worstRuleId).toBe('paused');
+        expect(result.rules.filter((rule) => rule.status === 'unknown')).toHaveLength(10);
+    });
+
+    test('every rule unknown → unknown with a null worstRuleId', () => {
+        const result = evaluateHealth({ token: makeToken(), issuer: makeIssuer(), holders: makeHolders(), pools: [] });
+        expect(result.rules.every((rule) => rule.status === 'unknown')).toBe(true);
+        expect(result.status).toBe('unknown');
+        expect(result.worstRuleId).toBeNull();
+    });
+
+    test('a token with every input null never yields a warning and every value stays null', () => {
+        const result = evaluateHealth({ token: makeToken(), issuer: makeIssuer(), holders: makeHolders(), pools: [], issuerApi: null });
+        expect(result.status).not.toBe('warning');
+        expect(result.rules.some((rule) => rule.status === 'warning')).toBe(false);
+        expect(result.rules.some((rule) => rule.status === 'caution')).toBe(false);
+        for (const rule of result.rules) expect(rule.value).toBeNull();
+    });
+
+    test('a fully healthy token grades good on all eleven rules', () => {
+        const result = evaluateHealth({
+            token: makeToken({
+                control: { paused: false },
+                market: { liquidity: 250000, organicSharePct: 40, usdPrice: 100 },
+                activity: { trades24: 500, tradesPerTrader: 2, dexPairs: 4, venueSpreadPct: 0.5, venuesPriced: 6, venueSpreadLow: 'A', venueSpreadHigh: 'B' },
+                reference: { premiumPct: 0.2, source: 'pyth', price: 100, marketOpen: true }
+            }),
+            issuer: makeIssuer({
+                grades: { verificationStrength: 5, verificationLabel: 'register' },
+                custodyVerification: { type: 'transfer-agent-register', machineReadable: true },
+                evidence: { coverage: { sourced: 50, needed: 50 }, unverified: 0, inference: 0 },
+                keyGovernance: { mint: 'multisig', freeze: 'multisig', delegate: 'multisig', rebase: 'multisig' }
+            }),
+            holders: makeHolders({
+                top20: [holder({ owner: 'A', sharePct: 10, amountUi: 100 }), holder({ owner: 'B', sharePct: 5, amountUi: 50 })],
+                top1SharePct: 10,
+                distinctOwnersTop20: 2,
+                frozenAccountsTop20: 0
+            }),
+            pools: [{ pair: 'P', dex: 'raydium', signaturesSeen: 100, failedTx: 4 }],
+            composabilityTemplate: makeComposability('good')
+        });
+        expect(result.rules.map((rule) => rule.status)).toEqual(Array(11).fill('good'));
+        expect(result.status).toBe('good');
+        expect(result.worstRuleId).toBe('tracking');
+    });
+});
+
+// --- Levels: the programme and this token -----------------------------------------------------
+// The headline. The eleven rules and the worst-of `status` are unchanged; `levels` splits them by
+// who they describe, and counts what this token passes among the checks that could be judged.
+
+describe('levels', () => {
+    /** A liquid, on-price token of an issuer whose legal evidence is incomplete. */
+    const liquidToken = () => makeToken({
+        control: { paused: false },
+        market: { liquidity: 546000, organicSharePct: 3.4, usdPrice: 100 },
+        activity: { trades24: 2000, tradesPerTrader: 6, venueSpreadPct: 0.45, venuesPriced: 4 },
+        reference: { premiumPct: 0.14, source: 'pyth', price: 100 }
+    });
+    const incompleteIssuer = () => makeIssuer({
+        grades: { verificationStrength: 4, verificationLabel: 'on-chain PoR' },
+        evidence: { coverage: { sourced: 48, needed: 50 }, unverified: 35, inference: 0 },
+        keyGovernance: { mint: 'hot-key', freeze: 'multisig', delegate: 'multisig', rebase: 'hot-key' }
+    });
+    const spreadHolders = () => makeHolders({ top20: [holder({ owner: 'A', sharePct: 3.8 })], frozenAccountsTop20: 0 });
+
+    test('a clean token of a caution programme reads "programme caution, this token good"', () => {
+        const result = evaluateHealth({ token: liquidToken(), issuer: incompleteIssuer(), holders: spreadHolders(), composabilityTemplate: makeComposability('caution') });
+        expect(result.status).toBe('caution');
+        expect(result.levels.programme).toMatchObject({ status: 'caution', worstRuleId: 'verification', judged: 3, passed: 0, unknown: 0, total: 3 });
+        expect(result.levels.token).toMatchObject({ status: 'good', worstRuleId: null, judged: 7, passed: 7, unknown: 1, total: 8, tradingJudged: 4 });
+    });
+
+    test('a level names the rule that fails it, and names none when nothing fails', () => {
+        // Unlike the overall worstRuleId, a level's points only at a caution or warning, so the
+        // monitor's "which token check fails" strip counts failures and nothing else.
+        const good = evaluateHealth({ token: makeToken({ control: { paused: false }, reference: { premiumPct: 0.2 } }) });
+        expect(good.levels.token).toMatchObject({ status: 'good', worstRuleId: null });
+        expect(good.worstRuleId).toBe('tracking');
+        const caution = evaluateHealth({ token: makeToken({ control: { paused: false }, reference: { premiumPct: 2 } }) });
+        expect(caution.levels.token).toMatchObject({ status: 'caution', worstRuleId: 'tracking' });
+    });
+
+    test('the token level is judged only on token checks, the programme level only on programme checks', () => {
+        const result = evaluateHealth({
+            token: makeToken({ control: { paused: false }, reference: { premiumPct: 9 } }),
+            issuer: makeIssuer({ grades: { verificationStrength: 0 }, evidence: { coverage: { sourced: 10, needed: 10 }, unverified: 0, inference: 0 } })
+        });
+        expect(result.levels.programme).toMatchObject({ status: 'warning', worstRuleId: 'verification' });
+        expect(result.levels.token).toMatchObject({ status: 'warning', worstRuleId: 'tracking', judged: 2, passed: 1 });
+    });
+
+    test('passes are counted among judged checks only — an unknown is neither a pass nor a fail', () => {
+        const result = evaluateHealth({ token: makeToken({ reference: { premiumPct: 0.5 }, market: { liquidity: 5 } }) });
+        expect(result.levels.token).toMatchObject({ status: 'warning', judged: 2, passed: 1, unknown: 6, total: 8 });
+    });
+
+    test('a token nobody trades is not called good for being unpaused, unfrozen and unconcentrated', () => {
+        const result = evaluateHealth({ token: makeToken({ control: { paused: false } }), holders: spreadHolders() });
+        expect(result.levels.token).toMatchObject({ status: 'unknown', worstRuleId: null, judged: 3, passed: 3, tradingJudged: 0 });
+    });
+
+    test('without a market a failing check still counts: an untraded concentrated token warns', () => {
+        const result = evaluateHealth({
+            token: makeToken({ control: { paused: false } }),
+            holders: makeHolders({ top20: [holder({ owner: 'A', sharePct: 82 })], frozenAccountsTop20: 0 })
+        });
+        expect(result.levels.token).toMatchObject({ status: 'warning', worstRuleId: 'concentration', judged: 3, passed: 2, tradingJudged: 0 });
+    });
+
+    test('nothing judged at either level is unknown with zero counts', () => {
+        const result = evaluateHealth({});
+        expect(result.levels.programme).toEqual({ status: 'unknown', worstRuleId: null, judged: 0, passed: 0, unknown: 3, total: 3 });
+        expect(result.levels.token).toEqual({ status: 'unknown', worstRuleId: null, judged: 0, passed: 0, unknown: 8, total: 8, tradingJudged: 0, rank: null });
+    });
+
+    test('the token rank sorts by band, then by how many checks fail, then by how many pass', () => {
+        const token = (overrides) => evaluateHealth({ token: makeToken(overrides), holders: spreadHolders() }).levels.token;
+        const cleanDeep = evaluateHealth({ token: liquidToken(), holders: spreadHolders() }).levels.token;       // good 7/7
+        const cleanThin = token({ control: { paused: false }, reference: { premiumPct: 0.2 } });               // good 4/4
+        const oneCaution = token({ control: { paused: false }, reference: { premiumPct: 2 } });                // caution, 1 fails
+        const twoCautions = token({ control: { paused: false }, reference: { premiumPct: 2 }, market: { liquidity: 50000 } });
+        const oneWarning = token({ control: { paused: false }, reference: { premiumPct: 7 } });                // warning, 1 fails
+        const idle = token({ control: { paused: false } });                                                   // not measured
+        const ordered = [cleanDeep, cleanThin, oneCaution, twoCautions, oneWarning];
+        expect(ordered.map((level) => level.status)).toEqual(['good', 'good', 'caution', 'caution', 'warning']);
+        const ranks = ordered.map((level) => level.rank);
+        expect(ranks.every(Number.isInteger)).toBe(true);
+        expect([...ranks].sort((a, b) => a - b)).toEqual(ranks);
+        expect(new Set(ranks).size).toBe(ranks.length);
+        // Not measured has no rank, so it sorts last in either direction (NULLS LAST in the API).
+        expect(idle.rank).toBeNull();
+        expect(evaluateHealth({}).levels.programme).not.toHaveProperty('rank');
+    });
+
+    test('the overall worst-of status still covers both levels', () => {
+        const result = evaluateHealth({ token: liquidToken(), issuer: makeIssuer({ grades: { verificationStrength: 0 }, evidence: { coverage: { sourced: 1, needed: 1 }, unverified: 0, inference: 0 } }), holders: spreadHolders() });
+        expect(result.levels.token.status).toBe('good');
+        expect(result.levels.programme.status).toBe('warning');
+        expect(result.status).toBe('warning');
+    });
+});
+
+// --- Real data sanity -------------------------------------------------------------------------
+// Cheap shape guard over the four real files: if a producer renames a field or changes a nesting,
+// the distribution collapses to unknown and this suite says so.
+
+describe('the real stocks data', () => {
+    const root = path.join(__dirname, '..');
+    const readJson = (relative) => JSON.parse(fs.readFileSync(repoFile(root, relative), 'utf8'));
+
+    const tokensDb = readJson('stocks-tokens.json');
+    const issuersDb = readJson('stocks-issuers.json');
+    const holdersDb = readJson('stocks/data/holders.json');
+    const tradesDb = readJson('stocks/fixtures/stocks-trades.sample.json');
+    const composabilityDb = readJson('stocks/data/composability-templates.json');
+
+    const issuerBySlug = new Map(issuersDb.issuers.map((issuer) => [issuer.slug, issuer]));
+    const holdersByMint = new Map(holdersDb.items.map((item) => [item.mint, item]));
+    const composabilityIndex = indexComposabilityTemplates(composabilityDb.templates);
+    const poolsByMint = new Map();
+    for (const pool of Array.isArray(tradesDb.pools) ? tradesDb.pools : []) {
+        if (!poolsByMint.has(pool.mint)) poolsByMint.set(pool.mint, []);
+        poolsByMint.get(pool.mint).push(pool);
+    }
+
+    const results = tokensDb.tokens.map((token) => evaluateHealth({
+        token,
+        issuer: issuerBySlug.get(token.issuer) ?? null,
+        holders: holdersByMint.get(token.mint) ?? null,
+        pools: poolsByMint.get(token.mint) ?? [],
+        issuerApi: token.issuerApi ?? null,
+        composabilityTemplate: composabilityTemplateFor(token, composabilityIndex)
+    }));
+
+    test('the fixtures really are the whole universe', () => {
+        expect(tokensDb.tokens.length).toBeGreaterThan(400);
+        expect(issuerBySlug.size).toBeGreaterThan(5);
+        expect(holdersByMint.size).toBeGreaterThan(400);
+    });
+
+    test('every token gets a valid status and eleven rules in the fixed order', () => {
+        for (const result of results) {
+            expect(STATUSES).toContain(result.status);
+            expect(result.rules).toHaveLength(11);
+            expect(result.rules.map((rule) => rule.id)).toEqual(RULE_IDS);
+            for (const rule of result.rules) {
+                expect(STATUSES).toContain(rule.status);
+                expect(rule.value === null || Number.isFinite(rule.value)).toBe(true);
+                expect(typeof rule.note).toBe('string');
+                expect(rule.note.length).toBeGreaterThan(0);
+            }
+        }
+    });
+
+    test('worstRuleId is null exactly when the status is unknown, and otherwise names a rule with that status', () => {
+        for (const result of results) {
+            if (result.status === 'unknown') {
+                expect(result.worstRuleId).toBeNull();
+                continue;
+            }
+            expect(RULE_IDS).toContain(result.worstRuleId);
+            expect(ruleOf(result, result.worstRuleId).status).toBe(result.status);
+        }
+    });
+
+    test('the real data exercises both overall risk bands and every per-rule status', () => {
+        const statuses = new Set(results.map((result) => result.status));
+        expect(statuses).toEqual(new Set(['caution', 'warning']));
+        const ruleStatuses = new Set(results.flatMap((result) => result.rules.map((rule) => rule.status)));
+        expect(ruleStatuses).toEqual(new Set(STATUSES));
+    });
+
+    test('no rule is dead — every one of the eleven is judged on at least one real token', () => {
+        for (const id of RULE_IDS) {
+            const judged = results.filter((result) => ruleOf(result, id).status !== 'unknown');
+            expect(judged.length).toBeGreaterThan(0);
+        }
+    });
+
+    // The reason for the split: a programme rule must give every token of an issuer the same
+    // answer. If one ever starts to vary by mint it has become a token fact, and belongs there.
+    test('every programme-level rule gives the same verdict to every token of an issuer', () => {
+        const programmeIds = HEALTH_RULES.filter((rule) => rule.level === 'programme').map((rule) => rule.id);
+        const byIssuer = new Map();
+        tokensDb.tokens.forEach((token, index) => {
+            const key = token.issuer ?? '(none)';
+            if (!byIssuer.has(key)) byIssuer.set(key, []);
+            byIssuer.get(key).push(results[index]);
+        });
+        for (const [issuer, list] of byIssuer) {
+            for (const id of programmeIds) {
+                const seen = new Set(list.map((result) => ruleOf(result, id).status));
+                expect({ issuer, id, statuses: [...seen] }).toEqual({ issuer, id, statuses: [ruleOf(list[0], id).status] });
+            }
+        }
+    });
+
+    test('the token level tells tokens apart where the worst-of status cannot', () => {
+        expect(new Set(results.map((result) => result.status))).not.toContain('good');
+        const tokenStatuses = new Set(results.map((result) => result.levels.token.status));
+        expect(tokenStatuses).toEqual(new Set(STATUSES));
+        for (const result of results) {
+            const { judged, passed, unknown, total } = result.levels.token;
+            expect(judged + unknown).toBe(total);
+            expect(passed).toBeLessThanOrEqual(judged);
+        }
+    });
+});
+
+// --- stocks-health.json (build-health.mjs) ---------------------------------------------------
+// The monitor and the database read the levels from this file, never from the rules again.
+
+describe('build-health levels', () => {
+    const { buildItems, summarize } = require('./build-health.mjs');
+
+    const tokens = [
+        // Traded, on price, deep: a good token.
+        { mint: 'M1', symbol: 'GOOD', issuer: 'iss', control: { paused: false },
+            market: { liquidity: 500000, usdPrice: 100 }, reference: { premiumPct: 0.1, price: 100 }, activity: {} },
+        // Traded, far off price: a warning token.
+        { mint: 'M2', symbol: 'OFF', issuer: 'iss', control: { paused: false },
+            market: { liquidity: 500000, usdPrice: 100 }, reference: { premiumPct: 7, price: 100 }, activity: {} },
+        // Nobody trades it: not measured at the token level.
+        { mint: 'M3', symbol: 'IDLE', issuer: 'iss', control: { paused: false }, market: {}, reference: {}, activity: {} }
+    ];
+    const issuers = [{ slug: 'iss', grades: { verificationStrength: 4 },
+        evidence: { coverage: { sourced: 9, needed: 10 }, unverified: 0, inference: 0 } }];
+
+    test('every item carries both levels with their pass counts', () => {
+        const items = buildItems({ tokens, issuers, holders: [], pools: [] });
+        const byMint = Object.fromEntries(items.map((item) => [item.mint, item]));
+        expect(byMint.M1.levels.token).toMatchObject({ status: 'good', judged: 3, passed: 3 });
+        expect(byMint.M2.levels.token).toMatchObject({ status: 'warning', worstRuleId: 'tracking', judged: 3, passed: 2 });
+        expect(byMint.M3.levels.token).toMatchObject({ status: 'unknown', judged: 1, passed: 1, tradingJudged: 0 });
+        for (const item of items) expect(item.levels.programme).toMatchObject({ status: 'caution', worstRuleId: 'verification' });
+    });
+
+    test('the summary counts each level and the token-level worst rule separately from the overall one', () => {
+        const summary = summarize(buildItems({ tokens, issuers, holders: [], pools: [] }));
+        expect(summary.counts).toEqual({ good: 0, caution: 2, warning: 1, unknown: 0 });
+        expect(summary.byLevel.token).toEqual({ good: 1, caution: 0, warning: 1, unknown: 1 });
+        expect(summary.byLevel.programme).toEqual({ good: 0, caution: 3, warning: 0, unknown: 0 });
+        expect(summary.byTokenWorstRule.tracking).toBe(1);
+        expect(Object.values(summary.byTokenWorstRule).reduce((a, b) => a + b, 0)).toBe(1);
+        expect(summary.byWorstRule.verification).toBe(2);
+    });
+});
+
+// --- The holder headline (card titles and preview images) -----------------------------------------
+
+describe('holderHeadline', () => {
+    const rules = (statuses) => HEALTH_RULES.map((rule) => ({ id: rule.id, status: statuses[rule.id] ?? 'unknown' }));
+    const programmeCaution = { verification: 'caution', defiComposability: 'caution', keyControl: 'caution' };
+
+    it('ignores programme cautions every token of an issuer shares, and bot-trading checks', () => {
+        const r = rules({ ...programmeCaution, tracking: 'good', liquidity: 'good', paused: 'good', frozen: 'good',
+            organic: 'warning', failedTx: 'warning', defiComposability: 'warning' });
+        expect(worstStatus(r.map((rule) => rule.status))).toBe('warning');
+        expect(holderHeadline(r)).toEqual({ status: 'good', ruleId: null, basis: 'measured' });
+    });
+
+    it('names the first holder check that fails, in display order', () => {
+        expect(holderHeadline(rules({ ...programmeCaution, tracking: 'caution', liquidity: 'warning', concentration: 'warning' })))
+            .toEqual({ status: 'warning', ruleId: 'liquidity', basis: 'measured' });
+        expect(holderHeadline(rules({ tracking: 'good', paused: 'warning' }))).toMatchObject({ status: 'warning', ruleId: 'paused' });
+    });
+
+    it('counts legal evidence only when nothing independent verifies the backing', () => {
+        expect(holderHeadline(rules({ tracking: 'good', verification: 'warning' })))
+            .toEqual({ status: 'warning', ruleId: 'verification', basis: 'measured' });
+    });
+
+    it('never calls a token with no market good', () => {
+        expect(holderHeadline(rules({ paused: 'good', frozen: 'good', concentration: 'good' })))
+            .toEqual({ status: 'unknown', ruleId: null, basis: 'no-market' });
+        // A fault still stands without a market.
+        expect(holderHeadline(rules({ paused: 'warning' }))).toEqual({ status: 'warning', ruleId: 'paused', basis: 'no-market' });
+    });
+
+    it('is carried on every evaluateHealth verdict', () => {
+        expect(evaluateHealth({}).headline).toEqual({ status: 'unknown', ruleId: null, basis: 'no-market' });
+    });
+});

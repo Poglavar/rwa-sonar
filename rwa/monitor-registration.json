@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "active": false,
+  "entries": [
+    {
+      "name": "RWA Sonar Cross-Asset Deployment Watcher",
+      "entrypoint": "rwa/watch-deployments.mjs",
+      "runStatsCommand": "cat .last-rwa-deployment-watch-stats.json",
+      "schedule": {
+        "cron": "11 * * * *",
+        "checkDelayMinutes": 5
+      },
+      "successCriteria": {
+        "type": "run-stats",
+        "field": "watchStatus",
+        "equals": "ok",
+        "timestampField": "lastRunEndedAt",
+        "requireRecent": true,
+        "minValues": {
+          "deploymentsRead": 17
+        },
+        "maxValues": {
+          "failures": 0
+        }
+      },
+      "active": false,
+      "mutedReason": "Prepared only; not deployed or scheduled.",
+      "unmuteWhen": "Explicit deployment authorization, actual production output verification and outcome registration.",
+      "description": "Read-only source-scoped observations; never automatically change legal research conclusions."
+    },
+    {
+      "name": "RWA Sonar Cross-Asset Document Watcher",
+      "entrypoint": "stocks/watch-sources.mjs --run --rwa --no-db",
+      "runStatsCommand": "cat .last-source-watch-stats-rwa.json",
+      "schedule": {
+        "cron": "35 */6 * * *",
+        "checkDelayMinutes": 30
+      },
+      "successCriteria": {
+        "type": "run-stats",
+        "field": "watchStatus",
+        "equals": "ok",
+        "timestampField": "lastRunEndedAt",
+        "requireRecent": true,
+        "minValues": {
+          "sourcesEvaluated": 86
+        },
+        "maxValues": {
+          "failures": 0
+        }
+      },
+      "active": false,
+      "mutedReason": "Prepared only; not deployed or scheduled.",
+      "unmuteWhen": "Explicit deployment authorization, actual production output verification and outcome registration.",
+      "description": "Read-only source-scoped observations; never automatically change legal research conclusions."
+    },
+    {
+      "name": "RWA Sonar Fund Data Watcher",
+      "entrypoint": "rwa/watch-fund-data.mjs",
+      "runStatsCommand": "cat .last-rwa-fund-watch-stats.json",
+      "schedule": {
+        "cron": "23 * * * *",
+        "checkDelayMinutes": 5
+      },
+      "successCriteria": {
+        "type": "run-stats",
+        "field": "watchStatus",
+        "equals": "ok",
+        "timestampField": "lastRunEndedAt",
+        "requireRecent": true,
+        "minValues": {
+          "successfulReads": 2
+        },
+        "maxValues": {
+          "failures": 0,
+          "staleEvidence": 0
+        }
+      },
+      "active": false,
+      "mutedReason": "Prepared only; not deployed or scheduled.",
+      "unmuteWhen": "Explicit deployment authorization, actual production output verification and outcome registration.",
+      "description": "Read-only source-scoped observations; never automatically change legal research conclusions."
+    }
+  ]
+}

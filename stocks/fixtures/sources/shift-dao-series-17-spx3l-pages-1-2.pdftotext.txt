@@ -1,0 +1,95 @@
+                              SERIES OPERATING AGREEMENT
+
+                                        SHIFT DAO LLC
+
+                                Series 17 “S&P 500 X3 SHIFT”
+
+                NOTICE OF RESTRICTIONS ON DUTIES AND TRANSFERS
+
+The rights of members in a decentralized autonomous organization may differ materially from
+the rights of members in other resident domestic or non-resident domestic limited liability
+companies. The DAO Act, underlying smart contracts, certificate of formation and limited liability
+company agreement (i.e., the operating agreement), if applicable, of a decentralized
+autonomous organization may define, reduce or eliminate fiduciary duties and may restrict
+transfer of ownership interests, withdrawal or resignation from the decentralized autonomous
+organization, return of capital contributions and dissolution of the decentralized autonomous
+organization.
+
+This Series Operating Agreement (the “Agreement”) relates to S&P 500 X3 SHIFT (“Series
+17”), a designated series of Shift DAO LLC, a for-profit series limited liability company (the
+“Company” or “Master DAO”) formed under the laws of the Republic of the Marshall Islands
+pursuant to the Marshall Islands Limited Liability Company Act of 1996, as amended (the “LLC
+Act”), the Marshall Islands Business Corporations Act, as amended (the “BCA”), and the
+Decentralized Autonomous Organization Act, 2022, as amended (the “DAO Act”), and is
+entered into by and between the Company, solely in its limited and non-discretionary capacity as
+the administrative agent of Series 17, and the initial nominee member of Series 17, which holds
+its membership interest solely for purposes of facilitating the formation and annual renewal of
+Series 17 and has no economic entitlement or discretionary authority, and shall become
+effective as of the date of its execution (the “Effective Date”). Capitalized terms used but not
+otherwise defined in this Agreement shall have the meanings ascribed to them in the
+Company’s Master Operating Agreement or, if not defined therein, in the applicable provisions of
+the LLC Act, the BCA, or the DAO Act, as applicable.
+
+WHEREAS, the Company hereby creates a new Series called S&P 500 X3 SHIFT (“Series 17”),
+which shall be governed by this Agreement. The Company is not a manager, managing
+member, fiduciary, or controlling person of Series 17 and acts solely in an administrative and
+non-fiduciary capacity;
+
+WHEREAS, the Series 17 Members shall have limited liability company interests with separate
+and distinct rights, powers, duties, obligations, and objectives from the Master DAO pursuant to
+Section 79 (Series of members, managers of limited liability company interest) of the LLC Act,
+and each Series 17 Member shall possess solely the economic rights expressly set forth herein
+and no voting, governance, consent, approval, management, or fiduciary rights;
+
+WHEREAS, Series 17 is designated solely to acquire, hold, and maintain in its treasury assets
+whose economic performance corresponds to the S&P 500® index (the “Assets”), as
+established and approved by the Master DAO. To the maximum extent permitted by the LLC
+Act, including, without limitation, Section 79, the assets, income, gains, losses, expenses,
+deductions, credits, distributions, debts, obligations and liabilities of the Series 17 Assets shall
+be associated with and limited to Series 17, and not any other Series or the Company;
+
+WHEREAS, Series 17 Members are owners in the Series 17 Assets and can be members of the
+Master DAO, and members of the Master DAO can also be members of Series 17 and other
+Series;
+
+WHEREAS, to the maximum extent permitted by the LLC Act, the debts, liabilities, obligations
+and expenses associated with Series 17 shall not be asserted against income, gains or assets
+of any other Series or the Company;
+
+WHEREAS, a Series 17 Member shall have no rights or interest with respect to any other
+Series, other than through such Member's interest in such Series independently acquired by
+such Member;
+
+WHEREAS, Series 17 shall be dissolved and its affairs wound up pursuant to the provisions
+herein. The dissolution and termination of Series 17 shall not, in and of itself, cause or result in
+the dissolution or termination of the Company or any other Series;
+
+WHEREAS, Series 17 and all other Series are formed and maintained pursuant to the existence
+and continued operation of the Company, and in the event that the Company as the Master
+DAO determines to wind up, cancel, or otherwise cease operations (including due to
+insolvency), the legal status of Series 17 and all other Series are correspondingly affected,
+requiring a determination as to whether such Series shall (i) continue as an independent DAO
+LLC pursuant to applicable law, or (ii) be wound up and its assets distributed in accordance with
+this Agreement;
+
+
+
+WHEREAS, there shall be no additional reporting requirements for Series 17 beyond the
+requirements for the Master DAO itself pursuant to Section 103(1)(c) of the DAO Act;
+
+NOW, THEREFORE, for and in consideration of mutual covenants contained and intending to
+be legally bound hereby, the parties agree as follows:
+
+                                            ARTICLE I
+
+                                         ORGANIZATION
+
+I.1 Organization. Series 17 is a designated series under Shift DAO LLC pursuant to the
+provisions of the DAO Act, the LLC Act, and the BCA.
+
+I.2 Decentralized Autonomous Organization. The Series shall operate as a decentralized
+autonomous organization within the meaning of §102(c) and §104(1) and (3) of the DAO Act,
+
+
+                                                 2
+

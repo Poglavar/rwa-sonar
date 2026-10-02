@@ -1,0 +1,153 @@
+// Tests the latest-events rows shared by the landing page and its build-time snapshot
+// (lib/events-view.js), and how index.html and landing.css wire the box: where it sits, that its
+// scripts are deferred, and that without motion it is a static list with no scroll controls.
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
+
+const view = require('./lib/events-view.js');
+
+const ROOT = join(__dirname, '..');
+const NOW = Date.parse('2026-09-24T14:30:00Z');
+const EVENT = {
+    id: 'doc-x', at: '2026-09-24T12:29:11Z', category: 'terms', severity: 'warning', source: 'document watcher',
+    title: 'Kraken xStocks changed its <Terms> page', href: './watch.html?material=true#change-835',
+    assessment: { by: 'model', material: true, severity: 'critical' }
+};
+
+describe('latest-events rows', () => {
+    test('an instant reads as an age when the clock is known, and as a UTC date and time when it is not', () => {
+        expect(view.whenLabel('2026-09-24T12:29:11Z', NOW)).toBe('2 h ago');
+        expect(view.whenLabel('2026-09-24T12:29:11Z', null)).toBe('24 Sep, 12:29 UTC');
+    });
+
+    test('a date-only event is counted in whole UTC days, never given an hour', () => {
+        expect(view.whenLabel('2026-09-24', NOW)).toBe('today');
+        expect(view.whenLabel('2026-09-23', NOW)).toBe('yesterday');
+        expect(view.whenLabel('2026-09-19', NOW)).toBe('5 d ago');
+        expect(view.whenLabel('2026-09-19', null)).toBe('19 Sep');
+    });
+
+    test('a row has the time with its ISO title, the category tag, the source, the model assessment and the linked title', () => {
+        const html = view.eventRowHtml(EVENT, { nowMs: NOW });
+        expect(html).toBe('<li class="event-row" data-category="terms" data-severity="warning">'
+            + '<span class="event-meta"><time datetime="2026-09-24T12:29:11Z" title="2026-09-24T12:29:11Z" data-at="2026-09-24T12:29:11Z">2 h ago</time>'
+            + '<span class="event-tag">Terms</span><span class="event-source">document watcher · model assessment: critical</span></span>'
+            + '<a class="event-title" href="./watch.html?material=true#change-835">Kraken xStocks changed its &lt;Terms&gt; page</a></li>');
+        expect(view.eventRowHtml({ ...EVENT, assessment: undefined })).not.toContain('model assessment');
+    });
+
+    test('the scroll copy is hidden from screen readers and the tab order', () => {
+        const copy = view.eventRowHtml(EVENT, { copy: true });
+        expect(copy).toMatch(/^<li class="event-row"[^>]* aria-hidden="true">/);
+        expect(copy).toContain('tabindex="-1"');
+        expect(view.eventRowHtml(EVENT)).not.toContain('aria-hidden');
+    });
+
+    test('only the site\'s own links are followed, and an unknown category is shown as terms', () => {
+        expect(view.eventRowHtml({ ...EVENT, href: 'javascript:alert(1)' })).toContain('href="./watch.html"');
+        expect(view.eventRowHtml({ ...EVENT, category: 'gossip' })).toContain('data-category="terms"');
+    });
+
+    test('lists only dated, titled events, at most the limit', () => {
+        const feed = { events: [EVENT, { ...EVENT, id: 'b', at: 'soon' }, { ...EVENT, id: 'c', title: ' ' }, { ...EVENT, id: 'd', at: '2026-09-23' }, { ...EVENT, id: 'e' }] };
+        expect(view.listEvents(feed, 10).map((e) => e.id)).toEqual(['doc-x', 'd', 'e']);
+        expect(view.listEvents(feed, 1).map((e) => e.id)).toEqual(['doc-x']);
+        expect(view.listEvents(null, 5)).toEqual([]);
+    });
+
+    test('the updated line names the cadence and the newest event\'s own time', () => {
+        expect(view.updatedLineHtml({ events: [EVENT] }, NOW)).toContain('Updated hourly · newest <time datetime="2026-09-24T12:29:11Z"');
+        expect(view.updatedLineHtml({ events: [EVENT] }, NOW)).toContain('>2 h ago</time>');
+        expect(view.updatedLineHtml({ events: [] })).toBe('Updated hourly · no events in the last 30 days');
+    });
+
+    test('the scroll step is time-based, wraps at one copy of the list, and ignores a long gap', () => {
+        // 14 px/s: a 60 Hz frame and a 30 Hz frame move the list by the same distance per second.
+        expect(view.nextScroll(0, 1000 / 60, 500, 14) * 60).toBeCloseTo(14);
+        expect(view.nextScroll(0, 1000 / 30, 500, 14) * 30).toBeCloseTo(14);
+        expect(view.nextScroll(499.9, 50, 500, 14)).toBeCloseTo(0.6);
+        // A tab coming back after a minute moves at most a quarter-second's worth, never a jump.
+        expect(view.nextScroll(10, 60000, 500, 14)).toBeCloseTo(13.5);
+        expect(view.nextScroll(10, 16, 0)).toBe(10);
+    });
+});
+
+describe('a token card\'s events', () => {
+    const feed = { events: [
+        { id: 'a', at: '2026-09-24', title: 'Kamino dropped 2 tokens from lending', subject: { type: 'protocol', id: 'kamino' }, mints: ['MINTA', 'MINTX'], href: './monitor.html' },
+        { id: 'b', at: '2026-09-23', title: 'Court filing names Kraken xStocks', subject: { type: 'issuer', id: 'xstocks-backed' }, href: './issuers/xstocks-backed.html' },
+        { id: 'c', at: '2026-09-22', title: 'Backpack: new token NOK first seen', subject: { type: 'issuer', id: 'xstocks-backed' }, mints: ['MINTN'] },
+        { id: 'd', at: '2026-09-21', title: 'APHx split', subject: { type: 'token', id: 'MINTX' } },
+        { id: 'e', at: '2026-09-20', title: 'A protocol-wide freeze', subject: { type: 'protocol', id: 'kamino' } }
+    ] };
+
+    test('a token sees events naming its mint and its programme\'s events that name no token; never a protocol-wide one', () => {
+        expect(view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 20).map((e) => e.id)).toEqual(['a', 'b', 'd']);
+        expect(view.eventsForToken(feed, { mint: 'MINTZ', issuer: 'superstate' }, 20)).toEqual([]);
+        expect(view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 1).map((e) => e.id)).toEqual(['a']);
+    });
+
+    test('the marquee is one link per event with its tag, title and age; its loop copy is out of the tab order', () => {
+        const events = view.eventsForToken(feed, { mint: 'MINTX', issuer: 'xstocks-backed' }, 20);
+        const html = view.eventMarqueeHtml(events, { root: '../', nowMs: Date.parse('2026-09-24T12:00:00Z') });
+        expect(html.match(/<a class="event-marquee-item"/g)).toHaveLength(3);
+        expect(html).toContain('href="../monitor.html"');
+        expect(html).toContain('<span class="event-tag">Terms</span>Kamino dropped 2 tokens from lending<span class="event-marquee-when">today</span>');
+        expect(html).not.toContain('tabindex');
+        expect(view.eventMarqueeHtml(events, { copy: true }).match(/tabindex="-1"/g)).toHaveLength(3);
+        expect(view.eventMarqueeHtml([])).toBe('');
+    });
+
+    test('a page one folder down rebases the feed\'s site-root links', () => {
+        const html = view.eventRowHtml({ ...EVENT, href: './issuers/xstocks-backed.html' }, { root: '../' });
+        expect(html).toContain('href="../issuers/xstocks-backed.html"');
+        expect(view.eventRowHtml(EVENT)).toContain('href="./watch.html?material=true#change-835"');
+    });
+});
+
+describe('the landing page box', () => {
+    const html = readFileSync(join(ROOT, 'index.html'), 'utf8');
+    const css = readFileSync(join(ROOT, 'landing.css'), 'utf8');
+
+    test('sits in the hero after the search and the comparison card, on a phone and on a wide screen', () => {
+        const hero = html.slice(html.indexOf('<section class="hero"'), html.indexOf('id="tradeTicker"'));
+        expect(hero.indexOf('id="heroSearch"')).toBeGreaterThan(-1);
+        expect(hero.indexOf('id="latestEvents"')).toBeGreaterThan(hero.indexOf('id="heroSearch"'));
+        // The search is its own hero area (25 Sep), and heads the right column above the card on a wide
+        // screen too since 28 Sep, as it already did below 900 px.
+        expect(css).toContain('grid-template-areas: "copy search" "copy preview" "copy events"');
+        expect(css).toMatch(/@media \(max-width: 900px\) \{\s*\.hero \{ grid-template-areas: "copy" "search" "preview" "events"; \}/);
+    });
+
+    test('is a plain list with a visible pause control and a link to every change; no live region', () => {
+        const box = html.slice(html.indexOf('id="latestEvents"'), html.indexOf('</section>', html.indexOf('id="latestEvents"')));
+        expect(box).toContain('<ul id="latestEventsList" class="latest-events-list">');
+        expect(box).toContain('<button type="button" id="latestEventsToggle" class="latest-events-toggle" aria-pressed="false" aria-controls="latestEventsList">Pause</button>');
+        expect(box).toContain('<a href="./watch.html">All changes →</a>');
+        expect(box).not.toContain('aria-live');
+    });
+
+    test('loads its scripts deferred, after the formatters and the API base they read', () => {
+        const at = (src) => html.indexOf(`src="${src}`);
+        expect(html).toMatch(/<script src="stocks\/lib\/events-view\.js\?v=\w+" defer><\/script>/);
+        expect(html).toMatch(/<script src="latest-events\.js\?v=\w+" defer><\/script>/);
+        expect(at('stocks/lib/events-view.js')).toBeGreaterThan(at('stocks/lib/fmt.js'));
+        expect(at('latest-events.js')).toBeGreaterThan(at('stocks/lib/events-view.js'));
+        expect(at('latest-events.js')).toBeGreaterThan(at('stocks/lib/api-base.js'));
+    });
+
+    test('without motion it is a static list of six: no inner scroll, no pause button, no copy', () => {
+        expect(css).toMatch(/\.latest-events-toggle \{ display: none;/);
+        expect(css).toMatch(/\.latest-events\.is-scrolling \.latest-events-toggle \{ display: inline-flex;/);
+        expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.latest-events-viewport \{ max-height: none; overflow: visible; \}\s*\.event-row:nth-child\(n\+7\) \{ display: none; \}/);
+        expect(css).toContain(':root.reduce-motion .latest-events-viewport { max-height: none; overflow: visible; }');
+        // The static rules come after the width rules, or a phone's max-height would win.
+        expect(css.lastIndexOf('.latest-events.is-static .latest-events-viewport')).toBeGreaterThan(css.indexOf('@media (max-width: 560px) {\n    .latest-events {'));
+        const js = readFileSync(join(ROOT, 'latest-events.js'), 'utf8');
+        expect(js).toContain("new URLSearchParams(window.location.search).has('reduceMotion')");
+        expect(js).toContain("classList.contains('reduce-motion')");
+        expect(js).toMatch(/document\.addEventListener\('visibilitychange'/);
+        expect(js).toContain('new window.IntersectionObserver(');
+        expect(js).not.toMatch(/setTimeout/);
+    });
+});

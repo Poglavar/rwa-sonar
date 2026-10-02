@@ -1,0 +1,43 @@
+{
+  "id": "john-buys",
+  "title": "John buys Apple as a token",
+  "voice": {
+    "id": "iP95p4xoKVk53GoZ742B",
+    "name": "Chris - Charming, Down-to-Earth",
+    "model": "eleven_multilingual_v2"
+  },
+  "padSeconds": 0.45,
+  "captionReplace": {
+    "RWA Sonar dot com": "rwasonar.com"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "narration": "This is John. He wants some Apple stock, held as a token on Solana."
+    },
+    {
+      "id": "search",
+      "narration": "He searches for AAPL and finds three tokens, from Oakmere, Northgate and Redcliff. Same ticker, same price."
+    },
+    {
+      "id": "own",
+      "narration": "RWA Sonar puts them side by side. First, what does he own? Oakmere records holders on the share register. Northgate gives him a debt note that tracks the price. Redcliff only pays the price difference, and holds no shares for him."
+    },
+    {
+      "id": "keys",
+      "narration": "Next, who can act on his tokens. All three can freeze an account. At Northgate and Redcliff, one key can mint new tokens. At Oakmere, minting needs three of five signers."
+    },
+    {
+      "id": "market",
+      "narration": "Then trading. Northgate has the deepest pool and trades closest to the stock. Oakmere's pool is thin, and it trades about half a percent above Apple."
+    },
+    {
+      "id": "pick",
+      "narration": "John can live with a thin pool if he is on the register. He picks Oakmere and buys two."
+    },
+    {
+      "id": "outro",
+      "narration": "One ticker can mean very different things. Compare them at RWA Sonar dot com."
+    }
+  ]
+}

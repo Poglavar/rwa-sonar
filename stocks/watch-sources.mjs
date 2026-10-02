@@ -1,0 +1,1862 @@
+#!/usr/bin/env node
+// The document watcher (EVIDENCE.md §2.1-§2.3): fetch every URL in stocks/data/sources.json with a
+// browser-like UA and conditional headers, normalise it to text (PDF through `pdftotext -layout`,
+// HTML stripped of chrome, JSON with sorted keys), hash it, and compare with the hash we stored
+// last time. An unchanged source only moves `last_checked_at`; a changed one gets its raw bytes and
+// text kept on disk, a line diff, a keyword severity, and a `sonar.change_event` when the change
+// touches one of the §2.3 legal keywords. A 404/410 or a host that stopped resolving is a
+// `document-gone` event — a dead citation is a finding about our own dossiers, not a crash.
+//
+// Everything that decides anything lives in lib/watch.mjs and lib/textdiff.mjs and is unit tested;
+// this file is the IO, the pacing, the checkpointing and the run verdict.
+
+import { spawn } from 'node:child_process';
+import { request as httpRequest } from 'node:http';
+import { request as httpsRequest } from 'node:https';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { join, relative } from 'node:path';
+import { rootCertificates } from 'node:tls';
+
+import { readEnvFile } from './lib/env.mjs';
+import { wrapTransaction } from './lib/db-load.mjs';
+import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
+import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
+import { companionFor, companionNote, companionText, currentNextChunk, wantsCompanion } from './lib/companions.mjs';
+import { DEFAULT_RPC, rpcCall } from './lib/solana-rpc.mjs';
+import { archiveTodayTimemapUrl, parseTimemapNewest } from './lib/archive-today.mjs';
+import { describeUrl, psql } from './lib/psql.mjs';
+import { hostOf, isDocumentWatchable, kindFromContentType, normaliseUrl } from './lib/sources.mjs';
+import { diffLines, summariseDiff } from './lib/textdiff.mjs';
+import { refreshCollectorStatus } from './build-collector-status.mjs';
+import { partitionEventResolutions } from './lib/event-resolutions.mjs';
+import {
+    apiAnswerIsDocument, binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
+    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, driveDownloadUrl, dropboxDownloadUrl, extraCaFor, fileStamp, htmlDocumentText, isTextual,
+    looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
+    parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
+    quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
+    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
+} from './lib/watch.mjs';
+import { buildRows, nextState, settleExtractorUpgrade } from './lib/watch-rows.mjs';
+import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
+import {
+    CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
+    parseCdxNewest, waybackNote, wantsWaybackFallback
+} from './lib/wayback.mjs';
+
+const HERE = import.meta.dirname;
+const REPO = join(HERE, '..');
+const SOURCES_FILE = join(HERE, 'data', 'sources.json');
+const EVENT_RESOLUTIONS_FILE = join(HERE, 'data', 'event-resolutions.json');
+const STATE_FILE = join(HERE, 'data', 'sources-state.json');
+const ISSUERS_DIR = join(HERE, 'data', 'issuers');
+const VERSIONS_DIR = join(HERE, 'data', 'sources');
+const RAW_DIR = join(HERE, 'data', 'raw');
+const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
+let runStatsFile = STATS_FILE;
+const RUN_STARTED_MS = Date.now();
+const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
+
+// A real browser string by default, because several of these hosts answer a scripted UA with a bot
+// wall — but per-host overrides win (lib/watch.mjs `userAgentFor`): the SEC requires a UA that
+// declares who is asking, and answers a browser string with 403.
+const USER_AGENT = DEFAULT_USER_AGENT;
+const TIMEOUT_MS = 30_000;
+const HOST_PACE_MS = 1500;
+/**
+ * Save Page Now pacing. 5 s between submits hit the account's active-session cap within four
+ * saves and then archive.org refused connections outright (2026-09-17, twice); 15 s keeps one
+ * capture in flight at a time, and `if_not_archived_within` lets Wayback answer with a capture
+ * someone else made in the last day instead of crawling the page again.
+ */
+const ARCHIVE_PACE_MS = 15_000;
+const ARCHIVE_REUSE_WITHIN = '1d';
+const BACKOFF_MS = [5000, 15_000];
+/**
+ * archive.org's refusals last minutes, not seconds (prod logs, 2026-09-19 to 09-30: Save Page Now
+ * waits 60 s between refused submits and the next one is often refused too), so a read it pushes
+ * back on waits longer before its retries — and once those fail too, the run stops reading from the
+ * archive (`archiveTraffic.pausedBy`): the rest wait for the next run instead of each walking into
+ * the same refusal. Every archive.org read, cited capture, CDX lookup and fallback read alike, keeps
+ * one gap of WAYBACK_PACE_MS from the last archive.org request of any kind, Save Page Now included
+ * (`archiveSlot`).
+ */
+const ARCHIVE_BACKOFF_MS = [30_000, 90_000];
+const KEEP_VERSIONS = 5;
+
+function usage() {
+    console.log(`watch-sources.mjs — fetch, normalise, hash and diff every source we rely on
+
+USAGE
+  node stocks/watch-sources.mjs --run [options]
+
+OPTIONS
+  --run              Actually fetch. Without it this help is printed and nothing runs.
+  --only=<issuer>    Only sources attributed to this issuer slug (e.g. --only=prestocks).
+  --limit=<n>        Only the first n sources after filtering (smoke test).
+  --force            Ignore today's checkpoint and look at every source again. Conditional
+                     headers are still sent, so an unchanged document still answers 304.
+  --only-blocked     Only the sources whose stored state says the live host did not give us the
+                     document last time (blocked, or read from an archived capture). Never reuses
+                     today's checkpoint for them; writes .last-source-watch-stats-only-blocked.json,
+                     never the heartbeat. Combine with --no-db to measure a fallback change.
+  --archive-missing-only
+                     Fetch nothing: submit only the sources whose stored state has no archive
+                     URL (not gone/error, already read once) to Save Page Now, and write each
+                     capture to sources-state.json and sonar.source.archive_url as it lands.
+                     Respects --only/--limit; leaves the watch heartbeat alone.
+  --archive          Push every NEW version — and any source with no archive yet — to the
+                     Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
+                     and never fatal. Measure a run without it first.
+  --no-db            Do everything except the Postgres load (files and checkpoint only).
+  --pace=<ms>        Minimum gap between two requests to the SAME host (default ${HOST_PACE_MS}).
+  --help             This text.
+
+WHAT A RUN DOES
+  Sources are ordered round-robin by host, so the per-host pacing almost never has to block.
+  Each fetch sends If-None-Match / If-Modified-Since from the stored version, so an unchanged
+  document usually costs a 304. The kind is taken from the response's content-type (the URL is
+  only a guess), with the bytes overruling it for a PDF served as octet-stream: pdf ->
+  \`pdftotext -layout\` on stdin, html -> chrome stripped and tags removed, api -> JSON with keys
+  sorted. Churn lines (bare dates, counters, cookie banners) are dropped before hashing, or every
+  page with a clock on it would report a change every day.
+
+  Three hosts serve a viewer instead of the document, and the fetch is rewritten for them while the
+  registered URL stays the one the dossier cites: a \`*.notion.site\` page is read through Notion's
+  public loadPageChunk API (lib/notion.mjs) and kept as its recordMap, a
+  \`drive.google.com/file/d/<id>\` link is fetched as \`uc?export=download\` and comes back a PDF,
+  and a Dropbox shared FILE link is fetched with \`dl=1\` (a folder link is not: that is a zip).
+
+  A Next.js page rendered in the browser (an empty body, its words in \`self.__next_f\` flight
+  payloads) is read from those payloads when the markup alone yields a short text.
+
+  A host that refuses us outright (401/403, a bot wall, an expired certificate, or a region block
+  served as a 200) is read from its newest Wayback Machine
+  capture instead (CDX, then the \`id_\` raw capture; ${WAYBACK_PACE_MS / 1000} s apart, at most ${WAYBACK_FALLBACK_CAP} per run). The
+  result says so: \`read_via = 'wayback'\` and \`capture_at\` (the capture's own CDX timestamp)
+  on sonar.source and sonar.source_version, with http_status still the live refusal — an archived
+  capture is never reported as a live read.
+
+  A page with a same-publisher machine-readable companion (lib/companions.mjs) is read from it
+  when the live page refuses us or renders nothing: npm's registry, crates.io's API, Builder.io
+  content (and, for /investments/stocks, Builder's translations) for securitize.io, and — for a
+  Solscan transaction page — the chain itself, through
+  Solana RPC getTransaction (SOLANA_RPC_URL from .env; the URL is never logged or stored).
+  A cited Next.js page chunk (/_next/static/chunks/app/<route>/page-<hash>.js) that answers 404
+  after a redeploy is read from the chunk its route loads now.
+
+  Quotes are checked against the text BEFORE the churn filter (a price alone on its line is churn
+  for the hash, but may be the quoted words); a stored copy is re-read from its raw file for that.
+  A blocked source's quotes are "not checkable", never lost.
+
+  Outcomes: ok (same hash, or 304) · changed (new hash -> new version + diff) · gone (404/410 or
+  the host stopped resolving -> \`document-gone\` event) · blocked (401/403/405/406/451, a bot wall,
+  or 429 after backoff — recorded with the reason and not retried forever) · unreadable (the host
+  answered 2xx but not with the document: a region block, a script-only page, an RPC info page, a
+  text file hashed as bytes, no text at all — lib/unreadable.mjs; no version, no diff, no change
+  event, the last readable version stays the baseline and the quotes are "not checkable") ·
+  reachable-unverified (a refusal or an unreadable read on a source NO dossier quote relies on — a
+  homepage, a listing, a folder: the host answered, which is all such a citation needs; content not
+  read) · throttled (archive.org — a cited web.archive.org capture or CDX query — refused OUR
+  traffic: connection refused/reset, timeout, 429/5xx after a 30 s + 90 s backoff; not a look at
+  the source, so nothing is written and it is retried next run; after the first such refusal the run
+  reads nothing more from the archive) · error (5xx, timeout, reset, or a source archive.org has
+  throttled on ${THROTTLE_PERSISTS_AFTER} runs in a row). A run with ANY error does not report success and exits
+  non-zero; gone, blocked, unreadable, reachable-unverified and throttled are recorded, not failures.
+
+  A URL listed in stocks/data/retired-sources.json (gone for good) is not fetched; its row and state
+  say \`retired\`, with the date and reason.
+
+  The first read under a newer extractor generation (lib/watch.mjs publisherNormalizerVersion,
+  HTML_EXTRACTOR_VERSION) whose text differs from the stored one is a silent RE-BASELINE: the new
+  text is recorded as a version, with no legal-term or quote-lost event; the log counts them. A real
+  change on a later run diffs against that baseline as usual.
+
+  A read that contains every dossier quote registered on it is the cited document, whatever it
+  looks like (a cited region-block page quoted verbatim is read as a document).
+
+  www.cysec.gov.cy sends the wrong intermediate certificate; its requests add the committed
+  intermediate (stocks/certs/) to the default roots (lib/watch.mjs EXTRA_CA_HOSTS).
+
+FILES
+  stocks/data/sources.json                          input registry (extract-sources.mjs)
+  stocks/data/sources/<id>/<fetched_at>.{pdf,html,json,txt}   raw + normalised copies (gitignored)
+  stocks/data/sources-state.json                    last hash/etag per URL (gitignored)
+  stocks/data/raw/sources-<date>.json               per-source checkpoint, resumable (gitignored)
+  sonar.source / sonar.source_version / sonar.change_event   the mirror in Postgres
+
+REQUIREMENTS
+  \`pdftotext\` (poppler) on PATH for pdf sources — on macOS \`brew install poppler\`, on the server
+  \`apt install poppler-utils\`. DATABASE_URL in ${join(REPO, '.env')} unless --no-db.`);
+}
+
+// --- pdftotext -------------------------------------------------------------------------------
+
+/** Loud, early failure: a missing binary must not be discovered 200 fetches into a run. */
+async function assertPdftotext() {
+    await new Promise((resolvePromise, rejectPromise) => {
+        const child = spawn('pdftotext', ['-v'], { stdio: ['ignore', 'ignore', 'pipe'] });
+        child.on('error', (err) => {
+            rejectPromise(new Error(
+                `pdftotext is not on PATH (${err.code || err.message}) and this run has PDF sources.`
+                + ' Install poppler: macOS `brew install poppler`, Debian/Ubuntu server'
+                + ' `apt install poppler-utils`. Or run with --only=<issuer> over html-only sources.'
+            ));
+        });
+        // `pdftotext -v` exits 0 on some builds and 99 on others; either proves it is installed.
+        child.on('close', () => resolvePromise());
+    });
+}
+
+/** PDF bytes -> layout-preserving text. stdin/stdout only: no temp file is ever written. */
+function pdfToText(buffer) {
+    return new Promise((resolvePromise, rejectPromise) => {
+        const child = spawn('pdftotext', ['-layout', '-', '-'], { stdio: ['pipe', 'pipe', 'pipe'] });
+        const chunks = [];
+        let err = '';
+        child.stdout.on('data', (d) => chunks.push(d));
+        child.stderr.on('data', (d) => { err += d; });
+        child.on('error', (e) => rejectPromise(new Error(`pdftotext: ${e.message}`)));
+        child.on('close', (code) => {
+            const text = Buffer.concat(chunks).toString('utf8');
+            // pdftotext exits non-zero on a damaged file but may still have produced pages.
+            if (code !== 0 && text.trim() === '') {
+                rejectPromise(new Error(`pdftotext exited ${code}: ${err.trim().slice(0, 200)}`));
+                return;
+            }
+            if (code !== 0) logWarn(`pdftotext exited ${code} but produced ${text.length} chars: ${err.trim().slice(0, 120)}`);
+            resolvePromise(text);
+        });
+        child.stdin.on('error', (e) => rejectPromise(new Error(`pdftotext stdin: ${e.message}`)));
+        child.stdin.end(buffer);
+    });
+}
+
+// --- fetching --------------------------------------------------------------------------------
+
+/**
+ * Fallback for a server whose response headers do not fit undici's 16 KB cap, which `fetch` reports
+ * as UND_ERR_HEADERS_OVERFLOW with no body at all. Measured on `https://superstate.com/assets/fwdi`:
+ * one `link:` preload header of 14,990 bytes takes the response to 17,456 bytes of headers. That is
+ * our client's limit, not the site's fault, so the document is fetched again through node:https with
+ * a 256 KB `maxHeaderSize` instead of being written off. Redirects are followed by hand (fetch is
+ * not doing it for us here) and `Accept-Encoding` is dropped, because unlike undici this path does
+ * not decompress.
+ */
+function fetchWithBigHeaders(url, headers, timeoutMs, redirectsLeft = 5, ca = null) {
+    const plain = { ...headers };
+    delete plain['Accept-Encoding'];
+    return new Promise((resolvePromise) => {
+        const fail = (code) => resolvePromise({
+            httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: code
+        });
+        let target;
+        try {
+            target = new URL(url);
+        } catch {
+            fail('ERR_INVALID_URL');
+            return;
+        }
+        const request = target.protocol === 'http:' ? httpRequest : httpsRequest;
+        const tlsOptions = ca && target.protocol === 'https:' ? { ca } : {};
+        const req = request(url, { method: 'GET', headers: plain, maxHeaderSize: 262_144, ...tlsOptions }, (res) => {
+            const redirect = [301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location;
+            if (redirect && redirectsLeft > 0) {
+                res.resume();
+                resolvePromise(fetchWithBigHeaders(new URL(res.headers.location, url).toString(),
+                    headers, timeoutMs, redirectsLeft - 1, ca));
+                return;
+            }
+            const chunks = [];
+            res.on('data', (chunk) => chunks.push(chunk));
+            res.on('end', () => resolvePromise({
+                httpStatus: res.statusCode,
+                headers: res.headers,
+                buffer: Buffer.concat(chunks),
+                finalUrl: url,
+                networkErrorCode: null
+            }));
+            res.on('error', (err) => fail(err.code || err.name));
+        });
+        req.setTimeout(timeoutMs, () => {
+            req.destroy(Object.assign(new Error('timeout'), { code: 'ETIMEDOUT' }));
+        });
+        req.on('error', (err) => fail(err.code || err.name));
+        req.end();
+    });
+}
+
+/**
+ * The trust store for a host that sends the wrong intermediate (lib/watch.mjs `extraCaFor`): the
+ * default roots plus that host's committed intermediate, or null for every other host. Read once.
+ */
+const extraCaCache = new Map();
+async function extraCaList(host) {
+    const file = extraCaFor(host);
+    if (!file) return null;
+    if (!extraCaCache.has(file)) extraCaCache.set(file, [...rootCertificates, await readFile(join(REPO, file), 'utf8')]);
+    return extraCaCache.get(file);
+}
+
+/**
+ * All of this run's archive.org traffic: when the last request went out (reads and Save Page Now
+ * alike) and, once the archive has refused a read through its backoffs, why the run stopped reading
+ * from it (`pausedBy`).
+ */
+const archiveTraffic = { lastMs: 0, pausedBy: null, paused: 0 };
+
+/** Wait for this run's next archive.org slot (WAYBACK_PACE_MS after the last request of any kind). */
+async function archiveSlot() {
+    const gap = WAYBACK_PACE_MS - (Date.now() - archiveTraffic.lastMs);
+    if (gap > 0) await sleep(gap);
+    archiveTraffic.lastMs = Date.now();
+}
+
+/** A request that was never sent, because archive.org pushed back earlier this run. */
+function archivePausedResponse(url) {
+    archiveTraffic.paused += 1;
+    return { httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: ARCHIVE_PAUSED };
+}
+
+/** One GET, with the conditional headers the stored version allows. Never throws. */
+async function fetchOnce(url, { etag, lastModified }, timeoutMs) {
+    if (isArchiveHost(hostOf(url))) {
+        if (archiveTraffic.pausedBy) return archivePausedResponse(url);
+        await archiveSlot();
+    }
+    // A cited Wayback capture is read as its raw `id_` bytes, never with the toolbar around it.
+    const cited = citedCapture(url);
+    if (cited) {
+        const res = await fetchWithBigHeaders(captureRawUrl(cited.timestamp, cited.original),
+            { 'User-Agent': USER_AGENT, Accept: '*/*' }, timeoutMs);
+        try {
+            res.buffer = decodeCaptureBody(res.buffer);
+        } catch (err) {
+            return { httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: err.code || 'ECAPTURE' };
+        }
+        return { ...res, finalUrl: url };
+    }
+    const headers = {
+        'User-Agent': userAgentFor(hostOf(url)),
+        Accept: 'text/html,application/xhtml+xml,application/pdf,application/json;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-GB,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br'
+    };
+    if (etag) headers['If-None-Match'] = etag;
+    if (lastModified) headers['If-Modified-Since'] = lastModified;
+    // A host whose server sends the wrong intermediate is read through node:https with that host's
+    // extra CA (fetch's undici agent takes no per-request trust store without the undici package).
+    const ca = await extraCaList(hostOf(url));
+    if (ca) return fetchWithBigHeaders(url, headers, timeoutMs, 5, ca);
+    try {
+        const res = await fetch(url, {
+            method: 'GET',
+            headers,
+            redirect: 'follow',
+            signal: AbortSignal.timeout(timeoutMs)
+        });
+        const buffer = res.status === 304 ? Buffer.alloc(0) : Buffer.from(await res.arrayBuffer());
+        const headerObject = Object.fromEntries([...res.headers.entries()]);
+        return { httpStatus: res.status, headers: headerObject, buffer, finalUrl: res.url, networkErrorCode: null };
+    } catch (err) {
+        const code = err.name === 'TimeoutError' ? 'ETIMEDOUT' : (err.cause?.code || err.code || err.name);
+        if (code === 'UND_ERR_HEADERS_OVERFLOW') {
+            logWarn(`${url}: response headers exceed undici's 16 KB cap — refetching with a 256 KB limit`);
+            return fetchWithBigHeaders(url, headers, timeoutMs);
+        }
+        return { httpStatus: null, headers: {}, buffer: Buffer.alloc(0), finalUrl: url, networkErrorCode: code };
+    }
+}
+
+/**
+ * Rate limits, temporary outages and connection failures get two backoffs before classification;
+ * archive.org pushing back gets the longer ARCHIVE_BACKOFF_MS, and when it is still refusing after
+ * them, archive reads pause for the rest of the run (`archiveTraffic.pausedBy`).
+ */
+async function fetchWithBackoff(url, conditional, timeoutMs) {
+    const host = hostOf(url);
+    const archive = isArchiveHost(host);
+    let response = await fetchOnce(url, conditional, timeoutMs);
+    if (response.networkErrorCode === ARCHIVE_PAUSED) return { ...response, retriedAfterBackoff: false };
+    let retried = false;
+    for (const wait of archive ? ARCHIVE_BACKOFF_MS : BACKOFF_MS) {
+        const pushback = archivePushback({ host, httpStatus: response.httpStatus, networkErrorCode: response.networkErrorCode });
+        const transientNetwork = ['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN'].includes(response.networkErrorCode);
+        if (!pushback && response.httpStatus !== 429 && response.httpStatus !== 503 && !transientNetwork) break;
+        // A challenge page served as 429/503 (Vercel's Security Checkpoint) is a wall, not a rate
+        // limit: waiting 20 s cannot change it, so it goes straight to classification.
+        if (challengeInBody(response.buffer.subarray(0, 4000).toString('utf8'))) break;
+        const retryAfter = Number(response.headers['retry-after']);
+        const pause = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, 60_000) : wait;
+        logWarn(`${response.httpStatus ?? response.networkErrorCode} on ${url} — backing off ${pause} ms`);
+        await sleep(pause);
+        response = await fetchOnce(url, conditional, timeoutMs);
+        retried = true;
+    }
+    if (archive && !archiveTraffic.pausedBy
+        && archivePushback({ host, httpStatus: response.httpStatus, networkErrorCode: response.networkErrorCode })) {
+        archiveTraffic.pausedBy = `${response.networkErrorCode ?? `http-${response.httpStatus}`} on ${url}`;
+        logWarn(`archive.org still pushing back after ${ARCHIVE_BACKOFF_MS.map((ms) => `${ms / 1000}s`).join(' + ')} of backoff`
+            + ` (${archiveTraffic.pausedBy}) — no more archive reads this run; the rest are retried next run`);
+    }
+    return { ...response, retriedAfterBackoff: retried };
+}
+
+/**
+ * Interleave hosts so consecutive requests hit different servers: with ~120 hosts the 1.5 s
+ * per-host floor then almost never costs any wall-clock time, while no host sees a burst.
+ */
+export function orderByHost(items) {
+    const buckets = new Map();
+    for (const item of items) {
+        const host = hostOf(item.url) ?? '';
+        if (!buckets.has(host)) buckets.set(host, []);
+        buckets.get(host).push(item);
+    }
+    const queues = [...buckets.values()];
+    const out = [];
+    for (let round = 0; out.length < items.length; round += 1) {
+        for (const queue of queues) if (queue[round]) out.push(queue[round]);
+    }
+    return out;
+}
+
+// --- version files ---------------------------------------------------------------------------
+
+/** Write the raw bytes and the normalised text of a new version; return their repo-relative paths. */
+async function writeVersionFiles(id, fetchedAt, kind, buffer, text) {
+    const dir = join(VERSIONS_DIR, id);
+    await mkdir(dir, { recursive: true });
+    const stamp = fileStamp(fetchedAt);
+    const rawPath = join(dir, `${stamp}.${rawExtension(kind)}`);
+    const textPath = join(dir, `${stamp}.txt`);
+    await writeFile(rawPath, buffer);
+    await writeFile(textPath, text, 'utf8');
+    return { rawPath: relative(REPO, rawPath), textPath: relative(REPO, textPath) };
+}
+
+/** Keep the last `KEEP_VERSIONS` versions per source (EVIDENCE.md §2.2), delete what is older. */
+async function pruneVersions(id) {
+    const dir = join(VERSIONS_DIR, id);
+    let names;
+    try {
+        names = await readdir(dir);
+    } catch {
+        return 0;
+    }
+    const stamps = [...new Set(names.map((n) => n.replace(/\.(txt|pdf|html|json)$/, '')))].sort();
+    const doomed = stamps.slice(0, Math.max(0, stamps.length - KEEP_VERSIONS));
+    let removed = 0;
+    for (const stamp of doomed) {
+        for (const name of names.filter((n) => n.startsWith(stamp))) {
+            await rm(join(dir, name), { force: true });
+            removed += 1;
+        }
+    }
+    return removed;
+}
+
+// --- Wayback ---------------------------------------------------------------------------------
+
+/**
+ * Save Page Now. `Content-Location` carries `/web/<ts>/<url>` on success; some responses only
+ * redirect, in which case the final URL is the archived one. Never fatal: an archive we failed to
+ * make is a missing nicety, not a failed watch.
+ */
+/** archive.org S3-style keys from .env (ARCHIVE_ORG_ACCESS_KEY / ARCHIVE_ORG_SECRET_KEY); set in main(). */
+let archiveAuth = null;
+// The Solana RPC a `solana-tx` companion (a Solscan transaction page) is read through: SOLANA_RPC_URL
+// from .env, else the public endpoint. The URL may carry an API key, so it is never logged, never
+// written to a checkpoint and scrubbed from any error text (`scrubRpc`).
+let solanaRpc = DEFAULT_RPC;
+const scrubRpc = (text) => String(text).split(solanaRpc).join('<solana-rpc>');
+const SPN_POLL_MS = 5000;
+const SPN_WAIT_MS = 90_000;
+/** SPN says "wait for a minute" when the account's active-session cap is hit; do that, a few times. */
+const SPN_BUSY_WAIT_MS = 60_000;
+const SPN_BUSY_RETRIES = 3;
+
+/**
+ * Save Page Now 2 with an account key: submit, then poll the job until it settles or SPN_WAIT_MS
+ * passes (a capture that is still pending is reported as such and retried on a later pass,
+ * because `archive_url` stays null). The key never appears in a log line.
+ */
+async function archiveUrlAuthenticated(url) {
+    const headers = {
+        Accept: 'application/json',
+        Authorization: `LOW ${archiveAuth.access}:${archiveAuth.secret}`,
+        'User-Agent': USER_AGENT
+    };
+    try {
+        let submit = null;
+        let submitted = null;
+        for (let attempt = 0; ; attempt += 1) {
+            submit = await fetch('https://web.archive.org/save', {
+                method: 'POST',
+                headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ url, capture_all: '1', if_not_archived_within: ARCHIVE_REUSE_WITHIN }).toString(),
+                signal: AbortSignal.timeout(60_000)
+            });
+            submitted = await submit.json().catch(() => null);
+            // Save Page Now shares the archive's rate limit with our reads (`archiveSlot`).
+            archiveTraffic.lastMs = Date.now();
+            if (submitted?.job_id) break;
+            const msg = submitted?.message || submitted?.status_ext || `http ${submit.status}`;
+            if (spnBusy(msg) && attempt < SPN_BUSY_RETRIES) {
+                log(`archive busy (active-session cap), waiting ${SPN_BUSY_WAIT_MS / 1000}s before retrying ${url}`);
+                await sleep(SPN_BUSY_WAIT_MS);
+                continue;
+            }
+            return { archiveUrl: null, httpStatus: submit.status, error: `save-page-now submit: ${msg}` };
+        }
+        const started = Date.now();
+        while (Date.now() - started < SPN_WAIT_MS) {
+            await sleep(SPN_POLL_MS);
+            const poll = await fetch(`https://web.archive.org/save/status/${submitted.job_id}`, { headers, signal: AbortSignal.timeout(30_000) });
+            const parsed = parseSpnStatus(await poll.json().catch(() => null), url);
+            archiveTraffic.lastMs = Date.now();
+            if (parsed.done) return { archiveUrl: parsed.archiveUrl, httpStatus: poll.status, error: parsed.error };
+        }
+        return { archiveUrl: null, httpStatus: 202, error: `save-page-now still pending after ${SPN_WAIT_MS / 1000}s (job ${submitted.job_id})` };
+    } catch (err) {
+        return { archiveUrl: null, httpStatus: null, error: err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message) };
+    }
+}
+
+/**
+ * A refused or dropped connection to web.archive.org is the archive pushing back, not a verdict on
+ * the source; wait the same minute the session cap asks for and try again before calling it a
+ * failure (which would count towards giving up for the run).
+ */
+async function archiveUrlWithRetry(url) {
+    for (let attempt = 0; ; attempt += 1) {
+        const saved = await archiveUrlAuthenticated(url);
+        if (saved.archiveUrl || !spnTransient(saved.error) || attempt >= SPN_BUSY_RETRIES) return saved;
+        log(`archive unreachable (${saved.error}), waiting ${SPN_BUSY_WAIT_MS / 1000}s before retrying ${url}`);
+        await sleep(SPN_BUSY_WAIT_MS);
+    }
+}
+
+/**
+ * The capture SPN declined to repeat (lib/watch.mjs `spnAlreadyCaptured`): the newest 200 capture
+ * in CDX, accepted only when it is recent enough to be that snapshot. Otherwise the original
+ * refusal stands — an older capture is not an archive of what we read today.
+ */
+async function recentCapture(url, refusal) {
+    try {
+        const cdx = await fetch(cdxQueryUrl(url), {
+            headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+            signal: AbortSignal.timeout(CDX_TIMEOUT_MS)
+        });
+        if (!cdx.ok) {
+            await cdx.body?.cancel();
+            return { ...refusal, error: `${refusal.error}; cdx http-${cdx.status}` };
+        }
+        const capture = parseCdxNewest(await cdx.text());
+        if (capture && captureIsRecent(capture.timestamp, Date.now())) {
+            log(`archive: SPN already captured ${url} in the last day — using ${capture.timestamp}`);
+            return { archiveUrl: captureViewUrl(capture.timestamp, capture.original), httpStatus: 200, error: null };
+        }
+        return { ...refusal, error: `${refusal.error}; no recent 200 capture in CDX` };
+    } catch (err) {
+        return { ...refusal, error: `${refusal.error}; cdx ${err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message)}` };
+    }
+}
+
+async function archiveUrl(url) {
+    if (archiveAuth) {
+        const saved = await archiveUrlWithRetry(url);
+        return !saved.archiveUrl && spnAlreadyCaptured(saved.error) ? recentCapture(url, saved) : saved;
+    }
+    try {
+        const res = await fetch(`https://web.archive.org/save/${url}`, {
+            method: 'GET',
+            headers: { 'User-Agent': USER_AGENT, Accept: 'text/html,*/*' },
+            redirect: 'follow',
+            signal: AbortSignal.timeout(60_000)
+        });
+        const parsed = parseArchiveLocation(res.headers.get('content-location'), res.url);
+        if (parsed) return { archiveUrl: parsed, httpStatus: res.status, error: null };
+        return { archiveUrl: null, httpStatus: res.status, error: archiveRefusal(res.status) };
+    } catch (err) {
+        return { archiveUrl: null, httpStatus: null, error: err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message) };
+    }
+}
+
+// --- the run ---------------------------------------------------------------------------------
+
+/** k/N with an ETA from the rate so far — a long run must be distinguishable from a hung one. */
+function progress(done, total, startedMs) {
+    const elapsed = Date.now() - startedMs;
+    const remaining = total - done;
+    const etaMs = done > 0 ? Math.round((elapsed / done) * remaining) : null;
+    const mm = etaMs === null ? '??:??' : `${String(Math.floor(etaMs / 60000)).padStart(2, '0')}:${String(Math.floor((etaMs % 60000) / 1000)).padStart(2, '0')}`;
+    return `${done}/${total} · ${Math.round((done / total) * 100)}% · ETA ${mm}`;
+}
+
+/**
+ * A fetched body -> `{kind, text, via, binary}`: PDF through pdftotext, textual payloads through
+ * the kind's normaliser (HTML with the Next.js flight reader, lib/watch.mjs `htmlDocumentText`),
+ * anything else watched as bytes. Shared by the live fetch and the Wayback fallback, so a capture
+ * is read exactly the way the live page would have been.
+ */
+async function bytesToText(buffer, contentType, url) {
+    let kind = kindFromContentType(contentType, url);
+    // Drive answers every download as `application/octet-stream`, so the bytes have the last
+    // word about what was served (lib/watch.mjs `looksLikePdf`).
+    if (kind !== 'pdf' && looksLikePdf(buffer)) kind = 'pdf';
+    if (kind === 'pdf') {
+        const pdfText = await pdfToText(buffer);
+        return {
+            kind, text: normaliseByKind('pdf', pdfText), quoteText: normaliseByKind('pdf', pdfText, { keepChurn: true }), via: 'pdf', binary: false
+        };
+    }
+    // Labelled bytes but really UTF-8 text (a Markdown file served as octet-stream): read it.
+    if (isTextual(contentType) || !contentType || looksLikeText(buffer)) {
+        if (kind === 'html') {
+            const read = htmlDocumentText(buffer.toString('utf8'));
+            return { kind, text: read.text, quoteText: read.quoteText, via: read.via, binary: false };
+        }
+        const body = buffer.toString('utf8');
+        return {
+            kind, text: normaliseByKind(kind, body), quoteText: normaliseByKind(kind, body, { keepChurn: true }), via: kind, binary: false
+        };
+    }
+    // Not text and not a PDF (a zip of attestations, say): watched as bytes.
+    const marker = binaryMarker(buffer, contentType);
+    return { kind, text: marker, quoteText: marker, via: 'binary', binary: true };
+}
+
+/** Character length of a stored text version, or null when there is none to read. */
+async function storedTextChars(textPath) {
+    if (typeof textPath !== 'string' || textPath === '') return null;
+    try {
+        return (await readFile(join(REPO, textPath), 'utf8')).length;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * lib/unreadable.mjs's verdict on one read, with the two inputs only the IO side has: the verdict
+ * of the dossier quotes registered on this source against this read (every one found means the read
+ * IS the cited document, whatever it looks like — Remora's region-block page is itself quoted), and,
+ * for a short read of a large page, the length of the last readable version on disk (`textPath`).
+ */
+async function classifyFresh({ kind, via = null, text, quoteText = null, raw, binary = false, quotes = [], textPath = null, prev = null }) {
+    const buffer = Buffer.isBuffer(raw) ? raw : Buffer.from(String(raw ?? ''), 'utf8');
+    const markup = binary ? '' : buffer.toString('utf8');
+    const check = Array.isArray(quotes) && quotes.length > 0 && typeof quoteText === 'string'
+        ? checkQuotes(quoteText, quotes, { pdf: kind === 'pdf' }) : null;
+    const previousChars = needsPreviousChars({ text, raw: markup }) ? await storedTextChars(textPath ?? prev?.textPath) : null;
+    return classifyRead({
+        kind, via, text, raw: markup, binary, bytesAreText: binary && looksLikeText(buffer), previousChars,
+        quotes: check && { checked: check.checked, lost: check.lost.length }
+    });
+}
+
+/** Everything about one source after one look at it. Written to the checkpoint as-is. */
+async function watchOne(source, prev, options) {
+    const { timeoutMs } = options;
+    const id = sourceId(source.url);
+    const fetchedAt = ts();
+    // Conditional headers always come from the stored version, `--force` included: --force means
+    // "ignore today's checkpoint and look again", not "make the server send the body again". A 304
+    // IS the answer we want — it is the cheapest possible "unchanged".
+    const normalizerVersion = publisherNormalizerVersion(source.url, source.kind);
+    const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1);
+    // A page with a companion API (lib/companions.mjs) is fetched unconditionally: its etag
+    // describes the shell, so a 304 would only confirm that the shell is still empty. A companion
+    // with `liveValidators` (a build chunk: the URL is the document itself) keeps them.
+    const shellCompanion = companionFor(source.url);
+    const conditional = shellCompanion && !shellCompanion.liveValidators
+        ? { etag: null, lastModified: null } : conditionalHeaders(prev, { normalizerUpgrade });
+
+    // A Google Drive file link serves its own JavaScript viewer, never the file; the bytes are at
+    // `uc?export=download`; a Dropbox file link likewise serves its previewer until asked for
+    // `dl=1`. The SOURCE keeps the URL the dossier cites — only the fetch moves.
+    const download = driveDownloadUrl(source.url) ?? dropboxDownloadUrl(source.url);
+    const res = await fetchWithBackoff(download ?? source.url, conditional, timeoutMs);
+    // The bot-wall test reads the BODY only; a vendor header is an annotation on a status that
+    // already refused us, never evidence on its own (see lib/watch.mjs).
+    const bodyPreview = res.buffer.subarray(0, 4000).toString('utf8');
+    const blocked = challengeInBody(bodyPreview);
+    const vendor = blockVendor(res.headers);
+
+    const result = {
+        id,
+        url: source.url,
+        // Where the bytes actually came from, when that is not the cited URL. Never written to
+        // sonar.source (the citation is the source), but it belongs in the checkpoint so a run can
+        // be read back and the rewrite seen.
+        resolvedUrl: download ?? null,
+        issuer: source.issuer ?? null,
+        title: source.title ?? null,
+        foundIn: source.foundIn ?? [],
+        registryKind: source.kind,
+        kind: source.kind,
+        fetchedAt,
+        httpStatus: res.httpStatus,
+        contentType: res.headers['content-type'] ?? null,
+        bytes: res.buffer.length || null,
+        textChars: null,
+        contentHash: prev?.contentHash ?? null,
+        // Validators only from a 2xx body (or a 304 confirming them): lib/watch.mjs `responseValidators`.
+        ...responseValidators({ httpStatus: res.httpStatus, headers: res.headers, prev }),
+        rawPath: null,
+        textPath: null,
+        archiveUrl: prev?.archiveUrl ?? null,
+        status: null,
+        reason: null,
+        error: null,
+        diff: null,
+        normalizerVersion,
+        normalizerUpgrade,
+        // Which reader produced the text: html, next-flight, pdf, api, notion, binary, or — when
+        // the live host refused us — wayback (with captureTimestamp/captureUrl beside it).
+        via: null
+    };
+
+    // A 2xx needs the body turned into text before the outcome is known, because the outcome is
+    // "same hash" versus "new hash". `quoteText` is the same reading without the churn filter:
+    // what the quote check reads (lib/watch.mjs `normaliseLines` keepChurn).
+    let text = null;
+    let quoteText = null;
+    let hash = null;
+    let raw = res.buffer;
+    // A `*.notion.site` page — whether cited as one or reached by the 308 from
+    // `url.prestocks.com` — is a shell whose document lives behind Notion's own public API.
+    const notionPage = isNotionSiteHost(hostOf(source.url)) || isNotionSiteHost(hostOf(res.finalUrl));
+    // An exact API query whose cited evidence is its 400/422 JSON answer (lib/watch.mjs).
+    const apiAnswer = !blocked && apiAnswerIsDocument({ httpStatus: res.httpStatus, contentType: res.headers['content-type'], url: source.url });
+    if (res.httpStatus !== null && ((res.httpStatus >= 200 && res.httpStatus < 300) || apiAnswer) && !blocked) {
+        const contentType = res.headers['content-type'];
+        result.kind = kindFromContentType(contentType, download ?? source.url);
+        if (result.kind !== 'pdf' && looksLikePdf(res.buffer)) result.kind = 'pdf';
+        let stage = 'normalise';
+        try {
+            if (notionPage) {
+                // A loadPageChunk parser/timeout/5xx failure is `error`: the host served us the
+                // shell but our document read failed. A 403 is classified below as `blocked`,
+                // because it is an explicit upstream access wall rather than a crashed watcher.
+                stage = 'notion';
+                const page = await fetchNotionPageText(res.finalUrl ?? source.url, {
+                    userAgent: userAgentFor(hostOf(res.finalUrl ?? source.url)),
+                    timeoutMs,
+                    html: res.buffer.toString('utf8')
+                });
+                // The kind stays `html` (it is a web page), but the raw copy kept on disk is the
+                // recordMap, so any stored version can be re-rendered without re-fetching it.
+                result.kind = 'html';
+                result.rawKind = 'api';
+                result.notionPageId = page.pageId;
+                result.notionBlocks = Object.keys(page.blocks).length;
+                raw = Buffer.from(`${JSON.stringify({ pageId: page.pageId, recordMap: page.recordMap })}\n`, 'utf8');
+                result.bytes = raw.length;
+                text = normaliseLines(page.text, { htmlWidgets: true });
+                quoteText = normaliseLines(page.text, { htmlWidgets: true, keepChurn: true });
+                result.via = 'notion';
+            } else {
+                const read = await bytesToText(res.buffer, contentType, download ?? source.url);
+                result.kind = read.kind;
+                result.via = read.via;
+                if (read.binary) result.binary = true;
+                text = read.text;
+                quoteText = read.quoteText;
+            }
+            text = stripPublisherChrome(source.url, text);
+            quoteText = stripPublisherChrome(source.url, quoteText);
+            hash = sha256Hex(text);
+            result.textChars = text.length;
+        } catch (err) {
+            // A public Notion document can start returning 403 from loadPageChunk while the
+            // viewer shell still answers 200. That is an upstream access wall, not a crashed
+            // watcher. Keep it visible as blocked and continue; timeouts/5xx/parser failures stay
+            // errors and make the run partial.
+            const notionBlocked = stage === 'notion' && /\bhttp 403\b/i.test(err.message);
+            result.status = notionBlocked ? 'blocked' : 'error';
+            result.reason = `${stage}: ${err.message}`;
+            result.error = err.message;
+            return { result, text: null, quoteText: null, raw, previousTextPath: prev?.textPath ?? null };
+        }
+    }
+
+    // Was what came back the document at all (lib/unreadable.mjs)? A region block, a script-only
+    // shell, an RPC info page or an empty body served with 200 is our reader failing, not the
+    // document changing: it gets no version, no diff and no event, and the last readable version
+    // stays the baseline. The Notion path has already read the document through its API, so the
+    // shell it came wrapped in is not evidence of anything (`via: 'notion'`).
+    const unreadable = text === null ? null : await classifyFresh({
+        kind: result.kind, via: result.via, text, quoteText, raw: notionPage ? raw : res.buffer,
+        binary: result.binary === true, quotes: options.quotes, prev
+    });
+    const outcome = decideOutcome({
+        host: hostOf(source.url),
+        httpStatus: res.httpStatus,
+        networkErrorCode: res.networkErrorCode,
+        blocked,
+        vendor,
+        unreadable,
+        sameHash: hash !== null && prev?.contentHash === hash,
+        retriedAfterBackoff: res.retriedAfterBackoff,
+        apiAnswer
+    });
+    result.status = outcome.status;
+    result.reason = outcome.reason;
+    if (outcome.status === 'error' || outcome.status === 'blocked' || outcome.status === 'gone' || outcome.status === 'unreadable') {
+        result.error = outcome.reason;
+    }
+    const readable = outcome.status === 'ok' || outcome.status === 'changed';
+    if (outcome.status === 'unreadable') {
+        // Kept apart from `via`, which describes the stored text this row still stands on.
+        result.unreadableCode = outcome.code;
+        result.servedKind = result.kind;
+        result.servedVia = result.via;
+        result.kind = prev?.kind ?? source.kind;
+        result.via = null;
+        text = null;
+        quoteText = null;
+    }
+    // Only a read of the document moves the stored hash and the validators: an unreadable body's
+    // etag answered 304 later would stand on the last readable version as if it had been confirmed.
+    if (hash !== null && readable) result.contentHash = hash;
+    if (!readable) Object.assign(result, responseValidators({ httpStatus: res.httpStatus, headers: res.headers, prev, readable: false }));
+    // The same publisher's machine-readable companion first (live, and the publisher's own words),
+    // then an archived capture (lib/companions.mjs, lib/wayback.mjs).
+    const companion = shellCompanion && wantsCompanion({
+        status: result.status, httpStatus: res.httpStatus, botWall: blocked, reader: shellCompanion.reader
+    }) ? shellCompanion : null;
+    if (companion) {
+        const read = await readFromCompanion(source, prev, result, companion, options);
+        if (read) return read;
+    }
+    if (options.wayback && wantsWaybackFallback({
+        status: result.status, httpStatus: res.httpStatus, botWall: blocked, tlsExpired: res.networkErrorCode === 'CERT_HAS_EXPIRED',
+        unreadableCode: result.unreadableCode ?? null, url: source.url
+    })) {
+        const archived = await readFromWayback(source, prev, result, options);
+        if (archived) return archived;
+    }
+    return { result, text, quoteText, raw, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * The cited page refused us or rendered nothing, and its publisher serves the same document from an
+ * API (lib/companions.mjs): read that. The result is `ok`/`changed` against the stored hash, with
+ * `companionReader`/`companionUrl` saying where the words came from, `httpStatus` still the live
+ * page's answer and `reason` carrying both. `via` is `api` (sonar.source.read_via: the text is a
+ * live JSON answer). Returns null — the result keeps its live verdict, reason extended — when the
+ * companion fails; the Wayback fallback may still apply after that.
+ */
+async function readFromCompanion(source, prev, result, companion, { timeoutMs }) {
+    const liveReason = result.reason;
+    if (companion.rpc) return readFromRpcCompanion(source, prev, result, companion);
+    if (companion.reader === 'next-app-chunk') return readFromChunkCompanion(source, prev, result, companion, { timeoutMs });
+    const res = await fetchWithBackoff(companion.url, { etag: null, lastModified: null }, timeoutMs);
+    const fail = (why) => {
+        result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
+        result.error = result.reason;
+        logWarn(`companion: no read for ${source.url} — ${why}`);
+        return null;
+    };
+    if (res.httpStatus === null || res.httpStatus < 200 || res.httpStatus >= 300) {
+        return fail(res.httpStatus === null ? res.networkErrorCode : `http-${res.httpStatus}`);
+    }
+    let raw;
+    try {
+        raw = companionText(companion.reader, res.buffer.toString('utf8'));
+    } catch (err) {
+        return fail(`unreadable: ${err.message}`);
+    }
+    const text = normaliseLines(raw);
+    const quoteText = normaliseLines(raw, { keepChurn: true });
+    const hash = sha256Hex(text);
+    const same = prev?.contentHash === hash;
+    result.via = 'api';
+    result.rawKind = 'api';
+    result.companionReader = companion.reader;
+    result.companionUrl = companion.url;
+    result.resolvedUrl = companion.url;
+    result.liveReason = liveReason;
+    result.contentType = res.headers['content-type'] ?? null;
+    result.bytes = res.buffer.length;
+    result.textChars = text.length;
+    result.contentHash = hash;
+    result.status = same ? 'ok' : 'changed';
+    result.reason = `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: companion.url })}`;
+    result.error = null;
+    return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * A companion that is a JSON-RPC call rather than a URL (a Solscan transaction page -> Solana RPC
+ * `getTransaction`). Same verdicts and provenance as `readFromCompanion`; the raw copy kept on disk
+ * is the RPC answer, and `companionUrl` is the key-free descriptor, never the RPC URL.
+ */
+async function readFromRpcCompanion(source, prev, result, companion) {
+    const liveReason = result.reason;
+    let answer;
+    let raw;
+    try {
+        answer = await rpcCall(companion.rpc.method, companion.rpc.params, { rpc: solanaRpc, timeoutMs: TIMEOUT_MS });
+        raw = companionText(companion.reader, answer);
+    } catch (err) {
+        const why = scrubRpc(err.message);
+        result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
+        result.error = result.reason;
+        logWarn(`companion: no read for ${source.url} — ${why}`);
+        return null;
+    }
+    const body = Buffer.from(`${JSON.stringify(answer)}\n`, 'utf8');
+    const text = normaliseLines(raw);
+    const quoteText = normaliseLines(raw, { keepChurn: true });
+    const hash = sha256Hex(text);
+    const same = prev?.contentHash === hash;
+    Object.assign(result, {
+        via: 'api', rawKind: 'api', companionReader: companion.reader, companionUrl: companion.url, resolvedUrl: companion.url,
+        liveReason, contentType: 'application/json', bytes: body.length, textChars: text.length, contentHash: hash,
+        status: same ? 'ok' : 'changed', error: null,
+        reason: `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: companion.url })}`
+    });
+    return { result, text, quoteText, raw: body, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * A cited Next.js page chunk that answered 404 (a redeploy renamed it): fetch the route that loads
+ * it, take the chunk that page loads now (lib/companions.mjs `currentNextChunk`) and read it exactly
+ * as a direct read of the chunk would be read (`bytesToText`), so identical words under a new build
+ * hash give the same hash. `companionUrl` is the chunk actually read; `httpStatus` stays the 404.
+ */
+async function readFromChunkCompanion(source, prev, result, companion, { timeoutMs }) {
+    const liveReason = result.reason;
+    const fail = (why) => {
+        result.reason = `${liveReason}; companion ${companion.reader}: ${why}`;
+        result.error = result.reason;
+        logWarn(`companion: no read for ${source.url} — ${why}`);
+        return null;
+    };
+    const ok = (r) => r.httpStatus !== null && r.httpStatus >= 200 && r.httpStatus < 300;
+    const page = await fetchWithBackoff(companion.url, { etag: null, lastModified: null }, timeoutMs);
+    if (!ok(page)) return fail(`page ${companion.url}: ${page.httpStatus === null ? page.networkErrorCode : `http-${page.httpStatus}`}`);
+    let chunkUrl;
+    try {
+        chunkUrl = currentNextChunk(page.buffer.toString('utf8'), page.finalUrl ?? companion.url, companion.chunkPrefix);
+    } catch (err) {
+        return fail(err.message);
+    }
+    const res = await fetchWithBackoff(chunkUrl, { etag: null, lastModified: null }, timeoutMs);
+    if (!ok(res)) return fail(`chunk ${chunkUrl}: ${res.httpStatus === null ? res.networkErrorCode : `http-${res.httpStatus}`}`);
+    const read = await bytesToText(res.buffer, res.headers['content-type'], chunkUrl);
+    const text = stripPublisherChrome(source.url, read.text);
+    const quoteText = stripPublisherChrome(source.url, read.quoteText);
+    const hash = sha256Hex(text);
+    const same = prev?.contentHash === hash;
+    Object.assign(result, {
+        kind: read.kind, via: read.via, companionReader: companion.reader, companionUrl: chunkUrl, resolvedUrl: chunkUrl,
+        liveReason, contentType: res.headers['content-type'] ?? null, bytes: res.buffer.length, textChars: text.length,
+        contentHash: hash, status: same ? 'ok' : 'changed', error: null,
+        reason: `${same ? 'same hash' : 'new hash'} — ${companionNote({ liveReason, reader: companion.reader, url: chunkUrl })}`
+    });
+    return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+}
+
+/** The capture a previous run read this source from (`{timestamp, original}`), or null. */
+function previousCapture(prev) {
+    if (prev?.via !== 'wayback' || !prev.contentHash || !prev.textPath) return null;
+    return citedCapture(prev.captureUrl);
+}
+
+/**
+ * The newest archive.today memento of `url` from its Memento timemap (lib/archive-today.mjs), or
+ * null. The timemap is a machine endpoint and answers scripted clients; the memento pages
+ * themselves sit behind a reCAPTCHA (measured 2026-09-23: HTTP 429 "One more step"), which this
+ * watcher does not solve, so only the memento's existence and link are used.
+ */
+async function archiveTodayMemento(url, pace) {
+    await pace();
+    try {
+        const res = await fetch(archiveTodayTimemapUrl(url), {
+            headers: { 'User-Agent': USER_AGENT, Accept: 'application/link-format,text/plain;q=0.9,*/*;q=0.1' },
+            signal: AbortSignal.timeout(CDX_TIMEOUT_MS)
+        });
+        if (!res.ok) {
+            await res.body?.cancel();
+            return null;
+        }
+        return parseTimemapNewest(await res.text());
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * The live host refused us (401/403, a bot wall, an expired certificate or a region block —
+ * lib/wayback.mjs `wantsWaybackFallback`): read the newest Wayback capture instead
+ * (lib/wayback.mjs). On success the result is `ok`/`changed` against the stored hash like any
+ * read, but `via: 'wayback'`, `captureTimestamp` and `captureUrl` say where the words came from,
+ * `httpStatus` stays the LIVE answer, and `reason` carries the live refusal plus the capture date;
+ * sonar.source gets `read_via = 'wayback'` and `capture_at` (lib/watch.mjs `readProvenance`), so
+ * neither the checkpoint nor the database can pass the capture off as the live page. `error` is
+ * null: a successful archived read is not a fetch error. Returns
+ * null (the result stays `blocked`, with the reason extended) when there is no usable capture or
+ * the per-run cap is spent. Never an `error`: the archive failing us is not our watch failing.
+ */
+async function readFromWayback(source, prev, result, { timeoutMs, wayback, quotes = [] }) {
+    const liveReason = result.reason;
+    if (wayback.used >= WAYBACK_FALLBACK_CAP) {
+        if (!wayback.capLogged) {
+            logWarn(`wayback fallback cap reached (${WAYBACK_FALLBACK_CAP} this run) — further refused sources stay blocked without an archive read`);
+            wayback.capLogged = true;
+        }
+        wayback.skipped += 1;
+        result.reason = `${liveReason}; wayback fallback cap reached`;
+        return null;
+    }
+    wayback.used += 1;
+    const pace = archiveSlot;
+    const giveUp = (why) => {
+        wayback.failed += 1;
+        result.reason = `${liveReason}; wayback: ${why}`;
+        result.error = result.reason;
+        log(`wayback: no archive read for ${source.url} — ${why}`);
+        return null;
+    };
+
+    // The CDX API is slow and intermittently overloaded (a 30 s timeout on thedefiant.io,
+    // 2026-09-23), so a timeout or 5xx gets one more paced attempt before the source stays blocked.
+    // While archive reads are paused (archive.org pushed back earlier this run), the index is not
+    // asked at all: that is the same "index unavailable" as a timeout, and handled the same way.
+    let capture;
+    let cdxFailure = archiveTraffic.pausedBy ? `archive reads paused this run (${archiveTraffic.pausedBy})` : null;
+    for (let attempt = 0; attempt < 2 && !archiveTraffic.pausedBy; attempt += 1) {
+        await pace();
+        try {
+            const cdx = await fetch(cdxQueryUrl(source.url), {
+                headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+                signal: AbortSignal.timeout(CDX_TIMEOUT_MS)
+            });
+            if (cdx.ok) {
+                capture = parseCdxNewest(await cdx.text());
+                cdxFailure = null;
+                break;
+            }
+            await cdx.body?.cancel();
+            cdxFailure = `cdx http-${cdx.status}`;
+            if (cdx.status < 500) break;
+        } catch (err) {
+            cdxFailure = `cdx ${err.name === 'TimeoutError' ? 'timeout' : (err.cause?.code || err.message)}`;
+        }
+    }
+    // The archive's index being down says nothing about the source. When the text we already
+    // stand on is a capture, keep standing on it — labelled as such — rather than turning a source
+    // with a perfectly good archived read into `blocked` for the day (lib/wayback.mjs).
+    const standing = cdxFailure ? previousCapture(prev) : null;
+    if (cdxFailure && !standing) return giveUp(cdxFailure);
+    if (standing) {
+        capture = standing;
+        log(`wayback: ${cdxFailure} for ${source.url} — standing on the capture read last run (${capture.timestamp})`);
+    }
+    if (!capture) {
+        const today = await archiveTodayMemento(source.url, pace);
+        if (today) {
+            // archive.today holds a memento, but serves its content only behind a CAPTCHA, so its
+            // words are not read: the memento is linked in the reason (sonar.source.error) and the
+            // state, never taken as the text. `archiveUrl` stays for a Wayback capture, so a later
+            // --archive pass still asks Save Page Now for one.
+            result.archiveTodayUrl = today.url;
+            result.archiveTodayAt = today.datetime;
+            return giveUp(`no 200 capture in the archive; archive.today holds a memento of ${today.datetime} (linked, not read: its pages sit behind a CAPTCHA) — ${today.url}`);
+        }
+        return giveUp('no 200 capture in the archive');
+    }
+
+    const captureUrl = captureViewUrl(capture.timestamp, capture.original);
+    const mark = (status, reasonTail) => {
+        result.via = 'wayback';
+        result.captureTimestamp = captureIso(capture.timestamp);
+        result.captureUrl = captureUrl;
+        result.resolvedUrl = captureRawUrl(capture.timestamp, capture.original);
+        result.liveReason = liveReason;
+        result.status = status;
+        result.waybackNote = waybackNote({ liveReason, captureTimestamp: capture.timestamp, captureUrl });
+        result.reason = `${reasonTail} — ${result.waybackNote}`;
+        result.error = null;
+        if (!result.archiveUrl) result.archiveUrl = captureUrl;
+        wayback.read += 1;
+    };
+
+    // The same capture we read last time: nothing new to fetch, and the stored text is still it —
+    // unless the extractor changed since, when the capture is read again so the baseline is re-read
+    // with it (only standing on it, with the index down, keeps the older generation for now).
+    if (prev?.via === 'wayback' && prev.captureTimestamp === captureIso(capture.timestamp)
+        && prev.contentHash && prev.textPath && (!result.normalizerUpgrade || standing)) {
+        if (result.normalizerUpgrade) {
+            result.normalizerVersion = prev.normalizerVersion ?? 1;
+            result.normalizerUpgrade = false;
+        }
+        result.contentHash = prev.contentHash;
+        result.kind = prev.kind ?? result.kind;
+        if (standing) wayback.standing += 1;
+        mark('ok', standing
+            ? `Wayback index unavailable (${cdxFailure}); newer captures not checked — standing on the capture read last run`
+            : 'same Wayback capture as last run');
+        return { result, text: null, quoteText: null, raw: Buffer.alloc(0), previousTextPath: prev.textPath };
+    }
+
+    await pace();
+    // node:https without decoding, never fetch(): see lib/wayback.mjs `decodeCaptureBody`.
+    const res = await fetchWithBigHeaders(captureRawUrl(capture.timestamp, capture.original),
+        { 'User-Agent': USER_AGENT, Accept: '*/*' }, timeoutMs);
+    if (res.httpStatus === null || res.httpStatus < 200 || res.httpStatus >= 300) {
+        return giveUp(`capture ${res.httpStatus === null ? res.networkErrorCode : `http-${res.httpStatus}`}`);
+    }
+    try {
+        res.buffer = decodeCaptureBody(res.buffer);
+    } catch (err) {
+        return giveUp(`capture undecodable: ${err.code || err.message}`);
+    }
+    // A capture of the refusal itself (the archive crawled the same wall) is not the document.
+    if (challengeInBody(res.buffer.subarray(0, 4000).toString('utf8'))) return giveUp('the capture is a bot wall too');
+    let read;
+    try {
+        read = await bytesToText(res.buffer, res.headers['content-type'], capture.original);
+    } catch (err) {
+        return giveUp(`capture unreadable: ${err.message}`);
+    }
+    const text = stripPublisherChrome(source.url, read.text);
+    const quoteText = stripPublisherChrome(source.url, read.quoteText);
+    // The archive's crawler can be served the same shell or region block we were (lib/unreadable.mjs).
+    const captureRead = await classifyFresh({
+        kind: read.kind, via: read.via, text, quoteText, raw: res.buffer, binary: read.binary === true, quotes, prev
+    });
+    if (!captureRead.readable) return giveUp(`the capture is unreadable too — ${captureRead.reason}`);
+    const hash = sha256Hex(text);
+    result.kind = read.kind;
+    result.bytes = res.buffer.length;
+    result.textChars = text.length;
+    result.contentType = res.headers['content-type'] ?? null;
+    result.contentHash = hash;
+    if (read.binary) result.binary = true;
+    mark(prev?.contentHash === hash ? 'ok' : 'changed', prev?.contentHash === hash ? 'same hash' : 'new hash');
+    result.captureReader = read.via;
+    return { result, text, quoteText, raw: res.buffer, previousTextPath: prev?.textPath ?? null };
+}
+
+/**
+ * lib/unreadable.mjs's verdict on the stored version a new read would be diffed against. Only an
+ * old version can be unreadable — the watcher stopped recording unreadable reads as versions — but
+ * before it did, a region block (assets.backed.fi), a Drive viewer shell or an RPC info page was
+ * stored as a source's only version, and a first real read diffed against it is "the whole document
+ * appeared", not a change in the document.
+ */
+async function storedVersionVerdict(prev, previousText, quotes) {
+    const rawPath = prev?.rawPath ?? null;
+    const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
+    let buffer = Buffer.alloc(0);
+    if (rawPath && ext !== 'pdf') {
+        try {
+            buffer = await readFile(join(REPO, rawPath));
+        } catch {
+            // No raw copy: the stored text is judged alone.
+        }
+    }
+    const binary = prev?.via === 'binary' || /^binary \S+ \d+ bytes sha256:[0-9a-f]{64}$/.test(previousText.trim());
+    const kind = ext === 'pdf' ? 'pdf' : ext === 'json' && prev?.via !== 'notion' ? 'api' : 'html';
+    return classifyFresh({ kind, via: prev?.via ?? null, text: previousText, quoteText: previousText, raw: buffer, binary, quotes, textPath: null });
+}
+
+/** The diff and severity of a changed source, plus the files it just wrote. */
+async function recordChange(result, { text, raw, previousTextPath, prev = null, quotes = [] }) {
+    // `rawKind` differs from `kind` only where the raw copy is not what the URL served: a Notion
+    // page is an html source whose raw file is the recordMap JSON it was rendered from.
+    const { rawPath, textPath } = await writeVersionFiles(result.id, result.fetchedAt,
+        result.rawKind ?? result.kind, raw, text);
+    result.rawPath = rawPath;
+    result.textPath = textPath;
+
+    let previousText = null;
+    if (previousTextPath) {
+        try {
+            previousText = await readFile(join(REPO, previousTextPath), 'utf8');
+        } catch (err) {
+            logWarn(`${result.url}: previous text ${previousTextPath} unreadable (${err.code}) — diff skipped`);
+        }
+    }
+    if (previousText === null) {
+        result.diff = {
+            added: null, removed: null, method: 'none', severity: null, keywords: [],
+            summary: previousTextPath ? 'previous text missing on disk — no diff' : 'first version (nothing to diff against)',
+            unified: null
+        };
+        return;
+    }
+    // The last READABLE version is the baseline; a stored copy that never was one is not.
+    const baseline = previousTextPath === prev?.textPath ? await storedVersionVerdict(prev, previousText, quotes) : { readable: true };
+    if (!baseline.readable) {
+        result.baselineUnreadable = baseline.code;
+        result.diff = {
+            added: null, removed: null, method: 'none', severity: null, keywords: [],
+            summary: `first readable version — the stored version before it was unreadable, so there is nothing to diff against (${baseline.reason})`,
+            unified: null
+        };
+        await pruneVersions(result.id);
+        return;
+    }
+    const diff = diffLines(previousText, text);
+    const severity = severityForChange({
+        kind: result.kind, changedLines: diff.changedLines, removedLines: diff.removedLines, addedLines: diff.addedLines
+    });
+    result.diff = {
+        added: diff.added,
+        removed: diff.removed,
+        method: severity.method,
+        diffMethod: diff.method,
+        severity: severity.severity,
+        keywords: severity.keywords,
+        capped: severity.capped === true,
+        summary: `${summariseDiff(diff)}${severity.keywords.length ? ` · keywords: ${severity.keywords.join(', ')}` : ''}`,
+        unified: diff.unified
+    };
+    await pruneVersions(result.id);
+}
+
+/**
+ * Every quote the dossiers rely on, keyed by the normalised URL it is checked against (lib/watch.mjs
+ * `dossierQuotes`): `claims[]` (id as sonar.claim) and `whatIf[]` (id as sonar.what_if). Read from the dossiers rather than the
+ * database so a run with --no-db still checks, and so a quote written this morning is checked
+ * this morning.
+ */
+async function loadQuoteRegistry() {
+    const byUrl = new Map();
+    const add = (url, item) => {
+        const key = normaliseUrl(url);
+        if (!key) return;
+        if (!byUrl.has(key)) byUrl.set(key, []);
+        byUrl.get(key).push(item);
+    };
+    let files = [];
+    try {
+        files = (await readdir(ISSUERS_DIR)).filter((f) => f.endsWith('.json')).sort();
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+    let total = 0;
+    for (const file of files) {
+        const slug = file.replace(/\.json$/, '');
+        const dossier = await readJson(join(ISSUERS_DIR, file), null);
+        if (!dossier) continue;
+        // claims[] and whatIf[] alike, each checked where `quoteVerificationSources` says.
+        for (const { url, ...item } of dossierQuotes(slug, dossier)) {
+            add(url, item);
+            total += 1;
+        }
+    }
+    return { byUrl, total };
+}
+
+/**
+ * A read that produced no fresh text (a live 304, or the same Wayback capture as last run) stands on
+ * the stored version. Re-read its raw copy (lib/watch.mjs `storedReading`) — trusted only when the
+ * re-read reproduces the stored hash, so a binary marker or an older extraction generation falls
+ * back to the stored text file — to get:
+ *  - the UNFILTERED text for the quote check (the stored .txt is churn-filtered, which drops a
+ *    price alone on its line), recomputed rather than stored twice on disk;
+ *  - whether the stored copy is itself unreadable (lib/unreadable.mjs). app.ventuals.com/sunset
+ *    answered 304 to an etag whose stored text was the 8 characters "Ventuals", so it was `ok` and
+ *    its quote was checked against the stub and reported lost; assets.backed.fi's only stored copies
+ *    are its region block. Such a source is `unreadable`, as its live read is.
+ * PDFs cost a pdftotext each, so they are only re-read when a quote needs them.
+ * Returns the text for the quote check, or null when there is none.
+ */
+async function reviewStoredCopy(result, prev, { needQuotes, quotes = [] }) {
+    const textPath = result.textPath ?? prev?.textPath ?? null;
+    const readStoredText = async () => {
+        if (!textPath) return null;
+        try {
+            return await readFile(join(REPO, textPath), 'utf8');
+        } catch {
+            return null;
+        }
+    };
+    const rawPath = prev?.rawPath ?? null;
+    const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
+    if (!rawPath || (ext === 'pdf' && !needQuotes)) return needQuotes ? readStoredText() : null;
+    let reading = null;
+    let payload = null;
+    try {
+        const buffer = await readFile(join(REPO, rawPath));
+        payload = ext === 'pdf' ? await pdfToText(buffer) : buffer.toString('utf8');
+        reading = storedReading({ rawExt: ext, via: prev?.via ?? null, payload });
+    } catch (err) {
+        logWarn(`${result.url}: stored raw copy ${rawPath} unreadable (${err.code || err.message}) — quote check uses the stored text`);
+    }
+    if (reading !== null && sha256Hex(stripPublisherChrome(result.url, reading.text)) === result.contentHash) {
+        const text = stripPublisherChrome(result.url, reading.text);
+        const quoteText = stripPublisherChrome(result.url, reading.quoteText);
+        const stored = await classifyFresh({
+            kind: reading.kind, via: prev?.via ?? null, text, quoteText, raw: ext === 'pdf' ? '' : payload, quotes, textPath: null
+        });
+        if (!stored.readable) {
+            result.status = 'unreadable';
+            result.unreadableCode = stored.code;
+            result.reason = `${stored.reason} (the host answered ${result.httpStatus === 304 ? '304' : 'with the same copy'}`
+                + ' over a stored copy that is itself unreadable)';
+            result.error = result.reason;
+            return null;
+        }
+        return needQuotes ? quoteText : null;
+    }
+    return needQuotes ? readStoredText() : null;
+}
+
+async function loadToPostgres(rows, { url }) {
+    const source = buildSourceSql(rows.sources);
+    log(`db: ${source.rows} source rows`);
+    await psql(url, wrapTransaction(source.sql), source.table);
+    if (rows.versions.length) {
+        const version = buildVersionSql(rows.versions);
+        log(`db: ${version.rows} new source_version rows`);
+        await psql(url, wrapTransaction(version.sql), version.table);
+    }
+    if (rows.events.length) {
+        const events = buildChangeEventSql(rows.events);
+        log(`db: ${events.rows} change_event row(s) offered`);
+        await psql(url, wrapTransaction(events.sql), events.table);
+    }
+    const counts = await psql(url,
+        "SELECT 'source' AS t, count(*) FROM sonar.source"
+        + " UNION ALL SELECT 'source_version', count(*) FROM sonar.source_version"
+        + " UNION ALL SELECT 'change_event', count(*) FROM sonar.change_event ORDER BY 1;\n",
+        'counts', ['-t', '-A', '-F', '|']);
+    for (const line of counts.trim().split('\n').filter(Boolean)) {
+        const [table, n] = line.split('|');
+        log(`  sonar.${table}: ${n} rows`);
+    }
+    const dist = await psql(url,
+        'SELECT status, kind, count(*) FROM sonar.source GROUP BY 1, 2 ORDER BY 3 DESC;\n',
+        'status distribution', ['-t', '-A', '-F', '|']);
+    for (const line of dist.trim().split('\n').filter(Boolean)) {
+        const [status, kind, n] = line.split('|');
+        log(`  status=${status} kind=${kind}: ${n}`);
+    }
+}
+
+/**
+ * `--archive-missing-only`: close the archive gap without a watch run. Each capture is written to
+ * the state file (re-read just before, so a concurrent run's changes survive) and to Postgres as
+ * it lands, so a kill loses at most the capture in flight; a rerun skips what is archived.
+ */
+async function archiveMissing(sources, { noDb }) {
+    const startedMs = Date.now();
+    const { targets, skipped } = archiveMissingTargets(sources, await readJson(STATE_FILE, {}));
+    log(`archive-missing: ${targets.length} of ${sources.length} source(s) without an archive`
+        + ` (skipped: ${skipped.archived} archived, ${skipped.gone} gone, ${skipped.error} error,`
+        + ` ${skipped.unchecked} never read, ${skipped.archiveHost} on the archive itself)`);
+    let dbUrl = null;
+    if (!noDb) {
+        const env = await readEnvFile(join(REPO, '.env'));
+        dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
+        if (!dbUrl) logWarn('archive-missing: DATABASE_URL is not set — state file only');
+        else log(`db: ${describeUrl(dbUrl)}`);
+    }
+    const failed = [];
+    let archived = 0;
+    let lastArchiveMs = 0;
+    for (const [index, target] of targets.entries()) {
+        const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
+        if (gap > 0) await sleep(gap);
+        lastArchiveMs = Date.now();
+        const saved = await archiveUrl(target.url);
+        const at = `[${progress(index + 1, targets.length, startedMs)}]`;
+        if (!saved.archiveUrl) {
+            failed.push({ url: target.url, status: target.status, error: saved.error });
+            logWarn(`${at} archive failed for ${target.url} (${target.status}): ${saved.error}`);
+            continue;
+        }
+        const state = await readJson(STATE_FILE, {});
+        if (state[target.url] && !state[target.url].archiveUrl) {
+            state[target.url].archiveUrl = saved.archiveUrl;
+            await writeJson(STATE_FILE, state);
+        }
+        if (dbUrl) {
+            const update = buildArchiveUrlSql([{ id: sourceId(target.url), archiveUrl: saved.archiveUrl }]);
+            await psql(dbUrl, wrapTransaction(update.sql), update.table);
+        }
+        archived += 1;
+        log(`${at} archived ${target.url} -> ${saved.archiveUrl}`);
+    }
+    await writeJson(runStatsFile, {
+        mode: 'archive-missing-only',
+        lastRunStartedAt: RUN_STARTED_AT,
+        lastRunEndedAt: ts(),
+        targets: targets.length,
+        skipped,
+        archived,
+        failed
+    });
+    log(`archive-missing: archived ${archived}/${targets.length}, ${failed.length} failed`
+        + ` — details in ${relative(REPO, runStatsFile)}`);
+}
+
+async function main() {
+    const { flags } = parseArgs(process.argv.slice(2));
+    if (flags.help || !flags.run) {
+        usage();
+        return;
+    }
+    // A targeted repair/smoke run is not evidence that the full registry is healthy. Keep its
+    // outcome for diagnostics without overwriting the canonical full-run heartbeat consumed by
+    // collector health and operations alerts.
+    const onlyBlocked = Boolean(flags['only-blocked']);
+    if (flags.only || flags.limit || onlyBlocked) {
+        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: flags.only, limit: flags.limit, onlyBlocked }));
+    }
+    const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
+    if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
+
+    const archiveMissingOnly = Boolean(flags['archive-missing-only']);
+    if (archiveMissingOnly) runStatsFile = join(REPO, '.last-source-archive-missing-stats.json');
+    if (flags.archive || archiveMissingOnly) {
+        const env = await readEnvFile(join(REPO, '.env'));
+        const access = process.env.ARCHIVE_ORG_ACCESS_KEY || env.ARCHIVE_ORG_ACCESS_KEY;
+        const secret = process.env.ARCHIVE_ORG_SECRET_KEY || env.ARCHIVE_ORG_SECRET_KEY;
+        if (access && secret) {
+            archiveAuth = { access, secret };
+            log('archive: Save Page Now with the archive.org account key (authenticated)');
+        } else {
+            logWarn('archive: no ARCHIVE_ORG_ACCESS_KEY/SECRET_KEY in .env — anonymous saves, which the archive currently refuses');
+        }
+    }
+
+    {
+        const env = await readEnvFile(join(REPO, '.env'));
+        const configured = process.env.SOLANA_RPC_URL || env.SOLANA_RPC_URL;
+        if (configured) solanaRpc = configured;
+        log(`solana rpc for transaction companions: ${configured ? 'SOLANA_RPC_URL from .env' : 'public endpoint'}`);
+    }
+
+    const registry = await readJson(SOURCES_FILE, null);
+    if (!registry?.items?.length) {
+        throw new Error(`${SOURCES_FILE} is missing or empty — run \`node stocks/extract-sources.mjs --run\` first`);
+    }
+    let sources = registry.items;
+    const onchainLocatorCount = sources.filter((source) => !isDocumentWatchable(source.url)).length;
+    sources = sources.filter((source) => isDocumentWatchable(source.url));
+    if (typeof flags.only === 'string') {
+        sources = sources.filter((s) => s.issuer === flags.only);
+        if (sources.length === 0) throw new Error(`no sources for issuer ${flags.only}`);
+    }
+    // A retired source (stocks/data/retired-sources.json, via extract-sources.mjs) is gone for good:
+    // it is not fetched, and its row and state say `retired` with the reason and date.
+    const retiredSources = sources.filter((s) => s.retired);
+    sources = sources.filter((s) => !s.retired);
+    if (onlyBlocked) {
+        const before = sources.length;
+        sources = previouslyBlocked(sources, await readJson(STATE_FILE, {}));
+        log(`only-blocked: ${sources.length} of ${before} source(s) were blocked or read from an archive on their last check`);
+        if (sources.length === 0) return;
+    }
+    if (flags.limit) {
+        const limit = Number(flags.limit);
+        if (!Number.isFinite(limit) || limit < 1) throw new Error(`--limit must be a positive number, got ${flags.limit}`);
+        sources = sources.slice(0, limit);
+    }
+    if (archiveMissingOnly) {
+        await archiveMissing(sources, { noDb: Boolean(flags['no-db']) });
+        return;
+    }
+    // A Google Drive file link is registered as `html` (that is what the viewer page is) but
+    // downloads a PDF, so those sources need poppler too — and a missing binary must be a loud
+    // failure now rather than a per-source `error` 200 fetches in.
+    if (sources.some((s) => s.kind === 'pdf' || driveDownloadUrl(s.url) || dropboxDownloadUrl(s.url))) await assertPdftotext();
+
+    const previous = await readJson(STATE_FILE, {});
+    const quoteRegistry = await loadQuoteRegistry();
+    const checkpointFile = join(RAW_DIR, `sources-${isoDate()}.json`);
+    // The day's checkpoint is always loaded, so a --force or --only-blocked run adds to it instead
+    // of replacing the other sources' entries; those two modes just never reuse an entry — a
+    // repair run over blocked sources that reused today's `blocked` outcomes would fetch nothing.
+    const checkpoint = await readJson(checkpointFile, {});
+    const reuseCheckpoint = !flags.force && !onlyBlocked;
+    const resumed = reuseCheckpoint ? Object.entries(checkpoint)
+        .filter(([url, result]) => reusableCheckpoint(result) && sources.some((s) => s.url === url)).length : 0;
+
+    log(`watch-sources: ${sources.length} source(s), registry ${registry.generatedAt}`
+        + `${flags.only ? `, only ${flags.only}` : ''}${flags.archive ? ', archiving new versions' : ''}`);
+    if (onchainLocatorCount) log(`watch-sources: ${onchainLocatorCount} on-chain locator(s) left to the chain watcher`);
+    if (resumed) log(`watch-sources: resuming — ${resumed} source(s) already in ${relative(REPO, checkpointFile)}`);
+    if (Object.keys(previous).length === 0) log('watch-sources: no stored state — every source is a first sight');
+
+    const ordered = orderByHost(sources);
+    const lastHitByHost = new Map();
+    const startedMs = Date.now();
+    const results = [];
+    let reusedFromCheckpoint = 0;
+    let done = 0;
+    let archived = 0;
+    let archiveFailures = 0;
+    let archiveFailureStreak = 0;
+    let archiveGaveUp = null;
+    let lastArchiveMs = 0;
+    // Wayback fallback for hosts that refuse us (lib/wayback.mjs): paced and capped per run.
+    const wayback = { used: 0, read: 0, failed: 0, skipped: 0, standing: 0, capLogged: false };
+
+    for (const source of ordered) {
+        done += 1;
+        const cached = checkpoint[source.url];
+        // Successful reads and explicit findings are safe restart checkpoints. A transient error
+        // is not: reusing it made a same-day manual retry reproduce the old failure without making
+        // an HTTP request. Retry errors until they become a real outcome or the run ends partial.
+        if (reuseCheckpoint && reusableCheckpoint(cached)) {
+            results.push(cached);
+            reusedFromCheckpoint += 1;
+            continue;
+        }
+        const host = hostOf(source.url) ?? '';
+        const wait = pace - (Date.now() - (lastHitByHost.get(host) ?? 0));
+        if (wait > 0) await sleep(wait);
+        lastHitByHost.set(host, Date.now());
+
+        const prev = previous[source.url] ?? null;
+        const registered = quoteRegistry.byUrl.get(normaliseUrl(source.url)) ?? [];
+        // The registered quotes go in with the fetch: a read that contains every one of them is the
+        // cited document whatever it looks like (lib/unreadable.mjs).
+        const { result, text, quoteText, raw, previousTextPath } = await watchOne(source, prev,
+            { timeoutMs: TIMEOUT_MS, wayback, quotes: registered });
+        results.push(result);
+        // archive.org pushing back on our traffic: not a look at the source, retried next run —
+        // unless it has refused this source on THROTTLE_PERSISTS_AFTER runs in a row (lib/watch.mjs).
+        settleThrottle(result, prev);
+        // No fresh text: the read stands on the stored version, which may itself be unreadable.
+        const storedQuoteText = text === null && result.status === 'ok'
+            ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0, quotes: registered })
+            : null;
+        // A refusal on a source no quote relies on is reachability evidence, not a blocked
+        // finding (lib/watch.mjs `quotelessRefusal`). After the stored-copy review, which can
+        // itself turn a 304 over a JavaScript shell into `blocked`.
+        const settled = quotelessRefusal({
+            status: result.status, httpStatus: result.httpStatus, reason: result.reason, quotesRegistered: registered.length
+        });
+        if (settled) {
+            result.status = settled.status;
+            result.reason = settled.reason;
+            result.error = null;
+        }
+
+        if (result.status === 'changed') {
+            // The raw bytes only exist in memory, so the version files are written here, before
+            // the checkpoint records the paths.
+            await recordChange(result, { text, raw, previousTextPath, prev, quotes: registered });
+            // Changed only because the extractor did: a silent re-baseline (lib/watch-rows.mjs).
+            settleExtractorUpgrade(result);
+        }
+        if (registered.length) {
+            // Unfiltered text (quoteText) when this run read the document, the stored copy re-read
+            // otherwise; a blocked source's quotes are not checkable (lib/watch.mjs quoteVerdicts).
+            const checked = quoteVerdicts({
+                status: result.status,
+                text: typeof quoteText === 'string' ? quoteText : storedQuoteText,
+                quotes: registered,
+                // The page-number rule of the quote key applies to PDF text only; a stored copy
+                // was read as whatever kind it was when it was stored.
+                kind: typeof quoteText === 'string' ? result.kind : (prev?.kind ?? result.kind),
+                // A capture only speaks for its own date (lib/watch.mjs quoteVerdicts).
+                capturedAt: result.via === 'wayback' ? (result.captureTimestamp ?? null) : null
+            });
+            if (checked !== null) {
+                result.quotes = {
+                    checked: checked.checked,
+                    found: checked.found.length,
+                    foundIds: checked.found.map((q) => q.id),
+                    skipped: checked.skipped,
+                    notCheckable: checked.notCheckable,
+                    lost: checked.lost.map((q) => ({ id: q.id, kind: q.kind, ref: q.ref, slug: q.slug, quote: q.quote }))
+                };
+                for (const q of checked.lost) {
+                    logWarn(`quote ${result.rebaselined ? 'missing from the re-baseline of' : 'lost in'} ${source.url}: ${q.slug} ${q.kind} ${q.ref}`
+                        + (result.rebaselined ? ' — no event now; the next run\'s read decides' : ''));
+                }
+                if (checked.notCheckable) log(`${checked.notCheckable} quote(s) not checkable in ${source.url}: the source is ${result.status} (${result.reason})`);
+            }
+        }
+        // EVIDENCE.md §2.2: archive on first sight and on every new version. "First sight" is
+        // "no archive_url stored", not "first run", so a source that has never been archived is
+        // picked up by a later --archive pass instead of being missed for good. A source that is
+        // gone or errored has nothing to archive.
+        // A source read from a capture older than WAYBACK_STALE_DAYS asks for a fresh capture, so
+        // the next run reads this week's page rather than re-confirming a months-old one.
+        const staleCapture = result.via === 'wayback' && captureIsStale(result.captureTimestamp, Date.now());
+        const wantsArchive = flags.archive && !archiveGaveUp && result.status !== 'gone'
+            && result.status !== 'error' && result.status !== 'throttled' && archivableUrl(result.url)
+            && (result.status === 'changed' || !result.archiveUrl || staleCapture);
+        if (wantsArchive) {
+            const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
+            if (gap > 0) await sleep(gap);
+            lastArchiveMs = Date.now();
+            const saved = await archiveUrl(result.url);
+            if (saved.archiveUrl) {
+                result.archiveUrl = saved.archiveUrl;
+                archived += 1;
+                archiveFailureStreak = 0;
+                log(`archived ${result.url} -> ${saved.archiveUrl}`);
+            } else {
+                archiveFailures += 1;
+                archiveFailureStreak += 1;
+                logWarn(`archive failed for ${result.url}: ${saved.error}`);
+                // The archive being offline, or refusing anonymous saves, is one fact about the
+                // archive — not 300 facts about our sources. Each attempt costs 5 s of pacing, so
+                // say it once and stop trying for the rest of the run.
+                if (archiveFailureStreak >= ARCHIVE_GIVE_UP_AFTER) {
+                    archiveGaveUp = saved.error;
+                    logWarn(`archive-unavailable: ${ARCHIVE_GIVE_UP_AFTER} consecutive failures`
+                        + ` (${saved.error}) — no further saves attempted this run`);
+                }
+            }
+        }
+
+        const mark = result.status === 'changed' ? 'CHANGED' : result.status.toUpperCase();
+        const detail = result.status === 'changed' ? ` ${result.diff?.summary ?? ''}` : ` ${result.reason}`;
+        log(`[${progress(done, ordered.length, startedMs)}] ${mark} ${result.url}${detail}`);
+
+        checkpoint[source.url] = result;
+        // Re-read before writing: a concurrent `--only=<issuer>` run shares today's checkpoint, and
+        // writing our start-of-run copy back would drop every entry it wrote meanwhile.
+        await writeJson(checkpointFile, { ...(await readJson(checkpointFile, {})), [source.url]: result });
+    }
+
+    // Retired sources were not fetched; they are written as `retired` (lib/watch-rows.mjs).
+    const retiredResults = retiredSources.map((source) => ({
+        id: sourceId(source.url),
+        url: source.url,
+        issuer: source.issuer ?? null,
+        title: source.title ?? null,
+        foundIn: source.foundIn ?? [],
+        kind: source.kind,
+        status: 'retired',
+        retiredAt: source.retired.at,
+        retiredReason: source.retired.reason
+    }));
+    if (retiredResults.length) {
+        log(`watch-sources: ${retiredResults.length} retired source(s) not fetched (stocks/data/retired-sources.json):`);
+        for (const r of retiredResults) log(`    ${r.url} — retired ${r.retiredAt}: ${r.retiredReason}`);
+    }
+    // State for the next run: what we now know per URL (lib/watch-rows.mjs).
+    const state = nextState([...results, ...retiredResults], previous);
+    // Merged into the state file as it is NOW, not as it was when this run started, so a concurrent
+    // run's entries for other sources survive (same reason as the checkpoint write above).
+    await writeJson(STATE_FILE, { ...(await readJson(STATE_FILE, {})), ...state });
+
+    const rows = buildRows([...results, ...retiredResults], previous);
+    const byStatus = {};
+    for (const result of results) byStatus[result.status] = (byStatus[result.status] ?? 0) + 1;
+    log(`watch-sources: ${Object.entries(byStatus).map(([k, v]) => `${k}=${v}`).join(' ')}`
+        + ` · ${rows.versions.length} new version(s) · ${rows.events.length} change event(s)`);
+    // The first read under a newer extractor (lib/watch.mjs `publisherNormalizerVersion`) of a
+    // source that already had a stored text: a changed text there is a re-baseline, recorded as a
+    // version with no change event (lib/watch-rows.mjs). A first sight has nothing to re-baseline.
+    const hadBaseline = (r) => typeof previous[r.url]?.textPath === 'string';
+    const upgradedReads = results.filter((r) => r.normalizerUpgrade && hadBaseline(r) && (r.status === 'ok' || r.status === 'changed'));
+    const rebaselined = upgradedReads.filter((r) => r.rebaselined);
+    if (upgradedReads.length) {
+        log(`watch-sources: extractor upgrade — ${upgradedReads.length} source(s) read under a newer extractor for the first time,`
+            + ` ${rebaselined.length} re-baselined silently (text changed, version recorded, no change event),`
+            + ` ${upgradedReads.length - rebaselined.length} unchanged`);
+    }
+    const throttled = results.filter((r) => r.status === 'throttled');
+    if (throttled.length) {
+        logWarn(`${throttled.length} source(s) throttled — archive.org pushed back on our traffic; not looked at, retried next run`
+            + ` (an error after ${THROTTLE_PERSISTS_AFTER} runs in a row):`);
+        for (const r of throttled) logWarn(`    ${r.url} (run ${r.throttledRuns} of ${THROTTLE_PERSISTS_AFTER}): ${r.reason}`);
+    }
+    const quoteTotals = results.reduce((acc, r) => {
+        if (!r.quotes) return acc;
+        acc.checked += r.quotes.checked;
+        acc.found += r.quotes.found;
+        acc.lost += r.rebaselined ? 0 : r.quotes.lost.length;
+        acc.notCheckable += r.quotes.notCheckable ?? 0;
+        acc.sources += 1;
+        return acc;
+    }, { checked: 0, found: 0, lost: 0, notCheckable: 0, sources: 0 });
+    if (wayback.used || wayback.skipped) {
+        log(`watch-sources: wayback fallback — ${wayback.used} tried, ${wayback.read} read from a capture,`
+            + ` ${wayback.failed} without a usable capture${wayback.skipped ? `, ${wayback.skipped} skipped at the cap of ${WAYBACK_FALLBACK_CAP}` : ''}`
+            + `${wayback.standing ? `; ${wayback.standing} stood on last run's capture while the index was down` : ''}`);
+        const archiveToday = results.filter((r) => r.archiveTodayUrl).length;
+        if (archiveToday) log(`watch-sources: ${archiveToday} source(s) with no Wayback capture have an archive.today memento (linked, not read)`);
+    }
+    const companionReads = results.filter((r) => r.companionUrl && (r.status === 'ok' || r.status === 'changed')).length;
+    if (companionReads) log(`watch-sources: ${companionReads} source(s) read from the publisher's companion API (lib/companions.mjs)`);
+    const viaCounts = {};
+    for (const result of results) if (result.via) viaCounts[result.via] = (viaCounts[result.via] ?? 0) + 1;
+    log(`watch-sources: read via ${Object.entries(viaCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join(' ')}`);
+    log(`watch-sources: quotes — ${quoteRegistry.total} registered, ${quoteTotals.checked} checked in ${quoteTotals.sources} source(s):`
+        + ` ${quoteTotals.found} found, ${quoteTotals.lost} lost, ${quoteTotals.notCheckable} not checkable (source blocked or unreadable)`);
+    if (quoteTotals.lost) {
+        logWarn(`${quoteTotals.lost} quote(s) no longer verbatim in their source — claims marked changed, one event each:`);
+        for (const r of results) for (const q of r.rebaselined ? [] : (r.quotes?.lost ?? [])) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
+    }
+    if (flags.archive) {
+        log(`watch-sources: archived ${archived}, archive failures ${archiveFailures}`
+            + (archiveGaveUp ? ` — gave up after ${ARCHIVE_GIVE_UP_AFTER} in a row: ${archiveGaveUp}` : ''));
+    }
+
+    const gone = results.filter((r) => r.status === 'gone');
+    if (gone.length) {
+        logWarn(`${gone.length} cited URL(s) are gone — a finding about our dossiers, not a run failure:`);
+        for (const r of gone) logWarn(`    ${r.reason} ${r.url} (${r.issuer ?? 'shared'}; cited in ${r.foundIn.length} place(s))`);
+    }
+    // Why a look did not read the document (lib/unreadable.mjs), counted whether the source ended
+    // `unreadable` or, with no quote relying on it, `reachable-unverified`.
+    const unreadableByCode = {};
+    for (const r of results) {
+        if (r.unreadableCode && r.status !== 'ok' && r.status !== 'changed') unreadableByCode[r.unreadableCode] = (unreadableByCode[r.unreadableCode] ?? 0) + 1;
+    }
+    const unreadableResults = results.filter((r) => r.status === 'unreadable');
+    if (unreadableResults.length) {
+        logWarn(`${unreadableResults.length} source(s) unreadable — the host answered, but not with the document; no version, no change event, the last readable version stays the baseline:`);
+        for (const r of unreadableResults) logWarn(`    ${r.url} (${r.issuer ?? 'shared'}): ${r.reason}`);
+    }
+    const unverified = results.filter((r) => r.status === 'reachable-unverified');
+    if (unverified.length) {
+        log(`watch-sources: ${unverified.length} source(s) reachable-unverified — the host refused or rendered nothing, but no quote relies on them:`);
+        for (const r of unverified) log(`    ${r.url} (${r.issuer ?? 'shared'}; ${r.foundIn.slice(0, 2).join(', ')})`);
+    }
+    const blocked = results.filter((r) => r.status === 'blocked');
+    if (blocked.length) {
+        const hosts = {};
+        for (const r of blocked) {
+            const host = hostOf(r.url) ?? '?';
+            hosts[host] = hosts[host] ?? [];
+            hosts[host].push(r.reason);
+        }
+        logWarn(`${blocked.length} source(s) blocked, on ${Object.keys(hosts).length} host(s):`);
+        for (const [host, reasons] of Object.entries(hosts).sort((a, b) => b[1].length - a[1].length)) {
+            logWarn(`    ${host}: ${reasons.length} (${[...new Set(reasons)].join(', ')})`);
+        }
+    }
+    const failures = results.filter((r) => r.status === 'error');
+    if (failures.length) {
+        logError(`${failures.length} source(s) FAILED for a reason that is neither gone nor blocked:`);
+        for (const r of failures) logError(`    ${r.reason} ${r.url}`);
+    }
+
+    if (!flags['no-db']) {
+        const env = await readEnvFile(join(REPO, '.env'));
+        const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL;
+        if (!dbUrl) {
+            logWarn(`DATABASE_URL is not set in ${join(REPO, '.env')} — skipping the Postgres load`);
+        } else {
+            log(`db: ${describeUrl(dbUrl)}`);
+            await loadToPostgres(rows, { url: dbUrl });
+            const claimChecks = [];
+            for (const r of results) {
+                if (!r.quotes) continue;
+                // Only a quote that got a verdict is written back: a not-checkable one (blocked
+                // source) or one too short to check was not looked for, so it is neither found nor lost.
+                // A re-baseline's missing quote is not written back as lost: the next run decides.
+                const lostIds = new Set(r.rebaselined ? [] : r.quotes.lost.map((q) => q.id));
+                const foundIds = new Set(r.quotes.foundIds ?? []);
+                for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
+                    if (q.kind !== 'claim' || (!lostIds.has(q.id) && !foundIds.has(q.id))) continue;
+                    claimChecks.push({ id: q.id, found: foundIds.has(q.id), checkedAt: r.fetchedAt });
+                }
+            }
+            if (claimChecks.length) {
+                const check = buildClaimCheckSql(claimChecks);
+                await psql(dbUrl, wrapTransaction(check.sql), check.table);
+                log(`db: ${check.rows} claim(s) marked checked`);
+            }
+        }
+    }
+
+    const endedAt = ts();
+    // Editorially reviewed events remain in the audit trail, but must not page the operator again.
+    // This is especially important for recurring publisher chrome and for our own evidence-text
+    // corrections: those are useful provenance, not new real-world changes.
+    const resolutionDb = await readJson(EVENT_RESOLUTIONS_FILE, { items: [] });
+    const eventReview = partitionEventResolutions(rows.events, resolutionDb.items);
+    const materialEvents = eventReview.open
+        .filter((event) => event.severity === 'warning' || event.severity === 'caution');
+    const noticeLines = materialEvents.length === 0 ? [] : [
+        `RWA evidence watch: ${materialEvents.length} material source change(s) across ${sources.length} active URLs`,
+        ...materialEvents.slice(0, 3).map((event) => `  • ${event.summary} · https://rwasonar.com/watch.html`),
+        'Evidence: https://rwasonar.com/watch.html'
+    ];
+    const sourceStats = {
+        watchStatus: failures.length ? 'partial' : 'ok',
+        lastRunStartedAt: RUN_STARTED_AT,
+        lastRunEndedAt: endedAt,
+        durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),
+        activeSources: sources.length,
+        sourcesEvaluated: results.length,
+        httpFetches: results.length - reusedFromCheckpoint,
+        resumedFromCheckpoint: reusedFromCheckpoint,
+        statusCounts: byStatus,
+        unreadableReasons: unreadableByCode,
+        versionsRecorded: rows.versions.length,
+        changeEvents: rows.events.length,
+        materialEvents: materialEvents.length,
+        reviewedEventsSuppressed: eventReview.resolved.length,
+        quotesRegistered: quoteRegistry.total,
+        quotesChecked: quoteTotals.checked,
+        quotesFound: quoteTotals.found,
+        quotesLost: quoteTotals.lost,
+        quotesNotCheckable: quoteTotals.notCheckable,
+        archived,
+        archiveFailures,
+        extractorUpgrade: { firstReads: upgradedReads.length, rebaselined: rebaselined.length },
+        throttled: throttled.length,
+        throttledSources: throttled.slice(0, 20).map((result) => ({ url: result.url, runs: result.throttledRuns, reason: result.reason })),
+        archiveReadsPausedBy: archiveTraffic.pausedBy,
+        retired: retiredResults.length,
+        waybackFallback: { tried: wayback.used, read: wayback.read, failed: wayback.failed, skippedAtCap: wayback.skipped, stoodOnPrevious: wayback.standing },
+        readVia: viaCounts,
+        failures: failures.length,
+        failureReasons: failures.slice(0, 20).map((result) => ({ url: result.url, reason: result.reason })),
+        noticeLines
+    };
+    await writeJson(runStatsFile, sourceStats);
+    if (runStatsFile === STATS_FILE) {
+        const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];
+        const docroot = process.env.RWA_DOCROOT;
+        if (typeof docroot === 'string' && docroot !== '') collectorOutputs.push(join(docroot, 'stocks-collector-status.json'));
+        await refreshCollectorStatus({ outputs: collectorOutputs });
+    }
+    log(`watch-sources: wrote ${relative(REPO, runStatsFile)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
+
+    if (runFailed(results)) {
+        logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`);
+        process.exitCode = 1;
+        return;
+    }
+    log('watch-sources: done');
+}
+
+main().catch(async (err) => {
+    logError(err.stack || err.message);
+    try {
+        await writeJson(runStatsFile, {
+            watchStatus: 'failed',
+            lastRunStartedAt: RUN_STARTED_AT,
+            lastRunEndedAt: ts(),
+            durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),
+            activeSources: null,
+            sourcesEvaluated: null,
+            httpFetches: null,
+            resumedFromCheckpoint: null,
+            failures: 1,
+            failureReasons: [{ reason: err.message }],
+            noticeLines: []
+        });
+        if (runStatsFile === STATS_FILE) {
+            const outputs = [join(REPO, 'stocks-collector-status.json')];
+            if (process.env.RWA_DOCROOT) outputs.push(join(process.env.RWA_DOCROOT, 'stocks-collector-status.json'));
+            await refreshCollectorStatus({ outputs });
+        }
+    } catch (statsError) {
+        logError(`watch-sources: could not record failed outcome: ${statsError.message}`);
+    }
+    process.exitCode = 1;
+});

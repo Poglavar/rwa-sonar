@@ -1,0 +1,118 @@
+/* "Get this on Telegram" control (watch-delivery.js), shared by the owned saved-watch cards on
+   watch.html and the owned saved comparisons on stocks.html. Uses only the stocks.css tokens both load. */
+
+.wat-tg {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.82rem;
+}
+
+.wat-tg p {
+    margin: 4px 0;
+}
+
+.wat-tg-line[role="status"] {
+    color: var(--page-text);
+}
+
+.wat-tg-error {
+    color: var(--sev-warning);
+}
+
+.wat-tg-actions,
+.wat-tg-settings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-top: 8px;
+}
+
+.wat-tg-actions button,
+.wat-tg-open {
+    min-height: 40px;
+    font-size: 0.82rem;
+}
+
+.wat-tg-open {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--card-bg) 90%, var(--page-text));
+    color: var(--page-text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.wat-tg-open:hover,
+.wat-tg-open:focus-visible {
+    text-decoration: underline;
+}
+
+.wat-tg-toggle,
+.wat-tg-hour {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+}
+
+.wat-tg-toggle input {
+    width: 18px;
+    height: 18px;
+}
+
+.wat-tg-hour select {
+    min-height: 36px;
+}
+
+.wat-tg-about {
+    margin-top: 8px;
+    color: var(--muted-text);
+}
+
+.wat-tg-about summary {
+    cursor: pointer;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+}
+
+.wat-tg .wat-muted {
+    color: var(--muted-text);
+}
+
+/* In the stocks.html "Saved comparisons" list: span the row, and undo the list's compact link/button look. */
+.personal-list .wat-tg {
+    grid-column: 1 / -1;
+    min-width: 0;
+    margin-top: 4px;
+    padding-top: 8px;
+    font-size: 0.78rem;
+}
+
+.personal-list .wat-tg button {
+    align-self: auto;
+    padding: 0 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.personal-list .wat-tg button:disabled {
+    cursor: default;
+    opacity: 0.65;
+}
+
+.personal-list .wat-tg a.wat-tg-open {
+    overflow: visible;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: normal;
+}

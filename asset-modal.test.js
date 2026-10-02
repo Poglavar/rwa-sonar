@@ -125,3 +125,13 @@ describe('getCirclePosition', () => {
         expect(pos.top).toBe(-CIRCLE_OFFSET);
     });
 });
+
+describe('assets.html modal images', () => {
+    // An <img src=""> requests the page itself and fires an error event on every load.
+    it('ships no empty src attribute; asset-modal.js sets src when the modal opens', () => {
+        const html = require('fs').readFileSync(require('path').join(__dirname, 'assets.html'), 'utf8');
+        expect(html).not.toMatch(/<img[^>]*\ssrc=""/);
+        expect(html).toMatch(/<img id="modalAssetImage" alt="Asset"/);
+        expect(html).toMatch(/<img id="modalChainImage" alt="Chain"/);
+    });
+});

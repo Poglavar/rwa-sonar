@@ -1,0 +1,1828 @@
+/**
+ * Renders monitor.html: the health monitor, now an explorer over the read-only JSON API. The facet
+ * panel lists every API facet with its count, the status tiles (this token's own checks), the
+ * programme block and the failing-check strip are facets rendered larger, and the table is one page
+ * of /api/tokens with the
+ * sort and the filters applied in Postgres rather than here. The filter state lives in the page's
+ * own query string, so a filtered view is a link.
+ *
+ * WHAT IS STILL A FILE: the universe and DeFi change logs, the curated events and the Meteora pool
+ * table read stocks-changes.json, stocks-defi-changes.json, stocks/data/meteora.json,
+ * stocks-tokens.json and stocks-trades.json exactly as before, and the "When closed" column reads
+ * stocks-closed-market.json (what each lending market that takes the token does while the US market
+ * is closed) — the API's slim token row does not carry it. Those sections are unaffected by the API
+ * being down; the table says so.
+ *
+ * The health RULES ARE NOT REIMPLEMENTED HERE, and neither are the statuses: every status and
+ * worst-rule id on this page comes from the API, which serves what stocks/build-health.mjs wrote
+ * from stocks/lib/health.mjs — the one copy of the eleven checks. RULE_LABELS is the one thing the API
+ * does not carry: the rules' DISPLAY names, which monitor-page.test.js locks against
+ * stocks-health.json so the two cannot drift.
+ *
+ * Everything above the DOM section is pure — no DOM, no fetch, no clock — and is exported for jest
+ * (monitor-page.test.js). The display formatters come from stocks/lib/fmt.js and the API base from
+ * stocks/lib/api-base.js, the copies shared with the other pages. Wrapped in a UMD factory so it
+ * declares no globals and cannot shadow a top-level name in another script.
+ */
+(function (root, factory) {
+    const api = factory();
+    if (typeof module !== 'undefined' && module.exports) module.exports = api;
+    if (root) root.__monitor = api;
+}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+    'use strict';
+
+    const fmt = (typeof __rwaFmt !== 'undefined') ? __rwaFmt : require('./stocks/lib/fmt.js');
+    // The closed-market wording the token cards use too (stocks/lib/closed-market-view.js).
+    const closedMarketView = (typeof __rwaClosedMarket !== 'undefined') ? __rwaClosedMarket : require('./stocks/lib/closed-market-view.js');
+    const {
+        DASH, escapeHtml, isNum, isSafeUrl, fmtMoney, fmtNumber, fmtPrice, fmtPct, fmtSignedPct,
+        fmtDate, fmtDateTime, fmtRelativeTime, fmtVenueSpreadPct, humanizeSlug, cardSlug
+    } = fmt;
+
+    // -----------------------------------------------------------------------
+    // Pure section — no DOM, no fetch, no Date.now(). Exported for jest.
+    // -----------------------------------------------------------------------
+
+    /** The four statuses, in the order the tiles read. `unknown` is a first-class answer, not a fault. */
+    const STATUSES = ['good', 'caution', 'warning', 'unknown'];
+
+    /** How bad a judged status is. Also the set of statuses a row may report. */
+    const STATUS_RANK = { good: 1, caution: 2, warning: 3, unknown: 4 };
+
+    /**
+     * What each tile says under its number, so a count is never a bare number without a claim. The
+     * tiles count THIS TOKEN's own checks (stocks/lib/health.mjs `levels.token`): the programme's
+     * issuer-wide checks are counted separately, because they give every token of an issuer the
+     * same answer and, folded in, made every token caution or worse.
+     */
+    const STATUS_BLURBS = {
+        good: 'a market was measured and every check we could run passed',
+        caution: 'its worst check sits in the middle band',
+        warning: 'at least one of its checks failed outright',
+        unknown: 'no market we could measure, so this is not a pass'
+    };
+
+    /** Where the per-token cards live, relative to this page. */
+    const CARDS_DIR = './cards/';
+
+    /** Kinds of curated event, for the chip's tooltip when events.json does not describe one. */
+    const DEFAULT_EVENT_KIND = 'An event recorded in the issuer dossiers.';
+
+    /**
+     * Every filter the API accepts, which is also every facet it reports — /api/facets with no `by`
+     * returns exactly these. Locked against api/src/lib/query.js by a test, because a name this
+     * page invents is a 400 (`unknown_filter`) and a name it forgets is a facet a reader cannot see.
+     */
+    const FACET_NAMES = [
+        'issuer', 'instrument', 'recipe', 'program', 'health', 'market_health', 'control_health',
+        'legal_health', 'composability_health', 'worst_rule', 'programme_health', 'token_health',
+        'token_worst_rule', 'reference',
+        'legal_form', 'claim_rung', 'maturity_stage', 'verification_type', 'key_governance_mint',
+        'key_governance_freeze', 'jurisdiction', 'pausable', 'paused', 'clawback', 'allowlist',
+        'transfer_fee', 'hook_active', 'seen_in_search', 'first_seen_day'
+    ];
+
+    /** The panel's headings, and which facets sit under each. Every facet appears exactly once. */
+    const FACET_GROUPS = [
+        { id: 'issuer', heading: 'Issuer', facets: ['issuer'] },
+        { id: 'instrument', heading: 'Instrument', facets: ['instrument'] },
+        { id: 'recipe', heading: 'Recipe & program', facets: ['recipe', 'program'] },
+        {
+            id: 'health', heading: 'Health',
+            facets: ['token_health', 'token_worst_rule', 'programme_health', 'health', 'market_health', 'control_health',
+                'legal_health', 'composability_health', 'worst_rule']
+        },
+        {
+            id: 'issuer-shape',
+            heading: 'Legal form, claim, maturity, verification, keys, jurisdiction',
+            facets: [
+                'legal_form', 'claim_rung', 'maturity_stage', 'verification_type',
+                'key_governance_mint', 'key_governance_freeze', 'jurisdiction'
+            ]
+        },
+        {
+            id: 'control',
+            heading: 'Control flags',
+            facets: ['pausable', 'paused', 'clawback', 'allowlist', 'transfer_fee', 'hook_active']
+        },
+        { id: 'reference', heading: 'Reference source', facets: ['reference'] },
+        { id: 'seen', heading: 'Seen', facets: ['seen_in_search', 'first_seen_day'] }
+    ];
+
+    /** What each facet is called in the panel. A facet with no entry falls back to its own name. */
+    const FACET_TITLES = {
+        issuer: 'Issuer',
+        instrument: 'Instrument type',
+        recipe: 'Recipe',
+        program: 'Token program',
+        health: 'Worst of all eleven checks',
+        token_health: 'This token',
+        token_worst_rule: 'Failing token check',
+        programme_health: 'Programme',
+        market_health: 'Market health',
+        control_health: 'Control health',
+        legal_health: 'Legal / evidence health',
+        composability_health: 'DeFi composability',
+        worst_rule: 'Worst check of all eleven',
+        reference: 'Reference price source',
+        legal_form: 'Legal form',
+        claim_rung: 'How close to the share (0–4)',
+        maturity_stage: 'Official record (0–4)',
+        verification_type: 'Reserve verification',
+        key_governance_mint: 'Mint authority held by',
+        key_governance_freeze: 'Freeze authority held by',
+        jurisdiction: 'Jurisdiction',
+        pausable: 'Pausable',
+        paused: 'Paused',
+        clawback: 'Clawback',
+        allowlist: 'Allowlist',
+        transfer_fee: 'Transfer fee',
+        hook_active: 'Transfer hook active',
+        seen_in_search: 'Seen in Jupiter search',
+        first_seen_day: 'First seen'
+    };
+
+    /**
+     * The eleven health rules' DISPLAY names. The API serves the rule ID (`worst_rule`) and nothing
+     * else, so this is the one label table the page has to hold. It is not a rule and not a
+     * threshold — stocks/lib/health.mjs remains the only copy of those — and a test asserts this
+     * map equals the `rules` array in stocks-health.json, so a renamed rule cannot slip past.
+     */
+    const RULE_LABELS = {
+        tracking: 'Price tracking',
+        liquidity: 'Pool liquidity',
+        organic: 'Organic flow',
+        failedTx: 'Failed swaps',
+        concentration: 'Holder concentration',
+        verification: 'Legal evidence review',
+        defiComposability: 'DeFi enforceability',
+        keyControl: 'Authority keys',
+        paused: 'Trading pause',
+        frozen: 'Frozen accounts',
+        spread: 'Venue spread'
+    };
+
+    /**
+     * The sort keys /api/tokens accepts. Anything else is a 400 there, so it is refused here.
+     * 2026-09-18: `worst_rule`, `venue_spread_pct` and `top1_share_pct` joined the API's whitelist,
+     * which is what lets this table finally offer those three columns as sortable; `health_status`
+     * now orders by SEVERITY there rather than alphabetically, so the header means what it says.
+     */
+    const TOKEN_SORTS = [
+        'symbol', 'liquidity_usd', 'volume24_usd', 'premium_pct', 'holder_count',
+        'first_seen_at', 'last_traded_at', 'health_status', 'market_health', 'control_health',
+        'legal_health', 'composability_health', 'usd_price', 'trades24', 'traders24',
+        'worst_rule', 'venue_spread_pct', 'top1_share_pct', 'programme_health', 'token_health'
+    ];
+
+    const DEFAULT_SORT = 'liquidity_usd';
+    const DEFAULT_ORDER = 'desc';
+
+    /** Rows per page. The API clamps `limit` to 500, so this is a reading choice, not a limit. */
+    const PER_PAGE = 50;
+
+    /** The literal the API reads as IS NULL, so the null bucket a facet reports is clickable. */
+    const NULL_PARAM = 'null';
+
+    /** What the null bucket is called in the panel. Never "null", never 0. */
+    const MISSING_LABEL = 'not recorded';
+
+    /** True for a non-empty string, trimmed. Anything else is treated as missing. */
+    function str(value) {
+        return typeof value === 'string' && value.trim() !== '' ? value.trim() : null;
+    }
+
+    /** A finite number or null — a missing measurement never becomes 0 on the way to a cell. */
+    function num(value) {
+        return isNum(value) ? value : null;
+    }
+
+    /**
+     * The per-mint card file name. The API and built feeds carry the builder-assigned slug because
+     * colliding symbols need a mint suffix; symbol/mint derivation remains the safe fallback for
+     * older auxiliary rows.
+     */
+    function cardHref(symbol, mint, assignedSlug = null) {
+        const slug = str(assignedSlug) ?? str(cardSlug(symbol, mint));
+        if (slug === null) return null;
+        const href = `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
+        return isSafeUrl(href) ? href : null;
+    }
+
+    /**
+     * `{slug: displayName}` from stocks-tokens.json's `issuerIndex`, which is an ARRAY of
+     * `{slug, name, …}` records — not, as its name suggests, an object keyed by slug. Both shapes are
+     * read, because getting this wrong is invisible: the lookup simply misses and every issuer
+     * silently falls back to a title-cased slug, so "Backed (xStocks)" renders as "Xstocks backed".
+     */
+    function issuerNames(tokens) {
+        const index = tokens?.issuerIndex;
+        const out = new Map();
+        if (Array.isArray(index)) {
+            for (const entry of index) {
+                const slug = str(entry?.slug);
+                if (slug !== null) out.set(slug, str(entry?.name) ?? humanizeSlug(slug));
+            }
+            return out;
+        }
+        if (index && typeof index === 'object') {
+            for (const [slug, entry] of Object.entries(index)) {
+                if (str(slug) === null) continue;
+                out.set(slug, str(entry?.name) ?? str(entry) ?? humanizeSlug(slug));
+            }
+        }
+        return out;
+    }
+
+    /** The display name for an issuer slug: the build's own name, else the slug made readable. */
+    function issuerName(slug, names) {
+        if (slug === null) return null;
+        return (names instanceof Map ? names.get(slug) : null) ?? humanizeSlug(slug);
+    }
+
+    // ------------------------------------------------------------ filter state
+
+    /**
+     * How a facet VALUE travels as a filter parameter. `null` becomes the literal the API reads as
+     * IS NULL; a boolean becomes true/false; a number and a date become their own text. Everything
+     * the panel clicks and everything the query string carries goes through here, so a chip, a
+     * button and a URL always spell the same value the same way.
+     */
+    function paramValue(value) {
+        if (value === null || value === undefined) return NULL_PARAM;
+        if (typeof value === 'boolean') return value ? 'true' : 'false';
+        return String(value);
+    }
+
+    /** What a facet value is CALLED: the API's own short label where it has one, else the value. */
+    function facetValueLabel(facet, row) {
+        const value = row?.value;
+        // A token with no failing check of its own (good, or no market) has no failing rule: that
+        // is an answer, not a missing record.
+        if ((value === null || value === undefined) && facet === 'token_worst_rule') return 'none fails';
+        if (value === null || value === undefined) return MISSING_LABEL;
+        if (typeof value === 'boolean') return value ? 'yes' : 'no';
+        if (facet === 'worst_rule' || facet === 'token_worst_rule') return RULE_LABELS[value] ?? String(value);
+        if (facet === 'token_health' && value === 'unknown') return 'not measured';
+        if (facet === 'issuer') return str(row?.name) ?? humanizeSlug(String(value));
+        if (facet === 'first_seen_day') return fmtDate(String(value));
+        return str(row?.label) ?? String(value);
+    }
+
+    /**
+     * The filter state a URL asks for. Only the 22 known facet names are read, so the page's own
+     * parameters (`api`, `reduceMotion`) can never be forwarded to the API, which would 400 them.
+     * A comma list and a repeated parameter both mean OR, and duplicates collapse.
+     */
+    function parseFilterState(search) {
+        const params = new URLSearchParams(typeof search === 'string' ? search : '');
+        const filters = {};
+        for (const name of FACET_NAMES) {
+            const values = [];
+            for (const raw of params.getAll(name)) {
+                for (const piece of String(raw).split(',')) {
+                    const value = piece.trim();
+                    if (value !== '' && !values.includes(value)) values.push(value);
+                }
+            }
+            if (values.length > 0) filters[name] = values;
+        }
+        const sort = params.get('sort');
+        const order = params.get('order');
+        const page = Number.parseInt(params.get('page') ?? '', 10);
+        return {
+            filters,
+            q: str(params.get('q')) ?? '',
+            sort: TOKEN_SORTS.includes(sort) ? sort : DEFAULT_SORT,
+            order: order === 'asc' ? 'asc' : DEFAULT_ORDER,
+            page: Number.isFinite(page) && page > 1 ? page : 1
+        };
+    }
+
+    /**
+     * The query string that reproduces a state, `extras` (the page's own `api`, `reduceMotion`)
+     * first so a shared link keeps pointing at the same API. A default is left out, so an unfiltered
+     * page has a clean URL; the comma stays literal so the filter reads as the API's own syntax.
+     */
+    function filterStateToSearch(state, extras = {}) {
+        const parts = [];
+        const push = (name, value) => parts.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+        for (const [name, value] of Object.entries(extras && typeof extras === 'object' ? extras : {})) {
+            if (value === null || value === undefined || value === '') continue;
+            push(name, value);
+        }
+        const filters = state?.filters && typeof state.filters === 'object' ? state.filters : {};
+        for (const name of FACET_NAMES) {
+            const values = (Array.isArray(filters[name]) ? filters[name] : [])
+                .map((value) => str(value))
+                .filter((value) => value !== null);
+            if (values.length === 0) continue;
+            parts.push(`${encodeURIComponent(name)}=${values.map(encodeURIComponent).join(',')}`);
+        }
+        const q = str(state?.q);
+        if (q !== null) push('q', q);
+        if (TOKEN_SORTS.includes(state?.sort) && state.sort !== DEFAULT_SORT) push('sort', state.sort);
+        if (state?.order === 'asc') push('order', 'asc');
+        if (isNum(state?.page) && state.page > 1) push('page', String(Math.floor(state.page)));
+        return parts.join('&');
+    }
+
+    /**
+     * One value toggled inside one facet: adding a second value to the same facet is OR (the API
+     * reads the comma list that way), and removing the last one drops the facet entirely rather
+     * than sending an empty parameter. Returns a NEW filters object; the input is not mutated.
+     */
+    function toggleFilterValue(filters, facet, value) {
+        const out = {};
+        for (const [name, values] of Object.entries(filters && typeof filters === 'object' ? filters : {})) {
+            if (Array.isArray(values) && values.length > 0) out[name] = [...values];
+        }
+        if (!FACET_NAMES.includes(facet) || str(value) === null) return out;
+        const current = out[facet] ?? [];
+        const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+        if (next.length === 0) delete out[facet];
+        else out[facet] = next;
+        return out;
+    }
+
+    /** The parameters /api/tokens is asked for: the filters, the search, the sort and the window. */
+    function tokenRequestParams(state, perPage = PER_PAGE) {
+        const page = isNum(state?.page) && state.page > 1 ? Math.floor(state.page) : 1;
+        return {
+            ...(state?.filters ?? {}),
+            q: str(state?.q) ?? null,
+            sort: TOKEN_SORTS.includes(state?.sort) ? state.sort : DEFAULT_SORT,
+            order: state?.order === 'asc' ? 'asc' : DEFAULT_ORDER,
+            limit: perPage,
+            offset: (page - 1) * perPage
+        };
+    }
+
+    /** The parameters /api/facets is asked for: the same filters, and no `by` — so all 22 come back. */
+    function facetRequestParams(state) {
+        return { ...(state?.filters ?? {}), q: str(state?.q) ?? null };
+    }
+
+    // ----------------------------------------------------------- facet shaping
+
+    /** One facet's clickable rows: the API's value, its label, its count and whether it is on. */
+    function buildFacet(name, rows, activeValues) {
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return {
+            name,
+            title: FACET_TITLES[name] ?? humanizeSlug(name),
+            values: (Array.isArray(rows) ? rows : []).map((row) => {
+                const param = paramValue(row?.value);
+                return {
+                    param,
+                    label: facetValueLabel(name, row),
+                    count: isNum(row?.count) ? row.count : null,
+                    active: selected.includes(param),
+                    // The API reads a comma as the OR separator, so a value CONTAINING one (six of
+                    // the nine jurisdiction blurbs do) cannot be asked for at all. It is still
+                    // listed with its count — the reader deserves the number — but not offered as
+                    // a filter, because clicking it would silently return zero tokens.
+                    filterable: !param.includes(',')
+                };
+            })
+        };
+    }
+
+    /**
+     * The whole panel: the facets the API reported, under this page's headings, in this page's
+     * order. A facet the response omits or reports empty is left out; a facet the API reports that
+     * this page has NOT placed in a group is shown at the end rather than dropped, so a new facet
+     * on the API appears here by itself instead of being invisible until someone notices.
+     */
+    function facetGroups(facets, filters) {
+        const source = facets && typeof facets === 'object' ? facets : {};
+        const active = filters && typeof filters === 'object' ? filters : {};
+        const has = (name) => Array.isArray(source[name]) && source[name].length > 0;
+        const groups = [];
+        const placed = new Set();
+        for (const group of FACET_GROUPS) {
+            const built = [];
+            for (const name of group.facets) {
+                placed.add(name);
+                if (has(name)) built.push(buildFacet(name, source[name], active[name]));
+            }
+            if (built.length > 0) groups.push({ id: group.id, heading: group.heading, facets: built });
+        }
+        const extra = Object.keys(source).filter((name) => !placed.has(name) && has(name));
+        if (extra.length > 0) {
+            groups.push({
+                id: 'other',
+                heading: 'Other',
+                facets: extra.map((name) => buildFacet(name, source[name], active[name]))
+            });
+        }
+        return groups;
+    }
+
+    /**
+     * The removable chips above the table, in panel order, with the search first. A chip's label
+     * comes from the facet response when the value is in it; when it is not (a filter that now
+     * matches nothing, or a link someone shared), the raw value is shown rather than nothing.
+     */
+    function filterChips(state, facets) {
+        const chips = [];
+        const q = str(state?.q);
+        if (q !== null) chips.push({ facet: 'q', value: q, title: 'Search', label: q });
+        const filters = state?.filters && typeof state.filters === 'object' ? state.filters : {};
+        for (const name of FACET_NAMES) {
+            const rows = Array.isArray(facets?.[name]) ? facets[name] : [];
+            for (const value of Array.isArray(filters[name]) ? filters[name] : []) {
+                const row = rows.find((candidate) => paramValue(candidate?.value) === value) ?? null;
+                chips.push({
+                    facet: name,
+                    value,
+                    title: FACET_TITLES[name] ?? humanizeSlug(name),
+                    label: row !== null ? facetValueLabel(name, row)
+                        : (value === NULL_PARAM ? MISSING_LABEL : value)
+                });
+            }
+        }
+        return chips;
+    }
+
+    /**
+     * The four tiles, from the `health` facet. All four always appear — a status the facet omits is
+     * 0, not absent — and because a facet excludes its OWN filter, the counts keep showing what you
+     * could switch to while a status filter is on, rather than collapsing to the one selected.
+     */
+    function statusTilesFromFacet(rows, activeValues) {
+        const counts = new Map();
+        for (const row of Array.isArray(rows) ? rows : []) {
+            counts.set(paramValue(row?.value), isNum(row?.count) ? row.count : 0);
+        }
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return STATUSES.map((status) => ({
+            status,
+            label: status.charAt(0).toUpperCase() + status.slice(1),
+            blurb: STATUS_BLURBS[status],
+            count: counts.get(status) ?? 0,
+            active: selected.includes(status)
+        }));
+    }
+
+    /**
+     * One plain line under the tiles. It says what the tiles count (the token's own checks), that the
+     * programme is judged separately, and — because the old single badge rated no token good — why:
+     * the programme checks are issuer-wide. `levels` holds three tile sets: `token` (the tiles),
+     * `programme` and `overall` (the worst of all eleven). `filtered` narrows the claim to the
+     * selection. Null when nothing is counted.
+     */
+    function statusVerdict(levels, { filtered = false } = {}) {
+        const count = (tiles, status) => (Array.isArray(tiles) ? tiles : []).find((tile) => tile.status === status)?.count ?? 0;
+        const sum = (tiles) => STATUSES.reduce((total, status) => total + count(tiles, status), 0);
+        const token = levels?.token;
+        const total = sum(token);
+        if (total === 0) return null;
+        const tokenParts = [];
+        if (count(token, 'caution') > 0) tokenParts.push(`${fmtNumber(count(token, 'caution'))} are at caution`);
+        if (count(token, 'warning') > 0) tokenParts.push(`${fmtNumber(count(token, 'warning'))} fail one outright`);
+        if (count(token, 'unknown') > 0) tokenParts.push(`${fmtNumber(count(token, 'unknown'))} have no market we could measure`);
+        const lead = `${filtered ? 'In this selection, ' : ''}${fmtNumber(count(token, 'good'))} of ${fmtNumber(total)} tokens pass every check we could run on the token itself`;
+        const tokenLine = tokenParts.length === 0 ? `${lead}.` : `${lead}; ${tokenParts.join(', ').replace(/, ([^,]*)$/, ' and $1')}.`;
+
+        const programme = levels?.programme;
+        if (sum(programme) === 0) return tokenLine;
+        const programmeParts = ['caution', 'warning', 'unknown']
+            .filter((status) => count(programme, status) > 0)
+            .map((status) => `${fmtNumber(count(programme, status))}${status === 'caution' ? ' tokens' : ''} ${status === 'unknown' ? 'unrated' : status}`);
+        const programmeGood = count(programme, 'good');
+        const programmeLine = programmeGood === 0
+            ? `Legal evidence, key control and DeFi enforceability are issuer-wide, so they are rated per programme: no programme is rated good (${programmeParts.join(', ')})`
+            : `Legal evidence, key control and DeFi enforceability are issuer-wide, so they are rated per programme: ${fmtNumber(programmeGood)} tokens belong to a programme rated good`
+                + (programmeParts.length ? ` (${programmeParts.join(', ')})` : '');
+        const overallTotal = sum(levels?.overall);
+        const overallLine = programmeGood === 0 && overallTotal > 0
+            ? ` — which is why the worst of all eleven checks is good for ${fmtNumber(count(levels.overall, 'good'))} of ${fmtNumber(overallTotal)}.`
+            : '.';
+        return `${tokenLine} ${programmeLine}${overallLine}`;
+    }
+
+    /**
+     * The programme's verdict and the worst of all eleven checks, as two clickable distributions
+     * beside the token tiles. The programme is shared by every token of an issuer; the worst of all
+     * eleven is the old single badge, kept visible so nothing that used to be shown is hidden.
+     */
+    function levelSummariesFromFacets(facets, filters) {
+        return [
+            { id: 'programme', label: 'Programme', facet: 'programme_health' },
+            { id: 'overall', label: 'Worst of all eleven checks', facet: 'health' }
+        ].map((block) => ({
+            ...block,
+            statuses: statusTilesFromFacet(facets?.[block.facet], filters?.[block.facet])
+        }));
+    }
+
+    /**
+     * The line under a token's This-token chip: how many of the checks that could be judged pass.
+     * An unknown is never counted either way. A token whose status is unknown but that WAS judged
+     * on something has no market: its other checks passed, and it is still not called good.
+     */
+    function tokenCheckLine(row) {
+        const passed = row?.tokenPassed;
+        const judged = row?.tokenJudged;
+        if (!isNum(passed) || !isNum(judged)) return null;
+        if (judged === 0) return 'nothing measured';
+        const counted = `${fmtNumber(passed)} of ${fmtNumber(judged)}`;
+        if (row.tokenStatus === 'unknown') return `no market · ${counted} other check${judged === 1 ? ' passes' : 's pass'}`;
+        return `${counted} check${judged === 1 ? ' passes' : 's pass'}`;
+    }
+
+    /** The same four-way distribution, kept separate for each health dimension. */
+    function dimensionSummariesFromFacets(facets, filters) {
+        return [
+            { id: 'market', label: 'Market', facet: 'market_health' },
+            { id: 'control', label: 'Control', facet: 'control_health' },
+            { id: 'legal', label: 'Legal / evidence', facet: 'legal_health' },
+            { id: 'composability', label: 'DeFi composability', facet: 'composability_health' }
+        ].map((dimension) => ({
+            ...dimension,
+            statuses: statusTilesFromFacet(facets?.[dimension.facet], filters?.[dimension.facet])
+        }));
+    }
+
+    /**
+     * The failing-check strip, from the `token_worst_rule` facet: biggest first, a rule that fails
+     * nobody left out. `share` is of the tokens that HAVE a failing check, so the bars add to 100 %
+     * and the null bucket (good, or no market) is not counted as anything.
+     */
+    function ruleStripFromFacet(rows, activeValues) {
+        const list = (Array.isArray(rows) ? rows : [])
+            .filter((row) => str(row?.value) !== null && isNum(row?.count) && row.count > 0)
+            .map((row) => ({
+                id: String(row.value),
+                label: RULE_LABELS[row.value] ?? String(row.value),
+                count: row.count
+            }))
+            .sort((a, b) => b.count - a.count || (a.id < b.id ? -1 : 1));
+        const total = list.reduce((sum, row) => sum + row.count, 0);
+        const selected = Array.isArray(activeValues) ? activeValues : [];
+        return list.map((row) => ({
+            ...row,
+            share: total === 0 ? null : (row.count / total) * 100,
+            active: selected.includes(row.id)
+        }));
+    }
+
+    /**
+     * What the bars count, with the total they add up to: every token whose OWN checks put it at
+     * caution or warning, under the first check that did. The programme checks are not here — they
+     * give every token of an issuer the same answer, and as the overall worst check they drowned
+     * every token-level difference (legal evidence was the "worst" check of 971 of 1,412 tokens).
+     * Null for an empty strip.
+     */
+    function ruleStripCaption(strip) {
+        const total = (Array.isArray(strip) ? strip : []).reduce((sum, rule) => sum + (isNum(rule.count) ? rule.count : 0), 0);
+        if (total === 0) return null;
+        return `Each bar counts the tokens whose own checks fail, under the first check that does: ${fmtNumber(total)} tokens. `
+            + 'That check failed outright (warning) for some and sits in its middle band (caution) for the rest. '
+            + 'Programme checks are not counted here: they are the same for every token of an issuer. The bars filter the table too.';
+    }
+
+    // ------------------------------------------------------------ table paging
+
+    /**
+     * Which slice of `total` a page is, and what the pager may offer. The page is CLAMPED into the
+     * range that exists, so `?page=99` on a 471-row set lands on the last page rather than showing
+     * an empty table, and an empty result is one page with no rows rather than zero pages.
+     */
+    function pageMath({ total = 0, page = 1, perPage = PER_PAGE } = {}) {
+        const size = isNum(perPage) && perPage >= 1 ? Math.floor(perPage) : PER_PAGE;
+        const count = isNum(total) && total > 0 ? Math.floor(total) : 0;
+        const pages = Math.max(1, Math.ceil(count / size));
+        const current = Math.min(Math.max(isNum(page) ? Math.floor(page) : 1, 1), pages);
+        const offset = (current - 1) * size;
+        const from = count === 0 ? null : offset + 1;
+        const to = count === 0 ? null : Math.min(offset + size, count);
+        return {
+            page: current,
+            pages,
+            perPage: size,
+            total: count,
+            offset,
+            from,
+            to,
+            hasPrev: current > 1,
+            hasNext: current < pages,
+            label: count === 0
+                ? 'no tokens match'
+                : `${fmtNumber(from)}–${fmtNumber(to)} of ${fmtNumber(count)} · page ${fmtNumber(current)} of ${fmtNumber(pages)}`
+        };
+    }
+
+    /**
+     * The stale-response guard. Every request takes a number; only the newest number may render.
+     * Without it a slow first response can land AFTER a fast second one and repaint the table with
+     * the filter the reader has already moved off — the classic faceted-search flicker.
+     */
+    function createSequence() {
+        let latest = 0;
+        return {
+            next() {
+                latest += 1;
+                return latest;
+            },
+            isCurrent(token) {
+                return token === latest;
+            },
+            get value() {
+                return latest;
+            }
+        };
+    }
+
+    /**
+     * What the table says when a request failed. The path and the status are both in the sentence:
+     * "unreachable" with no detail is indistinguishable from an empty result, and a 500 on
+     * /api/tokens and a dead port are different problems with different fixes.
+     */
+    function describeApiFailure({ path = null, status = null, message = null } = {}) {
+        const where = str(path) ?? 'the API';
+        if (isNum(status)) return `API unreachable: GET ${where} answered HTTP ${status}.`;
+        const why = str(message);
+        return `API unreachable: GET ${where} did not answer${why === null ? '' : ` (${why})`}. `
+            + 'Check that the API is running.';
+    }
+
+    /**
+     * `{mint: item}` from stocks-closed-market.json, for the one column the slim row cannot carry,
+     * or null when the file did not load — which is not the same as "no lender takes it".
+     */
+    function closedMarketIndex(doc) {
+        if (!doc || !Array.isArray(doc.items)) return null;
+        const out = new Map();
+        for (const item of doc.items) {
+            const mint = str(item?.mint);
+            if (mint !== null) out.set(mint, item);
+        }
+        return out;
+    }
+
+    /**
+     * One table row per slim token row the API returned, in the API's order — the sort happened in
+     * Postgres and must not be re-decided here. The lenders' closed-market labels are joined in from
+     * stocks-closed-market.json by mint: `closedLenders` is [] when the file loaded and no lender
+     * takes the token, and null when the file did not load (unknown, shown as a dash).
+     */
+    function tokenRowsFromApi(items, closedIndex, tapeIndex = null) {
+        const index = closedIndex instanceof Map ? closedIndex : null;
+        const tape = tapeIndex instanceof Map ? tapeIndex : new Map();
+        return (Array.isArray(items) ? items : []).map((item) => {
+            const mint = str(item?.mint);
+            const symbol = str(item?.symbol);
+            const issuer = str(item?.issuer_slug);
+            const tokenWorstRuleId = str(item?.token_worst_rule);
+            const programmeWorstRuleId = str(item?.programme_worst_rule);
+            const closed = index === null || mint === null ? null : (index.get(mint) ?? { lenders: [] });
+            const lastTrade = newestTrade(str(item?.last_traded_at), mint === null ? null : (tape.get(mint) ?? null));
+            return {
+                mint,
+                symbol,
+                name: str(item?.name),
+                issuer,
+                issuerName: str(item?.issuer_name) ?? (issuer === null ? null : humanizeSlug(issuer)),
+                tokenStatus: STATUS_RANK[item?.token_health] ? item.token_health : 'unknown',
+                tokenWorstRuleLabel: tokenWorstRuleId === null ? null : (RULE_LABELS[tokenWorstRuleId] ?? tokenWorstRuleId),
+                tokenPassed: num(item?.token_checks_passed),
+                tokenJudged: num(item?.token_checks_judged),
+                programmeStatus: STATUS_RANK[item?.programme_health] ? item.programme_health : 'unknown',
+                programmeWorstRuleLabel: programmeWorstRuleId === null ? null : (RULE_LABELS[programmeWorstRuleId] ?? programmeWorstRuleId),
+                marketStatus: STATUS_RANK[item?.market_health] ? item.market_health : 'unknown',
+                controlStatus: STATUS_RANK[item?.control_health] ? item.control_health : 'unknown',
+                legalStatus: STATUS_RANK[item?.legal_health] ? item.legal_health : 'unknown',
+                composabilityStatus: STATUS_RANK[item?.composability_health] ? item.composability_health : 'unknown',
+                liquidity: num(item?.liquidity_usd),
+                vol24: num(item?.volume24_usd),
+                premiumPct: num(item?.premium_pct),
+                venueSpreadPct: num(item?.venue_spread_pct),
+                closedLenders: closed === null ? null : closedMarketView.compactLenders(closed),
+                top1SharePct: num(item?.top1_share_pct),
+                holderCount: num(item?.holder_count),
+                lastTradedAt: lastTrade.at,
+                lastTradeSource: lastTrade.source,
+                href: cardHref(symbol, mint, item?.card_slug)
+            };
+        });
+    }
+
+    /**
+     * mint → newest trade time on our own trade tape (stocks-trades.json, the pools the live
+     * collector decodes). The API's `last_traded_at` is CoinGecko's exchange ticker, refreshed for
+     * only a few hundred tokens a day, so a heavily traded token could read "46 h ago" there.
+     */
+    function tapeLastTrades(trades) {
+        const out = new Map();
+        for (const trade of Array.isArray(trades?.trades) ? trades.trades : []) {
+            const mint = str(trade?.mint);
+            const time = str(trade?.time);
+            if (mint === null || time === null || !Number.isFinite(Date.parse(time))) continue;
+            const held = out.get(mint);
+            if (held === undefined || Date.parse(time) > Date.parse(held)) out.set(mint, time);
+        }
+        return out;
+    }
+
+    /** The newer of the CoinGecko ticker time and the tape time, and which one it was. */
+    function newestTrade(tickerAt, tapeAt) {
+        const t = tickerAt !== null && Number.isFinite(Date.parse(tickerAt)) ? Date.parse(tickerAt) : null;
+        const p = tapeAt !== null && Number.isFinite(Date.parse(tapeAt)) ? Date.parse(tapeAt) : null;
+        if (p !== null && (t === null || p > t)) return { at: tapeAt, source: 'tape' };
+        if (t !== null) return { at: tickerAt, source: 'coingecko' };
+        return { at: null, source: null };
+    }
+
+    /**
+     * The latest change list grouped into sections, in the ORDER THE DIFF DECLARES — `kinds` comes
+     * from stocks-changes.json, so this page and lib/changes.mjs cannot disagree about what a kind
+     * is called or where it belongs. A kind with no changes is left out; a kind the file does not
+     * declare still gets a section, at the end, rather than being silently dropped.
+     */
+    function groupChanges(changes, kinds) {
+        const list = Array.isArray(changes) ? changes : [];
+        const declared = (Array.isArray(kinds) ? kinds : []).map((kind) => ({
+            id: str(kind?.id),
+            label: str(kind?.label) ?? str(kind?.id) ?? DASH
+        })).filter((kind) => kind.id !== null);
+        const seen = new Set(declared.map((kind) => kind.id));
+        const extra = [...new Set(list.map((change) => str(change?.kind)).filter((id) => id !== null && !seen.has(id)))]
+            .map((id) => ({ id, label: humanizeSlug(id) }));
+        return [...declared, ...extra]
+            .map((kind) => ({ ...kind, items: list.filter((change) => change?.kind === kind.id) }))
+            .filter((group) => group.items.length > 0);
+    }
+
+    /** The latest protocol comparison plus the client-side kind filters shown above it. */
+    function defiChangeView(document, selectedKind = null) {
+        const latest = document?.latest && typeof document.latest === 'object' ? document.latest : null;
+        const events = Array.isArray(latest?.events) ? latest.events.filter((event) => event && typeof event === 'object') : [];
+        const declared = (Array.isArray(document?.kinds) ? document.kinds : []).map((kind) => ({
+            id: str(kind?.id),
+            label: str(kind?.label) ?? str(kind?.id) ?? DASH,
+            severity: str(kind?.severity) ?? 'info'
+        })).filter((kind) => kind.id !== null);
+        const validKind = declared.some((kind) => kind.id === selectedKind) ? selectedKind : null;
+        const filters = [{ id: null, label: 'All changes', severity: 'info', count: events.length, active: validKind === null }]
+            .concat(declared.map((kind) => ({
+                ...kind,
+                count: events.filter((event) => event.kind === kind.id).length,
+                active: validKind === kind.id
+            })));
+        const visible = validKind === null ? events : events.filter((event) => event.kind === validKind);
+        return {
+            baseline: latest === null,
+            from: str(latest?.from),
+            to: str(latest?.to),
+            total: events.length,
+            selectedKind: validKind,
+            filters,
+            groups: groupChanges(visible, declared)
+        };
+    }
+
+    function ltvRangeText(value) {
+        if (!value || typeof value !== 'object') return DASH;
+        const min = num(value.min);
+        const max = num(value.max);
+        if (min === null || max === null) return DASH;
+        return min === max ? fmtPct(min * 100) : `${fmtPct(min * 100)}–${fmtPct(max * 100)}`;
+    }
+
+    /** A terse, lay-readable before → after line underneath a protocol event's own explanation. */
+    function defiChangeDetail(change) {
+        const kind = str(change?.kind);
+        if (kind === 'ltv-changed') return `Maximum LTV ${ltvRangeText(change.before)} → ${ltvRangeText(change.after)}`;
+        if (kind === 'collateral-value-drop') {
+            const before = num(change?.before);
+            const after = num(change?.after);
+            const drop = num(change?.dropPct);
+            return `Reported collateral ${fmtMoney(before)} → ${fmtMoney(after)}`
+                + `${drop === null ? '' : ` (${fmtPct(drop)} down)`}`;
+        }
+        if (kind === 'market-inactive') return `Observed status ${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+        if (kind === 'token-added' || kind === 'token-removed') {
+            return `Registry observation ${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+        }
+        return `${str(change?.before) ?? DASH} → ${str(change?.after) ?? DASH}`;
+    }
+
+    /** The per-day count strip: one entry per diffed pair, oldest first, with its total. */
+    function dayCounts(history) {
+        return (Array.isArray(history) ? history : []).map((pair) => {
+            const counts = pair?.counts && typeof pair.counts === 'object' ? pair.counts : {};
+            const entries = Object.entries(counts).filter(([, n]) => isNum(n) && n > 0);
+            return {
+                from: str(pair?.from),
+                to: str(pair?.to),
+                total: entries.reduce((sum, [, n]) => sum + n, 0),
+                counts: entries.map(([kind, n]) => ({ kind, count: n }))
+            };
+        });
+    }
+
+    /**
+     * One row per Meteora pool, joined to the token (for its reference price) and to the collected
+     * trade tape (for the failed-transaction share and the newest trade on that pool).
+     *
+     * `premiumPct` is the pool's own price against the token's reference price — the same comparison
+     * the tracking rule makes, but per pool rather than per mint, so a pool quoting a different price
+     * from the venue aggregate is visible. `failedShare` is null, never 0, when no signatures were
+     * sampled for the pool at all: 22 pools exist and the collector reached four of them.
+     */
+    function meteoraRows({ meteora, tokens, trades } = {}) {
+        const byMint = new Map();
+        for (const token of Array.isArray(tokens?.tokens) ? tokens.tokens : []) {
+            const mint = str(token?.mint);
+            if (mint !== null) byMint.set(mint, token);
+        }
+        const poolStats = new Map();
+        for (const pool of Array.isArray(trades?.pools) ? trades.pools : []) {
+            const pair = str(pool?.pair);
+            if (pair !== null) poolStats.set(pair, pool);
+        }
+        const lastTradeByPair = new Map();
+        for (const trade of Array.isArray(trades?.trades) ? trades.trades : []) {
+            const pair = str(trade?.pair);
+            const time = str(trade?.time);
+            if (pair === null || time === null) continue;
+            const current = lastTradeByPair.get(pair);
+            if (current === undefined || time > current) lastTradeByPair.set(pair, time);
+        }
+        const names = issuerNames(tokens);
+
+        return (Array.isArray(meteora?.items) ? meteora.items : []).map((item) => {
+            const mint = str(item?.mint);
+            const token = mint === null ? null : (byMint.get(mint) ?? null);
+            const pair = str(item?.pairAddress);
+            const stats = pair === null ? null : (poolStats.get(pair) ?? null);
+            const signatures = num(stats?.signaturesSeen);
+            const failed = num(stats?.failedTx);
+            const price = num(item?.priceUsd);
+            const refPrice = num(token?.reference?.price);
+            const issuer = str(item?.issuer) ?? str(token?.issuer);
+            return {
+                mint,
+                symbol: str(item?.symbol) ?? str(token?.symbol),
+                issuer,
+                issuerName: issuerName(issuer, names),
+                pairAddress: pair,
+                dexId: str(item?.dexId),
+                poolType: str(item?.poolType),
+                poolName: str(item?.poolName),
+                binStep: num(item?.binStep),
+                baseFeePct: num(item?.baseFeePct),
+                maxFeePct: num(item?.maxFeePct),
+                dynamicFeePct: num(item?.dynamicFeePct),
+                liquidityUsd: num(item?.liquidityUsd),
+                volume24Usd: num(item?.volume24Usd),
+                fees24Usd: num(item?.fees24Usd),
+                dexscreenerLiquidityUsd: num(item?.dexscreener?.liquidityUsd),
+                dexscreenerVolume24Usd: num(item?.dexscreener?.volume24Usd),
+                priceUsd: price,
+                refPrice,
+                refSource: str(token?.reference?.source),
+                premiumPct: price === null || refPrice === null || refPrice === 0 ? null : (price / refPrice - 1) * 100,
+                quoteSymbol: str(item?.quoteSymbol),
+                cardSlug: str(token?.cardSlug),
+                signaturesSeen: signatures,
+                failedTx: failed,
+                failedShare: signatures === null || signatures === 0 || failed === null ? null : (failed / signatures) * 100,
+                lastTradeAt: pair === null ? null : (lastTradeByPair.get(pair) ?? null),
+                curve: item?.curve && typeof item.curve === 'object' ? item.curve : null,
+                error: str(item?.error)
+            };
+        }).sort((a, b) => {
+            const left = a.liquidityUsd;
+            const right = b.liquidityUsd;
+            if (!isNum(left) && !isNum(right)) return (a.symbol ?? '') < (b.symbol ?? '') ? -1 : 1;
+            if (!isNum(left)) return 1;
+            if (!isNum(right)) return -1;
+            return right - left;
+        });
+    }
+
+    /**
+     * What a DBC pool's curve record actually establishes, in a reader's terms. The bonding-curve
+     * account layout was NOT decoded by the fetcher, so this must not imply a progress figure that
+     * nobody read: it reports existence, the owning program and the data length, and says the state
+     * is undecoded when it is.
+     */
+    function curveSummary(curve) {
+        if (!curve || typeof curve !== 'object') return null;
+        const account = curve.account && typeof curve.account === 'object' ? curve.account : {};
+        const parts = [];
+        if (account.exists === true) parts.push('curve account exists');
+        else if (account.exists === false) parts.push('no curve account at that address');
+        if (isNum(account.dataLength)) parts.push(`${fmtNumber(account.dataLength)} bytes of state`);
+        if (account.isDbcProgram === true) parts.push('owned by the DBC program');
+        parts.push(curve.curveState === null ? 'state not decoded' : 'state decoded');
+        if (curve.migrated === true) parts.push('migrated');
+        else if (curve.migrated === false) parts.push('not migrated');
+        return {
+            address: str(curve.address),
+            text: parts.join(' · '),
+            note: str(curve.note),
+            pairName: [str(curve.tokenX?.symbol), str(curve.tokenY?.symbol)].filter(Boolean).join(' / ') || null
+        };
+    }
+
+    /** Curated events, newest first, defensively re-sorted so the page does not trust file order. */
+    function sortEvents(events) {
+        return (Array.isArray(events) ? events : [])
+            .filter((event) => event && typeof event === 'object')
+            .slice()
+            .sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')));
+    }
+
+    /** How long the "New on Solana" strip looks back when the feed does not say. */
+    const NEW_MINTS_WINDOW_DAYS = 14;
+
+    /** Keep high-volume discovery days from turning one marquee into thousands of DOM nodes. */
+    const NEW_MINTS_DISPLAY_LIMIT = 24;
+
+    /** Change groups start as a digest; the exact remaining rows stay available on demand. */
+    const CHANGE_GROUP_DISPLAY_LIMIT = 12;
+
+    function splitDisplayRows(items, limit = CHANGE_GROUP_DISPLAY_LIMIT) {
+        const rows = Array.isArray(items) ? items : [];
+        const count = Number.isInteger(limit) && limit > 0 ? limit : CHANGE_GROUP_DISPLAY_LIMIT;
+        return { visible: rows.slice(0, count), hidden: rows.slice(count) };
+    }
+
+    /**
+     * The chips of the "New on Solana" strip, from stocks-changes.json's `newMints` feed: one row
+     * per mint the universe crawl first saw inside the feed's window, kept in the order the feed
+     * selected (newest first). `firstSeen` is a RELATIVE age against `nowMs`, which the caller
+     * passes so this stays pure and the same feed always shapes the same way.
+     *
+     * A mint with no `firstSeenAt` keeps a null age rather than being dated now, and a mint with no
+     * `cardSlug` gets a null href and renders as plain text — a chip never links to a card the build
+     * did not write. An absent file, an absent `newMints` or a row with neither symbol nor mint
+     * yields nothing: an empty strip is hidden, not an error.
+     */
+    function newMintChips(changes, nowMs) {
+        const feed = Array.isArray(changes?.newMints) ? changes.newMints : [];
+        const chips = [];
+        for (const row of feed) {
+            if (!row || typeof row !== 'object') continue;
+            const mint = str(row.mint);
+            const symbol = str(row.symbol) ?? mint;
+            if (symbol === null) continue;
+            const slug = str(row.cardSlug);
+            const firstSeenAt = str(row.firstSeenAt);
+            const issuerSlug = str(row.issuer);
+            const name = str(row.name);
+            const href = slug === null ? null : `${CARDS_DIR}${encodeURIComponent(slug)}.html`;
+            chips.push({
+                mint,
+                symbol,
+                issuer: str(row.issuerName) ?? (issuerSlug === null ? null : humanizeSlug(issuerSlug)),
+                firstSeenAt,
+                firstSeen: firstSeenAt === null ? null : fmtRelativeTime(firstSeenAt, nowMs),
+                href: href !== null && isSafeUrl(href) ? href : null,
+                title: `${name === null ? symbol : `${symbol} — ${name}`}`
+                    + `${firstSeenAt === null ? '' : ` · first seen ${fmtDateTime(firstSeenAt)}`}`
+            });
+        }
+        return chips;
+    }
+
+    /** How many days the feed looked back, as the strip's note and the header line should say it. */
+    function newMintsWindowDays(changes) {
+        const days = num(changes?.newMintWindowDays);
+        return days !== null && days > 0 ? days : NEW_MINTS_WINDOW_DAYS;
+    }
+
+    /**
+     * One DeFi protocol change as a fold row (app-shell.css): line 1 is when (the day it was
+     * observed), how serious and which token on which protocol; line 2 the plain explanation. The
+     * card link, the before → after detail and the exact token address open below, so a click on
+     * the row only toggles.
+     */
+    function defiChangeRow(change, observedOn = null) {
+        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
+        const href = cardHref(change.symbol, change.mint, change.cardSlug);
+        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
+        const severity = ['info', 'caution', 'warning'].includes(change.severity) ? change.severity : 'info';
+        const protocol = escapeHtml(change.protocolName ?? change.protocolId ?? DASH);
+        const summary = str(change.summary);
+        return `<li class="fold-row fold-${escapeHtml(severity)} mon-defi-change mon-defi-change-${escapeHtml(severity)}">
+            <details><summary>
+            <span class="fold-line1">${escapeHtml(fmtDate(observedOn))} · <span class="mon-defi-severity mon-defi-severity-${escapeHtml(severity)}">${escapeHtml(severity)}</span>
+                <strong class="fold-title">${symbol} · ${protocol}</strong></span>
+            ${summary === null ? '' : `<span class="fold-line2">${escapeHtml(summary)}</span>`}
+            </summary><div class="fold-body">
+            <p class="mon-defi-change-head"><span class="mon-defi-token">${link}</span>
+                <span class="mon-defi-protocol">${protocol}</span></p>
+            <p class="mon-defi-summary">${escapeHtml(summary ?? '')}</p>
+            <p class="mon-defi-evidence">${escapeHtml(defiChangeDetail(change))} · exact token
+                <code>${escapeHtml(change.mint ?? DASH)}</code></p>
+            </div></details>
+        </li>`;
+    }
+
+    /**
+     * One curated event as a fold row: line 1 is the date, the kind (its description as the chip's
+     * tooltip) and the issuer; line 2 the summary, clamped. The full summary and its source open below.
+     */
+    function eventRow(event, kindNote = DEFAULT_EVENT_KIND) {
+        const kind = typeof event.kind === 'string' ? event.kind : '';
+        const summary = str(event.summary);
+        return `<li class="fold-row fold-caution mon-event">
+            <details><summary>
+            <span class="fold-line1"><time datetime="${escapeHtml(event.date ?? '')}">${escapeHtml(fmtDate(event.date))}</time> · <span class="mon-event-kind" title="${escapeHtml(kindNote)}">${escapeHtml(kind || DASH)}</span>
+                <strong class="fold-title">${escapeHtml(event.issuer ?? DASH)}</strong></span>
+            ${summary === null ? '' : `<span class="fold-line2">${escapeHtml(summary)}</span>`}
+            </summary><div class="fold-body">
+            <p class="mon-event-kind-note">${escapeHtml(kindNote)}</p>
+            <p class="mon-event-summary">${escapeHtml(summary ?? '')}</p>
+            <p class="mon-event-source">${escapeHtml(event.source ?? '')}</p>
+            </div></details>
+        </li>`;
+    }
+
+    const api = {
+        STATUSES,
+        STATUS_RANK,
+        STATUS_BLURBS,
+        FACET_NAMES,
+        FACET_GROUPS,
+        FACET_TITLES,
+        RULE_LABELS,
+        TOKEN_SORTS,
+        DEFAULT_SORT,
+        DEFAULT_ORDER,
+        PER_PAGE,
+        NULL_PARAM,
+        MISSING_LABEL,
+        NEW_MINTS_WINDOW_DAYS,
+        NEW_MINTS_DISPLAY_LIMIT,
+        CHANGE_GROUP_DISPLAY_LIMIT,
+        paramValue,
+        facetValueLabel,
+        parseFilterState,
+        filterStateToSearch,
+        toggleFilterValue,
+        tokenRequestParams,
+        facetRequestParams,
+        buildFacet,
+        facetGroups,
+        filterChips,
+        statusTilesFromFacet,
+        statusVerdict,
+        levelSummariesFromFacets,
+        tokenCheckLine,
+        dimensionSummariesFromFacets,
+        ruleStripFromFacet,
+        ruleStripCaption,
+        tapeLastTrades,
+        pageMath,
+        createSequence,
+        describeApiFailure,
+        closedMarketIndex,
+        tokenRowsFromApi,
+        newMintChips,
+        newMintsWindowDays,
+        splitDisplayRows,
+        cardHref,
+        issuerNames,
+        issuerName,
+        groupChanges,
+        defiChangeView,
+        defiChangeDetail,
+        dayCounts,
+        meteoraRows,
+        curveSummary,
+        sortEvents,
+        defiChangeRow,
+        eventRow
+    };
+
+    // -----------------------------------------------------------------------
+    // DOM section — only runs in a browser. Builds markup and wires events.
+    // -----------------------------------------------------------------------
+
+    if (typeof document === 'undefined') return api;
+
+    const apiLib = (typeof __rwaApi !== 'undefined') ? __rwaApi : null;
+
+    /** The sections that are still files, not API routes. */
+    const FILES = {
+        closedMarket: './stocks-closed-market.json',
+        changes: './stocks-changes.json',
+        defiChanges: './stocks-defi-changes.json',
+        meteora: './stocks/data/meteora.json',
+        tokens: './stocks-tokens.json',
+        trades: './stocks-trades.json'
+    };
+
+    /** How long a burst of clicks or keystrokes is allowed to settle before a request goes out. */
+    const DEBOUNCE_MS = 150;
+
+    const state = {
+        filters: {},
+        q: '',
+        sort: DEFAULT_SORT,
+        order: DEFAULT_ORDER,
+        page: 1,
+        facets: null,
+        items: [],
+        rows: [],
+        total: 0,
+        loading: false,
+        error: null,
+        closedIndex: null,
+        tape: null,
+        changes: null,
+        defiChanges: null,
+        defiKind: null,
+        meteora: []
+    };
+
+    const els = {};
+    const sequence = createSequence();
+    let base = '';
+    let debounceTimer = null;
+
+    /** One timestamped line per failure. Nothing else is logged: a healthy page is silent. */
+    function logError(message, detail) {
+        console.error(`[${new Date().toISOString()}] monitor: ${message}`, detail ?? '');
+    }
+
+    /**
+     * A status chip: the word carries the verdict, the colour only reinforces it. `unknownWord` lets
+     * a column say what its unknown means ("not measured") instead of the bare status name.
+     */
+    function statusChip(status, { unknownWord = 'unknown', title = null } = {}) {
+        const safe = STATUS_RANK[status] ? status : 'unknown';
+        const word = safe === 'unknown' ? unknownWord : safe;
+        return `<span class="mon-chip mon-chip-${safe}"${title ? ` title="${escapeHtml(title)}"` : ''}>${escapeHtml(word)}</span>`;
+    }
+
+    /** This token's chip, with the checks it passes underneath and its failing check on hover. */
+    function tokenHealthCell(row) {
+        const line = tokenCheckLine(row);
+        const title = row.tokenWorstRuleLabel === null ? null : `First failing check: ${row.tokenWorstRuleLabel}`;
+        return statusChip(row.tokenStatus, { unknownWord: 'not measured', title })
+            + (line === null ? '' : `<span class="mon-sub">${escapeHtml(line)}</span>`)
+            + (row.tokenWorstRuleLabel === null ? '' : `<span class="mon-sub">${escapeHtml(row.tokenWorstRuleLabel)}</span>`);
+    }
+
+    /** The programme's chip, with the check that holds it back — the same for every token of the issuer. */
+    function programmeHealthCell(row) {
+        return statusChip(row.programmeStatus, { unknownWord: 'not rated' })
+            + (row.programmeWorstRuleLabel === null ? '' : `<span class="mon-sub">${escapeHtml(row.programmeWorstRuleLabel)}</span>`);
+    }
+
+    function tokenTableRow(row) {
+        const symbol = escapeHtml(row.symbol ?? DASH);
+        const link = row.href === null
+            ? `<span class="mon-symbol">${symbol}</span>`
+            : `<a class="mon-symbol" href="${escapeHtml(row.href)}">${symbol}</a>`;
+        const premiumClass = !isNum(row.premiumPct) ? '' : row.premiumPct >= 0 ? ' num-up' : ' num-down';
+        const closed = row.closedLenders === null ? escapeHtml(DASH)
+            : row.closedLenders.length === 0 ? '<span class="mon-cm-none">no lender</span>'
+                : row.closedLenders.map((e) => `<span class="mon-cm ${escapeHtml(e.className)}" title="${escapeHtml(e.title)}">`
+                    + `${escapeHtml(e.protocolName)}: ${escapeHtml(e.label)}</span>`).join('');
+        return `<tr>
+            <td class="cell-token">${link}<span class="mon-name">${escapeHtml(row.name ?? '')}</span></td>
+            <td>${escapeHtml(row.issuerName ?? row.issuer ?? DASH)}</td>
+            <td class="mon-level">${tokenHealthCell(row)}</td>
+            <td class="mon-level">${programmeHealthCell(row)}</td>
+            <td>${statusChip(row.marketStatus)}</td>
+            <td>${statusChip(row.controlStatus)}</td>
+            <td>${statusChip(row.legalStatus)}</td>
+            <td>${statusChip(row.composabilityStatus)}</td>
+            <td class="num">${escapeHtml(fmtMoney(row.liquidity))}</td>
+            <td class="num${premiumClass}">${escapeHtml(fmtSignedPct(row.premiumPct))}</td>
+            <td class="num">${escapeHtml(fmtVenueSpreadPct(row.venueSpreadPct))}</td>
+            <td class="mon-closed">${closed}</td>
+            <td class="num">${escapeHtml(fmtPct(row.top1SharePct))}</td>
+            <td>${lastTradeCell(row)}</td>
+        </tr>`;
+    }
+
+    /** "3 min ago" with where the time came from: our trade tape, or CoinGecko's ticker (which can lag). */
+    function lastTradeCell(row) {
+        if (row.lastTradedAt === null) return escapeHtml(DASH);
+        const tape = row.lastTradeSource === 'tape';
+        const title = `${fmtDateTime(row.lastTradedAt)}, ${tape ? 'newest trade on our own trade tape' : "CoinGecko's exchange ticker, refreshed for a few hundred tokens a day, so it can lag"}`;
+        return `<span title="${escapeHtml(title)}">${escapeHtml(fmtRelativeTime(row.lastTradedAt))}</span>`
+            + `<span class="mon-sub">${tape ? 'our trade tape' : 'CoinGecko'}</span>`;
+    }
+
+    function renderTiles() {
+        const tiles = statusTilesFromFacet(state.facets?.token_health, state.filters.token_health);
+        els.tiles.innerHTML = tiles.map((tile) => `<button type="button"
+            class="mon-tile mon-tile-${tile.status}${tile.active ? ' mon-tile-active' : ''}"
+            data-facet="token_health" data-value="${tile.status}" aria-pressed="${tile.active ? 'true' : 'false'}">
+            <span class="mon-tile-count">${escapeHtml(fmtNumber(tile.count))}</span>
+            <span class="mon-tile-label">${escapeHtml(tile.status === 'unknown' ? 'Not measured' : tile.label)}</span>
+            <span class="mon-tile-blurb">${escapeHtml(tile.blurb)}</span>
+        </button>`).join('');
+        if (els.statusVerdict) {
+            const filtered = state.q !== '' || Object.keys(state.filters).some((name) => name !== 'token_health');
+            const line = state.facets === null ? null : statusVerdict({
+                token: tiles,
+                programme: statusTilesFromFacet(state.facets?.programme_health, []),
+                overall: statusTilesFromFacet(state.facets?.health, [])
+            }, { filtered });
+            els.statusVerdict.textContent = line ?? '';
+            els.statusVerdict.hidden = line === null;
+        }
+    }
+
+    /** The programme block and the old worst-of-eleven badge, both clickable like the dimensions. */
+    function renderLevels() {
+        const blocks = levelSummariesFromFacets(state.facets, state.filters);
+        els.levels.innerHTML = blocks.map((block) => `<section class="mon-dimension">
+            <h3>${escapeHtml(block.label)}</h3>
+            <div class="mon-dimension-statuses">${block.statuses.map((item) => `<button type="button"
+                class="mon-dimension-status mon-dimension-status-${item.status}${item.active ? ' mon-dimension-status-active' : ''}"
+                data-facet="${escapeHtml(block.facet)}" data-value="${item.status}"
+                aria-pressed="${item.active ? 'true' : 'false'}">
+                <span>${escapeHtml(item.label)}</span><strong>${escapeHtml(fmtNumber(item.count))}</strong>
+            </button>`).join('')}</div>
+        </section>`).join('');
+    }
+
+    function renderDimensions() {
+        const dimensions = dimensionSummariesFromFacets(state.facets, state.filters);
+        els.dimensions.innerHTML = dimensions.map((dimension) => `<section class="mon-dimension">
+            <h3>${escapeHtml(dimension.label)}</h3>
+            <div class="mon-dimension-statuses">${dimension.statuses.map((item) => `<button type="button"
+                class="mon-dimension-status mon-dimension-status-${item.status}${item.active ? ' mon-dimension-status-active' : ''}"
+                data-facet="${escapeHtml(dimension.facet)}" data-value="${item.status}"
+                aria-pressed="${item.active ? 'true' : 'false'}">
+                <span>${escapeHtml(item.label)}</span><strong>${escapeHtml(fmtNumber(item.count))}</strong>
+            </button>`).join('')}</div>
+        </section>`).join('');
+    }
+
+    function renderRuleStrip() {
+        const strip = ruleStripFromFacet(state.facets?.token_worst_rule, state.filters.token_worst_rule);
+        if (els.ruleCaption) els.ruleCaption.textContent = ruleStripCaption(strip) ?? 'Each bar counts the tokens whose own checks fail, under the first check that does.';
+        if (strip.length === 0) {
+            els.ruleStrip.innerHTML = '<p class="mon-empty">No token in this selection fails one of its own checks.</p>';
+            return;
+        }
+        els.ruleStrip.innerHTML = strip.map((rule) => `<button type="button"
+            class="mon-rule${rule.active ? ' mon-rule-active' : ''}"
+            data-facet="token_worst_rule" data-value="${escapeHtml(rule.id)}" aria-pressed="${rule.active ? 'true' : 'false'}">
+            <span class="mon-rule-label">${escapeHtml(rule.label)}</span>
+            <span class="mon-rule-count">${escapeHtml(fmtNumber(rule.count))}</span>
+            <span class="mon-rule-bar"><span class="mon-rule-fill" style="width:${isNum(rule.share) ? rule.share.toFixed(1) : 0}%"></span></span>
+        </button>`).join('');
+    }
+
+    function facetValueHtml(facet, value) {
+        const count = value.count === null ? DASH : fmtNumber(value.count);
+        const inner = `<span class="mon-facet-label">${escapeHtml(value.label)}</span>`
+            + `<span class="mon-facet-count">${escapeHtml(count)}</span>`;
+        if (!value.filterable) {
+            const why = 'The API reads a comma as the separator between OR-ed values, so this value '
+                + 'cannot be asked for as a filter.';
+            return `<li class="mon-facet-row"><span class="mon-facet-value mon-facet-value-blocked"
+                title="${escapeHtml(why)}">${inner}</span></li>`;
+        }
+        return `<li class="mon-facet-row"><button type="button"
+            class="mon-facet-value${value.active ? ' mon-facet-value-active' : ''}"
+            data-facet="${escapeHtml(facet)}" data-value="${escapeHtml(value.param)}"
+            aria-pressed="${value.active ? 'true' : 'false'}">${inner}</button></li>`;
+    }
+
+    function renderFacetPanel() {
+        if (state.facets === null) {
+            els.facetPanel.innerHTML = '<p class="mon-empty">The facets come from the API, which did not answer.</p>';
+            return;
+        }
+        const groups = facetGroups(state.facets, state.filters);
+        els.facetPanel.innerHTML = groups.map((group) => `<section class="mon-facet-group">
+            <h3 class="mon-facet-heading">${escapeHtml(group.heading)}</h3>
+            ${group.facets.map((facet) => `<div class="mon-facet" data-facet="${escapeHtml(facet.name)}">
+                <h4 class="mon-facet-title">${escapeHtml(facet.title)}</h4>
+                <ul class="mon-facet-values">${facet.values.map((value) => facetValueHtml(facet.name, value)).join('')}</ul>
+            </div>`).join('')}
+        </section>`).join('');
+    }
+
+    function renderChips() {
+        const chips = filterChips(state, state.facets);
+        els.chips.hidden = chips.length === 0;
+        if (chips.length === 0) {
+            els.chipList.innerHTML = '';
+            return;
+        }
+        els.chipList.innerHTML = chips.map((chip) => `<li class="mon-filter-chip">
+            <span class="mon-filter-facet">${escapeHtml(chip.title)}</span>
+            <span class="mon-filter-value">${escapeHtml(chip.label)}</span>
+            <button type="button" class="mon-filter-remove" data-facet="${escapeHtml(chip.facet)}"
+                data-value="${escapeHtml(chip.value)}"
+                aria-label="Remove the ${escapeHtml(chip.title)} filter ${escapeHtml(chip.label)}">&times;</button>
+        </li>`).join('');
+    }
+
+    function renderTable() {
+        const math = pageMath({ total: state.total, page: state.page });
+        els.tokenBody.innerHTML = state.rows.length === 0
+            ? `<tr><td colspan="14" class="mon-empty">${escapeHtml(state.error === null ? 'No token matches these filters.' : 'No rows. See the message above.')}</td></tr>`
+            : state.rows.map(tokenTableRow).join('');
+        els.tokenCount.textContent = state.error === null
+            ? `${fmtNumber(state.total)} mint${state.total === 1 ? '' : 's'} match`
+            : '';
+        els.pageLabel.textContent = state.error === null ? math.label : '';
+        els.prevPage.disabled = !math.hasPrev || state.error !== null;
+        els.nextPage.disabled = !math.hasNext || state.error !== null;
+        els.pager.hidden = state.error !== null || state.total === 0;
+        els.tableMessage.hidden = state.error === null;
+        els.tableMessage.textContent = state.error ?? '';
+        els.tableWrap.classList.toggle('is-loading', state.loading);
+        for (const th of els.tokenTable.querySelectorAll('th[data-sort]')) {
+            const active = th.dataset.sort === state.sort;
+            th.classList.toggle('sort-active', active);
+            th.setAttribute('aria-sort', active ? (state.order === 'asc' ? 'ascending' : 'descending') : 'none');
+        }
+    }
+
+    function changeRow(change) {
+        const symbol = escapeHtml(change.symbol ?? change.mint ?? DASH);
+        const href = cardHref(change.symbol, change.mint, change.cardSlug);
+        const link = href === null ? symbol : `<a href="${escapeHtml(href)}">${symbol}</a>`;
+        const before = change.before === null || change.before === undefined ? DASH : String(change.before);
+        const after = change.after === null || change.after === undefined ? DASH : String(change.after);
+        return `<li>
+            <span class="mon-change-token">${link}</span>
+            <span class="mon-change-issuer">${escapeHtml(change.issuer ?? '')}</span>
+            <span class="mon-change-delta"><code>${escapeHtml(change.field ?? '')}</code> ${escapeHtml(before)} &rarr; ${escapeHtml(after)}</span>
+            <span class="mon-change-note">${escapeHtml(change.note ?? '')}</span>
+        </li>`;
+    }
+
+    function renderChanges() {
+        const latest = state.changes?.latest ?? null;
+        const groups = groupChanges(latest?.changes, state.changes?.kinds);
+        const days = dayCounts(state.changes?.history);
+
+        els.changeStrip.innerHTML = days.length === 0
+            ? '<p class="mon-empty">Only one snapshot day so far, so there is nothing to compare.</p>'
+            : days.map((day) => `<span class="mon-day">
+                <span class="mon-day-range">${escapeHtml(fmtDate(day.from))} &rarr; ${escapeHtml(fmtDate(day.to))}</span>
+                <span class="mon-day-count">${escapeHtml(fmtNumber(day.total))} change${day.total === 1 ? '' : 's'}</span>
+                <span class="mon-day-kinds">${escapeHtml(day.counts.map((c) => `${c.kind} ${c.count}`).join(' · ')) || 'nothing changed'}</span>
+            </span>`).join('');
+
+        if (latest === null) {
+            els.changeRange.textContent = 'no pair of days to diff yet';
+            els.changeGroups.innerHTML = '';
+            return;
+        }
+        els.changeRange.textContent = `${fmtDate(latest.from)} → ${fmtDate(latest.to)}`;
+        if (groups.length === 0) {
+            els.changeGroups.innerHTML = '<p class="mon-empty">Nothing changed between those two days.</p>';
+            return;
+        }
+        els.changeGroups.innerHTML = groups.map((group) => {
+            const rows = splitDisplayRows(group.items);
+            return `<section class="mon-group">
+                <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
+                <ul class="mon-change-list">${rows.visible.map(changeRow).join('')}</ul>
+                ${rows.hidden.length === 0 ? '' : `<details class="mon-group-more"><summary>Show ${escapeHtml(fmtNumber(rows.hidden.length))} more exact mint${rows.hidden.length === 1 ? '' : 's'}</summary>
+                    <ul class="mon-change-list">${rows.hidden.map(changeRow).join('')}</ul></details>`}
+            </section>`;
+        }).join('');
+    }
+
+    function renderDefiChanges() {
+        const view = defiChangeView(state.defiChanges, state.defiKind);
+        els.defiChangeRange.textContent = view.baseline
+            ? 'baseline only'
+            : `${fmtDate(view.from)} → ${fmtDate(view.to)}`;
+        els.defiChangeFilters.innerHTML = view.baseline ? '' : view.filters.map((filter) => `<button
+            type="button" class="mon-defi-filter${filter.active ? ' mon-defi-filter-active' : ''}"
+            data-defi-kind="${escapeHtml(filter.id ?? '')}" aria-pressed="${filter.active ? 'true' : 'false'}"
+            ${filter.id !== null && filter.count === 0 ? 'disabled' : ''}>
+            ${escapeHtml(filter.label)} <strong>${escapeHtml(fmtNumber(filter.count))}</strong>
+        </button>`).join('');
+        if (view.baseline) {
+            els.defiChangeGroups.innerHTML = '<p class="mon-empty">Today is the first protocol snapshot and sets the baseline. Integrations that already existed are not shown as new.</p>';
+            return;
+        }
+        if (view.groups.length === 0) {
+            els.defiChangeGroups.innerHTML = `<p class="mon-empty">${view.total === 0
+                ? 'No watched protocol changes between these two daily observations.'
+                : 'No changes match this filter.'}</p>`;
+            return;
+        }
+        // Every event in the pair was observed on the later day.
+        const row = (change) => defiChangeRow(change, view.to);
+        els.defiChangeGroups.innerHTML = view.groups.map((group) => {
+            const rows = splitDisplayRows(group.items);
+            return `<section class="mon-group mon-defi-group">
+                <h3>${escapeHtml(group.label)} <span class="mon-group-count">${escapeHtml(fmtNumber(group.items.length))}</span></h3>
+                <ul class="fold-list mon-defi-list">${rows.visible.map(row).join('')}</ul>
+                ${rows.hidden.length === 0 ? '' : `<details class="mon-group-more"><summary>Show ${escapeHtml(fmtNumber(rows.hidden.length))} more exact integration change${rows.hidden.length === 1 ? '' : 's'}</summary>
+                    <ul class="fold-list mon-defi-list">${rows.hidden.map(row).join('')}</ul></details>`}
+            </section>`;
+        }).join('');
+    }
+
+    function renderEvents() {
+        const events = sortEvents(state.changes?.events);
+        if (events.length === 0) {
+            els.eventList.innerHTML = '<p class="mon-empty">No curated events.</p>';
+            return;
+        }
+        els.eventList.innerHTML = events.map((event) =>
+            eventRow(event, state.changes?.eventKinds?.[event.kind] ?? DEFAULT_EVENT_KIND)).join('');
+    }
+
+    function renderMeteora() {
+        if (state.meteora.length === 0) {
+            els.meteoraBody.innerHTML = '<tr><td colspan="9" class="mon-empty">No Meteora pool records.</td></tr>';
+            els.meteoraCount.textContent = '';
+            return;
+        }
+        els.meteoraBody.innerHTML = state.meteora.map((pool) => {
+            const symbol = escapeHtml(pool.symbol ?? pool.mint ?? DASH);
+            const href = cardHref(pool.symbol, pool.mint, pool.cardSlug);
+            const link = href === null
+                ? `<span class="mon-symbol">${symbol}</span>`
+                : `<a class="mon-symbol" href="${escapeHtml(href)}">${symbol}</a>`;
+            // The dynamic fee is only printed when it survives its own rounding: 3.2e-6 % renders as
+            // "0.0000% dynamic", which reads as a fee that is there but zero rather than one too
+            // small to show. Below that it is simply left out.
+            const showsDynamic = isNum(pool.dynamicFeePct) && pool.dynamicFeePct >= 0.00005;
+            const fee = isNum(pool.baseFeePct)
+                ? `${fmtPct(pool.baseFeePct, 2)} base${showsDynamic ? ` + ${fmtPct(pool.dynamicFeePct, 4)} dynamic` : ''}`
+                : DASH;
+            const bin = isNum(pool.binStep) ? fmtNumber(pool.binStep) : DASH;
+            const failed = isNum(pool.failedShare)
+                ? `${fmtPct(pool.failedShare)} <span class="mon-sub">of ${fmtNumber(pool.signaturesSeen)}</span>`
+                : `${DASH} <span class="mon-sub">not sampled</span>`;
+            const premiumClass = !isNum(pool.premiumPct) ? '' : pool.premiumPct >= 0 ? ' num-up' : ' num-down';
+            const curve = curveSummary(pool.curve);
+            const curveLine = curve === null ? '' : `<tr class="mon-curve-row"><td colspan="9">
+                <strong>Bonding curve</strong> ${escapeHtml(curve.text)}
+                ${curve.pairName ? ` &middot; pair ${escapeHtml(curve.pairName)}` : ''}
+                ${curve.note ? `<span class="mon-sub mon-curve-note">${escapeHtml(curve.note)}</span>` : ''}
+            </td></tr>`;
+            return `<tr>
+                <td class="cell-token">${link}<span class="mon-name">${escapeHtml(pool.issuerName ?? pool.issuer ?? '')}</span></td>
+                <td><span class="mon-pool-type">${escapeHtml((pool.poolType ?? DASH).toUpperCase())}</span></td>
+                <td class="num">${escapeHtml(bin)}</td>
+                <td>${fee}</td>
+                <td class="num">${escapeHtml(fmtMoney(pool.liquidityUsd))}</td>
+                <td class="num">${escapeHtml(fmtMoney(pool.volume24Usd))}</td>
+                <td class="num">${escapeHtml(fmtMoney(pool.fees24Usd))}</td>
+                <td class="num${premiumClass}">${escapeHtml(fmtSignedPct(pool.premiumPct))}<span class="mon-sub">${escapeHtml(isNum(pool.priceUsd) ? fmtPrice(pool.priceUsd) : DASH)}</span></td>
+                <td class="num">${failed}<span class="mon-sub" title="${escapeHtml(fmtDateTime(pool.lastTradeAt))}">${escapeHtml(pool.lastTradeAt === null ? 'no trade seen' : `last ${fmtRelativeTime(pool.lastTradeAt)}`)}</span></td>
+            </tr>${curveLine}`;
+        }).join('');
+        const sampled = state.meteora.filter((pool) => isNum(pool.failedShare)).length;
+        els.meteoraCount.textContent = `${fmtNumber(state.meteora.length)} pools · ${fmtNumber(sampled)} reached by the trade collector`;
+    }
+
+    /** One chip: a link when the card exists, plain text when it does not. */
+    function newMintChipHtml(chip) {
+        const parts = [`<span class="new-mint-symbol">${escapeHtml(chip.symbol)}</span>`];
+        if (chip.issuer !== null) parts.push(`<span class="new-mint-issuer">${escapeHtml(chip.issuer)}</span>`);
+        if (chip.firstSeen !== null) parts.push(`<span class="new-mint-age">first seen ${escapeHtml(chip.firstSeen)}</span>`);
+        const inner = parts.join('<span aria-hidden="true">·</span>');
+        const title = ` title="${escapeHtml(chip.title)}"`;
+        if (chip.href === null) return `<li class="new-mint-chip"><span${title}>${inner}</span></li>`;
+        return `<li class="new-mint-chip"><a href="${escapeHtml(chip.href)}"${title}>${inner}</a></li>`;
+    }
+
+    /**
+     * The "New on Solana" strip plus its count in the data line. Nothing to show — no file, no feed,
+     * no rows — hides both and says nothing: the strip is a bonus, not a fact the page owes.
+     */
+    function renderNewMints() {
+        if (!els.newMints || !els.newMintsTrack || !els.newMintsClone) return;
+        const chips = newMintChips(state.changes, Date.now());
+        const days = newMintsWindowDays(state.changes);
+        if (chips.length === 0) {
+            els.newMints.hidden = true;
+            if (els.newMintsSummary) els.newMintsSummary.hidden = true;
+            return;
+        }
+        const visible = chips.slice(0, NEW_MINTS_DISPLAY_LIMIT);
+        els.newMintsTrack.innerHTML = visible.slice(0, 8).map(newMintChipHtml).join('');
+        els.newMintsClone.innerHTML = visible.map(newMintChipHtml).join('');
+        if (els.newMintsWindow) els.newMintsWindow.textContent = String(days);
+        els.newMints.hidden = false;
+        if (els.newMintsSummaryLink) {
+            els.newMintsSummaryLink.textContent = `${fmtNumber(chips.length)} new mint${chips.length === 1 ? '' : 's'} `
+                + `in the last ${fmtNumber(days)} days`;
+        }
+        if (els.newMintsSummary) els.newMintsSummary.hidden = false;
+    }
+
+    /** Everything the API drives. The file-fed sections render once, when their files land. */
+    function renderExplorer() {
+        renderTiles();
+        renderLevels();
+        renderDimensions();
+        renderRuleStrip();
+        renderFacetPanel();
+        renderChips();
+        renderTable();
+    }
+
+    /** The page's own parameters, kept in the URL so a shared link reaches the same API. */
+    function urlExtras() {
+        const params = new URLSearchParams(window.location.search);
+        const extras = {};
+        if (params.has('api')) extras.api = params.get('api');
+        if (params.has('reduceMotion')) extras.reduceMotion = params.get('reduceMotion') || '1';
+        return extras;
+    }
+
+    /** The URL now mirrors the filter state, so this view is a link someone can send. */
+    function syncUrl() {
+        const search = filterStateToSearch(state, urlExtras());
+        const url = `${window.location.pathname}${search === '' ? '' : `?${search}`}`;
+        window.history.replaceState(null, '', url);
+    }
+
+    function apiFailure(url, status, message) {
+        const err = new Error(describeApiFailure({ path: url, status, message }));
+        err.api = { path: url, status, message };
+        return err;
+    }
+
+    async function getJson(url) {
+        let res;
+        try {
+            res = await fetch(url, { cache: 'no-store' });
+        } catch (err) {
+            throw apiFailure(url, null, err.message);
+        }
+        if (!res.ok) throw apiFailure(url, res.status, null);
+        return res.json();
+    }
+
+    /**
+     * One round trip for the current state: the facet counts and the page of tokens, in parallel.
+     * The sequence number is taken BEFORE the requests and checked after, so a slow earlier answer
+     * cannot repaint a table the reader has already moved on from.
+     */
+    async function refresh() {
+        const token = sequence.next();
+        state.loading = true;
+        els.tableWrap.classList.add('is-loading');
+        syncUrl();
+
+        const facetsUrl = apiLib.apiUrl('/api/facets', facetRequestParams(state), base);
+        const tokensUrl = apiLib.apiUrl('/api/tokens', tokenRequestParams(state), base);
+        try {
+            const [facets, tokens] = await Promise.all([getJson(facetsUrl), getJson(tokensUrl)]);
+            if (!sequence.isCurrent(token)) return;
+            state.loading = false;
+            state.error = null;
+            state.facets = facets?.facets ?? null;
+            state.items = Array.isArray(tokens?.items) ? tokens.items : [];
+            state.total = isNum(tokens?.total) ? tokens.total : 0;
+            state.rows = tokenRowsFromApi(state.items, state.closedIndex, state.tape);
+            // The API clamps nothing about `page`: an offset past the end is an empty page, so the
+            // reader is moved onto the last page that exists instead of being shown a blank table.
+            const math = pageMath({ total: state.total, page: state.page });
+            if (math.page !== state.page) {
+                state.page = math.page;
+                refresh();
+                return;
+            }
+            renderExplorer();
+        } catch (err) {
+            if (!sequence.isCurrent(token)) return;
+            state.loading = false;
+            state.error = err.message;
+            state.facets = null;
+            state.items = [];
+            state.rows = [];
+            state.total = 0;
+            logError('the API did not answer', err.api ?? err.message);
+            renderExplorer();
+        }
+    }
+
+    /** Every state change goes through here, so a burst of clicks costs one round trip. */
+    function scheduleRefresh() {
+        renderExplorer();
+        if (debounceTimer !== null) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            debounceTimer = null;
+            refresh();
+        }, DEBOUNCE_MS);
+    }
+
+    /** A facet value toggled: the page returns to the first page, since the set just changed. */
+    function toggleFilter(facet, value) {
+        if (facet === 'q') {
+            state.q = '';
+            els.searchFilter.value = '';
+        } else {
+            state.filters = toggleFilterValue(state.filters, facet, value);
+        }
+        state.page = 1;
+        scheduleRefresh();
+    }
+
+    async function loadFile(path, { required = false } = {}) {
+        try {
+            const res = await fetch(path, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            if (required) throw err;
+            logError(`${path} did not load`, err.message);
+            return null;
+        }
+    }
+
+    /**
+     * The sections that are still files: the "When closed" column, both change logs, the events
+     * and the Meteora pools. They are loaded beside the API calls and never block the table.
+     */
+    async function loadFileSections() {
+        const [closedMarket, changes, defiChanges, meteora, tokens, trades] = await Promise.all([
+            loadFile(FILES.closedMarket),
+            loadFile(FILES.changes),
+            loadFile(FILES.defiChanges),
+            loadFile(FILES.meteora),
+            loadFile(FILES.tokens),
+            loadFile(FILES.trades)
+        ]);
+        state.closedIndex = closedMarketIndex(closedMarket);
+        state.tape = tapeLastTrades(trades);
+        state.changes = changes;
+        state.defiChanges = defiChanges;
+        state.meteora = meteoraRows({ meteora, tokens, trades });
+        // The "When closed" column belongs to rows that may already be on screen.
+        state.rows = tokenRowsFromApi(state.items, state.closedIndex, state.tape);
+        renderTable();
+        renderNewMints();
+        renderChanges();
+        renderDefiChanges();
+        renderEvents();
+        renderMeteora();
+    }
+
+    async function loadApiHealth() {
+        const url = apiLib.apiUrl('/api/health', null, base);
+        try {
+            const health = await getJson(url);
+            if (els.dataAsOf) {
+                els.dataAsOf.textContent = fmtDateTime(health?.latestBuildAt);
+                els.dataAsOf.setAttribute('datetime', health?.latestBuildAt ?? '');
+            }
+            if (els.snapshotDate) els.snapshotDate.textContent = fmtDate(health?.latestSnapshotDate);
+            if (els.tokenTotal) els.tokenTotal.textContent = fmtNumber(health?.counts?.tokens);
+        } catch (err) {
+            logError('/api/health did not answer', err.api ?? err.message);
+            if (els.dataAsOf) els.dataAsOf.textContent = DASH;
+            if (els.snapshotDate) els.snapshotDate.textContent = DASH;
+            if (els.tokenTotal) els.tokenTotal.textContent = DASH;
+        }
+    }
+
+    function wireEvents() {
+        // One handler for every facet-shaped control: the tiles, the rule strip and the panel rows
+        // all carry data-facet + data-value, so they cannot drift apart from each other.
+        for (const el of [els.tiles, els.levels, els.dimensions, els.ruleStrip, els.facetPanel]) {
+            el.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-facet][data-value]');
+                if (!button || button.disabled) return;
+                toggleFilter(button.dataset.facet, button.dataset.value);
+            });
+        }
+        els.chipList.addEventListener('click', (event) => {
+            const button = event.target.closest('.mon-filter-remove');
+            if (!button) return;
+            toggleFilter(button.dataset.facet, button.dataset.value);
+        });
+        els.clearFilters.addEventListener('click', () => {
+            state.filters = {};
+            state.q = '';
+            els.searchFilter.value = '';
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.searchFilter.addEventListener('input', () => {
+            state.q = els.searchFilter.value;
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.tokenTable.addEventListener('click', (event) => {
+            const th = event.target.closest('th[data-sort]');
+            if (!th || !TOKEN_SORTS.includes(th.dataset.sort)) return;
+            if (state.sort === th.dataset.sort) {
+                state.order = state.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                state.sort = th.dataset.sort;
+                // A number reads most usefully largest-first; the symbol reads A–Z.
+                state.order = th.dataset.sort === 'symbol' ? 'asc' : 'desc';
+            }
+            state.page = 1;
+            scheduleRefresh();
+        });
+        els.prevPage.addEventListener('click', () => {
+            state.page = Math.max(1, state.page - 1);
+            scheduleRefresh();
+        });
+        els.nextPage.addEventListener('click', () => {
+            state.page += 1;
+            scheduleRefresh();
+        });
+        els.defiChangeFilters.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-defi-kind]');
+            if (!button || button.disabled) return;
+            state.defiKind = button.dataset.defiKind || null;
+            renderDefiChanges();
+        });
+        // The back button is a filter change like any other, so a shared link and the history both
+        // land on the same view.
+        window.addEventListener('popstate', () => {
+            Object.assign(state, parseFilterState(window.location.search));
+            els.searchFilter.value = state.q;
+            scheduleRefresh();
+        });
+    }
+
+    async function boot() {
+        els.status = document.getElementById('status');
+        els.dataAsOf = document.getElementById('dataAsOf');
+        els.snapshotDate = document.getElementById('snapshotDate');
+        els.tokenTotal = document.getElementById('tokenTotal');
+        els.newMints = document.getElementById('newMints');
+        els.newMintsTrack = document.getElementById('newMintsTrack');
+        els.newMintsClone = document.getElementById('newMintsClone');
+        els.newMintsWindow = document.getElementById('newMintsWindow');
+        els.newMintsSummary = document.getElementById('newMintsSummary');
+        els.newMintsSummaryLink = document.getElementById('newMintsSummaryLink');
+        els.tiles = document.getElementById('statusTiles');
+        els.levels = document.getElementById('healthLevels');
+        els.dimensions = document.getElementById('healthDimensions');
+        els.ruleStrip = document.getElementById('ruleStrip');
+        els.statusVerdict = document.getElementById('statusVerdict');
+        els.ruleCaption = document.getElementById('ruleCaption');
+        els.facetPanel = document.getElementById('facetPanel');
+        els.chips = document.getElementById('activeFilters');
+        els.chipList = document.getElementById('filterChips');
+        els.clearFilters = document.getElementById('clearFilters');
+        els.searchFilter = document.getElementById('searchFilter');
+        els.tableWrap = document.getElementById('tokenTableWrap');
+        els.tableMessage = document.getElementById('tableMessage');
+        els.tokenTable = document.getElementById('tokenTable');
+        els.tokenBody = document.getElementById('tokenBody');
+        els.tokenCount = document.getElementById('tokenCount');
+        els.pager = document.getElementById('tokenPager');
+        els.pageLabel = document.getElementById('pageLabel');
+        els.prevPage = document.getElementById('prevPage');
+        els.nextPage = document.getElementById('nextPage');
+        els.changeRange = document.getElementById('changeRange');
+        els.changeStrip = document.getElementById('changeStrip');
+        els.changeGroups = document.getElementById('changeGroups');
+        els.defiChangeRange = document.getElementById('defiChangeRange');
+        els.defiChangeFilters = document.getElementById('defiChangeFilters');
+        els.defiChangeGroups = document.getElementById('defiChangeGroups');
+        els.eventList = document.getElementById('eventList');
+        els.meteoraBody = document.getElementById('meteoraBody');
+        els.meteoraCount = document.getElementById('meteoraCount');
+
+        // Reduced motion is an accessibility setting first and the test hook second: the only thing
+        // that moves on this page is the "New on Solana" ticker, and the class turns it into a
+        // static wrapping row (stocks.css). ?reduceMotion=1 forces the same for a driver that cannot
+        // emulate the media query. Same class name live.js uses.
+        const reduceMotion = new URLSearchParams(window.location.search).has('reduceMotion')
+            || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (reduceMotion) document.body.classList.add('reduce-motion');
+
+        if (apiLib === null) {
+            els.status.hidden = false;
+            els.status.classList.add('status-error');
+            els.status.textContent = 'stocks/lib/api-base.js did not load, so this page cannot find the API.';
+            logError('stocks/lib/api-base.js is missing', null);
+            return;
+        }
+        base = apiLib.apiBase();
+
+        Object.assign(state, parseFilterState(window.location.search));
+        els.searchFilter.value = state.q;
+        els.status.hidden = true;
+
+        wireEvents();
+        // The files and the API go out together; neither waits for the other.
+        loadFileSections();
+        loadApiHealth();
+        await refresh();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+
+    return api;
+}));

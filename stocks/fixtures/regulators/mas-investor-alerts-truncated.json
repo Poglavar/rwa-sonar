@@ -1,0 +1,109 @@
+{
+ "response": {
+  "numFound": 920,
+  "docs": [
+   {
+    "id": "6012",
+    "date_dt": "2026-09-30T00:00:00Z",
+    "unregulatedpersons_t": [
+     "ProfitsMirror Ltd. ; ProfitsMirror ; Profits Mirror Ltd. ; Profits Mirror"
+    ],
+    "website_s": "profitsmirror.com\nhttps://profitsmirror.com/index.php ",
+    "modifieddate_dt": "2026-09-30T17:45:13.537Z",
+    "approveddate_dt": "2026-09-30T17:45:13.533Z",
+    "approveddate_s": "30 Sep 2026",
+    "modifieddate_s": "30 Sep 2026",
+    "date_s": "30 Sep 2026",
+    "unregulatedpersons_s": "ProfitsMirror Ltd. , ProfitsMirror , Profits Mirror Ltd. , Profits Mirror",
+    "agency_custom_categories": "Investor Alert List",
+    "url": "https://www.mas.gov.sg/investor-alert-list?q=ProfitsMirror Ltd. ; ProfitsMirror ; Profits Mirror Ltd. ; Profits Mirror",
+    "last_updated_at": [
+     "2026-09-30T17:45:13.537Z"
+    ],
+    "address_s": "",
+    "alternativename_t": [
+     ""
+    ],
+    "email_s": "",
+    "alternativename_s": "",
+    "phonenumber_s": "",
+    "relatedunregulatedpersonsid_s": "",
+    "formername_t": [
+     ""
+    ],
+    "formername_s": "",
+    "notes_s": "",
+    "relatedunregulatedpersons_s": "",
+    "score": 1.9985415
+   },
+   {
+    "id": "6011",
+    "date_dt": "2026-09-16T00:00:00Z",
+    "unregulatedpersons_t": [
+     "White Deer Club (operated by New Omaten Productions Technology Pte. Ltd.)"
+    ],
+    "website_s": "https://www.whitedeerclub.com/",
+    "modifieddate_dt": "2026-09-16T12:27:19.078Z",
+    "approveddate_dt": "2026-09-16T12:27:19.023Z",
+    "approveddate_s": "16 Sep 2026",
+    "modifieddate_s": "16 Sep 2026",
+    "date_s": "16 Sep 2026",
+    "unregulatedpersons_s": "White Deer Club (operated by New Omaten Productions Technology Pte. Ltd.)",
+    "agency_custom_categories": "Investor Alert List",
+    "url": "https://www.mas.gov.sg/investor-alert-list?q=White Deer Club (operated by New Omaten Productions Technology Pte. Ltd.)",
+    "last_updated_at": [
+     "2026-09-16T12:27:19.078Z"
+    ],
+    "address_s": "",
+    "alternativename_t": [
+     ""
+    ],
+    "email_s": "",
+    "alternativename_s": "",
+    "phonenumber_s": "",
+    "relatedunregulatedpersonsid_s": "",
+    "formername_t": [
+     ""
+    ],
+    "formername_s": "",
+    "notes_s": "",
+    "relatedunregulatedpersons_s": "",
+    "score": 1.9618306
+   },
+   {
+    "id": "6010",
+    "date_dt": "2026-08-24T00:00:00Z",
+    "unregulatedpersons_t": [
+     "Javelin Wealth Global"
+    ],
+    "website_s": "https://www.javelinwealthglobal.com/",
+    "modifieddate_dt": "2026-08-24T18:06:36.481Z",
+    "notes_s": "This entity impersonates a financial institution that is regulated by MAS, Javelin Wealth Management Pte. Ltd. Members of the public should take care in ensuring that they are dealing with the actual regulated entity. Contact details of the MAS regulated entity may be found in the Financial Institutions Directory on MAS’ website.",
+    "email_s": "contact@javelinwealthglobal.com",
+    "approveddate_dt": "2026-08-24T18:06:36.470Z",
+    "approveddate_s": "24 Aug 2026",
+    "modifieddate_s": "24 Aug 2026",
+    "date_s": "24 Aug 2026",
+    "unregulatedpersons_s": "Javelin Wealth Global",
+    "agency_custom_categories": "Investor Alert List",
+    "url": "https://www.mas.gov.sg/investor-alert-list?q=Javelin Wealth Global",
+    "last_updated_at": [
+     "2026-08-24T18:06:36.481Z"
+    ],
+    "address_s": "",
+    "alternativename_t": [
+     ""
+    ],
+    "alternativename_s": "",
+    "phonenumber_s": "",
+    "relatedunregulatedpersonsid_s": "",
+    "formername_t": [
+     ""
+    ],
+    "formername_s": "",
+    "relatedunregulatedpersons_s": "",
+    "score": 1.9070463
+   }
+  ]
+ }
+}

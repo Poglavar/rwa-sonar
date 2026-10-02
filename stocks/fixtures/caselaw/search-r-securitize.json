@@ -1,0 +1,246 @@
+{
+ "count": 2,
+ "document_count": 97,
+ "next": null,
+ "previous": null,
+ "results": [
+  {
+   "assignedTo": "Gregory B. Williams",
+   "assigned_to_id": null,
+   "attorney": [
+    "Rodger Dallery Smith , II",
+    "Anthony David Raucci"
+   ],
+   "attorney_id": [
+    13762272,
+    13762271
+   ],
+   "caseName": "Securitize I, Inc. v. tZERO Group, Inc.",
+   "case_name_full": "",
+   "cause": "35:1 Patent Infringement",
+   "chapter": null,
+   "court": "District Court, D. Delaware",
+   "court_citation_string": "D. Del.",
+   "court_id": "ded",
+   "dateArgued": null,
+   "dateFiled": "2026-06-22",
+   "dateTerminated": null,
+   "docketNumber": "1:26-cv-00722",
+   "docket_absolute_url": "/docket/73511778/securitize-i-inc-v-tzero-group-inc/",
+   "docket_id": 73511778,
+   "firm": [
+    "Morris, Nichols, Arsht & Tunnell"
+   ],
+   "firm_id": [
+    37252
+   ],
+   "jurisdictionType": "Federal Question",
+   "juryDemand": "Both",
+   "meta": {
+    "timestamp": "2026-08-24T15:10:30.361770Z",
+    "date_created": "2026-06-22T14:07:44.374370Z",
+    "score": {
+     "bm25": 13458183000000.0
+    },
+    "more_docs": true
+   },
+   "pacer_case_id": "93554",
+   "party": [
+    "tZERO Group, Inc.",
+    "tZERO IP, LLC",
+    "Securitize, Inc."
+   ],
+   "party_id": [
+    20074004,
+    20074005,
+    20074006
+   ],
+   "recap_documents": [
+    {
+     "absolute_url": "/docket/73511778/18/securitize-i-inc-v-tzero-group-inc/",
+     "attachment_number": null,
+     "description": "Disclosure Statement pursuant to Rule 7.1: identifying Corporate Parent Securitize Corp. for Securitize I, Inc. filed by Securitize I, Inc. (Raucci, Anthony) (Main Document 18 replaced on 7/22/2026) (lnb). Modified on 7/22/2026 (lnb). (Entered: 07/21/2026)",
+     "docket_entry_id": 471596637,
+     "document_number": 18,
+     "document_type": "PACER Document",
+     "entry_date_filed": "2026-07-21",
+     "entry_number": 18,
+     "filepath_local": "recap/gov.uscourts.ded.93554/gov.uscourts.ded.93554.18.0.pdf",
+     "id": 487005658,
+     "is_available": true,
+     "meta": {
+      "timestamp": "2026-08-24T15:11:15.275263Z",
+      "date_created": "2026-07-21T17:10:20.439206Z"
+     },
+     "pacer_doc_id": "04307300055",
+     "page_count": 1,
+     "short_description": "Disclosure Statement - Rule 7.1",
+     "snippet": "Case 1:26-cv-00722-GBW         Document 18        Filed 07/21/26       Page 1 of 1 PageID #: 504\n\n\n\n\n                          IN THE UNITED STATES DISTRICT COURT\n                              FOR THE"
+    },
+    {
+     "absolute_url": "/docket/73511778/25/securitize-i-inc-v-tzero-group-inc/",
+     "attachment_number": null,
+     "description": "OPENING BRIEF in Support re 24 MOTION to Dismiss for Failure to State a Claim tZero IP, LLC's Amended Counterclaims - filed by Securitize I, Inc..Answering Brief/Response due date per Local Rules is 9/4/2026. (Raucci, Anthony) (Entered: 08/21/2026)",
+     "docket_entry_id": 475422744,
+     "document_number": 25,
+     "document_type": "PACER Document",
+     "entry_date_filed": "2026-08-21",
+     "entry_number": 25,
+     "filepath_local": "recap/gov.uscourts.ded.93554/gov.uscourts.ded.93554.25.0.pdf",
+     "id": 490953419,
+     "is_available": true,
+     "meta": {
+      "timestamp": "2026-08-24T15:12:10.616627Z",
+      "date_created": "2026-08-21T22:08:51.732258Z"
+     },
+     "pacer_doc_id": "04307339089",
+     "page_count": 38,
+     "short_description": "Brief - Opening Brief in Support",
+     "snippet": "Case 1:26-cv-00722-GBW        Document 25        Filed 08/21/26    Page 1 of 38 PageID #: 524\n\n\n\n\n                       IN THE UNITED STATES DISTRICT COURT\n                           FOR THE DISTRICT"
+    },
+    {
+     "absolute_url": "/docket/73511778/26/securitize-i-inc-v-tzero-group-inc/",
+     "attachment_number": null,
+     "description": "DECLARATION of Zhikun (David) Jiang by Securitize I, Inc.. (Attachments: # 1 Exs. 1-5)(Raucci, Anthony) (Entered: 08/21/2026)",
+     "docket_entry_id": 475422743,
+     "document_number": 26,
+     "document_type": "PACER Document",
+     "entry_date_filed": "2026-08-21",
+     "entry_number": 26,
+     "filepath_local": null,
+     "id": 490953418,
+     "is_available": false,
+     "meta": {
+      "timestamp": "2026-09-23T04:49:07.969777Z",
+      "date_created": "2026-08-21T22:08:51.549303Z"
+     },
+     "pacer_doc_id": "04307339092",
+     "page_count": 3,
+     "short_description": "Declaration",
+     "snippet": ""
+    }
+   ],
+   "referredTo": null,
+   "referred_to_id": null,
+   "suitNature": "830 Patent",
+   "trustee_str": null
+  },
+  {
+   "assignedTo": "Gregory B. Williams",
+   "assigned_to_id": null,
+   "attorney": [
+    "Margaret Fleming England"
+   ],
+   "attorney_id": [
+    13739815
+   ],
+   "caseName": "Liquid Rarity Exchange, LLC v. Securitize I, Inc.",
+   "case_name_full": "",
+   "cause": "35:1 Patent Infringement",
+   "chapter": null,
+   "court": "District Court, D. Delaware",
+   "court_citation_string": "D. Del.",
+   "court_id": "ded",
+   "dateArgued": null,
+   "dateFiled": "2026-06-15",
+   "dateTerminated": null,
+   "docketNumber": "1:26-cv-00698",
+   "docket_absolute_url": "/docket/73488408/liquid-rarity-exchange-llc-v-securitize-i-inc/",
+   "docket_id": 73488408,
+   "firm": [
+    "Gellert Seitz Busenkell & Brown, LLC"
+   ],
+   "firm_id": [
+    937333
+   ],
+   "jurisdictionType": "Federal Question",
+   "juryDemand": "Plaintiff",
+   "meta": {
+    "timestamp": "2026-08-27T14:18:24.177801Z",
+    "date_created": "2026-06-16T13:16:28.722810Z",
+    "score": {
+     "bm25": 13457577000000.0
+    },
+    "more_docs": true
+   },
+   "pacer_case_id": "93500",
+   "party": [
+    "Securitize, Inc.",
+    "Liquid Rarity Exchange, LLC"
+   ],
+   "party_id": [
+    20038328,
+    20038329
+   ],
+   "recap_documents": [
+    {
+     "absolute_url": "/docket/73488408/1/8/liquid-rarity-exchange-llc-v-securitize-inc/",
+     "attachment_number": 8,
+     "description": "COMPLAINT for Patent Infringement with Jury Demand against Securitize, Inc. (Filing fee $ 405, receipt number ADEDC-4992844) - filed by Liquid Rarity Exchange, LLC. (Attachments: # 1 Exhibit A, # 2 Exhibit B, # 3 Exhibit C, # 4 Exhibit D, # 5 Exhibit E, # 6 Exhibit F, # 7 Exhibit G, # 8 Exhibit H, # 9 Exhibits H1-H9, # 10 Civil Cover Sheet)(scs) (Entered: 06/16/2026)",
+     "docket_entry_id": 467619427,
+     "document_number": 1,
+     "document_type": "Attachment",
+     "entry_date_filed": "2026-06-15",
+     "entry_number": 1,
+     "filepath_local": "recap/gov.uscourts.ded.93500/gov.uscourts.ded.93500.1.8.pdf",
+     "id": 483121738,
+     "is_available": true,
+     "meta": {
+      "timestamp": "2026-08-27T14:18:24.162567Z",
+      "date_created": "2026-06-17T15:16:10.072903Z"
+     },
+     "pacer_doc_id": "04307260694",
+     "page_count": 18,
+     "short_description": "Exhibit H",
+     "snippet": "Case 1:26-cv-00698-GBW   Document 1-8   Filed 06/15/26   Page 1 of 18 PageID #: 139\n\n\n\n\n                EXHIBIT H\n              CLAIM CHARTS\n\fCase 1:26-cv-00698-GBW        Document 1-8         Filed 0"
+    },
+    {
+     "absolute_url": "/docket/73488408/1/4/liquid-rarity-exchange-llc-v-securitize-inc/",
+     "attachment_number": 4,
+     "description": "COMPLAINT for Patent Infringement with Jury Demand against Securitize, Inc. (Filing fee $ 405, receipt number ADEDC-4992844) - filed by Liquid Rarity Exchange, LLC. (Attachments: # 1 Exhibit A, # 2 Exhibit B, # 3 Exhibit C, # 4 Exhibit D, # 5 Exhibit E, # 6 Exhibit F, # 7 Exhibit G, # 8 Exhibit H, # 9 Exhibits H1-H9, # 10 Civil Cover Sheet)(scs) (Entered: 06/16/2026)",
+     "docket_entry_id": 467619427,
+     "document_number": 1,
+     "document_type": "Attachment",
+     "entry_date_filed": "2026-06-15",
+     "entry_number": 1,
+     "filepath_local": "recap/gov.uscourts.ded.93500/gov.uscourts.ded.93500.1.4.pdf",
+     "id": 483121734,
+     "is_available": true,
+     "meta": {
+      "timestamp": "2026-08-27T14:18:24.162567Z",
+      "date_created": "2026-06-17T15:16:09.991459Z"
+     },
+     "pacer_doc_id": "04307260690",
+     "page_count": 14,
+     "short_description": "Exhibit D",
+     "snippet": "Case 1:26-cv-00698-GBW   Document 1-4   Filed 06/15/26   Page 1 of 14 PageID #: 79\n\n\n\n\n                  EXHIBIT D\n\f  Case 1:26-cv-00698-GBW            Document 1-4        Filed 06/15/26      Page 2 o"
+    },
+    {
+     "absolute_url": "",
+     "attachment_number": null,
+     "description": "",
+     "docket_entry_id": 467861197,
+     "document_number": null,
+     "document_type": "PACER Document",
+     "entry_date_filed": "2026-06-17",
+     "entry_number": null,
+     "filepath_local": null,
+     "id": 483133027,
+     "is_available": false,
+     "meta": {
+      "timestamp": "2026-08-27T14:18:24.162567Z",
+      "date_created": "2026-06-17T16:13:12.647962Z"
+     },
+     "pacer_doc_id": "",
+     "page_count": null,
+     "short_description": "- CORRECTING ENTRY",
+     "snippet": ""
+    }
+   ],
+   "referredTo": null,
+   "referred_to_id": null,
+   "suitNature": "830 Patent",
+   "trustee_str": null
+  }
+ ]
+}

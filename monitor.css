@@ -1,0 +1,956 @@
+/*
+ * Page-specific styles for monitor.html (the health monitor). stocks.css is loaded first and
+ * supplies the colour tokens, the header, the .filters row, the .table-wrap/#tokenTable table and
+ * the footer, so only what is new here is defined: the four status tiles, the worst-rule strip, the
+ * status chips, the change-log groups, the event list and the Meteora pool table. Every colour comes
+ * from a custom property declared in stocks.css, so the dark block there covers this file too and a
+ * status is never carried by colour alone — the word is always there beside it.
+ */
+
+/* --- section rhythm --------------------------------------------------- */
+
+#countsSection,
+#tokensSection,
+#changesSection,
+#defiChangesSection,
+#eventsSection,
+#meteoraSection {
+    /* Vertical rhythm only: a `margin` shorthand here zeroed app-shell's `margin-inline: auto`
+       (an id outranks it), which pinned these panels to x=0 instead of the page gutter. */
+    margin-block: 0 28px;
+}
+
+/* The one plain line under the status tiles (statusVerdict in monitor.js). */
+.mon-verdict {
+    max-width: 90ch;
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--page-text);
+}
+
+.mon-subhead {
+    font-size: 0.95rem;
+    margin: 18px 0 6px;
+}
+
+.mon-range {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+.mon-empty {
+    color: var(--muted-text);
+    font-size: 0.85rem;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.mon-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    font-variant-numeric: normal;
+}
+
+/* --- the four status tiles -------------------------------------------- */
+
+.mon-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 0 0 4px;
+}
+
+.mon-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.mon-tile:hover,
+.mon-tile:focus-visible {
+    border-color: var(--accent);
+}
+
+.mon-tile-active {
+    background: var(--sunken-bg);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mon-tile-count {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-tile-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.mon-tile-blurb {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--muted-text);
+}
+
+/* The four bands, as a left edge plus the label's own colour. */
+.mon-tile-good {
+    border-left-color: var(--up);
+}
+
+.mon-tile-good .mon-tile-label {
+    color: var(--up);
+}
+
+.mon-tile-caution {
+    border-left-color: var(--sev-caution);
+}
+
+.mon-tile-caution .mon-tile-label {
+    color: var(--sev-caution);
+}
+
+.mon-tile-warning {
+    border-left-color: var(--sev-critical);
+}
+
+.mon-tile-warning .mon-tile-label {
+    color: var(--sev-critical);
+}
+
+.mon-tile-unknown {
+    border-left-color: var(--muted-text);
+}
+
+.mon-tile-unknown .mon-tile-label {
+    color: var(--muted-text);
+}
+
+/* The population-level health split: each dimension retains all four explicit states. */
+.mon-dimensions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.mon-dimension {
+    margin: 0;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--sunken-bg);
+}
+
+.mon-dimension h3 {
+    margin: 0 0 8px;
+    font-size: 0.88rem;
+}
+
+.mon-dimension-statuses {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.mon-dimension-status {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 7px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.mon-dimension-status:hover,
+.mon-dimension-status:focus-visible,
+.mon-dimension-status-active {
+    border-color: var(--accent);
+}
+
+.mon-dimension-status-active { box-shadow: inset 0 0 0 1px var(--accent); }
+.mon-dimension-status-good strong { color: var(--up); }
+.mon-dimension-status-caution strong { color: var(--sev-caution); }
+.mon-dimension-status-warning strong { color: var(--sev-critical); }
+.mon-dimension-status-unknown strong { color: var(--muted-text); }
+
+/* The programme and the worst-of-eleven blocks under the token tiles: two blocks, each status on
+   one row on a wide screen. They stack (the 900px rule above) and wrap to two by two on a phone. */
+.mon-levels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mon-levels .mon-dimension-statuses {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* --- worst-rule strip ------------------------------------------------- */
+
+.mon-rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 8px;
+}
+
+.mon-rule {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mon-rule:hover,
+.mon-rule:focus-visible {
+    border-color: var(--accent);
+}
+
+.mon-rule-active {
+    background: var(--sunken-bg);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mon-rule-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mon-rule-count {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-rule-bar {
+    grid-column: 1 / -1;
+    display: block;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--sunken-bg);
+    overflow: hidden;
+}
+
+.mon-rule-fill {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+}
+
+/* --- status chips ----------------------------------------------------- */
+
+.mon-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mon-chip-good {
+    color: var(--up);
+}
+
+.mon-chip-caution {
+    color: var(--sev-caution);
+}
+
+.mon-chip-warning {
+    color: var(--sev-critical);
+}
+
+.mon-chip-unknown {
+    color: var(--muted-text);
+}
+
+/* --- "When closed": one label per lending market that takes the token -------------------- */
+
+/* stocks.css keeps every #tokenTable cell on one line; this one holds up to four labels, which must
+   wrap, so it needs the same id weight to override that. */
+#tokenTable td.mon-closed {
+    min-width: 13rem;
+    max-width: 20rem;
+    white-space: normal;
+}
+
+.mon-cm {
+    display: inline-block;
+    margin: 1px 4px 1px 0;
+    padding: 0 6px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.mon-cm.cm-frozen,
+.mon-cm.cm-unknown,
+.mon-cm-none {
+    color: var(--muted-text);
+}
+
+.mon-cm.cm-overnight {
+    color: var(--accent);
+}
+
+.mon-cm.cm-token,
+.mon-cm.cm-signed {
+    color: var(--sev-caution);
+}
+
+.mon-cm.cm-stale {
+    color: var(--sev-critical);
+}
+
+.mon-cm-none {
+    font-size: 0.8rem;
+}
+
+/* --- the explorer: facet panel beside the table ----------------------- */
+
+/* The panel sits beside the table on a wide screen and ABOVE it on a narrow one (the media query
+   at the end of this file), which is why it is first in the markup: the source order is the
+   narrow-screen order, so nothing has to be re-ordered for a phone. */
+.mon-explorer {
+    display: grid;
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+
+/* minmax(0, 1fr) above plus this: without both, the 1080px-wide table stretches the grid column
+   instead of scrolling inside .table-wrap, and the whole page scrolls sideways. */
+.mon-explorer-main {
+    min-width: 0;
+}
+
+.mon-facets {
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.mon-facet-group {
+    display: grid;
+    gap: 8px;
+}
+
+.mon-facet-heading {
+    margin: 0;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-text);
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 4px;
+}
+
+.mon-facet-title {
+    margin: 6px 0 2px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.mon-facet-values {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.mon-facet-value {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: none;
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.8rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mon-facet-value:hover,
+.mon-facet-value:focus-visible {
+    border-color: var(--accent);
+    background: var(--sunken-bg);
+}
+
+.mon-facet-value-active {
+    border-color: var(--rwa-pressed-line);
+    background: var(--rwa-pressed-bg);
+    color: var(--rwa-pressed-text);
+    font-weight: 750;
+}
+
+/* A value the API cannot be asked for (its text contains the comma the API reads as a separator).
+   The count still reads, because it is a fact; only the click is gone. */
+.mon-facet-value-blocked {
+    cursor: help;
+    color: var(--muted-text);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
+.mon-facet-label {
+    overflow-wrap: anywhere;
+}
+
+.mon-facet-count {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-text);
+}
+
+.mon-facet-value-active .mon-facet-count {
+    color: inherit;
+}
+
+/* --- active filter chips ---------------------------------------------- */
+
+.mon-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+/* `display: flex` is an author rule and the browser's own `[hidden] { display: none }` is not, so
+   without this the chip row and the pager stay visible however the `hidden` property is set. */
+.mon-active-filters[hidden],
+.mon-pager[hidden] {
+    display: none;
+}
+
+.mon-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mon-filter-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 3px 4px 3px 8px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    font-size: 0.76rem;
+    max-width: 44ch;
+}
+
+.mon-filter-facet {
+    color: var(--muted-text);
+}
+
+.mon-filter-value {
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mon-filter-remove {
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--page-text);
+    font: inherit;
+    font-size: 0.95rem;
+    line-height: 1;
+    padding: 0 5px;
+    cursor: pointer;
+}
+
+.mon-filter-remove:hover,
+.mon-filter-remove:focus-visible {
+    background: var(--accent);
+    color: var(--card-bg);
+}
+
+/* --- pagination ------------------------------------------------------- */
+
+.mon-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 0;
+}
+
+.mon-page-label {
+    font-size: 0.82rem;
+    color: var(--muted-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-pager button[disabled] {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.mon-sort-note {
+    margin: 8px 0 0;
+}
+
+/* A request in flight dims the rows it is about to replace, so a slow answer is visible without
+   the table emptying and jumping. */
+.table-wrap.is-loading {
+    opacity: 0.55;
+}
+
+/* --- token table extras ---------------------------------------------- */
+
+/* stocks.css already styles #tokenTable; only what this page adds is here. */
+#tokenTable {
+    min-width: 1080px;
+}
+
+.mon-symbol {
+    display: block;
+    font-weight: 600;
+}
+
+.mon-name {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    max-width: 22ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mon-reset {
+    padding: 7px 12px;
+    border: 1px solid var(--control-border);
+    border-radius: 8px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
+.mon-reset:hover,
+.mon-reset:focus-visible {
+    border-color: var(--accent);
+}
+
+/* --- change log ------------------------------------------------------- */
+
+.mon-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.mon-day {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 7px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--sunken-bg);
+    font-size: 0.76rem;
+}
+
+.mon-day-range {
+    font-weight: 600;
+}
+
+.mon-day-count {
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-day-kinds {
+    color: var(--muted-text);
+}
+
+.mon-group {
+    margin: 0 0 14px;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    padding: 10px 12px;
+}
+
+.mon-group h3 {
+    font-size: 0.9rem;
+    margin: 0 0 8px;
+}
+
+.mon-group-count {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.mon-change-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mon-change-list li {
+    display: grid;
+    grid-template-columns: 8ch 16ch minmax(14ch, 22ch) 1fr;
+    gap: 4px 12px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.82rem;
+}
+
+.mon-change-list li:first-child {
+    border-top: 0;
+}
+
+.mon-change-token {
+    font-weight: 600;
+}
+
+.mon-change-issuer,
+.mon-change-delta {
+    color: var(--muted-text);
+    font-size: 0.78rem;
+}
+
+.mon-change-delta code {
+    font-size: 0.74rem;
+}
+
+.mon-change-note {
+    line-height: 1.45;
+}
+
+.mon-group-more {
+    margin-top: 8px;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 8px;
+}
+
+.mon-group-more summary {
+    width: fit-content;
+    color: var(--link-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.mon-group-more[open] summary {
+    margin-bottom: 6px;
+}
+
+/* --- daily DeFi protocol changes ------------------------------------- */
+
+.mon-defi-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 14px;
+}
+
+.mon-defi-filter {
+    display: inline-flex;
+    gap: 7px;
+    align-items: baseline;
+    padding: 6px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.mon-defi-filter:hover,
+.mon-defi-filter:focus-visible {
+    border-color: var(--accent);
+}
+
+.mon-defi-filter-active {
+    border-color: var(--rwa-pressed-line);
+    background: var(--rwa-pressed-bg);
+    color: var(--rwa-pressed-text);
+    font-weight: 750;
+}
+
+.mon-defi-filter[disabled] {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+}
+
+.mon-defi-filter strong {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Each change is a fold row (app-shell.css): one closed line of when, severity, token and protocol,
+   one of explanation; the card link, before → after and exact token address open below. */
+.mon-defi-change-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 7px;
+    margin: 8px 0 0;
+}
+
+.mon-defi-token { font-weight: 700; }
+.mon-defi-protocol { font-size: 0.8rem; color: var(--muted-text); }
+
+.mon-defi-severity {
+    padding: 1px 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.mon-defi-severity-caution { color: var(--sev-caution); }
+.mon-defi-severity-warning { color: var(--sev-critical); }
+
+.mon-defi-summary {
+    margin: 5px 0 3px;
+    line-height: 1.45;
+    font-size: 0.85rem;
+}
+
+.mon-defi-evidence {
+    margin: 0;
+    color: var(--muted-text);
+    font-size: 0.74rem;
+    line-height: 1.45;
+}
+
+.mon-defi-evidence code { overflow-wrap: anywhere; }
+.mon-defi-source { margin-top: 9px; }
+
+/* --- events ----------------------------------------------------------- */
+
+/* Each event is a fold row (app-shell.css): date, kind and issuer closed; summary and source open. */
+.mon-event-kind {
+    padding: 1px 8px;
+    border: 1px solid var(--sev-caution);
+    border-radius: 999px;
+    color: var(--sev-caution);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: help;
+}
+
+.mon-event-kind-note {
+    margin: 8px 0 4px;
+    color: var(--muted-text);
+    font-size: 0.76rem;
+}
+
+.mon-event-summary {
+    margin: 0 0 4px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    max-width: 80ch;
+}
+
+.mon-event-source {
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--muted-text);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* --- Meteora pools ---------------------------------------------------- */
+
+#meteoraTable {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 900px;
+    font-size: 0.84rem;
+}
+
+#meteoraTable th,
+#meteoraTable td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--panel-border);
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+#meteoraTable th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--header-bg);
+    color: var(--header-text);
+    font-size: 0.76rem;
+}
+
+#meteoraTable td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.mon-pool-type {
+    display: inline-block;
+    padding: 1px 7px;
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    background: var(--sunken-bg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.mon-curve-row td {
+    white-space: normal;
+    background: var(--sunken-bg);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.mon-curve-note {
+    margin-top: 3px;
+}
+
+/* --- small screens ---------------------------------------------------- */
+
+/* The panel stops being a sidebar before the table does: below this the two columns would each be
+   too narrow to read, so the facets stack above the table (source order already does that). */
+@media (max-width: 900px) {
+    .mon-dimensions { grid-template-columns: 1fr; }
+
+    .mon-explorer {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mon-facets {
+        max-height: none;
+    }
+
+    .mon-facet-values {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 600px) {
+    .mon-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .mon-filter-chip {
+        max-width: 100%;
+    }
+
+    .mon-pager {
+        justify-content: space-between;
+    }
+
+    .mon-pager button {
+        width: auto;
+    }
+
+    .mon-tile {
+        padding: 10px;
+    }
+
+    .mon-tile-count {
+        font-size: 1.5rem;
+    }
+
+    .mon-rules {
+        grid-template-columns: 1fr;
+    }
+
+    .mon-levels .mon-dimension-statuses {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* A four-column change row has nothing left for the note at 360px; stack it. */
+    .mon-change-list li {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2px;
+        overflow-wrap: anywhere;
+    }
+
+    /* The stand-alone reset button is full width on a phone; the ones that sit inside a row of
+       other controls (the chip row, the pager) keep their own width. */
+    .mon-reset {
+        width: 100%;
+    }
+
+    .mon-active-filters .mon-reset,
+    .mon-pager .mon-reset {
+        width: auto;
+    }
+}
+
+/* Page title: the serif heading the other research pages (flows, tracking, exits) use. */
+.mon-title {
+    margin-block: 0 14px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.7rem, 4.6vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1.12;
+}

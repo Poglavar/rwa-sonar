@@ -1,0 +1,962 @@
+/*
+ * Styles for the generated cards in cards/ (one page per tokenized stock, built by
+ * stocks/build-cards.mjs). The colours alias the shared palette in app-shell.css, so a card looks
+ * like the rest of the site in both themes; the layout is its own —
+ * a single readable column, label/value pairs that collapse to one column on a phone, and every
+ * table in its own horizontal scroller so a 320 px screen never scrolls the page sideways.
+ */
+
+:root {
+    /* Aliases of the shared palette in app-shell.css, in the names the card markup uses. The status
+       pills (good · caution · warning · unknown) tint their own colour (10%, AA for the text on it), so both themes follow. */
+    color-scheme: light;
+    --page-bg: var(--rwa-paper);
+    --page-text: var(--rwa-ink);
+    --panel-border: var(--rwa-line);
+    --muted-text: var(--rwa-muted);
+    --link-color: var(--rwa-cobalt-dark);
+    --card-bg: var(--rwa-panel);
+    --sunken-bg: var(--rwa-sunken);
+    --header-bg: #e8e4da;
+    --header-text: var(--rwa-ink);
+    --accent: var(--rwa-cobalt);
+    --good: var(--rwa-green);
+    --caution: var(--rwa-amber);
+    --warning: var(--rwa-red);
+    --unknown: var(--rwa-muted);
+    --good-bg: color-mix(in srgb, var(--good) 10%, var(--card-bg));
+    --caution-bg: color-mix(in srgb, var(--caution) 10%, var(--card-bg));
+    --warning-bg: color-mix(in srgb, var(--warning) 10%, var(--card-bg));
+    --unknown-bg: color-mix(in srgb, var(--unknown) 10%, var(--card-bg));
+}
+
+:root:where([data-theme="dark"]) {
+    color-scheme: dark;
+    --header-bg: #2b344b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at 86% 0, rgba(49,84,216,.11), transparent 28rem), var(--page-bg);
+    color: var(--page-text);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 20px 16px 48px;
+}
+
+/* The shared site header sits inside this page's 16px body gutter: it takes the full content width
+   (not its own 20px-inset column) and the top of the page, like the header on every other page. */
+body.card-page > .app-header { width: min(1180px, 100%); margin-top: -20px; }
+
+/* An in-page jump lands a little below the top edge. */
+.card [id] { scroll-margin-top: 16px; }
+
+.card-disclosure { margin: 0 0 22px; border: 1px solid var(--panel-border); border-radius: 9px; background: color-mix(in srgb, var(--card-bg) 80%, transparent); overflow: clip; }
+.card-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 16px; cursor: pointer; list-style: none; }
+.card-disclosure > summary::-webkit-details-marker { display: none; }
+.card-disclosure > summary::after { content: "+"; color: var(--accent); font-size: 1.35rem; }
+.card-disclosure[open] > summary::after { content: "−"; }
+.card-disclosure > summary span { color: var(--page-text); font-size: 1.05rem; font-weight: 760; line-height: 1.3; }
+.card-disclosure > summary small { margin-left: auto; color: var(--muted-text); font-size: .78rem; text-align: right; }
+.card-disclosure > div { padding: 16px; border-top: 1px solid var(--panel-border); }
+/* Inside a block, its sections are flat parts divided by a rule, not boxes within a box; their
+   titles sit one step below the block's own title. */
+.card-disclosure > div > section { margin: 0; padding: 16px 0; border: 0; border-radius: 0; background: none; }
+.card-disclosure > div > section:first-child { padding-top: 0; }
+.card-disclosure > div > section:last-child { padding-bottom: 0; }
+.card-disclosure > div > section + section { border-top: 1px solid var(--panel-border); }
+.card-disclosure > div > section > h2,
+.card-disclosure > div > section > header > h2 { margin-bottom: 10px; font-size: .8rem; }
+/* A block's hint is its answer, so a phone shows it too: under the title, with the toggle staying on the title line. */
+@media (max-width: 480px) {
+    .card-disclosure > summary { flex-wrap: wrap; gap: 4px 12px; }
+    .card-disclosure > summary::after { margin-left: auto; }
+    .card-disclosure > summary small { flex-basis: 100%; order: 3; margin-left: 0; text-align: left; }
+}
+.card-disclosure > summary small b[class^="c-"] { margin-right: 4px; }
+
+a {
+    color: var(--link-color);
+}
+
+.card {
+    max-width: 62rem;
+    margin: 0 auto;
+}
+
+/* --- header ----------------------------------------------------------------------------- */
+
+.crumb {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: -0.01em;
+}
+
+/* The token's events running under its ticker (card.js drawMarquee): two copies of one run, moved
+   left by one run's width and looped. Paused on hover or focus; still and scrollable with reduced motion. */
+.event-marquee {
+    margin: 6px 0 4px;
+    overflow: hidden;
+    border-block: 1px solid var(--panel-border);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.event-marquee-track { display: flex; width: max-content; animation: event-marquee var(--marquee-s, 30s) linear infinite; }
+.event-marquee:hover .event-marquee-track, .event-marquee:focus-within .event-marquee-track { animation-play-state: paused; }
+.event-marquee-run { display: flex; flex: none; }
+.event-marquee-item { display: inline-flex; align-items: center; gap: 7px; padding: 7px 26px 7px 0; color: var(--page-text); font-size: .82rem; font-weight: 650; white-space: nowrap; text-decoration: none; }
+.event-marquee-item:hover, .event-marquee-item:focus-visible { color: var(--link-color); text-decoration: underline; }
+.event-marquee-item::before { content: "•"; color: var(--muted-text); }
+.event-marquee-when { color: var(--muted-text); font-size: .72rem; font-weight: 600; }
+@keyframes event-marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+    .event-marquee { overflow-x: auto; scrollbar-width: thin; }
+    .event-marquee-track { animation: none; }
+    .event-marquee-run[aria-hidden="true"] { display: none; }
+}
+:root.reduce-motion .event-marquee { overflow-x: auto; scrollbar-width: thin; }
+:root.reduce-motion .event-marquee-track { animation: none; }
+:root.reduce-motion .event-marquee-run[aria-hidden="true"] { display: none; }
+
+.card-head .solana-share { margin: -6px 0 12px; color: var(--muted-text); font-size: .86rem; }
+.card-head .solana-share b { color: var(--page-text); }
+
+.card-head .sub {
+    margin: 2px 0 12px;
+    color: var(--muted-text);
+}
+
+/* The ticker with its planet link to the right; wraps under it on a narrow screen. */
+.card-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+
+/* The way into the universe view (cards.mjs planetLinkHtml). */
+.card-head .planet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 5px 12px 5px 6px;
+    border: 1px solid var(--rwa-new-line);
+    border-radius: 999px;
+    background: var(--rwa-new-soft);
+    color: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.card-head .planet-link:hover { border-color: var(--rwa-new); }
+
+/* The price line under the title (cards.mjs priceLineHtml): price, premium, DEX liquidity, each sourced. */
+.card-head .price-line {
+    margin: -6px 0 14px;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.card-head .price-line b {
+    color: var(--page-text);
+    font-size: 1.15rem;
+}
+
+/* Who may hold the token and who may redeem it with the issuer (cards.mjs whoCanBuyHtml). */
+/* Now the first line inside "Things to know first". */
+.card-head .who-can-buy {
+    margin: 0 0 12px;
+    color: var(--muted-text);
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.card-head .who-can-buy b {
+    color: var(--page-text);
+}
+
+.card-head .who-can-buy a {
+    white-space: nowrap;
+}
+
+.asset-decision-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.asset-decision-grid article { display: flex; flex-direction: column; min-width: 0; padding: 12px 13px; border: 1px solid var(--panel-border); border-radius: 8px; background: var(--sunken-bg); }
+.asset-decision-grid article:first-child { grid-column: 1 / -1; border-left: 4px solid var(--accent); }
+.asset-decision-grid article:last-child { border-left: 4px solid var(--warning); }
+.asset-decision-grid small { color: var(--muted-text); font-size: .66rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.asset-decision-grid strong { margin: 4px 0 9px; font-size: .88rem; line-height: 1.42; }
+.asset-decision-grid article:first-child strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.18rem; font-weight: 550; }
+.asset-decision-grid a { margin-top: auto; font-size: .74rem; font-weight: 760; }
+.asset-decision-limit { margin: 10px 0 0; color: var(--muted-text); font-size: .72rem; }
+.decision-health .banner { margin: 0 0 10px; }
+.concept-links { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--panel-border); }
+.concept-links a { font-size: .75rem; font-weight: 760; }
+
+.under-review-banner { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin: 0 0 10px; padding: 11px 13px; border: 1px solid var(--warning); border-radius: 6px; background: var(--warning-bg); color: var(--warning); }
+.under-review-banner span { flex: 1 1 300px; color: var(--page-text); }
+/* The change judge's material verdicts (stocks/lib/cards.mjs materialChangesHtml): a model's reading, so caution-toned, never warning. */
+/* The model's readings keep their caution look (dashed, tinted) inside the shared block. */
+.card-disclosure.model-changes { border-style: dashed; border-color: var(--caution); background: var(--caution-bg); font-size: .82rem; }
+.card-disclosure.model-changes > summary span { color: var(--caution); }
+.model-changes .fold-list { margin: 0 0 8px; }
+.model-changes .fold-body q { display: block; color: var(--muted-text); }
+.model-changes > div > p { margin: 0; color: var(--muted-text); font-size: .74rem; }
+
+/* Found discrepancies: the shared block, open, in the warning colours. */
+.card-disclosure.discrepancy-block { border-color: var(--warning); border-left-width: 4px; background: var(--warning-bg); }
+.card-disclosure.discrepancy-block > summary span { color: var(--warning); }
+
+/* Discrepancies are fold rows (app-shell.css .fold-*): severity and title, then why it matters;
+   opened, the scope and both sides. Claim and reality prose quotes whole base58 addresses and
+   URLs; unbroken they widened a 375 px phone page to 494 px (SECZ) — .fold-body wraps anywhere. */
+.discrepancy-list .fold-body > :first-child { margin-top: 8px; }
+
+.discrepancy-sides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.discrepancy-side {
+    min-width: 0;
+    padding: 11px;
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    background: var(--card-bg);
+}
+
+.discrepancy-side-claim { border-top: 3px solid var(--caution); }
+.discrepancy-side-reality { border-top: 3px solid var(--warning); }
+.discrepancy-side h3 { margin: 0 0 5px; font-size: 0.78rem; text-transform: uppercase; }
+.discrepancy-side p { margin: 0; }
+.discrepancy-sources { margin: 9px 0 0; padding-left: 18px; color: var(--muted-text); font-size: 0.76rem; }
+.discrepancy-sources li + li { margin-top: 5px; }
+.discrepancy-missing { color: var(--warning); font-size: 0.76rem; }
+.discrepancy-impact { margin: 11px 0 0; }
+.discrepancy-impact strong { display: block; color: var(--warning); font-size: 0.72rem; text-transform: uppercase; }
+.discrepancy-observed { margin: 6px 0 0; color: var(--muted-text); font-size: 0.74rem; }
+
+.history-panel > header { display: flex; justify-content: space-between; gap: 12px; align-items: end; }
+.history-panel label { color: var(--muted-text); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
+.history-panel select { display: block; margin-top: 3px; padding: 6px 8px; border: 1px solid var(--panel-border); border-radius: 6px; background: var(--card-bg); color: var(--page-text); }
+.history-method, .history-empty { color: var(--muted-text); font-size: .82rem; }
+.history-svg { display: block; width: 100%; min-height: 210px; overflow: visible; }
+.history-grid line { stroke: var(--panel-border); stroke-width: 1; }.history-grid text, .history-svg > text { fill: var(--muted-text); font-size: 11px; }
+.history-lines path { fill: none; stroke: var(--series); stroke-width: 2.4; vector-effect: non-scaling-stroke; }.history-lines circle { fill: var(--series); }
+.history-event { stroke: var(--caution); stroke-width: 1.5; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }.history-event-warning, .history-event-critical { stroke: var(--warning); }
+.history-legend { display: flex; flex-wrap: wrap; gap: 7px 14px; margin: 12px 0 0; color: var(--muted-text); font-size: .72rem; }.history-legend span { display: inline-flex; align-items: center; gap: 5px; }.history-legend i { width: 16px; height: 3px; background: var(--series); }.history-event-key i { height: 12px; width: 2px; background: var(--caution); }
+
+.health-dimensions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+/* --- DeFi composability --------------------------------------------------------------- */
+
+.comp-summary {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.lender-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+.lender-bottom article {
+    padding: 10px 11px;
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.lender-bottom strong {
+    color: var(--accent);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.lender-bottom p {
+    margin: 5px 0 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.comp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.comp-scenario {
+    padding: 11px 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--sunken-bg);
+}
+
+.comp-scenario header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--muted-text);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.comp-scenario header strong {
+    color: var(--page-text);
+    text-align: right;
+}
+
+.comp-scenario h3 {
+    margin: 8px 0 3px;
+}
+
+.comp-scenario p {
+    margin: 0;
+}
+
+.comp-question {
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+/* A tile links to the block that holds its checks. */
+a.health-dimension { color: inherit; text-decoration: none; }
+a.health-dimension:hover, a.health-dimension:focus-visible { border-color: var(--accent); }
+
+.health-dimension {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px;
+    padding: 9px 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+}
+
+.health-dimension > span:first-child {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+}
+
+.health-dimension small {
+    grid-column: 1 / -1;
+    color: var(--muted-text);
+}
+
+@media (max-width: 560px) {
+    .health-dimensions { grid-template-columns: 1fr; }
+    .comp-grid { grid-template-columns: 1fr; }
+    .lender-bottom { grid-template-columns: 1fr; }
+    .discrepancy-sides { grid-template-columns: 1fr; }
+}
+
+.banner {
+    margin: 0 0 24px;
+    padding: 10px 12px;
+    border: 1px solid var(--panel-border);
+    border-left-width: 4px;
+    border-radius: 6px;
+    background: var(--sunken-bg);
+}
+
+.banner-good {
+    border-left-color: var(--good);
+}
+
+.banner-caution {
+    border-left-color: var(--caution);
+}
+
+.banner-warning {
+    border-left-color: var(--warning);
+}
+
+.banner-unknown {
+    border-left-color: var(--unknown);
+}
+
+/* --- fold rows (app-shell.css .fold-*): the severity chip and the card's own row details -------- */
+
+/* The chip's colour repeats the row's tone; the word carries the meaning. */
+.fold-chip {
+    display: inline-block;
+    padding: 0 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    vertical-align: 1px;
+}
+.fold-critical .fold-chip, .fold-warning .fold-chip { color: var(--warning); }
+.fold-caution .fold-chip { color: var(--caution); }
+.fold-good .fold-chip { color: var(--good); }
+.fold-info .fold-chip { color: var(--accent); }
+.fold-line1 .cm-l { vertical-align: 1px; font-size: 0.72rem; }
+.fold-body p { margin: 6px 0 0; }
+.fold-body small { display: block; margin-top: 4px; color: var(--muted-text); }
+/* Without JavaScript a row a link targets is at least marked; card.js also opens it. */
+.fold-row:target { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Opened, app-shell.css unclamps line 1 but leaves it a -webkit-box, whose children become flex items and lose the spaces between date, chip and title; a block keeps them. */
+.fold-row > details[open] .fold-line1 { display: block; }
+
+/* --- status chips ----------------------------------------------------------------------- */
+
+.c-good,
+.c-caution,
+.c-warning,
+.c-unknown {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.c-good {
+    color: var(--good);
+    background: var(--good-bg);
+}
+
+.c-caution {
+    color: var(--caution);
+    background: var(--caution-bg);
+}
+
+.c-warning {
+    color: var(--warning);
+    background: var(--warning-bg);
+}
+
+.c-unknown {
+    color: var(--unknown);
+    background: var(--unknown-bg);
+}
+
+/* A finding's severity word; "info" has no health status of its own. */
+.c-info {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--card-bg));
+}
+
+/* --- When the market is closed: one row per lending market ------------------------------ */
+
+/* Each lender is a fold row: label, name and liquidation threshold, then its borrower sentence. */
+.fold-list.cm-list {
+    margin: 0.5rem 0 0.75rem;
+}
+
+/* The label: the words carry the meaning, the colour only repeats it. */
+.cm-l {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cm-frozen,
+.cm-unknown {
+    color: var(--unknown);
+}
+
+.cm-overnight {
+    color: var(--accent);
+}
+
+.cm-token,
+.cm-signed {
+    color: var(--caution);
+}
+
+.cm-stale {
+    color: var(--warning);
+}
+
+.fold-list.cm-f {
+    margin: 0.5rem 0;
+}
+
+.cm-src {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+/* --- Where prices come from: each lender's price source, the Pyth prices read on Solana ---------- */
+
+/* Feed symbols and account addresses are long unbroken runs; let them wrap at 320 px. */
+#pyth .kv dd {
+    overflow-wrap: anywhere;
+}
+
+.pyth-lead {
+    margin: 0.75rem 0 0.25rem;
+}
+
+.fold-list.pyth-lenders {
+    margin: 0 0 0.75rem;
+}
+
+.pyth-src {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+/* --- sections --------------------------------------------------------------------------- */
+
+section {
+    margin: 0 0 22px;
+    padding: 14px 16px;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+}
+
+h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text);
+}
+
+h3 {
+    margin: 16px 0 6px;
+    font-size: 0.92rem;
+}
+
+h3:first-child {
+    margin-top: 0;
+}
+
+.note,
+.no {
+    margin: 0 0 10px;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+}
+
+/* --- label / value pairs ---------------------------------------------------------------- */
+
+.kv {
+    display: grid;
+    grid-template-columns: minmax(9rem, 15rem) 1fr;
+    gap: 6px 16px;
+    margin: 0;
+}
+
+.kv dt {
+    color: var(--muted-text);
+    font-size: 0.88rem;
+}
+
+.kv dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.redemption-usability,
+.authority-attribution {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--panel-border);
+}
+
+.redemption-usability h3,
+.authority-attribution h3 { margin: 0 0 8px; }
+
+.redemption-usability dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+    margin: 14px 0 0;
+}
+
+.redemption-usability dl > div {
+    min-width: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.redemption-usability dt { color: var(--muted-text); font-size: 0.76rem; }
+.redemption-usability dd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 3px 0 0; }
+/* A term's complete text quotes URLs (Backpack's asset API); unbroken, an opened term widened the phone page. */
+.redemption-usability dd > :first-child { min-width: 0; }
+.redemption-usability dd > .evidence-state { flex: none; }
+.redemption-term { overflow-wrap: anywhere; }
+/* "Who keeps the price honest": the verdict, toned like a health check, above its facts. */
+.price-anchor { margin: 0 0 10px; padding: 10px 12px; border-left: 4px solid var(--unknown); background: var(--unknown-bg); border-radius: 0 6px 6px 0; }
+.price-anchor-good { border-color: var(--good); background: var(--good-bg); }
+.price-anchor-caution { border-color: var(--caution); background: var(--caution-bg); }
+.price-anchor-warning { border-color: var(--warning); background: var(--warning-bg); }
+.redemption-observation { padding: 12px 14px; border-left: 4px solid var(--unknown); background: color-mix(in srgb, var(--unknown) 8%, transparent); }
+.evidence-state { color: var(--muted-text); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
+
+@media (max-width: 560px) {
+    .redemption-usability dl { grid-template-columns: 1fr; }
+
+    .kv {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .kv dt {
+        margin-top: 10px;
+    }
+
+    .kv dt:first-child {
+        margin-top: 0;
+    }
+}
+
+/* --- tables ----------------------------------------------------------------------------- */
+
+.scroll {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.r {
+    min-width: 18rem;
+}
+
+.rules {
+    min-width: 46rem;
+}
+
+th,
+td {
+    padding: 5px 10px 5px 0;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+thead th {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding-left: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+td.n,
+th.n {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+td.s {
+    color: var(--muted-text);
+    font-size: 0.82rem;
+}
+
+.mv {
+    color: var(--muted-text);
+    font-size: 0.8rem;
+}
+
+.t {
+    display: inline-block;
+    padding: 0 5px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--muted-text);
+}
+
+.t.a {
+    color: var(--warning);
+    border-color: var(--warning);
+}
+
+code {
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+}
+
+/* --- footer ----------------------------------------------------------------------------- */
+
+footer {
+    border-top: 1px solid var(--panel-border);
+    padding-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+footer h2 {
+    margin-bottom: 6px;
+}
+
+.src,
+.mint,
+.built {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+}
+
+#copy-mint {
+    font: inherit;
+    padding: 1px 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: var(--sunken-bg);
+    color: var(--page-text);
+    cursor: pointer;
+}
+
+.age {
+    color: var(--muted-text);
+}
+
+.card-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 12px;
+}
+
+/* --- evidence chips (stocks/EVIDENCE.md §4) --------------------------- */
+
+/*
+ * The labelled Evidence control after a value opens the source's own words. A <details>, so it
+ * works by tap and by keyboard with no script at all. The dashed No source label is a plain span
+ * with a title: every one of them would say the same sentence, and a card has a
+ * byte budget the build enforces.
+ */
+/* The foot of each block: when its own inputs were read (cards.mjs blockFreshnessHtml). */
+.block-src { margin: 16px 0 0; padding-top: 10px; border-top: 1px dashed var(--panel-border); color: var(--muted-text); font-size: 0.72rem; line-height: 1.5; }
+.block-src .ev-line { display: block; margin: 0 0 4px; font-weight: 700; }
+
+.ev-chip {
+    display: inline;
+    position: relative;
+}
+
+.ev-chip > summary,
+.ev-none {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 1px 5px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-size: 0.64rem;
+    font-weight: 700;
+    line-height: 1.35;
+    cursor: pointer;
+    list-style: none;
+}
+
+.ev-chip > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ev-none {
+    border-style: dashed;
+    color: var(--muted-text);
+    font-weight: 400;
+    cursor: help;
+}
+
+.ev-pop {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 4px);
+    left: 0;
+    width: min(340px, 78vw);
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 9px;
+    border: 1px solid var(--panel-border);
+    border-radius: 5px;
+    background: var(--card-bg);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 22%);
+    font-size: 0.76rem;
+    font-weight: 400;
+    white-space: normal;
+}
+
+.ev-claim + .ev-claim {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--panel-border);
+}
+
+.ev-pop blockquote {
+    margin: 5px 0;
+    padding-left: 8px;
+    border-left: 2px solid var(--accent);
+    font-style: italic;
+}
+
+.ev-ok {
+    color: var(--good);
+}
+
+.ev-caution {
+    color: var(--caution);
+}
+
+.ev-warn {
+    color: var(--warning);
+}
+
+.ev-muted {
+    color: var(--muted-text);
+}
+
+/*
+ * On a phone the popover cannot sit beside the chip: anchored to it, the box ran off the left edge
+ * (measured at 360 px on a card: left -116 px). Below 560 px the row is a single column, so the
+ * popover is anchored to the whole <dd> instead — `position: static` on the chip hands the
+ * containing block to the row, and the box then spans it whatever the chip's own x position is.
+ */
+@media (max-width: 560px) {
+    .kv dd {
+        position: relative;
+    }
+
+    .ev-chip {
+        position: static;
+    }
+
+    .ev-pop {
+        left: 0;
+        right: 0;
+        width: auto;
+    }
+}
+
+/* =====================================================================
+ * Trust chain and what-if colour tokens (stocks/EVIDENCE.md §6). The rules
+ * that paint with them live in trustchain.css, one stylesheet shared by
+ * stocks.html, whatif.html and the static cards, because the same pure
+ * libraries — stocks/lib/trustchain-svg.js and the what-if renderers —
+ * emit the same markup in all three. The tokens stay beside each page's
+ * own theme tokens: stocks.css and card.css carry the same set. Two axes,
+ * two vocabularies, never mixed:
+ *   --tc-*  the four LINK evidence grades (lane colour in the diagram)
+ *   --wi-*  the six ANSWER statuses (badge colour in the what-if list),
+ *           where `missing` is the absence of an answer, not an answer.
+ * ===================================================================== */
+
+:root {
+    --tc-documented: #15803d;
+    --tc-inferred: #2563eb;
+    --tc-asserted: #b45309;
+    --tc-unknown: #9ca3af;
+    --tc-node-bg: #f9fafb;
+    --wi-documented: #15803d;
+    --wi-litigated: #7c3aed;
+    --wi-inferred: #2563eb;
+    --wi-unknown: #b45309;
+    --wi-not-applicable: #9ca3af;
+    --wi-missing: #dc2626;
+}
+
+:root:where([data-theme="dark"]) {
+    --tc-documented: #4ade80;
+    --tc-inferred: #60a5fa;
+    --tc-asserted: #fbbf24;
+    --tc-unknown: #6b7280;
+    --tc-node-bg: #1b2030;
+    --wi-documented: #4ade80;
+    --wi-litigated: #c4b5fd;
+    --wi-inferred: #60a5fa;
+    --wi-unknown: #fbbf24;
+    --wi-not-applicable: #6b7280;
+    --wi-missing: #f87171;
+}
+
+.defi-use-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.defi-use {
+    padding: 12px;
+    border: 1px solid var(--panel-border);
+    border-radius: 7px;
+    background: var(--sunken-bg);
+}
+
+.defi-use-live { border-left: 4px solid var(--good); }
+.defi-use-available { border-left: 4px solid var(--unknown); }
+
+.defi-use header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.defi-use h3 { margin: 0; font-size: 0.95rem; }
+.defi-use header strong { color: var(--muted-text); font-size: 0.7rem; text-transform: uppercase; }
+.defi-use p { margin: 7px 0 0; }
+.defi-actions { font-weight: 700; }
+.defi-metrics, .defi-access { color: var(--muted-text); font-size: 0.8rem; }
+.defi-capabilities { display: grid; gap: 6px; margin: 9px 0 0; padding: 0; list-style: none; }
+.defi-capabilities li { display: grid; grid-template-columns: minmax(110px, auto) 1fr; gap: 3px 8px; padding: 7px 8px; border-radius: 7px; background: var(--card-bg); font-size: 0.76rem; }
+.defi-capabilities li span, .defi-capabilities li small { color: var(--muted-text); }
+.defi-capabilities li small { grid-column: 1 / -1; line-height: 1.4; }
+.defi-proof { padding: 8px; border: 1px solid var(--panel-border); border-radius: 7px; color: var(--muted-text); font-size: 0.76rem; line-height: 1.45; }
+.exit-verdict { margin: 0 0 12px; padding: 10px 12px; border-left: 4px solid var(--unknown); border-radius: 8px; background: var(--sunken-bg); }
+.exit-verdict strong { display: block; margin-bottom: 3px; }
+.exit-verdict p { margin: 0; font-size: 0.84rem; line-height: 1.45; }
+.exit-verdict-autonomous { border-left-color: var(--good); }
+.exit-verdict-conditional { border-left-color: var(--accent); }
+.exit-verdict-issuer-dependent, .exit-verdict-fragile { border-left-color: var(--caution); }
+.defi-links { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; }
+
+@media (max-width: 620px) {
+    .asset-decision-grid { grid-template-columns: 1fr; }
+    .asset-decision-grid article:first-child { grid-column: auto; }
+    .defi-use-grid { grid-template-columns: 1fr; }
+    .defi-capabilities li { grid-template-columns: 1fr; }
+}
+
+/* --- latest events (card.js wireEvents; rows styled in app-shell.css) -------------------------- */
+
+.token-events-list { max-height: 18rem; margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; scrollbar-width: thin; }
+.token-events-list .event-row:last-child { border-bottom: 0; }
+.token-events-foot { margin: 10px 0 0; color: var(--muted-text); font-size: .74rem; line-height: 1.5; }
+.token-events-foot a { color: var(--link-color); font-weight: 760; text-decoration: none; }
+.token-events-foot a:hover, .token-events-foot a:focus-visible { text-decoration: underline; }
+
+/* CoinMarketCap in Markets (card.js wireCmc, stocks/lib/cmc-view.js). */
+.cmc-empty, .cmc-src { margin: 8px 0 0; color: var(--muted-text); font-size: .76rem; line-height: 1.5; }
+.cmc-src a { font-weight: 700; }

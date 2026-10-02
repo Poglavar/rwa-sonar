@@ -1,0 +1,763 @@
+{
+  "methodology": "Versioned decisions on watcher alerts. Public entries describe a real issuer, venue, protocol or source change. Non-public entries are collection false alarms or transient availability failures and are used only to keep them out of the public product.",
+  "reviewedAt": "2026-09-23T11:11:18Z",
+  "items": [
+    {
+      "id": "prestocks-transfer-fee-300bps-scheduled-2026-09-24",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-24",
+      "reviewedAt": "2026-09-24T23:17:00Z",
+      "issuerSlug": "prestocks",
+      "actor": "PreStocks programme authority",
+      "kind": "fee-change",
+      "severity": "warning",
+      "title": "PreStocks scheduled a 3 % transfer fee on 7 of its 8 tokens",
+      "summary": "Read on chain at finalized slot 450170982 (fee epoch 1042): all eight PreStocks mints charge 100 bps now. On seven of them (all but SPACEX) the transfer-fee configuration's newer fee is 300 bps from fee epoch 1043, which begins about 26 Sep 2026; SPACEX stays at 100 bps. The maximum fee remains u64::MAX, and the shared Squads-controlled address WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc remains both transfer-fee configuration authority and withheld-fee withdrawal authority. The chain watcher recorded the configuration change as 100 → 300 bps on 24 Sep; the 3 % is not charged before epoch 1043.",
+      "whyItMatters": "Transfers withhold 1.00 % now on all 8 PreStocks mints; 7 of them have 3.00 % scheduled from fee epoch 1043 (about 26 Sep 2026), uncapped, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "affectedHolders": [
+        "all holders and transferees of the seven affected tokens",
+        "protocol depositors, borrowers and liquidators moving those tokens"
+      ],
+      "before": "100 bps",
+      "after": "300 bps from fee epoch 1043",
+      "affectedMints": [
+        "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+        "PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+        "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+        "PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+        "Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+        "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
+      "sources": [
+        {
+          "label": "Solana account observation at finalized slot 450170982: transferFeeConfig olderTransferFee 100 bps (epoch 1039), newerTransferFee 300 bps (epoch 1043), maximumFee u64::MAX",
+          "url": "https://explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+        }
+      ],
+      "match": {
+        "issuerSlug": "prestocks",
+        "kind": "extension-toggle",
+        "field": "transfer_fee_bps",
+        "before": "100",
+        "after": "300",
+        "detectedOn": "2026-09-24"
+      }
+    },
+    {
+      "id": "prestocks-transfer-fee-100bps-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "prestocks",
+      "actor": "PreStocks programme authority",
+      "kind": "fee-change",
+      "severity": "warning",
+      "title": "PreStocks doubled its on-chain transfer fee",
+      "summary": "All eight PreStocks mints changed from 50 bps to 100 bps at fee epoch 1039. The maximum fee remains u64::MAX and the shared Squads-controlled address remains both transfer-fee configuration authority and withheld-fee withdrawal authority.",
+      "whyItMatters": "Every transfer now withholds 1%, including wallet-to-wallet transfers and protocol movements. That directly affects exits, collateral transfers and liquidation proceeds.",
+      "affectedHolders": [
+        "all holders and transferees of the eight affected tokens",
+        "protocol depositors, borrowers and liquidators moving those tokens"
+      ],
+      "before": "50 bps",
+      "after": "100 bps",
+      "affectedMints": [
+        "Pre8AREmFPtoJFT8mQSXQLh56cwJmM7CFDRuoGBZiUP",
+        "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh",
+        "PreLWGkkeqG1s4HEfFZSy9moCrJ7btsHuUtfcCeoRua",
+        "PreZad18qfPtbxNpMtMuAuX2zVpvkEU8DnJx56faCWd",
+        "PrekqLJvJ3qVdXmBGDiexvwUTF4rLFDa6HWS4HJbw9S",
+        "Pren1FvFX6J3E4kXhJuCiAD5aDmGEb7qJRncwA8Lkhw",
+        "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
+      "sources": [
+        {
+          "label": "Solana account observation at slot 448348634",
+          "url": "https://explorer.solana.com/address/PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+        }
+      ],
+      "match": {
+        "issuerSlug": "prestocks",
+        "kind": "extension-toggle",
+        "field": "transfer_fee_bps",
+        "before": "50",
+        "after": "100",
+        "detectedOn": "2026-09-19"
+      }
+    },
+    {
+      "id": "ondo-itn-document-moved-2026-09-19",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "ondo-global-markets",
+      "actor": "Ondo documentation",
+      "kind": "document-moved",
+      "severity": "info",
+      "title": "Ondo moved its ITN integration documentation",
+      "summary": "The old Ondo Stocks path now returns 404. The same issuer documentation is available at the API Reference path, and the dossier now cites that current location.",
+      "whyItMatters": "The authorized-participant in-kind redemption channel remains documented; this was a URL move, not evidence that the channel ended.",
+      "affectedHolders": [
+        "authorized participants using the in-kind redemption channel",
+        "holders relying on that channel as an indirect exit route"
+      ],
+      "before": "https://docs.ondo.finance/ondo-stocks/itn-integration",
+      "after": "https://docs.ondo.finance/api-reference/itn-integration",
+      "sources": [
+        {
+          "label": "Current Ondo ITN integration documentation",
+          "url": "https://docs.ondo.finance/api-reference/itn-integration"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://docs.ondo.finance/ondo-stocks/itn-integration"
+      }
+    },
+    {
+      "id": "ondo-disclosures-index-replaced-2026-09-19",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "ondo-global-markets",
+      "actor": "Ondo documentation",
+      "kind": "document-moved",
+      "severity": "caution",
+      "title": "Ondo removed its disclosures index; the cited Sales Terms remain available",
+      "summary": "The former disclosures page returns 404. RWA Sonar now cites the issuer-hosted Sales Terms PDF directly, including the Swiss-law cancellation clause used in the legal analysis.",
+      "whyItMatters": "The governing evidence remains readable, but the loss of the index makes document discovery and precedence less transparent.",
+      "affectedHolders": [
+        "Ondo Global Markets holders relying on the Sales Terms",
+        "prospective holders comparing document authority and precedence"
+      ],
+      "before": "https://docs.ondo.finance/legal/disclosures",
+      "after": "Issuer-hosted Sales Terms PDF",
+      "sources": [
+        {
+          "label": "Ondo Global Markets Sales Terms",
+          "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://docs.ondo.finance/legal/disclosures"
+      }
+    },
+    {
+      "id": "shift-markets-page-removed-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "shift",
+      "actor": "Shift",
+      "kind": "product-page-removed",
+      "severity": "warning",
+      "title": "Shift removed its markets page",
+      "summary": "The former /markets page returns 404 and is absent from Shift's current sitemap. The SPCX1L product previously listed there could not be found on-chain.",
+      "whyItMatters": "A product name without a current issuer page or an exact mint cannot be treated as an available tokenized asset.",
+      "affectedHolders": [
+        "people evaluating the advertised SPCX1L product",
+        "current holders only if an exact token address is later established"
+      ],
+      "before": "Markets page listed SPCX1L",
+      "after": "Page removed; exact mint still unverified",
+      "sources": [
+        {
+          "label": "Shift current sitemap",
+          "url": "https://www.shiftrwa.xyz/sitemap.xml"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://www.shiftrwa.xyz/markets"
+      }
+    },
+    {
+      "id": "remora-token-metadata-bucket-removed-2026-09-19",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "issuerSlug": "remora-markets",
+      "actor": "Remora Markets / Step Finance",
+      "kind": "metadata-removed",
+      "severity": "warning",
+      "title": "Remora's token-metadata bucket disappeared",
+      "summary": "The S3 bucket referenced by the rToken mints now returns NoSuchBucket. On-chain names and symbols remain, but wallets can no longer retrieve the issuer-hosted logo and description.",
+      "whyItMatters": "The programme has already wound down; loss of issuer-hosted metadata is another observable degradation while residual tokens and holders remain on-chain.",
+      "affectedHolders": [
+        "residual rToken holders",
+        "wallet users relying on issuer-hosted names, logos and descriptions"
+      ],
+      "before": "Issuer metadata bucket available",
+      "after": "S3 NoSuchBucket",
+      "sources": [
+        {
+          "label": "TSLAr metadata URI written into the mint",
+          "url": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://remora-public.s3.us-east-2.amazonaws.com/solana/tokens/tslar.json"
+      }
+    },
+    {
+      "id": "prestocks-attestations-negative-check",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The URL was recorded as a negative search result and already returned 404 when researched. It was never a supporting document that subsequently disappeared.",
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://prestocks.com/attestations"
+      }
+    },
+    {
+      "id": "xstocks-us-transient-availability",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The official page is currently live and the watcher observed only a transient failed fetch, not an issuer change.",
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://xstocks.fi/us"
+      }
+    },
+    {
+      "id": "backpack-risk-disclosure-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1Bw7oNVFsrqu8SE41-xAIJfPJnhdNnNms/view",
+        "before": "4a1cc34d60b6b71715341ed1f47b925d3f68109a037661c7259706408118113e",
+        "after": "273878704aba0be8d743ae6e7cdaed2cc8f5f45ea535f7535e6a63a0be86a2c4"
+      }
+    },
+    {
+      "id": "backpack-tokenization-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1NK498yjlZRuy6FUjJ0tc9WMbNG1sxk9u/view",
+        "before": "c3479b25dc20634d7fac6e1e178bc89d4e6c43ebc8a97629f0a573eadb15de8b",
+        "after": "2737858d7d9a4fde21dae987132a3e8f2c31d24c483e6f69ce60e1edc3620a9b"
+      }
+    },
+    {
+      "id": "backpack-user-agreement-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1R1-MTQYGcWj5qk4q9vJcAsMwDwGP5Bok/view",
+        "before": "4badb2330bb9a0db0d6c1ec2835935643dd1203f43121ba84bb30e280b52ca12",
+        "after": "30ac63d659b6f3a164db3e81af38407c59ad21ff9dadcc2cd0221b09809e0adc"
+      }
+    },
+    {
+      "id": "backpack-brokerage-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1kcQfez-1YNcmoaIRXzDt4zvwTG1dd-d5/view",
+        "before": "970d4e8dba3056f16ad46a2b2c54119c9845c5bcb456734247aea6c2310e72d2",
+        "after": "6b3d63cb1520dcd431935fd1a0cf5acd5846a810e0f71de24df3a3c81e2f09a3"
+      }
+    },
+    {
+      "id": "backpack-issuer-terms-drive-extraction-upgrade",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The previous stored text was Google Drive's one-line loading shell. The watcher then fetched and extracted the same issuer PDF through Drive's download endpoint; this was a collector improvement, not a change by Backpack.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view",
+        "before": "eda48864ad78e0f9a7e3483bafc65b851d09c6647d8c7d946915d226c9b454e0",
+        "after": "e4e01d0aff6e1dc1ba3768e251fc86da56219a9d5da281e37bc082c6a8359efd"
+      }
+    },
+    {
+      "id": "xstocks-launch-release-canonical-url",
+      "resolution": "superseded",
+      "public": true,
+      "date": "2026-09-17",
+      "issuerSlug": "xstocks-backed",
+      "actor": "PR Newswire / Backed Finance",
+      "kind": "document-moved",
+      "severity": "info",
+      "title": "The xStocks launch release moved to PR Newswire's canonical page",
+      "summary": "The tools.prnewswire.com live-event URL returns 404, while PR Newswire's canonical release remains available with the original Backed Finance launch announcement.",
+      "whyItMatters": "The launch and initial DeFi-integration claims remain readable; only the transient event URL disappeared.",
+      "affectedHolders": [
+        "people verifying historical xStocks launch and integration claims"
+      ],
+      "before": "tools.prnewswire.com live-event URL",
+      "after": "Canonical PR Newswire release",
+      "sources": [
+        {
+          "label": "Backed's xStocks Go Live Today on Bybit, Kraken, and Solana DeFi",
+          "url": "https://www.prnewswire.com/news-releases/backeds-xstocks-go-live-today-on-bybit-kraken-and-solana-defi-302494374.html"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://tools.prnewswire.com/en-us/live/20823/release/20250630EN21069"
+      }
+    },
+    {
+      "id": "remora-proof-of-reserves-site-removed",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-17",
+      "issuerSlug": "remora-markets",
+      "actor": "Remora Markets",
+      "kind": "document-removed",
+      "severity": "warning",
+      "title": "Remora's proof-of-reserves page disappeared with the programme",
+      "summary": "The Remora Markets domain no longer resolves, including its proof-of-reserves page. This follows the programme's February 2026 wind-down; residual token supply remains an on-chain fact, but the live reserve disclosure is no longer available.",
+      "whyItMatters": "A residual holder can no longer verify backing through the issuer's former live disclosure, so historical claims must be read as historical rather than current reserve evidence.",
+      "affectedHolders": [
+        "residual Remora rToken holders",
+        "people assessing whether historical backing claims remain current"
+      ],
+      "before": "Issuer-hosted proof-of-reserves page",
+      "after": "Domain unavailable after wind-down",
+      "sources": [
+        {
+          "label": "Solana Compass programme history and wind-down record",
+          "url": "https://solanacompass.com/projects/remora-markets"
+        }
+      ],
+      "match": {
+        "kind": "document-gone",
+        "sourceUrl": "https://remoramarkets.xyz/proof-of-reserves"
+      }
+    },
+    {
+      "id": "solana-compass-live-widgets-2026-09-17",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "Four same-day diffs changed embedded live prices, market tables and sidebar ordering. The article's comparison, ownership and redemption prose did not change; this is dynamic-page noise, not an actor changing a token or its terms.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+        "detectedOn": "2026-09-17"
+      }
+    },
+    {
+      "id": "tekedia-promotional-list-2026-09-17",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The diffs were confined to the publisher's rotating product and forum lists outside the cited article. No Republic Mirror product term changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.tekedia.com/a-look-into-republic-cryptos-rspacex-token-on-the-solana-blockchain/",
+        "detectedOn": [
+          "2026-09-17",
+          "2026-09-22"
+        ]
+      }
+    },
+    {
+      "id": "solanacompass-spcx-live-prices-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The article body and its custody, ownership, redemption and deadline claims did not change. Only embedded live token prices changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/backpack-and-sunrise-launch-spcx-a-tokenized-spacex-stock-on-solana-the-same-day-it-lists-on-nasdaq",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "altcoinbuzz-related-stories-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The cited Remora KYB announcement remained unchanged. The diff was entirely the publisher's rotating Related stories list, whose unrelated story contained the keyword lockup.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.altcoinbuzz.io/remora-markets-opens-kyb-for-tokenized-stocks",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "coindesk-live-sidebar-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "Four CoinDesk diffs changed only live market tickers, relative story ages and sidebar ordering. The cited articles' tokenization, wind-down, listing and invalid-transfer reporting did not change.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://www.coindesk.com/business/2026/05/05/crypto-platform-bullish-to-buy-equiniti-for-usd4-25-billion-building-tokenized-securities-infrastructure",
+          "https://www.coindesk.com/business/2026/06/15/hyperliquid-loses-anthropic-openai-markets-as-creator-shuts-down-project",
+          "https://www.coindesk.com/business/2026/07/02/securitize-tokenizes-usd295-million-of-its-own-stock-on-solana-and-avalanche-amid-nyse-debut",
+          "https://www.coindesk.com/markets/2026/05/13/anthropic-openai-tokens-plunge-nearly-40-as-ai-firms-warn-spv-transfers-are-invalid",
+          "https://www.coindesk.com/policy/2026/09/17/sec-rolls-out-long-awaited-innovation-exemption-for-tokenized-securities-venues",
+          "https://www.coindesk.com/tech/2026/06/10/spacex-stock-is-coming-to-solana-on-the-same-day-it-lists-on-nasdaq"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "solanacompass-spacex-comparison-prices-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The comparison's legal and product prose remained unchanged. Only two embedded live prices changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://solanacompass.com/news/three-tokenized-spacex-products-now-trade-on-solana-and-they-work-very-differently",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "claim-quote-refresh-2026-09-22",
+      "resolution": "research-correction",
+      "public": false,
+      "note": "These events came from initial machine-verification wording that did not exactly match the current official page, or from a verifier-normalization false negative. Current dossier claims now quote the official source exactly. This is RWA Sonar research maintenance, not an external change in holder rights.",
+      "match": {
+        "kind": "quote-lost",
+        "subjectId": [
+          "ondo-global-markets:redemption.rails:1c44271d",
+          "ondo-global-markets:redemption.operationalRouteAvailable:74245e7d",
+          "ventuals:redemption.fees:cfbd5ec3",
+          "xstocks-backed:redemption.operationalRouteAvailable:fce7ea56"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "cryptotimes-related-news-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "note": "The SECZ article body remained unchanged. The diff only reordered CryptoTimes' Latest News and related-story shelf; it did not alter Securitize, token or protocol facts.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.cryptotimes.io/2026/08/20/securitize-links-secz-shares-to-solanas-onchain-credit-markets/",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "cmc-ai-spcx-rolling-feed",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T09:51:55Z",
+      "note": "CMC AI 'latest updates' for SPCX is a machine-written feed regenerated daily; every read differs. backpack-securities-spcx incidents[5] cites it but anchors no quote to it (it is press-level and flagged unverified), and the 2026-09-23 re-read found nothing that changes that entry beyond a lock-up figure conflict now recorded in its quoteNote. Matched on the URL without a date on purpose: a rolling feed's churn is never a legal-term change. If the dossier ever quotes this page, remove this resolution.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://coinmarketcap.com/cmc-ai/spacex-tokenized-stock-backpack/latest-updates/"
+      }
+    },
+    {
+      "id": "xstocks-optimism-chain-added-2026-09-22",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-22",
+      "issuerSlug": "xstocks-backed",
+      "actor": "Backed Assets (JE) Limited",
+      "kind": "chain-added",
+      "severity": "info",
+      "title": "Backed lists Optimism as a tenth xStocks chain",
+      "summary": "The issuer's legal-documentation page now lists xStocks on Ethereum, Solana, Arbitrum, Mantle, Ink, BNB Smart Chain, TRON, TON, X Layer and Optimism; on 2026-09-17 Optimism was on neither the xStocks nor the bTokens list. The dossier's chains field now has ten entries.",
+      "whyItMatters": "Another chain means another deployment whose mint, authorities and bridge have to be checked before a holder relies on it; no Optimism mint is recorded in the dossier yet, and the Base Prospectus still names no chain list.",
+      "affectedHolders": [
+        "holders and prospective holders of xStocks on any chain"
+      ],
+      "before": "9 xStocks chains",
+      "after": "10 xStocks chains (Optimism added)",
+      "sources": [
+        {
+          "label": "Backed legal documentation, 'Supported Blockchains' (watcher read 2026-09-22 16:43 UTC)",
+          "url": "https://assets.backed.fi/legal-documentation"
+        }
+      ],
+      "note": "The same diff also added the site footer (normaliser generation 2). The quote-lost event is the old nine-chain claim, kept as superseded in the dossier.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": "https://assets.backed.fi/legal-documentation",
+        "detectedOn": "2026-09-22"
+      },
+      "reviewedAt": "2026-09-23T09:51:55Z"
+    },
+    {
+      "id": "fwdi-page-values-and-extraction-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T09:51:55Z",
+      "note": "Only USD values moved with the FWDI price (Solana 7,280,819.10 and book-entry 1,442,616.90 FWDI, the 83.46/16.54 split and the 3,156,493.10 FWDI DeFi borrowing-and-lending line are unchanged) and the site footer was added by the generation-2 HTML extraction. The three quote-lost events were quotes taken from the page's embedded JSON payload, which the new extraction drops: underlyingCustodian and parties.transferAgents are re-quoted from the rendered Details table (same fact); custodyVerification.notes is a contradicted-corrected historical record. No conclusion changes.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": "https://superstate.com/assets/fwdi",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "kraken-xstocks-faq-redated-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T09:51:55Z",
+      "note": "Kraken re-dated the xStocks FAQ ('Last updated: September 18, 2026', was April 8, 2026), added an asset count ('131 assets in total: 100 stocks, 27 ETFs, and 4 specialist assets') and reordered sections. Re-read 2026-09-23: withdrawal is still offered on Solana, Ethereum, TON and Ink, the rebasing formula and off-hours pricing text are unchanged, and the watcher reports no dossier quote lost. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://support.kraken.com/articles/xstocks-faq",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "tessera-docs-drop-transfer-hook-claim-2026-09-22",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-22",
+      "issuerSlug": "tessera",
+      "actor": "Tessera documentation",
+      "kind": "documentation-corrected",
+      "severity": "info",
+      "title": "Tessera corrects its docs: T-Tokens have no Transfer Hook",
+      "summary": "Tessera's on-chain-programs page and llms-full.txt now read 'T-Tokens do not use the Transfer Hook extension.' Until at least 2026-09-17 they claimed a Transfer Hook was enabled on all T-Tokens, which rwa-sonar had recorded as a documentation/on-chain mismatch because no hook exists on the mints.",
+      "whyItMatters": "The docs now match the chain: nothing in the transfer path enforces eligibility, so transfers are unconditional apart from the 20 bps fee and the reactive freeze authority — which the docs' Authorities & Security table still omits.",
+      "affectedHolders": [
+        "holders of Tessera T-Tokens"
+      ],
+      "before": "docs: Transfer Fee, Transfer Hook, Metadata Pointer, On-Chain Metadata",
+      "after": "docs: Transfer Fee, Metadata Pointer, On-Chain Metadata; no Transfer Hook",
+      "sources": [
+        {
+          "label": "Tessera docs, On-Chain Programs (watcher read 2026-09-22 16:47 UTC)",
+          "url": "https://docs.tessera.pe/technicals/on-chain-programs"
+        },
+        {
+          "label": "Tessera docs corpus llms-full.txt",
+          "url": "https://docs.tessera.pe/llms-full.txt"
+        }
+      ],
+      "note": "The GitBook page showed 'Last updated 4 days ago' on 2026-09-22, so the edit was made around 2026-09-18; exact date not published. findings[4] re-quoted with the new sentence and the old wording kept in its quoteNote.",
+      "match": {
+        "kind": [
+          "legal-term",
+          "quote-lost"
+        ],
+        "sourceUrl": [
+          "https://docs.tessera.pe/technicals/on-chain-programs",
+          "https://docs.tessera.pe/llms-full.txt"
+        ],
+        "detectedOn": "2026-09-22"
+      },
+      "reviewedAt": "2026-09-23T09:51:55Z"
+    },
+    {
+      "id": "backed-tesla-xstock-footer-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T09:51:55Z",
+      "note": "The only change is the site footer (US-persons legend, '2024 © Backed Assets (JE) Limited') now captured by the generation-2 HTML extraction; the legend already appeared in the page body. Custodians, ISIN and fee text unchanged; no dossier quote lost.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://assets.backed.fi/products/tesla-xstock",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "kraken-xstocks-legal-footer-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. The diff is the site footer and navigation now captured by the generation-2 HTML extraction (+106 -0: menus, '© 2011–2026 Payward, Inc.' and the generic regulatory-status legend). The disclosure body — Backed Assets (JE) Limited as issuer, Payward Digital Solutions Ltd. under the BMA as offeror, geo exclusions, Kraken credit risk, redemption with Backed — is unchanged, and all three dossier quotes on this page are still found verbatim (re-checked 2026-09-23). Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.kraken.com/legal/xstocks",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "shared-regulator-homepages-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Regulator homepages cited only as party websites: the diff is the site footer and navigation now captured by the generation-2 html extraction plus rotating news tiles (FMA TGI AG appeal notice and a clone-firm warning; SEC events calendar). The SEC tile on the \"Innovation Exemption\" for tokenized NMS stock was already on the 2026-09-17 capture; only its teaser sentence is newly extracted, and the exemption is already recorded in the dossiers. No dossier quote cites these pages. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://www.vara.ae/",
+          "https://www.fma-li.li/",
+          "https://www.finra.org/",
+          "https://www.sec.gov/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "shared-service-provider-homepages-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Service-provider homepages cited only as party websites: the diff is the site footer and navigation now captured by the generation-2 html extraction (Backed's US-persons legend and copyright, Superstate's RIA/transfer-agent legend, RQD Clearing's SEC/FINRA/SIPC line, Alpaca's FINRA/SIPC and FinCEN MSB disclosures, The Network Firm's service menu), plus live counters (Chainlink value secured, Kraken market caps) and CSS class residue in Alpaca's markup. No dossier quote cites these pages and no party's stated regulatory status changed.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://assets.backed.fi/",
+          "https://superstate.com/",
+          "https://thenetworkfirm.com/",
+          "https://rqdclearing.com/",
+          "https://chain.link/",
+          "https://alpaca.markets/",
+          "https://www.kraken.com/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "bitgo-homepage-marketing-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Marketing rewrite: the title and the hero badges ('NYSE LISTED: BTGO', 'OCC Federally Chartered', 'Founded in 2013') were replaced by rotating use-case copy and new blog tiles; the footer (now extracted) still describes BitGo Bank & Trust, National Association as a national trust bank. BitGo's custodial role is sourced elsewhere in the dossiers; no quote cites this page. Conclusion holds.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://www.bitgo.com/",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "dapp-homepages-rotating-content-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Promotional banners (Jupiter: Riftbound packs and a Stocks feedback banner replaced by wallet-extension and vaults banners) and live market listings (Polymarket, +534 -465 lines). Cited only as party websites; no dossier quote cites them.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://jup.ag/",
+          "https://polymarket.com/"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "backpack-homepage-stocks-as-collateral-copy-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Real marketing rewrite, conclusion holds. The homepage now leads with \"Stocks as Collateral\": \"Eligible US stocks, crypto and cash all back the same trades. Borrow against your shares or trade equity perps without selling them\" and \"Keep your shares and your shareholder rights\". This is the brokerage leg the backpack-securities-spcx dossier already records (Brokerage Terms allow stocks to be counted as margin Collateral; the \"Stock Collateral Risk\" bullet is quoted under collateral.onLoanDisclosed). The shareholder-rights line concerns shares held through the brokerage account, not the SPCX token, whose holder remains an on-chain holder \"for blockchain transfer purposes only\" under the Issuer Terms. No dossier quote cites this page.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://backpack.exchange/",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "superstate-footer-and-fund-table-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. superstate.com/terms: the diff is the site footer and navigation now captured by the generation-2 html extraction (+32 -0); all 25 dossier quotes on the Transfer Agent and Terms of Service Agreement are still found verbatim (re-checked 2026-09-23). superstate.com/assets: daily NAV, AUM, yield and share counts moved (USTB 64,873,236 to 65,030,965 shares; VBDC 699,530 to 899,349), and the page is cited only in sources[] with no quote. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://superstate.com/terms",
+          "https://superstate.com/assets"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "solanacompass-remora-step-widgets-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Staking-APY banner (5.74% to 11.57%), a news tile (SIMD-0525 slot time) and the trending-token widget. The \"Remora Markets tokens\" box rotated which four rTokens it shows (NVDAr, TSLAr, CRCLr, MSTRr to TSLAr, SPYr, MSTRr, NVDAr); the dossier lists all of them from on-chain metadata. Article text unchanged; all 23 remora-markets and 1 step-finance dossier quotes are still found (re-checked 2026-09-23).",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://solanacompass.com/projects/remora-markets",
+          "https://solanacompass.com/projects/step-finance"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "news-article-sidebars-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T10:30:00Z",
+      "note": "Noise. Related-news and latest-headlines sidebars rotated (holder.io market blurbs, Crypto Daily headlines, Talos related-insights cards) and the Talos footer was extracted. Article bodies unchanged; the 5 holder.io dossier quotes are still found, and the other two pages carry no quote. Conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": [
+          "https://holder.io/news/step-finance-acquires-moose-capital-launches-remora-markets/",
+          "https://cryptodaily.co.uk/2026/06/shift-launches-the-worlds-first-tokenized-leveraged-spcx-rwa-on-chain",
+          "https://www.talos.com/insights/state-of-the-network-367"
+        ],
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "backed-por-announcement-quote-check-2026-09-22",
+      "resolution": "false-alarm",
+      "public": false,
+      "reviewedAt": "2026-09-23T11:11:18Z",
+      "note": "Noise. The watcher marked four dossier quotes on this page as lost on 2026-09-22 (xstocks-backed custodyVerification.type, .agent, .frequency and vocabulary.thirdPartyAttestations.value). That day's only version change was +13 -0 lines from the generation-2 HTML extraction. Re-read live on 2026-09-23 and checked with the watcher's own extraction and quoteFound: all three quoted passages are present verbatim (The Network Firm operates the attestation API with 10-minute updates; Chainlink PoR verification; figures updated daily or on a 10% reserve move). Custody-verification conclusions hold.",
+      "match": {
+        "kind": "legal-term",
+        "sourceUrl": "https://backed.fi/news-updates/chainlink-proof-of-reserve-is-now-active",
+        "detectedOn": "2026-09-22"
+      }
+    },
+    {
+      "id": "backpack-trek-labs-fincen-renewal-2026-09-22",
+      "resolution": "confirmed",
+      "public": true,
+      "date": "2026-09-19",
+      "eventAt": "2026-09-01",
+      "firstObservedAt": "2026-09-19T06:41:17Z",
+      "issuerSlug": "backpack-securities",
+      "actor": "Trek Labs, Inc. (Backpack Exchange)",
+      "kind": "registration-renewed",
+      "severity": "info",
+      "title": "Backpack's US money transmitter renewed its FinCEN registration under a new number",
+      "summary": "Backpack's US licences page now gives Trek Labs, Inc.'s FinCEN registration number as 31000339714338 instead of 31000329581307. The page showed the old number on 2026-09-18 at 11:40 UTC and the new one when our watcher next read it, on 2026-09-19 at 06:41 UTC. FinCEN's public MSB Registrant Search lists the new number as a \"Corrected Report, Renewal\" for Trek Labs, Inc. (DBA Backpack Exchange), signed and received on 2026-09-01, and no longer finds the old number.",
+      "whyItMatters": "Nothing about the product changed: it is the same company renewing the same kind of registration, money transmission. It is still the only US registration Backpack discloses. No broker-dealer, FINRA or SEC registration appears on that page, and a FinCEN registration is neither a securities licence nor an endorsement.",
+      "affectedHolders": [
+        "people checking Backpack's US registration before using Backpack Exchange or its SPCX token"
+      ],
+      "before": "FinCEN MSB 31000329581307",
+      "after": "FinCEN MSB 31000339714338 (renewal received 2026-09-01)",
+      "sources": [
+        {
+          "label": "Backpack, US Licenses, Registrations and Regulatory Disclosures (new number first read 2026-09-22 16:48 UTC)",
+          "url": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate"
+        },
+        {
+          "label": "FinCEN MSB Registration Status Information for 31000339714338 (read 2026-09-24 15:33 UTC)",
+          "url": "https://msb.fincen.gov/msb.registration.letter.php?ID=29770416"
+        },
+        {
+          "label": "FinCEN MSB Registrant Search (31000329581307: \"System could not find matching data.\", 2026-09-24 15:33 UTC)",
+          "url": "https://msb.fincen.gov/"
+        }
+      ],
+      "note": "The watcher raised this as a quote-lost event on the backpack-securities-spcx parties.regulators claim (detected 2026-09-19T06:41:17Z by the production watcher, events 904 and 905; 2026-09-22T16:48:04Z by a laptop run). The regulatoryStatus and parties.regulators claims with the old number are kept as changed, followed by confirmed claims with the new one and a claim quoting FinCEN's transcript. eventAt is FinCEN's own received date for the renewal; firstObservedAt is the production watcher's first copy of the page with the new number.",
+      "match": {
+        "kind": "quote-lost",
+        "sourceUrl": "https://support.backpack.exchange/legal/us-licenses-registrations-and-regulatory-disclosures/states-where-we-operate",
+        "detectedOn": [
+          "2026-09-19",
+          "2026-09-22"
+        ]
+      },
+      "reviewedAt": "2026-09-24T15:44:34Z"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    }
+  },
+  "data": {
+    "type": "lei-records",
+    "id": "254900AXMKR0R3OG8R21",
+    "attributes": {
+      "lei": "254900AXMKR0R3OG8R21",
+      "entity": {
+        "legalName": {
+          "name": "PAYWARD EUROPE LIMITED",
+          "language": "en"
+        },
+        "otherNames": [],
+        "transliteratedOtherNames": [],
+        "legalAddress": {
+          "language": "en",
+          "addressLines": [
+            "70 SIR JOHN ROGERSON'S QUAY"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "DUBLIN",
+          "region": "IE-D",
+          "country": "IE",
+          "postalCode": "D02 R296"
+        },
+        "headquartersAddress": {
+          "language": "en",
+          "addressLines": [
+            "70 SIR JOHN ROGERSON'S QUAY"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "DUBLIN",
+          "region": "IE-D",
+          "country": "IE",
+          "postalCode": "D02 R296"
+        },
+        "registeredAt": {
+          "id": "RA000402",
+          "other": null
+        },
+        "registeredAs": "687722",
+        "jurisdiction": "IE",
+        "category": "GENERAL",
+        "legalForm": {
+          "id": "MNQ7",
+          "other": null
+        },
+        "associatedEntity": {
+          "lei": null,
+          "name": null
+        },
+        "status": "ACTIVE",
+        "expiration": {
+          "date": null,
+          "reason": null
+        },
+        "successorEntity": {
+          "lei": null,
+          "name": null
+        },
+        "successorEntities": [],
+        "creationDate": "2021-02-11T00:00:00Z",
+        "subCategory": null,
+        "otherAddresses": [],
+        "eventGroups": []
+      },
+      "registration": {
+        "initialRegistrationDate": "2021-07-14T16:36:06Z",
+        "lastUpdateDate": "2026-06-02T05:08:24Z",
+        "status": "ISSUED",
+        "nextRenewalDate": "2027-07-31T21:29:00Z",
+        "managingLou": "529900T8BM49AURSDO55",
+        "corroborationLevel": "FULLY_CORROBORATED",
+        "validatedAt": {
+          "id": "RA000402",
+          "other": null
+        },
+        "validatedAs": "687722",
+        "otherValidationAuthorities": []
+      },
+      "bic": null,
+      "mic": null,
+      "ocid": "ie/687722",
+      "qcc": "QIE81QB4B2",
+      "gem": null,
+      "spglobal": [
+        "1674013488"
+      ],
+      "conformityFlag": "CONFORMING"
+    },
+    "relationships": {
+      "managing-lou": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/managing-lou"
+        }
+      },
+      "lei-issuer": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/lei-issuer"
+        }
+      },
+      "field-modifications": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/field-modifications"
+        }
+      },
+      "direct-parent": {
+        "links": {
+          "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/direct-parent-reporting-exception"
+        }
+      },
+      "ultimate-parent": {
+        "links": {
+          "reporting-exception": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21/ultimate-parent-reporting-exception"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.gleif.org/api/v1/lei-records/254900AXMKR0R3OG8R21"
+    }
+  }
+}

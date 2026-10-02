@@ -1,0 +1,1338 @@
+{
+ "note": "jsonParsed mint accounts read 2026-09-30 for the mints in these fixtures, and their stocks-tokens.json rows",
+ "accounts": {
+  "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 9,
+      "extensions": [
+       {
+        "extension": "transferFeeConfig",
+        "state": {
+         "newerTransferFee": {
+          "epoch": 1047,
+          "maximumFee": 18446744073709552000,
+          "transferFeeBasisPoints": 0
+         },
+         "olderTransferFee": {
+          "epoch": 918,
+          "maximumFee": 18446744073709552000,
+          "transferFeeBasisPoints": 20
+         },
+         "transferFeeConfigAuthority": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+         "withdrawWithheldAuthority": "BnWEwDEZFGZkDQDMs7q7UtK8dFR9VUXprhH1xnLqD2j7",
+         "withheldAmount": 0
+        }
+       },
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+         "metadataAddress": "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v"
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v",
+         "name": "T-SpaceX",
+         "symbol": "tSpaceX",
+         "updateAuthority": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+         "uri": "https://cdn.tesseralab.co/tessera/t-spacex.json"
+        }
+       }
+      ],
+      "freezeAuthority": "7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+      "isInitialized": true,
+      "mintAuthority": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+      "supply": "1189969629778"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 492
+   },
+   "executable": false,
+   "lamports": 772637012,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 492
+  },
+  "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 6,
+      "extensions": [
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD"
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "programId": null
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "frozen"
+        }
+       },
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "metadataAddress": "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U"
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "paused": false
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+         "name": "Bullish Ordinary Shares",
+         "symbol": "BLSH",
+         "updateAuthority": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+         "uri": "https://assets.bullish.com/metadata/blsh.json"
+        }
+       }
+      ],
+      "freezeAuthority": "4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+      "isInitialized": true,
+      "mintAuthority": "4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+      "supply": "151810063500000"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 665
+   },
+   "executable": false,
+   "lamports": 6215280,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 665
+  },
+  "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 6,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+         "metadataAddress": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+         "programId": null
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "Cmzoo3U8ezcb95BJYmy3e6p6Lh1kyPm2bjDLcvNtVXES",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+         "name": "Cypherpunk Technologies - Backpack Securities",
+         "symbol": "CYPH",
+         "updateAuthority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+         "uri": "https://metadata.backpack.exchange/stocks/cyph.us.json"
+        }
+       }
+      ],
+      "freezeAuthority": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+      "isInitialized": true,
+      "mintAuthority": "Cmzoo3U8ezcb95BJYmy3e6p6Lh1kyPm2bjDLcvNtVXES",
+      "supply": "146737783002"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 696
+   },
+   "executable": false,
+   "lamports": 4226560,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 696
+  },
+  "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 9,
+      "extensions": [
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "multiplier": "1.003376073740221",
+         "newMultiplier": "1.003376073740221",
+         "newMultiplierEffectiveTimestamp": 1789754055
+        }
+       },
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "metadataAddress": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo"
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "paused": false
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+         "name": "Apple (Ondo Tokenized)",
+         "symbol": "AAPLon",
+         "updateAuthority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+         "uri": "https://app.ondo.finance/api/v2/assets/AAPLon/sol_metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+      "isInitialized": true,
+      "mintAuthority": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+      "supply": "371248207288"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 648
+   },
+   "executable": false,
+   "lamports": 5400960,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 648
+  },
+  "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1.0048837684862768",
+         "newMultiplier": "1.0061623180646875",
+         "newMultiplierEffectiveTimestamp": 1789777800
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo",
+         "name": "Broadcom xStock",
+         "symbol": "AVGOx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/AVGOx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "4558098469840"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 681
+   },
+   "executable": false,
+   "lamports": 200661894,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 681
+  },
+  "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1.0045820905025638",
+         "newMultiplier": "1.0059033904787456",
+         "newMultiplierEffectiveTimestamp": 1787185800
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX",
+         "name": "Microsoft xStock",
+         "symbol": "MSFTx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/MSFTx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "10497011746611"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 682
+   },
+   "executable": false,
+   "lamports": 5637601,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 682
+  },
+  "XsfAzPzYrYjd4Dpa9BU3cusBsvWfVB9gBcyGC87S57n": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsfAzPzYrYjd4Dpa9BU3cusBsvWfVB9gBcyGC87S57n"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1.0306506859428242",
+         "newMultiplier": "1.0370549907437874",
+         "newMultiplierEffectiveTimestamp": 1786753800
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsfAzPzYrYjd4Dpa9BU3cusBsvWfVB9gBcyGC87S57n",
+         "name": "Novo Nordisk xStock",
+         "symbol": "NVOx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/NVOx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "31615055708048"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 683
+   },
+   "executable": false,
+   "lamports": 5644560,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 683
+  },
+  "XsApJFV9MAktqnAc6jqzsHVujxkGm9xcSUffaBoYLKC": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsApJFV9MAktqnAc6jqzsHVujxkGm9xcSUffaBoYLKC"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1.0035467321925013",
+         "newMultiplier": "1.0047223563218923",
+         "newMultiplierEffectiveTimestamp": 1783557000
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsApJFV9MAktqnAc6jqzsHVujxkGm9xcSUffaBoYLKC",
+         "name": "Mastercard xStock",
+         "symbol": "MAx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/MAx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "2814445350529"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 679
+   },
+   "executable": false,
+   "lamports": 5616720,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 679
+  },
+  "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4",
+         "name": "Palantir xStock",
+         "symbol": "PLTRx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/PLTRx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "14686895658241"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 681
+   },
+   "executable": false,
+   "lamports": 5630640,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 681
+  },
+  "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+         "name": "Amazon.com xStock",
+         "symbol": "AMZNx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/AMZNx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "17229469704749"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 683
+   },
+   "executable": false,
+   "lamports": 5644560,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 683
+  },
+  "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+         "name": "Robinhood xStock",
+         "symbol": "HOODx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/HOODx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "59738860243148"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 682
+   },
+   "executable": false,
+   "lamports": 5637600,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 682
+  },
+  "XsQ6NfzzLH8nspjrB9X8R2K64Zz7Tnxqu12juDiMPMW": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsQ6NfzzLH8nspjrB9X8R2K64Zz7Tnxqu12juDiMPMW"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsQ6NfzzLH8nspjrB9X8R2K64Zz7Tnxqu12juDiMPMW",
+         "name": "Palo Alto Networks xStock",
+         "symbol": "PANWx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/PANWx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "5350000000000"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 691
+   },
+   "executable": false,
+   "lamports": 5700240,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 691
+  },
+  "Xs72K1Ta1D5ccNy3RzSyQWGgZywWvphX78pL8WBk1Bo": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "Xs72K1Ta1D5ccNy3RzSyQWGgZywWvphX78pL8WBk1Bo"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "Xs72K1Ta1D5ccNy3RzSyQWGgZywWvphX78pL8WBk1Bo",
+         "name": "VanEck Agribusiness ETF xStock",
+         "symbol": "MOOx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/MOOx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "12699999999999"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 694
+   },
+   "executable": false,
+   "lamports": 5721120,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 694
+  },
+  "XsbELVbLGBkn7xfMfyYuUipKGt1iRUc2B7pYRvFTFu3": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 8,
+      "extensions": [
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "metadataAddress": "XsbELVbLGBkn7xfMfyYuUipKGt1iRUc2B7pYRvFTFu3"
+        }
+       },
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+         "multiplier": "1.004730320498842",
+         "newMultiplier": "1.004730320498842",
+         "newMultiplierEffectiveTimestamp": 1789443000
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+         "paused": false
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "programId": null
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "XsbELVbLGBkn7xfMfyYuUipKGt1iRUc2B7pYRvFTFu3",
+         "name": "Russell 2000 xStock",
+         "symbol": "IWMx",
+         "updateAuthority": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+         "uri": "https://xstocks-metadata.backed.fi/tokens/Solana/IWMx/metadata.json"
+        }
+       }
+      ],
+      "freezeAuthority": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+      "isInitialized": true,
+      "mintAuthority": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+      "supply": "5797775387225"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 683
+   },
+   "executable": false,
+   "lamports": 5644560,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 683
+  },
+  "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB": {
+   "data": {
+    "parsed": {
+     "info": {
+      "decimals": 9,
+      "extensions": [
+       {
+        "extension": "permanentDelegate",
+        "state": {
+         "delegate": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc"
+        }
+       },
+       {
+        "extension": "defaultAccountState",
+        "state": {
+         "accountState": "initialized"
+        }
+       },
+       {
+        "extension": "transferFeeConfig",
+        "state": {
+         "newerTransferFee": {
+          "epoch": 1043,
+          "maximumFee": 18446744073709552000,
+          "transferFeeBasisPoints": 300
+         },
+         "olderTransferFee": {
+          "epoch": 1039,
+          "maximumFee": 18446744073709552000,
+          "transferFeeBasisPoints": 100
+         },
+         "transferFeeConfigAuthority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "withdrawWithheldAuthority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "withheldAmount": 6794723075
+        }
+       },
+       {
+        "extension": "confidentialTransferMint",
+        "state": {
+         "auditorElgamalPubkey": null,
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "autoApproveNewAccounts": false
+        }
+       },
+       {
+        "extension": "confidentialTransferFeeConfig",
+        "state": {
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "harvestToMintEnabled": true,
+         "withdrawWithheldAuthorityElgamalPubkey": "YIHVbuQq0xDvW8g8vW1enaIBxIdrm7v+7EyEiMaHDmM=",
+         "withheldAmount": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+        }
+       },
+       {
+        "extension": "transferHook",
+        "state": {
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "programId": null
+        }
+       },
+       {
+        "extension": "scaledUiAmountConfig",
+        "state": {
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "multiplier": "1",
+         "newMultiplier": "1",
+         "newMultiplierEffectiveTimestamp": 0
+        }
+       },
+       {
+        "extension": "metadataPointer",
+        "state": {
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "metadataAddress": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB"
+        }
+       },
+       {
+        "extension": "pausableConfig",
+        "state": {
+         "authority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "paused": false
+        }
+       },
+       {
+        "extension": "tokenMetadata",
+        "state": {
+         "additionalMetadata": [],
+         "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+         "name": "Anduril PreStocks",
+         "symbol": "ANDURIL",
+         "updateAuthority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+         "uri": "https://prestocks.com/metadata/anduril.json"
+        }
+       }
+      ],
+      "freezeAuthority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "isInitialized": true,
+      "mintAuthority": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "supply": "11805759202306"
+     },
+     "type": "mint"
+    },
+    "program": "spl-token-2022",
+    "space": 905
+   },
+   "executable": false,
+   "lamports": 200799295,
+   "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "rentEpoch": 18446744073709552000,
+   "space": 905
+  }
+ },
+ "tokens": [
+  {
+   "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
+   "symbol": "AAPLon",
+   "issuer": "ondo-global-markets"
+  },
+  {
+   "mint": "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+   "symbol": "BLSH",
+   "issuer": "bullish"
+  },
+  {
+   "mint": "CYPHuMmCL1GxJWa2tsPhLKykC7GrHJTCHwbXD4g5uawK",
+   "symbol": "CYPH",
+   "issuer": "backpack-securities"
+  },
+  {
+   "mint": "PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+   "symbol": "ANDURIL",
+   "issuer": "prestocks"
+  },
+  {
+   "mint": "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v",
+   "symbol": "tSpaceX",
+   "issuer": "tessera"
+  },
+  {
+   "mint": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
+   "symbol": "AMZNx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "Xs72K1Ta1D5ccNy3RzSyQWGgZywWvphX78pL8WBk1Bo",
+   "symbol": "MOOx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsApJFV9MAktqnAc6jqzsHVujxkGm9xcSUffaBoYLKC",
+   "symbol": "MAx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsQ6NfzzLH8nspjrB9X8R2K64Zz7Tnxqu12juDiMPMW",
+   "symbol": "PANWx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsbELVbLGBkn7xfMfyYuUipKGt1iRUc2B7pYRvFTFu3",
+   "symbol": "IWMx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsfAzPzYrYjd4Dpa9BU3cusBsvWfVB9gBcyGC87S57n",
+   "symbol": "NVOx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo",
+   "symbol": "AVGOx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4",
+   "symbol": "PLTRx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX",
+   "symbol": "MSFTx",
+   "issuer": "xstocks-backed"
+  },
+  {
+   "mint": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
+   "symbol": "HOODx",
+   "issuer": "xstocks-backed"
+  }
+ ]
+}

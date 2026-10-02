@@ -1,0 +1,560 @@
+/*
+ * Styles for whatif.html — the failure-mode matrix. stocks.css carries the colour tokens (--wi-*
+ * among them), the header and the section and filter furniture, and trustchain.css the shared
+ * .wi-* answer rows this page's side panel reuses, so only the matrix itself is new here.
+ *
+ * Mobile first, and the matrix is the reason: 38 questions x 12 issuers cannot be a grid at 320 px,
+ * so the DEFAULT layout is a stack — every question a block, its twelve answers a wrapping row of
+ * labelled chips — and the grid only appears from 900 px up, where `display: contents` folds each
+ * row's cells into the row's own grid so the header strip and every row share one column track
+ * list. One DOM, two readings; no second markup path to keep in step.
+ */
+
+/* --- the answer and the collapsed method ------------------------------- */
+
+/* The page's answer in one sentence, then "How to read this" closed: on a phone the scenario
+   picker starts on the first screen instead of after a screenful of method. */
+.wm-answer { margin: 0 0 10px; font-size: clamp(1.05rem, 2.1vw, 1.3rem); font-weight: 650; line-height: 1.4; letter-spacing: -.01em; color: var(--page-text); }
+.wm-how { margin: 0 0 4px; }
+.wm-how > summary { display: flex; align-items: center; gap: 6px; min-height: 44px; width: max-content; list-style: none; cursor: pointer; color: var(--link-color); font-size: 0.9rem; font-weight: 650; }
+.wm-how > summary::-webkit-details-marker { display: none; }
+.wm-how > summary::before { content: "▸"; }
+.wm-how[open] > summary::before { content: "▾"; }
+.wm-how[open] > summary { margin-bottom: 8px; }
+.wm-how-h { margin: 18px 0 8px; font-size: 1rem; }
+.wm-how .section-note { max-width: 920px; }
+
+/* --- the status legend ------------------------------------------------ */
+
+.scenario-start { display: grid; grid-template-columns: minmax(180px, .35fr) 1fr; gap: 24px; }
+.scenario-start h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.8rem, 3vw, 2.8rem); font-weight: 500; }
+.scenario-start nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.scenario-start a { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--panel-border); border-radius: 9px; background: var(--card-bg); color: var(--page-text); text-decoration: none; }
+.scenario-start a:hover { border-color: var(--accent); }
+.scenario-start a span { color: var(--muted-text); font-size: .74rem; line-height: 1.45; }
+
+@media (max-width: 720px) { .scenario-start, .scenario-start nav { grid-template-columns: 1fr; } }
+
+.wm-key,
+.wm-colkey {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 5px;
+}
+
+@media (min-width: 720px) {
+    .wm-key,
+    .wm-colkey {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px 24px;
+    }
+}
+
+.wm-key-item,
+.wm-colkey li {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--muted-text);
+}
+
+.wm-key-item strong,
+.wm-colkey strong {
+    color: var(--page-text);
+    font-weight: 600;
+}
+
+.wm-key-swatch {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    align-self: center;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    background: color-mix(in srgb, currentColor 55%, var(--card-bg));
+}
+
+/* `missing` is the absence of an answer, so its cell carries no colour: a hatch, which reads as
+   "nothing here" rather than as a sixth kind of finding. */
+.wm-key-swatch.wi-s-missing,
+.wm-cell.wi-s-missing {
+    background: repeating-linear-gradient(45deg,
+            transparent 0 3px,
+            color-mix(in srgb, currentColor 45%, transparent) 3px 4.5px);
+}
+
+/* --- counts and filters ---------------------------------------------- */
+
+.wm-counts {
+    margin: 0 0 10px;
+}
+
+.wm-filters {
+    align-items: flex-start;
+}
+
+.wm-field-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text);
+}
+
+.wm-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.wm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    background: var(--control-bg);
+    font: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+/* A status chip is tinted by the status it filters on, so the filter and the matrix agree —
+   which is again why no `color` is declared above: see the note on .wm-cell. */
+.wm-chip.wi-s-documented,
+.wm-chip.wi-s-litigated,
+.wm-chip.wi-s-inferred,
+.wm-chip.wi-s-unknown,
+.wm-chip.wi-s-not-applicable,
+.wm-chip.wi-s-missing {
+    border-color: currentColor;
+}
+
+.wm-chip-on {
+    background: color-mix(in srgb, currentColor 18%, var(--control-bg));
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+
+.wm-chip-n {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.72rem;
+    opacity: 0.75;
+}
+
+.wm-clear {
+    margin-top: 18px;
+    padding: 4px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+/* The banner over an issuer-narrowed matrix (?issuer=<slug>): whose column this is, its counts,
+   and the way back to every issuer. */
+.wm-issuer-banner {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    background: var(--card-bg);
+}
+
+.wm-issuer-who {
+    margin: 0 0 6px;
+    font-size: 0.88rem;
+}
+
+.wm-issuer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin: 8px 0 0;
+    font-size: 0.85rem;
+}
+
+.wm-issuer-actions .wm-clear {
+    margin-top: 0;
+    min-height: 32px;
+}
+
+.wm-range {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--muted-text);
+}
+
+.wm-subhead {
+    margin: 18px 0 6px;
+    font-size: 0.95rem;
+}
+
+/* --- the matrix: stacked (default, 320 px up) ------------------------- */
+
+.wm-matrix {
+    --wm-cols: 12;
+    margin: 12px 0 0;
+}
+
+/* The header strip only means something beside a grid, so it is not drawn without one. */
+.wm-head {
+    display: none;
+}
+
+.wm-actor {
+    margin: 0 0 14px;
+}
+
+.wm-actor-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--panel-border);
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted-text);
+}
+
+.wm-actor-n {
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.wm-row {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--panel-border);
+}
+
+.wm-q {
+    margin: 0 0 6px;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.wm-cells {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/*
+ * NO `color` DECLARATION HERE, deliberately. The status colour arrives on the same element as
+ * .wi-s-<status> from trustchain.css, and this stylesheet is loaded AFTER that one — so an
+ * equal-specificity `color` here would win and paint all 456 cells the same grey, with the
+ * colour that carries the whole page's meaning silently gone. Every cell gets a status class
+ * (statusClass() has no path that returns none), so there is nothing to fall back to.
+ */
+.wm-cell {
+    min-height: 26px;
+    padding: 2px 7px;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    background: var(--card-bg);
+    background: color-mix(in srgb, currentColor 14%, var(--card-bg));
+    font: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.wm-cell:hover,
+.wm-cell:focus-visible {
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+
+/* A cell the status filter asked for. An outline rather than another colour, because the colour
+   already means the status and a second meaning on the same channel would be unreadable. */
+.wm-marked {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.wm-cell-i {
+    color: var(--page-text);
+}
+
+/* The status word a single-issuer matrix spells beside the short name. */
+.wm-cell-s {
+    margin-left: 6px;
+    font-weight: 600;
+}
+
+.wm-empty {
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+/* The one-time reveal: the first time the drawn matrix is on screen, whatif.js adds .wm-revealing
+   and each row fades up after its own --wm-reveal-delay (under half a second for the last row).
+   Only with motion allowed; the rows' resting state is untouched, so nothing depends on it. */
+@media (prefers-reduced-motion: no-preference) {
+    .wm-revealing .wm-row {
+        animation: wm-row-in .26s ease-out var(--wm-reveal-delay, 0ms) 1 backwards;
+    }
+
+    @keyframes wm-row-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+    }
+}
+
+/* --- the matrix: a grid from 900 px up -------------------------------- */
+
+@media (min-width: 900px) {
+    .wm-head,
+    .wm-row {
+        display: grid;
+        grid-template-columns: minmax(220px, 4fr) repeat(var(--wm-cols), minmax(0, 1fr));
+        gap: 3px;
+        align-items: stretch;
+    }
+
+    .wm-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding-bottom: 4px;
+        background: var(--page-bg);
+        border-bottom: 1px solid var(--panel-border);
+    }
+
+    .wm-head-q {
+        align-self: end;
+        font-size: 0.74rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted-text);
+    }
+
+    /* Twelve column labels will not fit horizontally in ~60 px each, so they stand on end.
+       rotate(180deg) on top of vertical-rl makes them read bottom-to-top rather than top-to-bottom. */
+    .wm-head-i {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        justify-self: center;
+        max-height: 96px;
+        overflow: hidden;
+        font-size: 0.72rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .wm-row {
+        padding: 2px 0;
+    }
+
+    .wm-q {
+        margin: 0;
+        align-self: center;
+        padding-right: 10px;
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+
+    /* The twelve cells become grid items of .wm-row itself, so they line up with .wm-head. */
+    .wm-cells {
+        display: contents;
+    }
+
+    .wm-cell {
+        min-height: 22px;
+        padding: 0;
+        border-radius: 3px;
+        background: color-mix(in srgb, currentColor 60%, var(--card-bg));
+    }
+
+    .wm-cell.wi-s-missing {
+        background: repeating-linear-gradient(45deg,
+                transparent 0 3px,
+                color-mix(in srgb, currentColor 45%, transparent) 3px 4.5px);
+    }
+
+    /* The issuer's name is in the column header and in every cell's title and aria-label, so the
+       cell itself does not repeat it. */
+    .wm-cell-i {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}
+
+/* --- the answer panel ------------------------------------------------- */
+
+.wm-panel {
+    width: min(94vw, 620px);
+    max-height: 88vh;
+    padding: 0;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--page-text);
+    overflow: hidden;
+}
+
+.wm-panel::backdrop {
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.wm-panel-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--header-bg);
+    color: var(--header-text);
+}
+
+.wm-panel-head h2 {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.4;
+}
+
+.wm-panel-close {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    background: var(--control-bg);
+    color: var(--control-text);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.wm-panel-body {
+    padding: 12px 14px 16px;
+    max-height: calc(88vh - 60px);
+    overflow-y: auto;
+    display: grid;
+    gap: 9px;
+}
+
+.wm-panel-who {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted-text);
+}
+
+/* On a phone the panel is the whole screen: a 620 px sheet with 14 px of padding leaves a quote
+   two words wide at 320 px. */
+@media (max-width: 560px) {
+    .wm-panel {
+        width: 100vw;
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+        border: 0;
+    }
+
+    .wm-panel-body {
+        max-height: calc(100vh - 58px);
+    }
+}
+
+.wi-title { margin: 0 0 14px; font-size: clamp(1.45rem, 3.2vw, 2.1rem); line-height: 1.12; letter-spacing: -.03em; }
+
+/* The panel's link to the issuer's dossier page, after the answer. */
+.wm-panel-dossier {
+    margin: 4px 0 0;
+    padding-top: 9px;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* --- the documented-answer scoreboard ---------------------------------- */
+/* One link per issuer: name and documented count, an inline-SVG stacked bar whose viewBox is the
+   question count wide (a segment's width is its count), and the counts in words beneath. Each
+   rect takes its status colour from .wi-s-<status> (trustchain.css) through `fill: currentColor`. */
+
+.wm-board {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 4px;
+}
+
+.wm-board-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "name doc" "bar bar" "counts counts";
+    gap: 2px 8px;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--page-text);
+    text-decoration: none;
+}
+
+.app-page .wm-board-row { color: var(--page-text); }
+
+.wm-board-row:hover,
+.wm-board-row[aria-current="true"] {
+    border-color: var(--panel-border);
+    background: var(--card-bg);
+}
+
+.wm-board-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.wm-board-name { grid-area: name; font-size: 0.86rem; font-weight: 600; }
+.wm-board-doc { grid-area: doc; font-size: 0.86rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--wi-documented); }
+.wm-board-doc small { font-weight: 400; color: var(--muted-text); }
+
+.wm-board-bar {
+    grid-area: bar;
+    display: block;
+    width: 100%;
+    height: 12px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--sunken-bg);
+}
+
+.wm-board-bar rect { fill: currentColor; }
+
+/* The unanswered remainder reads as a gap, not a seventh finding. */
+.wm-board-bar rect.wi-s-missing { fill: color-mix(in srgb, currentColor 30%, transparent); }
+
+.wm-board-counts { grid-area: counts; font-size: 0.72rem; line-height: 1.4; color: var(--muted-text); }
+
+@media (min-width: 900px) {
+    .wm-board-row {
+        grid-template-columns: 110px minmax(0, 1fr) 52px;
+        grid-template-areas: "name bar doc" ". counts counts";
+        align-items: center;
+    }
+    .wm-board-doc { text-align: right; }
+}

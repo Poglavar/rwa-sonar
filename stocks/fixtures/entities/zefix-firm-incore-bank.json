@@ -1,0 +1,169 @@
+{
+  "name": "InCore Bank AG",
+  "ehraid": 856432,
+  "uid": "CHE113315761",
+  "uidFormatted": "CHE-113.315.761",
+  "chid": "CH02030303866",
+  "chidFormatted": "CH-020-3030386-6",
+  "legalSeatId": 247,
+  "legalSeat": "Schlieren",
+  "registerOfficeId": 20,
+  "legalFormId": 3,
+  "status": "EXISTIEREND",
+  "rabId": null,
+  "shabDate": "2026-09-10",
+  "deleteDate": null,
+  "cantonalExcerptWeb": "https://zh.chregister.ch/cr-portal/auszug/auszug.xhtml?uid=CHE-113.315.761",
+  "translation": [
+    "InCore Bank Ltd.",
+    "InCore Banque SA"
+  ],
+  "purpose": "Der Zweck der Gesellschaft ist der Betrieb einer Transaktionsbank mit hauptsächlicher Ausrichtung auf die Übernahme von ",
+  "shabPub": [
+    {
+      "shabDate": "2026-09-10",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006752784,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 42221,
+      "registryOfficeJournalDate": "2026-09-07",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 83 vom 01.05.2026, Publ. 10066"
+    },
+    {
+      "shabDate": "2026-05-01",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006639795,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 21136,
+      "registryOfficeJournalDate": "2026-04-28",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 68 vom 10.04.2026, Publ. 10066"
+    },
+    {
+      "shabDate": "2026-04-10",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006621011,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 17737,
+      "registryOfficeJournalDate": "2026-04-07",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 60 vom 27.03.2026, Publ. 10066"
+    },
+    {
+      "shabDate": "2026-03-27",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006608488,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 14930,
+      "registryOfficeJournalDate": "2026-03-24",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 16 vom 26.01.2026, Publ. 10065"
+    },
+    {
+      "shabDate": "2026-01-26",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006549136,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 3620,
+      "registryOfficeJournalDate": "2026-01-21",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 238 vom 09.12.2025, Publ. 1006"
+    },
+    {
+      "shabDate": "2025-12-09",
+      "shabNr": 0,
+      "shabPage": 0,
+      "shabId": 1006506928,
+      "shabMutationStatus": 0,
+      "registryOfficeId": 20,
+      "registryOfficeCanton": "ZH",
+      "registryOfficeJournalId": 54634,
+      "registryOfficeJournalDate": "2025-12-04",
+      "mutationTypes": [
+        {
+          "id": 17,
+          "key": "aenderungorgane"
+        }
+      ],
+      "message": "<FT TYPE=\"F\">InCore Bank AG</FT>, in <FT TYPE=\"S\">Schlieren</FT>, <FT TYPE=\"A\">CHE-113.315.761</FT>, Aktiengesellschaft (SHAB Nr. 214 vom 05.11.2025, Publ. 1006"
+    }
+  ],
+  "address": {
+    "organisation": "InCore Bank AG",
+    "careOf": "",
+    "street": "Wiesenstrasse",
+    "houseNumber": "17",
+    "addon": "",
+    "poBox": "",
+    "town": "Schlieren",
+    "swissZipCode": "8952",
+    "country": "CH"
+  },
+  "mainOffices": null,
+  "furtherMainOffices": null,
+  "branchOffices": null,
+  "hasTakenOver": null,
+  "wasTakenOverBy": null,
+  "auditFirms": [
+    {
+      "name": "PricewaterhouseCoopers AG",
+      "ehraid": 431189,
+      "uid": "CHE106839438",
+      "uidFormatted": "CHE-106.839.438",
+      "chid": "CH02030208765",
+      "chidFormatted": "CH-020-3020876-5",
+      "legalSeatId": 261,
+      "legalSeat": "Zürich",
+      "registerOfficeId": 20,
+      "legalFormId": 3,
+      "status": "EXISTIEREND",
+      "rabId": 4888,
+      "shabDate": "2026-08-26",
+      "deleteDate": null,
+      "cantonalExcerptWeb": "https://zh.chregister.ch/cr-portal/auszug/auszug.xhtml?uid=CHE-106.839.438"
+    }
+  ],
+  "auditFirmFor": null,
+  "oldNames": null
+}

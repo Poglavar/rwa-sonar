@@ -1,0 +1,116 @@
+/* The site-wide contact footer (X, Telegram group, private alerts bot, GitHub) and the no-JavaScript
+   summary on app pages, both rendered by stocks/lib/site-seo.mjs / stocks/build-site-seo.mjs on every
+   page. Colours inherit from the page, so the block follows each page's light and dark theme. */
+
+.site-contact {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1180px;
+    margin: 32px auto 0;
+    padding: 18px 16px 32px;
+    border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.site-contact .site-contact-title {
+    margin: 0 0 8px;
+    font-weight: 700;
+}
+
+.site-contact ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-contact li {
+    margin: 0;
+    padding: 0;
+}
+
+.site-contact li::before {
+    content: none;
+}
+
+.site-contact a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset: 3px;
+}
+
+.site-contact a:hover,
+.site-contact a:focus-visible {
+    text-decoration-color: currentColor;
+}
+
+/* Each link is an icon (from images/contact-icons.svg, in the text colour) and a short label. */
+.site-contact li > a:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.site-contact-icon {
+    width: 1.1em;
+    height: 1.1em;
+    flex: none;
+    fill: currentColor;
+}
+
+.site-noscript {
+    box-sizing: border-box;
+    max-width: 1180px;
+    margin: 16px auto;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.site-noscript ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+/* A snap target, so a footer after a scroll-snapped deck (pitch/) can be scrolled to. */
+body > .site-contact {
+    scroll-snap-align: end;
+}
+
+.site-contact-dark {
+    max-width: none;
+    margin: 0;
+    padding: 24px max(16px, calc((100vw - 1080px) / 2)) 96px; /* clears the deck's fixed controls */
+    background: #172033;
+    color: #e8ecf8;
+}
+
+/* Inside a page's own footer the block is part of that footer: no second full-width band. */
+.site-contact.site-contact-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    max-width: none;
+    margin: 10px 0 0;
+    padding: 0;
+    border-top: 0;
+    font-size: inherit;
+}
+
+.site-contact.site-contact-inner .site-contact-title {
+    margin: 0;
+}
+
+/* In a footer laid out as a row (editorial pages), the contact line takes a full row of its own. */
+footer > .site-contact-inner {
+    flex-basis: 100%;
+    width: 100%;
+}

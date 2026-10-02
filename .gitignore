@@ -3,3 +3,139 @@ tmp
 .claude
 node_modules/
 package-lock.json
+stocks/data/raw/
+
+# Secrets live in .env; never commit them (the deploy script also refuses to copy it).
+.env
+.env.*
+!.env.example
+
+# npm install output
+node_modules/
+
+# Server-side job state (stocks/refresh-on-server.sh, stocks/watch-chain.mjs, PM2 logs)
+logs/
+.last-refresh-stats.json
+.last-chain-watch-stats.json
+.last-caselaw-watch-stats.json
+.caselaw-watch-checkpoint.json
+.last-source-watch-stats.json
+.last-source-watch-stats-*.json
+.last-trade-watch-stats.json
+.last-watch-digest-stats.json
+.last-lending-watch-stats.json
+.refresh.lock
+release-evidence.json
+stocks-watchlist-changes.json
+
+# The per-token stock cards: generated per refresh by stocks/build-cards.mjs and rebuilt on the
+# server, so they are never committed (441 HTML + 441 JSON files that change on every run).
+/cards/
+/weekly/
+
+# Reusable legal-template pages are generated alongside cards on every refresh (and the catalogue,
+# stocks-legal-templates.json, is ignored with the other job-owned files below).
+# Anchored to the root: an unanchored `issuers/` also ignored the research dossiers in
+# stocks/data/issuers/, so a new dossier file would never have been committed.
+/templates/
+/issuers/
+/protocols/
+/comparisons/
+
+# Social preview images of the hand-written pages and the sitemaps: rebuilt on every refresh by
+# stocks/build-site-seo.mjs from the data (the committed pages carry the matching ?v= in their head).
+/og/
+/sitemap.xml
+/sitemaps/
+
+# The API's own dependencies (api/package.json). The lockfile IS committed, so the deploy can
+# `npm ci` the exact tree — the blanket package-lock.json rule above is un-ignored for it.
+api/node_modules/
+!api/package-lock.json
+# The og image renderer's own locked dependency (stocks/og, resvg), installed by the deploy.
+!stocks/og/package-lock.json
+
+# Raw and normalised copies of every watched source, plus the watcher's per-URL state
+# (stocks/watch-sources.mjs). Rebuilt by every run and pruned to the last five versions; the
+# durable record is sonar.source_version in Postgres.
+stocks/data/sources/
+stocks/data/sources-state.json
+
+# Live trade collector output. These files are mutable runtime state: production and local
+# collectors refresh them independently, while tests use the deterministic fixture below.
+/stocks-trades.json
+/stocks/data/trades-24h.json
+# The redemption observer's rolling state and checkpoints (stocks/observe-redemptions.mjs): written
+# on the server by rwa-redemptions; ignored so a deploy's git clean never resets its coverage.
+/stocks/data/redemption-observations.json
+/stocks/data/tracking-log.json
+/stocks/data/xstocks-float.json
+# The DeFi footprint scan (1.4 MB, server state); only its candidates are published, via stocks-defi-new.json.
+/stocks/data/defi-footprint.json
+
+
+# Creation times of recently first-seen mints (stocks/fetch-mint-created.mjs): a server-side cache
+# of chain facts that never change, rebuilt on demand; the latest-events feed reads it.
+stocks/data/mint-created.json
+# When the events build first saw each daily-snapshot change (stocks/build-events.mjs): server state,
+# so a same-day market event keeps its first time while the day's snapshot is rewritten.
+stocks/data/event-first-seen.json
+# "When the market is closed" collectors' accumulating server state (stocks/fetch-lender-price-history.mjs,
+# stocks/fetch-solana-depth.mjs): ignored so a deploy's git clean never erases the weeks they build up.
+/stocks/data/lender-price-gaps.json
+/stocks/data/solana-depth.json
+# Pyth prices read from Solana's push-oracle accounts every refresh (stocks/fetch-pyth-onchain.mjs):
+# runtime state that changes each run; the cards carry what they show in their own .json records.
+/stocks/data/pyth-onchain.json
+
+# The universe view's generated index (stocks/build-universe-view.mjs).
+/universe-view/
+
+# Job-owned runtime data: written by the prod jobs on every refresh (the release manifest's list,
+# stocks/lib/release-manifest.mjs), so never committed. A local copy comes from prod with
+# `./pull-prod-data.sh`; tests read the frozen copy in test-fixtures/catalogue/. Two files in the
+# manifest are curated inputs, edited by hand and only read by the jobs, so they stay tracked:
+# stocks/data/events.json and stocks/data/defi-program-registry.json (RELEASE_CURATED in the manifest).
+/stocks-issuers.json
+/stocks-tokens.json
+/stocks-discovery.json
+/stocks-funnel.json
+/stocks-graph.json
+/stocks-health.json
+/stocks-collector-status.json
+/stocks-review-queue.json
+/stocks-closed-market.json
+/stocks-changes.json
+/stocks-change-journal.json
+/stocks-defi-changes.json
+/stocks-defi-new.json
+/stocks-legal-templates.json
+/stocks-power-map.json
+/stocks-flows.json
+/stocks-tracking.json
+/stocks-exits.json
+/stocks-schematics.json
+/stocks-events.json
+/stocks/data/venues.json
+/stocks/data/holders.json
+/stocks/data/meteora.json
+/stocks/data/reference-prices.json
+/stocks/data/defi-usage.json
+/stocks/data/discovery-candidates.json
+/stocks/data/identity-onchain.json
+/stocks/data/mint-identities.json
+/stocks/data/history/
+.last-reserves-watch-stats.json
+.last-entities-watch-stats.json
+.entities-watch-checkpoint.json
+.last-corporate-actions-watch-stats.json
+.last-regulators-watch-stats.json
+.last-regulators-watch-stats-*.json
+.regulators-watch-checkpoint*.json
+.last-powers-watch-stats.json
+stocks/data/cmc-tokenized.json
+
+# Private open-work list, kept local only
+next-steps.md
+
+/monitoring-map.json

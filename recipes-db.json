@@ -137,5 +137,164 @@
         "note": "Issuer's financial statements audited per GAAS/IFRS"
       }
     ]
+  },
+  {
+    "name": "Tokenized Public Equity V1",
+    "author": "rwa-sonar",
+    "description": "What a tokenized listed-equity product should attest to, derived from eleven Solana issuer dossiers read from primary documents in September 2026. The set covers the three wrapper families it found - registered shares recorded by a transfer agent, SPV/trust claims, and tracker certificates or notes - so the conditional entries are marked in the note rather than split into separate recipes. Absences, not just claims, drove the list: the products examined failed most often on published terms, on a verifiable reconciliation between chain and register, on a redemption rail that actually works, and on naming the canonical mint.",
+    "version": "1.0",
+    "createdDate": "2026-09-16",
+    "attestationTypes": [
+      {
+        "schema": "token-represents-equity",
+        "required": false,
+        "note": "Exactly one of this, token-represents-tracker-certificate or token-represents-fund-share must be present, and the statement should name the share class and CUSIP/ISIN. Registered-share wrappers only (Superstate, Bullish, Securitize). Ondo was recorded as equity in error until 2026-09; a wrapper that cannot name a class and identifier is not equity."
+      },
+      {
+        "schema": "token-represents-tracker-certificate",
+        "required": false,
+        "note": "Structured-note, tracker-certificate and debt-note wrappers only (xStocks, Ondo). Declaring the form is mandatory even though this particular slug is conditional."
+      },
+      {
+        "schema": "token-represents-fund-share",
+        "required": false,
+        "note": "SPV or trust-claim wrappers only (Backpack SPCX). Pair it with holder-claim-priority-defined: a beneficial entitlement in a pool is not a share."
+      },
+      {
+        "schema": "token-confers-no-shareholder-rights",
+        "required": false,
+        "note": "Required for everything except registered shares, where the opposite is the point. Given by 7 of 11 issuers examined, and the cheapest honest disclosure in the category."
+      },
+      {
+        "schema": "issuer-terms-are-public",
+        "required": true,
+        "note": "A durable, versioned, pinned terms document for the token itself. Bullish publishes none for onchain BLSH (two press releases are the whole record); Remora shipped empty terms pages. Google Drive files with no effective-date history only just pass."
+      },
+      {
+        "schema": "issuer-regulatory-disclosure-document-published",
+        "required": true,
+        "note": "Prospectus, registration statement, offering circular or KID - the risk-factor document, not the marketing page."
+      },
+      {
+        "schema": "product-registered-under-regulation",
+        "required": true,
+        "note": "Name the regulator, the instrument and the expiry. A consent or AML registration is not approval: the xStocks prospectus says its JFSC consent \"does not give the issuer a regulated status\"."
+      },
+      {
+        "schema": "underlying-custodied-at-named-custodian",
+        "required": true,
+        "note": "Name the custodian of the shares for this specific pool or series. Naming group brokers without tying them to the pool does not satisfy it, and Remora never named one at all."
+      },
+      {
+        "schema": "reserve-independently-verified",
+        "required": true,
+        "note": "Daily, by a named third party with read-only access to the accounts. Ondo (Ankura, daily) and xStocks (The Network Firm via Chainlink PoR) meet it; PreStocks promised attestations at launch and published none."
+      },
+      {
+        "schema": "reserve-value-gte-token-supply",
+        "required": true,
+        "note": "Per series, not pooled across products, and in value rather than unit counts. Ondo publishes 108.02% pooled across Ondo Stocks and USDY; Tessera's PoR feeds publish asset counts only."
+      },
+      {
+        "schema": "no-rehypothecation-of-customer-assets",
+        "required": true,
+        "note": "Must bind the issuer as well as the custodian, and must be clean. xStocks bars lending by InCore Bank while letting the issuer lend the same shares to Alpaca as Prime Borrower; Ondo's ban carries an issuer-consent carve-out."
+      },
+      {
+        "schema": "collateral-substitution-limits-disclosed",
+        "required": false,
+        "note": "Collateralised wrappers only. State what may stand in for the shares and at what overcollateralisation factor, and break out standard versus substitute collateral in the periodic report."
+      },
+      {
+        "schema": "chain-state-reconciled-with-offchain-register",
+        "required": false,
+        "note": "Registered-share wrappers only, and it needs published output, not a stated obligation. A public per-chain supply endpoint is the minimum: Superstate has one and a 0.1-share break was measurable through it, while Bullish and Securitize publish nothing testable."
+      },
+      {
+        "schema": "zero-unresolved-reconciliation-breaks",
+        "required": false,
+        "note": "Registered-share wrappers only. As-of-date, from the transfer agent. None of the three registered-share issuers examined publishes it."
+      },
+      {
+        "schema": "transfer-agent-is-sec-registered",
+        "required": false,
+        "note": "Registered-share wrappers only. File number and live TA-1/TA-2 filings. It does not imply independence: Securitize is its own transfer agent, broker-dealer and ATS, and Bullish is acquiring Equiniti."
+      },
+      {
+        "schema": "token-holder-can-redeem-for-underlying",
+        "required": true,
+        "note": "State the process, eligibility, latency, fee and what happens on refusal. Bullish and Securitize state the right with no operational term at all; xStocks excludes delivery in kind entirely, which should be declared rather than implied."
+      },
+      {
+        "schema": "redemption-rail-live",
+        "required": true,
+        "note": "With a count of completed redemptions or transfers in a stated period. Backpack advertises ACATS/DTCC transfers while its own status table says they are not available - the failure mode this entry exists to catch."
+      },
+      {
+        "schema": "holder-claim-priority-defined",
+        "required": true,
+        "note": "Where the holder ranks on issuer insolvency, and whether any security interest exists. Ondo names a first-priority perfected interest held by a security agent; Tessera and RepublicX leave the holder an unsecured creditor."
+      },
+      {
+        "schema": "assets-bankruptcy-remote-from-issuer",
+        "required": true,
+        "note": "By third-party legal opinion, published. Every issuer examined that claimed bankruptcy remoteness claimed it in its own words, and Backpack expressly withholds any assurance that its trust structure is enforceable."
+      },
+      {
+        "schema": "admin-operations-require-multisig",
+        "required": true,
+        "note": "N-of-M over minting, freezing, thawing, claw-back and program upgrades, disclosed and observable on-chain. Superstate, Bullish and Securitize all run single-signer or unresolved authorities; Tessera moved from a Squads multisig to one Fireblocks key in January 2026."
+      },
+      {
+        "schema": "reversal-authority-is-named-role",
+        "required": true,
+        "note": "Name the role AND attribute the on-chain key to it. Naming only the role leaves the holder unable to tell who can freeze their position, which is the gap at Bullish, Backpack and Remora."
+      },
+      {
+        "schema": "onchain-authority-is-program-derived",
+        "required": false,
+        "note": "Preferred over a keypair wherever the design allows: it moves policy into code. Cheap to verify - getAccountInfo on the mint and freeze authority."
+      },
+      {
+        "schema": "issuer-publishes-canonical-mint-address",
+        "required": true,
+        "note": "On a source the issuer controls, repudiating all others. Bullish does it; Securitize and RepublicX do not, and both have impersonation mints trading under their tickers."
+      },
+      {
+        "schema": "price-feed-provided-by-oracle",
+        "required": true,
+        "note": "A named publisher and a maximum latency. Only 5 of 441 tokens had an entitled Pyth feed in September 2026, so most premiums had to be computed against a competitor-sourced underlying price."
+      },
+      {
+        "schema": "independent-smart-contract-security-audit-completed",
+        "required": true,
+        "note": "The audit must name the program or mint configuration actually in use. Superstate publishes 14 audits, none specific to the equity token; xStocks, Bullish and Securitize publish none that could be tied to these mints."
+      },
+      {
+        "schema": "corporate-actions-applied-via-onchain-multiplier",
+        "required": false,
+        "note": "Where splits, reverse splits or reinvested dividends are applied by rebasing rather than reissuing. Publish the multiplier on-chain and off-chain; 200 of 436 mints carried a multiplier other than 1 in September 2026, so a consumer that ignores it reads supply wrong."
+      },
+      {
+        "schema": "allowlist-publicly-enumerable",
+        "required": false,
+        "note": "Allowlisted tokens only. Superstate's allowlist program is readable by anyone (827 accounts, with published SDKs); Bullish and Securitize keep membership private, so the restriction is verifiable but its contents are not."
+      },
+      {
+        "schema": "verification-report-published-at-contractual-location",
+        "required": true,
+        "note": "Wherever a verification or attestation report is promised. Ondo's Sales Terms name ondo.finance/global-markets and the reports live in a Dropbox link embedded in a JS bundle."
+      },
+      {
+        "schema": "reconciliation-cadence-is",
+        "required": true,
+        "note": "State the cadence and the reporting deadline contractually, as Ondo does (daily verification, report by 4:30pm GMT next day, monthly reconciliation)."
+      },
+      {
+        "schema": "settlement-gap-documented",
+        "required": true,
+        "note": "Quantify the token-to-book-entry conversion time, which is the gap that governs arbitrage and a holder who needs to sell on the exchange. Superstate bounds it (\"up to multiple weeks\"); Bullish and Securitize only gesture at it."
+      }
+    ]
   }
 ]

@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "goldenCopy": {
+      "publishDate": "2026-09-30T00:00:00Z"
+    }
+  },
+  "data": {
+    "type": "lei-records",
+    "id": "549300RQT6K4WXZL3083",
+    "attributes": {
+      "lei": "549300RQT6K4WXZL3083",
+      "entity": {
+        "legalName": {
+          "name": "GOLDMAN SACHS GROUP UK LIMITED",
+          "language": "en"
+        },
+        "otherNames": [],
+        "transliteratedOtherNames": [],
+        "legalAddress": {
+          "language": "en",
+          "addressLines": [
+            "Plumtree Court",
+            "25 Shoe Lane"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "London",
+          "region": "GB-LND",
+          "country": "GB",
+          "postalCode": "EC4A 4AU"
+        },
+        "headquartersAddress": {
+          "language": "en",
+          "addressLines": [
+            "Plumtree Court",
+            "25 Shoe Lane"
+          ],
+          "addressNumber": null,
+          "addressNumberWithinBuilding": null,
+          "mailRouting": null,
+          "city": "London",
+          "region": "GB-LND",
+          "country": "GB",
+          "postalCode": "EC4A 4AU"
+        },
+        "registeredAt": {
+          "id": "RA000585",
+          "other": null
+        },
+        "registeredAs": "08657873",
+        "jurisdiction": "GB",
+        "category": "GENERAL",
+        "legalForm": {
+          "id": "H0PO",
+          "other": null
+        },
+        "associatedEntity": {
+          "lei": null,
+          "name": null
+        },
+        "status": "ACTIVE",
+        "expiration": {
+          "date": null,
+          "reason": null
+        },
+        "successorEntity": {
+          "lei": null,
+          "name": null
+        },
+        "successorEntities": [],
+        "creationDate": "2013-08-20T00:00:00Z",
+        "subCategory": null,
+        "otherAddresses": [],
+        "eventGroups": []
+      },
+      "registration": {
+        "initialRegistrationDate": "2014-04-08T01:45:00Z",
+        "lastUpdateDate": "2026-04-20T12:55:03Z",
+        "status": "ISSUED",
+        "nextRenewalDate": "2027-04-28T17:45:29Z",
+        "managingLou": "529900T8BM49AURSDO55",
+        "corroborationLevel": "FULLY_CORROBORATED",
+        "validatedAt": {
+          "id": "RA000585",
+          "other": null
+        },
+        "validatedAs": "08657873",
+        "otherValidationAuthorities": []
+      },
+      "bic": [
+        "GOSGGB21XXX"
+      ],
+      "mic": null,
+      "ocid": "gb/08657873",
+      "qcc": "QGBDU0Q9NU",
+      "gem": null,
+      "spglobal": [
+        "261714770"
+      ],
+      "conformityFlag": "CONFORMING"
+    },
+    "relationships": {
+      "managing-lou": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/managing-lou"
+        }
+      },
+      "lei-issuer": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/lei-issuer"
+        }
+      },
+      "field-modifications": {
+        "links": {
+          "related": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/field-modifications"
+        }
+      },
+      "direct-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/direct-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/direct-parent"
+        }
+      },
+      "ultimate-parent": {
+        "links": {
+          "relationship-record": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/ultimate-parent-relationship",
+          "lei-record": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/ultimate-parent"
+        }
+      },
+      "direct-children": {
+        "links": {
+          "relationship-records": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/direct-child-relationships",
+          "related": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083/direct-children"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.gleif.org/api/v1/lei-records/549300RQT6K4WXZL3083"
+    }
+  }
+}

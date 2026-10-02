@@ -1,0 +1,323 @@
+# `api/` — public analytics and owner-key-protected watches
+
+The API reads the built research data from Postgres and serves the questions a static file cannot
+answer efficiently: **any combination of facets** (issuer × recipe × health × legal form ×
+jurisdiction …), paginated token and trade views, **per-day snapshot history**, watched claims and
+sources, failure scenarios and saved comparison watches.
+
+The product is deliberately hybrid. `monitor.html` uses the API for facets and token rows;
+`stocks.html` uses it for the large token table, historical comparisons and what-if answers;
+`live.html` pages through the accumulating trade tape; `watch.html` and `whatif.html` are API-first;
+cards fetch their history on demand; and the landing/methodology pages use small health/history
+responses. Compact build artifacts still supply immutable dossiers, charts and generated cards.
+
+Analytics routes are read-only. The one bounded mutation surface stores comparison and focused watches; it uses
+a random owner key, stores only its SHA-256 hash, accepts no cookies and never places the key in a
+query string. DDL remains in `db/` and is applied by `stocks/load-db.mjs`.
+
+## Run it locally
+
+```bash
+cd api
+npm install                                   # first time only
+node --env-file=../.env src/server.js         # reads DATABASE_URL from the repo-root .env
+PORT=3399 node --env-file=../.env src/server.js
+```
+
+It binds **127.0.0.1 only** — never `0.0.0.0` — on `PORT`, default **3300**. The startup line
+reports the database host and name, never the URL:
+
+```
+[2026-09-20T14:25:33Z] rwa-sonar-api starting; database localhost:5432/geodata
+[2026-09-20T14:25:33Z] schema sonar reachable; 1183 tokens
+[2026-09-20T14:25:33Z] listening on http://127.0.0.1:3300 (25 routes)
+[2026-09-20T14:25:36Z] nj2p0p GET /api/health 200 12.2ms
+```
+
+The last line is the per-request format: **request id, method, path+query, status, ms**. A
+statement over 500 ms adds a `WARN slow query …` line with the request id above it.
+
+## Routes
+
+All routes are under `/api`. Successful GETs use `Cache-Control: public, max-age=60`; mutations and
+errors are `no-store` and use the same JSON error envelope.
+
+| Route | Returns |
+|---|---|
+| `/api`, `/api/` | The route list (`{name, docs, routes}`) |
+| `/api/health` | `{ok, now, counts:{issuers,tokens,snapshots,trades}, latestSnapshotDate, latestTradeAt, latestBuildAt}` |
+| `/api/history/overview` | Daily catalogue, active-address, underlying, supply, holder-account, market value, volume, liquidity, confirmed DeFi-support and four-dimension health series, plus exact added/removed-address annotations between consecutive snapshots |
+| `/api/history/underlyings/:ticker?days=` | Daily rows for every product tracking one underlying, plus relevant evidence/control events for chart overlays |
+| `/api/facets?by=&<filters>` | `{total, filters, q, facets:{<name>:[{value,count,…}]}}` |
+| `/api/tokens?<filters>&q=&sort=&order=&limit=&offset=` | `{total, limit, offset, sort, order, filters, q, items:[slim]}` |
+| `/api/tokens/:mint` | Scoped `redemptionUsability`, effective `authorityControl`, labelled raw `record` jsonb, health, issuer summary, `snapshotDates`, `tradesInDb`. 404 when unknown |
+| `/api/tokens/:mint/history?days=` | Snapshot rows by date **ascending**, typed columns only, plus relevant token/issuer events |
+| `/api/tokens/:mint/trades?limit=&before=` | Trades newest first, keyset cursor |
+| `/api/issuers` | Every issuer with grades, status, recipes, `mint_count`, `tokens_in_db`, health counts |
+| `/api/issuers/:slug` | Programme-scoped `redemptionUsability`, labelled raw `record`, its tokens' slim rows and health counts |
+| `/api/search?q=` | `{tokens:[≤20 slim], issuers:[≤5]}` |
+| `/api/trades/recent?limit=&before=` | The tape, newest first |
+| `/api/trades/daily?days=` | Per day per dex: trades, volume, traders, mints, suspect |
+| `/api/claims?issuer=&field=&status=&method=&sort=&order=&limit=&offset=` | Current claims from `sonar.claim`, in TRUST order by default, each joined to its source; superseded internal research rows are excluded |
+| `/api/issuers/:slug/claims` | One issuer's claims plus a per-status summary. 404 when unknown |
+| `/api/sources?issuer=&kind=&status=` | The watched URLs from `sonar.source`, with `last_checked_at`, `archive_url` and their claim/version counts |
+| `/api/changes?kind=&severity=&issuer=&since=&limit=` | The change feed from `sonar.change_event`, newest first |
+| `/api/rules` | The health rule ids with their labels, descriptions and thresholds |
+| `/api/failure-modes` | The 38 shared failure modes in catalogue order, each with its actor and flow labels and per-status counts across issuers, plus `missing` |
+| `/api/what-if?mode=&issuer=&status=&actor=&flow=&sort=&order=&limit=&offset=` | The what-if answers from `sonar.what_if`, joined to their mode's question and actor and to their source |
+| `/api/issuers/:slug/what-if` | One issuer's whole answer sheet: **all 38 modes**, unanswered ones with `status: "missing"`. 404 when unknown |
+| `/api/issuers/:slug/chain` | The trust chain rebuilt from the issuer's stored `record`: a node per actor, a link per rights flow with its two grades. 404 when unknown |
+| `POST /api/watchlists` | Create a comparison, exact-token, issuer or exact protocol-market watch; returns separate owner and read-only keys once |
+| `GET /api/watchlists/:watchId` | Read a watch using either key in `X-Watch-Key`; the response states `owner` or `read-only` access |
+| `PUT/DELETE /api/watchlists/:watchId` | Replace or remove a watch using the owner key only |
+| `POST /api/watchlists/:watchId/share` | Rotate the read-only key using the owner key; the old share link stops working |
+
+| `GET /api/watchlists/:watchId/delivery` | Owner key only: channel availability, whether a private chat is verified, a pending link's expiry and the digest setting. Never the chat id |
+| `POST /api/watchlists/:watchId/delivery/telegram` | Owner key only: a one-time `https://t.me/<bot>?start=<token>` link, valid 15 minutes; replaces any unused earlier link |
+| `DELETE /api/watchlists/:watchId/delivery` | Owner key only: forget the chat and turn the digest off |
+| `PUT /api/watchlists/:watchId/digest` | Owner key only: `{"enabled", "hour"?, "timezone"?}`; enabling returns `409 digest_delivery_unverified` without a verified chat |
+| `POST /api/telegram/watch-bot` | The dedicated watch bot's webhook, authenticated by `X-Telegram-Bot-Api-Secret-Token`; handles `/start <token>` in private chats and `/stop` |
+
+A watch body (`POST`/`PUT /api/watchlists…`) never enables delivery: `digest.enabled: true` there
+still returns `409 digest_delivery_unavailable`. Anonymous saved-watch contents are never copied into
+the operator's Telegram digest; legacy rows carrying the reserved flag without a verified chat are
+never delivered (the sender joins on `sonar.stock_watch_delivery`).
+| `GET/POST /api/review/resolutions` | Authenticated append-only editorial decisions using `Authorization: Bearer …` |
+
+The creating browser stores the raw owner key locally. Share URLs carry a separate read-only key in
+a fragment (`#watch=id.key` on comparisons, `#saved=id.key` on the Changes page); fragments are not
+sent to nginx or the API. A reader cannot edit or delete the watch, and rotating the read key leaves
+the owner key intact. Creation is limited to five watches per IP per hour. Personal delivery needs a
+verified private chat first; see "Private watch digests" below.
+
+### Examples
+
+```bash
+curl -s localhost:3300/api/health
+# {"ok":true,"now":"…","counts":{"issuers":12,"tokens":1183,"snapshots":2095,"trades":5669},…}
+
+curl -s localhost:3300/api/history/overview
+
+curl -s 'localhost:3300/api/facets?by=recipe,health' | head -c 400
+# {"total":1183,…,"facets":{"recipe":[{"value":"token-2022 · pausable + clawback + rebase","count":898},…]}}
+
+# Every facet at once (29 of them) — the whole navigation state in one request:
+curl -s 'localhost:3300/api/facets' | head -c 600
+
+# Warning-status tokens of two issuers, biggest 24 h volume first:
+curl -s 'localhost:3300/api/tokens?issuer=ondo-global-markets,xstocks-backed&health=warning&sort=volume24_usd&order=desc&limit=10'
+
+curl -s 'localhost:3300/api/tokens?q=nvda&limit=5'
+curl -s 'localhost:3300/api/tokens/XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W' | head -c 300
+curl -s 'localhost:3300/api/tokens/XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W/history?days=7'
+curl -s 'localhost:3300/api/issuers/prestocks' | head -c 300
+curl -s 'localhost:3300/api/search?q=tesla'
+curl -s 'localhost:3300/api/trades/daily?days=30'
+```
+
+Paginating the tape uses the cursor the previous page hands back — never `OFFSET`, because the
+table keeps growing under the client:
+
+```bash
+curl -s 'localhost:3300/api/trades/recent?limit=5'          # → "nextBefore":"2026-09-17T09:58:11.000Z,5ZHt4…"
+curl -s 'localhost:3300/api/trades/recent?limit=5&before=2026-09-17T09:58:11.000Z,5ZHt4…'
+```
+
+### Filters and facets
+
+The 29 filter names are also the 29 facet names, so a facet can never offer a value its own
+filter would reject. A comma list is OR (`?issuer=shift,prestocks`); the literal value `null`
+means IS NULL, so the null bucket a facet reports is clickable like any other. An **unknown**
+parameter name is a `400 unknown_filter`, never silently ignored — a dropped filter returns a
+wrong answer that looks right.
+
+Token columns: `issuer`, `instrument`, `recipe`, `program`, `health`, `market_health`,
+`control_health`, `legal_health`, `composability_health`, `worst_rule`, `programme_health`,
+`token_health`, `token_worst_rule` (the headline split from `stocks/lib/health.mjs` `levels`: the
+issuer-wide programme verdict, this token's own verdict, and the check that fails it), `reference`,
+`pausable`, `paused`, `clawback`, `allowlist`, `transfer_fee` (installed extension or retained
+configuration/withdrawal authority, including a current rate of `0 bps`),
+`hook_active`, `seen_in_search`, `first_seen_day` (the UTC day of `first_seen_at`).
+Issuer columns, reached by join: `legal_form`, `claim_rung`, `maturity_stage`,
+`verification_type`, `key_governance_mint`, `key_governance_freeze`, `jurisdiction`.
+
+**Faceted navigation proper:** a facet's counts exclude *its own* filter and apply every other
+one. `?by=health,issuer&health=warning` returns the full health breakdown (so you can switch to
+`caution`) and an issuer breakdown of the warning tokens only. `total` is the count matching
+*all* filters.
+
+`jurisdiction` is the one awkward facet: it comes from `stock_issuer.entity_jurisdiction`, which
+holds researched prose rather than a country code (one issuer's value runs past 700 characters).
+The exact string stays in `value` because that is what the filter takes, and a shortened `label`
+is added beside it for a chip.
+
+`sort` is a whitelist — `symbol`, `usd_price`, `liquidity_usd`, `volume24_usd`, `trades24`,
+`traders24`, `premium_pct`, `holder_count`, `first_seen_at`, `last_traded_at`, `health_status`,
+`market_health`, `control_health`, `legal_health`, `composability_health`, `worst_rule`, `venue_spread_pct`,
+`top1_share_pct`, `programme_health`, `token_health` — and anything else is a `400 unknown_sort`, not a silent default. NULLs sort last
+in both directions. `limit` defaults to 50 and is clamped to 500; `offset` is clamped to ≥ 0.
+
+**`sort=health_status` orders by SEVERITY**, not alphabetically: `good, caution, warning`, then
+everything unmeasured. The bare column sorts `caution, good, unknown, warning`, which puts the two
+ends of the scale in the middle and makes the column useless as a sort. `programme_health` sorts
+the same way. **`sort=token_health` orders by `token_health_rank`**, the number `health.mjs` computes:
+band first, then how many of the token's checks fail, then how many pass; a token with no market has
+no rank and sorts last.
+
+### Multi-value filters
+
+A filter takes its values in three forms, and the difference matters for values that contain a
+comma:
+
+```
+?issuer=shift,prestocks            one occurrence  -> comma list (OR)
+?issuer=shift&issuer=prestocks     repeated        -> one value per occurrence, never split
+?jurisdiction[]=Cayman, with …     the [] form     -> ONE literal value, never split
+```
+
+The `[]` form exists because **six of the nine `jurisdiction` values contain a comma**, so before it
+there was no way to filter on them at all — the page listed them with their counts and could not
+offer them. A repeated plain parameter is not comma-split either: two occurrences are already two
+values, and splitting them would make `?x=a,b&x=c` mean something different from `?x[]=a,b&x[]=c`.
+Duplicate values are deduplicated before they reach the `ANY()` array. Every route reads
+`c.req.queries()` rather than `c.req.query()`, because the latter keeps only the LAST occurrence —
+`?status=a&status=b` would silently filter on `b` alone.
+
+## Consumers
+
+`monitor.html` is the fullest API explorer. It calls `/api/health` once, then `/api/facets` (no
+`by`, so all 29) and `/api/tokens` on every filter change — debounced 150 ms, with a sequence number
+so a slow earlier answer cannot repaint the table. Its filter state
+lives in the page's own query string, which means **a filtered view is a link**:
+
+```
+monitor.html?recipe=token-2022%20%C2%B7%20pausable&health=warning&sort=liquidity_usd&page=2
+```
+
+Where the API is comes from `stocks/lib/api-base.js` (`window.__rwaApi`): `?api=<origin>` wins,
+then `<meta name="rwa-api-base">`, then port 3300 for a localhost preview, then the empty string —
+same origin, which is production.
+Only an `http(s)://host[:port]` is accepted, so `?api=javascript:…` cannot steer the page's
+fetches. `apiUrl(path, params)` builds the query string: an array becomes the comma list this API
+reads as OR, `null`/`''` are dropped and `false`/`0` are kept.
+
+**CORS**: `/api/*` answers any origin for reads and the watchlist methods, including the explicit
+`X-Watch-Key` header, with no credentials or cookies.
+That is what lets a page on the dev server (`localhost:8113`) call the API on `localhost:3300`;
+production is same-origin and never sees the header. Without it the browser reports the block as a
+network failure with **no status code**, which looks exactly like the API being down.
+
+What the page needed and this API does not serve, so it is worth knowing before the next page is
+switched over:
+
+- **What each lender does when the market is closed** (the "When closed" column) is not in the slim
+  row (nor anywhere in the schema), so that one column reads `stocks-closed-market.json`.
+
+Four gaps that were listed here and are now closed (2026-09-18):
+
+- **Rule labels** are served by `/api/rules`, read once at import from the repo-root
+  `stocks-health.json`. `monitor.js` still holds its `RULE_LABELS` map, now redundant rather than
+  necessary; a test still locks it to the same file.
+- **A filter value containing a comma** is expressible through the `[]` form above.
+- **`worst_rule`, `venue_spread_pct` and `top1_share_pct` are sortable**, and `monitor.html` offers
+  all three.
+- **`sort=health_status` orders by severity.**
+
+## Tests
+
+```bash
+npm run test:api          # from the repo root; also part of `npm test`
+```
+
+- `test/evidence.test.js` — the claim, source and change-event builders, plus the three closed
+  gaps: that a comma-bearing value reaches the parameter array and never the SQL text, that a
+  repeated parameter is OR rather than last-one-wins, and that the severity CASE is what the
+  statement carries.
+- `test/query.test.js` and `test/facets.test.js` — the pure builders. No database, no server:
+  they assert the generated SQL text and the parameter array, that no user value ever reaches the
+  statement text, whitelist rejection, clamping, and the facet-excludes-its-own-filter rule.
+- `test/whatif.test.js` — the trust-chain surface: the `failure_mode` / `what_if` builders (an
+  unanswered mode must survive the LEFT JOIN, `missing` must be derived and never stored, the
+  catalogue `ord` must be the sort), plus the four routes against the real database — including
+  that the chain the API serves is byte-identical to the one the builder wrote into
+  `stocks-issuers.json`, since both run the same `stocks/lib/trustchain.js`.
+- `test/routes.integration.test.js` — the app in-process (`app.request()`, no port) against the
+  real local database. Skipped with a printed message when `DATABASE_URL` is absent, so:
+
+```bash
+set -a; . ./.env; set +a; npm run test:api     # runs the integration suite too
+```
+
+## Deployment shape
+
+Production is wired by `deploy-to-server.sh`, `ecosystem.config.cjs` and
+`stocks/refresh-on-server.sh`. PM2 runs the API on loopback and nginx publishes `/api/` under the
+same origin as the static site. The relevant process shape is:
+
+```js
+// ecosystem.config.cjs — a third app beside rwa-trades and rwa-refresh
+{
+    name: 'rwa-sonar-api',
+    cwd: '/root/code/rwa-sonar/api',
+    script: 'src/server.js',
+    interpreter: 'node',
+    // DATABASE_URL is a secret and stays in the clone's .env; --env-file loads it into the
+    // process, so it is never in this file and never in a log line.
+    node_args: '--env-file=/root/code/rwa-sonar/.env',
+    env: { TZ: 'UTC', PORT: 3300 },
+    autorestart: true,
+    error_file: './logs/rwa-sonar-api-error.log',
+    out_file: './logs/rwa-sonar-api-out.log',
+    merge_logs: true
+}
+```
+
+Restart with the **file**, or PM2 re-reads nothing:
+`pm2 restart ecosystem.config.cjs --only rwa-sonar-api --update-env`. Then verify from the
+process, not the deploy log: `cat /proc/$(pm2 pid rwa-sonar-api)/environ | tr '\0' '\n' | grep -c DATABASE_URL`.
+
+nginx publishes it under the existing static vhost, so production pages call `/api/…` same-origin:
+
+```nginx
+location /api/ {
+    proxy_pass http://127.0.0.1:3300;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+```
+
+`npm ci` in `api/` on the server: `api/package-lock.json` is committed for exactly that (the
+repo-root `.gitignore` un-ignores it), and `api/node_modules/` is not.
+
+## Private watch digests
+
+Personal digests go through a **dedicated** Telegram bot, never the operator alerts bot: verifying
+`/start <token>` means receiving updates, and a bot has exactly one update stream, which a webhook
+(or a `getUpdates` poller) would take away from anything else reading it. `deliveryConfig()` refuses
+to run when `WATCH_BOT_TOKEN` equals `TELEGRAM_BOT_TOKEN`.
+
+1. The owner's browser asks for a binding link; only the token's SHA-256 is stored, 15-minute expiry,
+   single use (`sonar.stock_watch_binding`).
+2. Telegram pushes the private chat's `/start <token>` to `POST /api/telegram/watch-bot`. The token is
+   claimed atomically and the chat id stored as AES-256-GCM ciphertext plus an HMAC for `/stop`
+   lookups (`sonar.stock_watch_delivery`), keyed by `WATCH_DELIVERY_KEY`.
+3. The owner enables the digest and picks an hour. Changes found by
+   `stocks/build-watchlist-changes.mjs` are kept in `sonar.stock_watch_event`.
+4. `api/src/jobs/run-watch-digests.js --run` (PM2 `rwa-watch-digest`, hourly at :50; the logic is in `send-watch-digests.js`) sends one
+   message per watch per local day, within three hours of its hour, only when a material change was
+   found since its last digest; `sonar.stock_watch_digest_log` makes reruns send nothing twice. A
+   chat that blocked the bot (HTTP 403) is disconnected. Any other failure produces ONE operator
+   message without watch contents; `.last-watch-digest-stats.json` is the outcome record.
+
+Server `.env` additions: `WATCH_BOT_TOKEN`, `WATCH_BOT_USERNAME`, `WATCH_BOT_WEBHOOK_SECRET`
+(16–256 of `A-Za-z0-9_-`), `WATCH_DELIVERY_KEY` (`openssl rand -base64 32`). Then
+`node --env-file=/root/code/rwa-sonar/.env api/src/jobs/watch-bot-webhook.js --set` once. Losing
+`WATCH_DELIVERY_KEY` makes every stored chat undecryptable; owners would have to reconnect.
+
+## Evidence review
+
+`GET` and `POST /api/review/resolutions` require `Authorization: Bearer <RWA_REVIEW_ADMIN_TOKEN>`.
+The token is never embedded in the public site; the editor enters it in the review workbench and
+the browser keeps it in session storage only. Decisions are append-only audit records. Resolving a
+watcher event (anything except `deferred`) also acknowledges that event atomically.

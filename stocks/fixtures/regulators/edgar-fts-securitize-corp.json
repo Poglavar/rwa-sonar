@@ -1,0 +1,618 @@
+{
+ "took": 423,
+ "timed_out": false,
+ "_shards": {
+  "total": 50,
+  "successful": 50,
+  "skipped": 0,
+  "failed": 0
+ },
+ "hits": {
+  "total": {
+   "value": 65,
+   "relation": "eq"
+  },
+  "max_score": 16.782064,
+  "hits": [
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-059960:forms-8securitizecorpsepte.htm",
+    "_score": 16.782064,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": null,
+     "file_num": [
+      "333-298706"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": 1,
+     "root_forms": [
+      "S-8"
+     ],
+     "file_date": "2026-09-02",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "S-8",
+     "adsh": "0001628280-26-059960",
+     "film_num": [
+      "261352510"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "S-8",
+     "file_description": "S-8",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056815:a42bb3-securitizecorpq2202.htm",
+    "_score": 16.761393,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": null,
+     "file_num": [
+      "333-297848"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": 1,
+     "root_forms": [
+      "424B3"
+     ],
+     "file_date": "2026-08-13",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "424B3",
+     "adsh": "0001628280-26-056815",
+     "film_num": [
+      "261274765"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "424B3",
+     "file_description": "424B3",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056788:secz-20260630.htm",
+    "_score": 16.6365,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": "2026-06-30",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": 1,
+     "root_forms": [
+      "10-Q"
+     ],
+     "file_date": "2026-08-13",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "10-Q",
+     "adsh": "0001628280-26-056788",
+     "film_num": [
+      "261274211"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "10-Q",
+     "file_description": "10-Q",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056788:exhibit321.htm",
+    "_score": 16.580452,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": "2026-06-30",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": "4",
+     "root_forms": [
+      "10-Q"
+     ],
+     "file_date": "2026-08-13",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "10-Q",
+     "adsh": "0001628280-26-056788",
+     "film_num": [
+      "261274211"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "EX-32.1",
+     "file_description": "EX-32.1",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0000950103-26-010299:ownership.xml",
+    "_score": 16.314226,
+    "_source": {
+     "ciks": [
+      "0001806087",
+      "0002094496"
+     ],
+     "period_ending": "2026-07-01",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Sabharwal Sunil  (CIK 0001806087)",
+      "Securitize Corp.  (CIK 0002094496)"
+     ],
+     "xsl": "xslF345X06",
+     "schema_version": "X0609",
+     "sequence": 1,
+     "root_forms": [
+      "4"
+     ],
+     "file_date": "2026-07-06",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "4",
+     "adsh": "0000950103-26-010299",
+     "film_num": [
+      "261157589"
+     ],
+     "biz_locations": [
+      "",
+      "Miami, FL"
+     ],
+     "file_type": "4",
+     "file_description": "FORM 4",
+     "inc_states": [
+      "",
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0000950103-26-010300:ownership.xml",
+    "_score": 16.262737,
+    "_source": {
+     "ciks": [
+      "0002140438",
+      "0002094496"
+     ],
+     "period_ending": "2026-07-01",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Redfearn Brett Wilson  (CIK 0002140438)",
+      "Securitize Corp.  (CIK 0002094496)"
+     ],
+     "xsl": "xslF345X06",
+     "schema_version": "X0609",
+     "sequence": 1,
+     "root_forms": [
+      "4"
+     ],
+     "file_date": "2026-07-06",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "4",
+     "adsh": "0000950103-26-010300",
+     "film_num": [
+      "261157602"
+     ],
+     "biz_locations": [
+      "",
+      "Miami, FL"
+     ],
+     "file_type": "4",
+     "file_description": "FORM 4",
+     "inc_states": [
+      "",
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056829:a424b3formaxq22026_august1.htm",
+    "_score": 16.164024,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": null,
+     "file_num": [
+      "333-297848"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": 1,
+     "root_forms": [
+      "424B3"
+     ],
+     "file_date": "2026-08-13",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "424B3",
+     "adsh": "0001628280-26-056829",
+     "film_num": [
+      "261274906"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "424B3",
+     "file_description": "424B3",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0000950103-26-010304:ownership.xml",
+    "_score": 16.127968,
+    "_source": {
+     "ciks": [
+      "0002122535",
+      "0002094496"
+     ],
+     "period_ending": "2026-07-01",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Miller William Dawson  (CIK 0002122535)",
+      "Securitize Corp.  (CIK 0002094496)"
+     ],
+     "xsl": "xslF345X06",
+     "schema_version": "X0609",
+     "sequence": 1,
+     "root_forms": [
+      "4"
+     ],
+     "file_date": "2026-07-06",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "4",
+     "adsh": "0000950103-26-010304",
+     "film_num": [
+      "261157611"
+     ],
+     "biz_locations": [
+      "",
+      "Miami, FL"
+     ],
+     "file_type": "4",
+     "file_description": "FORM 4",
+     "inc_states": [
+      "",
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0000950103-26-010303:ownership.xml",
+    "_score": 16.07651,
+    "_source": {
+     "ciks": [
+      "0002116871",
+      "0002094496"
+     ],
+     "period_ending": "2026-07-01",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Flores Junco Jose Francisco  (CIK 0002116871)",
+      "Securitize Corp.  (CIK 0002094496)"
+     ],
+     "xsl": "xslF345X06",
+     "schema_version": "X0609",
+     "sequence": 1,
+     "root_forms": [
+      "4"
+     ],
+     "file_date": "2026-07-06",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "4",
+     "adsh": "0000950103-26-010303",
+     "film_num": [
+      "261157609"
+     ],
+     "biz_locations": [
+      "",
+      "Miami, FL"
+     ],
+     "file_type": "4",
+     "file_description": "FORM 4",
+     "inc_states": [
+      "",
+      "DE"
+     ],
+     "items": []
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056811:secz-20260708.htm",
+    "_score": 16.060835,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": "2026-07-08",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": 1,
+     "root_forms": [
+      "8-K"
+     ],
+     "file_date": "2026-08-13",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "8-K/A",
+     "adsh": "0001628280-26-056811",
+     "film_num": [
+      "261274703"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "8-K/A",
+     "file_description": "8-K/A",
+     "inc_states": [
+      "DE"
+     ],
+     "items": [
+      "9.01"
+     ]
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-056164:exhibit991-secz2q26earning.htm",
+    "_score": 15.984993,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": "2026-08-12",
+     "file_num": [
+      "001-43379"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": "2",
+     "root_forms": [
+      "8-K"
+     ],
+     "file_date": "2026-08-12",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "8-K",
+     "adsh": "0001628280-26-056164",
+     "film_num": [
+      "261267340"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "EX-99.1",
+     "file_description": "EX-99.1",
+     "inc_states": [
+      "DE"
+     ],
+     "items": [
+      "2.02",
+      "9.01"
+     ]
+    }
+   },
+   {
+    "_index": "edgar_file",
+    "_id": "0001628280-26-059960:ex51_233-opinionofdavispol.htm",
+    "_score": 15.964113,
+    "_source": {
+     "ciks": [
+      "0002094496"
+     ],
+     "period_ending": null,
+     "file_num": [
+      "333-298706"
+     ],
+     "display_names": [
+      "Securitize Corp.  (SECZ)  (CIK 0002094496)"
+     ],
+     "xsl": null,
+     "sequence": "3",
+     "root_forms": [
+      "S-8"
+     ],
+     "file_date": "2026-09-02",
+     "biz_states": [
+      "FL"
+     ],
+     "sics": [
+      "6199"
+     ],
+     "form": "S-8",
+     "adsh": "0001628280-26-059960",
+     "film_num": [
+      "261352510"
+     ],
+     "biz_locations": [
+      "Miami, FL"
+     ],
+     "file_type": "EX-5.1",
+     "file_description": "EX-5.1",
+     "inc_states": [
+      "DE"
+     ],
+     "items": []
+    }
+   }
+  ]
+ },
+ "query": {
+  "_source": {
+   "exclude": [
+    "doc_text"
+   ]
+  },
+  "query": {
+   "bool": {
+    "must": [
+     {
+      "match_phrase": {
+       "doc_text": "Securitize Corp."
+      }
+     }
+    ],
+    "must_not": [],
+    "should": [],
+    "filter": [
+     {
+      "range": {
+       "file_date": {
+        "gte": "2026-02-02",
+        "lte": "2026-09-30"
+       }
+      }
+     }
+    ]
+   }
+  },
+  "from": 0,
+  "size": 100,
+  "aggregations": {
+   "form_filter": {
+    "terms": {
+     "field": "root_forms",
+     "size": 30
+    }
+   },
+   "entity_filter": {
+    "terms": {
+     "field": "display_names.raw",
+     "size": 30
+    }
+   },
+   "sic_filter": {
+    "terms": {
+     "field": "sics",
+     "size": 30
+    }
+   },
+   "biz_states_filter": {
+    "terms": {
+     "field": "biz_states",
+     "size": 30
+    }
+   }
+  }
+ }
+}

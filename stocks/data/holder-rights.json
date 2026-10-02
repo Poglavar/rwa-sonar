@@ -1,0 +1,330 @@
+{
+  "_comment": "Which rights of the underlying share reach a token holder, per issuer programme: curated from the issuer dossiers' own claims (stocks/data/issuers/*.json), each with the source it rests on. Read by stocks/build-stocks-db.mjs into stocks-issuers.json; statuses and wording rules are in stocks/lib/holder-rights.js.",
+  "reviewedAt": "2026-09-24",
+  "issuers": {
+    "xstocks-backed": {
+      "dividends": {
+        "status": "value",
+        "summary": "Reinvested into more of the same stock, net of withholding tax; your displayed balance grows.",
+        "source": { "url": "https://docs.xstocks.fi/docs/dividends-and-stock-splits", "locator": "section 'Dividends'", "quote": "Rather than distributing cash, the dividend is reinvested into additional shares of the same stock." }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "The note gives creditor rights only: no voting at the company's general meetings.",
+        "source": { "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "locator": "Base Prospectus p. 83, s. 4.1.6 'Rights attached to the Securities'", "quote": "the Investors' respective creditors' rights do not consist of any shareholders' rights; thus, excluding all rights of attendance, dividend payments, other participation rights or voting rights at a general assembly" }
+      },
+      "information": {
+        "status": "no",
+        "summary": "No right to attend meetings or receive shareholder materials.",
+        "source": { "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "locator": "Base Prospectus p. 83, s. 4.1.6 'Rights attached to the Securities'", "quote": "excluding all rights of attendance, dividend payments, other participation rights or voting rights at a general assembly" }
+      },
+      "splits": {
+        "status": "value",
+        "summary": "Splits and reverse splits change your balance through the token's on-chain multiplier.",
+        "source": { "url": "https://docs.xstocks.fi/docs/how-xstocks-work", "locator": "section 'Corporate Actions'", "quote": "Corporate actions such as dividends, stock splits, and reverse splits are handled through an onchain rebasing mechanism." }
+      },
+      "takeovers": {
+        "status": "discretion",
+        "summary": "Mergers are not named; if the stock stops trading the issuer may end the product and pay what it alone decides is fair value.",
+        "source": { "url": "https://cdn.prod.website-files.com/655f3efc4be468487052e35a/6a748b81c9b1aca19a11c102_Backed_Assets_Base%20Prospectus_20260727.pdf", "locator": "Base Prospectus p. 118, Terms and Conditions clause IX.iii", "quote": "then this shall be a Termination Event at the sole discretion of the Issuer" }
+      }
+    },
+    "ondo-global-markets": {
+      "dividends": {
+        "status": "value",
+        "summary": "Reinvested into the stock, net of withholding tax; your displayed balance grows.",
+        "source": { "url": "https://docs.ondo.finance/ondo-stocks/corporate-actions", "locator": "section 'How are dividends handled?'", "quote": "Dividends are automatically invested back into the referenced stock and reflected in token pricing." }
+      },
+      "voting": {
+        "status": "discretion",
+        "summary": "You can state a voting preference through Broadridge; Ondo does not have to follow it.",
+        "source": { "url": "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory", "locator": "section 'Does this mean the tokenholder does not actually own the underlying asset?'", "quote": "you do not have shareholder voting rights, shareholder information rights or other shareholder rights from the issuer of the underlying securities." }
+      },
+      "information": {
+        "status": "no",
+        "summary": "No shareholder information rights.",
+        "source": { "url": "https://docs.ondo.finance/ondo-stocks/legal-and-regulatory", "locator": "section 'Does this mean the tokenholder does not actually own the underlying asset?'", "quote": "you do not have shareholder voting rights, shareholder information rights or other shareholder rights" }
+      },
+      "splits": {
+        "status": "unknown",
+        "summary": "Ondo's documentation covers dividends and earnings only; other corporate actions are 'to be provided'.",
+        "source": { "url": "https://docs.ondo.finance/ondo-stocks/corporate-actions", "locator": "section 'What about other corporate actions?'", "quote": "More information about other corporate actions will be provided soon." }
+      },
+      "takeovers": {
+        "status": "discretion",
+        "summary": "The issuer may replace the underlying stock or call and redeem the whole series; you can redeem before it ends.",
+        "source": { "url": "https://cdn.sanity.io/files/8k2tqa6n/production/f22c30e6d14a8000abc4e1ad6f62d6cb41dc3da0.pdf", "locator": "p. 71, s. 6 'Information Concerning the Tokens'", "quote": "exercise its Issuer Call Option or replace the Underlying held as Collateral." }
+      }
+    },
+    "backpack-securities": {
+      "dividends": {
+        "status": "value",
+        "summary": "The trustee reinvests dividends into more of the stock; cash payouts are 'not enabled yet'.",
+        "source": { "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view", "locator": "Issuer terms p. 9, cl. 3.7", "quote": "to the acquisition of additional units of such Approved Asset" }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "Only Backpack's own registered tokenholder can instruct votes; holder voting is 'still being worked on'.",
+        "source": { "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions", "locator": "section 'Voting rights'", "quote": "Shareholder voting for certain securities is supported by the underlying brokerage infrastructure and is still being worked on — it isn't enabled yet." }
+      },
+      "information": {
+        "status": "unknown",
+        "summary": "The terms do not say whether holders receive company reports or meeting materials.",
+        "source": { "url": "https://drive.google.com/file/d/1stJoNwPAOaHDbFmL72OGSkAxyCf-_RCo/view", "locator": "Issuer terms, cl. 3 (trust over the pooled shares)", "quote": "" }
+      },
+      "splits": {
+        "status": "value",
+        "summary": "Adjusted through the conversion rate you get when you redeem; your token count does not change.",
+        "source": { "url": "https://support.backpack.exchange/backpack-securities/tokenized-securities", "locator": "table 'Comparing the Two Ownership Models', row 'Corporate Actions'", "quote": "Corporate actions are automatically reflected through tokenized share balance adjustments" }
+      },
+      "takeovers": {
+        "status": "unknown",
+        "summary": "Neither the terms nor the support pages say what happens in a takeover or merger.",
+        "source": { "url": "https://support.backpack.exchange/backpack-securities/your-holdings-dividends-and-corporate-actions", "locator": "whole page", "quote": "" }
+      }
+    },
+    "bullish": {
+      "dividends": {
+        "status": "yes",
+        "summary": "You hold the share itself, so any dividend is yours; Bullish has never paid one.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926007417/blsh20251231_20f.htm", "locator": "Form 20-F p. 41, risk factor on dividends", "quote": "we have never declared or paid any cash dividends on our share capital" }
+      },
+      "voting": {
+        "status": "yes",
+        "summary": "One vote per share; no process for voting from a token wallet is published.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1872195/000110465925077583/tm2421409-32_424b4.htm", "locator": "424B4 p. 222, Voting Rights", "quote": "The holders of ordinary shares are entitled to one vote per share on all matters to be voted on by such shareholders." }
+      },
+      "information": {
+        "status": "yes",
+        "summary": "Registered shareholders get company reports and meeting materials through the transfer agent.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm", "locator": "Form 6-K Exhibit 99.1, paragraph 3", "quote": "giving holders direct share ownership and the same legal standing as conventional shareholders" }
+      },
+      "splits": {
+        "status": "yes",
+        "summary": "A split applies to your registered shares; the token can show it through its multiplier.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm", "locator": "Form 6-K Exhibit 99.1, paragraph 3", "quote": "the same legal standing as conventional shareholders" }
+      },
+      "takeovers": {
+        "status": "yes",
+        "summary": "As a registered shareholder you receive what every shareholder receives in a deal.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1872195/000143774926027408/ex_1003753.htm", "locator": "Form 6-K Exhibit 99.1, paragraph 3", "quote": "the same legal standing as conventional shareholders" }
+      }
+    },
+    "securitize": {
+      "dividends": {
+        "status": "yes",
+        "summary": "Same share class as the listed stock, so any dividend is yours; none is expected.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm", "locator": "p. 47, tokenization risk factor", "quote": "Tokenized SECZ is not a separate share class." }
+      },
+      "voting": {
+        "status": "yes",
+        "summary": "One vote per share; no process for voting from a token wallet is published.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm", "locator": "p. 121, Description of Securities, Common Stock", "quote": "Holders of Securitize Common Stock are entitled to one vote per share on matters to be voted on" }
+      },
+      "information": {
+        "status": "yes",
+        "summary": "A registered shareholder's reports and meeting materials; who is on the register for a token is still an open question.",
+        "source": { "url": "https://stocks.securitize.io/tokenize/instructions?stock=SECZ&view=general&fromTransferAgent=1", "locator": "step 4 'Transfer Agent Creates Your Account'", "quote": "Once the transfer is verified, the transfer agent records you as the registered owner of the shares." }
+      },
+      "splits": {
+        "status": "yes",
+        "summary": "A split applies to the share itself; the token can show it through its multiplier.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm", "locator": "p. 47, tokenization risk factor", "quote": "Tokenized SECZ is not a separate share class." }
+      },
+      "takeovers": {
+        "status": "yes",
+        "summary": "Same share class, so you receive what every shareholder receives in a deal.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/2094496/000162828026051182/secz-20260731.htm", "locator": "p. 47, tokenization risk factor", "quote": "Tokenized SECZ is not a separate share class." }
+      }
+    },
+    "superstate-opening-bell": {
+      "dividends": {
+        "status": "yes",
+        "summary": "Paid to you as a holder of record, in cash or shares at your election; none of these companies pays one today.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm", "locator": "Digital Transfer Agency Agreement, Schedule A s. 4.1", "quote": "Such payment will be made in cash or additional Shares (or other agreed to form, such as stablecoins, in the future), at the election of each shareholder" }
+      },
+      "voting": {
+        "status": "yes",
+        "summary": "You vote as a holder of record through proxy materials; there is no on-chain voting.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm", "locator": "Schedule A s. 3.3 Shareholder Communication; Proxy Materials", "quote": "the Digital Transfer Agent will coordinate with the RTA to enable shareholder communication and proxy material distribution." }
+      },
+      "information": {
+        "status": "yes",
+        "summary": "Shareholder communications and proxy materials reach you through the transfer agents.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm", "locator": "Schedule A s. 3.3 Shareholder Communication; Proxy Materials", "quote": "enable shareholder communication and proxy material distribution." }
+      },
+      "splits": {
+        "status": "yes",
+        "summary": "Applied to your shares and shown through the token's split multiplier.",
+        "source": { "url": "https://api.superstate.com/v2/instruments", "locator": "$.FWDI.equity_info.current_split_multiplier", "quote": "\"current_split_multiplier\":{\"multiplier\":\"1\"}" }
+      },
+      "takeovers": {
+        "status": "yes",
+        "summary": "The token is the company's own book-entry share, so you receive what every shareholder receives.",
+        "source": { "url": "https://www.sec.gov/Archives/edgar/data/1821534/000182153426000009/digitaltransferagencyagree.htm", "locator": "s. 1.9 Definitions", "quote": "Tokenized Shares means Issuer’s Book-Entry Shares represented by digital tokens recorded on the Solana blockchain" }
+      }
+    },
+    "prestocks": {
+      "dividends": {
+        "status": "no",
+        "summary": "The terms exclude dividends and distributions.",
+        "source": { "url": "https://url.prestocks.com/terms-of-service", "locator": "section 'Nature of the tokens; absence of rights'", "quote": "no entitlement to dividends, distributions, interest, yield, or proceeds of any corporate action" }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "The terms exclude voting.",
+        "source": { "url": "https://url.prestocks.com/terms-of-service", "locator": "section 'Nature of the tokens; absence of rights'", "quote": "no voting, consent, governance, board, inspection, information, notice, pre-emption, tag-along, drag-along, anti-dilution, appraisal, or registration rights" }
+      },
+      "information": {
+        "status": "no",
+        "summary": "The terms exclude information and notice rights.",
+        "source": { "url": "https://url.prestocks.com/terms-of-service", "locator": "section 'Nature of the tokens; absence of rights'", "quote": "no voting, consent, governance, board, inspection, information, notice" }
+      },
+      "splits": {
+        "status": "discretion",
+        "summary": "No anti-dilution right; the issuer has restated balances twice on its own (SPACEX ×5, OPENAI ×1.486) without explaining why.",
+        "source": { "url": "https://url.prestocks.com/terms-of-service", "locator": "section 'Nature of the tokens; absence of rights'", "quote": "anti-dilution, appraisal, or registration rights" }
+      },
+      "takeovers": {
+        "status": "discretion",
+        "summary": "The FAQ says cash-deal proceeds are paid in USDC, but the binding terms deny any right to corporate-action proceeds.",
+        "source": { "url": "https://prestocks.com/faq", "locator": "FAQ 'What happens if the company gets acquired or merges with another company?'", "quote": "If the deal is cash-based, net proceeds will be distributed pro rata as USDC, which holders can convert their PreStocks into." }
+      }
+    },
+    "tessera": {
+      "dividends": {
+        "status": "no",
+        "summary": "No dividend rights in the company.",
+        "source": { "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work", "locator": "section 'What T-Tokens are not'", "quote": "Holders have no ownership, voting, or dividend rights in the underlying company and do not appear on its cap table." }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "No voting rights in the company.",
+        "source": { "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work", "locator": "section 'What T-Tokens are not'", "quote": "Holders have no ownership, voting, or dividend rights in the underlying company" }
+      },
+      "information": {
+        "status": "no",
+        "summary": "Holders are not on the company's cap table.",
+        "source": { "url": "https://docs.tessera.pe/overview/how-do-tessera-token-work", "locator": "section 'What T-Tokens are not'", "quote": "do not appear on its cap table." }
+      },
+      "splits": {
+        "status": "na",
+        "summary": "Your claim is a share of the issuer's sale proceeds, so a split does not change it.",
+        "source": { "url": "https://terms.tessera.pe/terms-and-conditions", "locator": "Terms s. 2.2(b)(i), 'Liquidity Event'", "quote": "divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof." }
+      },
+      "takeovers": {
+        "status": "value",
+        "summary": "Paid only when the issuer sells its whole position for cash or stablecoins; unclaimed proceeds are forfeited after 90 days.",
+        "source": { "url": "https://terms.tessera.pe/terms-and-conditions", "locator": "Terms s. 2.2(b)(i), 'Liquidity Event'", "quote": "divestment by that Issuer of all interests in that PE Investment for cash or stablecoins or equivalent thereof." }
+      }
+    },
+    "republic-mirror": {
+      "dividends": {
+        "status": "no",
+        "summary": "No dividends or distributions from SpaceX.",
+        "source": { "url": "https://web.archive.org/web/20260918135722/https://republic.com/rspax", "locator": "FAQ 'If I invest, am I now an owner of SpaceX?'", "quote": "You will not receive dividends or other distributions from SpaceX and will have no rights to vote or influence SpaceX’s management" }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "No voting or attendance rights.",
+        "source": { "url": "https://web.archive.org/web/20250916201851/https://republic.com/rspax", "locator": "FAQ 'What are my rights attached to the securities?'", "quote": "investors have no rights of attendance, other participation rights or voting rights of the Issuer). Investors have no rights whatsoever to SpaceX." }
+      },
+      "information": {
+        "status": "no",
+        "summary": "You rely on public information only.",
+        "source": { "url": "https://web.archive.org/web/20260918135722/https://republic.com/rspax", "locator": "FAQ 'If I invest, am I now an owner of SpaceX?'", "quote": "must rely solely on public information and updates regarding SpaceX provided by RepublicX" }
+      },
+      "splits": {
+        "status": "discretion",
+        "summary": "RepublicX's own calculation agent decides whether and how to adjust the notes.",
+        "source": { "url": "https://web.archive.org/web/20260918135722/https://republic.com/rspax", "locator": "FAQ 'Am I participating in SpaceX’s economic success or failure?'", "quote": "RepublicX's designated calculation agent will determine whether that event has a diluting or concentrative effect" }
+      },
+      "takeovers": {
+        "status": "value",
+        "summary": "On a qualifying liquidity event RepublicX pays the value of a common share, pro rata.",
+        "source": { "url": "https://web.archive.org/web/20250916201851/https://republic.com/rspax", "locator": "FAQ 'Am I participating in SpaceX’s economic success or failure?'", "quote": "RepublicX will pay to each Noteholder a pro rata portion of the value of a common share of SpaceX at that time" }
+      }
+    },
+    "shift": {
+      "dividends": {
+        "status": "no",
+        "summary": "Membership gives no expectation of income or dividends.",
+        "source": { "url": "https://2992791489-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F5s1bCAlEtOtNyqYLZJvW%2Fuploads%2F9Ie91L86G2zJX49fJSOs%2Fshift-dao-series-17-spx3l-sp500-long-x3.pdf?alt=media&token=da57d6f4-f113-41e2-8421-c82850086527", "locator": "Series 17 agreement p. 4, Art. IV", "quote": "do not provide any expectation of profit, income, or dividends." }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "No voting or management rights; governance sits with SHFT tokens.",
+        "source": { "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/faq", "locator": "FAQ 'Do I get voting rights if I buy into a Series?'", "quote": "it does not include voting or management rights. Governance is reserved for SHFT tokens." }
+      },
+      "information": {
+        "status": "unknown",
+        "summary": "The documents do not say whether holders receive the ETF's reports.",
+        "source": { "url": "https://shiftrwa.gitbook.io/shift_education/legal/trade/faq", "locator": "FAQ", "quote": "" }
+      },
+      "splits": {
+        "status": "discretion",
+        "summary": "One issuer key can restate every balance (SOX3S sits at ×0.1); no policy is published.",
+        "source": { "url": "https://api.mainnet-beta.solana.com", "locator": "rpc:getMultipleAccounts on the 8 Shift mints, extension scaledUiAmountConfig", "quote": "scaledUiAmountConfig.multiplier: 0.1 on SOX3S" }
+      },
+      "takeovers": {
+        "status": "unknown",
+        "summary": "The documents do not cover a merger or closure of the underlying ETF.",
+        "source": { "url": "https://shiftrwa.gitbook.io/shift_education/shift_learn-2", "locator": "whole page", "quote": "" }
+      }
+    },
+    "remora-markets": {
+      "dividends": {
+        "status": "unknown",
+        "summary": "No terms survive; the programme wound down in February 2026.",
+        "source": { "url": "https://solanacompass.com/projects/remora-markets", "locator": "section 'The product'", "quote": "" }
+      },
+      "voting": {
+        "status": "unknown",
+        "summary": "No terms survive.",
+        "source": { "url": "https://solanacompass.com/projects/remora-markets", "locator": "section 'The product'", "quote": "" }
+      },
+      "information": {
+        "status": "unknown",
+        "summary": "No terms survive.",
+        "source": { "url": "https://solanacompass.com/projects/remora-markets", "locator": "section 'The product'", "quote": "" }
+      },
+      "splits": {
+        "status": "unknown",
+        "summary": "The mints could rebase but never did; no policy was published.",
+        "source": { "url": "https://api.mainnet-beta.solana.com", "locator": "rpc:getAccountInfo FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe extension scaledUiAmountConfig", "quote": "multiplier: 1, newMultiplier: 1, newMultiplierEffectiveTimestamp: 0" }
+      },
+      "takeovers": {
+        "status": "unknown",
+        "summary": "No terms survive.",
+        "source": { "url": "https://solanacompass.com/projects/remora-markets", "locator": "section 'The product'", "quote": "" }
+      }
+    },
+    "ventuals": {
+      "dividends": {
+        "status": "no",
+        "summary": "A price bet on the company's valuation, with no ownership.",
+        "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you do not have any underlying economic ownership in the company" }
+      },
+      "voting": {
+        "status": "no",
+        "summary": "No ownership, so no vote.",
+        "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you do not have any underlying economic ownership in the company" }
+      },
+      "information": {
+        "status": "no",
+        "summary": "No ownership, so no shareholder materials.",
+        "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you do not have any underlying economic ownership in the company" }
+      },
+      "splits": {
+        "status": "na",
+        "summary": "Positions tracked a valuation, not shares.",
+        "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you're merely speculating on its valuation change." }
+      },
+      "takeovers": {
+        "status": "no",
+        "summary": "No ownership; the markets were settled at their own prices when the venue closed.",
+        "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you do not have any underlying economic ownership in the company" }
+      }
+    }
+  }
+}

@@ -1,0 +1,3866 @@
+{
+  "builtAt": "2026-09-23T23:07:45Z",
+  "sources": {
+    "issuers": {
+      "file": "stocks-issuers.json",
+      "builtAt": "2026-09-23T11:58:24Z"
+    },
+    "tokens": {
+      "file": "stocks-tokens.json",
+      "builtAt": "2026-09-23T11:58:24Z"
+    },
+    "chain": {
+      "file": "stocks/data/raw/mints-parsed-2026-09-20.json",
+      "fetchedAt": "2026-09-20T10:28:25Z",
+      "rpc": "https://api.mainnet-beta.solana.com",
+      "method": "getMultipleAccounts",
+      "mintsRead": 1183
+    }
+  },
+  "powers": [
+    {
+      "id": "mint",
+      "label": "Mint new tokens",
+      "short": "Mint"
+    },
+    {
+      "id": "freeze",
+      "label": "Freeze a holder account",
+      "short": "Freeze"
+    },
+    {
+      "id": "moveBurn",
+      "label": "Move or burn your tokens (permanent delegate / clawback)",
+      "short": "Move / burn"
+    },
+    {
+      "id": "pause",
+      "label": "Pause every transfer",
+      "short": "Pause"
+    },
+    {
+      "id": "rebase",
+      "label": "Rebase displayed balances (UI multiplier)",
+      "short": "Rebase"
+    },
+    {
+      "id": "transferFee",
+      "label": "Set or withdraw a transfer fee",
+      "short": "Fee"
+    },
+    {
+      "id": "upgrade",
+      "label": "Upgrade the issuer programme",
+      "short": "Upgrade"
+    }
+  ],
+  "kinds": [
+    "single-key",
+    "multisig",
+    "program",
+    "none",
+    "unknown"
+  ],
+  "counts": {
+    "single-key": 21,
+    "multisig": 15,
+    "program": 10,
+    "none": 12,
+    "unknown": 26
+  },
+  "issuers": [
+    {
+      "slug": "backpack-securities",
+      "name": "Backpack Securities",
+      "status": "live",
+      "mints": 57,
+      "mintsRead": 57,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T07:34:13Z"
+      },
+      "governanceEvidence": "rpc:getAccountInfo on SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb and on both authority keys, 2026-09-17. The SPCX mint authority is HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ and the freeze authority, permanent delegate, pause, metadata, hook and confidential-transfer authority is 2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a; BOTH accounts are owned by program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH (an upgradeable BPF program, programData FLnzUDv45qt17NxqtBoi8cpK8mTk2PqUECxUj26BgifJ, upgrade authority the single key ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz), so issuance, clawback and corporate actions are all program-mediated rather than raw keypair signatures. Neither key is attributed to a named entity, and the program is undocumented in Backpack’s and Sunrise’s materials. The wider figure from stocks/findings.md (Authority keys in practice, 2026-09-16) stands: 48 distinct per-mint mint authorities across the Backpack mints, whose transactions are transferChecked, burnChecked, mintToChecked and updateMultiplier. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority on all 51 mints (HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ on SPCX), so it inherits the mint key's characterisation: a PDA of the undocumented upgradeable program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH, hence 'program' — with the same caveat that the program's behaviour can be changed unilaterally by the single upgrade authority ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 57,
+            "absent": 0,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 57,
+            "shown": [
+              {
+                "address": "2R1N2gJibQEZJVe2b1hzutGUQ2sCAAQcyv9sCQQGfwg8",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2WNad2FPwqZUZ3rcbDDiogyuFuxnZ6Az4DX2Ji6wV7fC",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2cvL5ctqB4sgDwHW3zYR1wbULu7KeV7UJ9xHcHrTyDyx",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2oPTjFXJBp6CxsCzCXSDp23PZ11T4sPgcVTV2G8yDmoH",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2tX1LvpCB2qrg8ABZGrgRpFFcGbJrHNV31wXkinBoogY",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "3KcsEVwamShn8CQwkikHsVxJqZxD49PsZwVvZwPnK9cx",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 56 of 57 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 57,
+            "absent": 0,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+                "role": "freeze authority",
+                "mints": 57,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 57,
+            "absent": 0,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+                "role": "permanent delegate",
+                "mints": 57,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "program",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 57,
+            "absent": 0,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+                "role": "pause authority",
+                "mints": 57,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": "freeze",
+          "sameAddressAs": [
+            "freeze",
+            "moveBurn"
+          ]
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 57,
+            "absent": 0,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 57,
+            "shown": [
+              {
+                "address": "2R1N2gJibQEZJVe2b1hzutGUQ2sCAAQcyv9sCQQGfwg8",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2WNad2FPwqZUZ3rcbDDiogyuFuxnZ6Az4DX2Ji6wV7fC",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2cvL5ctqB4sgDwHW3zYR1wbULu7KeV7UJ9xHcHrTyDyx",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2oPTjFXJBp6CxsCzCXSDp23PZ11T4sPgcVTV2G8yDmoH",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "2tX1LvpCB2qrg8ABZGrgRpFFcGbJrHNV31wXkinBoogY",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "3KcsEVwamShn8CQwkikHsVxJqZxD49PsZwVvZwPnK9cx",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "the balance multiplier in force is not 1 on 1 of 57 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 57,
+            "unknown": 0,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 57,
+            "total": 57
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "bullish",
+      "name": "Bullish BLSH",
+      "status": "live",
+      "mints": 1,
+      "mintsRead": 1,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T01:17:31Z"
+      },
+      "governanceEvidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Bullish entry): mint and freeze authority 4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk is a plain system-program-owned wallet holding 0.4417 SOL ; the permanent-delegate, hook, pause, split, metadata and confidential-transfer authority DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD is another funded system-owned wallet (0.6077 SOL (607,693,876 lamports)). No PDA, no Squads account, no allowlist program and no disclosed threshold or key-management provider. The rebase (scaledUiAmountConfig) authority is DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD — the same plain system-owned wallet that holds the permanent delegate, pause, metadata and confidential-transfer authorities — so it inherits that key's 'hot-key' characterisation. One signature from it restates every BLSH holder's displayed share count.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 1 of 1 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "4Be7JXd6JaiXd6KkSMBEya5yt19gq1d11NEWTZC6Bsgk",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "single-key",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": "moveBurn",
+          "sameAddressAs": [
+            "moveBurn",
+            "rebase"
+          ]
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "DPT54eBQJf7ghEQTzX7vjAb8WaDRMJFQchX6MKm3dFcD",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 1,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 1,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "xstocks-backed",
+      "name": "Kraken xStocks",
+      "status": "live",
+      "mints": 833,
+      "mintsRead": 833,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:32Z",
+        "to": "2026-09-20T07:34:16Z"
+      },
+      "governanceEvidence": "Finalized getMultipleAccounts across the issuer's 828-address registry on 2026-09-20 found one shared mint key, one shared freeze+pause key, one shared permanent-delegate+hook-authority key and one shared rebase key across all 828 mints. The freeze/pause address JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs is vault index 0 of Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X. Its finalized 561-byte account decodes to threshold 2 of 4, timeLock 0, default configAuthority (configuration changes go through the multisig), and four full-permission members: S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS, 2emBpySXN5p1YadehxEcS247NMjH3Ve2vbhpq2ikGR3D, 5wjPY71YCgcAK5YYmcdhXVD26rWgGtYsNSJX6b69Cvcb and HxszS1heZvNLqMDETZeUtQw6PFzkovnGKv5HpPTouPNq. Their beneficial identities remain unpublished. The mint key 7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj is a plain funded wallet running daily mintTo, with no multisig in its history. The permanent-delegate/hook key 5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq is vault index 0 of a second Squads v4 multisig, Dsm8Dmh6ip3pc19G3oB3FBc2Kx7A9sQBSA2akD2Jraot: threshold 2 of 3, timeLock 0, default configAuthority, members 49pmqovsRrPoKcrxULMXjFizFHuDD3AtKzwodkzweUZv, 82s7WdW9X8RKfxhR2C2YHnSj1vd6Rinpiwc8eREH7MNN and FN5JKy3ySbUH2QoCc329ni75oz76t7qFFg6xGfWkq68t, none of whom is a member of the freeze multisig; their beneficial identities are unpublished. The same vault is metadata-update and confidential-transfer authority. New mints are created by S7vYFF..., which names the vault as permanent delegate; the vault itself has never signed a transaction directly, and across all 1,844 transactions that touch it from 2025-06-10 to 2026-09-18 no transfer or burn names it as authority, so the permanent-delegate power had not been exercised on Solana by that date. The rebase authority S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS is shared by all 828 mints and is also one of the four Squads members, but its separate rebase power is unilateral: it signs Token-2022 transactions directly with no multisig program. One signature from it can restate every holder's displayed balance across the programme.",
+      "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 833,
+            "absent": 0,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+                "role": "mint authority",
+                "mints": 833,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 833 of 833 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 833,
+            "absent": 0,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+          "signerThreshold": "2 of 4",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+                "role": "freeze authority",
+                "mints": 833,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 833,
+            "absent": 0,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+                "role": "permanent delegate",
+                "mints": 833,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 833,
+            "absent": 0,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": "Squads v4 multisig 8gep9m2BmCqz4qCQMcqZoqnaGedXgRWehFYhKaPuiu8X",
+          "signerThreshold": "2 of 4",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs; zero execution timelock; beneficial identities unpublished.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+                "role": "pause authority",
+                "mints": 833,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 833,
+            "absent": 0,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": "Unattributed direct signer S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Signs Token-2022 multiplier changes directly, outside the Squads execution path.",
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 833,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "the balance multiplier in force is not 1 on 378 of 833 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 833,
+            "unknown": 0,
+            "total": 833
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 833,
+            "total": 833
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "ondo-global-markets",
+      "name": "Ondo Global Markets",
+      "status": "live",
+      "mints": 268,
+      "mintsRead": 268,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T01:17:34Z"
+      },
+      "governanceEvidence": "Finalized Solana account and transaction decoding, 2026-09-20. Mint/pause/scaled-UI authority 9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD is the MINT_AUTHORITY_SEED PDA of official programme XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm, not a private key. The programme is upgradeable: upgrade/root-role vault 9ECecz... belongs to Squads multisig EfMUAS..., threshold 4 of 7, timeLock 7,200 seconds. Direct administrative minting/deployment sits with vault 4pfyfe... behind multisig 3nvvgm..., threshold 4 of 6, timeLock 900 seconds. Emergency pausing sits with BwjBuK... behind 1-of-9 multisig HK15Gu... with no timelock; unpause and administrative roles use separate higher-threshold vaults. The active freeze authority 51QVC... is vault index 0 of Squads multisig CDCCa8..., threshold 3 of 8 with no timelock; it has been used for one freeze and one thaw. No Ondo mint carries a permanentDelegate. Important exception to the programme-level posture: live UpdateMultiplierRole belongs only to ordinary signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn, which directly submits multiplier changes with no multisig or timelock. The programme PDA signs the inner Token-2022 update, but the published wrapper performs no application-level range, price, or corporate-action validation. The multiplier is actively used for dividends: it differs from 1 on 156 of the 268 live mints read on 2026-09-20.",
+      "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 268,
+            "absent": 0,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": "Ondo GM Solana program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm",
+          "signerThreshold": "4 of 6",
+          "upgradeAuthority": "Squads v4 multisig EfMUAS… (4 of 7)",
+          "upgradeGovernance": "multisig",
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Administrative minting and deployment use operational vault 4pfyfe… behind Squads v4 multisig 3nvvgm… (4 of 6; 900-second timelock). The program upgrade/root-role vault is 9ECecz… behind EfMUAS… (4 of 7; 7,200-second timelock).",
+          "timelock": {
+            "seconds": 900,
+            "phrase": "900-second timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+                "role": "mint authority",
+                "mints": 268,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 245 of 268 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 268,
+            "absent": 0,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": "Squads v4 multisig CDCCa8…",
+          "signerThreshold": "3 of 8",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Active freeze authority 51QVC… is vault index 0; zero execution timelock; one freeze and one thaw were observed.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 2,
+            "shown": [
+              {
+                "address": "51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+                "role": "freeze authority",
+                "mints": 230,
+                "onCurve": false
+              },
+              {
+                "address": "Chm9dcASBc9C54FGxcSRGv9qC998TueQqr5XzGZkEVCc",
+                "role": "freeze authority",
+                "mints": 38,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "recorded",
+            "finding": {
+              "schema": "freeze-authority-has-been-exercised",
+              "statement": "The Ondo freeze key has five transactions in its entire history, including one freezeAccount and one thawAccount between 2026-04-27 and 2026-05-01: the power has been used on a real holder account.",
+              "evidence": "rpc:getSignaturesForAddress 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+              "observedAt": "2026-09-16"
+            },
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 268,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "single-key",
+          "governanceType": "single-signer-multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 268,
+            "absent": 0,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": "Squads v4 multisig HK15Gu…",
+          "signerThreshold": "1 of 9",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Emergency pausing uses BwjBuK… with no timelock. A 1-of-9 configuration permits any one member to approve; it is not treated as a meaningful multisignature constraint. Unpause and administrative roles use separate higher-threshold vaults.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "no timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+                "role": "pause authority",
+                "mints": 268,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "recorded",
+            "finding": {
+              "schema": "issuer-paused-trading-for-session",
+              "statement": "Ondo's own assets API reported 97 of 452 listed assets paused at read time with reason 'unavailable_in_session', 27 off-hours tradable and 354 tradeable: the primary market is session-gated by the issuer, not continuously open.",
+              "evidence": "https://app.ondo.finance/api/v2/assets",
+              "observedAt": "2026-09-16"
+            },
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 268,
+            "absent": 0,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": "Unattributed direct signer 5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn (UpdateMultiplierRole)",
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Directly submits multiplier changes; no multisig or timelock. The program PDA signs the inner Token-2022 instruction; no application-level range, price, or corporate-action validation was observed.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "no multisig or timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 268,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "the balance multiplier in force is not 1 on 156 of 268 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 268,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 268,
+            "absent": 0,
+            "unknown": 0,
+            "total": 268
+          },
+          "controller": "Squads v4 multisig EfMUAS…",
+          "signerThreshold": "4 of 7",
+          "upgradeAuthority": "Vault 9ECecz…",
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Program upgrade/root-role vault has a 7,200-second timelock.",
+          "timelock": {
+            "seconds": 7200,
+            "phrase": "7,200-second timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "superstate-opening-bell",
+      "name": "Opening Bell by Superstate",
+      "status": "live",
+      "mints": 4,
+      "mintsRead": 4,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T01:17:31Z"
+      },
+      "governanceEvidence": "stocks/findings.md (Superstate on-chain profile, 2026-09-16): re-read 2026-09-17: the per-mint MINT authorities are single funded system-owned addresses with no multisig or timelock visible (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, 4.574 SOL), but the one shared freeze/permanent-delegate authority 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x returns null from getAccountInfo - zero lamports, never initialized - so it is a program signer, not a key. 0xMacro states the design: the Admin Authority for the PermanentDelegate is assigned to the Allowlist Program itself; Superstate states only that key management is facilitated by Turnkey. Tension worth noting: the account that actually thaws holder accounts is the upgradeable Allowlist BPF program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA (CPI into Token-2022), so the thaw path is program-mediated even though the authority key is not a PDA of a constrained program. The rebase (scaledUiAmountConfig) authority is per-mint and is the SAME address as that mint's own mint authority (FWDI CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq, GLXY CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN, EXOD 3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa, HSDT 7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6), NOT the program-derived 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x that holds freeze and permanent delegate. It therefore inherits the mint key's 'hot-key' characterisation: on a registered share, the split mechanism is the one authority NOT held by the Allowlist program.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 4,
+            "absent": 0,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 4,
+            "shown": [
+              {
+                "address": "3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 3 of 4 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 4,
+            "absent": 0,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x",
+                "role": "freeze authority",
+                "mints": 4,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 4,
+            "absent": 0,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x",
+                "role": "permanent delegate",
+                "mints": 4,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 4,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 4,
+            "absent": 0,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 4,
+            "shown": [
+              {
+                "address": "3y1U29yH7npj3wvHqFQ4gVxgzccMHybjpcQRAdZbyEFa",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "7cowcPXxq3dfEKwg2MHmxkneKSNkzKuma8WZTaaZbwh6",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "CgByw6Si35n7UrtHERukoqBQMBqUJmfz2uG3XXnFpndN",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 4,
+            "unknown": 0,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 4,
+            "total": 4
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "prestocks",
+      "name": "PreStocks",
+      "status": "live",
+      "mints": 8,
+      "mintsRead": 8,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:32Z",
+        "to": "2026-09-20T01:17:32Z"
+      },
+      "governanceEvidence": "One address, WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc, holds mint, freeze, permanent-delegate, pause, metadata, transfer-fee, withheld-fee, hook and rebase authority on all eight mints. It is vault index 0 of Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8. The finalized 561-byte account decoded on 2026-09-20 to threshold 2, timeLock 0, default configAuthority, transactionIndex 463 and seven members: five full initiate/vote/execute members (Cxr1P9..., 6osFjB..., 9euiyP..., CwhmxA..., JCA8K4...) and two initiate-only members (Bb4zG7..., BgogNf...). In practical voting terms it is 2 of 5, with no execution delay; all beneficial identities remain unpublished. Multisig applies to signers but every administrative role remains concentrated in the same vault. This is the only programme whose rebase has been USED to restate balances without prior disclosure: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z and OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z.",
+      "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "mint authority",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 8 of 8 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "freeze authority",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "permanent delegate",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; all administrative roles share this vault.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "pause authority",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; observed multiplier changes include SPACEX 5 and OPENAI 1.4861347.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "the balance multiplier in force is not 1 on 2 of 8 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": "Squads v4 multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8",
+          "signerThreshold": "2 of 5 eligible voters (7 members; 2 initiate-only)",
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": "2026-09-20",
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": "Authority is vault index 0 WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc; zero execution timelock; the same vault can set and withdraw fees.",
+          "timelock": {
+            "seconds": 0,
+            "phrase": "zero execution timelock"
+          },
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 2,
+            "shown": [
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "fee-config authority",
+                "mints": 8,
+                "onCurve": false
+              },
+              {
+                "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+                "role": "withheld-fee withdraw authority",
+                "mints": 8,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "recorded",
+            "finding": {
+              "schema": "transfer-fee-charged-on-chain",
+              "statement": "Every PreStocks mint carries transferFeeConfig with an unbounded maximum fee; the rate is now 100 bps after increases from 0 to 50 bps and then from 50 to 100 bps, and the authority spends transactions on withdrawWithheldTokensFromMint.",
+              "evidence": "rpc:getAccountInfo PresTj4Yc2bAR197Er7wz4UUKSfqt6FryBEdAriBoQB",
+              "observedAt": "2026-09-16"
+            },
+            "effects": [
+              "a non-zero fee is configured on 8 of 8 mints",
+              "fees are withheld on 8 of 8 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 8,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": "https://api.mainnet-beta.solana.com",
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "remora-markets",
+      "name": "Remora Markets",
+      "status": "defunct",
+      "mints": 0,
+      "mintsRead": 0,
+      "chainReadAt": null,
+      "governanceEvidence": "Every rToken mint names the single key DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb as mint, freeze, pause, permanent-delegate and metadata authority (RPC getAccountInfo on FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe and the other mints, 2026-09-16; re-verified 2026-09-17). Characterised 2026-09-17: that key is NOT a bare keypair but the Squads v4 vault PDA (vault index 0, bump 251) of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35, which is owned by the Squads v4 program SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf, has threshold 2 of 3 members, timeLock 0 and configAuthority 11111111111111111111111111111111 (no config authority, so membership and threshold are immutable), and had reached transactionIndex 640. Members: 4aog1ZhoEDrx47fddZ1BYq6yeXgb8mufTubJ3dvgLi6f (permissions 3), 7bzfFK9VxtUgK9Pr1mg7HegQtWPk9mXxmXkf556QMAEz (permissions 7), H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E (permissions 6). Proof it is the vault and not a keypair: in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29) the Squads program logs 'Instruction: VaultTransactionExecute' and DQSTm2Wt... signs an inner SPL transferChecked as authority, which a transaction-level keypair signature does not do and a PDA can only do by CPI; the vault PDA derivation for index 0 also hashes to that address exactly. So all three powers sit behind a 2-of-3 multisig rather than one key, though the three member identities remain unattributed. The rebase (scaledUiAmountConfig) authority is DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb on all five rStock mints — the same single address that holds mint, freeze and permanent delegate — so it inherits their characterisation. Multiplier 1 everywhere: never used. RESOLVED 2026-09-18: the doubt raised on 2026-09-17 — that DQSTm2Wt... reads as a plain system-owned account (owner 11111111111111111111111111111111, space 0) holding 0.001995004 SOL, i.e. the shape of a hot key — does not survive the transaction evidence, and a system-owned zero-space account is also exactly what an uninitialised Squads v4 vault PDA looks like. Re-read 2026-09-18: multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35 is still owned by the Squads v4 program and 495 bytes long, and in tx 3wLDeSocn6Tg52KPjH3HWvohfpq9vVWoo8d9zXGLiSXd9L1h2BkpJtvYuET8KjurUuNMT1Ls1QEhRhrgsdGHy7Ts (2026-06-29T09:35:46Z) the ONLY transaction signer is member H61gpHmkSvTSLNWDuJvLA62EVtjrdfHDD5hF978pwa4E, the Squads program logs 'Instruction: VaultTransactionExecute', DQSTm2Wt... appears as a non-signer writable account, and the inner spl-token transferChecked names DQSTm2Wt... as its 'authority' — which a non-signing account can only be by PDA CPI. The multisig reading stands; the flag is cleared. What remains unknown is who the three members are.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "multisig",
+          "governanceType": "multisig",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "republic-mirror",
+      "name": "Republic Mirror",
+      "status": "live",
+      "mints": 0,
+      "mintsRead": 0,
+      "chainReadAt": null,
+      "governanceEvidence": "No mint address is published by RepublicX in any SEC filing, press release or accessible page, and none was located in the token registries, so no authority key could be read from the chain (stocks/findings.md, Republic Mirror entry). Republic describes its own standard as carrying freeze, clawback, mint and burn functions, but nothing ties those powers to an identified key. keyGovernance.rebase is 'unknown' for the same single reason as the other three: no mint address is published, so no scaledUiAmountConfig extension — and therefore no rebase authority, and not even whether the extension exists — could be read from Solana mainnet. On paper, no programme document reserves a power to move or freeze a holder's tokens: the Private Placement Risk Disclosure says \"The loss of one or more of such private keys will result in the loss of the holder’s digital Securities.\", the rSPAX offering page restricts transfers only contractually, and the Terms of Service say of the Republic Wallet \"At no time will we be able to access or transfer your funds without your consent.\" That leaves the clawback in Republic's description of its token standard unreconciled with its own offering documents until a mint can be read.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "securitize",
+      "name": "Securitize SECZ",
+      "status": "live",
+      "mints": 1,
+      "mintsRead": 1,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T01:17:31Z"
+      },
+      "governanceEvidence": "RPC getAccountInfo, 2026-09-16 (stocks/findings.md, Securitize entry): the mint and freeze authority 8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs returns null - zero lamports, never initialized - which is the shape of a PDA used as a CPI signer, so minting and thawing are program-mediated. The owning program was not identified and its upgrade authority is unknown. RESOLVED 2026-09-17: the permanent-delegate/pause/split/metadata authority D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS is NOT a PDA - getAccountInfo returns an initialized, funded, system-program-owned account with zero data (499,971,639 lamports = 0.49997 SOL, owner 11111111111111111111111111111111, executable false), which is a plain keypair wallet with no multisig account behind it. So claw-back, global pause and the split multiplier sit behind one ordinary private key even though minting and thawing are program-mediated. Which entity holds it is still unattributed. The rebase (scaledUiAmountConfig) authority is D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS — the same address as the permanent delegate, pause and metadata authority — so it inherits that key's 'hot-key' characterisation. Multiplier 1, no pending change.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 1 of 1 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "program",
+          "governanceType": "program",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "single-key",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": "moveBurn",
+          "sameAddressAs": [
+            "moveBurn",
+            "rebase"
+          ]
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 1,
+            "absent": 0,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 1,
+            "unknown": 0,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 1,
+            "total": 1
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "shift",
+      "name": "Shift leveraged tokens",
+      "status": "live",
+      "mints": 8,
+      "mintsRead": 8,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:31Z",
+        "to": "2026-09-20T01:17:33Z"
+      },
+      "governanceEvidence": "Verified 2026-09-16 by RPC. Each mint has its own single authority address that simultaneously holds mintAuthority, freezeAuthority, permanentDelegate, metadataUpdateAuthority, pause and scaled-UI authority (SPX3L CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte; SPX3S 2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf; TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd; TSL1S 9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1; SOX3L 2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB; SOX3S 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA; SPCX2L ELt7GJcL4jxVoF1snNjxjegPKjuELxi13ut5f8R7vgH; SPCX2S 4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK). getMultipleAccounts returns null for all eight, i.e. they are unfunded, dataless addresses, and each one nevertheless appears as a true transaction signer on raw Token-2022 mintTo instructions with a separate funded fee payer (2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz) - so they are plain off-chain Ed25519 keypairs, not program-derived addresses (a PDA cannot sign at the transaction level) and not Squads or any other multisig (no multisig program appears in any of the transactions). Recorded as hot-key with that nuance: single-key control, fees sponsored by another wallet. The mints themselves were created on 2026-05-12 to 2026-06-11 by HJfhNwwaDqcUc7k5J8N5y3y1xHZ7qDYMsC7YFpp9fCdp with a plain createAccount + initialize* + setAuthority script. No threshold, timelock or governance process is disclosed for any of these keys, and none of the eight addresses appears in any Shift document. The rebase (scaledUiAmountConfig) authority is the same per-mint key that already holds mint, freeze, pause, metadata and permanent delegate — eight distinct keys, one per mint — so it inherits their 'hot-key' characterisation. The mechanism is in use, not merely armed: SOX3S (authority 76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA) reads a multiplier of 0.1, so a displayed SOX3S balance is already one tenth of its raw amount.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 8,
+            "shown": [
+              {
+                "address": "21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1",
+                "role": "mint authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 8 of 8 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 8,
+            "shown": [
+              {
+                "address": "21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1",
+                "role": "freeze authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 8,
+            "shown": [
+              {
+                "address": "21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1",
+                "role": "permanent delegate",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "single-key",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 8,
+            "shown": [
+              {
+                "address": "21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1",
+                "role": "pause authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": "mint",
+          "sameAddressAs": [
+            "mint",
+            "freeze",
+            "moveBurn",
+            "rebase"
+          ]
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 8,
+            "absent": 0,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 8,
+            "shown": [
+              {
+                "address": "21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2CeU1GEWbhXXZvypMfAPa2AzyvF3yhrG7AqUyFoDqxZf",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "2g5JvVx2C6si9XoLoMjr1CEyK8Mt597qptsrNN1RZ4WB",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "4mU3jH1iEA78LJ9YPfFYnN4ABty6xMBxndajFg3iToaK",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "76ThePy3xFjiAvEn2dxymehQJBGoD2vywfYVNgXGVJVA",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              },
+              {
+                "address": "9eo5QkvdxsAU6kdAbAABWpbq1TGvsxPkLoroPwgxY4o1",
+                "role": "scaled-UI (multiplier) authority",
+                "mints": 1,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "the balance multiplier in force is not 1 on 1 of 8 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 8,
+            "unknown": 0,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 8,
+            "total": 8
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "tessera",
+      "name": "Tessera",
+      "status": "live",
+      "mints": 3,
+      "mintsRead": 3,
+      "chainReadAt": {
+        "from": "2026-09-20T01:17:32Z",
+        "to": "2026-09-20T01:17:33Z"
+      },
+      "governanceEvidence": "stocks/findings.md (Multisig evidence, 2026-09-16): the freeze key 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o is a nonce-based hot key with no Squads program in its history and has exercised freeze/thaw four times. Program upgrade authority moved from the Squads multisig HimRFy5qQHKribjfnqSDYLhZ6hujsmJgYoGRKir1NMrA to the single Fireblocks wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW on 2026-01-28, which now also holds mint, transfer-fee-config and referral-config authority. The mints carry no permanentDelegate at all, so there is no delegate authority to govern. keyGovernance.rebase is 'none': no scaledUiAmountConfig extension exists on any of the three T-Token mints (the extension list is transferFeeConfig, metadataPointer and tokenMetadata only), so there is no rebase authority to hold and no holder balance can be restated. That is an absence of capability, not an absence of research — Tessera is the only programme here that cannot re-denominate its holders.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 3,
+            "absent": 0,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+                "role": "mint authority",
+                "mints": 3,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "effect-observed",
+            "finding": null,
+            "effects": [
+              "supply has been minted on 3 of 3 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "single-key",
+          "governanceType": "hot-key",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 3,
+            "absent": 0,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 1,
+            "shown": [
+              {
+                "address": "7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+                "role": "freeze authority",
+                "mints": 3,
+                "onCurve": true
+              }
+            ]
+          },
+          "usage": {
+            "state": "recorded",
+            "finding": {
+              "schema": "freeze-authority-has-been-exercised",
+              "statement": "The freeze key has 2 freezeAccount and 2 thawAccount transactions, all on 2026-06-07 and all on the T-SpaceX mint: 2grbfzkjwfEB1Em26Hfs1iYfoJEEmezvw9TSU1NNSVzF frozen 08:08:50Z and thawed 08:11:16Z, 6b99iGSCyivPVxztDLwMvpf2SvN22QJ4r5mGGe6t7RmN frozen 08:18:32Z and thawed 08:19:32Z. The power has been used on real holder accounts, not merely reserved - but the shape fits the published explanation rather than a compliance or dispute freeze: the key was funded 2026-06-01T12:51:58Z, the day Tessera's Hypernative threat-monitoring layer went live with \"automated protective response\", and each freeze was reversed within one to three minutes, which is what \"recovery is deliberately manual\" looks like when the investigation clears. Those five transactions are the key's entire history. What remains unmitigated: the Terms state no grounds, no notice, no time limit and no appeal, the docs' own Authorities & Security table omits the key, and no multisig program appears in any of its transactions.",
+              "evidence": "rpc:getSignaturesForAddress 7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+              "observedAt": "2026-09-16"
+            },
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 3,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "none",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 3,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "none",
+          "governanceType": "none",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "none",
+            "present": 0,
+            "absent": 3,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "all",
+            "present": 3,
+            "absent": 0,
+            "unknown": 0,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 4,
+            "shown": [
+              {
+                "address": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+                "role": "fee-config authority",
+                "mints": 3,
+                "onCurve": true
+              },
+              {
+                "address": "5P6aL1imw2Vi7GptqoRHPu8fowJvXM8eVrs8nWnxVx5h",
+                "role": "withheld-fee withdraw authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "BnWEwDEZFGZkDQDMs7q7UtK8dFR9VUXprhH1xnLqD2j7",
+                "role": "withheld-fee withdraw authority",
+                "mints": 1,
+                "onCurve": false
+              },
+              {
+                "address": "DjMKLEZe8d1nfCWQjoeoihqCU1owkxM8j2WqgFcCbzft",
+                "role": "withheld-fee withdraw authority",
+                "mints": 1,
+                "onCurve": false
+              }
+            ]
+          },
+          "usage": {
+            "state": "recorded",
+            "finding": {
+              "schema": "transfer-fee-charged-on-chain",
+              "statement": "Each mint carries transferFeeConfig at 20 bps with an unbounded maximum fee, so every secondary transfer is taxed at the token level.",
+              "evidence": "rpc:getAccountInfo oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ",
+              "observedAt": "2026-09-16"
+            },
+            "effects": [
+              "a non-zero fee is configured on 3 of 3 mints",
+              "fees are withheld on 3 of 3 mints"
+            ]
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unknown",
+            "present": 0,
+            "absent": 0,
+            "unknown": 3,
+            "total": 3
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    },
+    {
+      "slug": "ventuals",
+      "name": "Ventuals Pre-IPO",
+      "status": "defunct",
+      "mints": 0,
+      "mintsRead": 0,
+      "chainReadAt": null,
+      "governanceEvidence": "Not applicable: Ventuals never issued a token and never deployed a Solana program. Positions were margin entries in a Hyperliquid HIP-3 perpetual market, so no mint, freeze or delegate authority exists to govern (stocks/findings.md, Ventuals entry). keyGovernance.rebase is 'unknown' on the same basis as the other three keys: Ventuals never had a Solana mint, so there is no Token-2022 scaledUiAmountConfig extension to read and no rebase authority to characterise. Its Hyperliquid perpetuals have no equivalent holder-balance-restatement primitive.",
+      "authorityFactsSource": null,
+      "cells": [
+        {
+          "power": "mint",
+          "modelId": "mint",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "freeze",
+          "modelId": "freeze",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "moveBurn",
+          "modelId": "permanentDelegate",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "pause",
+          "modelId": "pause",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "rebase",
+          "modelId": "rebase",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "transferFee",
+          "modelId": "transferFee",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        },
+        {
+          "power": "upgrade",
+          "modelId": "upgrade",
+          "kind": "unknown",
+          "governanceType": "unknown",
+          "viaProgramUpgrade": false,
+          "capability": {
+            "state": "unobserved",
+            "present": 0,
+            "absent": 0,
+            "unknown": 0,
+            "total": 0
+          },
+          "controller": null,
+          "signerThreshold": null,
+          "upgradeAuthority": null,
+          "upgradeGovernance": null,
+          "observedAt": null,
+          "lastRotatedAt": null,
+          "source": null,
+          "technicalNotes": null,
+          "timelock": null,
+          "contractualCircumstances": null,
+          "addresses": {
+            "distinct": 0,
+            "shown": []
+          },
+          "usage": {
+            "state": "not-recorded",
+            "finding": null,
+            "effects": []
+          },
+          "inheritedFrom": null,
+          "sameAddressAs": []
+        }
+      ]
+    }
+  ]
+}

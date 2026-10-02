@@ -1,0 +1,2345 @@
+// Unit tests for the per-token stock cards (lib/cards.mjs) and the promise the cards make: the slug
+// rules hold over the real symbols, a card carries all eleven health rules, it never turns into a
+// wallet dump, it stays inside its byte budget, it links to its exact .json record, and
+// two builds from the same inputs differ only in the one `builtAt` stamp. The real built files are
+// read, so a shape drift in any of the seven inputs fails here rather than on a shared card.
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { fixture, repoFile } = require('../test-fixtures/catalogue.js');
+const {
+    CARD_BYTE_LIMIT,
+    CARD_BYTE_TARGET,
+    CARD_CLAIM_FIELDS,
+    NO_CLAIM_TEXT,
+    OG_DESCRIPTION_MAX,
+    OUTCOME_MAX,
+    HOLDER_ROWS,
+    MATERIAL_CHANGE_TITLE,
+    QUOTE_MAX,
+    assignSlugs,
+    assetDecisionFacts,
+    buildCard,
+    cardDiscrepancies,
+    cardEvidence,
+    cardProtocolDiscrepancies,
+    cardMaterialChanges,
+    discrepanciesBody,
+    evidenceLine,
+    indexEntry,
+    ogDescription,
+    ogTitle,
+    transferRestrictionWords,
+    publicCard,
+    renderCard,
+    shortAddress,
+    truncate,
+    whoCanBuy,
+    BLOCK_SOURCES, blockAnswers, blockFreshnessHtml,
+} = require('./lib/cards.mjs');
+const evidenceLib = require('./lib/evidence.js');
+const { HEALTH_RULES } = require('./lib/health.mjs');
+const { composabilityTemplateFor, indexComposabilityTemplates } = require('./lib/composability.mjs');
+const fmt = require('./lib/fmt.js');
+
+const REPO_ROOT = path.join(__dirname, '..');
+const read = (...parts) => JSON.parse(fs.readFileSync(repoFile(REPO_ROOT, ...parts), 'utf8'));
+const trustChainSvg = require('./lib/trustchain-svg.js');
+const whatIfLib = require('./lib/whatif-render.js');
+
+const tokenDb = read('stocks-tokens.json');
+const issuerDb = read('stocks-issuers.json');
+const holderDb = read('stocks', 'data', 'holders.json');
+const venueDb = read('stocks', 'data', 'venues.json');
+const tradeDb = read('stocks', 'fixtures', 'stocks-trades.sample.json');
+const closedMarketDb = read('stocks-closed-market.json');
+const meteoraDb = read('stocks', 'data', 'meteora.json');
+const catalogue = read('stocks', 'data', 'trust-chain.json');
+const composabilityDb = read('stocks', 'data', 'composability-templates.json');
+const composability = indexComposabilityTemplates(composabilityDb.templates);
+const defiUsageDb = read('stocks', 'data', 'defi-usage.json');
+const defiUsage = new Map(defiUsageDb.items.map((row) => [row.mint, row]));
+const oraclePricing = read('stocks', 'data', 'protocol-market-research.json').oraclePricing;
+const referenceDb = read('stocks', 'data', 'reference-prices.json');
+const referenceItems = new Map(referenceDb.items.map((row) => [row.mint, row]));
+
+/**
+ * What stocks/fetch-pyth-onchain.mjs would write, built from a REAL read (fixtures/pyth-onchain:
+ * the Clock sysvar and the shard-0/1 accounts of eleven feeds, 2026-09-25 00:01 UTC) through the
+ * same lib, with the token → feed map made the way the collector makes it.
+ */
+const pythOnchainLib = require('./lib/pyth-onchain.mjs');
+const PYTH_FIXTURE = read('stocks', 'fixtures', 'pyth-onchain', 'accounts.sample.json');
+const PYTH_CRYPTO = pythOnchainLib.indexTokenFeeds(read('stocks', 'fixtures', 'pyth-onchain', 'crypto-feeds.sample.json').body);
+const PYTH_ONCHAIN = (() => {
+    const bySymbol = new Map(PYTH_FIXTURE.feeds.map((f) => [f.symbol, f.id]));
+    const feeds = [...bySymbol].map(([symbol, id]) => ({
+        id, symbol, kind: symbol.startsWith('Crypto.') ? 'token' : 'stock', schedule: PYTH_CRYPTO.get(symbol)?.attributes.schedule ?? null
+    }));
+    const ids = new Set(feeds.map((f) => f.id));
+    const tokens = referenceDb.items.map((item) => ({
+        mint: item.mint, symbol: item.symbol,
+        stockFeedId: ids.has(item.pythFeedId) ? item.pythFeedId : null,
+        tokenFeedId: pythOnchainLib.tokenFeedFor(item, PYTH_CRYPTO)?.id ?? null
+    })).filter((t) => t.stockFeedId !== null || t.tokenFeedId !== null);
+    const plan = pythOnchainLib.planAccountReads(feeds);
+    return pythOnchainLib.buildPythOnchain({
+        feeds, plan, accounts: plan.requests.flat().map((address) => PYTH_FIXTURE.accounts[address] ?? null),
+        slots: [PYTH_FIXTURE.slot], tokens, inputs: {}
+    });
+})();
+
+/**
+ * Each issuer's dossier `whatIf[]`, resolved exactly the way build-cards.mjs resolves it: the file
+ * named after the slug, else the one file whose name is the slug plus a token suffix
+ * (`bullish-blsh.json` for `bullish`). Derived, so a thirteenth issuer needs no map entry here
+ * either — and if the rule ever stopped resolving, the answer-sheet tests below would see 38 gaps.
+ */
+const DOSSIER_DIR = path.join(REPO_ROOT, 'stocks', 'data', 'issuers');
+const DOSSIER_FILES = fs.readdirSync(DOSSIER_DIR).filter((name) => name.endsWith('.json'));
+
+function dossierFileFor(slug) {
+    if (DOSSIER_FILES.includes(`${slug}.json`)) return `${slug}.json`;
+    const prefixed = DOSSIER_FILES.filter((name) => name.startsWith(`${slug}-`));
+    return prefixed.length === 1 ? prefixed[0] : null;
+}
+
+/** The built schematics (stocks-schematics.json), so every card is measured with its drawn route. */
+const SCHEMATICS = JSON.parse(fs.readFileSync(fixture('stocks-schematics.json'), 'utf8'));
+/** Who can create and redeem at each issuer (curated, committed): the card's "Who keeps the price honest". */
+const PRIMARY_MARKET = read('stocks', 'data', 'primary-market.json');
+
+const whatIfBySlug = new Map();
+for (const row of issuerDb.issuers) {
+    const file = dossierFileFor(row.slug);
+    if (file === null) continue;
+    const dossier = JSON.parse(fs.readFileSync(path.join(DOSSIER_DIR, file), 'utf8'));
+    whatIfBySlug.set(row.slug, Array.isArray(dossier.whatIf) ? dossier.whatIf : []);
+}
+
+const issuers = new Map(issuerDb.issuers.map((row) => [row.slug, row]));
+const holders = new Map(holderDb.items.map((row) => [row.mint, row]));
+const venues = new Map(venueDb.items.map((row) => [row.mint, row]));
+const closedMarket = new Map((closedMarketDb.items ?? []).map((row) => [row.mint, row]));
+const meteora = new Map((meteoraDb.items ?? []).map((row) => [row.pairAddress, row]));
+const pools = new Map();
+for (const pool of tradeDb.pools ?? []) {
+    if (typeof pool?.mint !== 'string') continue;
+    if (!pools.has(pool.mint)) pools.set(pool.mint, []);
+    pools.get(pool.mint).push(pool);
+}
+
+const SOURCES = {
+    tokens: tokenDb.builtAt,
+    issuers: issuerDb.builtAt,
+    holders: holderDb.fetchedAt,
+    venues: venueDb.fetchedAt,
+    trades: tradeDb.generatedAt,
+    closedMarket: closedMarketDb.generatedAt,
+    meteora: meteoraDb.fetchedAt,
+    defiUsage: defiUsageDb.fetchedAt
+};
+
+const BUILT_AT = '2026-09-17T01:02:03Z';
+const SLUGS = assignSlugs(tokenDb.tokens);
+
+function cardFor(symbol, builtAt = BUILT_AT, materialChanges = null, issuerOverride = null) {
+    const token = tokenDb.tokens.find((row) => row.symbol === symbol);
+    if (token === undefined) throw new Error(`no token with symbol ${symbol} in stocks-tokens.json`);
+    return buildCard({
+        materialChanges,
+        token,
+        issuer: issuerOverride ?? issuers.get(token.issuer) ?? null,
+        holdersItem: holders.get(token.mint) ?? null,
+        venuesItem: venues.get(token.mint) ?? null,
+        closedMarketItem: closedMarket.get(token.mint) ?? null,
+        closedMarketMeta: closedMarketDb,
+        meteoraByPair: meteora,
+        pools: pools.get(token.mint) ?? null,
+        slug: SLUGS.get(token.mint),
+        builtAt,
+        sources: SOURCES,
+        catalogue,
+        whatIf: whatIfBySlug.get(token.issuer) ?? null,
+        archives: null,
+        composabilityTemplate: composabilityTemplateFor(token, composability),
+        defiUsageItem: defiUsage.get(token.mint) ?? null,
+        schematics: SCHEMATICS.issuers[token.issuer] ?? null,
+        primaryMarket: PRIMARY_MARKET.issuers[token.issuer] ?? null,
+        referenceItem: referenceItems.get(token.mint) ?? null,
+        pythOnchain: PYTH_ONCHAIN,
+        oraclePricing,
+        priceReadAt: tokenDb.sources?.universe?.fetchedAt ?? null
+    });
+}
+
+/** Every string anywhere in a record, so a test can tell a wallet from a pair address. */
+function collectStrings(value, out = []) {
+    if (typeof value === 'string') out.push(value);
+    else if (Array.isArray(value)) for (const inner of value) collectStrings(inner, out);
+    else if (value && typeof value === 'object') for (const inner of Object.values(value)) collectStrings(inner, out);
+    return out;
+}
+
+const BASE58_RUN = /[1-9A-HJ-NP-Za-km-z]{32,44}/g;
+
+/**
+ * The base58 addresses a rendered card shows that are not accounted for: not the mint, not an
+ * authority, not a pool, and not a key quoted inside the dossier evidence prose. What is left is
+ * the holder list, which is the thing that must never turn into a wallet dump.
+ */
+function walletsIn(card, html) {
+    const owners = new Set(card.holders.top.map((row) => row.owner));
+    const known = new Set();
+    for (const value of collectStrings(card)) {
+        if (owners.has(value)) continue;
+        for (const run of value.match(BASE58_RUN) ?? []) {
+            known.add(run);
+            known.add(run.toLowerCase());
+        }
+    }
+    return [...new Set(html.match(BASE58_RUN) ?? [])].filter((address) => !known.has(address));
+}
+
+const REAL_SYMBOLS = ['NVDAx', 'SPACEX', 'AAPLon', 'GLXY', 'tKalshi'];
+
+// --- slugs ------------------------------------------------------------------------------------
+
+describe('cardSlug', () => {
+    it('keeps a path-safe symbol exactly as it is, case included', () => {
+        expect(fmt.cardSlug('NVDAx', 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh')).toBe('NVDAx');
+        expect(fmt.cardSlug('BRK.Bx', 'Mint')).toBe('BRK.Bx');
+        expect(fmt.cardSlug('T-Kalshi', 'Mint')).toBe('T-Kalshi');
+    });
+
+    it('turns every unsafe run into a single hyphen', () => {
+        expect(fmt.cardSlug('Apple (Ondo)', 'Mint')).toBe('Apple-Ondo');
+        expect(fmt.cardSlug('a/b\\c', 'Mint')).toBe('a-b-c');
+        expect(fmt.cardSlug('../../etc/passwd', 'Mint')).toBe('etc-passwd');
+    });
+
+    it('falls back to the mint when nothing of the symbol survives, and never to an empty name', () => {
+        expect(fmt.cardSlug('', 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh')).toBe('mint-Xsc9qvGR');
+        expect(fmt.cardSlug('***', 'Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh')).toBe('mint-Xsc9qvGR');
+        expect(fmt.cardSlug(null, '')).toBe('');
+    });
+});
+
+describe('assignSlugs over the real token file', () => {
+    it('gives all 441 mints a path-safe slug', () => {
+        expect(SLUGS.size).toBe(tokenDb.tokens.length);
+        for (const slug of SLUGS.values()) {
+            expect(slug).toMatch(/^[A-Za-z0-9._-]+$/);
+            expect(slug.length).toBeGreaterThan(0);
+        }
+    });
+
+    it('never gives two mints the same file name, case-insensitively', () => {
+        const seen = new Map();
+        for (const [mint, slug] of SLUGS) {
+            const key = slug.toLowerCase();
+            expect(seen.has(key)).toBe(false);
+            seen.set(key, mint);
+        }
+    });
+
+    /**
+     * The built record carries the collision-safe slug used by the cards builder and API list.
+     */
+    it('agrees with the slug the stocks page computes for every token', () => {
+        for (const token of tokenDb.tokens) {
+            expect(token.cardSlug).toBe(SLUGS.get(token.mint));
+        }
+    });
+
+    it('appends the mint prefix to every member of a colliding group', () => {
+        const slugs = assignSlugs([
+            { mint: 'AaaaMint111111111111111111111111111111111111', symbol: 'TSLAx' },
+            { mint: 'BbbbMint222222222222222222222222222222222222', symbol: 'tslax' },
+            { mint: 'CcccMint333333333333333333333333333333333333', symbol: 'SOLO' }
+        ]);
+        expect(slugs.get('AaaaMint111111111111111111111111111111111111')).toBe('TSLAx-AaaaMi');
+        expect(slugs.get('BbbbMint222222222222222222222222222222222222')).toBe('tslax-BbbbMi');
+        expect(slugs.get('CcccMint333333333333333333333333333333333333')).toBe('SOLO');
+    });
+
+    it('does not depend on the order the tokens arrive in', () => {
+        const tokens = tokenDb.tokens.slice(0, 40);
+        const forwards = assignSlugs(tokens);
+        const backwards = assignSlugs(tokens.slice().reverse());
+        expect([...backwards.entries()].sort()).toEqual([...forwards.entries()].sort());
+    });
+});
+
+// --- prose and addresses ----------------------------------------------------------------------
+
+describe('truncate and shortAddress', () => {
+    it('cuts prose at a word boundary and marks the cut', () => {
+        expect(truncate('a short line', 40)).toBe('a short line');
+        expect(truncate('the quick brown fox jumped over it', 20)).toBe('the quick brown fox…');
+        expect(truncate('  collapses\n  whitespace  ', 40)).toBe('collapses whitespace');
+    });
+
+    it('keeps a missing value missing rather than inventing an empty quotation', () => {
+        expect(truncate(null)).toBeNull();
+        expect(truncate('   ')).toBeNull();
+        expect(truncate(42)).toBeNull();
+    });
+
+    it('shortens a Solana address and leaves anything else alone', () => {
+        expect(shortAddress('Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh')).toBe('Xsc9qv…9qEh');
+        expect(shortAddress('multisig')).toBe('multisig');
+    });
+});
+
+// --- OpenGraph --------------------------------------------------------------------------------
+
+describe('transferRestrictionWords', () => {
+    it('says who may hold and move the token in plain words, leaving unknown flags out', () => {
+        expect(transferRestrictionWords({ allowlist: false, kycToHold: false, usPersonsExcluded: true, mechanism: 'permanent-delegate' }))
+            .toBe('Any wallet can hold it; no identity check to hold; not for US persons; enforced by: an issuer key can move or burn tokens in any wallet');
+        expect(transferRestrictionWords({ allowlist: true, kycToHold: true, usPersonsExcluded: false, mechanism: 'program-mediated — accounts are born frozen.' }))
+            .toBe('Only wallets the issuer has approved can hold it; holders must pass the issuer’s identity check (KYC); US persons may hold it; '
+                + 'enforced by: a program must approve each wallet before it can hold the token. Accounts are born frozen.');
+        expect(transferRestrictionWords({ allowlist: null, kycToHold: null, usPersonsExcluded: null, mechanism: 'Twelve-month lock-up.' }))
+            .toBe('How it is enforced: Twelve-month lock-up.');
+        expect(transferRestrictionWords({ allowlist: null, kycToHold: null, usPersonsExcluded: null, mechanism: null })).toBeNull();
+        expect(transferRestrictionWords(null)).toBeNull();
+    });
+
+    it('replaces the raw flags row on the card', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(html).toContain('Who may hold and move it');
+        expect(html).not.toMatch(/allowlist (yes|no)|KYC to hold (yes|no)|US persons excluded (yes|no)/);
+    });
+});
+
+describe('ogDescription', () => {
+    it('stays inside the OpenGraph limit on every real token', () => {
+        for (const token of tokenDb.tokens) {
+            const card = cardFor(token.symbol);
+            const description = ogDescription(card);
+            expect(description.length).toBeLessThanOrEqual(OG_DESCRIPTION_MAX);
+            expect(description).not.toMatch(/[<>]/);
+        }
+    });
+
+    it('names the issuer, the claim, the premium and the depth', () => {
+        const description = ogDescription(cardFor('NVDAx'));
+        expect(description).toMatch(/xStocks/i);
+        expect(description).toMatch(/what you own: a secured claim on collateral/);
+        expect(description).toMatch(/for a holder: (good|no market data|(caution|warning) \([a-z ]+\))/);
+        expect(description).toMatch(/liquidity/);
+    });
+
+    it('titles the card with the holder headline, not the worst of all eleven checks', () => {
+        const rules = [{ id: 'tracking', label: 'Price tracking' }, { id: 'verification', label: 'Legal evidence review' }];
+        const card = (headline) => ({ symbol: 'TEST', underlyingTicker: 'TST', health: { status: 'warning', worstRuleId: 'verification', headline, rules } });
+        expect(ogTitle(card({ status: 'good', ruleId: null, basis: 'measured' }))).toBe('TEST — good · tokenized TST on Solana');
+        expect(ogTitle(card({ status: 'caution', ruleId: 'tracking', basis: 'measured' }))).toBe('TEST — caution: price tracking · tokenized TST on Solana');
+        expect(ogTitle(card({ status: 'unknown', ruleId: null, basis: 'no-market' }))).toBe('TEST — no market data · tokenized TST on Solana');
+        expect(ogDescription(cardFor('NVDAx'))).toMatch(/for a holder: /);
+        expect(ogDescription(cardFor('NVDAx'))).not.toMatch(/worst check/);
+    });
+
+    it('escapes the description and the title into their meta tags', () => {
+        const card = cardFor('NVDAx');
+        const hostile = { ...card, name: 'Evil <script>alert("x")</script> & co', symbol: 'A"B<C' };
+        const html = renderCard(hostile, { baseUrl: null, version: 'test' });
+        const head = html.slice(0, html.indexOf('</head>'));
+        // The head's one real script is theme.js; the hostile name must not add another.
+        expect(head.replace(/<script src="\.\.\/theme\.js\?v=\w+"><\/script>/, '')).not.toContain('<script');
+        expect(head).toContain('&lt;script&gt;');
+        expect(head).toContain('&quot;');
+        expect(ogTitle(hostile)).toContain('A"B<C');
+    });
+});
+
+// --- the rendered card ------------------------------------------------------------------------
+
+describe('renderCard', () => {
+    const card = cardFor('NVDAx');
+    const html = renderCard(card, { baseUrl: 'https://rwasonar.com', version: '20260917a' });
+
+    it('renders every one of the eleven health rules with its label, threshold, inputs and note', () => {
+        for (const rule of HEALTH_RULES) {
+            expect(html).toContain(rule.label);
+            expect(card.health.rules.some((row) => row.id === rule.id)).toBe(true);
+            expect(publicCard(card).health.rules.some((row) => row.id === rule.id)).toBe(true);
+        }
+        for (const rule of card.health.rules) {
+            expect(html).toContain(fmt.escapeHtml(rule.threshold));
+            if (rule.note !== null) expect(html).toContain(fmt.escapeHtml(rule.note).slice(0, 24));
+        }
+    });
+
+    it('shows all four dimensions as separate verdicts above the overall result', () => {
+        expect(html).toContain('aria-label="Health by dimension"');
+        expect(html).toContain('Market');
+        expect(html).toContain('Control');
+        expect(html).toContain('Legal / evidence');
+        expect(html).toContain('DeFi composability');
+        expect(publicCard(card).health.dimensions).toEqual(card.health.dimensions);
+    });
+
+    it('starts with the five holder decisions and keeps each explanation one click away', () => {
+        const facts = assetDecisionFacts(card);
+        expect(facts.map((row) => row.id)).toEqual(['ownership', 'control', 'exit', 'defi', 'risk']);
+        expect(facts.every((row) => row.value && row.href && row.link)).toBe(true);
+        expect(html).toContain('Things to know first');
+        expect(html).toContain('../learn/beneficial-ownership.html');
+        expect(html).toContain('../learn/issuer-control.html');
+        expect(html).toContain('../learn/redemption.html');
+        expect(html).toContain('../learn/defi-custody.html');
+        expect(html).toContain('class="card-disclosure decision-health"');
+        expect(html).toContain('The protocol’s own list names this exact token.');
+        expect(html).toContain('We have not read its settings or simulated a transaction');
+    });
+
+    it('propagates an issuer P0 review to the token record and above-the-fold card', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const flagged = buildCard({ token, issuer: issuers.get(token.issuer), reviewItems: [{
+            id: 'review-1', priority: 'P0', issuerSlug: token.issuer, area: 'control',
+            title: 'Authority changed', claimImpact: 'Control may differ.'
+        }] });
+        expect(flagged.underReview).toHaveLength(1);
+        expect(publicCard(flagged).underReview).toHaveLength(1);
+        expect(renderCard(flagged)).toContain('Legal conclusions under review');
+    });
+
+    it('highlights issuer claims that conflict with observed reality and cites both sides', () => {
+        const xstocks = cardFor('FGDLx');
+        const xstocksHtml = renderCard(xstocks);
+        expect(xstocks.discrepancies).toHaveLength(1);
+        expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
+            .toContain('No confirmed secondary-market exit');
+        expect(assetDecisionFacts(xstocks).find((row) => row.id === 'exit').value)
+            .toContain('DEX pools checked');
+        expect(cardDiscrepancies(issuers.get('xstocks-backed'), tokenDb.tokens.find((row) => row.symbol === 'FGDLx'))).toEqual(xstocks.discrepancies);
+        expect(cardFor('NVDAx').discrepancies).toHaveLength(0);
+        expect(xstocksHtml).toContain('Claim ≠ observed reality');
+        expect(xstocksHtml).toContain('<section id="discrepancies">');
+        expect(xstocksHtml).toContain('Published claim');
+        expect(xstocksHtml).toContain('Observed reality');
+        expect(xstocksHtml).toContain('xStocks proof-of-reserves API');
+        expect(xstocksHtml).toContain('xStocks asset registry API');
+        expect(xstocksHtml).toContain('Why it matters');
+        expect(xstocksHtml).toContain('What resolves it');
+        expect(publicCard(xstocks).discrepancies).toEqual([{
+            id: 'proof-of-reserves-coverage',
+            severity: 'warning',
+            classification: 'asset-specific evidence-coverage gap',
+            affectedMints: ['XspurdrAqbRJMQfAUEfh88QxE3XbSWxQGu3GneJR6e3', 'XsVXnJqySwKVHq3stnK9EKc7criyv5oTtrid7UJQot7']
+        }]);
+        expect(publicCard(xstocks).discrepancies[0]).not.toHaveProperty('claim');
+    });
+
+    it('carries protocol docs-vs-chain findings onto the cards of the token that market takes', () => {
+        const discrepancyView = require('./lib/discrepancy-view.js');
+        const records = discrepancyView.protocolDiscrepancyRecords(read('stocks', 'data', 'protocol-market-research.json'),
+            { protocolNames: discrepancyView.protocolNamesFromUsage(defiUsageDb) });
+        const secz = tokenDb.tokens.find((row) => row.symbol === 'SECZ');
+        const card = buildCard({ token: secz, issuer: issuers.get(secz.issuer) ?? null, protocolDiscrepancies: records });
+        const protocolRows = card.discrepancies.filter((row) => row.protocol === 'Loopscale');
+        expect(protocolRows.map((row) => row.id).sort()).toEqual(['loopscale-secrets-manager-role', 'loopscale-upgrade-multisig-threshold']);
+        for (const row of protocolRows) {
+            expect(row).toMatchObject({ observedAt: '2026-09-23', href: '../protocols/secz-loopscale-loopscale-collateral-5vzwkk.html',
+                classification: 'Loopscale market, docs vs chain', affectedMints: [secz.mint] });
+            expect(row.claim.sources.length + row.reality.sources.length).toBeGreaterThan(0);
+            expect([...row.claim.sources, ...row.reality.sources].every((source) => source.url && source.accessedAt)).toBe(true);
+        }
+        const html = renderCard(card, { version: 'test' });
+        expect(html).toContain('<section id="discrepancies">');
+        expect(html).toContain('Open the Loopscale dossier');
+        expect(html).toContain('checked <time datetime="2026-09-23T19:31:59Z">');
+        // The worst finding (caution) leads the risk line on the decision facts.
+        expect(assetDecisionFacts(card).find((row) => row.id === 'risk')?.value ?? '').toContain('CyNKPf');
+        expect(cardProtocolDiscrepancies(records, tokenDb.tokens.find((row) => row.symbol === 'NVDAx'))).toEqual([]);
+    });
+
+    it('escapes discrepancy prose and does not link an unsafe evidence URL', () => {
+        const body = discrepanciesBody({ discrepancies: [{
+            id: 'hostile', title: '<img src=x onerror=alert(1)>', severity: 'warning', observedAt: '2026-09-20',
+            claim: { text: '<script>alert(1)</script>', sources: [{ label: '<b>claim</b>', url: 'javascript:alert(1)', locator: 'line <1>', accessedAt: null }] },
+            reality: { text: 'Observed & checked', sources: [{ label: 'Safe', url: 'https://example.com/evidence', locator: 's. 1', accessedAt: '2026-09-20T00:00:00Z' }] },
+            impact: 'Important <now>'
+        }] });
+        expect(body).not.toContain('<script>');
+        expect(body).not.toContain('<img');
+        expect(body).not.toContain('href="javascript:');
+        expect(body).toContain('&lt;script&gt;');
+        expect(body).toContain('href="https://example.com/evidence"');
+    });
+
+    it('renders all sections in the order a reader needs them', () => {
+        // The big topics (30 Sep): terms, legal rights, legal control, onchain control, markets,
+        // DeFi, risks. Each block opens with its own health checks and carries its own evidence.
+        const order = ['terms-detail', 'own', 'checks-legal', 'trust-chain', 'verification', 'checks-control', 'control',
+            'checks-market', 'reference', 'depth', 'holders', 'venues', 'issuer-api',
+            'checks-composability', 'defi-usage', 'composability', 'closed-market', 'pyth', 'what-if'];
+        const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
+        let cursor = -1;
+        for (const id of order) {
+            const at = prestocks.indexOf(`<section id="${id}">`);
+            expect(at).toBeGreaterThan(cursor);
+            cursor = at;
+        }
+    });
+
+    it('separates confirmed exact-mint usage from structural composability', () => {
+        expect(card.defiUsage.protocols).toEqual(expect.arrayContaining([
+            'Jupiter Lend', 'Kamino', 'Loopscale', 'Nest', 'Raydium', 'xStocks Vaults (Kraken · Veda · Sentora · Kamino)'
+        ]));
+        expect(html).toContain('<section id="defi-usage">');
+        expect(html).toContain('Use as collateral');
+        expect(html).toContain('Earn yield');
+        expect(html.indexOf('<section id="defi-usage">')).toBeLessThan(html.indexOf('<section id="composability">'));
+        expect(publicCard(card).defiUsage.confirmedUseCount).toBe(6);
+        expect(publicCard(card).defiUsage.integrations[0]).not.toHaveProperty('summary');
+        expect(html).toContain('Open RWA Sonar dossier');
+        expect(html).toContain('../protocols/');
+
+        // Shared proof wording is printed once in the key, never once per integration, while each
+        // integration keeps its own stage and account check (the 96 kB target, 2026-09-23).
+        const usage = html.slice(html.indexOf('<section id="defi-usage">'), html.indexOf('</section>', html.indexOf('<section id="defi-usage">')));
+        const count = (needle) => usage.split(needle).length - 1;
+        expect(count('We have not read its settings or simulated a transaction.')).toBe(new Set(card.defiUsage.integrations
+            .map((entry) => entry.proof?.sourceStatus === 'observed-market' ? 'market' : 'listed')).size);
+        expect(count('<p class="defi-proof"><strong>')).toBe(card.defiUsage.integrations.length);
+        expect(count('accounts the protocol publishes exist on-chain') + count('The protocol publishes no Solana account')).toBe(card.defiUsage.integrations.length);
+        expect(count('Issuer eligibility and the protocol’s geographic restrictions apply')).toBe(1);
+        expect(usage).toContain('<strong>Access:</strong> as for Kamino above.');
+
+        const emptyUsage = [...defiUsage.values()].find((item) => item.integrations.length === 0
+            && tokenDb.tokens.filter((token) => token.symbol === item.symbol).length === 1);
+        expect(emptyUsage).toBeDefined();
+        const none = cardFor(emptyUsage.symbol);
+        expect(none.defiUsage.integrations).toEqual([]);
+        expect(renderCard(none, { version: 'test' })).toContain('No protocol found that accepts this exact token.');
+    });
+
+    it('separates documented redemption terms from route and successful-use evidence', () => {
+        expect(card.ownership.redemptionUsability.documentedButNotIndependentlyObserved).toBe(true);
+        expect(html).toContain('Can a holder redeem?');
+        expect(html).toContain('Documented, but not independently observed.');
+        expect(html).toContain('Successful redemption independently observed');
+        expect(publicCard(card).ownership.redemptionUsability.fields).toHaveLength(9);
+    });
+
+    it('keeps product-scoped redemption terms scoped on FGDLx and exposes complete qualifications', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const issuer = { ...issuers.get(token.issuer), redemption: {
+            ...issuers.get(token.issuer).redemption,
+            termScopes: { fees: { kind: 'product-example', products: ['TSLAx'] } }
+        } };
+        const fgdlx = buildCard({ token, issuer });
+        const fgdlxHtml = renderCard(fgdlx, { version: 'test' });
+        const fee = fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'fees');
+        expect(fee).toMatchObject({
+            value: 'No FGDLx-specific fee is confirmed; TSLAx is a programme example only.',
+            scope: 'other-product-example', applicable: false, exampleProduct: 'TSLAx'
+        });
+        expect(fgdlxHtml).toContain('No FGDLx-specific fee is confirmed; TSLAx is a programme example only.');
+        expect(fgdlxHtml).toContain('<details class="redemption-term">');
+        expect(fgdlxHtml).toContain('Primary-market access requires onboarding with the issuer');
+        expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: true, evidence: 'documented' });
+        expect(fgdlx.ownership.redemptionUsability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: false, evidence: 'not-recorded' });
+    });
+
+    it('keeps redemption scope metadata in the adjacent machine record', () => {
+        const published = publicCard(card).ownership.redemptionUsability.fields;
+        const eligibility = published.find((field) => field.id === 'eligibility-and-place');
+        const fee = published.find((field) => field.id === 'fees');
+        expect(eligibility).toHaveProperty('value');
+        expect(eligibility).toMatchObject({
+            summary: 'Programme term expressly applies across the product set, including NVDAx.',
+            scope: 'programme-all-products', evidence: 'documented'
+        });
+        // A scope-aware conclusion is not a duplicate of the visible source text and remains
+        // machine-readable for comparison consumers.
+        const scoped = { ...card, ownership: { ...card.ownership, redemptionUsability: {
+            ...card.ownership.redemptionUsability,
+            fields: card.ownership.redemptionUsability.fields.map((field) => field.id === 'fees'
+                ? { ...field, value: 'No NVDAx-specific fee is confirmed.', completeText: 'TSLAx price.' } : field)
+        } } };
+        expect(publicCard(scoped).ownership.redemptionUsability.fields.find((field) => field.id === 'fees').value)
+            .toBe('No NVDAx-specific fee is confirmed.');
+        expect(fee).not.toHaveProperty('completeText');
+    });
+
+    it('does not promote issuer redemption prose or flags into an independently observed outcome', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const issuer = { ...issuers.get(token.issuer), redemption: {
+            ...issuers.get(token.issuer).redemption,
+            operationalRouteAvailable: true,
+            operationalEvidence: null,
+            successfulRedemptionObserved: true
+        } };
+        const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
+        expect(usability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+        expect(usability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: null, evidence: 'unknown' });
+    });
+
+    it('labels a current official route as documented while keeping successful execution unobserved', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const base = issuers.get(token.issuer);
+        const { successfulRedemptionEvidence, ...terms } = base.redemption;
+        const issuer = { ...base, redemption: { ...terms, successfulRedemptionObserved: false } };
+        const usability = buildCard({ token, issuer }).ownership.redemptionUsability;
+        expect(usability.fields.find((field) => field.id === 'route-currently-available'))
+            .toMatchObject({ value: true, evidence: 'documented' });
+        expect(usability.fields.find((field) => field.id === 'successful-redemption'))
+            .toMatchObject({ value: false, evidence: 'not-recorded' });
+    });
+
+    it('scopes a recorded on-chain redemption to the products actually observed', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const base = issuers.get(token.issuer);
+        const issuer = { ...base, redemption: { ...base.redemption, successfulRedemptionObserved: true,
+            successfulRedemptionEvidence: { status: 'observed-onchain-transaction', chain: 'solana',
+                accepted: [{ symbol: 'METAx' }, { symbol: 'SPCXx' }] } } };
+        const card = buildCard({ token, issuer });
+        const usability = card.ownership.redemptionUsability;
+        expect(usability.documentedButNotIndependentlyObserved).toBe(false);
+        expect(usability.fields.find((field) => field.id === 'successful-redemption')).toMatchObject({
+            value: true, evidence: 'observed', exactProductObserved: false,
+            summary: 'Observed on-chain for the programme route (METAx, SPCXx), not for FGDLx itself.'
+        });
+    });
+
+    it('renders the observed product scoping on the static card, not a bare "Yes"', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'FGDLx');
+        const base = issuers.get(token.issuer);
+        const issuer = { ...base, redemption: { ...base.redemption, successfulRedemptionObserved: true,
+            successfulRedemptionEvidence: { status: 'observed-onchain-transaction', chain: 'solana',
+                accepted: [{ symbol: 'METAx' }, { symbol: 'SPCXx' }] } } };
+        const html = renderCard(buildCard({ token, issuer }), { version: 'test' });
+        expect(html).toContain('<summary>Observed on-chain for the programme route (METAx, SPCXx), not for FGDLx itself.</summary>');
+    });
+
+    describe('recurring on-chain scan line', () => {
+        const { publicFeed } = require('./lib/redemption-feed.mjs');
+        const NOW = '2026-09-23T21:00:00Z';
+        const scanned = (extra = {}) => publicFeed({
+            observable: true, mechanism: 'three-leg-transfer-redemption',
+            coverage: [{ from: '2026-09-23T01:27:46Z', to: '2026-09-23T20:22:10Z' }],
+            daily: { '2026-09-23': { redemptions: 6 } }, lastObserved: { blockTime: '2026-09-23T15:48:28Z' },
+            lastScan: { at: '2026-09-23T20:23:10Z', status: 'ok', backlog: 0 }, ...extra
+        }, { now: NOW });
+        const withFeed = (symbol, feed) => {
+            const base = issuers.get(tokenDb.tokens.find((row) => row.symbol === symbol).issuer);
+            const issuer = { ...base, redemption: { ...base.redemption, observationFeed: feed } };
+            return renderCard(cardFor(symbol, BUILT_AT, null, issuer), { version: 'test' });
+        };
+        const row = (html) => html.match(/<div class="redemption-feed">.*?<\/div>/)?.[0] ?? null;
+
+        it('sits right after the observed-execution row, labelled programme-wide, for every state', () => {
+            const cases = [
+                [scanned(), 'Redemptions observed on-chain: last on 2026-09-23 (6 in the last 19 h, recurring scan).'],
+                [scanned({ lastObserved: null, daily: {}, coverage: [{ from: '2026-09-20T20:22:10Z', to: '2026-09-23T20:22:10Z' }] }), 'No redemption observed in 3 days of continuous coverage.'],
+                [scanned({ lastObserved: null, daily: {} }), 'Not yet covered by the recurring scan.'],
+                [scanned({ lastScan: { at: '2026-09-23T20:23:10Z', status: 'failed', error: 'RPC 429' } }), 'Scan failed on 2026-09-23; redemptions for that period are unknown.'],
+                [scanned({ coverage: [{ from: '2026-09-01T00:00:00Z', to: '2026-09-18T12:00:00Z' }] }), 'Scan stale since 2026-09-18; redemptions after that date are unknown.'],
+                [scanned({ coverage: [], lastObserved: null }), 'Not yet covered by the recurring scan.'],
+                [publicFeed({ observable: false, whyNotObservable: 'No redemption address is published. The rest is detail.' }, { now: NOW }), 'Not observable on-chain: No redemption address is published.']
+            ];
+            for (const [feed, text] of cases) {
+                const html = withFeed('TSLAx', feed);
+                expect(row(html)).toContain('<dt>Recurring on-chain scan (programme)</dt>');
+                expect(row(html)).toContain(`<b>${text.replace(/"/g, '&quot;')}</b>`);
+                expect(html.indexOf('Successful redemption independently observed')).toBeLessThan(html.indexOf('redemption-feed'));
+                expect(html.indexOf('redemption-feed')).toBeLessThan(html.indexOf('<dt>Secondary-market exit</dt>'));
+                // Documented route and operational availability keep their own rows.
+                expect(html).toContain('<dt>Eligible holder and route</dt>');
+                expect(html).toContain('<dt>Route currently available</dt>');
+            }
+            expect(row(renderCard(cardFor('TSLAx'), { version: 'test' }))).toBeNull();
+        });
+
+        it('Superstate reads as an on-chain conversion leg, never as a redemption observed', () => {
+            const symbol = tokenDb.tokens.find((row) => row.issuer === 'superstate-opening-bell')?.symbol;
+            if (!symbol) return;
+            const html = withFeed(symbol, scanned({ mechanism: 'burn-to-book-entry-conversion', completionObservable: false }));
+            expect(row(html)).toContain('On-chain leg only: burn-to-book-entry conversion last seen on 2026-09-23');
+            expect(row(html)).toContain('happens off-chain and is not observed');
+            expect(row(html)).not.toMatch(/Redemptions observed/);
+        });
+
+        it('costs a few hundred bytes and keeps the widest real card inside the hard limit', () => {
+            const why = 'Redemption is terminal and contingent: holders burn T-Tokens to the Tessera smart contracts only during a Redemption Period, which opens after a Liquidity Event, receipt of the proceeds in full and a Redemption Start Date announced by TWF; per the Terms no Liquidity Event Proceeds have been received and no Redemption Period has commenced. Second sentence.';
+            const feed = publicFeed({ observable: false, whyNotObservable: why }, { now: NOW });
+            const widest = tokenDb.tokens.map((t) => ({ symbol: t.symbol, bytes: Buffer.byteLength(renderCard(cardFor(t.symbol), { version: 'test' }), 'utf8') }))
+                .sort((a, b) => b.bytes - a.bytes)[0];
+            const withLine = Buffer.byteLength(withFeed(widest.symbol, feed), 'utf8');
+            expect(withLine - widest.bytes).toBeGreaterThan(0);
+            expect(withLine - widest.bytes).toBeLessThan(600);
+            expect(withLine).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
+        });
+
+        it('is deterministic: the same feed renders byte-identically', () => {
+            expect(withFeed('TSLAx', scanned())).toBe(withFeed('TSLAx', scanned()));
+        });
+    });
+
+    it('separates technical authority capabilities from attribution and lawful-use limits', () => {
+        expect(card.authorityAttribution.authorities).toHaveLength(10);
+        expect(html).toContain('Capability and permission');
+        expect(html).toContain('Controller / threshold / rotation');
+        // No "Contractual circumstances" row: 0 of 1,418 cards carry the field (30 Sep), so the row
+        // read "Not established" everywhere; what the terms let the issuer do is in the what-ifs.
+        expect(html).not.toContain('Contractual circumstances');
+        expect(html).toContain('Technical control notes');
+        expect(html).toContain('Technical observations');
+        expect(publicCard(card).control).toEqual(card.control);
+        expect(html).toContain('<dt>Freeze authority</dt>');
+        expect(html).toContain(`title="${card.control.freezeAuthority}"`);
+    });
+
+    it('groups identical technical notes without dropping their distinct authority roles', () => {
+        const note = 'Shared technical fact used by both authority roles.';
+        const local = cardFor('NVDAx');
+        for (const row of local.authorityAttribution.authorities.filter((row) => ['freeze', 'pause'].includes(row.id))) {
+            row.governance.technicalNotes = note;
+            row.governance.observedAt = '2026-09-20';
+            row.governance.source = 'https://fixture.example/control';
+        }
+        const rendered = renderCard(local);
+        expect(rendered.split(note)).toHaveLength(2);
+        expect(rendered).toContain('Freeze accounts, Pause transfers:');
+        expect(rendered).toContain('observed 20 Sep 2026');
+    });
+
+    it('does not promote source-listed DeFi support into a successful user action', () => {
+        const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
+        expect(defi.value).toContain('Listed for this exact token by');
+        expect(defi.value).toContain('(as the protocols describe it)');
+        expect(defi.value).toContain('Checked');
+        expect(defi.value).toContain('We have not seen a real transaction succeed.');
+        expect(defi.value).not.toContain('Confirmed with');
+    });
+
+    it('shows each health dimension’s judged and unknown coverage beside its status', () => {
+        expect(html).toMatch(/Market<\/span><b[^>]*>[^<]+<\/b><small>[^<]+ · \d+\/\d+ checks judged; \d+ unknown<\/small>/);
+        expect(html).toContain('checks judged;');
+        expect(html).toContain('unknown</small>');
+    });
+
+    it('explains escrow, borrower default, protocol hack and access loss from the matched template', () => {
+        expect(card.composability.id).toMatch(/^xstocks-backed--/);
+        for (const phrase of ['Smart-contract escrow', 'Borrower default', 'Protocol hacked', 'Access or key loss']) {
+            expect(html).toContain(phrase);
+        }
+        expect(html).toContain('Programmatic collateral listing');
+        expect(html).toContain('Can seizure become cash?');
+        expect(html).toContain('issuer redemption requires KYC/AML');
+        expect(html).toContain('Pool presence does not guarantee executable liquidation size');
+        expect(html).toContain('able to act, with no duty to act');
+        expect(html).toContain(`../templates/${card.composability.id}.html`);
+        expect(publicCard(card).composability).toEqual({
+            id: card.composability.id,
+            healthStatus: 'caution',
+            scenarios: {
+                escrow: { outcome: 'conditional' },
+                borrowerDefault: { outcome: 'conditional' },
+                protocolHack: { outcome: 'issuer-may-recover' },
+                accessLoss: { outcome: 'discretionary-recovery' }
+            }
+        });
+    });
+
+    it('shows at most five wallet addresses, each truncated with the full one in a title', () => {
+        expect(card.holders.top.length).toBeLessThanOrEqual(HOLDER_ROWS);
+        const wallets = walletsIn(card, html);
+        expect(wallets.length).toBeLessThanOrEqual(HOLDER_ROWS);
+        const section = html.slice(html.indexOf('<section id="holders">'), html.indexOf('<section id="control">'));
+        expect(new Set(section.match(BASE58_RUN) ?? []).size).toBeLessThanOrEqual(HOLDER_ROWS);
+        for (const owner of card.holders.top.map((row) => row.owner)) {
+            expect(html).toContain(`title="${owner}"`);
+            expect(html).toContain(shortAddress(owner));
+        }
+    });
+
+    it('emits og:url and the canonical link only when a base URL was given', () => {
+        expect(html).toContain('<meta property="og:url" content="https://rwasonar.com/cards/NVDAx.html" />');
+        expect(html).toContain('<link rel="canonical" href="https://rwasonar.com/cards/NVDAx.html" />');
+        const anonymous = renderCard(card, { baseUrl: null, version: 'v' });
+        expect(anonymous).not.toContain('og:url');
+        expect(anonymous).not.toContain('canonical');
+    });
+
+    it('shares the site preview image as a large card, keeping its own token title', () => {
+        expect(html).toContain('<meta property="og:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />');
+        expect(html).toContain('<meta name="twitter:image" content="https://rwasonar.com/images/og-rwasonar.png?v=20260923" />');
+        expect(html).toContain('<meta property="og:image:width" content="1200" />');
+        expect(html).toContain('<meta name="twitter:card" content="summary_large_image" />');
+        expect(html).toMatch(/<meta property="og:title" content="[^"]*NVDAx/);
+        const anonymous = renderCard(card, { baseUrl: null, version: 'v' });
+        expect(anonymous).not.toContain('og:image');
+        expect(anonymous).toContain('<meta name="twitter:card" content="summary" />');
+    });
+
+    it('is a complete, indexable page with the shared assets', () => {
+        expect(html.startsWith('<!doctype html>')).toBe(true);
+        expect(html).not.toContain('noindex');
+        expect(html).toContain('<meta name="description"');
+        expect(html).toContain('<details id="five-things" class="card-disclosure asset-decision" open>');
+        expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" />');
+        // The trust-chain/what-if rules are one shared sheet, after card.css (next-steps.md F11).
+        expect(html).toContain('<link rel="stylesheet" href="../card.css?v=20260917a" /><link rel="stylesheet" href="../trustchain.css?v=20260917a" />');
+        expect(html).toContain('<script src="../card.js?v=20260917a"></script>');
+        expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
+        expect(html).toContain('href="https://x.com/RWASonar"');
+        for (const page of ['../stocks.html?view=assets', '../stocks.html?view=compare', '../watch.html', '../learn/']) {
+            expect(html).toContain(`href="${page}"`);
+        }
+    });
+
+    it('labels the issuer API as the issuer\'s own numbers and omits the section otherwise', () => {
+        const prestocks = renderCard(cardFor('SPACEX'), { baseUrl: null, version: 'v' });
+        expect(prestocks).toContain('own numbers, with no independent check');
+        expect(prestocks).toContain('Mark price');
+        expect(renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' })).not.toContain('Issuer API');
+    });
+
+    it('carries the per-source data timestamps and the mint', () => {
+        for (const value of Object.values(SOURCES)) {
+            if (value) expect(html).toContain(`datetime="${value}"`);
+        }
+        expect(html).toContain(card.mint);
+    });
+});
+
+// --- budget, determinism, round-trip ----------------------------------------------------------
+
+describe('the redemption schematic on a card', () => {
+    it('links the drawn route on the issuer page instead of drawing it (the byte budget)', () => {
+        const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
+        expect(html).toContain('<a href="../issuers/xstocks-backed.html#how-it-works">See it drawn step by step: xStocks: stablecoin redemption (observed on-chain) →</a>');
+        expect(html).not.toContain('<figure class="fd ');
+    });
+});
+
+describe('exchange markets on a card are dated by their own CoinGecko read', () => {
+    const AAPLX = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+    // The live AAPLx record of 2026-09-24: DEX pools refreshed that day, exchange markets last read
+    // on 2026-09-22 by the daily CoinGecko rotation. The Raydium ticker is verbatim from CoinGecko,
+    // which uppercases the USDC mint it is quoted in.
+    const venuesItem = {
+        mint: AAPLX.mint, coingeckoId: 'apple-xstock', dexFetchedAt: '2026-09-24T12:13:06Z', cexFetchedAt: '2026-09-22T00:08:37Z',
+        dex: [],
+        cex: [
+            { market: 'Raydium (CLMM)', marketId: 'raydium-clmm', base: 'XSBEHLATCF6HDFPFZ5XEMDQW8NFAVCSP5BDUDRLJZJP', target: 'EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V', priceUsd: 338.84, volume24Usd: 3122530, trustScore: null, url: null, lastTradedAt: '2026-09-22T00:05:03+00:00' },
+            { market: 'BigONE', marketId: 'bigone', base: 'AAPLX', target: 'USDT', priceUsd: 339.66, volume24Usd: 2960000, trustScore: null, url: 'https://big.one/trade/AAPLX-USDT', lastTradedAt: '2026-09-22T00:04:00+00:00' }
+        ]
+    };
+    const build = (item) => buildCard({
+        token: { ...AAPLX, activity: { ...AAPLX.activity, cexMarkets: item.cex.length, lastTradedAt: item.cex[0]?.lastTradedAt ?? null, lastTradedVenue: item.cex[0]?.market ?? null } },
+        issuer: issuers.get(AAPLX.issuer), venuesItem: item, slug: 'AAPLx', builtAt: BUILT_AT,
+        sources: { ...SOURCES, venues: '2026-09-24T12:24:33Z' }
+    });
+
+    it('states the as-of date on the table, the venue count and the last trade seen', () => {
+        const card = build(venuesItem);
+        const html = renderCard(card, { version: 'v' });
+        const asOf = '<time datetime="2026-09-22T00:08:37Z">22 Sep 2026 00:08 UTC</time>';
+        expect(card.venues.cexAsOf).toBe('2026-09-22T00:08:37Z');
+        expect(publicCard(card).venues.cexAsOf).toBe('2026-09-22T00:08:37Z');
+        expect(html).toContain(`<p class="note">Exchange data as of ${asOf}, from CoinGecko. Each 24 h volume covers the 24 h before that time.</p>`);
+        expect(html).toContain(`2 exchange market(s) · exchange data as of ${asOf}`);
+        expect(html).toMatch(new RegExp(`Last exchange trade seen.*on Raydium \\(CLMM\\) · exchange data as of ${asOf.replace(/[()]/g, '\\$&')}`));
+    });
+
+    it('names the quote asset instead of printing CoinGecko\'s uppercased mint', () => {
+        const card = build(venuesItem);
+        const html = renderCard(card, { version: 'v' });
+        expect(card.venues.cex.map((row) => row.targetLabel)).toEqual(['USDC', 'USDT']);
+        expect(html).toContain('Raydium (CLMM) <span class="t">USDC</span>');
+        expect(html).not.toContain('EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V');
+        // The machine-readable record keeps what CoinGecko reported beside the label.
+        expect(publicCard(card).venues.cex[0].target).toBe('EPJFWDD5AUFQSSQEM2QN1XZYBAPC8G4WEGGKZWYTDT1V');
+    });
+
+    it('dates an empty exchange check too, and says nothing about a date it does not have', () => {
+        const empty = renderCard(build({ ...venuesItem, cex: [] }), { version: 'v' });
+        expect(empty).toContain('No exchange market reported as of <time datetime="2026-09-22T00:08:37Z">');
+        const unmapped = renderCard(build({ ...venuesItem, coingeckoId: null, cexFetchedAt: null, cex: [] }), { version: 'v' });
+        expect(unmapped).toContain('<p class="no">No exchange market reported.</p>');
+        expect(unmapped).not.toContain('exchange data as of');
+    });
+});
+
+describe('every real card', () => {
+    const rendered = tokenDb.tokens.map((token) => {
+        const card = cardFor(token.symbol);
+        return { card, html: renderCard(card, { baseUrl: 'https://rwasonar.com', version: 'v' }) };
+    });
+
+    it('stays inside the per-card byte budget', () => {
+        for (const { card, html } of rendered) {
+            expect(Buffer.byteLength(html, 'utf8')).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
+            expect(card.slug.length).toBeGreaterThan(0);
+        }
+    });
+
+    it('links each card to its own planet in the universe view, marked new', () => {
+        for (const { card, html } of rendered) {
+            const link = html.match(/<a class="planet-link" href="([^"]+)">(.*?)<\/a>/);
+            expect(link?.[1]).toBe(`../universe.html#*/@${encodeURIComponent(card.slug)}`);
+            expect(link[2]).toContain('<span class="badge-new">New</span>');
+            // In the page header, not buried further down the card.
+            expect(html.indexOf('class="planet-link"')).toBeLessThan(html.indexOf('</header>', html.indexOf('<header class="card-head">')));
+        }
+    });
+
+    it('renders the shared application header exactly once', () => {
+        for (const { html } of rendered) {
+            expect((html.match(/<header class="app-header">/g) ?? [])).toHaveLength(1);
+        }
+    });
+
+    it('never shows more than five wallet addresses', () => {
+        for (const { card, html } of rendered) {
+            expect(walletsIn(card, html).length).toBeLessThanOrEqual(HOLDER_ROWS);
+            const section = html.slice(html.indexOf('<section id="holders">'), html.indexOf('<section id="control">'));
+            expect(new Set(section.match(BASE58_RUN) ?? []).size).toBeLessThanOrEqual(HOLDER_ROWS);
+        }
+    });
+
+    it('links to the separate machine-readable record, which round-trips exactly', () => {
+        for (const { card, html } of rendered) {
+            expect(html).toContain(`<link rel="alternate" type="application/json" href="./${card.slug}.json" />`);
+            expect(html).not.toContain('id="card-data"');
+            const parsed = JSON.parse(JSON.stringify(publicCard(card)));
+            expect(parsed).toEqual(publicCard(card));
+            expect(Object.keys(parsed)).toEqual(Object.keys(publicCard(card)));
+        }
+    });
+
+    it('lists itself in cards/index.json with exactly the five index fields', () => {
+        for (const { card } of rendered) {
+            expect(Object.keys(indexEntry(card))).toEqual(['slug', 'symbol', 'mint', 'issuer', 'status']);
+            expect(indexEntry(card).status).toBe(card.health.status);
+        }
+    });
+
+    it('rounds every number in the published record to six significant figures', () => {
+        for (const { card } of rendered) {
+            for (const value of JSON.stringify(publicCard(card)).match(/-?\d+\.\d+/g) ?? []) {
+                expect(Number(value)).toBe(Number(Number(value).toPrecision(6)));
+            }
+        }
+    });
+});
+
+describe('two builds from the same inputs', () => {
+    it('are byte-identical', () => {
+        const options = { baseUrl: 'https://rwasonar.com', version: 'v' };
+        for (const symbol of REAL_SYMBOLS) {
+            expect(renderCard(cardFor(symbol), options)).toBe(renderCard(cardFor(symbol), options));
+        }
+    });
+
+    it('differ only in the one builtAt stamp when the clock has moved', () => {
+        const later = '2026-09-18T09:08:07Z';
+        const options = { baseUrl: 'https://rwasonar.com', version: 'v' };
+        for (const symbol of REAL_SYMBOLS) {
+            const first = renderCard(cardFor(symbol, BUILT_AT), options);
+            const second = renderCard(cardFor(symbol, later), options);
+            expect(first).not.toBe(second);
+            // The HTML carries one visible stamp; the linked JSON record carries its own copy.
+            expect(first.split(BUILT_AT).length - 1).toBe(1);
+            const normalise = (html, stamp) => html
+                .split(stamp).join('STAMP')
+                .split(fmt.fmtDateTime(stamp)).join('WHEN');
+            expect(normalise(first, BUILT_AT)).toBe(normalise(second, later));
+        }
+    });
+});
+
+/**
+ * Evidence chips on a card (stocks/EVIDENCE.md §4). The claim logic is tested once in
+ * stocks/evidence.test.js; what is tested here is the card's own promises: only the fields the
+ * three issuer-derived sections show can put bytes on a card, a hollow chip costs nothing in the
+ * published JSON, the quote is cut visibly rather than silently, and a card stays readable with
+ * JavaScript off — no script of ours opens these popovers.
+ */
+describe('evidence chips on a card', () => {
+    const FIXTURE = JSON.parse(fs.readFileSync(
+        path.join(__dirname, 'fixtures', 'dossier-claims.sample.json'), 'utf8'
+    ));
+    const CLAIM_FIELDS = JSON.parse(fs.readFileSync(
+        path.join(__dirname, 'data', 'claim-fields.json'), 'utf8'
+    )).fields;
+
+    /** The fixture dossier dressed as a built issuer record, the way build-stocks-db.mjs writes it. */
+    function fixtureIssuer() {
+        const claims = evidenceLib.dossierClaims('fixture', FIXTURE);
+        return {
+            ...FIXTURE,
+            slug: 'fixture',
+            name: 'Fixture',
+            grades: { claimRung: 1, claimLabel: 'unsecured claim on the issuer' },
+            claims,
+            evidenceFields: evidenceLib.neededFields(FIXTURE, CLAIM_FIELDS),
+            evidence: evidenceLib.evidenceSummary(FIXTURE, claims, CLAIM_FIELDS)
+        };
+    }
+
+    function fixtureCard() {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'TSLAon') ?? tokenDb.tokens[0];
+        return buildCard({
+            token,
+            issuer: fixtureIssuer(),
+            holdersItem: holders.get(token.mint) ?? null,
+            venuesItem: venues.get(token.mint) ?? null,
+            closedMarketItem: null,
+            closedMarketMeta: null,
+            meteoraByPair: meteora,
+            pools: null,
+            slug: 'FIXTURE',
+            builtAt: BUILT_AT,
+            sources: SOURCES
+        });
+    }
+
+    it('carries only the fields the three issuer-derived sections render', () => {
+        const ev = cardEvidence(fixtureIssuer());
+        for (const field of Object.keys(ev.fields)) expect(CARD_CLAIM_FIELDS).toContain(field);
+        // The fixture quotes a finding and products[0]; neither is on a card, so neither is carried.
+        expect(ev.fields['findings[0]']).toBeUndefined();
+        expect(ev.fields['products[0]']).toBeUndefined();
+        expect(ev.fields['redemption.rails'].claims).toHaveLength(1);
+    });
+
+    it('takes the coverage numbers from the issuer, so a card cannot disagree with the panel', () => {
+        const issuer = fixtureIssuer();
+        expect(cardEvidence(issuer).coverage).toEqual(issuer.evidence.coverage);
+        expect(cardEvidence(issuer).lastCheckedAt).toBe(issuer.evidence.lastCheckedAt);
+    });
+
+    it('retains reviewed and unreviewed inference counts from issuer evidence', () => {
+        const issuer = fixtureIssuer();
+        issuer.evidence = { ...issuer.evidence, inferenceReviewed: 2, inferenceUnreviewed: 3 };
+        expect(cardEvidence(issuer)).toMatchObject({ inferenceReviewed: 2, inferenceUnreviewed: 3 });
+    });
+
+    it('cuts a long quote VISIBLY rather than silently', () => {
+        const long = 'word '.repeat(80).trim();
+        const issuer = {
+            ...fixtureIssuer(),
+            claims: [{ field: 'legalForm', quote: long, url: 'https://x/tos', status: 'confirmed',
+                locator: 'p. 1', accessedAt: '2026-09-18T10:00:00Z', method: 'manual', note: null }]
+        };
+        const quote = cardEvidence(issuer).fields.legalForm.claims[0].quote;
+        expect(quote.length).toBeLessThanOrEqual(QUOTE_MAX + 1);
+        expect(quote.endsWith('…')).toBe(true);
+    });
+
+    it('renders a chip with the quote and an escaped, safe link', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        expect(html).toContain('<details class="ev-chip">');
+        expect(html).toContain('USDC or another mutually agreed form of value');
+        expect(html).toContain('href="https://fixture.example/tos"');
+        expect(html).toContain('rel="nofollow noopener"');
+    });
+
+    it('gives a needed-but-unsourced field the hollow chip with its one sentence', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        expect(html).toContain(`<span class="ev-none" title="${NO_CLAIM_TEXT}">No source</span>`);
+        expect(NO_CLAIM_TEXT).toBe('no source recorded yet');
+    });
+
+    it('needs no JavaScript: nothing in card.js opens a chip', () => {
+        const js = fs.readFileSync(path.join(REPO_ROOT, 'card.js'), 'utf8');
+        expect(js).not.toContain('ev-chip');
+        expect(js).not.toContain('ev-pop');
+        const css = fs.readFileSync(path.join(REPO_ROOT, 'card.css'), 'utf8');
+        const block = css.slice(css.indexOf('/* --- evidence chips'));
+        expect(block).toContain('.ev-pop');
+        expect(block).not.toContain('!important');
+        expect(block).not.toMatch(/#[0-9a-fA-F]{3}\b/);
+    });
+
+    it('puts the evidence line in the footer, worded as specified', () => {
+        expect(evidenceLine({ coverage: { sourced: 34, needed: 41 }, lastCheckedAt: '2026-09-18T10:22:00Z' }))
+            .toBe('Evidence: 34 of 41 fields sourced · last checked 18 Sep 2026 10:22 UTC');
+        expect(evidenceLine({ coverage: { sourced: 0, needed: 46 }, lastCheckedAt: null }))
+            .toBe('Evidence: 0 of 46 fields sourced · never checked');
+        expect(evidenceLine(null)).toBe('');
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        // At the foot of the Legal control block, with the legal evidence check it feeds, not in the page footer.
+        const evidenceBlock = html.slice(html.indexOf('<details id="legal-control"'), html.indexOf('<details id="control-detail"'));
+        expect(evidenceBlock).toMatch(/<span class="ev-line">Evidence: \d+ of \d+ fields sourced/);
+    });
+
+    it('publishes the evidence SUMMARY only — the claims are rendered above it', () => {
+        // 9.3 kB of the widest card was a second copy of the popovers the reader is looking at.
+        // The full set is in stocks-issuers.json and /api/issuers/:slug/claims.
+        const card = fixtureCard();
+        const published = publicCard(card);
+        expect(published.evidence.fields).toBeUndefined();
+        expect(published.evidence.coverage).toEqual(card.evidence.coverage);
+        expect(published.evidence.lastCheckedAt).toBe(card.evidence.lastCheckedAt);
+        expect(Object.keys(card.evidence.fields).length).toBeGreaterThan(0);
+    });
+
+    it('does not repeat the quote in the summary title that the popover shows', () => {
+        const html = renderCard(fixtureCard(), { version: 'test' });
+        const chips = [...html.matchAll(/<details class="ev-chip">[\s\S]*?<\/details>/g)]
+            .map((m) => m[0]);
+        expect(chips.length).toBeGreaterThan(0);
+        for (const chip of chips) {
+            const title = /<summary class="[^"]*" title="([^"]*)"/.exec(chip)[1];
+            expect(title.length).toBeLessThan(30);
+            expect(title).not.toContain('“');
+        }
+        // The source prints as the document's registered title (else its host), never as the
+        // whole URL a second time.
+        expect(html).toContain('href="https://fixture.example/tos" rel="nofollow noopener">Terms of Service (2026-08)<');
+        const untitled = { ...fixtureIssuer(), documents: [] };
+        expect(renderCard(buildCard({ token: tokenDb.tokens[0], issuer: untitled, slug: 'U', builtAt: BUILT_AT, sources: SOURCES }), { version: 'test' }))
+            .toContain('>fixture.example<');
+    });
+
+    it('costs a bounded number of bytes on a REAL fully-sourced issuer', () => {
+        // The chips are what moved the ceiling on 2026-09-18, so this is the test that catches them
+        // growing again — and it measures the real widest card, not the fixture, because the
+        // fixture is only as dense as it was written to be. The numbers are printed rather than
+        // just asserted: a silent pass would hide the maximum creeping towards the limit.
+        const sourced = issuerDb.issuers
+            .filter((i) => (i.evidence?.claims ?? 0) > 0).map((i) => i.slug);
+        const widest = tokenDb.tokens
+            .filter((t) => sourced.includes(t.issuer))
+            .map((t) => ({ symbol: t.symbol, bytes: Buffer.byteLength(
+                renderCard(cardFor(t.symbol), { version: 'test' }), 'utf8') }))
+            .sort((a, b) => b.bytes - a.bytes)[0] ?? null;
+        const fixture = Buffer.byteLength(renderCard(fixtureCard(), { version: 'test' }), 'utf8');
+        console.log(`[cards] fixture card ${fixture} B; widest sourced card `
+            + `${widest ? `${widest.symbol} ${widest.bytes} B` : 'none yet'}; target ${CARD_BYTE_TARGET}, limit ${CARD_BYTE_LIMIT}`);
+        expect(fixture).toBeLessThan(CARD_BYTE_TARGET);
+        if (widest !== null) expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
+        expect(CARD_BYTE_TARGET).toBe(128 * 1024);
+        expect(CARD_BYTE_LIMIT).toBe(150 * 1024);
+    });
+
+    it('every issuer-derived card field path is one the dossiers can actually carry', () => {
+        // A path nobody can write a claim against would show a hollow chip for ever.
+        for (const field of CARD_CLAIM_FIELDS) {
+            const reachable = CLAIM_FIELDS.some((pattern) => pattern === field
+                || (pattern.includes('*') && field.startsWith(pattern.split('.*')[0])));
+            expect({ field, reachable }).toEqual({ field, reachable: true });
+        }
+    });
+});
+
+// --- the fourth authority row (MODEL.md §2.7) -------------------------------------------------
+
+describe('the rebase authority on a card', () => {
+    it('is carried on the record and rendered as its own row, with its evidence chip', () => {
+        const card = cardFor('TSLAx');
+        expect(card.keyGovernance.rebase).toBe('hot-key');
+        const html = renderCard(card, { baseUrl: 'https://rwasonar.com' });
+        expect(html).toContain('<dt>Rebase-authority governance</dt><dd>Hot key');
+        // The row's evidence chip must carry the dossier's own rebase claim, not the delegate one
+        // it used to be filed under — that is what the field path on CARD_CLAIM_FIELDS buys.
+        expect(CARD_CLAIM_FIELDS).toContain('keyGovernance.rebase');
+        expect(cardEvidence(issuers.get('xstocks-backed')).fields['keyGovernance.rebase'].claims.length)
+            .toBeGreaterThanOrEqual(1);
+        expect(html).toContain('S7vYFFWH6BjJyEsdrPQpqpYTqLTrPRK6KW3VwsJuRaS');
+    });
+
+    it("renders 'none' rather than an em dash where the extension does not exist", () => {
+        // Tessera's three mints are the only ones with no scaledUiAmountConfig at all, and that
+        // absence is a fact about the mint — it must not render as a missing value.
+        const card = cardFor('tOpenAI');
+        expect(card.keyGovernance.rebase).toBe('none');
+        expect(renderCard(card, { baseUrl: 'https://rwasonar.com' }))
+            .toContain('<dt>Rebase-authority governance</dt><dd>None');
+    });
+
+    it('survives the public projection, so the .json record shows it too', () => {
+        expect(publicCard(cardFor('TSLAx')).keyGovernance.rebase).toBe('hot-key');
+    });
+});
+
+// --- the trust chain and the what-if answers (stocks/EVIDENCE.md §6) --------------------------
+
+describe('the trust-chain diagram on a card', () => {
+    it('is the record’s own graded chain, copied rather than re-derived', () => {
+        const card = cardFor('NVDAx');
+        const record = issuers.get('xstocks-backed');
+        expect(card.trustChain.nodes).toHaveLength(catalogue.actors.length);
+        expect(card.trustChain.links).toHaveLength(catalogue.flows.length);
+        // Byte-identical to what the builder wrote into stocks-issuers.json: a card and the issuer
+        // panel drawing two differently graded chains would be the worst failure this page has.
+        expect(JSON.stringify(card.trustChain)).toBe(JSON.stringify(record.chain));
+    });
+
+    it('draws every actor and every flow, with one evidence class and one verification class each', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        expect(html).toContain('<section id="trust-chain">');
+        expect(html.match(/class="tc-node[ "]/g)).toHaveLength(catalogue.actors.length);
+        expect(html.match(/data-flow="/g).length).toBeGreaterThanOrEqual(catalogue.flows.length);
+        // The space matters: `tc-lanes` is the container group, not a lane.
+        for (const lane of html.matchAll(/<g class="(tc-lane [^"]*)"/g)) {
+            const classes = lane[1].split(' ');
+            expect(classes.filter((c) => c.startsWith('tc-ev-'))).toHaveLength(1);
+            expect(classes.filter((c) => c.startsWith('tc-vf-'))).toHaveLength(1);
+        }
+    });
+
+    it('has the legend, so a colour and a line style are never unexplained', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        for (const grade of trustChainSvg.EVIDENCE_GRADES) {
+            expect(html).toContain(`tc-key-swatch tc-ev-${grade}`);
+        }
+        for (const grade of trustChainSvg.VERIFICATION_GRADES) {
+            expect(html).toContain(`tc-key-line tc-vf-${grade}`);
+        }
+    });
+
+    it('names the fields behind each grade but not their values, and links out for them', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        expect(html).toContain('tc-field-path');
+        // The values are 9.4 kB of dossier prose; the API serves them. See CARD_BYTE_TARGET.
+        expect(html).not.toContain('tc-field-value');
+        expect(html).toContain('on the issuer panel');
+    });
+
+    it('carries the chain’s shape in the published record, never its prose', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.trustChain.nodes).toHaveLength(catalogue.actors.length);
+        expect(record.trustChain.links[0]).toEqual({
+            flow: expect.any(String), evidence: expect.any(String), verification: expect.any(String)
+        });
+        // No field values, no summaries: they are rendered above and served by the API.
+        expect(JSON.stringify(record.trustChain)).not.toContain('claimStatus');
+        expect(JSON.stringify(record.trustChain)).not.toContain('summary');
+    });
+
+    it('says so, rather than drawing an empty frame, when the issuer has no chain', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token, issuer: null, slug: 'test', builtAt: BUILT_AT, sources: SOURCES, catalogue
+        });
+        expect(card.trustChain).toBeNull();
+        expect(renderCard(card, { version: 'test' })).toContain('No trust chain has been built');
+    });
+});
+
+describe('the what-if answers on a card', () => {
+    const MODES = catalogue.failureModes.length;
+
+    it('asks all 38 questions of every issuer, whatever has been answered', () => {
+        for (const symbol of ['NVDAx', 'GLXY', 'SPACEX']) {
+            const card = cardFor(symbol);
+            expect(card.whatIf.answers).toHaveLength(MODES);
+            expect(card.whatIf.answers.map((a) => a.mode))
+                .toEqual(catalogue.failureModes.map((m) => m.id));
+        }
+    });
+
+    it('counts the six statuses, and they add up to the catalogue’s own mode count', () => {
+        const counts = cardFor('NVDAx').whatIf.counts;
+        expect(Object.keys(counts).sort()).toEqual([
+            'documented', 'inferred', 'litigated', 'missing', 'not-applicable', 'unknown'
+        ]);
+        expect(Object.values(counts).reduce((a, b) => a + b, 0)).toBe(MODES);
+    });
+
+    it('groups the answers by actor in the catalogue’s order, not the question order', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        const heads = [...html.matchAll(/<h5 class="wi-actor-head">([^<]+)<\/h5>/g)].map((m) => m[1]);
+        const labels = catalogue.actors.map((actor) => actor.label);
+        const seen = heads.filter((head) => labels.includes(head));
+        expect(seen.length).toBeGreaterThan(3);
+        // The catalogue asks about `law` at mode 16 and again at 36; one group, in actor order.
+        expect(new Set(seen).size).toBe(seen.length);
+        expect(seen).toEqual(labels.filter((label) => seen.includes(label)));
+    });
+
+    it('prints the counts line as counts of what it shows', () => {
+        const card = cardFor('NVDAx');
+        const html = renderCard(card, { version: 'test' });
+        for (const [status, n] of Object.entries(card.whatIf.counts)) {
+            if (n === 0) continue;
+            expect(html).toContain(`<span class="wi-count-n">${n}</span> ${whatIfLib.STATUS_SHORT[status]}`);
+        }
+        // A status with nothing under it is left out rather than printed as a zero.
+        const zero = Object.entries(card.whatIf.counts).find(([, n]) => n === 0);
+        if (zero !== undefined) {
+            expect(html).not.toContain(`<span class="wi-count-n">0</span> ${whatIfLib.STATUS_SHORT[zero[0]]}`);
+        }
+    });
+
+    it('carries the outcome, the status and the source, and NOT the quote or the search record', () => {
+        const card = cardFor('NVDAx');
+        const answered = card.whatIf.answers.find((a) => a.status === 'documented');
+        expect(answered.outcome).not.toBeNull();
+        expect(answered.url).not.toBeNull();
+        // The three things the byte policy bought (see CARD_BYTE_TARGET): they are on the panel.
+        expect(answered.quote).toBeNull();
+        expect(answered.note).toBeNull();
+        expect(answered.searched).toEqual([]);
+        const html = renderCard(card, { version: 'test' });
+        expect(html).not.toContain('wi-quote');
+        expect(html).not.toContain('Where we looked');
+        expect(html).toContain('Full answers, with the quotes');
+    });
+
+    it('cuts the outcome visibly and never mid-word', () => {
+        const card = cardFor('NVDAx');
+        for (const answer of card.whatIf.answers) {
+            if (answer.outcome === null) continue;
+            expect(answer.outcome.length).toBeLessThanOrEqual(OUTCOME_MAX + 1);
+        }
+        expect(card.whatIf.answers.some((a) => a.outcome !== null && a.outcome.endsWith('…'))).toBe(true);
+    });
+
+    it('cites one numbered source list instead of repeating a URL on every row', () => {
+        const html = renderCard(cardFor('NVDAx'), { version: 'test' });
+        const section = html.slice(html.indexOf('<section id="what-if">'), html.indexOf('<footer>'));
+        expect(section).toContain('<ol class="wi-sources">');
+        const refs = [...section.matchAll(/class="wi-ref" href="#wi-src-(\d+)"/g)].map((m) => Number(m[1]));
+        const entries = [...section.matchAll(/<li id="wi-src-(\d+)"/g)].map((m) => Number(m[1]));
+        expect(refs.length).toBeGreaterThan(5);
+        // Far fewer distinct documents than answers, which is the whole saving.
+        expect(entries.length).toBeLessThan(refs.length);
+        for (const ref of refs) expect(entries).toContain(ref);
+    });
+
+    it('draws a question nobody has answered as a gap, and says it is one', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token,
+            issuer: issuers.get('xstocks-backed'),
+            slug: 'test',
+            builtAt: BUILT_AT,
+            sources: SOURCES,
+            catalogue,
+            whatIf: []
+        });
+        expect(card.whatIf.counts.missing).toBe(MODES);
+        const html = renderCard(card, { version: 'test' });
+        expect(html.match(/wi-badge wi-s-missing/g)).toHaveLength(MODES);
+        expect(html).toContain('Not answered yet for this issuer');
+        // And never softened into the one status that would read as "nothing to answer".
+        expect(html).not.toContain('wi-badge wi-s-not-applicable');
+    });
+
+    it('carries the counts in the published record, never the answers', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.whatIf.counts).toEqual(cardFor('NVDAx').whatIf.counts);
+        expect(record.whatIf.version).toBe(catalogue.version);
+        expect(record.whatIf.answers).toBeUndefined();
+    });
+
+    it('offers the archived copy of a source when the registry has one', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const answers = whatIfBySlug.get('xstocks-backed') ?? [];
+        const withUrl = answers.find((entry) => typeof entry.url === 'string');
+        const card = buildCard({
+            token,
+            issuer: issuers.get('xstocks-backed'),
+            slug: 'test',
+            builtAt: BUILT_AT,
+            sources: SOURCES,
+            catalogue,
+            whatIf: answers,
+            archives: { [withUrl.url]: 'https://web.archive.org/web/2026/test' }
+        });
+        expect(renderCard(card, { version: 'test' })).toContain('https://web.archive.org/web/2026/test');
+    });
+
+    it('says the catalogue did not load rather than claiming the questions are answered', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = buildCard({
+            token, issuer: issuers.get('xstocks-backed'), slug: 'test', builtAt: BUILT_AT, sources: SOURCES
+        });
+        expect(card.whatIf).toBeNull();
+        expect(renderCard(card, { version: 'test' })).toContain('failure-mode list did not load at build time');
+    });
+});
+
+/**
+ * The change judge's material verdicts on a card (stocks/EVIDENCE.md §2.3): shown only when one
+ * concerns the token, always headed as a model assessment, linked to the change feed where each
+ * reading sits beside its diff, and a pure function of the verdict export (never the clock).
+ */
+describe('model-assessed material changes on a card', () => {
+    const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+    const AS_OF = '2026-09-23T12:00:00Z';
+    const row = (overrides = {}) => ({
+        id: '139', detectedAt: '2026-09-22T16:47:12Z', kind: 'legal-term', severity: 'caution',
+        summary: `${token.issuer}:sources[6]: +1 -1 line(s) · keywords: fee`, subjectType: 'source', subjectId: 'abc',
+        issuerSlug: token.issuer, judgmentId: '52', representative: true, material: true,
+        assessmentSeverity: 'caution', assessmentSummary: 'A redemption fee now applies to every holder.', ...overrides
+    });
+    const exportOf = (...items) => ({ asOf: AS_OF, items });
+
+    it('is absent from a card with no material verdict, and from every card built without the export', () => {
+        const none = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(none).not.toContain('model-changes');
+        expect(none).not.toContain(MATERIAL_CHANGE_TITLE);
+        expect(publicCard(cardFor('NVDAx')).materialChanges).toBeNull();
+        for (const items of [[row({ material: false })], [row({ issuerSlug: 'someone-else' })],
+            [row({ detectedAt: '2026-07-01T00:00:00Z' })], [row({ detectedAt: '2026-09-24T00:00:00Z' })],
+            [row({ assessmentSummary: '' })], []]) {
+            const card = cardFor('NVDAx', BUILT_AT, exportOf(...items));
+            expect(card.materialChanges).toBeNull();
+            expect(renderCard(card, { version: 'v' })).not.toContain('model-changes');
+        }
+    });
+
+    it('is present with a material verdict, labelled as a model assessment and linked to the filtered feed', () => {
+        const card = cardFor('NVDAx', BUILT_AT, exportOf(row()));
+        const html = renderCard(card, { version: 'v' });
+        expect(MATERIAL_CHANGE_TITLE).toContain('model assessment');
+        expect(html).toContain(`<details id="material-changes" class="card-disclosure model-changes" open><summary><span>${MATERIAL_CHANGE_TITLE}</span>`);
+        expect(html).toContain('A redemption fee now applies to every holder.');
+        expect(html).toContain('not a legal conclusion');
+        expect(html).toContain(`../watch.html?type=issuer&amp;issuerSlug=${encodeURIComponent(token.issuer)}&amp;material=true`);
+        expect(publicCard(card).materialChanges).toEqual({ basis: 'model assessment', asOf: AS_OF, windowDays: 30, count: 1, ids: ['139'] });
+    });
+
+    it('matches an event filed under the dossier slug (programme slug plus a suffix), never a lookalike', () => {
+        // The watcher files Backpack's and Securitize's events under their dossier slugs.
+        expect(cardMaterialChanges([row({ issuerSlug: `${token.issuer}-spcx` })], token, { asOf: AS_OF })?.count).toBe(1);
+        expect(cardMaterialChanges([row({ issuerSlug: `${token.issuer}extra` })], token, { asOf: AS_OF })).toBeNull();
+    });
+
+    it('matches an event on the token itself, whatever issuer it names', () => {
+        const card = cardFor('NVDAx', BUILT_AT, exportOf(row({ issuerSlug: null, subjectType: 'token', subjectId: token.mint })));
+        expect(card.materialChanges.count).toBe(1);
+    });
+
+    it('counts one change once, shown by the event the judge read', () => {
+        const quoteLost = row({ id: '140', detectedAt: '2026-09-22T16:47:29Z', kind: 'quote-lost', representative: false,
+            summary: 'quoted words lost' });
+        const block = cardMaterialChanges([quoteLost, row()], token, { asOf: AS_OF });
+        expect(block.count).toBe(1);
+        expect(block.items[0].id).toBe('139');
+        expect(cardMaterialChanges([row(), quoteLost], token, { asOf: AS_OF })).toEqual(block);
+    });
+
+    /**
+     * Our own quote maintenance is not the issuer changing anything: a lost quote or a document we
+     * could not fetch reaches a buyer's card only when a curated review confirms a real change, and a
+     * curated false alarm never does, whatever the model said.
+     */
+    it('keeps only real changes: our quote-maintenance events stay off the card unless confirmed', () => {
+        const url = 'https://issuer.example/terms';
+        const quoteLost = row({ id: '150', judgmentId: '60', kind: 'quote-lost', sourceUrl: url,
+            summary: `${token.issuer}: the quoted words for claim holderClaim are no longer in ${token.issuer}:claims[3].url` });
+        const gone = row({ id: '151', judgmentId: '61', kind: 'document-gone', sourceUrl: url, summary: 'document gone' });
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF })).toBeNull();
+        expect(cardMaterialChanges([gone], token, { asOf: AS_OF })).toBeNull();
+        const html = renderCard(cardFor('NVDAx', BUILT_AT, exportOf(quoteLost)), { version: 'v' });
+        expect(html).not.toContain('model-changes');
+        expect(html).not.toContain('words we quoted');
+
+        // A reviewer's `confirmed` resolution (sonar.review_resolution) lets it through.
+        expect(cardMaterialChanges([row({ ...quoteLost, confirmed: true })], token, { asOf: AS_OF }).count).toBe(1);
+        // A curated public resolution (stocks/data/event-resolutions.json) does too; a curated false alarm does not.
+        const curated = (resolution, isPublic) => [{ id: 'r1', resolution, public: isPublic, match: { kind: ['legal-term', 'quote-lost'], sourceUrl: url } }];
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF, resolutions: curated('confirmed', true) }).count).toBe(1);
+        expect(cardMaterialChanges([quoteLost], token, { asOf: AS_OF, resolutions: curated('false-alarm', false) })).toBeNull();
+        expect(cardMaterialChanges([row({ sourceUrl: url })], token, { asOf: AS_OF, resolutions: curated('false-alarm', false) })).toBeNull();
+        // An unreviewed legal-term change is still a real change and stays; the export carries the resolutions.
+        expect(cardMaterialChanges([row({ sourceUrl: url }), quoteLost], token, { asOf: AS_OF }).items.map((item) => item.id)).toEqual(['139']);
+        expect(cardFor('NVDAx', BUILT_AT, { ...exportOf(quoteLost), resolutions: curated('confirmed', true) }).materialChanges.count).toBe(1);
+    });
+
+    it('names at most two, newest first, and still counts the rest', () => {
+        const items = [1, 2, 3].map((n) => row({ id: String(n), judgmentId: String(n), detectedAt: `2026-09-2${n - 1}T00:00:00Z` }));
+        const block = cardMaterialChanges(items, token, { asOf: AS_OF });
+        expect(block.count).toBe(3);
+        expect(block.items.map((item) => item.id)).toEqual(['3', '2']);
+    });
+
+    it('rebuilds byte-identically from the same export, and the builtAt stamp does not move the window', () => {
+        const options = { baseUrl: 'https://rwasonar.com', version: 'v' };
+        const first = renderCard(cardFor('NVDAx', BUILT_AT, exportOf(row())), options);
+        expect(renderCard(cardFor('NVDAx', BUILT_AT, exportOf(row())), options)).toBe(first);
+        const later = renderCard(cardFor('NVDAx', '2026-12-01T00:00:00Z', exportOf(row())), options);
+        expect(later).toContain('A redemption fee now applies to every holder.');
+    });
+
+    // Each change is a fold row, so its reading appears twice (the closed row's second line and the
+    // opened body) and each row links to its diff: the two longest rows measured 1.7 kB (2026-09-25),
+    // against the 150 kB limit and a widest card of about 111 kB.
+    it('costs under two kilobytes, so the widest card stays inside its hard limit', () => {
+        const long = 'x '.repeat(400);
+        const items = [1, 2, 3].map((n) => row({ id: String(n), judgmentId: String(n), summary: long, assessmentSummary: long }));
+        const bare = Buffer.byteLength(renderCard(cardFor('QQQx'), { version: 'v' }), 'utf8');
+        const withBlock = Buffer.byteLength(renderCard(cardFor('QQQx', BUILT_AT, exportOf(...items)), { version: 'v' }), 'utf8');
+        expect(withBlock - bare).toBeLessThan(2048);
+        expect(withBlock).toBeLessThanOrEqual(CARD_BYTE_LIMIT);
+    });
+});
+
+// --- When the market is closed ------------------------------------------------------------------
+
+describe('the "When the market is closed" section on a card', () => {
+    const sectionOf = (html) => html.slice(html.indexOf('<section id="closed-market">'), html.indexOf('<section id="pyth">'));
+
+    it('replaces the closed-hours premium: no premium-gap wording is left on any card', () => {
+        const html = renderCard(cardFor('NVDAx'), { baseUrl: null, version: 'v' });
+        expect(html).toContain('<section id="closed-market"><h2>When the market is closed</h2>');
+        expect(html).not.toContain('After-hours premium');
+        expect(html).not.toContain('Gap (closed − open)');
+        expect(publicCard(cardFor('NVDAx')).afterHours).toBeUndefined();
+    });
+
+    it('lists each lender with its closed-market label, liquidation threshold and borrower sentence', () => {
+        const card = cardFor('NVDAx');
+        const section = sectionOf(renderCard(card, { baseUrl: null, version: 'v' }));
+        const labels = card.closedMarket.lenders.map((l) => [l.protocolId, l.label, l.liquidationLtvPct]);
+        expect(labels).toEqual(expect.arrayContaining([
+            ['kamino', 'frozen at close', 65], ['jupiter-lend', '24/5 overnight', 75], ['nest', '24/7 token price', 60]
+        ]));
+        expect(labels.find((l) => l[0] === 'loopscale')[1]).toMatch(/^stale since \d{1,2} \w{3} 2026$/);
+        expect(section).toContain('<span class="cm-l cm-frozen">frozen at close</span>');
+        expect(section).toContain('<span class="cm-l cm-token">24/7 token price</span>');
+        expect(section).toContain('<strong class="fold-title">Kamino xStocks Pool</strong> · liquidation at 65 % LTV');
+        expect(section).toContain('a thin weekend sell-off can liquidate you');
+        expect(section).toContain('<dt>Exposure at the Monday gap</dt><dd>not measured</dd>');
+        // The weekend premium survives only as the weekend move in the 24/7 lender's own price.
+        expect(section).toContain('<dt>Weekend move in Nest&#39;s price</dt>');
+        const kaminoOnly = sectionOf(renderCard(cardFor('HOODx'), { baseUrl: null, version: 'v' }));
+        expect(kaminoOnly).not.toContain('Weekend move');
+    });
+
+    it('shows the findings its lenders carry, each with its source', () => {
+        const section = sectionOf(renderCard(cardFor('QQQx'), { baseUrl: null, version: 'v' }));
+        expect(section).toContain('Collateral price suspended around a corporate action');
+        expect(section).toContain('<strong class="fold-title">Lending market prices the collateral from the token&#39;s own trading</strong> · Nest');
+        expect(section).toContain('<strong class="fold-title">Collateral price suspended around a corporate action</strong> · Kamino and Jupiter Lend, about 44 h from 19 Sep 2026');
+        expect(section).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">Source<\/a>/);
+    });
+
+    it('a token no lender takes says so in one line; an unbuilt file is not called "no lender"', () => {
+        const none = cardFor('TSLAon');
+        expect(none.closedMarket.lenders).toEqual([]);
+        expect(sectionOf(renderCard(none, { baseUrl: null, version: 'v' }))).toContain('No Solana lending market we track takes this token as collateral');
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const unbuilt = buildCard({ token, slug: 'NVDAx', builtAt: BUILT_AT, sources: SOURCES, closedMarketItem: null, closedMarketMeta: null });
+        expect(unbuilt.closedMarket).toBeNull();
+        expect(renderCard(unbuilt, { baseUrl: null, version: 'v' })).toContain('Not built yet');
+    });
+
+    it('keeps the widest card with the most lenders inside the byte target', () => {
+        const widest = ['QQQx', 'NVDAx', 'SPYx', 'TSLAx'].map((symbol) => ({ symbol, bytes: Buffer.byteLength(renderCard(cardFor(symbol), { version: 'test' }), 'utf8') }))
+            .sort((a, b) => b.bytes - a.bytes)[0];
+        console.log(`[cards] widest multi-lender card ${widest.symbol} ${widest.bytes} B (target ${CARD_BYTE_TARGET})`);
+        expect(widest.bytes).toBeLessThan(CARD_BYTE_TARGET);
+    });
+});
+
+// --- judge-walkthrough fixes (2026-09-25) ---------------------------------------------------------
+
+describe('the underlying market session on a card', () => {
+    const AAPLX = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+    // The Pyth feed list's schedule for Equity.US.AAPL/USD, verbatim (stocks/data/reference-prices.json).
+    const SCHEDULE = 'America/New_York;0930-1600,0930-1600,0930-1600,0930-1600,0930-1600,C,C;0907/C,1126/C,1127/0930-1300,1224/0930-1300,1225/C,0101/C,0118/C,0215/C,0326/C,0531/C,0618/C,0705/C';
+    // The live snapshot of 2026-09-24: prices read at 19:08 UTC while New York was open (the feed
+    // said is_open), the catalogue and cards built at 21:27 UTC, after the 16:00 EDT close.
+    const build = (catalogueAt, { schedule = SCHEDULE, openAtRead = true } = {}) => buildCard({
+        token: { ...AAPLX, reference: { ...AAPLX.reference, marketOpen: openAtRead } },
+        issuer: issuers.get(AAPLX.issuer), slug: 'AAPLx', builtAt: '2026-09-24T21:27:45Z',
+        sources: { ...SOURCES, tokens: catalogueAt, referencePrices: '2026-09-24T19:08:02Z' },
+        referenceSchedule: schedule
+    });
+    const row = (html) => /<dt>Underlying market<\/dt><dd>(.*?)<\/dd>/.exec(html)?.[1] ?? null;
+
+    it('says closed in a snapshot built after the US close, even though the feed said open when read', () => {
+        const card = build('2026-09-24T21:27:36Z');
+        expect(card.reference.session).toBe('closed');
+        expect(card.reference.marketOpen).toBe(false);
+        expect(card.reference.marketOpenAtRead).toBe(true);
+        const html = renderCard(card, { version: 'v' });
+        expect(row(html)).toMatch(/^closed at <time datetime="2026-09-24T21:27:36Z">24 Sep 2026 21:27 UTC<\/time>/);
+        expect(row(html)).toContain('open when the reference price was read');
+        expect(publicCard(card).reference).toMatchObject({ marketOpen: false, session: 'closed', sessionAt: '2026-09-24T21:27:36Z' });
+    });
+
+    it('says open inside the session and names a holiday as one', () => {
+        expect(build('2026-09-24T15:00:00Z').reference.session).toBe('open');
+        const html = renderCard(build('2026-09-24T15:00:00Z'), { version: 'v' });
+        expect(row(html)).toMatch(/^open at /);
+        expect(row(html)).not.toContain('when the reference price was read');
+        expect(build('2026-11-26T15:00:00Z').reference.session).toBe('holiday');
+    });
+
+    it('does not claim a session it cannot compute, and keeps the read-time flag dated', () => {
+        const card = build('2026-09-24T21:27:36Z', { schedule: null });
+        expect(card.reference.marketOpen).toBeNull();
+        expect(row(renderCard(card, { version: 'v' }))).toMatch(/^open when the reference price was read, <time/);
+    });
+});
+
+describe('no internal key reaches a reader', () => {
+    const aaplx = cardFor('AAPLx');
+    const html = renderCard(aaplx, { version: 'v' });
+    const visible = (page) => page.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+
+    it('names the reference source in words, in the markets section and the link preview', () => {
+        expect(aaplx.reference.source).toBe('ondo-implied');
+        expect(html).toContain('<dt>Reference source</dt><dd>Ondo’s implied price');
+        expect(visible(html)).not.toContain('ondo-implied');
+        expect(ogDescription(aaplx)).not.toContain('ondo-implied');
+        expect(visible(renderCard(cardFor('SPACEX'), { version: 'v' }))).not.toContain('issuer-mark');
+    });
+
+    it('rewrites a watcher summary: issuer name, field in words, readable date', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const materialChanges = { asOf: '2026-09-23T12:00:00Z', items: [{
+            id: '7', detectedAt: '2026-09-19T08:00:00Z', kind: 'quote-lost', severity: 'warning',
+            summary: 'xstocks-backed: the quoted words for claim vocabulary.thirdPartyAttestation are no longer in xstocks-backed:claims[3].url',
+            subjectType: 'source', subjectId: 'x', issuerSlug: token.issuer, judgmentId: '9', representative: true, material: true,
+            // A lost quote reaches a card only once a reviewer confirmed it as a real change.
+            confirmed: true,
+            assessmentSeverity: 'warning', assessmentSummary: 'The custody page moved.'
+        }, {
+            id: '8', detectedAt: '2026-09-18T08:00:00Z', kind: 'legal-term', severity: 'caution',
+            summary: 'xstocks-backed:sources[15]: +9 -2 line(s) · keywords: fee',
+            subjectType: 'source', subjectId: 'y', issuerSlug: token.issuer, judgmentId: '10', representative: true, material: true,
+            assessmentSeverity: 'caution', assessmentSummary: 'A fee changed.'
+        }] };
+        const block = visible(renderCard(cardFor('AAPLx', BUILT_AT, materialChanges), { version: 'v' }))
+            .split('Recent material changes')[1].split('A model')[0].replace(/\s+/g, ' ');
+        expect(block).toContain('19 Sep 2026 · warning Kraken xStocks: the words we quoted for “third party attestation” are no longer in the source');
+        expect(block).toContain('Kraken xStocks (a listed source): 9 lines added, 2 removed · mentions fee');
+        for (const key of ['xstocks-backed', 'vocabulary.', 'claims[', 'sources[', '2026-09-19']) expect(block).not.toContain(key);
+    });
+
+    it('labels a claim’s source link with the document’s title, not its host', () => {
+        expect(html).not.toContain('>cdn.prod.website-files.com<');
+        expect(html).not.toContain('>api.mainnet-beta.solana.com<');
+        expect(html).toContain('>Base Prospectus, Backed Assets (JE) Limited');
+    });
+
+    it('prints dates as dates and each block’s sources in words', () => {
+        expect(visible(html)).not.toMatch(/observed \d{4}-\d{2}-\d{2}/);
+        const lines = [...html.matchAll(/<p class="block-src">([\s\S]*?)<\/p>/g)].map((m) => visible(m[1]));
+        expect(lines.join(' ')).toContain('token universe');
+        expect(lines.join(' ')).not.toMatch(/\b(tokens|issuerApi|closedMarket|defiUsage)\b/);
+    });
+
+    it('says in each block when its own inputs were read, and every input is named in some block', () => {
+        const card = aaplx;
+        expect(Object.keys(card.sources).filter((key) => !Object.values(BLOCK_SOURCES).flat().includes(key))).toEqual([]);
+        const markets = html.slice(html.indexOf('<details id="market-detail"'), html.indexOf('<details id="risks"'));
+        expect(markets).toContain('<p class="block-src">Data as of: ');
+        expect(blockFreshnessHtml(card, 'control')).toMatch(/^<p class="block-src">Data as of: token universe <time/);
+        expect(blockFreshnessHtml({ ...card, sources: {} }, 'control')).toBe('');
+        expect(html).not.toContain('<h2>Data</h2>');
+    });
+});
+
+describe('the largest unresolved risk, in a sentence a holder can read', () => {
+    const riskOf = (card) => assetDecisionFacts(card).find((row) => row.id === 'risk');
+    // A card with each earlier rung removed, so a test can reach the one below it.
+    const without = (card, ...rungs) => ({
+        ...card,
+        discrepancies: rungs.includes('discrepancy') ? [] : card.discrepancies,
+        underReview: rungs.includes('review') ? [] : card.underReview,
+        authorityAttribution: rungs.includes('powers') ? { authorities: [] } : card.authorityAttribution,
+        closedMarket: rungs.includes('closed') ? null : card.closedMarket,
+        ownership: rungs.includes('redemption')
+            ? { ...card.ownership, redemption: { ...card.ownership.redemption, available: true, kyc: false } } : card.ownership
+    });
+
+    it('never prints a health rule’s raw note', () => {
+        for (const symbol of ['AAPLx', 'NVDAx', 'SPACEX', 'AAPLon', 'GLXY', 'tKalshi', 'BLSH', 'SECZ', 'MU']) {
+            const card = cardFor(symbol);
+            const value = riskOf(card).value;
+            for (const rule of card.health.rules) if (rule.note) expect(value).not.toContain(rule.note);
+            expect(value).not.toMatch(/organic share and|trades per trader over/);
+        }
+    });
+
+    it('shows found discrepancies at the top as an open block, with no banner pointing below', () => {
+        const fgdl = cardFor('FGDLx');
+        const html = renderCard(fgdl, { version: 'v' });
+        const head = html.indexOf('<header class="card-head">');
+        const top = html.slice(head, html.indexOf('<details id="events"', head));
+        expect(top).toContain(`<details id="discrepancy-detail" class="card-disclosure discrepancy-block" open><summary><span>Claim ≠ observed reality (${fgdl.discrepancies.length})</span>`);
+        expect(top).toContain('<section id="discrepancies">');
+        expect(html).not.toContain('discrepancy-banner');
+        expect(renderCard(without(fgdl, 'discrepancy'), { version: 'v' })).not.toContain('discrepancy-detail');
+    });
+
+    it('leads with a documented claim-vs-reality conflict, then a priority-zero review', () => {
+        const fgdl = cardFor('FGDLx');
+        expect(riskOf(fgdl)).toMatchObject({ value: fgdl.discrepancies[0].title, href: `#discrepancy-${fgdl.discrepancies[0].id}` });
+        const p0 = [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }];
+        expect(riskOf({ ...fgdl, underReview: p0 }).href).toBe(`#discrepancy-${fgdl.discrepancies[0].id}`);
+        // A discrepancy without an id still lands on the section.
+        expect(riskOf({ ...fgdl, discrepancies: [{ ...fgdl.discrepancies[0], id: null }] }).href).toBe('#discrepancies');
+        const review = { ...without(fgdl, 'discrepancy'), underReview: p0 };
+        expect(riskOf(review).value).toBe('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
+    });
+
+    it('then names a power over holders’ tokens that one key, or a multisig with no time lock, can use', () => {
+        // Bullish: the permanent delegate and the freeze authority are two different plain wallets.
+        const blsh = riskOf(cardFor('BLSH'));
+        expect(blsh.value).toBe('One private key can move or burn any holder’s tokens, with no second signature needed. Another single private key can freeze any holder’s account.');
+        expect(blsh.href).toBe('#control');
+        // Shift: one per-mint key holds both powers.
+        expect(riskOf(cardFor('SPX3L')).value).toBe('One private key can move or burn any holder’s tokens and freeze any holder’s account, with no second signature needed.');
+        const openai = riskOf(without(cardFor('OPENAI'), 'discrepancy'));
+        expect(openai.value).toBe('2 of 5 signers of one multisig can move or burn any holder’s tokens and freeze any holder’s account at once: there is no time lock, so holders get no warning.');
+        // xStocks' permanent delegate has no recorded time lock, so only the freeze qualifies.
+        expect(riskOf(without(cardFor('AAPLx'), 'discrepancy')).value)
+            .toBe('2 of 4 signers of one multisig can freeze any holder’s account at once: there is no time lock, so holders get no warning.');
+    });
+
+    it('then a lending market’s stale or 24/7 collateral price, dated in words', () => {
+        const tslax = riskOf(without(cardFor('TSLAx'), 'discrepancy', 'powers'));
+        expect(tslax.value).toMatch(/^If you borrow against it: Loopscale .* can neither roll nor be liquidated\.$/);
+        expect(tslax.value).not.toMatch(/\d{4}-\d{2}-\d{2}T/);
+        expect(tslax.href).toBe('#closed-market');
+    });
+
+    it('then a redemption this holder cannot use', () => {
+        const card = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed');
+        expect(riskOf(card).value).toBe('Only holders who pass the issuer’s KYC checks can redeem; anyone else can only sell to another buyer.');
+        const none = { ...card, ownership: { ...card.ownership, redemption: { ...card.ownership.redemption, available: false } } };
+        expect(riskOf(none).value).toBe('The issuer offers holders no redemption: the only way out is selling to another buyer.');
+    });
+
+    it('falls back to the worst market check, in words', () => {
+        // AAPLx's real organic inputs (about 5 % organic volume), with the rule forced to caution:
+        // since the 2026-09-25 recalibration (stocks/lib/health.mjs organicRule) a low organic share
+        // across many wallets passes, so the real AAPLx no longer fails a market check at all.
+        const real = without(cardFor('AAPLx'), 'discrepancy', 'powers', 'closed', 'redemption');
+        const card = { ...real, health: { ...real.health, rules: real.health.rules.map((rule) => (rule.id === 'organic' ? { ...rule, status: 'caution' } : rule)) } };
+        expect(riskOf(card).value).toBe('Most trading looks automated: Jupiter counts only about 5 % of the last day’s volume as organic (non-bot) trading.');
+        const allGood = { ...card, health: { ...card.health, rules: card.health.rules.map((rule) => ({ ...rule, status: 'good' })) } };
+        expect(riskOf(allGood).value).toBe('The current checks measured no material risk; what they could not measure is unknown.');
+    });
+});
+
+describe('a programme dossier researched on one product, on another product’s card', () => {
+    // backpack-securities-spcx.json: the Backpack dossier was researched on SPCX (build-cards.mjs
+    // reads the product from the dossier's file name). MU is another Backpack token.
+    const SPCX = { symbol: 'SPCX', terms: ['SPCX', 'SpaceX'] };
+    const cardOf = (symbol) => {
+        const token = tokenDb.tokens.find((row) => row.symbol === symbol);
+        return buildCard({ token, issuer: issuers.get(token.issuer), slug: symbol, builtAt: BUILT_AT, sources: SOURCES, catalogue,
+            whatIf: whatIfBySlug.get(token.issuer) ?? null, schematics: SCHEMATICS.issuers[token.issuer] ?? null, researchProduct: SPCX });
+    };
+    const mu = cardOf('MU');
+    const html = renderCard(mu, { version: 'v' });
+    const visible = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+
+    it('scopes a redemption term that names SPCX as SPCX’s, keeping the full text one tap away', () => {
+        const minimum = mu.ownership.redemptionUsability.fields.find((field) => field.id === 'minimum');
+        expect(minimum.value).toBe('No MU-specific minimum is confirmed; SPCX is a programme example only.');
+        expect(html).toContain('<summary>No MU-specific minimum is confirmed; SPCX is a programme example only.</summary>');
+        expect(mu.researchedOn).toBe('SPCX');
+        expect(publicCard(mu).researchedOn).toBe('SPCX');
+    });
+
+    it('labels every what-if outcome that rests on SPCX, and says so above the answers', () => {
+        const lent = mu.whatIf.answers.find((answer) => answer.mode === 'collateral-lent');
+        expect(lent.outcome.startsWith('Researched on SPCX (programme example): We could not establish')).toBe(true);
+        expect(lent.outcome.length).toBeLessThanOrEqual(OUTCOME_MAX + 1);
+        expect(visible).toContain('These answers were researched on SPCX');
+        const plain = mu.whatIf.answers.filter((answer) => answer.outcome !== null && !/\bSPCX\b|SpaceX/.test(answer.outcome));
+        expect(plain.length).toBeGreaterThan(10);
+    });
+
+    it('labels the schematic link and the trust chain as SPCX’s', () => {
+        expect(html).toMatch(/See it drawn step by step: [^<]*SPCX[^<]* \(researched on SPCX, a programme example\) →<\/a>/);
+        expect(visible).toContain('The diagram was drawn from the dossier researched on SPCX');
+    });
+
+    it('shows none of that on SPCX’s own card', () => {
+        const spcx = cardOf('SPCX');
+        const own = renderCard(spcx, { version: 'v' });
+        expect(spcx.researchedOn).toBeNull();
+        expect(own).not.toContain('programme example)');
+        expect(own).not.toContain('researched on SPCX');
+    });
+});
+
+describe('the transfer fee on a card', () => {
+    const OPENAI = tokenDb.tokens.find((row) => row.symbol === 'OPENAI');
+    // PreStocks OPENAI read at epoch 1042 (2026-09-24): 100 bps in effect, 300 bps set from epoch 1043,
+    // maximumFee u64::MAX on both legs (lib/classify.mjs transferFeeAtEpoch).
+    const build = (control) => buildCard({ token: { ...OPENAI, control: { ...OPENAI.control, ...control } },
+        issuer: issuers.get(OPENAI.issuer), slug: 'OPENAI', builtAt: BUILT_AT, sources: SOURCES });
+    const row = (html) => /<dt>Transfer fee<\/dt><dd>(.*?)<\/dd>/.exec(html)?.[1] ?? null;
+
+    it('shows the fee in effect and the scheduled one, each with its cap', () => {
+        const card = build({ transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042,
+            transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+        expect(row(renderCard(card, { version: 'v' }))).toBe('1.00 % (no cap) now, at epoch 1042; 3.00 % (no cap) scheduled from epoch 1043');
+        expect(publicCard(card).control).toMatchObject({ transferFeeBps: 100, transferFeeScheduled: { bps: 300, epoch: 1043, capped: false } });
+    });
+
+    it('shows a settled fee alone, and no row on a mint with no fee extension', () => {
+        const settled = build({ transferFeeBps: 100, transferFeeCapped: false, transferFeeReadEpoch: 1042, transferFeeScheduled: null });
+        expect(row(renderCard(settled, { version: 'v' }))).toBe('1.00 % (no cap) now, at epoch 1042');
+        expect(row(renderCard(cardFor('NVDAx'), { version: 'v' }))).toBeNull();
+    });
+});
+
+describe('the price line under a card’s title', () => {
+    const lineOf = (html) => /<p class="price-line">(.*?)<\/p>/.exec(html)?.[1] ?? null;
+    const plain = (fragment) => fragment.replace(/<[^>]+>/g, '');
+
+    it('says price, premium against the tracked share and DEX liquidity, naming where each comes from', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        const line = lineOf(html);
+        expect(line).not.toBeNull();
+        expect(plain(line)).toBe('$333.99 on Jupiter · -0.18% vs AAPL · $591.7k DEX liquidity (Jupiter, all pools)');
+        expect(line).toContain('href="#depth"');
+        // The header sits right under the title, before the five facts.
+        expect(html.indexOf('class="price-line"')).toBeLessThan(html.indexOf('Things to know first'));
+    });
+
+    it('labels each liquidity figure with its source, so the two do not read as a contradiction', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        expect(html).toContain('<dt>Liquidity (Jupiter, all pools)</dt>');
+        expect(html).toContain('<h3>DEX pools (DexScreener)</h3>');
+    });
+
+    it('is left out when there is neither a price nor a liquidity figure', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const bare = buildCard({ token: { ...token, market: {}, reference: {} }, slug: 'X', builtAt: BUILT_AT, sources: SOURCES });
+        expect(lineOf(renderCard(bare, { version: 'v' }))).toBeNull();
+    });
+});
+
+/**
+ * Plain words on the buyer-facing top of a card and in "What you own" (25 Sep judge audit): no
+ * "rung", "ledger maturity", "source-listed", "proof stage" or "priority-zero" in a visible label;
+ * each technical term survives in a title attribute for the reader who wants it.
+ */
+describe('plain words at the top of a card and in "What you own"', () => {
+    const visibleText = (fragment) => fragment.replace(/<script[\s\S]*?<\/script>/g, '')
+        .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const topOf = (html) => html.slice(html.indexOf('<header class="card-head">'), html.indexOf('<details id="events"'));
+    // Terms and legal rights: the instrument as documented, then what it gives the holder.
+    const ownOf = (html) => html.slice(html.indexOf('<section id="terms-detail">'), html.indexOf('<details id="legal-control"'));
+    const JARGON = /\brung\b|ledger maturity|source-listed|proof stage|priority-zero|configuration decoding|inherited (legal )?analysis|\bLevel \d|allowlist (yes|no)|\bmechanism\b/i;
+
+    it('says claim depth and ledger maturity as questions with "N of 4" answers, the terms kept as titles', () => {
+        const html = renderCard(cardFor('AAPLx'), { version: 'v' });
+        const own = ownOf(html);
+        expect(visibleText(own)).toContain('How close to owning the share 2 of 4 — a secured claim on collateral');
+        expect(visibleText(own)).toContain('How far the token is the official record 2 of 4 — the chain is the official record and the token moves without anyone’s approval');
+        expect(visibleText(own)).not.toMatch(JARGON);
+        expect(own).toContain('title="Secured claim: ');
+        expect(own).toContain('title="Moves freely: ');
+        expect(own).not.toMatch(/title="[^"]*(\brung\b|Level \d|Ledger maturity)/);
+    });
+
+    it('keeps the five facts and the review banner free of jargon, with the proof stage in a title', () => {
+        const card = cardFor('AAPLx');
+        const reviewed = { ...card, underReview: [{ id: 'r', area: 'control', title: 'Authority changed', claimImpact: null }], discrepancies: [] };
+        for (const html of [renderCard(card, { version: 'v' }), renderCard(reviewed, { version: 'v' })]) {
+            expect(visibleText(topOf(html))).not.toMatch(JARGON);
+        }
+        const defi = assetDecisionFacts(card).find((row) => row.id === 'defi');
+        expect(defi.value).toMatch(/^Listed for this exact token by /);
+        expect(defi.value).toContain('Furthest we checked: we read the market’s settings on chain.');
+        expect(renderCard(card, { version: 'v' })).not.toMatch(/title="Proof stage/);
+        expect(visibleText(topOf(renderCard(reviewed, { version: 'v' }))))
+            .toContain('1 change in the issuer’s documents may change the legal answers on this card; our review is not finished.');
+    });
+});
+
+/**
+ * "Who can buy" under the price line (24 Sep buyer walkthrough): who may hold the token and who may
+ * redeem it with the issuer are separate answers, and an allowlisted token is not buyable by an
+ * arbitrary wallet whatever the market looks like.
+ */
+describe('the "who can buy" line at the top of a card', () => {
+    const lineOf = (html) => /<p class="who-can-buy"[^>]*>(.*?)<\/p>/.exec(html)?.[1]?.replace(/<[^>]+>/g, '') ?? null;
+    const withOwnership = (card, transferRestrictions, redemption = {}, depth = {}) => ({
+        ...card,
+        depth: { ...card.depth, ...depth },
+        ownership: { ...card.ownership, transferRestrictions: { ...card.ownership.transferRestrictions, ...transferRestrictions },
+            redemption: { ...card.ownership.redemption, ...redemption } }
+    });
+
+    it('says an open token is buyable by any wallet on a DEX while issuer redemption is gated', () => {
+        const card = cardFor('AAPLx');
+        expect(whoCanBuy(card)).toEqual({
+            buy: 'anyone with a Solana wallet, on a DEX, with no KYC, though the terms bar US persons',
+            redeem: 'only holders who pass the issuer’s KYC and are not US persons'
+        });
+        const html = renderCard(card, { version: 'v' });
+        expect(lineOf(html)).toBe('Who can buy: anyone with a Solana wallet, on a DEX, with no KYC, though the terms bar US persons. '
+            + 'Redeeming with the issuer: only holders who pass the issuer’s KYC and are not US persons. Terms →');
+        // It sits with the price line, above the five facts.
+        expect(html.indexOf('class="who-can-buy"')).toBeGreaterThan(html.indexOf('class="price-line"'));
+        // Since 30 Sep the line opens "Things to know first", before its five facts.
+        expect(html.indexOf('class="who-can-buy"')).toBeGreaterThan(html.indexOf('Things to know first'));
+        expect(html.indexOf('class="who-can-buy"')).toBeLessThan(html.indexOf('class="asset-decision-grid"'));
+    });
+
+    it('says an allowlisted token cannot be bought by an arbitrary wallet (SECZ)', () => {
+        const words = whoCanBuy(cardFor('SECZ'));
+        expect(words.buy).toBe('only wallets the issuer has allowlisted after KYC; an ordinary Solana wallet cannot receive it');
+        expect(words.redeem).toBe('only holders who pass the issuer’s KYC');
+        // The on-chain default-frozen state alone is enough to call it allowlisted.
+        const onChainOnly = withOwnership({ ...cardFor('AAPLx'), control: { ...cardFor('AAPLx').control, allowlist: true } }, {});
+        expect(whoCanBuy(onChainOnly).buy).toMatch(/^only wallets the issuer has allowlisted/);
+    });
+
+    it('names the market it found, and says so when there is none', () => {
+        const base = cardFor('AAPLx');
+        expect(whoCanBuy(withOwnership(base, {}, {}, { dexPairs: 0, cexMarkets: 3 })).buy)
+            .toBe('anyone with an account at an exchange that lists it (the exchange’s own checks apply), though the terms bar US persons');
+        expect(whoCanBuy(withOwnership(base, { usPersonsExcluded: false }, {}, { dexPairs: 0, cexMarkets: 0 })).buy)
+            .toBe('any Solana wallet may hold it, with no KYC; we found no market that sells it');
+    });
+
+    it('says unknown rather than guessing, and keeps redemption separate', () => {
+        const base = cardFor('AAPLx');
+        expect(whoCanBuy(withOwnership(base, { allowlist: null, kycToHold: null, usPersonsExcluded: null })).buy)
+            .toBe('not established from the documents we hold');
+        expect(whoCanBuy(withOwnership(base, {}, { available: false })).redeem).toBe('not offered');
+        expect(whoCanBuy(withOwnership(base, {}, { available: true, kyc: null })).redeem).toBe('offered; its KYC terms are not established');
+        expect(whoCanBuy(withOwnership(base, {}, { available: null })).redeem).toBe('not established');
+    });
+});
+
+describe('ISO instants inside generated prose', () => {
+    it('are printed as dates a reader can read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const item = defiUsage.get(token.mint);
+        const integration = { ...item.integrations[0], summary: 'The program was last upgraded 2026-06-17T20:57:58Z, slot 427147035.' };
+        const card = buildCard({ token, issuer: issuers.get(token.issuer), slug: 'NVDAx', builtAt: BUILT_AT, sources: SOURCES,
+            defiUsageItem: { ...item, integrations: [integration] } });
+        const html = renderCard(card, { version: 'v' });
+        expect(html).toContain('The program was last upgraded 17 Jun 2026 20:57 UTC, slot 427147035.');
+        expect(html).not.toContain('2026-06-17T20:57:58Z');
+    });
+});
+
+describe('the "Where prices come from" block', () => {
+    const html = (symbol, card = cardFor(symbol)) => renderCard(card, { baseUrl: null, version: 'v' });
+    const blockOf = (page) => page.slice(page.indexOf('<section id="pyth">'), page.indexOf('</section>', page.indexOf('<section id="pyth">')));
+    const visible = (fragment) => fragment.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const readAt = PYTH_ONCHAIN.readAt;
+
+    it('sits in DeFi right after "When the market is closed", which points to it', () => {
+        const page = html('AAPLx');
+        expect(page.indexOf('<section id="pyth"><h2>Where prices come from</h2>')).toBeGreaterThan(page.indexOf('<section id="closed-market">'));
+        expect(page.indexOf('<section id="pyth">')).toBeLessThan(page.indexOf('<details id="risks"'));
+        expect(blockOf(page).length).toBeGreaterThan(200);
+        expect(page.slice(page.indexOf('<section id="closed-market">'), page.indexOf('<section id="pyth">'))).toContain('<a href="#pyth">Which price each lender uses</a>');
+    });
+
+    it('puts the price each lender uses first, then Pyth\'s prices; how we read them stays in the source line', () => {
+        const block = blockOf(html('AAPLx'));
+        const lenders = block.indexOf('<h3>What each lender uses</h3>');
+        const ours = block.indexOf('<h3>Pyth’s prices for the stock and the token</h3>');
+        expect(lenders).toBeGreaterThan(0);
+        expect(ours).toBeGreaterThan(lenders);
+        // Every lender row sits under the lenders' heading; the Pyth prices we read sit under ours.
+        expect(block.indexOf('Nest xStock markets')).toBeGreaterThan(lenders);
+        expect(block.indexOf('Nest xStock markets')).toBeLessThan(ours);
+        expect(block.indexOf('<dt>Stock price on Pyth</dt>')).toBeGreaterThan(ours);
+        expect(block).toMatch(/<p class="pyth-src">Prices read from Solana[^<]*<time[^>]*>[^<]*<\/time>: Pyth’s push-oracle price accounts; publish times are Pyth’s own\./);
+        // The section describes the token, not RWA Sonar.
+        expect(visible(block)).not.toMatch(/RWA Sonar|our read|API key/);
+    });
+
+    it('AAPLx: both feeds linked to their Pyth pages, the stock price read on Solana with Pyth\'s publish time', () => {
+        const card = cardFor('AAPLx');
+        const block = blockOf(html('AAPLx', card));
+        expect(block).toContain('<a href="https://app.pyth.com/explore/Equity.US.AAPL%2FUSD" rel="nofollow noopener">Equity.US.AAPL/USD</a>');
+        expect(block).toContain('<a href="https://app.pyth.com/explore/Crypto.AAPLX%2FUSD" rel="nofollow noopener">Crypto.AAPLX/USD</a>');
+        expect(block).toContain('<code>49f6b6…5688</code> the stock');
+        expect(block).toContain('<code>978e6c…8675</code> this token, 24/7');
+        expect(block).toContain(`Prices read from Solana at slot ${PYTH_FIXTURE.slot}, <time datetime="${readAt}">`);
+        expect(card.pyth.stock).toMatchObject({ shard: 1, account: 'D9uk39pqZMcnmtPP9WeC8cREUpKZmyXLga9mSQ79SphW' });
+        expect(card.pyth.stock.ageSeconds).toBeLessThan(60);
+        expect(block).toContain(`<time datetime="${card.pyth.stock.publishedAt}">`);
+        expect(block).toMatch(/<dt>US market \(Pyth schedule\)<\/dt><dd>closed at <time datetime="2026-09-25T00:01:00Z">/);
+        // The token price on Solana is 12 days older than the stock's: shown, dated, and not compared.
+        expect(card.pyth.token.publishedAt).toBe('2026-09-12T12:18:29Z');
+        expect(card.pyth.gap).toMatchObject({ comparable: false, pct: null, reason: 'token-older' });
+        expect(visible(block)).toContain('Token vs stock on Pyth not compared: the token price on Solana was published 12 d before the stock’s');
+    });
+
+    it('AAPLx: what each lender reads from Pyth, with the Lazer feed ids from the on-chain research', () => {
+        const text = visible(blockOf(html('AAPLx')));
+        expect(text).toContain('Nest xStock markets values it at Pyth Lazer Crypto.AAPLX/USD (feed 1792), the token’s own 24/7 price, less its confidence interval.');
+        expect(text).toContain('Kamino xStocks Pool prices it from Chainlink Data Streams; Pyth Lazer is the check: Chainlink and Crypto.AAPLX/USD (feed 1792) must agree within 5 %, and a Chainlink report more than 5 % from Equity.US.AAPL/USD (feed 922) is rejected.');
+        // A lender whose pricing is not researched is left out; the page never says "not researched" (30 Sep).
+        expect(text).not.toMatch(/not researched/);
+    });
+
+    it('SPYx: the Loopscale account stopped being updated — dated, aged against its 900 s maximum, never "Pyth failed"', () => {
+        const card = cardFor('SPYx');
+        const block = blockOf(html('SPYx', card));
+        const loopscale = card.pyth.lenders.find((l) => l.protocolId === 'loopscale');
+        expect(loopscale).toMatchObject({
+            account: '9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy', maxAgeS: 900, lastPublishedAt: '2026-08-26T15:54:46Z'
+        });
+        // The same feed's other shard, read in the same pass, was current.
+        expect(loopscale.sameFeedLive).toMatchObject({ shard: 1, account: 'CRDaGwcVnKdRNRtx6fjHtvrBgKM5U55AhbqBWhtPMDA' });
+        expect(block).toContain('The Pyth price account Loopscale reads stopped being updated on <time datetime="2026-08-26T15:54:46Z">');
+        expect(visible(block)).toMatch(/29 d old at our lending watcher’s last check, .*24 Sep 2026 18:51 UTC.*, against Loopscale’s 900 s maximum\./);
+        // A market whose research records no band of its own is not given one.
+        expect(visible(block)).toContain('Kamino Sentora xStocks Market prices it from Chainlink Data Streams; Pyth Lazer is the check: Chainlink and Crypto.SPYX/USD (feed 1843) must agree, and a Chainlink report too far from Equity.US.SPY/USD (feed 1398) is rejected.');
+        expect(block).toContain('href="https://solscan.io/account/9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy"');
+        expect(visible(block)).toContain('Pyth’s shard-1 account for the same feed');
+        expect(visible(block)).not.toMatch(/Pyth (failed|is down|broke|stopped working)/i);
+        expect(visible(block)).toContain('Jupiter Lend xStock vaults prices it from Chainlink Data Streams; no Pyth feed.');
+    });
+
+    it('AAPLon: the Ondo token feed is listed, and a feed with no Solana account says so instead of showing a price', () => {
+        const card = cardFor('AAPLon');
+        const block = blockOf(html('AAPLon', card));
+        expect(card.pyth.feeds.map((f) => [f.role, f.symbol])).toEqual([['stock', 'Equity.US.AAPL/USD'], ['token', 'Crypto.AAPLON/USD']]);
+        expect(card.pyth.token).toBeNull();
+        expect(visible(block)).toContain('Token price on Pyth no Pyth price account for Crypto.AAPLON/USD on Solana (shards 0 and 1 read');
+    });
+
+    it('STRCx: the Raydium gate is not a Pyth feed; the Pyth reference check keeps the band its research records', () => {
+        const text = visible(blockOf(html('STRCx')));
+        expect(text).toContain('Kamino STRCx Pool prices it from Chainlink Data Streams; Pyth Lazer is the check: a Chainlink report more than 10 % from Equity.US.STRC/USD (feed 2419) is rejected.');
+    });
+
+    it('a token with no Pyth feed at all gets one line saying so', () => {
+        const card = cardFor('OPENAI');
+        const block = blockOf(html('OPENAI', card));
+        expect(card.pyth.feeds).toEqual([]);
+        expect(visible(block).trim()).toBe('Where prices come from Pyth publishes no feed for this token or its stock (Pyth’s equity and crypto feed lists checked).');
+    });
+
+    it('premium over the on-chain Pyth price only when the Jupiter price was read within the hour of the Pyth read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const base = { token, slug: 'AAPLx', builtAt: BUILT_AT, sources: SOURCES, referenceItem: referenceItems.get(token.mint), pythOnchain: PYTH_ONCHAIN, oraclePricing };
+        const near = buildCard({ ...base, priceReadAt: '2026-09-24T23:40:00Z' });
+        expect(near.pyth.premium).toMatchObject({ source: 'pyth-onchain', comparable: true });
+        expect(near.pyth.premium.pct).toBeCloseTo((token.market.usdPrice / near.pyth.stock.price - 1) * 100, 3);
+        expect(visible(blockOf(renderCard(near, { version: 'v' })))).toMatch(/Premium over Pyth [+-]\d+\.\d\d% over the stock’s Pyth price/);
+        const far = buildCard({ ...base, priceReadAt: '2026-09-20T10:28:13Z' });
+        expect(far.pyth.premium).toMatchObject({ comparable: false, pct: null, reason: 'read-apart' });
+        expect(visible(blockOf(renderCard(far, { version: 'v' })))).toContain('Premium over Pyth not compared: the Jupiter price was read 5 d before the Pyth read');
+    });
+
+    it('TSLAx: a key-entitled Hermes reference is the premium, named and dated without nested brackets', () => {
+        const card = cardFor('TSLAx');
+        expect(card.pyth.premium).toMatchObject({ source: 'pyth-hermes', comparable: true });
+        const block = blockOf(html('TSLAx', card));
+        expect(block).toMatch(/<dt>Premium over Pyth<\/dt><dd>[+-]\d+\.\d\d% over Pyth’s Equity\.US\.TSLA\/USD \$[\d,.]+ on Hermes, published <time datetime="2026-09-16T22:49:\d\dZ">[^<]+<\/time><\/dd>/);
+    });
+
+    it('without the on-chain read the feeds still show, and the block says the prices were not read', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'AAPLx');
+        const card = buildCard({ token, slug: 'AAPLx', builtAt: BUILT_AT, sources: SOURCES, referenceItem: referenceItems.get(token.mint), oraclePricing });
+        expect(card.pyth.feeds.map((f) => f.symbol)).toEqual(['Equity.US.AAPL/USD']);
+        expect(visible(blockOf(renderCard(card, { version: 'v' })))).toContain('Pyth prices on Solana not read yet');
+    });
+
+    it('carries the block in the card\'s JSON record, numbers cut to six significant figures', () => {
+        const record = publicCard(cardFor('SPYx'));
+        expect(record.pyth.readAt).toBe(readAt);
+        expect(record.pyth.lenders.map((l) => l.protocolId)).toEqual(expect.arrayContaining(['kamino', 'nest', 'jupiter-lend', 'loopscale']));
+        expect(record.sources.pythOnchain).toBe(readAt);
+    });
+});
+
+describe('the health split on a card: this token and its programme', () => {
+    // The old summary was one worst-of word that read "caution" or "warning" on every card, because
+    // three issuer-wide checks can never be good for any current issuer (stocks/lib/health.mjs
+    // HEALTH_LEVELS). The card now names both levels and what holds each back.
+    const WORDS = { good: 'good', caution: 'caution', warning: 'warning', unknown: 'not measured' };
+    const healthSection = (html) => {
+        const start = html.indexOf('<details id="risks" class="card-disclosure decision-health">');
+        return html.slice(start, html.indexOf('</details>', start));
+    };
+    const aaplx = cardFor('AAPLx');
+    const section = healthSection(renderCard(aaplx, { baseUrl: 'https://rwasonar.com', version: 't' }));
+
+    it('carries both levels in the card and in its published record', () => {
+        expect(aaplx.health.levels.token.total).toBe(8);
+        expect(aaplx.health.levels.programme.total).toBe(3);
+        expect(publicCard(aaplx).health.levels).toEqual(aaplx.health.levels);
+        expect(aaplx.health.rules.find((rule) => rule.id === 'verification').level).toBe('programme');
+    });
+
+    it('the summary names this token and its programme instead of one worst-of word', () => {
+        const { token, programme } = aaplx.health.levels;
+        expect(section).toContain(`Risks: token ${WORDS[token.status]} · programme ${WORDS[programme.status]}`);
+    });
+
+    it('each level has its own banner, with the pass count and what holds the programme back', () => {
+        const { token, programme } = aaplx.health.levels;
+        expect(section).toContain(`<p class="banner banner-${token.status}"><strong>This token</strong>`);
+        expect(section).toContain(`${token.passed} of ${token.judged} checks that could be run pass`);
+        expect(section).toContain(`<p class="banner banner-${programme.status}"><strong>Programme</strong>`);
+        expect(section).toMatch(/the same for every [^<]+ token/);
+        const held = aaplx.health.rules.find((rule) => rule.id === programme.worstRuleId);
+        expect(held).toBeDefined();
+        expect(section).toContain(fmt.escapeHtml(held.label));
+    });
+
+    it('a token with no market is not called good on its own checks, and says so', () => {
+        const idle = tokenDb.tokens
+            .filter((row) => row.market?.usdPrice == null && row.market?.liquidity == null)
+            .slice(0, 40)
+            .map((row) => cardFor(row.symbol))
+            .find((card) => card.health.levels.token.status === 'unknown' && card.health.levels.token.judged > 0);
+        expect(idle).toBeDefined();
+        const html = healthSection(renderCard(idle, { baseUrl: 'https://rwasonar.com', version: 't' }));
+        expect(html).toContain('Risks: token not measured');
+        expect(html).toContain('No market could be measured');
+        expect(html).not.toContain('<p class="banner banner-good"><strong>This token</strong>');
+    });
+});
+
+// --- Fold rows: lists that grow over time are one compact row per item -------------------------
+
+describe('growing lists on a card are compact rows that open to the full item', () => {
+    const { escapeHtml } = require('./lib/fmt.js');
+    /** Every <li class="fold-row…"> in `html`, split into its summary and its opened body. */
+    const foldRows = (html) => html.split(/(?=<li(?: id="[^"]*")? class="fold-row)/).slice(1).map((part) => part.slice(3)).map((part) => ({
+        open: part.slice(0, part.indexOf('>')),
+        summary: part.slice(part.indexOf('<summary>'), part.indexOf('</summary>')),
+        body: part.slice(part.indexOf('<div class="fold-body">'))
+    }));
+    const sectionOf = (html, id, next) => html.slice(html.indexOf(`<section id="${id}">`), html.indexOf(`<section id="${next}">`));
+
+    it('shows each discrepancy as one row: severity and title, why it matters, then both sides when opened', () => {
+        const card = cardFor('FGDLx');
+        const row = card.discrepancies[0];
+        const html = renderCard(card, { version: 'v' });
+        const section = html.slice(html.indexOf('<section id="discrepancies">'), html.indexOf('<section id="own">'));
+        const rows = foldRows(section);
+        expect(rows).toHaveLength(card.discrepancies.length);
+        expect(rows[0].open).toBe(` id="discrepancy-${row.id}" class="fold-row fold-${row.severity}"`);
+        expect(rows[0].summary).toContain(`<b class="fold-chip">${row.severity}</b> <strong class="fold-title">${escapeHtml(row.title)}</strong>`);
+        expect(rows[0].summary).toContain(`<span class="fold-line2">${escapeHtml(row.impact)}</span>`);
+        // A click on the row only toggles: no link in the summary, every source in the opened body.
+        expect(rows[0].summary).not.toContain('<a ');
+        for (const words of ['Published claim', 'Observed reality', 'Why it matters', 'What resolves it', 'xStocks proof-of-reserves API']) {
+            expect(rows[0].body).toContain(words);
+        }
+    });
+
+    it('points the largest-risk line at the exact discrepancy row it names', () => {
+        const card = cardFor('FGDLx');
+        const risk = assetDecisionFacts(card).find((fact) => fact.id === 'risk');
+        expect(risk.href).toBe(`#discrepancy-${card.discrepancies[0].id}`);
+        expect(renderCard(card, { version: 'v' })).toContain(`<li id="discrepancy-${card.discrepancies[0].id}"`);
+    });
+
+    it('shows each lender of the closed-market section as one row: label, name and threshold, then its sentence', () => {
+        const card = cardFor('NVDAx');
+        const section = sectionOf(renderCard(card, { version: 'v' }), 'closed-market', 'pyth');
+        const lenders = section.slice(section.indexOf('<ul class="fold-list cm-list">'), section.indexOf('<dl class="kv">'));
+        const rows = foldRows(lenders);
+        expect(rows).toHaveLength(card.closedMarket.lenders.length);
+        const nest = rows.find((row) => row.summary.includes('Nest xStock markets'));
+        expect(nest.open).toContain('class="fold-row fold-caution"');
+        expect(nest.summary).toContain('<span class="cm-l cm-token">24/7 token price</span> <strong class="fold-title">Nest xStock markets</strong> · liquidation at 60 % LTV');
+        expect(nest.summary).toContain('<span class="fold-line2">Valued at the token&#39;s own 24/7 price');
+        expect(nest.body).toContain('Freezes (30 d): not watched');
+        const stale = rows.find((row) => row.summary.includes('Loopscale'));
+        expect(stale.open).toContain('fold-warning');
+    });
+
+    it('shows each closed-market finding as one row whose body carries the full statement and the source', () => {
+        const card = cardFor('QQQx');
+        const section = sectionOf(renderCard(card, { version: 'v' }), 'closed-market', 'pyth');
+        const findings = foldRows(section.slice(section.indexOf('<ul class="fold-list cm-f">')));
+        expect(findings.length).toBe(card.closedMarket.findings.length);
+        const suspended = findings.find((row) => row.summary.includes('Collateral price suspended around a corporate action'));
+        const record = card.closedMarket.findings.find((f) => f.name === 'Collateral price suspended around a corporate action');
+        expect(suspended.summary).not.toContain('<a ');
+        expect(suspended.summary).toContain(`<strong class="fold-title">${escapeHtml(record.name)}</strong> · ${escapeHtml(record.short)}</span>`);
+        expect(suspended.summary).toContain(`<span class="fold-line2">${escapeHtml(record.statement)}</span>`);
+        expect(suspended.body).toContain(`<p>${escapeHtml(record.statement)}</p>`);
+        expect(suspended.body).toMatch(/<a href="https:\/\/solscan\.io\/tx\/26SQ52zV[^"]+" rel="nofollow noopener">/);
+    });
+
+    it('shows each lender\'s Pyth feed as one row; the stale Loopscale account is flagged and its links sit in the body', () => {
+        const card = cardFor('NVDAx');
+        const rows = foldRows(sectionOf(renderCard(card, { version: 'v' }), 'pyth', 'what-if'));
+        expect(rows).toHaveLength(card.pyth.lenders.length);
+        const loopscale = rows.find((row) => row.summary.includes('Loopscale'));
+        expect(loopscale.summary).not.toContain('<a ');
+        expect(loopscale.summary).not.toContain('<time');
+        expect(loopscale.body).toContain('https://solscan.io/account/');
+        const jupiter = rows.find((row) => row.summary.includes('Jupiter Lend'));
+        expect(jupiter.summary).toContain('<span class="fold-line2">prices it from Chainlink Data Streams; no Pyth feed.</span>');
+    });
+
+    it('shows each material change as one row: date, the model\'s severity, the change, then its reading and the diff link', () => {
+        const token = tokenDb.tokens.find((row) => row.symbol === 'NVDAx');
+        const card = cardFor('NVDAx', BUILT_AT, { asOf: '2026-09-23T12:00:00Z', items: [{
+            id: '139', detectedAt: '2026-09-22T16:47:12Z', kind: 'legal-term', severity: 'caution',
+            summary: `${token.issuer}:sources[6]: +1 -1 line(s) · keywords: fee`, subjectType: 'source', subjectId: 'abc',
+            issuerSlug: token.issuer, judgmentId: '52', representative: true, material: true,
+            assessmentSeverity: 'caution', assessmentSummary: 'A redemption fee now applies to every holder.'
+        }] });
+        const html = renderCard(card, { version: 'v' });
+        const block = html.slice(html.indexOf('<details id="material-changes"'));
+        const [row] = foldRows(block);
+        expect(row.open).toBe(' id="material-139" class="fold-row fold-caution"');
+        expect(row.summary).toContain('22 Sep 2026 · <b class="fold-chip">caution</b>');
+        expect(row.summary).toContain('<span class="fold-line2">A redemption fee now applies to every holder.</span>');
+        expect(row.summary).not.toContain('<a ');
+        expect(row.body).toContain('<q>A redemption fee now applies to every holder.</q>');
+        expect(row.body).toContain('href="../watch.html?material=true#change-139"');
+    });
+});
+
+describe('card.js opens the fold row a link targets', () => {
+    const vm = require('node:vm');
+    /** Runs card.js against a minimal fake page whose URL targets `hash`; returns the fake elements. */
+    function load(hash) {
+        const classes = (initial) => {
+            const set = new Set(initial);
+            return { contains: (c) => set.has(c), add: (c) => set.add(c), remove: (c) => set.delete(c), has: (c) => set.has(c) };
+        };
+        const disclosure = { open: false };
+        const rowDetails = { open: false };
+        const row = { classList: classes(['fold-row']), closest: () => disclosure, querySelector: (sel) => (sel === 'details' ? rowDetails : null) };
+        const stale = { classList: classes(['fold-row', 'fold-target']) };
+        const document = {
+            addEventListener: () => {},
+            getElementById: (id) => (id === 'discrepancy-x' ? row : null),
+            querySelector: () => null,
+            querySelectorAll: (sel) => (sel === '.fold-target' ? [stale] : [])
+        };
+        const context = { document, location: { hash }, window: { addEventListener: () => {} }, Date, isFinite };
+        vm.runInNewContext(fs.readFileSync(path.join(REPO_ROOT, 'card.js'), 'utf8'), context);
+        return { disclosure, rowDetails, row, stale };
+    }
+
+    it('opens the targeted row and its enclosing disclosure, and moves the mark to it', () => {
+        const { disclosure, rowDetails, row, stale } = load('#discrepancy-x');
+        expect(disclosure.open).toBe(true);
+        expect(rowDetails.open).toBe(true);
+        expect(row.classList.has('fold-target')).toBe(true);
+        expect(stale.classList.has('fold-target')).toBe(false);
+    });
+
+    it('leaves every row closed when the URL targets none', () => {
+        const { rowDetails, row } = load('#nothing-here');
+        expect(rowDetails.open).toBe(false);
+        expect(row.classList.has('fold-target')).toBe(false);
+    });
+});
+
+describe('each topic block states its answer and carries its own checks (30 Sep)', () => {
+    const aaplx = cardFor('AAPLx');
+    const html = renderCard(aaplx, { version: 'v' });
+    const block = (id, next) => html.slice(html.indexOf(`<details id="${id}"`), html.indexOf(`<details id="${next}"`));
+    const chip = /^<b class="c-(good|caution|warning|unknown)">\w[\w ]*<\/b> /;
+
+    it('answers, built only from the record: terms, rights, custody and reserves, powers and keys, market, DeFi, what-ifs', () => {
+        const answers = blockAnswers(aaplx);
+        expect(answers.terms).toBe('Tracker certificate · Jersey');
+        expect(answers.rights).toMatch(/^2 of 4 — a secured claim on collateral · .+ · redeemable through the issuer$/);
+        // The rights words, on a record that states them (the frozen issuer fixture predates holder rights).
+        const stated = { ...aaplx, ownership: { ...aaplx.ownership, holderRights: { dividends: { status: 'value' }, voting: { status: 'no' }, splits: { status: 'value' } } } };
+        expect(blockAnswers(stated).rights).toBe('2 of 4 — a secured claim on collateral · dividends, splits pass through · redeemable through the issuer');
+        expect(blockAnswers({ ...aaplx, ownership: { ...aaplx.ownership, holderRights: { dividends: { status: 'no' }, voting: { status: 'no' } } } }).rights).toContain('no shareholder rights');
+        expect(answers.legalControl).toMatch(chip);
+        expect(answers.legalControl).toContain('custody: InCore Bank AG +4 · reserves: on-chain PoR (4 of 5)');
+        expect(answers.control).toMatch(chip);
+        expect(answers.control).toMatch(/ can freeze, pause, move or burn, rebase · keys: hot key, multisig$/);
+        // Only the four keys' types reach the answer, never the evidence sentence stored beside them.
+        expect(blockAnswers({ ...aaplx, keyGovernance: { ...aaplx.keyGovernance, evidence: 'Finalized getMultipleAccounts…' } }).control).not.toMatch(/getMultipleAccounts/i);
+        expect(blockAnswers({ ...aaplx, keyGovernance: { mint: 'program', freeze: 'unknown', delegate: 'none', rebase: null } }).control).toMatch(/keys: program-controlled$/);
+        expect(answers.markets).toMatch(/^<b class="c-\w+">\w+<\/b> \$[\d,.]+ · [-+−]?[\d.]+% vs AAPL · \$[\d,.]+[kM]? liquidity · only authorized participants can arbitrage$/);
+        expect(answers.defi).toMatch(chip);
+        expect(answers.defi).toMatch(/Kamino.* · as collateral$/);
+        expect(answers.risks).toMatch(/^38 what-if scenarios: 34 documented, 1 unknown$/);
+        const spacex = blockAnswers(cardFor('SPACEX'));
+        expect(spacex.terms).toBe('SPV synthetic');
+        expect(spacex.legalControl).toContain('no custodian named · reserves: auditor (2 of 5)');
+        expect(spacex.control).toMatch(/ can freeze, pause, move or burn, rebase, transfer fee · keys: multisig$/);
+    });
+
+    it('puts each answer in its block header, and every topic block has one', () => {
+        for (const [id, key] of [['terms', 'terms'], ['rights', 'rights'], ['legal-control', 'legalControl'], ['control-detail', 'control'], ['market-detail', 'markets'], ['defi-detail', 'defi'], ['risks', 'risks']]) {
+            expect(html).toContain(`<details id="${id}" class="card-disclosure${id === 'risks' ? ' decision-health' : ''}"><summary><span>`);
+            expect(html).toContain(`<small>${blockAnswers(aaplx)[key]}</small>`);
+        }
+    });
+
+    it('opens each block with the health checks of its own dimension; Risks maps them with tiles that link to the blocks', () => {
+        expect(block('legal-control', 'control-detail')).toMatch(/^<details id="legal-control"[^>]*><summary>[\s\S]*?<\/summary><div><section id="checks-legal"><h2>Legal \/ evidence checks<\/h2>/);
+        expect(block('control-detail', 'market-detail')).toContain('<section id="checks-control"><h2>Control checks</h2>');
+        expect(block('market-detail', 'defi-detail')).toContain('<section id="checks-market"><h2>Market checks</h2>');
+        expect(block('defi-detail', 'risks')).toContain('<section id="checks-composability"><h2>DeFi composability checks</h2>');
+        // Every rule is printed exactly once, in its dimension's block.
+        for (const rule of aaplx.health.rules) {
+            const own = html.slice(html.indexOf(`<section id="checks-${rule.dimension}">`), html.indexOf('</section>', html.indexOf(`<section id="checks-${rule.dimension}">`)));
+            expect(own).toContain(`<tr><td>${rule.label}</td>`);
+            expect(html.split(`<tr><td>${rule.label}</td>`)).toHaveLength(2);
+        }
+        expect(html).not.toContain('<section id="rules">');
+        for (const [dimension, target] of [['market', 'market-detail'], ['control', 'control-detail'], ['legal', 'legal-control'], ['composability', 'defi-detail']]) {
+            expect(html).toMatch(new RegExp(`<a class="health-dimension health-dimension-\\w+" href="#${target}">`));
+            expect(html).toContain(`href="#${target}"`);
+            void dimension;
+        }
+        expect(html.indexOf('<details id="market-detail"')).toBeLessThan(html.indexOf('<details id="defi-detail"'));
+    });
+
+    it('shows the answer on a phone under the title instead of hiding it', () => {
+        const css = fs.readFileSync(path.join(REPO_ROOT, 'card.css'), 'utf8');
+        expect(css).toMatch(/@media \(max-width: 480px\) \{\s*\.card-disclosure > summary \{ flex-wrap: wrap;/);
+        expect(css).not.toMatch(/summary small \{ display: none/);
+    });
+});
+
+describe('no card says a lender is "not researched" (30 Sep)', () => {
+    it('a lender the research does not price is left out of "Where prices come from" instead of saying so', () => {
+        // The frozen closed-market fixture predates the research; the card must not print its gap.
+        for (const symbol of ['AAPLx', 'MSTRx', 'QQQx']) {
+            const html = renderCard(cardFor(symbol), { version: 'v' });
+            expect(html).not.toMatch(/not researched yet/i);
+        }
+    });
+});
+
+describe('who keeps the price honest', () => {
+    test('the Markets block says who can create and redeem, and the verdict is toned like a health check', () => {
+        const nvdax = renderCard(cardFor('NVDAx'), { version: 'v' });
+        expect(nvdax).toContain('<h2>Who keeps the price honest</h2>');
+        expect(nvdax).toContain('<p class="price-anchor price-anchor-good"><strong>Only authorized participants can create and redeem, so they keep the price near the share on weekdays; nobody else can arbitrage it.</strong></p>');
+        expect(nvdax).toContain('<dt>Minimum</dt><dd>$5,000 direct with the issuer</dd>');
+        expect(nvdax).toContain('<a href="#rights">Can a holder redeem?</a>');
+        expect(renderCard(cardFor('OPENAI'), { version: 'v' })).toContain('<p class="price-anchor price-anchor-warning"><strong>No one can create or redeem, so nothing ties the price to the share: it is what the last trade paid.</strong></p>');
+        expect(renderCard(cardFor('FWDI'), { version: 'v' })).toContain('price-anchor-unknown"><strong>Only allowlisted wallets can hold or convert it and it has no open market');
+    });
+
+    test('an Ondo token reads its own hours: six mint and redeem around the clock, the rest in market hours', () => {
+        expect(renderCard(cardFor('NVDAon'), { version: 'v' })).toContain('instantly and around the clock, so the price should stay close to the share.');
+        const aaplon = renderCard(cardFor('AAPLon'), { version: 'v' });
+        expect(aaplon).toContain('so the price should track the share in US market hours; outside them it floats.');
+        expect(aaplon).toContain('<dt>When</dt><dd>US market hours: Ondo pauses the token outside them (“unavailable in session”).</dd>');
+        expect(blockAnswers(cardFor('AAPLon')).markets).toMatch(/ · arbitrage open to onboarded wallets$/);
+    });
+
+    test('the card record carries the verdict without the exception list; without an entry the section and the words are absent', () => {
+        const record = publicCard(cardFor('NVDAx'));
+        expect(record.primaryMarket).toMatchObject({ who: 'authorized-participants', hours: '24/5', anchor: { verdict: 'anchored-by-few', tone: 'good' } });
+        expect(record.primaryMarket.hoursExceptions).toBeUndefined();
+        const bare = { ...cardFor('NVDAx'), primaryMarket: null };
+        expect(renderCard(bare, { version: 'v' })).not.toContain('Who keeps the price honest');
+        expect(blockAnswers(bare).markets).toMatch(/liquidity$/);
+    });
+});

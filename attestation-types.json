@@ -1126,5 +1126,186 @@
       "Spiko USTBL and WisdomTree WTGXX high-level claim sourcing from issuer websites"
     ],
     "schema": "issuer-website-claim-published"
+  },
+  {
+    "_comment": "=== TOKENIZED PUBLIC EQUITY (2026-09) ===",
+    "name": "Issuer publishes the canonical mint address",
+    "category": "disclosure",
+    "description": "The issuer names the one legitimate contract/mint address for the token on a source it controls, and repudiates all others. Cheap to give, and the defence against impersonation mints.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Bullish: \"The official BLSH token contract address on Solana is 6d5zak... - tokens claiming to represent BLSH from any other contract address are fraudulent.\"",
+      "Not given by Securitize for SECZ, where four pump.fun impersonation mints use the ticker"
+    ],
+    "schema": "issuer-publishes-canonical-mint-address"
+  },
+  {
+    "name": "The entire cap table is tokenized",
+    "category": "record",
+    "description": "The issuer's whole share register is represented on-chain rather than an opt-in tranche. Changes what supply means: it measures the register, not adoption.",
+    "attestorType": "issuer-or-transfer-agent",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": true,
+    "publicationLocation": "onchain",
+    "realWorldExamples": [
+      "Bullish BLSH: mint supply 151,810,063.5 against 150,833,916 ordinary shares outstanding (FY2025 20-F), with only 21 token accounts",
+      "Contrast Superstate Opening Bell, where supply is the tokenized subset"
+    ],
+    "schema": "entire-cap-table-tokenized"
+  },
+  {
+    "name": "The token trades on a regulated exchange",
+    "category": "compliance",
+    "description": "The token itself, not merely the underlying security, has a trading venue authorised by a named regulator — as distinct from peer-to-peer transferability or a DEX pool.",
+    "attestorType": "issuer-or-regulator",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Bullish: tokenized BLSH traded on Bullish Exchange from 2026-08-12 under a GFSC approval to offer tokenized securities trading",
+      "Superstate issuers disclose that 'there are no current trading venues for the tokenized shares'"
+    ],
+    "schema": "token-venue-is-a-regulated-exchange"
+  },
+  {
+    "name": "On-chain authority is program-derived, not a wallet",
+    "category": "governance",
+    "description": "The mint/freeze authority is a program-derived address signing through a program, not a keypair a person can use directly, so minting and thawing run through code rather than a private key.",
+    "attestorType": "issuer-or-auditor",
+    "paidBy": "issuer",
+    "frequency": "continuous",
+    "onchain": true,
+    "publicationLocation": "onchain",
+    "realWorldExamples": [
+      "Securitize SECZ: mint/freeze authority returns null from getAccountInfo (uninitialized, zero lamports) — the shape of a PDA CPI signer",
+      "Contrast Bullish, whose mint/freeze authority is a funded system-owned wallet holding 441.98 SOL"
+    ],
+    "schema": "onchain-authority-is-program-derived"
+  },
+  {
+    "name": "Corporate actions are applied via an on-chain multiplier",
+    "category": "record",
+    "description": "Splits, reverse splits and reinvested dividends are applied at the mint by changing a published UI multiplier rather than by reissuing tokens, so balances and DeFi positions are not broken.",
+    "attestorType": "issuer-or-transfer-agent",
+    "paidBy": "issuer",
+    "frequency": "per-event",
+    "onchain": true,
+    "publicationLocation": "onchain",
+    "realWorldExamples": [
+      "Superstate: Token-2022 ScaledUiAmount multiplier on the equity mints, published on-chain and as equity_info.current_split_multiplier in the instruments API",
+      "Ondo and xStocks apply dividends the same way (200 of 436 mints carried a multiplier other than 1 on 2026-09-16)"
+    ],
+    "schema": "corporate-actions-applied-via-onchain-multiplier"
+  },
+  {
+    "name": "The allowlist is publicly enumerable",
+    "category": "compliance",
+    "description": "The set of addresses permitted to hold the token can be read on-chain by anyone, so the compliance perimeter is auditable even though the identities behind it are not.",
+    "attestorType": "issuer-or-transfer-agent",
+    "paidBy": "issuer",
+    "frequency": "continuous",
+    "onchain": true,
+    "publicationLocation": "onchain",
+    "realWorldExamples": [
+      "Superstate Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA: 827 accounts enumerable via getProgramAccounts, with published Rust and TypeScript SDKs",
+      "Not available for Bullish or Securitize, where the whitelist is verifiable but its membership is not"
+    ],
+    "schema": "allowlist-publicly-enumerable"
+  },
+  {
+    "name": "The redemption rail is live, not merely eligible",
+    "category": "rights",
+    "description": "The redemption or transfer-out route is operational and has been used, as distinct from being described as eligible, compatible or supported by the infrastructure.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "periodic",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Backpack SPCX fails it: ACATS/DTCC transfers are advertised while its own status table says they 'are still being worked on and are not currently available'",
+      "The attestation should carry a count of completed redemptions in a stated period"
+    ],
+    "schema": "redemption-rail-live"
+  },
+  {
+    "name": "Collateral substitution limits are disclosed",
+    "category": "reserves",
+    "description": "The issuer discloses which substitutes may stand in for the underlying security, and the overcollateralisation factor applied to each, so the holder can tell what the backing may become.",
+    "attestorType": "issuer-or-auditor",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": false,
+    "publicationLocation": "prospectus",
+    "realWorldExamples": [
+      "Ondo Base Prospectus: 'Other Collateral' may be cash, listed securities, non-listed book-entry instruments or highly liquid crypto, subject to an asset-type overcollateralisation factor monitored daily with T+1 cure",
+      "The companion question is whether the periodic report breaks out standard versus other collateral"
+    ],
+    "schema": "collateral-substitution-limits-disclosed"
+  },
+  {
+    "name": "Verification report is published at the contractual location",
+    "category": "disclosure",
+    "description": "The verification or attestation report is actually published where the offering documents say it will be, in a stable machine-readable form, within the contractual deadline.",
+    "attestorType": "issuer-or-auditor",
+    "paidBy": "issuer",
+    "frequency": "periodic",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Ondo fails the location and timeliness legs: the Sales Terms name ondo.finance/global-markets, the reports live in a Dropbox link embedded in a JS bundle, and the latest was four days old",
+      "Passing it requires a stated URL, a stated cadence and a machine-readable artifact"
+    ],
+    "schema": "verification-report-published-at-contractual-location"
+  },
+  {
+    "name": "Non-security legal opinion obtained",
+    "category": "legal",
+    "description": "Named counsel has opined in a named jurisdiction that the instrument is not a security or capital-markets product, and the opinion is published.",
+    "attestorType": "third-party-legal",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Tessera asserts 'a non-security legal opinion under Singapore law, confirming it is structured as a loan product' but publishes neither the opinion nor the firm",
+      "Unpublished opinions should be recorded as status unknown, not valid"
+    ],
+    "schema": "non-security-legal-opinion-obtained"
+  },
+  {
+    "name": "Wind-down settlement methodology published",
+    "category": "disclosure",
+    "description": "On wind-down the operator publishes the settlement method, the exact settlement prices, the halt schedule and the exit routes, before executing them.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": false,
+    "publicationLocation": "issuer-website",
+    "realWorldExamples": [
+      "Ventuals Sunset Guide: 24h TWAP from 5-minute mark samples, settlement prices $1,341.80 OPENAI and $1,618.90 ANTHROPIC, a per-market halt schedule and the USDH-to-USDC exit routes",
+      "Remora Markets published no methodology and priced its exit pool off the prior Friday close"
+    ],
+    "schema": "winddown-settlement-methodology-published"
+  },
+  {
+    "name": "Vault depositors repaid in full at wind-down",
+    "category": "settlement",
+    "description": "At wind-down the operator repaid every depositor their principal plus accrued yield, and the repayment is observable rather than promised.",
+    "attestorType": "issuer",
+    "paidBy": "issuer",
+    "frequency": "one-off",
+    "onchain": true,
+    "publicationLocation": "onchain",
+    "realWorldExamples": [
+      "Ventuals vHYPE: '100% of vHYPE holders will be able to withdraw their deposited HYPE back 1:1, plus any accrued native staking yield', batch-processed from 2026-06-19",
+      "Pairs with winddown-settlement-methodology-published: one states the method, this one states the outcome"
+    ],
+    "schema": "vault-depositors-repaid-in-full-at-winddown"
   }
 ]

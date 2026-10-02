@@ -1,0 +1,229 @@
+{
+ "capturedAt": "2026-09-25",
+ "method": "getMultipleAccounts(base64), Solana mainnet, read-only: the Clock sysvar and the Pyth push-oracle PDAs [shard u16 LE, feed id] for shards 0 and 1",
+ "slot": 450184678,
+ "feeds": [
+  {
+   "symbol": "Equity.US.AAPL/USD",
+   "id": "49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688",
+   "shard": 0,
+   "address": "DJ2FyTgUAkEtXW3U5P9PF19meFTRtW4ZWKKFgACfVbUy"
+  },
+  {
+   "symbol": "Equity.US.AAPL/USD",
+   "id": "49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688",
+   "shard": 1,
+   "address": "D9uk39pqZMcnmtPP9WeC8cREUpKZmyXLga9mSQ79SphW"
+  },
+  {
+   "symbol": "Equity.US.SPY/USD",
+   "id": "19e09bb805456ada3979a7d1cbb4b6d63babc3a0f8e8a9509f68afa5c4c11cd5",
+   "shard": 0,
+   "address": "9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy"
+  },
+  {
+   "symbol": "Equity.US.SPY/USD",
+   "id": "19e09bb805456ada3979a7d1cbb4b6d63babc3a0f8e8a9509f68afa5c4c11cd5",
+   "shard": 1,
+   "address": "CRDaGwcVnKdRNRtx6fjHtvrBgKM5U55AhbqBWhtPMDA"
+  },
+  {
+   "symbol": "Equity.US.CRCL/USD",
+   "id": "92b8527aabe59ea2b12230f7b532769b133ffb118dfbd48ff676f14b273f1365",
+   "shard": 0,
+   "address": "7zWGncBP5aGTDmEK7Ej4GYwGc2kXFHZJZFxmq28ocCaG"
+  },
+  {
+   "symbol": "Equity.US.CRCL/USD",
+   "id": "92b8527aabe59ea2b12230f7b532769b133ffb118dfbd48ff676f14b273f1365",
+   "shard": 1,
+   "address": "HK88ukUTCcjf3ZooGkzA8iBF4fvDCci1C8GEWYibpbwK"
+  },
+  {
+   "symbol": "Crypto.AAPLX/USD",
+   "id": "978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675",
+   "shard": 0,
+   "address": "Gs4DVtiGSJ9LJvXaQFjYp6vhLNK2QsH4qWox2ck1kuMp"
+  },
+  {
+   "symbol": "Crypto.AAPLX/USD",
+   "id": "978e6cc68a119ce066aa830017318563a9ed04ec3a0a6439010fc11296a58675",
+   "shard": 1,
+   "address": "51m2JtkQcZBsUzhmgcZKBUQQWCGepjd95JTK76fUiXb4"
+  },
+  {
+   "symbol": "Crypto.AAPLON/USD",
+   "id": "e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2",
+   "shard": 0,
+   "address": "DXWEja89354e4u6auaBJvWZBRubgCPDJGWtj1HqM1R7b"
+  },
+  {
+   "symbol": "Crypto.AAPLON/USD",
+   "id": "e6734de88a83d9d2fb33072adab319004700aefd069653aba30ba9e3cac056f2",
+   "shard": 1,
+   "address": "3pYDBf1wT5d7ev7mNV4VELU6QzA6NL2agYfFKDroy8wA"
+  },
+  {
+   "symbol": "Crypto.SPYX/USD",
+   "id": "2817b78438c769357182c04346fddaad1178c82f4048828fe0997c3c64624e14",
+   "shard": 0,
+   "address": "jf8MarLKgBte4f3NWufbNpGRCuBfJLhuZPuFigvSQR2"
+  },
+  {
+   "symbol": "Crypto.SPYX/USD",
+   "id": "2817b78438c769357182c04346fddaad1178c82f4048828fe0997c3c64624e14",
+   "shard": 1,
+   "address": "7LqVac8fyvhJfQapRPZHi6Ss1E4WbD5GLfS24vCFTnT9"
+  },
+  {
+   "symbol": "Equity.US.NVDA/USD",
+   "id": "b1073854ed24cbc755dc527418f52b7d271f6cc967bbf8d8129112b18860a593",
+   "shard": 0,
+   "address": "2w1Tg1XTZbUib7srfRoStJ4v5JXVsK7roQEGMsMaGZFC"
+  },
+  {
+   "symbol": "Equity.US.NVDA/USD",
+   "id": "b1073854ed24cbc755dc527418f52b7d271f6cc967bbf8d8129112b18860a593",
+   "shard": 1,
+   "address": "5VETJ8h3p4JrESYrzhjTDAWPEjDjfcnduqe9CjxgqBNd"
+  },
+  {
+   "symbol": "Crypto.NVDAX/USD",
+   "id": "4244d07890e4610f46bbde67de8f43a4bf8b569eebe904f136b469f148503b7f",
+   "shard": 0,
+   "address": "6TPsjFigUaMFanRCsxQ4WbmG215xhRBXsb5y5Cn5L6eE"
+  },
+  {
+   "symbol": "Crypto.NVDAX/USD",
+   "id": "4244d07890e4610f46bbde67de8f43a4bf8b569eebe904f136b469f148503b7f",
+   "shard": 1,
+   "address": "9a6FLptoMN4AMc11qVS8YmhiCgssrmRC2qjehKscr27"
+  },
+  {
+   "symbol": "Equity.US.QQQ/USD",
+   "id": "9695e2b96ea7b3859da9ed25b7a46a920a776e2fdae19a7bcfdf2b219230452d",
+   "shard": 0,
+   "address": "EwssJrQ7UVz6itHEaQQsKWikhZ3iHddyxRhmR7pTvwt5"
+  },
+  {
+   "symbol": "Equity.US.QQQ/USD",
+   "id": "9695e2b96ea7b3859da9ed25b7a46a920a776e2fdae19a7bcfdf2b219230452d",
+   "shard": 1,
+   "address": "TWtoAxPvaXy46uy3Vr4UwFxmWdgyMjpZAJSFxV4RGbF"
+  },
+  {
+   "symbol": "Crypto.QQQX/USD",
+   "id": "178a6f73a5aede9d0d682e86b0047c9f333ed0efe5c6537ca937565219c4054d",
+   "shard": 0,
+   "address": "BRZ4SSorCG3DQ1KLgTPu7TYmQWsxa8ghqz2BAfDzs6a3"
+  },
+  {
+   "symbol": "Crypto.QQQX/USD",
+   "id": "178a6f73a5aede9d0d682e86b0047c9f333ed0efe5c6537ca937565219c4054d",
+   "shard": 1,
+   "address": "2xdqcqEb633LJiMtWzCPE9bghncp3TgNqmUHR1RYFKWV"
+  },
+  {
+   "symbol": "Equity.US.TSLA/USD",
+   "id": "16dad506d7db8da01c87581c87ca897a012a153557d4d578c3b9c9e1bc0632f1",
+   "shard": 0,
+   "address": "E8WFH8brgP58arcuW2wwsPHiomYrSvrgWTsRLZLAEZUQ"
+  },
+  {
+   "symbol": "Equity.US.TSLA/USD",
+   "id": "16dad506d7db8da01c87581c87ca897a012a153557d4d578c3b9c9e1bc0632f1",
+   "shard": 1,
+   "address": "FQB8c4zB8Emrp9W8bmyk6GanCLq4aRytHYPDAnaEpq9z"
+  },
+  {
+   "symbol": "Crypto.TSLAX/USD",
+   "id": "47a156470288850a440df3a6ce85a55917b813a19bb5b31128a33a986566a362",
+   "shard": 0,
+   "address": "GpoWLTd6GoisYxYgHz7mTcZvgnfJu4SN7T6PxWjgUTFY"
+  },
+  {
+   "symbol": "Crypto.TSLAX/USD",
+   "id": "47a156470288850a440df3a6ce85a55917b813a19bb5b31128a33a986566a362",
+   "shard": 1,
+   "address": "Exzs9zruUELRmPAn6SzzLiqx5wpkVJ8cghTQnF8wSCXP"
+  }
+ ],
+ "accounts": {
+  "SysvarC1ock11111111111111111111111111111111": {
+   "owner": "Sysvar1111111111111111111111111111111111111",
+   "data": "5kXVGgAAAABUj7VqAAAAABIEAAAAAAAAEwQAAAAAAAC8ubVqAAAAAA=="
+  },
+  "DJ2FyTgUAkEtXW3U5P9PF19meFTRtW4ZWKKFgACfVbUy": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M22qIobWbfIasZFzYU4kLAmRMXwVLcgFl9Eo5UYbkGDfgFJ9rZcsd5rEOr3XnwDygKcMG0DV+kbUxGxdQhKWtVWiADM0gEAAAAA0AcAAAAAAAD7////03N/agAAAADTc39qAAAAAKaF0gEAAAAAlzYAAAAAAAAcHDcaAAAAAAA="
+  },
+  "D9uk39pqZMcnmtPP9WeC8cREUpKZmyXLga9mSQ79SphW": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M20lIZyMNU/Ew6sDypIEyPeOYmooRWTOJq2X67JeylJMQFJ9rZcsd5rEOr3XnwDygKcMG0DV+kbUxGxdQhKWtVWiBBcAAIAAAAA6AMAAAAAAAD7////trm1agAAAAC1ubVqAAAAAMOeAAIAAAAAExUAAAAAAADcRdUaAAAAAAA="
+  },
+  "9owhtgrdLiUMAH9JKxYFt5pUY4Luy4EzzLhdcWPVuDyy": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M2C5BFayWC/JW78o0VqoI8c5gwI51tpXK8ypWHH/SXg+AEZ4Ju4BUVq2jl5p9HLtLbWO6vDoPjoqVCfaK+lxMEc1VYHkAQAAAAAh08AAAAAAAD7////RgyPagAAAABGDI9qAAAAAIB6kAQAAAAAg3EAAAAAAACw3lYaAAAAAAA="
+  },
+  "CRDaGwcVnKdRNRtx6fjHtvrBgKM5U55AhbqBWhtPMDA": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M0C7MVaUC26+Y8C6u4ZtfhIBl9G4C5v7SVFJI16TyROcQEZ4Ju4BUVq2jl5p9HLtLbWO6vDoPjoqVCfaK+lxMEc1bAokQQAAAAAPYEAAAAAAAD7////sLm1agAAAACvubVqAAAAAFJxkQQAAAAAZQgAAAAAAADDRdUaAAAAAAA="
+  },
+  "7zWGncBP5aGTDmEK7Ej4GYwGc2kXFHZJZFxmq28ocCaG": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M1n4VNpwgiXuBa3WDGYZtwk/1ux52qQEEeLsglt621kDQGSuFJ6q+WeorEiMPe1MnabEz/7EY371I/2dvFLJz8TZb51hwAAAAAAMCkAAAAAAAD7////RgyPagAAAABGDI9qAAAAALwpiQAAAAAAIysAAAAAAACx3lYaAAAAAAA="
+  },
+  "HK88ukUTCcjf3ZooGkzA8iBF4fvDCci1C8GEWYibpbwK": null,
+  "Gs4DVtiGSJ9LJvXaQFjYp6vhLNK2QsH4qWox2ck1kuMp": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M3rsfrodUz6frA0OLVJX/DoUxcPiMWUy+n9CW2qzsZi3wGXjmzGihGc4GaqgwAXMYVjqe0E7DoKZDkBD8ESlqWGdSpgWMcHAAAAqk1uAAAAAAD4////FUOlagAAAAAUQ6VqAAAAAEqt88YHAAAAo5yUAAAAAADi8ZsaAAAAAAA="
+  },
+  "51m2JtkQcZBsUzhmgcZKBUQQWCGepjd95JTK76fUiXb4": null,
+  "DXWEja89354e4u6auaBJvWZBRubgCPDJGWtj1HqM1R7b": null,
+  "3pYDBf1wT5d7ev7mNV4VELU6QzA6NL2agYfFKDroy8wA": null,
+  "jf8MarLKgBte4f3NWufbNpGRCuBfJLhuZPuFigvSQR2": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M0K7YEMwcUHts3lOma0j092WpnWfYGib4+FcVWBjDKEhQEoF7eEOMdpNXGCwENG/dqtEXjIL0BIgo/gmXw8ZGJOFF3jwh4SAAAAYxBIAQAAAAD4////lIyxagAAAACTjLFqAAAAABbRlh8SAAAAXXQCAQAAAAAWlcUaAAAAAAA="
+  },
+  "7LqVac8fyvhJfQapRPZHi6Ss1E4WbD5GLfS24vCFTnT9": null,
+  "2w1Tg1XTZbUib7srfRoStJ4v5JXVsK7roQEGMsMaGZFC": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M0csZIShyZSiADO4OKEBCbdBwN8WKe7rjz3nWZswGV3HwGxBzhU7STLx1XcUnQY9St9Jx9syWe7+NgSkRKxiGClk7/7QQEAAAAAKisAAAAAAAD7////RgyPagAAAABGDI9qAAAAAKcrQgEAAAAAoS8AAAAAAACx3lYaAAAAAAA="
+  },
+  "5VETJ8h3p4JrESYrzhjTDAWPEjDjfcnduqe9CjxgqBNd": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M1CqjjdphhaHXai2zcpcg23Akpz36cRrCWRgS6ov2SWngGxBzhU7STLx1XcUnQY9St9Jx9syWe7+NgSkRKxiGClk3DjVQEAAAAAYVQAAAAAAAD7////sLm1agAAAACvubVqAAAAAGK+VQEAAAAAgA0AAAAAAADGRdUaAAAAAAA="
+  },
+  "6TPsjFigUaMFanRCsxQ4WbmG215xhRBXsb5y5Cn5L6eE": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M1RDWZsi+8a2MkwEKdlBA0maard/2drYIzUZIcn/EYjOwFCRNB4kORhD0a73mfej0Okv4tWnuvpBPE2tGnxSFA7fwUYnSgFAAAAIE1BAAAAAAD4////7DqwagAAAADrOrBqAAAAAFIEgSgFAAAAjcxRAAAAAABFpcAaAAAAAAA="
+  },
+  "9a6FLptoMN4AMc11qVS8YmhiCgssrmRC2qjehKscr27": null,
+  "EwssJrQ7UVz6itHEaQQsKWikhZ3iHddyxRhmR7pTvwt5": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M3PNs9FuT+XvKufWCf97VMrzD8mDHY+t7UuVJ52J5mc8gGWleK5bqezhZ2p7SW3pGqSCnduL9rhmnvP3yshkjBFLZC6QgQAAAAAWBsAAAAAAAD7/////5WkagAAAAD+laRqAAAAAAgzQwQAAAAAjAUAAAAAAAAjwJwaAAAAAAA="
+  },
+  "TWtoAxPvaXy46uy3Vr4UwFxmWdgyMjpZAJSFxV4RGbF": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M0Gyua0+qEX91tWQITIzJ6Tc3d7SsMxIKneU/JJKS93DgGWleK5bqezhZ2p7SW3pGqSCnduL9rhmnvP3yshkjBFLYAmaQQAAAAA6AMAAAAAAAD7////sLm1agAAAACvubVqAAAAAAr9aAQAAAAA7wAAAAAAAADERdUaAAAAAAA="
+  },
+  "BRZ4SSorCG3DQ1KLgTPu7TYmQWsxa8ghqz2BAfDzs6a3": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M2a3w7oak0W5cxvHF+1GrHh69ebeL7ZfBoNbFIbzZrFEAEXim9zpa7enQ1oLoawBHyfMz7Q7+XGU3ypN1ZSGcQFTdjlAbQQAAAABH8kAQAAAAD4////LkOlagAAAAAtQ6VqAAAAAKCBALQQAAAAtyFPAQAAAAAz8psaAAAAAAA="
+  },
+  "2xdqcqEb633LJiMtWzCPE9bghncp3TgNqmUHR1RYFKWV": null,
+  "E8WFH8brgP58arcuW2wwsPHiomYrSvrgWTsRLZLAEZUQ": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M3DFBCAhPMppDv/Jjb7yMJOnYrRnz1l4+2pMQbDYO3KrQEW2tUG19uNoByHWByHyol6ASoVNVfU1XjDucnhvAYy8YxdLQIAAAAAxk0AAAAAAAD7/////5WkagAAAAD+laRqAAAAAEDfLAIAAAAA8AUAAAAAAADxu5waAAAAAAA="
+  },
+  "FQB8c4zB8Emrp9W8bmyk6GanCLq4aRytHYPDAnaEpq9z": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M3V825NLl5AdkncvpCkDUhrNaS5G3vnj9T6JhN8X/vlUQEW2tUG19uNoByHWByHyol6ASoVNVfU1XjDucnhvAYy8cCDQQIAAAAAmDoAAAAAAAD7////srm1agAAAACxubVqAAAAAPepQAIAAAAA4g4AAAAAAADJRdUaAAAAAAA="
+  },
+  "GpoWLTd6GoisYxYgHz7mTcZvgnfJu4SN7T6PxWjgUTFY": {
+   "owner": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "data": "IvEjY51+9M3rHi+pfZKcEq8z9y+7+0jTHePaYmisK6k/GeGQ3sZbmwFHoVZHAoiFCkQN86bOhaVZF7gToZu1sxEoozqYZWajYnyPLc0IAAAARIzFAAAAAAD4////+MazagAAAAD3xrNqAAAAAIJXatEIAAAAxTnEAAAAAABt8s0aAAAAAAA="
+  },
+  "Exzs9zruUELRmPAn6SzzLiqx5wpkVJ8cghTQnF8wSCXP": null
+ }
+}

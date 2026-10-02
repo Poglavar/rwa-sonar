@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Universe · RWA Sonar</title>
+    <meta name="description" content="Every tokenized stock on Solana as a planet; its rights, legal structure, custody, on-chain powers, DeFi use and health as moons you can open." />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./universe.css?v=20260928a" />
+    <script src="./stocks/lib/universe-view-model.js?v=20260928c"></script>
+    <script type="module" src="./universe.js?v=20260929b"></script>
+</head>
+<body>
+    <div id="stage" class="stage" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="where">
+            <a class="brand" href="./index.html">RWA Sonar</a>
+            <nav id="crumbs" class="crumbs" aria-label="Where you are"></nav>
+        </div>
+        <form id="search" class="search" role="search" autocomplete="off">
+            <label class="visually-hidden" for="searchInput">Search tokens, stocks, issuers, custodians, keys, protocols</label>
+            <input id="searchInput" type="search" role="combobox" aria-expanded="false" aria-controls="searchResults" aria-autocomplete="list"
+                placeholder="Search a token, stock, issuer, custodian, protocol…" spellcheck="false" />
+            <kbd class="search-key" aria-hidden="true">/</kbd>
+            <div id="searchResults" class="search-results" role="listbox" hidden></div>
+        </form>
+    </header>
+
+    <aside id="panel" class="panel" aria-live="polite">
+        <p id="panelKicker" class="kicker"></p>
+        <h1 id="panelTitle">Loading the universe…</h1>
+        <p id="panelSummary" class="summary"></p>
+        <dl id="panelDetails" class="details"></dl>
+        <div id="panelChildren" class="children"></div>
+        <p class="panel-actions">
+            <button id="backButton" type="button" hidden>← Back</button>
+            <a id="panelLink" hidden>Open on the card →</a>
+        </p>
+    </aside>
+
+    <p class="hint">Drag to turn · scroll to zoom · click a body to open it · / to search · Esc to go back</p>
+</body>
+</html>

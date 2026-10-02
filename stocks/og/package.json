@@ -1,0 +1,10 @@
+{
+  "name": "rwa-sonar-og-render",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The one dependency of the per-token social-image step (stocks/og/render.mjs): SVG to PNG with resvg. Kept out of the root package so the rest of the stocks pipeline stays dependency-free.",
+  "type": "module",
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2"
+  }
+}

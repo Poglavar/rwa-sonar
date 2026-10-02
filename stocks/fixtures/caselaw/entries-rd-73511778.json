@@ -1,0 +1,132 @@
+{
+ "count": 60,
+ "next": "https://www.courtlistener.com/api/rest/v4/search/?cursor=cz0xMzQ2MDY4ODAwMDAwMC4wJnM9NDg3MDA1NjU4JnQ9cmQmZD0yMDI2LTA5LTIzJnA9Mg%3D%3D&order_by=entry_date_filed+desc&q=docket_id%3A73511778&type=rd",
+ "previous": null,
+ "results": [
+  {
+   "absolute_url": "/docket/73511778/27/securitize-i-inc-v-tzero-group-inc/",
+   "attachment_number": null,
+   "description": "",
+   "docket_entry_id": 478570122,
+   "docket_id": 73511778,
+   "document_number": 27,
+   "document_type": "PACER Document",
+   "entry_date_filed": "2026-09-18",
+   "entry_number": 27,
+   "filepath_local": "recap/gov.uscourts.ded.93554/gov.uscourts.ded.93554.27.0.pdf",
+   "id": 494198545,
+   "is_available": true,
+   "meta": {
+    "timestamp": "2026-09-20T02:37:06.303924Z",
+    "date_created": "2026-09-18T20:20:57.303225Z",
+    "score": {
+     "bm25": 13465786000000.0
+    }
+   },
+   "pacer_doc_id": "04307368295",
+   "page_count": 30,
+   "short_description": "Brief - Answering Brief in Opposition",
+   "snippet": "Case 1:26-cv-00722-GBW           Document 27   Filed 09/18/26     Page 1 of 30 PageID #: 713\n\n\n\n\n                        IN THE UNITED STATES DISTRICT COURT\n                           FOR THE DISTRICT"
+  },
+  {
+   "absolute_url": "",
+   "attachment_number": null,
+   "description": "",
+   "docket_entry_id": 475576462,
+   "docket_id": 73511778,
+   "document_number": null,
+   "document_type": "PACER Document",
+   "entry_date_filed": "2026-08-24",
+   "entry_number": null,
+   "filepath_local": null,
+   "id": 491113199,
+   "is_available": false,
+   "meta": {
+    "timestamp": "2026-08-24T19:08:43.871276Z",
+    "date_created": "2026-08-24T19:08:43.778157Z",
+    "score": {
+     "bm25": 13463626000000.0
+    }
+   },
+   "pacer_doc_id": "",
+   "page_count": null,
+   "short_description": "Add Attorneys - PHV only",
+   "snippet": ""
+  },
+  {
+   "absolute_url": "",
+   "attachment_number": null,
+   "description": "SO ORDERED, re 22 MOTION for Pro Hac Vice Appearance of Attorney Rachael S. Bacha filed by Securitize I, Inc. Signed by Judge Gregory B. Williams on 8/24/2026. (lnb)",
+   "docket_entry_id": 475530012,
+   "docket_id": 73511778,
+   "document_number": null,
+   "document_type": "PACER Document",
+   "entry_date_filed": "2026-08-24",
+   "entry_number": null,
+   "filepath_local": null,
+   "id": 491065641,
+   "is_available": false,
+   "meta": {
+    "timestamp": "2026-08-24T15:10:30.507006Z",
+    "date_created": "2026-08-24T15:10:30.427169Z",
+    "score": {
+     "bm25": 13463626000000.0
+    }
+   },
+   "pacer_doc_id": "",
+   "page_count": null,
+   "short_description": "",
+   "snippet": ""
+  },
+  {
+   "absolute_url": "",
+   "attachment_number": null,
+   "description": "",
+   "docket_entry_id": 475520565,
+   "docket_id": 73511778,
+   "document_number": null,
+   "document_type": "PACER Document",
+   "entry_date_filed": "2026-08-24",
+   "entry_number": null,
+   "filepath_local": null,
+   "id": 491055917,
+   "is_available": false,
+   "meta": {
+    "timestamp": "2026-08-24T15:10:30.321545Z",
+    "date_created": "2026-08-24T14:19:27.992111Z",
+    "score": {
+     "bm25": 13463626000000.0
+    }
+   },
+   "pacer_doc_id": "",
+   "page_count": null,
+   "short_description": "SO ORDERED",
+   "snippet": ""
+  },
+  {
+   "absolute_url": "/docket/73511778/23/securitize-i-inc-v-tzero-group-inc/",
+   "attachment_number": null,
+   "description": "Pro Hac Vice Fee - Credit Card Payment received for Rachael S. Bacha. ( re 22 MOTION for Pro Hac Vice Appearance of Attorney Rachael S. Bacha )( Payment of $ 50, receipt number ADEDC-5048349).(Raucci, Anthony) (Entered: 08/21/2026)",
+   "docket_entry_id": 475530049,
+   "docket_id": 73511778,
+   "document_number": 23,
+   "document_type": "PACER Document",
+   "entry_date_filed": "2026-08-21",
+   "entry_number": 23,
+   "filepath_local": null,
+   "id": 491065683,
+   "is_available": false,
+   "meta": {
+    "timestamp": "2026-08-24T15:11:15.555120Z",
+    "date_created": "2026-08-24T15:11:15.496985Z",
+    "score": {
+     "bm25": 13463367000000.0
+    }
+   },
+   "pacer_doc_id": "",
+   "page_count": null,
+   "short_description": "",
+   "snippet": ""
+  }
+ ]
+}

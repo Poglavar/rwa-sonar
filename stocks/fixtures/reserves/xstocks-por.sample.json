@@ -1,0 +1,113 @@
+{
+ "capturedAt": "2026-09-30T12:36:27Z",
+ "source": "https://api.xstocks.fi/api/v2/public/proof-of-reserves?page=N&pageSize=100",
+ "note": "Real rows from the 2026-09-30 read (all 11 pages), cut to nine symbols; `page` is the real last-page metadata (totalNodes over-counts by 100, hasNextPage false).",
+ "nodes": [
+  {
+   "symbol": "CRESMx",
+   "timestamp": "2026-09-10T00:31:08.620Z",
+   "sharesHeld": "4",
+   "circulatingSupply": "3.98535135215754997",
+   "holdings": [
+    {
+     "provider": "Gtn",
+     "quantity": "4",
+     "symbol": "HKEX~1209"
+    }
+   ]
+  },
+  {
+   "symbol": "XIAOx",
+   "timestamp": "2026-09-30T01:39:43.382Z",
+   "sharesHeld": "436916",
+   "circulatingSupply": "431240.61307828750308",
+   "holdings": [
+    {
+     "provider": "Gtn",
+     "quantity": "436916",
+     "symbol": "HKEX~1810"
+    }
+   ]
+  },
+  {
+   "symbol": "SPCXx",
+   "timestamp": "2026-09-29T18:12:06.441Z",
+   "sharesHeld": "305231",
+   "circulatingSupply": "304943.58067451050468",
+   "holdings": [
+    {
+     "provider": "Alpaca",
+     "quantity": "305231",
+     "symbol": "SPCX"
+    }
+   ]
+  },
+  {
+   "symbol": "RKLBx",
+   "timestamp": "2026-09-30T12:22:20.140Z",
+   "sharesHeld": "24124",
+   "circulatingSupply": "23847.032742899461075",
+   "holdings": [
+    {
+     "provider": "Alpaca",
+     "quantity": "24124",
+     "symbol": "RKLB"
+    }
+   ]
+  },
+  {
+   "symbol": "LULUx",
+   "timestamp": "2026-09-30T12:21:15.341Z",
+   "sharesHeld": "0",
+   "circulatingSupply": "0",
+   "holdings": []
+  },
+  {
+   "symbol": "MDTx",
+   "timestamp": "2026-09-25T00:36:00.880Z",
+   "sharesHeld": "1968",
+   "circulatingSupply": "1963.0048695031391976",
+   "holdings": [
+    {
+     "provider": "Alpaca",
+     "quantity": "1968",
+     "symbol": "MDT"
+    }
+   ]
+  },
+  {
+   "symbol": "AZNx",
+   "timestamp": "2026-09-30T12:21:55.259Z",
+   "sharesHeld": "1270",
+   "circulatingSupply": "1227.1998929149687827",
+   "holdings": [
+    {
+     "provider": "Alpaca",
+     "quantity": "1270",
+     "symbol": "AZN"
+    }
+   ]
+  },
+  {
+   "symbol": "TSLAx",
+   "timestamp": "2026-09-30T12:21:35.634Z",
+   "sharesHeld": "191977",
+   "circulatingSupply": "191797.55005092096101",
+   "holdings": [
+    {
+     "provider": "Alpaca",
+     "quantity": "191977",
+     "symbol": "TSLA"
+    }
+   ]
+  }
+ ],
+ "page": {
+  "currentPage": 11,
+  "pageSize": 100,
+  "totalPages": 12,
+  "totalNodes": 1167,
+  "hasNextPage": false,
+  "hasPreviousPage": true
+ }
+}

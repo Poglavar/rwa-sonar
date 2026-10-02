@@ -1,0 +1,42 @@
+[
+  {
+    "mint": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9",
+    "symbol": "FWDI",
+    "name": "Forward Industries tokenized common stock (Superstate Opening Bell)",
+    "issuer": "superstate-opening-bell",
+    "source": "https://www.businesswire.com/news/home/20251218784682/en/Forward-Industries-and-Superstate-Launch-Tokenized-FWDI-Public-Shares-on-Solana",
+    "note": "Allowlisted registered share; not listed on Jupiter. Address from the Superstate dossier (2026-09-16)."
+  },
+  {
+    "mint": "8UBqBGXM4NF22y5TZs8PhNVwVNqsHw2jBstfcxsSZaQ4",
+    "symbol": "HSDT",
+    "name": "Solana Company tokenized common stock (Superstate Opening Bell)",
+    "issuer": "superstate-opening-bell",
+    "source": "https://superstate.com/opening-bell",
+    "note": "Allowlisted registered share; not listed on Jupiter. Address from the Superstate dossier (2026-09-16)."
+  },
+  {
+    "mint": "3DBudkWQNbXGAjzEAtpjMKorb76sjozcHCzc8ZtkHDAQ",
+    "symbol": "EXOD",
+    "name": "Exodus Movement tokenized Class A common stock (Superstate Opening Bell)",
+    "issuer": "superstate-opening-bell",
+    "source": "https://docs.superstate.com/issuers/opening-bell",
+    "note": "Allowlisted registered share; not listed on Jupiter. Address from the Superstate dossier (2026-09-16)."
+  },
+  {
+    "mint": "6d5zakCaxjjRALNRyudC6ArivxeBGT3XUAci7ybWQY8U",
+    "symbol": "BLSH",
+    "name": "Bullish ordinary shares, tokenized (Equiniti transfer agent)",
+    "issuer": "bullish",
+    "source": "https://ir.bullish.com/ (issuer press release naming the canonical mint; see stocks/data/issuers/bullish-blsh.json)",
+    "note": "Whole cap table mirrored on-chain (~151.8M tokens vs 150.8M shares on the FY2025 20-F); allowlisted; not on Jupiter. Added 2026-09-16."
+  },
+  {
+    "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+    "symbol": "SECZ",
+    "name": "Securitize Corp. tokenized shares (Solana deployment)",
+    "issuer": "securitize",
+    "source": "TokenMetadata URI on metadata.securitize.io (mint not published by the issuer; see stocks/data/issuers/securitize-secz.json)",
+    "note": "~148,998 tokens on Solana (~0.4% of the $295M headline); allowlisted via Securitize Markets onboarding; not on Jupiter. Attribution high-confidence but unconfirmed by the issuer. Added 2026-09-16."
+  }
+]
