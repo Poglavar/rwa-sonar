@@ -72,3 +72,11 @@ Each job writes separate ignored runtime state and completion statistics. For th
 The stock adapter retains programme corporate-action, voting, dividend and authority details plus the complete researched scenario catalogue in `reportDetails`. Those details, custody actors, evidence profiles and exit terms are suppressed when an exact address is not bound to the reviewed instrument. Token observations remain available under Controls. The report does not convert a programme finding into token-specific rights.
 
 Headless presentation and scope checks: `NODE_OPTIONS=--experimental-vm-modules npx jest stocks/rwa-report-view.test.js --runInBand`.
+
+## Narrated story prototype
+
+Backpack's programme report has a `#story` topic and a Watch the story entry on Overview. `lib/token-story.js` verifies the authored script against the seven finding/source signatures and the three retained failure cases, then provides the pure playback and scene state. `token-story-ui.js` binds local recorded audio, scrubbing, chapter controls and the report evidence drawer. Leaving the topic stops the audio. An unbound exact token cannot inherit this story.
+
+`data/stories/backpack.json` contains the approved narration, evidence bindings, audio durations and generation metadata. `media/stories/backpack/` contains nine ElevenLabs recordings, using George and `eleven_multilingual_v2`. To regenerate, configure `ELEVENLABS_API_KEY` in a private environment and run `node --env-file=.env rwa/record-story.mjs --run`. The command checkpoints each completed clip and skips verified matching recordings on resume. No credential is delivered to the browser. API reference: https://elevenlabs.io/docs/api-reference/text-to-speech/convert.
+
+Headless scope and playback checks: `NODE_OPTIONS=--experimental-vm-modules npx jest stocks/rwa-token-story.test.js --runInBand`.

@@ -36,6 +36,7 @@
         return `<div style="--issuer-color:var(--issuer-${structure.colorSlot(p.programmeId)})">${visual.render(visual.profile(p, ctx.id, deployment ? { deploymentId: deployment } : {}), { prefix, compact: prefix !== 'finding-', summaryOnly: true })}</div>`;
     }
     function report(p, ctx) {
+        $('researchContent').querySelector('[data-token-story]')?.__storyDispose?.();
         const deploymentLabel = $('reportDeployment').closest('label');
         // Move the persistent picker out before replacing topic content; its listeners survive.
         $('reportPickers').append(deploymentLabel);
@@ -47,6 +48,8 @@
         $('researchScope').textContent = `${activeReportView.scope} · ${p.deployments.length} indexed ${p.kind === 'programme' ? (p.deployments.length === 1 ? 'token' : 'tokens') : (p.deployments.length === 1 ? 'address' : 'addresses')}${activeReportView.deployment ? ' · ' + (activeReportView.deployment.symbol || activeReportView.deployment.network) : ''}`;
         $('reportContext').closest('label').hidden = p.contexts.length === 1;
         $('researchContent').innerHTML = reportView.render(activeReportView);
+        const storyHost = $('researchContent').querySelector('[data-token-story]');
+        if (storyHost) window.__rwaTokenStoryUI.mount(storyHost, activeReportView);
         const slot = $('researchContent').querySelector('[data-report-deployment-slot]');
         if (slot) { slot.append(deploymentLabel); deploymentLabel.hidden = false; }
         if (!p.deployments.length && slot) deploymentLabel.hidden = true;
@@ -118,6 +121,7 @@
                 const backdrop = event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom);
                 if (event.target.closest('[data-report-close]') || backdrop) dialog.close();
             });
+            window.addEventListener('pagehide', () => $('researchContent').querySelector('[data-token-story]')?.__storyDispose?.());
             window.addEventListener('hashchange', () => {
                 render();
                 $('researchContent').querySelector('.report-topic-title')?.focus({preventScroll:true});

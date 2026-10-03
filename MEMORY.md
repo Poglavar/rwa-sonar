@@ -122,3 +122,5 @@
 - 2026-10-01: Research original non-stock products before deploying their monitors; reuse stock source monitoring and stage cross-asset observers/outcome registrations locally, with no production activation until requested.
 
 - 2026-10-02: Unify reports around a relationship overview and five findings, with persistent topic navigation, one spacious reading column, and evidence opened beside the answer; exact-token selection must not inherit unbound programme research.
+
+- 2026-10-03: Prototype narrated token stories with Backpack first, using ElevenLabs recordings, an interactive chapter timeline and separate exchange, trustee and custody failure branches; narration must stay tied to reviewed evidence and the stated holder scope.
