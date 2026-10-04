@@ -158,6 +158,8 @@ async function pacedGet(url, { headers, paceMs, accept }) {
             }
             if (!retryable(res.status)) break;
         } catch (err) {
+            // The quota stop is thrown from inside this try; it must not fall into the retry wait below.
+            if (err instanceof QuotaExhaustedError) throw err;
             lastRequestEnd.set(host, Date.now());
             lastError = err.name === 'TimeoutError' ? `timeout after ${TIMEOUT_MS} ms` : `${err.cause?.code ?? err.name}: ${err.message}`;
         }
