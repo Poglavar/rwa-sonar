@@ -15,7 +15,8 @@ import {
     STOPLIST, backoffMs, buildCaseUpsertSql, buildQueryRunSql, compareEntries, containsPhrase,
     courtListenerUrl, deriveQueries, entryEvent, expandPartyName, extractLegalEntities, foldHits,
     formatTelegramSummary, issuerBrand, latestEntryFromDocuments, matchLevel, matchSecItems,
-    normalisePhrase, normaliseStoredRows, parseCourtListenerResults, parseSecFeed, rankRows, retryable,
+    normalisePhrase, normaliseStoredRows, parseCourtListenerResults, parseSecFeed, QUOTA_STOP_MS, quotaExhaustion,
+    quotaWaitSeconds, rankRows, retryable,
     reviewIndex, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
@@ -404,6 +405,32 @@ describe('retry and pacing decisions', () => {
         expect(backoffMs(3)).toBe(20_000);
         expect(backoffMs(10)).toBe(120_000);
     });
+
+    // The keyless CourtListener reply seen from 2026-09-30.
+    const DAILY_429 = '{"detail":"Request was throttled. Rate limit exceeded: 125/day. Expected available in 51338 seconds."}';
+    const NOW = Date.parse('2026-10-04T04:23:00Z');
+
+    test('quota wait: CourtListener body text, Retry-After seconds or date, the longer wins', () => {
+        expect(quotaWaitSeconds({ body: DAILY_429 })).toBe(51338);
+        expect(quotaWaitSeconds({ body: 'Expected available in 1 second.' })).toBe(1);
+        expect(quotaWaitSeconds({ retryAfter: '120' })).toBe(120);
+        expect(quotaWaitSeconds({ retryAfter: 'Sun, 04 Oct 2026 05:23:00 GMT', now: NOW })).toBe(3600);
+        expect(quotaWaitSeconds({ retryAfter: '120', body: DAILY_429 })).toBe(51338);
+        expect(quotaWaitSeconds({ retryAfter: 'soon', body: 'Too many requests' })).toBeNull();
+        expect(quotaWaitSeconds({ retryAfter: null, body: null })).toBeNull();
+    });
+
+    test('a 429 with a wait past the threshold stops the host; short, unparseable or non-429 keep retrying', () => {
+        expect(QUOTA_STOP_MS).toBe(15 * 60 * 1000);
+        expect(quotaExhaustion({ status: 429, body: DAILY_429, now: NOW }))
+            .toEqual({ waitMs: 51_338_000, resumeAt: '2026-10-04T18:38:38.000Z' });
+        expect(quotaExhaustion({ status: 429, retryAfter: '3600', now: NOW })).toEqual({ waitMs: 3_600_000, resumeAt: '2026-10-04T05:23:00.000Z' });
+        expect(quotaExhaustion({ status: 429, retryAfter: '900', now: NOW })).toBeNull();
+        expect(quotaExhaustion({ status: 429, retryAfter: '901', now: NOW })).not.toBeNull();
+        expect(quotaExhaustion({ status: 429, body: 'Too many requests', now: NOW })).toBeNull();
+        expect(quotaExhaustion({ status: 503, body: DAILY_429, now: NOW })).toBeNull();
+        expect(quotaExhaustion({ status: 429, retryAfter: '600', now: NOW }, { thresholdMs: 60_000 })).not.toBeNull();
+    });
 });
 
 describe('SQL and DDL', () => {
@@ -455,5 +482,14 @@ describe('formatTelegramSummary', () => {
         expect(text.split('\n')[0]).toBe('RWA Sonar case-law watch: 2 new event(s), 1 failure(s)');
         expect(text.indexOf('caption hit')).toBeLessThan(text.indexOf('text-only hit'));
         expect(text).toContain('Nothing is marked litigated automatically');
+    });
+
+    test('an exhausted quota is its own line, not a failure', () => {
+        const text = formatTelegramSummary({
+            events: [], failures: [], queries: 66, requests: 50, durationMs: 60000, recorded: 0,
+            quota: { host: 'www.courtlistener.com', skipped: 82, resumeAt: '2026-10-04T18:38:38.000Z' }
+        });
+        expect(text.split('\n')[0]).toBe('RWA Sonar case-law watch: 0 new event(s), 0 failure(s)');
+        expect(text).toContain('www.courtlistener.com quota exhausted: 82 task(s) skipped, available again 2026-10-04T18:38:38.000Z');
     });
 });

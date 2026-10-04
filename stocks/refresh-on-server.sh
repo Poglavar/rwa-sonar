@@ -16,6 +16,11 @@ STATS="$REPO/.last-refresh-stats.json"
 LOCK="$REPO/.refresh.lock"
 START=$(date -u +%s)
 START_ISO=$(date -u +%FT%TZ)
+# The UTC hour this refresh STARTED, read once. Every daily gate below tests this, never the clock
+# when the step is reached: the midnight run can take over an hour to reach a late step (since
+# 2026-09-30 the saved-watches step was reached after 01:00 and silently never ran). GNU date
+# (`-d @epoch`); this script runs on the Linux server — macOS date would need `-r "$START"`.
+START_HOUR=$(date -u -d @"$START" +%H)
 
 exec 9>"$LOCK"
 if ! flock -n 9; then
@@ -76,7 +81,8 @@ step "mint identities (final)"; node stocks/build-mint-identities.mjs --run
 # rotate oldest/unseen first through the rest. With 1,169 mapped coins (2026-09-24) that is 1,069
 # tail coins, each refreshed about every 7.1 days. The run logs "coingecko tiers:" with the live
 # numbers and venues.json records them in source.coingecko.tiers; cards date exchange data by cexFetchedAt.
-if [ "$(date -u +%H)" = "00" ]; then
+# START_HOUR, not the current hour: the gate describes the refresh that started at midnight.
+if [ "$START_HOUR" = "00" ]; then
     soft "coingecko venues (daily, quota-capped)" node stocks/fetch-venues.mjs --run --only-cex --coin-limit=250
 fi
 # DexScreener still refreshes on-chain pools, liquidity, volume and transaction counts every run.
@@ -123,7 +129,9 @@ step "public change journal"; node stocks/build-change-journal.mjs --run
 # Protocol history is genuinely daily, not a six-hour series repeatedly overwriting the same day.
 # Never freeze a stale defi-usage.json after its fetch failed: the next successful midnight then
 # compares with the last genuine observation instead of erasing a change or inventing removals.
-if [ "$(date -u +%H)" = "00" ]; then
+# START_HOUR, not the current hour: the gate describes the refresh that started at midnight, which
+# may reach this step after 01:00.
+if [ "$START_HOUR" = "00" ]; then
     # Which programs hold each tracked mint (stocks/fetch-defi-footprint.mjs): finds integrations the
     # protocol registries don't list. Bounded; a failed read is never a removal.
     soft "DeFi footprint" node stocks/fetch-defi-footprint.mjs --run --budget=250 --resolve-budget=15
@@ -154,7 +162,9 @@ step "complete release surfaces"; node stocks/build-release-artifacts.mjs --run 
 # Watch changes are a daily signal for the morning digest. Re-running every six hours would move
 # the baseline after the digest and could consume an event before the next morning. The first
 # post-deploy run may create the file once so later stats assembly always has a baseline payload.
-if [ "$(date -u +%H)" = "00" ] || [ ! -f stocks-watchlist-changes.json ] || [ "${RWA_WATCHLIST_CHECK:-0}" = "1" ]; then
+# START_HOUR, not the current hour: the midnight refresh reaches this late step after 01:00, and
+# testing the clock here skipped the daily build every night from 2026-09-30.
+if [ "$START_HOUR" = "00" ] || [ ! -f stocks-watchlist-changes.json ] || [ "${RWA_WATCHLIST_CHECK:-0}" = "1" ]; then
     step "saved watches (daily)"; node stocks/build-watchlist-changes.mjs --run
 fi
 

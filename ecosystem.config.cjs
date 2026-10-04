@@ -113,13 +113,16 @@ module.exports = {
             // since each checkpoint at the Ondo GM program, the xStocks redemption address and
             // treasury, and Superstate's equity burn address, classified and folded into the rolling
             // stocks/data/redemption-observations.json that the 00:17 refresh builds into the issuer
-            // records. At most 1,500 getTransaction calls per address (~3,500 on a typical day, a
-            // backlog is carried over, not skipped). Telegram off: its noticeLines reach the morning
-            // digest through the central monitor, like rwa-watch-chain.
+            // records. At most 3,000 getTransaction calls per address (a backlog is carried over, not
+            // skipped). Raised from the 1,500 default on 2026-10-04: the xStocks treasury and redemption
+            // addresses had hit 1500/1500 three nights running and the issuer stayed "partial" with a
+            // backlog of up to 2,005; a run was ~2,100 RPC calls, so expect up to ~4,500 against the
+            // Alchemy mainnet quota. Telegram off: its noticeLines reach the morning digest through the
+            // central monitor, like rwa-watch-chain.
             name: 'rwa-redemptions',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/observe-redemptions.mjs',
-            args: '--run --no-telegram',
+            args: '--run --no-telegram --budget=3000',
             interpreter: 'node',
             cron_restart: '5 23 * * *',
             autorestart: false,

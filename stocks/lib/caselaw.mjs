@@ -712,6 +712,41 @@ export function backoffMs(attempt, { retryAfter = null, baseMs = 5000 } = {}) {
     return Math.min(baseMs * 2 ** (attempt - 1), 120_000);
 }
 
+/** A 429 that says the quota is back later than this ends the run's requests to that host. */
+export const QUOTA_STOP_MS = 15 * 60 * 1000;
+
+/**
+ * Seconds a rate-limit response says to wait, or null when it says nothing usable. Reads the
+ * `Retry-After` header (delta-seconds or an HTTP date) and CourtListener's body text "Expected
+ * available in N seconds" (keyless 125/day and 50/hour, seen from 2026-09-30); the longer wins.
+ */
+export function quotaWaitSeconds({ retryAfter = null, body = '', now = Date.now() } = {}) {
+    const waits = [];
+    if (retryAfter !== null && String(retryAfter).trim() !== '') {
+        const text = String(retryAfter).trim();
+        if (/^\d+$/.test(text)) waits.push(Number(text));
+        else {
+            const at = Date.parse(text);
+            if (Number.isFinite(at)) waits.push(Math.max(0, Math.round((at - now) / 1000)));
+        }
+    }
+    const match = /expected available in\s+(\d+)\s+seconds?/i.exec(String(body ?? ''));
+    if (match) waits.push(Number(match[1]));
+    return waits.length ? Math.max(...waits) : null;
+}
+
+/**
+ * Whether a response means "out of quota for this run": a 429 whose wait is longer than
+ * `thresholdMs`. Returns { waitMs, resumeAt } to stop, or null to keep the normal retry path
+ * (a short 429, an unparseable one, any other status).
+ */
+export function quotaExhaustion({ status, retryAfter = null, body = '', now = Date.now() }, { thresholdMs = QUOTA_STOP_MS } = {}) {
+    if (status !== 429) return null;
+    const seconds = quotaWaitSeconds({ retryAfter, body, now });
+    if (seconds === null || seconds * 1000 <= thresholdMs) return null;
+    return { waitMs: seconds * 1000, resumeAt: new Date(now + seconds * 1000).toISOString() };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Comparing against the stored state
 // ---------------------------------------------------------------------------------------------
@@ -983,9 +1018,10 @@ export function buildQueryRunSql(runs, { tag = 'sonar' } = {}) {
 // ---------------------------------------------------------------------------------------------
 
 /** One Telegram message per run: counts, the first few events, the failures. Plain text. */
-export function formatTelegramSummary({ events, failures, queries, requests, durationMs, recorded }) {
+export function formatTelegramSummary({ events, failures, queries, requests, durationMs, recorded, quota = null }) {
     const lines = [`RWA Sonar case-law watch: ${events.length} new event(s), ${failures.length} failure(s)`];
     lines.push(`${queries} quer${queries === 1 ? 'y' : 'ies'} · ${requests} request(s) · ${recorded} record(s) · ${(durationMs / 1000).toFixed(0)} s`);
+    if (quota) lines.push(`⏸ ${quota.host} quota exhausted: ${quota.skipped} task(s) skipped, available again ${quota.resumeAt}`);
     const top = [...events].sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'caution' ? -1 : 1)).slice(0, 8);
     for (const e of top) lines.push(`• [${e.severity}] ${e.summary.slice(0, 220)}`);
     if (events.length > top.length) lines.push(`… and ${events.length - top.length} more in sonar.change_event (kind litigation)`);

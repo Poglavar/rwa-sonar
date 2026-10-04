@@ -19,7 +19,7 @@ import {
     COURTLISTENER_SEARCH, SEC_FEEDS, backoffMs, buildCaseUpsertSql, buildQueryRunSql,
     buildReadCasesQuery, buildReadQueriesQuery, courtListenerUrl, deriveQueries, entryEvent, foldHits,
     formatTelegramSummary, latestEntryFromDocuments, matchSecItems, normaliseStoredRows, parseCourtListenerResults,
-    parseSecFeed, rankRows, retryable, reviewIndex, secFeedGap, selectEntryChecks, validateExtra
+    parseSecFeed, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -87,7 +87,7 @@ WHAT A RUN DOES
      case -> one change_event per issuer (kind litigation, severity caution when the name is in the
      caption or among the parties, info when only in the text), and a newer docket entry -> caution.
      Cases marked \`dismissed\` in stocks/data/caselaw-reviewed.json are recorded but raise nothing.
-  7. ONE Telegram summary when there are events or failures; ${relative(REPO, STATS_FILE)}; exit 1 if
+  7. ONE Telegram summary when there are events, failures or an exhausted quota; ${relative(REPO, STATS_FILE)}; exit 1 if
      any request failed.
 
 RESUME
@@ -99,7 +99,10 @@ LIMITS AND KEYS
   CourtListener's search API answers without a key (verified 2026-09-23). Its documented limits for
   AUTHENTICATED users are 5/min, 50/hour, 125/day — below one full run — so the job runs keyless by
   default and paces at ${DEFAULT_PACE_MS} ms. COURTLISTENER_API_TOKEN in .env is used when present (never logged),
-  and then the pace is raised to ${TOKEN_PACE_MS} ms. 429 and 5xx are retried with backoff (Retry-After obeyed).
+  and then the pace is raised to ${TOKEN_PACE_MS} ms. 429 and 5xx are retried with backoff (Retry-After obeyed),
+  except a 429 saying the quota is back in more than ${QUOTA_STOP_MS / 60000} min ("Expected available in N seconds" or
+  Retry-After): then no further request goes to that host this run, the remaining tasks are counted as
+  skipped for quota (not failures), and the run ends promptly as partial (quotaExhausted in the stats).
   sec.gov is sent the declared User-Agent from lib/watch.mjs.
 
 PM2
@@ -118,9 +121,21 @@ FILES
 
 const lastRequestEnd = new Map();
 const counters = { requests: 0, retries: 0 };
+/** Hosts whose quota ran out this run: host -> { resumeAt, waitMs, message }. No request goes to them again. */
+const quotaStops = new Map();
+
+/** A task not attempted because its host's quota is exhausted for this run — not a failure. */
+class QuotaExhaustedError extends Error {
+    constructor(host, stop) {
+        super(`${host} quota exhausted until ${stop.resumeAt}`);
+        this.name = 'QuotaExhaustedError';
+        this.host = host;
+    }
+}
 
 async function pacedGet(url, { headers, paceMs, accept }) {
     const host = new URL(url).host;
+    if (quotaStops.has(host)) throw new QuotaExhaustedError(host, quotaStops.get(host));
     let lastError = null;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
         const since = Date.now() - (lastRequestEnd.get(host) ?? 0);
@@ -133,6 +148,14 @@ async function pacedGet(url, { headers, paceMs, accept }) {
             lastRequestEnd.set(host, Date.now());
             if (res.ok) return body;
             lastError = `HTTP ${res.status}: ${body.replace(/\s+/g, ' ').slice(0, 160)}`;
+            // A daily quota is not waited out: retrying 3 × 300 s per task stretched a keyless run to 17 h.
+            const stop = quotaExhaustion({ status: res.status, retryAfter: res.headers.get('retry-after'), body });
+            if (stop) {
+                quotaStops.set(host, { ...stop, message: lastError });
+                logWarn(`${host}: QUOTA EXHAUSTED — available again in ${Math.round(stop.waitMs / 1000)} s (${stop.resumeAt});`
+                    + ` no further ${host} requests this run, remaining tasks skipped for quota — ${lastError}`);
+                throw new QuotaExhaustedError(host, stop);
+            }
             if (!retryable(res.status)) break;
         } catch (err) {
             lastRequestEnd.set(host, Date.now());
@@ -294,6 +317,7 @@ async function main() {
     const touched = new Set();
     const hitsBySource = {};
     let skipped = 0;
+    let skippedForQuota = 0;
     let completed = 0;
     let baselineRecords = 0;
     const loopStartedMs = Date.now();
@@ -400,6 +424,11 @@ async function main() {
                 await saveCheckpoint();
                 log(`${label} [${progress(i + 1, list.length, startedMs)}] ${task.id.slice(0, 70)} — ${outcome}`);
             } catch (err) {
+                if (err instanceof QuotaExhaustedError) {
+                    // Logged once where the quota ran out; one line per skipped task would be spam.
+                    skippedForQuota += 1;
+                    continue;
+                }
                 failures.push(`${task.id}: ${err.message}`);
                 logError(`${label} [${progress(i + 1, list.length, startedMs)}] ${task.id} FAILED — ${err.message}`);
             }
@@ -423,8 +452,10 @@ async function main() {
     const ranked = rankRows(recorded.filter((r) => r.reviewStatus !== 'dismissed'));
     const byLevel = { caption: 0, party: 0, text: 0 };
     for (const r of recorded) byLevel[r.matchLevel] = (byLevel[r.matchLevel] ?? 0) + 1;
-    log(`watch-caselaw: ${completed} task(s) done, ${skipped} skipped from the checkpoint, ${failures.length} failed`
-        + ` · ${counters.requests} request(s) (${counters.retries} retries) · ${(durationMs / 1000).toFixed(0)} s`);
+    const [quotaHost, quotaStop] = [...quotaStops.entries()][0] ?? [null, null];
+    const quota = quotaStop ? { host: quotaHost, resumeAt: quotaStop.resumeAt, skipped: skippedForQuota } : null;
+    log(`watch-caselaw: ${completed} task(s) done, ${skipped} skipped from the checkpoint, ${skippedForQuota} skipped for quota,`
+        + ` ${failures.length} failed · ${counters.requests} request(s) (${counters.retries} retries) · ${(durationMs / 1000).toFixed(0)} s`);
     log(`watch-caselaw: hits per source — ${Object.entries(hitsBySource).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}`);
     log(`watch-caselaw: ${recorded.length} distinct record(s) seen — caption ${byLevel.caption}, party ${byLevel.party}, text ${byLevel.text};`
         + ` ${recorded.filter((r) => r.reviewStatus === 'dismissed').length} dismissed`);
@@ -438,7 +469,7 @@ async function main() {
     for (const e of events.slice(0, 20)) log(`  [${e.severity}] ${e.subjectId}: ${e.summary}`);
 
     const stats = {
-        watchStatus: failures.length ? 'partial' : 'ok',
+        watchStatus: failures.length || quota ? 'partial' : 'ok',
         generatedAt: ts(),
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         detectedAt,
@@ -448,6 +479,10 @@ async function main() {
         tasks: tasks.length,
         tasksCompleted: completed,
         tasksSkipped: skipped,
+        quotaExhausted: Boolean(quota),
+        skippedForQuota,
+        quotaResumeAt: quota?.resumeAt ?? null,
+        quotaReason: quotaStop?.message ?? null,
         requests: counters.requests,
         retries: counters.retries,
         hitsBySource,
@@ -462,17 +497,18 @@ async function main() {
     await writeJson(STATS_FILE, stats);
     await rm(CHECKPOINT_FILE, { force: true });
 
-    if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
+    if ((events.length > 0 || failures.length > 0 || quota) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
         await postTelegram(formatTelegramSummary({
-            events, failures, queries: queries.length, requests: counters.requests, durationMs, recorded: recorded.length
+            events, failures, queries: queries.length, requests: counters.requests, durationMs, recorded: recorded.length, quota
         }), { env });
     } else if (!flags['no-telegram']) {
         log('watch-caselaw: no events and no failures — no Telegram message');
     }
 
-    if (failures.length) {
-        logError(`watch-caselaw: run NOT successful — ${failures.length} failure(s):`);
+    if (failures.length || quota) {
+        logError(`watch-caselaw: run NOT successful — ${failures.length} failure(s)`
+            + `${quota ? `, ${skippedForQuota} task(s) skipped: ${quota.host} quota exhausted until ${quota.resumeAt}` : ''}`);
         for (const f of failures.slice(0, 20)) logError(`    ${f}`);
         process.exitCode = 1;
         return;
