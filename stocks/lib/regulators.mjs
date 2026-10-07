@@ -668,6 +668,8 @@ export function parseAsicReleases(json) {
 // since the last good read is a failure), or `query` (asked per watched name / date window).
 // `maxSilentDays`: a readable source whose newest notice is older than this is `stale`.
 // `cadence`: `daily` sources run in the daily job; `hourly` ones only with --only (their own PM2 job).
+// `knownBlocked`: {since, reason} for a source whose host blocks the server; its block is reported
+// as "blocked (known)" and is not a failure (see knownBlock), while a good read is still recorded.
 // ---------------------------------------------------------------------------------------------
 
 const DAY_MS = 86_400_000;
@@ -722,7 +724,15 @@ export const SOURCES = [
     {
         id: 'cftc-enforcement', regulator: 'CFTC', jurisdiction: 'US', label: 'CFTC enforcement press releases',
         url: 'https://www.cftc.gov/RSS/RSSENF/rssenf.xml', format: 'rss', window: 'newest', cadence: 'daily',
-        maxSilentDays: 60, parse: parseCftcEnforcement
+        maxSilentDays: 60, parse: parseCftcEnforcement,
+        // Measured from the server 2026-10-07: Node's fetch gets a Cloudflare challenge (403) on every
+        // cftc.gov path tried (this RSS, the general RSS, /PressRoom/PressReleases incl. its
+        // ?field_press_release_types_value=Enforcement listing), whatever the User-Agent; curl passed
+        // the HTML listing but got 429 challenges on /RSS/ after a few requests. Read daily until 2026-10-06.
+        knownBlocked: {
+            since: '2026-10-07',
+            reason: 'Cloudflare challenges the server\'s Node fetch on every cftc.gov path (RSS and press-release listing)'
+        }
     },
     {
         id: 'fca-news', regulator: 'FCA', jurisdiction: 'UK', label: 'FCA news and press releases',
@@ -1010,6 +1020,40 @@ export function checkVerdict(source, { prev = null, error = null, notices = [], 
     };
 }
 
+/** A read that a host's bot wall refused: a 403, or any status carrying the Cloudflare challenge marker. */
+const BLOCK_RE = /HTTP (?:403\b|\d{3} \(Cloudflare challenge\/block\))/;
+
+/**
+ * The `knownBlocked` record when `error` is the block a source is known for, else null. Only the
+ * block itself is excused: any other failure of that source (a timeout, a 500, a parse error, a
+ * gap after it reads again) is still a failure.
+ */
+export function knownBlock(source, error) {
+    if (!source?.knownBlocked || !error) return null;
+    return BLOCK_RE.test(String(error)) ? source.knownBlocked : null;
+}
+
+/**
+ * The run's verdict from the per-source results {status, consecutiveFailures, lastError, knownBlocked}.
+ * Status `blocked` (a known block) is listed apart and is neither a failure nor ok; `watchStatus`
+ * is `failed` when every polled source failed, `partial` when some did, else `ok`.
+ */
+export function runVerdict(results) {
+    const entries = Object.entries(results ?? {});
+    const failures = [];
+    const blocked = [];
+    for (const [id, r] of entries) {
+        if (r.status === 'blocked') {
+            blocked.push(`${id}: blocked (known since ${r.knownBlocked?.since ?? '?'}${r.consecutiveFailures > 1 ? `, ${r.consecutiveFailures} runs in a row` : ''}) — ${r.knownBlocked?.reason ?? r.lastError ?? '?'}`);
+        } else if (r.status !== 'ok') {
+            failures.push(`${id}: ${r.status}${r.consecutiveFailures > 1 ? ` (${r.consecutiveFailures} runs in a row)` : ''} — ${r.lastError ?? '?'}`);
+        }
+    }
+    const polled = entries.length - blocked.length;
+    const watchStatus = failures.length === 0 ? 'ok' : (failures.length === polled ? 'failed' : 'partial');
+    return { failures, blocked, watchStatus };
+}
+
 // ---------------------------------------------------------------------------------------------
 // SQL (psql over stdin, like every other loader here)
 // ---------------------------------------------------------------------------------------------
@@ -1119,8 +1163,9 @@ export function buildCheckSql(checks, { tag = 'sonar' } = {}) {
 // ---------------------------------------------------------------------------------------------
 
 /** One Telegram message per run: counts, the first few new matches, the failing sources. Plain text. */
-export function formatTelegramSummary({ events, failures, checks, noticesRead, durationMs }) {
-    const lines = [`RWA Sonar regulator watch: ${events.length} new match event(s), ${failures.length} failure(s)`];
+export function formatTelegramSummary({ events, failures, checks, noticesRead, durationMs, blocked = [] }) {
+    const lines = [`RWA Sonar regulator watch: ${events.length} new match event(s), ${failures.length} failure(s)`
+        + `${blocked.length ? `, ${blocked.length} known-blocked source(s)` : ''}`];
     lines.push(`${checks} source(s) · ${noticesRead} notice(s) read · ${(durationMs / 1000).toFixed(0)} s`);
     const rank = { warning: 0, caution: 1, info: 2 };
     const top = [...events].sort((a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9)).slice(0, 8);
@@ -1128,6 +1173,8 @@ export function formatTelegramSummary({ events, failures, checks, noticesRead, d
     if (events.length > top.length) lines.push(`… and ${events.length - top.length} more in sonar.change_event (kind regulator-notice)`);
     for (const f of failures.slice(0, 6)) lines.push(`✗ ${f.slice(0, 200)}`);
     if (failures.length > 6) lines.push(`… and ${failures.length - 6} more failure(s)`);
+    // Known blocks are a reminder, not a failure: one line each so they are not forgotten.
+    for (const b of blocked.slice(0, 3)) lines.push(`⊘ ${b.slice(0, 200)}`);
     lines.push('Nothing is marked warned or sanctioned automatically — each event is for review.');
     return lines.join('\n');
 }

@@ -195,16 +195,25 @@ CARDS=$(ls cards/*.html | wc -l | tr -d ' ')
 WARN=$(node -e "console.log(JSON.parse(require('fs').readFileSync('stocks-health.json','utf8')).counts.warning)")
 DEFI_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-defi-changes.json','utf8'));console.log(d.latest?.events?.length||0)")
 WATCH_CHANGES=$(node -e "const d=JSON.parse(require('fs').readFileSync('stocks-watchlist-changes.json','utf8'));console.log(d.materialChanges||0)")
+# Per-token Solana depth quote failures (a venue's stale oracle) are recorded by the step, not fatal
+# below its threshold; say them in the summary so a green run never hides tokens that kept old depth.
+# Only this run's record counts: lastRun.endedAt must be at or after START_ISO (same ISO format).
+DEPTH_FAILED=$(node -e 'const fs=require("fs");let r=null;try{r=JSON.parse(fs.readFileSync("stocks/data/solana-depth.json","utf8")).lastRun}catch{}console.log(r&&r.endedAt>=process.argv[1]?r.quoteErrors.length:0)' "$START_ISO")
+DEPTH_SUMMARY=$(node -e 'const fs=require("fs");let r=null;try{r=JSON.parse(fs.readFileSync("stocks/data/solana-depth.json","utf8")).lastRun}catch{}console.log(JSON.stringify(r&&r.endedAt>=process.argv[1]?r.summary:null))' "$START_ISO")
+DEPTH_NOTE=""
+if [ "$DEPTH_FAILED" -gt 0 ]; then
+    DEPTH_NOTE=" depth: $(node -e 'console.log(JSON.parse(process.argv[1]))' "$DEPTH_SUMMARY")"
+fi
 NOTICE_LINES=$(node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('stocks-changes.json','utf8'));const d=JSON.parse(fs.readFileSync('stocks-defi-changes.json','utf8'));const w=JSON.parse(fs.readFileSync('stocks-watchlist-changes.json','utf8'));const compact=x=>x.length<=4?x:[x[0],...x.slice(1,3),x.at(-1)];const lines=[...compact(c.latest?.noticeLines||[]),...compact(d.latest?.noticeLines||[]),...compact(w.noticeLines||[])];process.stdout.write(JSON.stringify(lines))")
 
 DURATION=$(( $(date -u +%s) - START ))
 if [ ${#SOFT_FAILURES[@]} -gt 0 ]; then
     FAILED_STEPS=$(IFS=,; echo "${SOFT_FAILURES[*]}")
-    printf '{"refreshStatus":"partial","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":%s,"failureReasons":["%s"],"failedSteps":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s}\n' \
-        "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "${#SOFT_FAILURES[@]}" "$FAILED_STEPS" "$FAILED_STEPS" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" > "$STATS"
-    echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS"
+    printf '{"refreshStatus":"partial","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":%s,"failureReasons":["%s"],"failedSteps":"%s","builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"depthQuoteFailures":%s,"depthQuoteSummary":%s}\n' \
+        "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "${#SOFT_FAILURES[@]}" "$FAILED_STEPS" "$FAILED_STEPS" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DEPTH_FAILED" "$DEPTH_SUMMARY" > "$STATS"
+    echo "[$(date -u +%FT%TZ)] refresh PARTIAL: step(s) failed: $FAILED_STEPS — site updated with what was fetched; builtAt=$LOCAL_BUILT cards=$CARDS$DEPTH_NOTE"
     exit 1
 fi
-printf '{"refreshStatus":"ok","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":0,"failureReasons":[],"builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s}\n' \
-    "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" > "$STATS"
-echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION"
+printf '{"refreshStatus":"ok","lastRunStartedAt":"%s","lastRunEndedAt":"%s","durationSec":%s,"failures":0,"failureReasons":[],"builtAt":"%s","cards":%s,"warning":%s,"defiChanges":%s,"watchChanges":%s,"noticeLines":%s,"depthQuoteFailures":%s,"depthQuoteSummary":%s}\n' \
+    "$START_ISO" "$(date -u +%FT%TZ)" "$DURATION" "$LOCAL_BUILT" "$CARDS" "$WARN" "$DEFI_CHANGES" "$WATCH_CHANGES" "$NOTICE_LINES" "$DEPTH_FAILED" "$DEPTH_SUMMARY" > "$STATS"
+echo "[$(date -u +%FT%TZ)] refresh done: builtAt=$LOCAL_BUILT cards=$CARDS warning=$WARN durationSec=$DURATION$DEPTH_NOTE"

@@ -13,12 +13,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { deriveQueries } from './lib/caselaw.mjs';
 import {
     ROUTINE_FORMS, SOURCES, brokerCheckNames, buildCheckSql, buildMatchUpsertSql, canonicalName, checkVerdict,
-    deriveWatchNames, distinctiveCore, fcaDates, feedGap, foldMatches, formatTelegramSummary, matchKey, matchNotices,
+    deriveWatchNames, distinctiveCore, fcaDates, feedGap, foldMatches, formatTelegramSummary, knownBlock, matchKey, matchNotices,
     nameCore, nameStrength, normaliseStoredChecks, normaliseStoredMatches, numericDate, parseAsicReleases,
     parseBafinMeasures, parseBafinNews, parseBrokerCheckFirm, parseBrokerCheckSearch, parseCbiUnauthorised,
     parseCftcEnforcement, parseCima, parseCsv, parseEdgarSearch, parseEsmaNcasp, parseEsmaSanctions,
     parseFcaNews, parseFcaPublications, parseFcaWarnings, parseFinmaNews, parseFinmaWarnings, parseFinraDisciplinary,
-    parseFmaLi, parseMasAlerts, parseSecPressReleases, parseSecSuspensions, parseSmvAlerts, rfc822Dates, selectSources, zonedToUtc
+    parseFmaLi, parseMasAlerts, parseSecPressReleases, parseSecSuspensions, parseSmvAlerts, rfc822Dates, runVerdict, selectSources, zonedToUtc
 } from './lib/regulators.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -403,7 +403,54 @@ describe('SQL and DDL', () => {
     });
 });
 
+describe('known-blocked sources: reported, never a failure', () => {
+    const cftc = SOURCES.find((s) => s.id === 'cftc-enforcement');
+    const fca = SOURCES.find((s) => s.id === 'fca-news');
+    // The real error of 2026-10-07 05:41 UTC, as pacedFetch words it.
+    const CF_403 = 'https://www.cftc.gov/RSS/RSSENF/rssenf.xml: HTTP 403 (Cloudflare challenge/block): <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title>';
+
+    test('cftc-enforcement is flagged; its Cloudflare block (403, or a 429 challenge) is the known block', () => {
+        expect(cftc.knownBlocked).toMatchObject({ since: '2026-10-07' });
+        expect(knownBlock(cftc, CF_403)).toBe(cftc.knownBlocked);
+        expect(knownBlock(cftc, 'https://www.cftc.gov/RSS/RSSENF/rssenf.xml: HTTP 429 (Cloudflare challenge/block): <!DOCTYPE html>')).toBe(cftc.knownBlocked);
+    });
+
+    test('any other failure of a flagged source, and a block of an unflagged one, still fail', () => {
+        expect(knownBlock(cftc, 'https://www.cftc.gov/RSS/RSSENF/rssenf.xml: HTTP 500: oops')).toBeNull();
+        expect(knownBlock(cftc, 'timeout after 45000 ms')).toBeNull();
+        expect(knownBlock(cftc, null)).toBeNull();
+        expect(knownBlock(fca, 'https://www.fca.org.uk/news/rss.xml: HTTP 403 (Cloudflare challenge/block): …')).toBeNull();
+    });
+
+    test('the run verdict lists a known block apart: ok with no failures, partial or failed only on real ones', () => {
+        const blocked = { status: 'blocked', knownBlocked: cftc.knownBlocked, consecutiveFailures: 1, lastError: CF_403 };
+        const ok = { status: 'ok', consecutiveFailures: 0, lastError: null };
+        const v = runVerdict({ 'sec-press-releases': ok, 'cftc-enforcement': blocked, 'fca-news': ok });
+        expect(v.watchStatus).toBe('ok');
+        expect(v.failures).toEqual([]);
+        expect(v.blocked).toHaveLength(1);
+        expect(v.blocked[0]).toMatch(/^cftc-enforcement: blocked \(known since 2026-10-07\) — Cloudflare/);
+        const failed = { status: 'failed', consecutiveFailures: 2, lastError: 'HTTP 500' };
+        expect(runVerdict({ 'cftc-enforcement': blocked, 'fca-news': failed, 'sec-press-releases': ok }))
+            .toMatchObject({ watchStatus: 'partial', failures: ['fca-news: failed (2 runs in a row) — HTTP 500'] });
+        expect(runVerdict({ 'cftc-enforcement': blocked, 'fca-news': failed }).watchStatus).toBe('failed');
+    });
+
+    test('a good read of a flagged source is an ordinary ok verdict', () => {
+        const v = checkVerdict(cftc, { notices: [{ publishedAt: '2026-09-30T14:00:00Z' }], runAt: '2026-10-08T05:40:00Z', prev: { lastOkAt: '2026-10-06T05:40:00Z' } });
+        expect(v.status).toBe('ok');
+        expect(runVerdict({ 'cftc-enforcement': { status: v.status, consecutiveFailures: 0 } })).toEqual({ failures: [], blocked: [], watchStatus: 'ok' });
+    });
+});
+
 describe('formatTelegramSummary', () => {
+    test('a known block is a reminder line and a count, not a failure', () => {
+        const text = formatTelegramSummary({ events: [], failures: ['fca-news: failed — HTTP 500'], checks: 23, noticesRead: 9000, durationMs: 1000,
+            blocked: ['cftc-enforcement: blocked (known since 2026-10-07) — Cloudflare'] });
+        expect(text.split('\n')[0]).toBe('RWA Sonar regulator watch: 0 new match event(s), 1 failure(s), 1 known-blocked source(s)');
+        expect(text).toContain('⊘ cftc-enforcement: blocked (known since 2026-10-07)');
+    });
+
     test('one message: counts, warnings first, failures listed', () => {
         const events = [
             { severity: 'info', summary: 'weak one' },

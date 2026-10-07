@@ -21,8 +21,8 @@ import { describeUrl, psql } from './lib/psql.mjs';
 import {
     NOT_FEASIBLE, QUERY_WINDOW_DAYS, SOURCES, brokerCheckNames, buildCheckSql, buildMatchUpsertSql,
     buildReadChecksQuery, buildReadMatchesQuery, canonicalName, checkVerdict, deriveWatchNames, foldMatches,
-    formatTelegramSummary, matchNotices, nameCore, normaliseStoredChecks, normaliseStoredMatches,
-    parseBrokerCheckFirm, parseBrokerCheckSearch, selectSources
+    formatTelegramSummary, knownBlock, matchNotices, nameCore, normaliseStoredChecks, normaliseStoredMatches,
+    parseBrokerCheckFirm, parseBrokerCheckSearch, runVerdict, selectSources
 } from './lib/regulators.mjs';
 import { postTelegram, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql, userAgentFor } from './lib/watch.mjs';
@@ -55,7 +55,8 @@ function runFiles(only) {
 function usage() {
     const daily = SOURCES.filter((s) => s.cadence === 'daily');
     const hourly = SOURCES.filter((s) => s.cadence !== 'daily');
-    const row = (s) => `  ${s.id.padEnd(24)} ${s.regulator} (${s.jurisdiction}) — ${s.label}; ${s.format}, ${s.window}`;
+    const row = (s) => `  ${s.id.padEnd(24)} ${s.regulator} (${s.jurisdiction}) — ${s.label}; ${s.format}, ${s.window}`
+        + `${s.knownBlocked ? `; BLOCKED (known since ${s.knownBlocked.since}): ${s.knownBlocked.reason}` : ''}`;
     console.log(`watch-regulators.mjs — daily regulator-notice watcher: warnings, enforcement, suspensions, registers
 
 USAGE
@@ -101,7 +102,10 @@ WHAT A RUN DOES
      subject of a warning / enforcement / suspension / sanction), caution (other strong), info (weak).
   5. Any source that failed, went stale (newest notice older than its limit) or has a gap (a
      newest-N feed that no longer reaches the last good read) fails the run: exit 1, ONE Telegram
-     summary, and the stats file says which and for how many runs in a row.
+     summary, and the stats file says which and for how many runs in a row. A source flagged
+     knownBlocked (lib/regulators.mjs) whose read is refused by the host's bot wall is reported as
+     "blocked (known)" in the log and the stats (knownBlocked) instead: not a failure, still tried
+     every run, and a good read is recorded as usual.
 
 RESUME
   A run killed part-way is resumed by the next run within ${CHECKPOINT_MAX_AGE_MS / 3600000} h (same detected_at, finished sources
@@ -353,6 +357,8 @@ async function main() {
         const notices = collected?.notices ?? [];
         const matches = error ? [] : matchNotices(notices, names);
         const verdict = checkVerdict(source, { prev, error, notices, matches: matches.length, runAt: detectedAt });
+        // The DB row stays `failed` (the read did fail); only the run's verdict excuses a known block.
+        const blockedAs = knownBlock(source, error);
         const { rows, events: sourceEvents } = foldMatches(matches, { regulator: source, previous, baseline, detectedAt, review });
         if (dbUrl) {
             const statements = [buildCheckSql([verdict]).sql];
@@ -362,12 +368,14 @@ async function main() {
         }
         events.push(...sourceEvents);
         const strong = rows.filter((r) => r.strength === 'strong').length;
-        const summary = error ? `FAILED — ${error}`
+        const summary = blockedAs ? `blocked (known since ${blockedAs.since}) — ${error}`
+            : error ? `FAILED — ${error}`
             : `${notices.length} notice(s) · ${rows.length} match(es) (${strong} strong, ${rows.length - strong} weak)`
                 + ` · ${sourceEvents.length} new${baseline ? ' · baseline' : ''} · ${verdict.status}`
                 + `${verdict.newestPublishedAt ? ` · newest ${verdict.newestPublishedAt.slice(0, 10)}` : ''}`;
         results[source.id] = {
-            status: verdict.status,
+            status: blockedAs ? 'blocked' : verdict.status,
+            knownBlocked: blockedAs,
             notices: error ? null : notices.length,
             matches: rows.length,
             strongMatches: strong,
@@ -381,6 +389,8 @@ async function main() {
         };
         if (verdict.status === 'ok') {
             log(`${label} — ${summary}${ctx.note ? ` · ${ctx.note}` : ''}`);
+        } else if (blockedAs) {
+            logWarn(`${label} — ${summary} (${verdict.consecutiveFailures} run(s) in a row; not counted as a failure)`);
         } else {
             logError(`${label} — ${summary}${verdict.lastError && !error ? ` — ${verdict.lastError}` : ''}`
                 + ` (${verdict.consecutiveFailures} run(s) in a row)`);
@@ -395,14 +405,13 @@ async function main() {
     }
 
     // --- report -------------------------------------------------------------------------------
-    for (const [id, r] of Object.entries(results)) {
-        if (r.status !== 'ok') failures.push(`${id}: ${r.status}${r.consecutiveFailures > 1 ? ` (${r.consecutiveFailures} runs in a row)` : ''} — ${r.lastError ?? '?'}`);
-    }
+    const run = runVerdict(results);
+    failures.push(...run.failures);
     const durationMs = Date.now() - RUN_STARTED_MS;
     const all = Object.values(results);
     const sum = (k) => all.reduce((acc, r) => acc + (r[k] ?? 0), 0);
     const stats = {
-        watchStatus: failures.length === 0 ? 'ok' : (failures.length === all.length ? 'failed' : 'partial'),
+        watchStatus: run.watchStatus,
         generatedAt: ts(),
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         lastRunEndedAt: ts(),
@@ -423,6 +432,8 @@ async function main() {
         names: names.length,
         failures: failures.length,
         failureReasons: failures.slice(0, 30),
+        sourcesBlocked: run.blocked.length,
+        knownBlocked: run.blocked,
         sources: Object.fromEntries(Object.entries(results).map(([id, r]) => [id, { ...r, summary: undefined }])),
         notPolled: NOT_FEASIBLE.map((n) => n.regulator)
     };
@@ -430,12 +441,14 @@ async function main() {
     await rm(files.checkpoint, { force: true });
     log(`watch-regulators: ${stats.regulatorsOk}/${stats.regulatorsChecked} source(s) ok · ${stats.noticesRead} notice(s) · `
         + `${stats.matches} match(es) (${stats.strongMatches} strong) · ${stats.newMatches} new · ${counters.requests} request(s) · `
-        + `${(durationMs / 1000).toFixed(0)} s → ${relative(REPO, files.stats)}`);
+        + `${(durationMs / 1000).toFixed(0)} s${run.blocked.length ? ` · ${run.blocked.length} blocked (known)` : ''} → ${relative(REPO, files.stats)}`);
+    // Every run says which sources are known-blocked, so the gap is never silently forgotten.
+    for (const b of run.blocked) logWarn(`watch-regulators: ${b}`);
     for (const e of events.slice(0, 20)) log(`  [${e.severity}] ${e.subjectId}: ${e.summary}`);
 
     if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
-        await postTelegram(formatTelegramSummary({ events, failures, checks: all.length, noticesRead: stats.noticesRead, durationMs }), { env });
+        await postTelegram(formatTelegramSummary({ events, failures, blocked: run.blocked, checks: all.length, noticesRead: stats.noticesRead, durationMs }), { env });
     } else if (!flags['no-telegram']) {
         log('watch-regulators: no new matches and no failures — no Telegram message');
     }

@@ -747,6 +747,18 @@ export function quotaExhaustion({ status, retryAfter = null, body = '', now = Da
     return { waitMs: seconds * 1000, resumeAt: new Date(now + seconds * 1000).toISOString() };
 }
 
+/**
+ * The run's outcome from its failures and quota stop. A quota stop is `partial` (the monitor reads
+ * that from the stats) but exits 0 when nothing failed: the run did everything the quota allowed,
+ * and a non-zero exit for it read as a crash every day. Exit 1 is kept for real failures.
+ */
+export function runOutcome({ failures = 0, quotaExhausted = false } = {}) {
+    return {
+        watchStatus: failures > 0 || quotaExhausted ? 'partial' : 'ok',
+        exitCode: failures > 0 ? 1 : 0
+    };
+}
+
 // ---------------------------------------------------------------------------------------------
 // Comparing against the stored state
 // ---------------------------------------------------------------------------------------------

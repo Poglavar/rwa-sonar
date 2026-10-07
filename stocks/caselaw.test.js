@@ -17,7 +17,7 @@ import {
     formatTelegramSummary, issuerBrand, latestEntryFromDocuments, matchLevel, matchSecItems,
     normalisePhrase, normaliseStoredRows, parseCourtListenerResults, parseSecFeed, QUOTA_STOP_MS, quotaExhaustion,
     quotaWaitSeconds, rankRows, retryable,
-    reviewIndex, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
+    reviewIndex, runOutcome, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -430,6 +430,13 @@ describe('retry and pacing decisions', () => {
         expect(quotaExhaustion({ status: 429, body: 'Too many requests', now: NOW })).toBeNull();
         expect(quotaExhaustion({ status: 503, body: DAILY_429, now: NOW })).toBeNull();
         expect(quotaExhaustion({ status: 429, retryAfter: '600', now: NOW }, { thresholdMs: 60_000 })).not.toBeNull();
+    });
+
+    test('a clean quota stop is partial but exits 0; any real failure exits 1 (the 2026-10-07 run: 50 done, 86 skipped, 0 failed)', () => {
+        expect(runOutcome({ failures: 0, quotaExhausted: true })).toEqual({ watchStatus: 'partial', exitCode: 0 });
+        expect(runOutcome({ failures: 1, quotaExhausted: true })).toEqual({ watchStatus: 'partial', exitCode: 1 });
+        expect(runOutcome({ failures: 2, quotaExhausted: false })).toEqual({ watchStatus: 'partial', exitCode: 1 });
+        expect(runOutcome({ failures: 0, quotaExhausted: false })).toEqual({ watchStatus: 'ok', exitCode: 0 });
     });
 });
 

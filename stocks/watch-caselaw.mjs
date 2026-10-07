@@ -19,7 +19,7 @@ import {
     COURTLISTENER_SEARCH, SEC_FEEDS, backoffMs, buildCaseUpsertSql, buildQueryRunSql,
     buildReadCasesQuery, buildReadQueriesQuery, courtListenerUrl, deriveQueries, entryEvent, foldHits,
     formatTelegramSummary, latestEntryFromDocuments, matchSecItems, normaliseStoredRows, parseCourtListenerResults,
-    parseSecFeed, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, secFeedGap, selectEntryChecks, validateExtra
+    parseSecFeed, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -88,7 +88,7 @@ WHAT A RUN DOES
      caption or among the parties, info when only in the text), and a newer docket entry -> caution.
      Cases marked \`dismissed\` in stocks/data/caselaw-reviewed.json are recorded but raise nothing.
   7. ONE Telegram summary when there are events, failures or an exhausted quota; ${relative(REPO, STATS_FILE)}; exit 1 if
-     any request failed.
+     any request failed. A quota stop with no failure is watchStatus partial in the stats but exits 0.
 
 RESUME
   Every finished task is in the DB and in ${relative(REPO, CHECKPOINT_FILE)}. A run killed part-way
@@ -470,8 +470,9 @@ async function main() {
     log(`watch-caselaw: ${events.length} event(s)`);
     for (const e of events.slice(0, 20)) log(`  [${e.severity}] ${e.subjectId}: ${e.summary}`);
 
+    const outcome = runOutcome({ failures: failures.length, quotaExhausted: Boolean(quota) });
     const stats = {
-        watchStatus: failures.length || quota ? 'partial' : 'ok',
+        watchStatus: outcome.watchStatus,
         generatedAt: ts(),
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         detectedAt,
@@ -508,11 +509,16 @@ async function main() {
         log('watch-caselaw: no events and no failures — no Telegram message');
     }
 
-    if (failures.length || quota) {
+    if (outcome.exitCode !== 0) {
         logError(`watch-caselaw: run NOT successful — ${failures.length} failure(s)`
             + `${quota ? `, ${skippedForQuota} task(s) skipped: ${quota.host} quota exhausted until ${quota.resumeAt}` : ''}`);
         for (const f of failures.slice(0, 20)) logError(`    ${f}`);
-        process.exitCode = 1;
+        process.exitCode = outcome.exitCode;
+        return;
+    }
+    if (quota) {
+        // A clean quota stop: partial in the stats, exit 0 — the skipped tasks run next time.
+        logWarn(`watch-caselaw: PARTIAL — 0 failures, ${skippedForQuota} task(s) skipped: ${quota.host} quota exhausted until ${quota.resumeAt}`);
         return;
     }
     log(`watch-caselaw: done (${COURTLISTENER_SEARCH} + ${SEC_FEEDS.length} SEC feeds)`);

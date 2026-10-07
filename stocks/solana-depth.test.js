@@ -149,3 +149,47 @@ describe('refinement', () => {
         expect(at5.usd).toBeLessThan(158114);
     });
 });
+
+describe('per-token quote failures', () => {
+    const { quoteErrorKind, depthRunVerdict, MAX_QUOTE_FAILURE_SHARE } = require('./lib/solana-depth.mjs');
+    // Real Jupiter 500 bodies from the refresh error log (2026-09-26 … 2026-10-07); "orcale" is upstream's spelling.
+    const STALE = [
+        'HTTP 500  Riptide market orcale is stale 453982526 453982527',
+        'HTTP 500  BinaryFi exact-in quote failed: QuoteTooStale',
+        'HTTP 500  Oracle update past stale threshold',
+        'HTTP 500  Oracle price out of date. Pair temporarily unavailable',
+        'HTTP 500  Pool has not been updated in a while'
+    ];
+    const fail = (symbol, error) => ({ symbol, error, kind: quoteErrorKind(error) });
+
+    test('a venue\'s stale oracle or pool is classed stale-oracle; anything else is other', () => {
+        for (const e of STALE) expect(quoteErrorKind(e)).toBe('stale-oracle');
+        expect(quoteErrorKind('rate limited')).toBe('other');
+        expect(quoteErrorKind('HTTP 400 INVALID_MINT')).toBe('other');
+        expect(quoteErrorKind(null)).toBe('other');
+    });
+
+    test('one stale oracle among 26 quoted tokens is recorded, not fatal (the 2026-10-07 12:30 run)', () => {
+        const v = depthRunVerdict({ attempted: 26, quoteErrors: [fail('SPCXbp', STALE[1])] });
+        expect(v.ok).toBe(true);
+        expect(v.failed).toBe(1);
+        expect(v.stale).toBe(1);
+        expect(v.summary).toBe('1 quote(s) failed (1 stale oracle): SPCXbp');
+    });
+
+    test('the run fails only above the share limit, and always when every token failed', () => {
+        const errors = (n) => Array.from({ length: n }, (_, i) => fail(`T${i}`, STALE[0]));
+        expect(MAX_QUOTE_FAILURE_SHARE).toBe(0.2);
+        expect(depthRunVerdict({ attempted: 25, quoteErrors: errors(5) }).ok).toBe(true);   // exactly 20 %
+        expect(depthRunVerdict({ attempted: 25, quoteErrors: errors(6) }).ok).toBe(false);  // 24 %
+        expect(depthRunVerdict({ attempted: 1, quoteErrors: errors(1) }).ok).toBe(false);
+        expect(depthRunVerdict({ attempted: 26, quoteErrors: errors(26) }).ok).toBe(false);
+    });
+
+    test('no failures: ok with no summary; mixed kinds are counted apart', () => {
+        expect(depthRunVerdict({ attempted: 26, quoteErrors: [] })).toMatchObject({ ok: true, failed: 0, summary: null });
+        expect(depthRunVerdict({ attempted: 0, quoteErrors: [] }).ok).toBe(true);
+        const mixed = depthRunVerdict({ attempted: 26, quoteErrors: [fail('QQQx', STALE[0]), fail('SNDK', 'rate limited')] });
+        expect(mixed.summary).toBe('2 quote(s) failed (1 stale oracle, 1 other): QQQx, SNDK');
+    });
+});

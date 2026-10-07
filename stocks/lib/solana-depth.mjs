@@ -180,3 +180,42 @@ export function lenderMints(oraclePricing, defiUsage) {
     }
     return [...out].map(([mint, symbol]) => ({ mint, symbol }));
 }
+
+/**
+ * Upstream answers that mean one venue's oracle or pool is stale for a moment, not that the request
+ * was wrong: Jupiter answers HTTP 500 with the venue's own text ("Riptide market orcale is stale" —
+ * upstream's spelling, "BinaryFi … QuoteTooStale", "Oracle update past stale threshold", "Oracle
+ * price out of date", "Pool has not been updated in a while"; one or two tokens per run, 2026-09/10).
+ */
+const STALE_QUOTE_RE = /stale|out of date|not been updated/i;
+
+/** `stale-oracle` for a venue's stale oracle or pool, else `other`. */
+export function quoteErrorKind(error) {
+    return STALE_QUOTE_RE.test(String(error ?? '')) ? 'stale-oracle' : 'other';
+}
+
+/** Above this share of quoted tokens failing, the run fails; below it the failures are recorded only. */
+export const MAX_QUOTE_FAILURE_SHARE = 0.2;
+
+/**
+ * The run's verdict from the tokens whose ladder was started (`attempted`) and the per-token
+ * failures [{symbol, error, kind}]. A failed token keeps its previous sample (nothing is stored for
+ * it), so one stale oracle is recorded, not fatal; the run fails only when more than `maxShare` of
+ * the attempted tokens failed (every token failing is always above it). The summary is the phrase
+ * the refresh prints: "2 quote(s) failed (2 stale oracle): QQQx, TSLAx", or null when none failed.
+ */
+export function depthRunVerdict({ attempted, quoteErrors, maxShare = MAX_QUOTE_FAILURE_SHARE }) {
+    const list = Array.isArray(quoteErrors) ? quoteErrors : [];
+    const n = Number.isInteger(attempted) && attempted > 0 ? attempted : 0;
+    const share = n > 0 ? list.length / n : 0;
+    const stale = list.filter((e) => e?.kind === 'stale-oracle').length;
+    const kinds = [stale ? `${stale} stale oracle` : null, list.length - stale ? `${list.length - stale} other` : null].filter(Boolean).join(', ');
+    return {
+        ok: !(n > 0 && share > maxShare),
+        attempted: n,
+        failed: list.length,
+        stale,
+        share,
+        summary: list.length ? `${list.length} quote(s) failed (${kinds}): ${list.map((e) => e?.symbol ?? e?.mint ?? '?').join(', ')}` : null
+    };
+}

@@ -14,8 +14,8 @@ import { DEFAULT_PACE_MS } from './lib/jupiter.mjs';
 import { usEquitySchedule } from './lib/lending-events.mjs';
 import { parseSchedule } from './lib/market-hours.mjs';
 import {
-    LADDER_USD, PRICE_URL, QUOTE_URL, USDC_MINT, buildSample, ladderDone, ladderPrice, lenderMints, mergeSamples,
-    rawAmountForUsd, refinementSizes, sampledRecently, sessionKind, stepFromQuote, withSteps
+    LADDER_USD, MAX_QUOTE_FAILURE_SHARE, PRICE_URL, QUOTE_URL, USDC_MINT, buildSample, depthRunVerdict, ladderDone, ladderPrice,
+    lenderMints, mergeSamples, quoteErrorKind, rawAmountForUsd, refinementSizes, sampledRecently, sessionKind, stepFromQuote, withSteps
 } from './lib/solana-depth.mjs';
 
 const HERE = import.meta.dirname;
@@ -54,7 +54,14 @@ OUTPUT
   {fetchedAt, source, method, samples[]}: per token and run, the request time (the quote is live,
   so that IS the measurement time), the session (open / closed / weekend), the price used, the
   ladder, and at5Pct / at10Pct {usd, bound}: bound "interpolated" between two ladder sizes, "below"
-  the smallest, "above" the largest, or "no-route". Samples older than 45 days are dropped.`);
+  the smallest, "above" the largest, or "no-route". Samples older than 45 days are dropped.
+  lastRun {startedAt, endedAt, session, attempted, measured, quoteErrors[{mint, symbol, error, kind}],
+  summary}: a token whose quote failed (kind "stale-oracle" when a venue's oracle or pool was stale)
+  stores no sample, so readers keep its previous one.
+
+EXIT
+  0 when at most ${MAX_QUOTE_FAILURE_SHARE * 100} % of the quoted tokens failed (the failures are logged and kept in lastRun);
+  1 above that, or when the price read or anything else fails.`);
 }
 
 /** One quote, with 429 back-off. Returns {step} or {error}. */
@@ -127,14 +134,17 @@ async function main() {
         await sleep(paceMs);
     }
 
+    // This run's outcome, written with every checkpoint (endedAt stays null until the run finishes),
+    // so the refresh summary can say which tokens kept their previous depth and why.
+    const lastRun = { startedAt: ts(new Date(nowMs)), endedAt: null, session, attempted: 0, measured: 0, quoteErrors: [], summary: null };
     // Checkpoint after every token, measured or not: a killed run keeps what it learned.
     const save = () => writeJson(outPath, {
         fetchedAt: ts(),
         source: 'Jupiter keyless quote API (lite-api.jup.ag/swap/v1/quote, all routes, token → USDC)',
         method: 'Average price impact Jupiter reports for a sale of each ladder size; the 5 % and 10 % sizes are interpolated log-linearly between the two sizes that bracket them. noPrice: Jupiter reported no price for the token, so there is no Solana market to sell into.',
-        samples
+        samples,
+        lastRun
     });
-    const errors = [];
     let measured = 0;
     const startedMs = Date.now();
     for (const [index, token] of tokens.entries()) {
@@ -150,6 +160,7 @@ async function main() {
             logWarn(`budget of ${budget} call(s) reached; ${tokens.length - index} token(s) left for the next run`);
             break;
         }
+        lastRun.attempted += 1;
         const at = ts(new Date());
         let steps = [];
         let error = null;
@@ -178,24 +189,36 @@ async function main() {
         }
         if (error !== null) {
             // A partial ladder is not stored: an unfinished ladder would read as a bound it never reached.
-            errors.push(`${token.symbol}: ${error}`);
-            logWarn(`${token.symbol}: ${error}; not stored`);
+            // The token keeps its previous sample; the failure is recorded in lastRun, not fatal by itself.
+            const kind = quoteErrorKind(error);
+            lastRun.quoteErrors.push({ mint: token.mint, symbol: token.symbol, error, kind });
+            logWarn(`${index + 1}/${tokens.length} ${token.symbol}: ${error}${kind === 'stale-oracle' ? ' (stale oracle upstream)' : ''}; not stored, previous sample kept`);
+            await save();
             continue;
         }
         const sample = buildSample({ at, session, mint: token.mint, symbol: token.symbol, price, steps });
         samples = mergeSamples(samples, [sample], Date.now());
         await save();
         measured += 1;
+        lastRun.measured = measured;
         const fmt = (x) => (x === null ? 'n/a' : `${x.bound === 'interpolated' ? '≈' : x.bound === 'below' ? '<' : x.bound === 'above' ? '>' : 'no route at'} $${Math.round(x.usd).toLocaleString('en-US')}`);
         const elapsed = (Date.now() - startedMs) / 1000;
         const eta = Math.round((elapsed / (index + 1)) * (tokens.length - index - 1));
         log(`${index + 1}/${tokens.length} ${token.symbol}: ${steps.length} quote(s) · 5 % ${fmt(sample.at5Pct)} · 10 % ${fmt(sample.at10Pct)} · ${counter.calls} call(s) · ETA ${eta}s`);
     }
-    log(`wrote ${outPath}: ${measured} token(s) measured this run (${session}), ${samples.length} sample(s) stored, ${counter.calls} call(s), ${errors.length} error(s)`);
-    if (errors.length) {
-        logError(`depth errors: ${errors.join(' | ')}`);
+    const verdict = depthRunVerdict({ attempted: lastRun.attempted, quoteErrors: lastRun.quoteErrors });
+    lastRun.endedAt = ts();
+    lastRun.summary = verdict.summary;
+    // Only a run that quoted something rewrites the store (and its fetchedAt) at the end.
+    if (lastRun.attempted > 0) await save();
+    log(`wrote ${outPath}: ${measured} token(s) measured this run (${session}), ${samples.length} sample(s) stored, ${counter.calls} call(s),`
+        + ` ${verdict.failed}/${verdict.attempted} quote(s) failed (${verdict.stale} stale oracle)`);
+    const detail = lastRun.quoteErrors.map((e) => `${e.symbol}: ${e.error}`).join(' | ');
+    if (!verdict.ok) {
+        logError(`depth FAILED: ${verdict.failed}/${verdict.attempted} token(s) failed, above the ${MAX_QUOTE_FAILURE_SHARE * 100} % limit — ${detail}`);
         return 1;
     }
+    if (verdict.failed) logWarn(`depth quote failures (within the ${MAX_QUOTE_FAILURE_SHARE * 100} % limit, previous samples kept): ${detail}`);
     return 0;
 }
 
