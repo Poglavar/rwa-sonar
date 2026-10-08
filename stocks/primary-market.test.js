@@ -16,7 +16,8 @@ const TOKENS = JSON.parse(readFileSync(fixture('stocks-tokens.json'), 'utf8')).t
 describe('the record', () => {
     test('validates, and covers every issuer that has tokens', () => {
         expect(validatePrimaryMarket(DOC)).toEqual([]);
-        const issuers = new Set(TOKENS.map((token) => token.issuer));
+        const manual = JSON.parse(readFileSync(new URL('./data/manual-mints.json', import.meta.url), 'utf8'));
+        const issuers = new Set([...TOKENS, ...manual].map((token) => token.issuer));
         for (const slug of issuers) expect(Object.keys(DOC.issuers)).toContain(slug);
     });
 

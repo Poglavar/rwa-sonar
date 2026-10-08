@@ -1,7 +1,7 @@
 // Keeps the reviewed CET catalogue separate from SECZ shares and checks that its evidence is discoverable.
 const fs = require('node:fs');
 const path = require('node:path');
-const { underlyingTicker, issuerLabel, summarizeExtensions } = require('./lib/classify.mjs');
+const { underlyingTicker, issuerLabel, summarizeExtensions, controlFromOnchain } = require('./lib/classify.mjs');
 const { claimRung, instrumentType } = require('./lib/grade.mjs');
 const { assessDiscovery } = require('./lib/discovery-candidates.mjs');
 const { buildRegistry } = require('./lib/sources.mjs');
@@ -59,4 +59,27 @@ test('source extraction discovers the new agreements and both protocol merger FA
     expect(urls.has('https://docs.orca.so/formation/faqs')).toBe(true);
     expect(urls.has('https://docs.loopscale.com/resources/formation')).toBe(true);
     expect(registry.truncated).toEqual([]);
+});
+
+
+test('CET reports include documented in-kind exit and a distinct template for the observed controls', () => {
+    const { validatePrimaryMarket, shapePrimaryMarket, primaryMarketHtml } = require('./lib/primary-market.mjs');
+    const { indexComposabilityTemplates, composabilityTemplateFor } = require('./lib/composability.mjs');
+    const { controlRecipe } = require('./lib/recipe.mjs');
+    const market = read('data/primary-market.json');
+    expect(validatePrimaryMarket(market)).toEqual([]);
+    const entry = market.issuers['securitize-stocks'];
+    expect(entry).toMatchObject({ mechanism: 'broker-conversion', inKind: true, settlement: 'unknown' });
+    const html = primaryMarketHtml(shapePrimaryMarket(entry, 'AAPL'));
+    expect(html).toContain('CET cash redemption is excluded');
+    expect(html).toContain('DRS transfer-out $30');
+    const index = indexComposabilityTemplates(read('data/composability-templates.json').templates);
+    for (const row of observation.items.filter(item => item.issuer === 'securitize-stocks')) {
+        const state = summarizeExtensions({ owner: row.tokenProgram, info: row });
+        const recipe = controlRecipe({ tokenProgram: row.tokenProgram, control: controlFromOnchain(state) });
+        const template = composabilityTemplateFor({ ...row, recipe }, index);
+        expect(template?.issuer).toBe('securitize-stocks');
+        expect(template?.scenarios.borrowerDefault.outcome).toBe('issuer-mediated');
+        expect(template?.legalTemplate).toContain('Article 8');
+    }
 });

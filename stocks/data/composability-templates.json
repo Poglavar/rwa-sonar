@@ -288,6 +288,44 @@
         }
       },
       "basisFields": ["holderClaim", "securityInterest", "redemption", "transferRestrictions", "knownExtensions", "vocabulary.bearerRedemption"]
+    },
+    {
+      "id": "securitize-stocks--token-2022-pausable-clawback-allowlist-rebase",
+      "issuer": "securitize-stocks",
+      "reviewedAt": "2026-10-08",
+      "legalTemplate": "Article 8 convertible security entitlement recorded by Securitize Markets",
+      "recipe": "token-2022 · pausable + clawback + allowlist + rebase",
+      "healthStatus": "warning",
+      "summary": "Beneficial ownership follows the share entitlement credited on broker books. Default-frozen accounts require approval before a protocol can hold or transfer CETs; enforcement and DRS exit depend on broker recognition, compliance and an accepting receiving broker. Administrative powers can override on-chain custody.",
+      "scenarios": {
+        "escrow": {
+          "outcome": "issuer-approved-only",
+          "headline": "Protocol accounts need approval",
+          "explanation": "A new token account starts frozen. A protocol-controlled account therefore requires approval and thawing before receiving or releasing CETs, and the broker must recognize the corresponding entitlement on its books. No general permissionless lending integration was verified."
+        },
+        "borrowerDefault": {
+          "outcome": "issuer-mediated",
+          "headline": "Seizure needs an eligible recipient and broker recognition",
+          "explanation": "A lending contract cannot assume that an arbitrary liquidation recipient can receive a default-frozen, allowlisted token. Legal transfer completes with the broker book entry; conversion and DRS also require an approved holder and an accepting receiving broker."
+        },
+        "protocolHack": {
+          "outcome": "issuer-may-recover",
+          "headline": "Administrative recovery is possible, not assured",
+          "explanation": "The observed permanent delegate can transfer or burn balances without the protocol signature, and the pause authority can halt the mint. These powers can support containment or recovery but do not establish a duty to reimburse a hacked protocol or restore its collateral."
+        },
+        "accessLoss": {
+          "outcome": "discretionary-recovery",
+          "headline": "Recovery depends on the broker and authority operators",
+          "explanation": "Broker records and administrative token powers provide potential ways to reconcile or recover a stranded entitlement. The protocol cannot invoke those powers autonomously; the reviewed documents do not establish a guaranteed recovery procedure or completion time for a lost protocol key."
+        }
+      },
+      "basisFields": [
+        "holderClaim",
+        "redemption",
+        "transferRestrictions",
+        "knownExtensions",
+        "vocabulary.mainLedger"
+      ]
     }
   ]
 }

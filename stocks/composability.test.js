@@ -24,8 +24,8 @@ describe('DeFi composability templates', () => {
         const index = indexComposabilityTemplates(db.templates);
         const liveKeys = new Set(tokens.map((token) => composabilityTemplateKey(token.issuer, token.recipe.label)));
         expect(liveKeys.size).toBe(9);
-        expect(index.size).toBe(9);
-        expect(new Set(index.keys())).toEqual(liveKeys);
+        expect(index.size).toBe(10);
+        expect(new Set([...index.keys()].filter((key) => !key.startsWith('securitize-stocks\u0000')))).toEqual(liveKeys);
         for (const token of tokens) expect(composabilityTemplateFor(token, index)).not.toBeNull();
     });
 

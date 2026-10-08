@@ -206,6 +206,30 @@
       "inKindText": "No.",
       "basis": ["redemption.eligibility", "redemption.rails"],
       "checkedAt": "2026-09-30"
+    },
+    "securitize-stocks": {
+      "who": "onboarded",
+      "whoText": "KYC/AML-approved Securitize Markets customers using linked, approved wallets. Conversion and DRS require an accepting DTCC-member broker; account and regional eligibility still apply.",
+      "create": true,
+      "redeem": true,
+      "mechanism": "broker-conversion",
+      "mechanismText": "SM credits a CET share entitlement on its books. The documented exit converts the CET into a book-entry share position for DRS transfer to an accepting broker. CET cash redemption is excluded; selling is a separate route.",
+      "settlement": "unknown",
+      "settlementText": "No verified end-to-end DRS completion time or completed CET DRS transfer was located.",
+      "hours": "mixed",
+      "hoursText": "Published platform trading window: 04:00–17:30 Eastern Time. The reviewed documents do not establish the conversion/DRS processing window.",
+      "minimum": "Disclosure says typically 1 USDC, subject to the product; the catalogue settlement asset shows minLimit 10. Authenticated order minimum unverified.",
+      "fee": "CET trading commission 0.1%; DRS transfer-out $30 plus receiving-broker charges; other network, conversion and corporate-action charges may apply.",
+      "inKind": true,
+      "inKindText": "Documented book-entry share conversion and DRS transfer, independently of the stock issuer adopting tokenization. No contractual CET cash redemption.",
+      "anchorNote": "This is a documented conversion route, not a verified arbitrage service. No completed CET DRS transfer or unrestricted two-way arbitrage was established.",
+      "basis": [
+        "redemption.eligibility",
+        "redemption.rails",
+        "redemption.fees",
+        "redemption.minimum"
+      ],
+      "checkedAt": "2026-10-08"
     }
   }
 }
