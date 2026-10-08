@@ -11,6 +11,45 @@
   },
   "events": [
     {
+      "date": "2026-10-08",
+      "kind": "disclosure",
+      "issuer": "securitize-stocks",
+      "mints": [
+        "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD",
+        "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP",
+        "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h",
+        "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK",
+        "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1",
+        "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ",
+        "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1",
+        "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX",
+        "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3",
+        "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi",
+        "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj",
+        "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv"
+      ],
+      "summary": "Securitize launches CET stock entitlements. Twelve official Solana addresses verified; AAPL swap observed. Broker books govern title transfer; DRS share exit is documented, while cash redemption is excluded. Launch GOOG / catalogue GOOGL mismatch remains.",
+      "source": "https://x.com/Securitize/status/2108180783827411451",
+      "publishedAt": "2026-10-08T13:00:41Z",
+      "title": "Securitize launches convertible stock entitlements"
+    },
+    {
+      "date": "2026-10-07",
+      "kind": "sector",
+      "issuer": null,
+      "protocols": [
+        "orca",
+        "loopscale"
+      ],
+      "mints": [],
+      "summary": "Orca and Loopscale announce their combination as Formation. Both remain operating protocols; official FAQs say positions and upgrade controls are unchanged. This is organisational consolidation, not evidence of a contract migration or a new claim to backing assets.",
+      "source": "https://x.com/formation_so/status/2107965006578921623",
+      "publishedAt": "2026-10-07T22:43:16.000Z",
+      "reviewedAt": "2026-10-08T17:55:38.675773Z",
+      "title": "Orca and Loopscale combine as Formation",
+      "actor": "Formation"
+    },
+    {
       "date": "2026-09-16",
       "kind": "pause",
       "issuer": "ondo-global-markets",
@@ -22,7 +61,9 @@
       "date": "2026-09-16",
       "kind": "disclosure",
       "issuer": "backpack-securities-spcx",
-      "mints": ["SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb"],
+      "mints": [
+        "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb"
+      ],
       "summary": "Backpack's own risk disclosure says tokens withdrawn to a self-custody wallet 'may be economically worthless to you' because redemption needs conditions that self-custody does not satisfy; ACATS/DTCC brokerage transfers, dividends, splits and voting are all listed as 'still being worked on'.",
       "source": "stocks/data/issuers/backpack-securities-spcx.json (T&C and Risk Disclosure Statement dated 2026-06-10; holdings page and FAQ read 2026-09-16)"
     },
@@ -38,7 +79,9 @@
       "date": "2026-07-17",
       "kind": "rebase",
       "issuer": "prestocks",
-      "mints": ["PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"],
+      "mints": [
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
       "summary": "OPENAI's scaled-UI-amount multiplier moved from 1 to 1.4861347 at 16:30 UTC, restating every holder's displayed balance up by about 48.6 % without any transfer and without a public explanation. The issuer can unilaterally rebase balances.",
       "source": "stocks/data/issuers/prestocks.json (Solana RPC getAccountInfo on the OPENAI mint)"
     },
@@ -54,7 +97,9 @@
       "date": "2026-06-12",
       "kind": "shortfall",
       "issuer": "xstocks-backed",
-      "mints": ["Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8"],
+      "mints": [
+        "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8"
+      ],
       "summary": "Binance, Bybit and Bitget cancelled their tokenized-SpaceX IPO campaigns after Kraken's xStocks could not source shares; Binance unwound roughly $557 M of subscriptions from 27,689 addresses with zero allocations. Backpack's SPCX, which had custodied shares through its own brokerage chain, was reported unaffected.",
       "source": "stocks/data/issuers/backpack-securities-spcx.json (The Block, 2026-06-12)"
     },
@@ -62,7 +107,9 @@
       "date": "2026-05-13",
       "kind": "sector",
       "issuer": "prestocks",
-      "mints": ["PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"],
+      "mints": [
+        "PreweJYECqtQwBtpxHL171nL2K6umo692gTm7Q3rpgF"
+      ],
       "summary": "Anthropic and OpenAI declared SPV-routed transfers of their stock void and warned that tokenized exposure 'may have no value'; PreStocks ANTHROPIC fell about 34–38 % and OPENAI about 39–46 % within days. Tessera's T-OpenAI carries the same exposure question.",
       "source": "stocks/data/issuers/prestocks.json and tessera.json (CoinDesk and The Block, 2026-05-13)"
     },

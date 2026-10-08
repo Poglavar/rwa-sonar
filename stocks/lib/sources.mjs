@@ -104,6 +104,7 @@ export function classifyKind(url) {
     }
     const path = u.pathname;
     if (/\.pdf$/i.test(path)) return 'pdf';
+    if (/\.docx$/i.test(path)) return 'docx';
     if (/\.json$/i.test(path)) return 'api';
     if (API_HOST_RE.test(u.hostname)) return 'api';
     if (/(^|\/)api(\/|$)/i.test(path)) return 'api';
@@ -151,6 +152,7 @@ const PARAMETERISED_FAMILIES = [
 export function kindFromContentType(contentType, url) {
     const ct = typeof contentType === 'string' ? contentType.toLowerCase() : '';
     if (ct.includes('application/pdf')) return 'pdf';
+    if (ct.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) return 'docx';
     if (ct.includes('json')) return 'api';
     if (ct.includes('html') || ct.includes('xml')) return 'html';
     if (ct.includes('text/plain')) return 'html';
@@ -270,6 +272,9 @@ export function buildRegistry(dossiers, { generatedAt } = {}) {
             const tagged = `${prefix}:${label}`;
             if (!item.foundIn.includes(tagged)) item.foundIn.push(tagged);
             if (slug && item._firstIssuer === null) item._firstIssuer = slug;
+            const documentMatch = /^documents\[(\d+)\]\.url$/.exec(hit.path);
+            const format = documentMatch ? doc.documents?.[Number(documentMatch[1])]?.format : null;
+            if (['pdf', 'docx', 'html', 'api'].includes(format)) item.kind = format;
             const title = documentTitle(doc, hit.path);
             if (title && item._docTitle === null) {
                 item._docTitle = title;

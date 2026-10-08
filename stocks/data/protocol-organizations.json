@@ -1,0 +1,38 @@
+{
+  "_comment": "Reviewed organizational relationships between protocols. Announced common teams do not imply merged contracts, shared collateral, changed keys or legal novation.",
+  "groups": [
+    {
+      "id": "formation",
+      "name": "Formation",
+      "relationship": "announced-operating-group",
+      "protocolIds": [
+        "orca",
+        "loopscale"
+      ],
+      "announcedAt": "2026-10-07T22:43:16.000Z",
+      "reviewedAt": "2026-10-08T17:55:38.675773Z",
+      "legalEntity": null,
+      "legalMergerCompletionVerified": false,
+      "summary": "Orca and Loopscale announce a combined team under Formation; both remain operating products. Exact corporate transaction documents were not reviewed.",
+      "operationalEffect": "Official FAQs say positions, programmes, upgrade authorities and multisigs continue unchanged. This announcement review did not re-decode current protocol controls.",
+      "documents": [
+        {
+          "title": "Formation announcement",
+          "url": "https://x.com/formation_so/status/2107965006578921623"
+        },
+        {
+          "title": "Formation website",
+          "url": "https://formation.so"
+        },
+        {
+          "title": "Orca Formation FAQ",
+          "url": "https://docs.orca.so/formation/faqs"
+        },
+        {
+          "title": "Loopscale Formation FAQ",
+          "url": "https://docs.loopscale.com/resources/formation"
+        }
+      ]
+    }
+  ]
+}

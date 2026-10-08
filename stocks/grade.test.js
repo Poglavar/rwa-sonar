@@ -225,6 +225,11 @@ describe('ledger maturity parity with assets.html', () => {
 // ---------------------------------------------------------------- claim depth
 
 describe('claimRung', () => {
+    test('convertible broker entitlements remain distinct from registered shares and generic ETs', () => {
+        expect(claimRung({ legalForm: 'convertible-security-entitlement' }))
+            .toEqual({ rung: 3, label: 'beneficial interest in the security' });
+        expect(claimRung({ legalForm: 'security-entitlement' }).rung).toBeNull();
+    });
     test('rung 0 — synthetic exposure', () => {
         expect(claimRung({ legalForm: 'derivative' })).toEqual({ rung: 0, label: 'synthetic exposure' });
         expect(claimRung({ legalForm: 'spv-synthetic' })).toEqual({ rung: 0, label: 'synthetic exposure' });

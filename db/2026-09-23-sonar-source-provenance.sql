@@ -22,6 +22,7 @@ $$;
 -- `read_via` values are the readers the watcher actually records (stocks/watch-sources.mjs `via`):
 --   html         the live page's markup
 --   next-flight  the live page's Next.js flight payload (lib/nextflight.mjs), its markup being empty
+--   docx         the live Word document through the bounded ZIP/XML text reader
 --   pdf          the live response through pdftotext
 --   api          the live JSON response, keys sorted
 --   binary       the live response watched as bytes (a zip, an image)
@@ -41,10 +42,10 @@ ALTER TABLE sonar.source_version ADD COLUMN IF NOT EXISTS capture_at timestamptz
 -- Re-stated as DROP+ADD so a later widening of the list reaches an existing database.
 ALTER TABLE sonar.source DROP CONSTRAINT IF EXISTS source_read_via_check;
 ALTER TABLE sonar.source ADD CONSTRAINT source_read_via_check CHECK (read_via IS NULL OR read_via IN (
-    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
+    'live', 'html', 'next-flight', 'pdf', 'docx', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
 ALTER TABLE sonar.source_version DROP CONSTRAINT IF EXISTS source_version_read_via_check;
 ALTER TABLE sonar.source_version ADD CONSTRAINT source_version_read_via_check CHECK (read_via IS NULL OR read_via IN (
-    'live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
+    'live', 'html', 'next-flight', 'pdf', 'docx', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'));
 
 -- A capture time belongs to a capture: never on a live read. It is the CDX `timestamp` of the
 -- capture that was read, never the time we fetched it (that is `last_checked_at`/`fetched_at`).
@@ -55,7 +56,7 @@ ALTER TABLE sonar.source_version DROP CONSTRAINT IF EXISTS source_version_captur
 ALTER TABLE sonar.source_version ADD CONSTRAINT source_version_capture_at_check
     CHECK (capture_at IS NULL OR read_via = 'wayback');
 
-COMMENT ON COLUMN sonar.source.read_via IS 'reader that produced the stored text on the last check (html, next-flight, pdf, api, binary, notion, drive, wayback, companion, live=304); NULL when nothing was read';
+COMMENT ON COLUMN sonar.source.read_via IS 'reader that produced the stored text on the last check (html, next-flight, pdf, docx, api, binary, notion, drive, wayback, companion, live=304); NULL when nothing was read';
 COMMENT ON COLUMN sonar.source.capture_at IS 'Wayback capture timestamp (CDX) the text was read from when read_via = wayback; NULL for live reads';
 COMMENT ON COLUMN sonar.source_version.read_via IS 'reader that produced this version''s text; see sonar.source.read_via';
 COMMENT ON COLUMN sonar.source_version.capture_at IS 'Wayback capture timestamp (CDX) of this version when read_via = wayback';

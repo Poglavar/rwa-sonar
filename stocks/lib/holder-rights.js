@@ -74,7 +74,7 @@
         if (yes.length === list.length && list.length) return 'All five shareholder rights';
         if (yes.length) return `${yes.length} of ${list.length} shareholder rights`;
         return passed.length
-            ? `No shareholder rights; the issuer passes through ${joinWords(passed)}`
+            ? `Rights passed through: ${joinWords(passed)}`
             : 'No shareholder rights';
     }
 

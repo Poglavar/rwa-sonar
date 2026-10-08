@@ -1,0 +1,707 @@
+{
+  "_comment": "Programme-level review of Securitize Stocks CETs, separate from issuer-sponsored SECZ. Exact mint identity is verified; account-specific and jurisdiction-specific order terms are not.",
+  "slug": "securitize-stocks",
+  "issuer": "Securitize Stocks — Convertible Entitlement Tokens administered by Securitize Markets, LLC",
+  "status": "live",
+  "statusCheckedAt": "2026-10-08",
+  "statusNote": "Official catalogue lists 12 new stock mints; finalized AAPL/USDC swap observed. Individual eligibility and DRS execution not tested.",
+  "products": [
+    "CET launch: AAPL, AMZN, CRCL, META, MSFT, MSTR, NFLX, NVDA, PLTR, SPCX and TSLA; launch names GOOG but the live catalogue instead lists GOOGL.",
+    "SECZ is an issuer-sponsored share covered separately under securitize. ETs have different ownership and cash-exit terms and are outside this CET review."
+  ],
+  "issuingEntity": "Securitize Markets, LLC is the contractual securities intermediary and broker. Apple and the other referenced companies issue the underlying shares; the launch does not make them sponsors of these tokens.",
+  "entityJurisdiction": "United States broker; Securitize Europe Brokerage and Markets, S.V., S.A. separately provides EU investment services. Exact account contracting chain must be checked for each jurisdiction.",
+  "governingLaw": "Customer Brokerage Account Agreement: New York law, Article 8 securities entitlements and FINRA or eligible exchange arbitration. EU platform terms use Spanish law; they do not establish that every EU customer has the same direct SM account claim.",
+  "regulatoryStatus": "SM identifies itself as an SEC-registered broker-dealer and FINRA/SIPC member. Registration is not an approval of each product or a guarantee that a wallet-held position qualifies for SIPC. Access requires eligibility checks.",
+  "legalForm": "convertible-security-entitlement",
+  "holderClaim": "The CET disclosure identifies the customer as beneficial owner of a share position credited on SM books, separate from proprietary holdings. The brokerage agreement makes those books authoritative: an on-chain transfer is an instruction, and the legal entitlement moves when SM records the corresponding debit and credit. A CET is distinct from an issuer-sponsored registered share and from the separately defined ET.",
+  "underlyingCustodian": "SM holds the underlying book-entry share position for the customer and may use nominees or third-party custodians. No exact stock-by-stock custody account, subcustodian agreement or independent reconciliation was located. Do not attribute the new CET pool to RQD from another programme.",
+  "collateral": {
+    "ratio": "1:1 (issuer-stated)",
+    "composition": "Underlying listed shares associated with CET positions; actual reconciliation not independently verified.",
+    "rehypothecation": "Launch states no lending; disclosure restricts underlying transfers while CETs exist and excludes use for unrelated proprietary trading. The brokerage agreement still grants SM a lien for customer obligations; this is not proof of an unencumbered upstream custody chain.",
+    "onLoanDisclosed": null
+  },
+  "custodyVerification": {
+    "type": "issuer-statement",
+    "frequency": "No public independent reserve-report cadence located",
+    "agent": "Securitize Markets, LLC",
+    "machineReadable": false,
+    "notes": "Public mint supply and the issuer catalogue verify deployed token identity, not matching shares in custody. No independent dated CET reserve statement located."
+  },
+  "securityInterest": {
+    "exists": null,
+    "holder": "No separately granted holder collateral security package reviewed; Article 8 property rights are a different legal mechanism.",
+    "priority": "Article 8 section 8-503 normally separates financial assets from intermediary creditors, subject to section 8-511. SM also has a customer-obligation lien under the brokerage agreement; upstream liens unverified."
+  },
+  "bankruptcyRemote": null,
+  "redemption": {
+    "available": true,
+    "eligibility": "Approved, KYC/AML-cleared customer. Conventional share transfer requires a DTCC-member receiving broker willing to accept the position; SM procedures and compliance restrictions apply.",
+    "rails": "CETs have no contractual cash redemption. Exit by selling on the platform, or request book-entry conversion and DRS transfer to an accepting broker independently of issuer tokenization. Conversion into an issuer-sponsored token separately requires the underlying issuer to adopt a programme and authorize SM. DRS execution has not been independently observed.",
+    "fees": "CET/ET trading commission 0.1% of gross value. DRS transfer-out $30 plus receiving-broker charges. Wallet gas, stablecoin conversion and corporate-action charges can also apply.",
+    "minimum": "Disclosure says typically 1 USDC but product-specific; current order screen controls. Catalogue settlement asset shows minLimit 10. No authenticated order minimum verified.",
+    "kyc": true
+  },
+  "transferRestrictions": {
+    "allowlist": true,
+    "kycToHold": true,
+    "usPersonsExcluded": null,
+    "mechanism": "default-frozen token accounts, linked approved wallets and broker compliance controls"
+  },
+  "tokenProgram": "token-2022",
+  "knownExtensions": [
+    "metadataPointer",
+    "tokenMetadata",
+    "permanentDelegate",
+    "pausableConfig",
+    "defaultAccountState (frozen)",
+    "scaledUiAmountConfig"
+  ],
+  "dividends": "cash-pass-through-net-fees",
+  "voting": "expected-pass-through-subject-to-proxy-policy",
+  "corporateActions": "SM processes mandatory actions against underlying shares and updates accounts/tokens; voluntary actions require timely elections. Cash distributions use the settlement stablecoin, net of charges and tax. A processing fee can consume a small dividend. Votes are expected to pass through; SM handles uninstructed votes under a policy available on request. Delivery performance and that policy were not verified.",
+  "pricing": {
+    "referenceMarket": "exchange-nbbo",
+    "arbitrageable": null,
+    "notes": "Public FAQ quotes NBBO with a 10 bps execution-protection band and 04:00–17:30 ET trading hours. AAPL/USDC execution was observed on-chain. Continuous 24/7 liquidity and unrestricted arbitrage are not established."
+  },
+  "venues": [
+    "Securitize Stocks / SM execution venue; AAPL swap observed on Solana. Broader NYSE/OKX/Ripple/Aave integrations in the announcement are plans, not verified live CET routes."
+  ],
+  "chains": [
+    "Solana"
+  ],
+  "sampleMints": [
+    {
+      "symbol": "AAPL",
+      "mint": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "AMZN",
+      "mint": "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "CRCL",
+      "mint": "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "GOOGL",
+      "mint": "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "META",
+      "mint": "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "MSFT",
+      "mint": "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "MSTR",
+      "mint": "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "NFLX",
+      "mint": "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "NVDA",
+      "mint": "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "PLTR",
+      "mint": "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "SPCX",
+      "mint": "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    },
+    {
+      "symbol": "TSLA",
+      "mint": "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv",
+      "source": "https://stocks.securitize.io/",
+      "note": "Exact address in official catalogue; finalized account retained in research observations."
+    }
+  ],
+  "keyGovernance": {
+    "mint": "unknown",
+    "freeze": "unknown",
+    "delegate": "hot-key",
+    "rebase": "hot-key",
+    "evidence": "All 12 new mints share delegate, pause, metadata and scaled-UI authority Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR. Finalized read at slot 454614970: funded system-owned zero-data account. This is one on-chain authority address, not proof of one human or absence of off-chain MPC. AAPL mint/freeze authority account is absent; its signing programme and upgrade path were not resolved. The shared administrative authority is on the Ed25519 curve; AAPL mint/freeze authority is off-curve, checked with the existing solana-address module. No claim is made about the number of people or off-chain approvals needed to sign."
+  },
+  "authorityFactsSource": "https://api.mainnet-beta.solana.com",
+  "parties": {
+    "securitiesIssuers": [
+      {
+        "name": "Apple",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Amazon.com, Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Circle Internet Group, Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Alphabet Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established. Catalogue identifies the referenced Class A share; share class is not a separate legal entity.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Meta Platforms, Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established. Catalogue identifies the referenced Class A share; share class is not a separate legal entity.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Microsoft Corporation",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Strategy Inc",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Netflix, Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "NVIDIA Corporation",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Palantir Technologies Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "SpaceX",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established. Catalogue identifies the referenced Class A share; share class is not a separate legal entity.",
+        "jurisdiction": "",
+        "identifier": ""
+      },
+      {
+        "name": "Tesla, Inc.",
+        "role": "security-issuer",
+        "source": "https://stocks.securitize.io/",
+        "note": "Referenced share issuer; CET sponsorship not established.",
+        "jurisdiction": "",
+        "identifier": ""
+      }
+    ],
+    "tokenizationProviders": [
+      {
+        "name": "Securitize",
+        "role": "tokenization-provider",
+        "source": "https://x.com/Securitize/status/2108180783827411451",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named role in the reviewed programme documentation; individual account terms remain relevant."
+      }
+    ],
+    "custodians": [
+      {
+        "name": "Securitize Markets, LLC",
+        "role": "custodian",
+        "source": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+        "note": "Contractual intermediary; exact subcustodians and custody accounts not identified.",
+        "jurisdiction": "",
+        "identifier": ""
+      }
+    ],
+    "distributors": [
+      {
+        "name": "Securitize Markets, LLC",
+        "role": "distributor",
+        "source": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+        "jurisdiction": "",
+        "identifier": "",
+        "note": "Named role in the reviewed programme documentation; individual account terms remain relevant."
+      },
+      {
+        "name": "Securitize Europe Brokerage and Markets, S.V., S.A.",
+        "role": "distributor",
+        "source": "https://securitize.io/disclosure-library",
+        "note": "EU reception/transmission role; cross-border customer account chain unresolved.",
+        "jurisdiction": "",
+        "identifier": ""
+      }
+    ],
+    "tokenIssuers": [],
+    "transferAgents": [],
+    "verificationAgents": [],
+    "regulators": [],
+    "parents": [],
+    "audience": []
+  },
+  "vocabulary": {
+    "blockchainIsMainLedger": {
+      "value": "no",
+      "reason": "SM book entry makes the security entitlement transfer legally effective."
+    },
+    "unconditionalTransfers": {
+      "value": "no",
+      "reason": "Approved-wallet and compliance conditions apply."
+    },
+    "bearerRedemption": {
+      "value": "no",
+      "reason": "Wallet possession alone does not satisfy broker onboarding or DRS acceptance."
+    },
+    "forcedTransfers": {
+      "value": "yes",
+      "reason": "Permanent delegate observed on every reviewed new mint."
+    },
+    "titleDeed": {
+      "value": "no",
+      "reason": "A CET represents a book-entry security entitlement, not the issuer register."
+    },
+    "tokenSelfCustody": {
+      "value": "yes",
+      "reason": "Approved self-custody wallets are expressly supported; administrative token powers remain."
+    },
+    "issuerIndependent": {
+      "value": "no",
+      "reason": "SM reconciliation, compliance and exit processing remain necessary."
+    },
+    "presetJurisdiction": {
+      "value": "yes",
+      "reason": "SM agreement specifies New York law; EU relationship has separate Spanish terms."
+    },
+    "thirdPartyAttestations": {
+      "value": "unknown",
+      "reason": "No independent CET share reconciliation located."
+    },
+    "aiReady": {
+      "value": "unknown",
+      "reason": "Public catalogue identifies mints but does not expose independently verified backing or complete order-specific terms."
+    }
+  },
+  "documents": [
+    {
+      "title": "Entitlement Token Disclosure — CET/ET distinction and exits",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "date": "2026-09-15",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "terms",
+      "format": "docx"
+    },
+    {
+      "title": "Customer Brokerage Account Agreement — authoritative books, liens and SIPC exclusions",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "date": null,
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "terms",
+      "format": "docx"
+    },
+    {
+      "title": "Official Securitize Stocks catalogue",
+      "url": "https://stocks.securitize.io/",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "docs"
+    },
+    {
+      "title": "Securitize Stocks FAQ — wallets, trading hours and execution",
+      "url": "https://stocks.securitize.io/faq",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "docs"
+    },
+    {
+      "title": "Current 2026 fee schedule",
+      "url": "https://securitize.io/fee-schedule-table",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "docs"
+    },
+    {
+      "title": "Disclosure library — current document discovery",
+      "url": "https://securitize.io/disclosure-library",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "docs"
+    },
+    {
+      "title": "New York UCC 8-503 — entitlement-holder property interest",
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "regulatory"
+    },
+    {
+      "title": "New York UCC 8-511 — competing secured-creditor priority",
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-511",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "regulatory"
+    },
+    {
+      "title": "SIPC scope and exclusions",
+      "url": "https://www.sipc.org/for-investors/what-sipc-protects",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "type": "docs"
+    }
+  ],
+  "findings": [
+    {
+      "schema": "broker-books-control-entitlement-transfer",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "statement": "Token movement alone is not the final legal transfer: SM must make the book-entry debit and credit. Reconciliation failure can separate the wallet display from the enforceable account position."
+    },
+    {
+      "schema": "cash-redemption-not-available",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "statement": "CET cash redemption is excluded. The alternative is a platform sale or a documented transfer into conventional shares; a successful DRS exit was not observed."
+    },
+    {
+      "schema": "self-custody-sipc-scope-unresolved",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "statement": "The documents expect customer-securities treatment for underlying CET positions but exclude held-away self-custody assets from SIPC through SM. The treatment of a wallet-held CET and its retained underlying share needs account-specific clarification."
+    },
+    {
+      "schema": "independent-cet-reserve-reconciliation-not-located",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://stocks.securitize.io/",
+      "statement": "The 1:1 and no-lending statements are issuer assertions. A live mint and trade do not prove the required share pool exists, is fully reconciled or is free of upstream liens."
+    },
+    {
+      "schema": "shared-cet-administrative-authority",
+      "severity": "caution",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://api.mainnet-beta.solana.com",
+      "statement": "All 12 mints share the permanent-delegate/pause/scaled-UI authority Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR. Accounts start frozen. Token self-custody does not remove these intervention powers; signing policy is unverified."
+    },
+    {
+      "schema": "conventional-share-exit-documented",
+      "severity": "info",
+      "observer": "rwa-sonar",
+      "observedAt": "2026-10-08",
+      "evidence": "https://securitize.io/fee-schedule-table",
+      "statement": "CET terms provide DRS transfer to an accepting DTCC-member broker even without issuer adoption of tokenization. Published transfer fee is $30, subject to procedures and receiving-broker fees."
+    }
+  ],
+  "discrepancies": [
+    {
+      "id": "alphabet-share-class",
+      "title": "Launch names GOOG; official catalogue lists GOOGL",
+      "severity": "caution",
+      "observedAt": "2026-10-08T17:55:38.675773Z",
+      "classification": "Reference-share identity mismatch",
+      "claim": {
+        "text": "Launch list names GOOG.",
+        "sources": [
+          {
+            "label": "Issuer launch",
+            "url": "https://x.com/Securitize/status/2108180783827411451",
+            "accessedAt": "2026-10-08T17:55:38.675773Z"
+          }
+        ]
+      },
+      "reality": {
+        "text": "Catalogue lists GOOGL, Alphabet Class A, ISIN US02079K3059 / CUSIP 02079K305, at mint 2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK.",
+        "sources": [
+          {
+            "label": "Official GOOGL page and catalogue",
+            "url": "https://stocks.securitize.io/asset/GOOGL",
+            "accessedAt": "2026-10-08T17:55:38.675773Z"
+          }
+        ]
+      },
+      "impact": "Share classes carry different voting rights. Index the published GOOGL address without inventing a GOOG mint or assuming a GOOG order disclosure covers it.",
+      "resolutionCondition": "Issuer corrects the launch list or publishes consistent per-mint share-class and order terms."
+    }
+  ],
+  "incidents": [],
+  "attestations": [],
+  "confidence": "medium",
+  "openQuestions": [
+    "Which exact custody accounts and subcustodians hold each share pool, and where is an independently dated share-to-token reconciliation?",
+    "How are customer securities and SIPC eligibility recorded when the CET is in a self-custody wallet? The agreement distinguishes custody models but does not resolve that combined case.",
+    "Which signed product/order disclosure binds each mint and customer, especially GOOGL and EU users? The catalogue does not carry those agreements.",
+    "How long does DRS conversion take, which brokers accept fractional positions, and has the exit actually completed for a CET holder?",
+    "What signing policy governs the shared administrative key, and which programmes and upgrade keys control minting and thawing?",
+    "What does the proxy voting policy require, and what corporate-action processing fees apply?",
+    "The disclosure calls CETs Convertible; the brokerage agreement mainly calls them Custodial. Confirm that the executed agreement and order disclosures map those terms to the same product.",
+    "What happens if SM books and chain diverge or SM becomes unavailable? No product-specific tested recovery procedure or court decision located.",
+    "Which jurisdictions and investor categories are currently eligible for each CET? No comprehensive current admission matrix was verified."
+  ],
+  "claims": [
+    {
+      "field": "status",
+      "quote": "ExecuteSwap",
+      "url": "https://explorer.solana.com/tx/2ggjAjXokTeQRr3WggB2MxrbfKnHLTiANb4vCPQbUkZUQQJ4Gedd1d1cxSL3mdUziuRaAzhjnxakfAxp8s4dLrJt",
+      "locator": "rpc:getTransaction, slot 454600556",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Successful secondary exchange of 10 USDC for 0.029543 AAPL tokens, with a 0.01 USDC fee leg; not a DRS redemption."
+    },
+    {
+      "field": "legalForm",
+      "quote": null,
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "sections 2 and 4.1",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "inference",
+      "note": "Programme classification from the CET definition; order-specific binding to each mint remains unreviewed.",
+      "reasoning": "Programme classification from the CET definition; order-specific binding to each mint remains unreviewed.",
+      "sources": [
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c"
+      ],
+      "scope": "CET programme terms; authenticated mint-specific orders not reviewed",
+      "reviewedAt": "2026-10-08T17:55:38.675773Z"
+    },
+    {
+      "field": "holderClaim",
+      "quote": "beneficial owner",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "section 4.1",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "CET beneficial share ownership through a specifically credited intermediary position; distinguish ET section 5.1."
+    },
+    {
+      "field": "vocabulary.blockchainIsMainLedger.value",
+      "quote": "authoritative record",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "SM as Securities Intermediary",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Entitlement transfer takes effect on SM books; on-chain transfer is an entitlement order."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "laws of the State of New York",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "Governing Law",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Account-specific agreement; separate EU platform terms reviewed, not assumed identical."
+    },
+    {
+      "field": "securityInterest.priority",
+      "quote": "continuing security interest",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "Security Interest and Lien",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Lien for obligations to SM covers carried assets; excludes held-away wallet assets absent a separate control agreement. Do not confuse this broker lien with security granted to holders."
+    },
+    {
+      "field": "bankruptcyRemote",
+      "quote": "not covered by SIPC through SM",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "SIPC; compare Risk Disclosures section 29(ii)",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Held-away exclusion must be reconciled with expected treatment of underlying CET positions; no blanket coverage conclusion."
+    },
+    {
+      "field": "transferRestrictions",
+      "quote": "freeze or block",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "Compliance; Freezes and Blocks",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Broker can restrict orders, transfers and accounts for stated compliance and risk reasons."
+    },
+    {
+      "field": "redemption.eligibility",
+      "quote": "agrees to accept",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "section 4.6",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "DRS exit requires a willing DTCC-member broker and SM processing; independent of issuer-sponsored tokenization."
+    },
+    {
+      "field": "redemption.rails",
+      "quote": "not redeemable for cash",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "section 4.5",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Platform sale and share conversion are distinct from cash redemption."
+    },
+    {
+      "field": "redemption.fees",
+      "quote": "0.1%",
+      "url": "https://securitize.io/fee-schedule-table",
+      "locator": "CET & ET Commission; CET Transfer Out",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "0.1% gross trading commission; separate $30 book-entry conversion/DRS transfer-out."
+    },
+    {
+      "field": "keyGovernance.rebase",
+      "quote": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+      "url": "https://api.mainnet-beta.solana.com",
+      "locator": "rpc:getMultipleAccounts, finalized slots 454613378 and 454614970",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Shared delegate/pause/rebase/metadata address on 12 mints; system-owned funded zero-data authority account. Off-chain approval policy is not visible."
+    },
+    {
+      "field": "custodyVerification.frequency",
+      "quote": null,
+      "url": "https://securitize.io/disclosure-library",
+      "locator": "Disclosure library, CET disclosure and account agreement",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "unverified",
+      "note": "No independently dated backing reconciliation found in the reviewed public sources."
+    },
+    {
+      "field": "governingLaw",
+      "quote": "shall control",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "Corporate Actions, incorporation of Entitlement Token Disclosure",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "The account agreement prevails over the disclosure in a conflict; the disclosure separately prevails over specified general platform terms."
+    }
+  ],
+  "whatIf": [
+    {
+      "mode": "issuer-wind-down",
+      "status": "unknown",
+      "outcome": "Article 8 provides property protections for financial assets held for entitlement holders, subject to priority rules. Actual pool completeness, customer obligations, custody model and SIPC eligibility determine recovery. No CET-specific insolvency outcome verified.",
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+      "locator": "section 8-503; see agreement SIPC and lien provisions",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "cases": [],
+      "searched": [
+        "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c"
+      ]
+    },
+    {
+      "mode": "redemption-refused",
+      "status": "documented",
+      "outcome": "No cash redemption right. A conventional-share DRS route is documented but depends on SM compliance processing and an accepting broker; no alternative autonomous execution route verified.",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "sections 3.6, 4.5, 4.6",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "cases": []
+    },
+    {
+      "mode": "venue-delists",
+      "status": "documented",
+      "outcome": "The disclosure describes SM as the only current secondary venue and imposes no market-making obligation. A DRS conversion request is a different exit route, not guaranteed immediate liquidity.",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "locator": "sections 3.3 and 4.6",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "cases": []
+    },
+    {
+      "mode": "keys-stolen",
+      "status": "unknown",
+      "outcome": "The permanent delegate can move or burn tokens without the holder signature, subject to token-program checks. Recovery and reconciliation after compromise are unverified; self-custody alone does not prevent intervention.",
+      "url": "https://solana.com/docs/tokens/extensions/permanent-delegate",
+      "locator": "Permanent Delegate, mint-level transfer/burn capability",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "cases": [],
+      "searched": [
+        "https://solana.com/docs/tokens/extensions/permanent-delegate",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c"
+      ]
+    },
+    {
+      "mode": "backing-shortfall",
+      "status": "unknown",
+      "outcome": "Public documents promise corresponding share positions, but no independent reconciliation or CET-specific shortfall waterfall was located. Article 8 gives a pro-rata interest in the asset pool; recoverability remains fact-dependent.",
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+      "locator": "section 8-503(b)",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "cases": [],
+      "searched": [
+        "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+        "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c"
+      ]
+    }
+  ],
+  "sources": [
+    "https://x.com/Securitize/status/2108180783827411451",
+    "https://securitize.io/disclosure-library",
+    "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+    "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+    "https://stocks.securitize.io/",
+    "https://stocks.securitize.io/faq",
+    "https://securitize.io/fee-schedule-table",
+    "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+    "https://www.nysenate.gov/legislation/laws/UCC/8-511",
+    "https://www.sipc.org/for-investors/what-sipc-protects",
+    "https://explorer.solana.com/tx/2ggjAjXokTeQRr3WggB2MxrbfKnHLTiANb4vCPQbUkZUQQJ4Gedd1d1cxSL3mdUziuRaAzhjnxakfAxp8s4dLrJt"
+  ]
+}

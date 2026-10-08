@@ -100,10 +100,10 @@ export function buildChangeJournal({ changes, defiChanges, curatedEvents, resolu
         const label = issuerName(canonical, issuerNames) ?? issuer ?? 'Sector';
         items.push({
             id: `curated-${row.date}-${issuer ?? 'sector'}-${kind}`, date: row.date,
-            eventAt: row.date, effectiveAt: text(row.effectiveAt), firstObservedAt: text(row.firstObservedAt),
+            eventAt: text(row.publishedAt) ?? row.date, effectiveAt: text(row.effectiveAt), firstObservedAt: text(row.firstObservedAt),
             reviewedAt: text(row.reviewedAt),
             category: 'actor-change', kind, severity: kind === 'shortfall' || kind === 'wind-down' ? 'warning' : 'caution',
-            actor: issuer, issuer, title: `${label}: ${kind.replaceAll('-', ' ')}`,
+            actor: text(row.actor) ?? issuer, issuer, title: text(row.title) ?? `${label}: ${kind.replaceAll('-', ' ')}`,
             summary: row.summary, whyItMatters: null, before: null, after: null,
             consequence: text(row.consequence),
             affectedHolders: (Array.isArray(row.affectedHolders) ? row.affectedHolders : [])

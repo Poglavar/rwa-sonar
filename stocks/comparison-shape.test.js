@@ -448,7 +448,7 @@ describe('the buyer table for pre-IPO tokens (OpenAI: PreStocks OPENAI vs Tesser
 
     test('rights, powers, liquidity and lending read the same sources as for any stock', () => {
         expect(cells('rights').prestocks.text).toBe('No shareholder rights');
-        expect(cells('rights').tessera.text).toBe('No shareholder rights; the issuer passes through takeovers');
+        expect(cells('rights').tessera.text).toBe('Rights passed through: takeovers');
         expect(cells('powers').prestocks.text).toBe('Yes: freeze, pause and take');
         expect(cells('powers').tessera.text).toBe('Yes: freeze; cannot take');
         expect(cells('liquidity').tessera.text).toBe('$390.5k liquidity · $1.24M traded 24 h');

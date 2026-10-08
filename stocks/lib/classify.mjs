@@ -43,6 +43,7 @@ export const ISSUER_LABELS = {
     'superstate-opening-bell': 'Opening Bell by Superstate',
     'bullish': 'Bullish BLSH',
     'securitize': 'Securitize SECZ',
+    'securitize-stocks': 'Securitize Stocks',
     'prestocks': 'PreStocks',
     'tessera': 'Tessera',
     'shift': 'Shift leveraged tokens',
@@ -100,6 +101,7 @@ export function underlyingTicker(symbol, issuer) {
         case 'ondo-global-markets':
             return symbol.endsWith('on') ? symbol.slice(0, -2) : symbol;
         case 'backpack-securities':
+        case 'securitize-stocks':
             return symbol;
         case 'shift':
             return symbol.replace(/[123][LS]$/, '');

@@ -7,14 +7,13 @@ import { join } from 'node:path';
 import { byString, logWarn, readJson } from './io.mjs';
 
 /**
- * The dossier file that belongs to an issuer slug. Three of the twelve dossiers are filed under a
- * token-suffixed name (`bullish-blsh.json` for `bullish`), so the rule is: the exact name first,
- * then the one file whose name is the slug plus a suffix. Derived rather than typed, so a new
- * issuer needs no map entry — and an AMBIGUOUS prefix returns null and is warned about rather than
- * resolved by guessing, because the wrong dossier would put another issuer's answers on this card.
+ * Resolve a published issuer slug to its dossier. SECZ keeps its established `securitize` slug;
+ * the distinct Securitize Stocks programme must never make that lookup ambiguous. Otherwise use
+ * the exact name, then an unambiguous token suffix; never guess between different programmes.
  */
 export function dossierFileFor(slug, files) {
     if (files.includes(`${slug}.json`)) return `${slug}.json`;
+    if (slug === 'securitize' && files.includes('securitize-secz.json')) return 'securitize-secz.json';
     const prefixed = files.filter((name) => name.startsWith(`${slug}-`));
     return prefixed.length === 1 ? prefixed[0] : null;
 }

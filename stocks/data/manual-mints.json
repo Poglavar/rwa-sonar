@@ -36,7 +36,103 @@
     "symbol": "SECZ",
     "name": "Securitize Corp. tokenized shares (Solana deployment)",
     "issuer": "securitize",
-    "source": "TokenMetadata URI on metadata.securitize.io (mint not published by the issuer; see stocks/data/issuers/securitize-secz.json)",
-    "note": "~148,998 tokens on Solana (~0.4% of the $295M headline); allowlisted via Securitize Markets onboarding; not on Jupiter. Attribution high-confidence but unconfirmed by the issuer. Added 2026-09-16."
+    "source": "https://stocks.securitize.io/",
+    "note": "Official catalogue now publishes this exact SECZ mint (reviewed 2026-10-08). SECZ remains an issuer-sponsored share, separate from Securitize Stocks CETs."
+  },
+  {
+    "mint": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD",
+    "symbol": "AAPL",
+    "name": "Apple — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP",
+    "symbol": "AMZN",
+    "name": "Amazon.com, Inc. — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h",
+    "symbol": "CRCL",
+    "name": "Circle Internet Group, Inc. — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK",
+    "symbol": "GOOGL",
+    "name": "Alphabet Inc. Class A — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1",
+    "symbol": "META",
+    "name": "Meta Platforms, Inc. Class A — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ",
+    "symbol": "MSFT",
+    "name": "Microsoft Corporation — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1",
+    "symbol": "MSTR",
+    "name": "Strategy Inc — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX",
+    "symbol": "NFLX",
+    "name": "Netflix, Inc. — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3",
+    "symbol": "NVDA",
+    "name": "NVIDIA Corporation — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi",
+    "symbol": "PLTR",
+    "name": "Palantir Technologies Inc. — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj",
+    "symbol": "SPCX",
+    "name": "Space Exploration Technologies Corp. Class A — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
+  },
+  {
+    "mint": "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv",
+    "symbol": "TSLA",
+    "name": "Tesla, Inc. — Securitize Stocks",
+    "issuer": "securitize-stocks",
+    "source": "https://stocks.securitize.io/",
+    "note": "Exact official catalogue address, finalized Token-2022 read 2026-10-08. Programme-level CET review; specific order terms not inspected."
   }
 ]

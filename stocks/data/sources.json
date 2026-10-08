@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-30T14:19:51Z",
-  "count": 627,
+  "generatedAt": "2026-10-08T18:27:10Z",
+  "count": 641,
   "items": [
     {
       "url": "http://remora.markets/",
@@ -459,6 +459,9 @@
         "securitize-secz:whatIf[program-bug].searched[13]",
         "securitize-secz:whatIf[rebase-error].searched[11]",
         "securitize-secz:whatIf[tokens-seized].searched[13]",
+        "securitize-stocks:authorityFactsSource",
+        "securitize-stocks:claims[11].url",
+        "securitize-stocks:findings[4].evidence",
         "shift:claims[53].url",
         "shift:claims[56].url",
         "shift:claims[59].url",
@@ -1070,6 +1073,51 @@
       "foundIn": [
         "bullish-blsh:documents[17].url",
         "bullish-blsh:sources[27]"
+      ]
+    },
+    {
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "kind": "docx",
+      "issuer": "securitize-stocks",
+      "title": "Customer Brokerage Account Agreement — authoritative books, liens and SIPC exclusions",
+      "foundIn": [
+        "securitize-stocks:claims[13].url",
+        "securitize-stocks:claims[3].url",
+        "securitize-stocks:claims[4].url",
+        "securitize-stocks:claims[5].url",
+        "securitize-stocks:claims[6].url",
+        "securitize-stocks:claims[7].url",
+        "securitize-stocks:documents[1].url",
+        "securitize-stocks:findings[0].evidence",
+        "securitize-stocks:findings[2].evidence",
+        "securitize-stocks:parties.custodians[0].source",
+        "securitize-stocks:parties.distributors[0].source",
+        "securitize-stocks:sources[3]",
+        "securitize-stocks:whatIf[backing-shortfall].searched[2]",
+        "securitize-stocks:whatIf[issuer-wind-down].searched[2]",
+        "securitize-stocks:whatIf[keys-stolen].searched[2]",
+        "shared:[106].website"
+      ]
+    },
+    {
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "kind": "docx",
+      "issuer": "securitize-stocks",
+      "title": "Entitlement Token Disclosure — CET/ET distinction and exits",
+      "foundIn": [
+        "securitize-stocks:claims[1].sources[0]",
+        "securitize-stocks:claims[1].url",
+        "securitize-stocks:claims[2].url",
+        "securitize-stocks:claims[8].url",
+        "securitize-stocks:claims[9].url",
+        "securitize-stocks:documents[0].url",
+        "securitize-stocks:findings[1].evidence",
+        "securitize-stocks:sources[2]",
+        "securitize-stocks:whatIf[backing-shortfall].searched[1]",
+        "securitize-stocks:whatIf[issuer-wind-down].searched[1]",
+        "securitize-stocks:whatIf[keys-stolen].searched[1]",
+        "securitize-stocks:whatIf[redemption-refused]",
+        "securitize-stocks:whatIf[venue-delists]"
       ]
     },
     {
@@ -2089,6 +2137,15 @@
       ]
     },
     {
+      "url": "https://docs.loopscale.com/resources/formation",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:groups[0].documents[3].url",
+      "foundIn": [
+        "shared:groups[0].documents[3].url"
+      ]
+    },
+    {
       "url": "https://docs.nestusd.com/deployments/mainnet.json",
       "kind": "api",
       "issuer": "xstocks-backed",
@@ -2502,6 +2559,15 @@
       "foundIn": [
         "ondo-global-markets:documents[14].url",
         "ondo-global-markets:sources[12]"
+      ]
+    },
+    {
+      "url": "https://docs.orca.so/formation/faqs",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:groups[0].documents[2].url",
+      "foundIn": [
+        "shared:groups[0].documents[2].url"
       ]
     },
     {
@@ -3884,6 +3950,25 @@
       ]
     },
     {
+      "url": "https://explorer.solana.com/tx/2ggjAjXokTeQRr3WggB2MxrbfKnHLTiANb4vCPQbUkZUQQJ4Gedd1d1cxSL3mdUziuRaAzhjnxakfAxp8s4dLrJt",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "securitize-stocks:claims[0].url",
+      "foundIn": [
+        "securitize-stocks:claims[0].url",
+        "securitize-stocks:sources[10]"
+      ]
+    },
+    {
+      "url": "https://formation.so/",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:groups[0].documents[1].url",
+      "foundIn": [
+        "shared:groups[0].documents[1].url"
+      ]
+    },
+    {
       "url": "https://forwardindustries.com/",
       "kind": "html",
       "issuer": null,
@@ -4548,10 +4633,8 @@
       "title": "securitize-secz:findings[10].evidence",
       "foundIn": [
         "securitize-secz:findings[10].evidence",
-        "securitize-secz:findings[3].evidence",
         "securitize-secz:findings[9].evidence",
         "securitize-secz:parties.distributors[1].source",
-        "securitize-secz:sampleMints[0].source",
         "securitize-secz:sampleMints[3].source",
         "securitize-secz:sources[10]",
         "securitize-secz:whatIf[defrauded].searched[11]",
@@ -4708,7 +4791,6 @@
         "securitize-secz:custodyVerification.notes",
         "securitize-secz:documents[7].url",
         "securitize-secz:knownExtensions[5]",
-        "securitize-secz:sampleMints[0].source",
         "securitize-secz:sources[9]"
       ]
     },
@@ -4718,9 +4800,7 @@
       "issuer": "securitize-secz",
       "title": "securitize-secz:claims[52].quote",
       "foundIn": [
-        "securitize-secz:claims[52].quote",
-        "securitize-secz:findings[3].quote",
-        "securitize-secz:sampleMints[0].source"
+        "securitize-secz:claims[52].quote"
       ]
     },
     {
@@ -6083,7 +6163,12 @@
         "securitize-secz:whatIf[transfer-agent-fails].searched[8]",
         "securitize-secz:whatIf[venue-delists].searched[8]",
         "securitize-secz:whatIf[venue-insolvency].searched[8]",
-        "securitize-secz:whatIf[voting-rights].searched[8]"
+        "securitize-secz:whatIf[voting-rights].searched[8]",
+        "securitize-stocks:claims[12].url",
+        "securitize-stocks:documents[5].url",
+        "securitize-stocks:parties.distributors[1].source",
+        "securitize-stocks:sources[1]",
+        "shared:[107].website"
       ]
     },
     {
@@ -6240,6 +6325,18 @@
         "securitize-secz:whatIf[venue-delists].searched[5]",
         "securitize-secz:whatIf[venue-insolvency].searched[5]",
         "securitize-secz:whatIf[voting-rights].searched[5]"
+      ]
+    },
+    {
+      "url": "https://securitize.io/fee-schedule-table",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "Current 2026 fee schedule",
+      "foundIn": [
+        "securitize-stocks:claims[10].url",
+        "securitize-stocks:documents[4].url",
+        "securitize-stocks:findings[5].evidence",
+        "securitize-stocks:sources[6]"
       ]
     },
     {
@@ -6950,6 +7047,16 @@
       ]
     },
     {
+      "url": "https://solana.com/docs/tokens/extensions/permanent-delegate",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "securitize-stocks:whatIf[keys-stolen]",
+      "foundIn": [
+        "securitize-stocks:whatIf[keys-stolen]",
+        "securitize-stocks:whatIf[keys-stolen].searched[0]"
+      ]
+    },
+    {
       "url": "https://solana.com/news/case-study-xstocks",
       "kind": "html",
       "issuer": "xstocks-backed",
@@ -7311,8 +7418,13 @@
       "issuer": "securitize-secz",
       "title": "stocks.securitize.io — the SECZ trading front end (RFQ quotes, the 0.10% platform fee covering gas) and the entry point to the tokenize instructions",
       "foundIn": [
+        "securitize-secz:claims[89].url",
         "securitize-secz:documents[15].url",
+        "securitize-secz:documents[21].url",
+        "securitize-secz:findings[3].evidence",
+        "securitize-secz:sampleMints[0].source",
         "securitize-secz:sources[18]",
+        "securitize-secz:sources[31]",
         "securitize-secz:whatIf[account-frozen].searched[9]",
         "securitize-secz:whatIf[attestation-wrong].searched[9]",
         "securitize-secz:whatIf[authority-key-compromised].searched[9]",
@@ -7350,7 +7462,54 @@
         "securitize-secz:whatIf[transfer-agent-fails].searched[9]",
         "securitize-secz:whatIf[venue-delists].searched[9]",
         "securitize-secz:whatIf[venue-insolvency].searched[9]",
-        "securitize-secz:whatIf[voting-rights].searched[9]"
+        "securitize-secz:whatIf[voting-rights].searched[9]",
+        "securitize-stocks:documents[2].url",
+        "securitize-stocks:findings[3].evidence",
+        "securitize-stocks:parties.securitiesIssuers[0].source",
+        "securitize-stocks:parties.securitiesIssuers[10].source",
+        "securitize-stocks:parties.securitiesIssuers[11].source",
+        "securitize-stocks:parties.securitiesIssuers[1].source",
+        "securitize-stocks:parties.securitiesIssuers[2].source",
+        "securitize-stocks:parties.securitiesIssuers[3].source",
+        "securitize-stocks:parties.securitiesIssuers[4].source",
+        "securitize-stocks:parties.securitiesIssuers[5].source",
+        "securitize-stocks:parties.securitiesIssuers[6].source",
+        "securitize-stocks:parties.securitiesIssuers[7].source",
+        "securitize-stocks:parties.securitiesIssuers[8].source",
+        "securitize-stocks:parties.securitiesIssuers[9].source",
+        "securitize-stocks:sampleMints[0].source",
+        "securitize-stocks:sampleMints[10].source",
+        "securitize-stocks:sampleMints[11].source",
+        "securitize-stocks:sampleMints[1].source",
+        "securitize-stocks:sampleMints[2].source",
+        "securitize-stocks:sampleMints[3].source",
+        "securitize-stocks:sampleMints[4].source",
+        "securitize-stocks:sampleMints[5].source",
+        "securitize-stocks:sampleMints[6].source",
+        "securitize-stocks:sampleMints[7].source",
+        "securitize-stocks:sampleMints[8].source",
+        "securitize-stocks:sampleMints[9].source",
+        "securitize-stocks:sources[4]",
+        "shared:[100].website",
+        "shared:[101].website",
+        "shared:[102].website",
+        "shared:[103].website",
+        "shared:[104].website",
+        "shared:[105].website",
+        "shared:[95].website",
+        "shared:[96].website",
+        "shared:[97].website",
+        "shared:[98].website",
+        "shared:[99].website"
+      ]
+    },
+    {
+      "url": "https://stocks.securitize.io/asset/GOOGL",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "securitize-stocks:discrepancies[0].reality.sources[0].url",
+      "foundIn": [
+        "securitize-stocks:discrepancies[0].reality.sources[0].url"
       ]
     },
     {
@@ -7363,7 +7522,7 @@
         "securitize-secz:claims[77].note",
         "securitize-secz:claims[79].note",
         "securitize-secz:claims[81].url",
-        "securitize-secz:openQuestions[2]",
+        "securitize-secz:openQuestions[1]",
         "securitize-secz:quoteVerificationSources[0].verificationUrl",
         "securitize-secz:whatIf[transfer-agent-fails].searched[15]"
       ]
@@ -7424,7 +7583,9 @@
         "securitize-secz:whatIf[transfer-agent-fails].searched[9]",
         "securitize-secz:whatIf[venue-delists].searched[9]",
         "securitize-secz:whatIf[venue-insolvency].searched[9]",
-        "securitize-secz:whatIf[voting-rights].searched[9]"
+        "securitize-secz:whatIf[voting-rights].searched[9]",
+        "securitize-stocks:documents[3].url",
+        "securitize-stocks:sources[5]"
       ]
     },
     {
@@ -10200,6 +10361,30 @@
       ]
     },
     {
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-503",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "New York UCC 8-503 — entitlement-holder property interest",
+      "foundIn": [
+        "securitize-stocks:documents[6].url",
+        "securitize-stocks:sources[7]",
+        "securitize-stocks:whatIf[backing-shortfall]",
+        "securitize-stocks:whatIf[backing-shortfall].searched[0]",
+        "securitize-stocks:whatIf[issuer-wind-down]",
+        "securitize-stocks:whatIf[issuer-wind-down].searched[0]"
+      ]
+    },
+    {
+      "url": "https://www.nysenate.gov/legislation/laws/UCC/8-511",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "New York UCC 8-511 — competing secured-creditor priority",
+      "foundIn": [
+        "securitize-stocks:documents[7].url",
+        "securitize-stocks:sources[8]"
+      ]
+    },
+    {
       "url": "https://www.orca.so/",
       "kind": "html",
       "issuer": null,
@@ -11389,6 +11574,16 @@
       ]
     },
     {
+      "url": "https://www.sipc.org/for-investors/what-sipc-protects",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "SIPC scope and exclusions",
+      "foundIn": [
+        "securitize-stocks:documents[8].url",
+        "securitize-stocks:sources[9]"
+      ]
+    },
+    {
       "url": "https://www.spacex.com/",
       "kind": "html",
       "issuer": null,
@@ -11502,6 +11697,26 @@
       "title": "shared:[66].website",
       "foundIn": [
         "shared:[66].website"
+      ]
+    },
+    {
+      "url": "https://x.com/Securitize/status/2108180783827411451",
+      "kind": "html",
+      "issuer": "securitize-stocks",
+      "title": "securitize-stocks:discrepancies[0].claim.sources[0].url",
+      "foundIn": [
+        "securitize-stocks:discrepancies[0].claim.sources[0].url",
+        "securitize-stocks:parties.tokenizationProviders[0].source",
+        "securitize-stocks:sources[0]"
+      ]
+    },
+    {
+      "url": "https://x.com/formation_so/status/2107965006578921623",
+      "kind": "html",
+      "issuer": null,
+      "title": "shared:groups[0].documents[0].url",
+      "foundIn": [
+        "shared:groups[0].documents[0].url"
       ]
     },
     {

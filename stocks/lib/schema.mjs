@@ -17,6 +17,7 @@ export const SCHEMA_FILES = [
     '2026-09-22-sonar-focused-watches.sql',
     '2026-09-22-sonar-current-claims.sql',
     '2026-09-23-sonar-source-provenance.sql',
+    '2026-10-08-sonar-source-docx.sql',
     '2026-09-23-sonar-watch-delivery.sql',
     '2026-09-23-sonar-caselaw.sql',
     '2026-09-23-sonar-change-judgment.sql',

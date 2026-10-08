@@ -475,7 +475,7 @@
     "jurisdiction": "",
     "identifier": "",
     "website": "https://www.orca.so",
-    "note": "Solana AMM; thin SPCX pools (~$18k on 2026-09-16) and a named Shift RFQ venue."
+    "note": "Solana AMM; thin SPCX pools (~$18k on 2026-09-16) and a named Shift RFQ venue. Announced 2026-10-07: team combines with Loopscale as Formation. Orca remains a separate protocol/product; FAQ says positions, programmes and upgrade controls are unchanged."
   },
   {
     "name": "Meteora",
@@ -791,5 +791,109 @@
     "identifier": "",
     "website": "https://remoramarkets.xyz",
     "note": "Operator of the Remora Markets website and service: the 2026 remoramarkets.xyz Privacy Policy defines it as \"Remora Markets\", \"we\" or \"us\" (https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy). No state or country of organisation, address or registration number is published, and no document says it issued the rTokens; SEC EDGAR full-text search and the GLEIF LEI register return nothing for the name (2026-09-23). Unrelated, as far as any source shows, to the London-addressed Step Labs XYZ (steplabs.xyz) and to the Silicon Valley acoustics company STEP Labs."
+  },
+  {
+    "name": "Apple",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Amazon.com, Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Circle Internet Group, Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Alphabet Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Meta Platforms, Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Microsoft Corporation",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Strategy Inc",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Netflix, Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "NVIDIA Corporation",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Palantir Technologies Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Tesla, Inc.",
+    "type": "security-issuer",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://stocks.securitize.io/",
+    "note": "Referenced share issuer; CET sponsorship not established."
+  },
+  {
+    "name": "Securitize Markets, LLC",
+    "type": "custodian",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+    "note": "Contractual intermediary; exact subcustodians and custody accounts not identified."
+  },
+  {
+    "name": "Securitize Europe Brokerage and Markets, S.V., S.A.",
+    "type": "distributor",
+    "jurisdiction": "",
+    "identifier": "",
+    "website": "https://securitize.io/disclosure-library",
+    "note": "EU reception/transmission role; cross-border customer account chain unresolved."
   }
 ]

@@ -54,6 +54,20 @@ describe('public change journal', () => {
         expect(items[0].affectedHolders).toContain('current or prospective users of this exact protocol route');
     });
 
+    test('an organizational announcement retains its published time, actor and specific title', () => {
+        const [item] = buildChangeJournal({ curatedEvents: [{
+            date: '2026-10-07', publishedAt: '2026-10-07T22:43:16.000Z',
+            kind: 'sector', issuer: null, actor: 'Formation',
+            title: 'Orca and Loopscale combine as Formation', summary: 'Both protocols continue.',
+            source: 'https://docs.orca.so/formation/faqs'
+        }] });
+        expect(item).toMatchObject({
+            eventAt: '2026-10-07T22:43:16.000Z', actor: 'Formation', issuer: null,
+            title: 'Orca and Loopscale combine as Formation', href: null,
+            sources: [{ label: 'Primary record', url: 'https://docs.orca.so/formation/faqs' }]
+        });
+    });
+
     test('a curated programme event links its issuer dossier and is titled with the issuer name', () => {
         const [spcx, unknown] = buildChangeJournal({
             curatedEvents: [

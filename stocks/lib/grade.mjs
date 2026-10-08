@@ -92,7 +92,7 @@ export function claimRung(issuer) {
     if (NOTE_FORMS.includes(legalForm)) {
         return issuer?.securityInterest?.exists === true ? rung(2) : rung(1);
     }
-    if (legalForm === 'spv-claim-redeemable') return rung(3);
+    if (legalForm === 'spv-claim-redeemable' || legalForm === 'convertible-security-entitlement') return rung(3);
     if (legalForm === 'registered-share') return rung(4);
     return { rung: null, label: null };
 }
@@ -310,6 +310,7 @@ export function instrumentType(token, ondoItem) {
             return ondoInstrumentType(ondoItem);
         case 'xstocks-backed':
         case 'backpack-securities':
+        case 'securitize-stocks':
             return listedEquityType(token);
         default:
             return 'unknown';

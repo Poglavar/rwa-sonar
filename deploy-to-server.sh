@@ -21,6 +21,8 @@ PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-https://rwasonar.com}"
 # main by default; DEPLOY_BRANCH=<name> deploys another pushed branch (the guards below still
 # apply to it). Used for the hackathon branch, which stays unmerged until judging is over.
 BRANCH="${DEPLOY_BRANCH:-main}"
+# Opt in when a release admits newly researched mint addresses; resume the daily collector caches.
+REFRESH_CATALOGUE="${DEPLOY_REFRESH_CATALOGUE:-0}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -52,7 +54,7 @@ fi
 
 echo "Deploying rwa-sonar — server pulls ${BRANCH} on ${REMOTE_HOST}"
 
-DEPLOY_SHA=$(ssh "$REMOTE_HOST" "REMOTE_REPO_DIR='$REMOTE_REPO_DIR' REMOTE_DOCROOT='$REMOTE_DOCROOT' CLONE_URL='$CLONE_URL' BRANCH='$BRANCH' PUBLIC_BASE_URL='$PUBLIC_BASE_URL' bash -s" <<'EOF'
+DEPLOY_SHA=$(ssh "$REMOTE_HOST" "REMOTE_REPO_DIR='$REMOTE_REPO_DIR' REMOTE_DOCROOT='$REMOTE_DOCROOT' CLONE_URL='$CLONE_URL' BRANCH='$BRANCH' PUBLIC_BASE_URL='$PUBLIC_BASE_URL' REFRESH_CATALOGUE='$REFRESH_CATALOGUE' bash -s" <<'EOF'
 set -euo pipefail
 if [ ! -d "$REMOTE_REPO_DIR/.git" ]; then
 	mkdir -p "$(dirname "$REMOTE_REPO_DIR")"
@@ -113,6 +115,14 @@ fi
 if [ -f stocks/og/package-lock.json ]; then
 	(cd stocks/og && npm ci --omit=dev --no-audit --no-fund --loglevel=error >&2) && echo "og image renderer installed" >&2
 fi
+# New reviewed seeds need identity admission and actual chain reads before they enter the release.
+# Daily checkpoints make this bounded to missing queries/mints, without rerunning the full refresh.
+if [ "$REFRESH_CATALOGUE" = "1" ]; then
+    node stocks/fetch-universe.mjs --run >&2
+    node stocks/fetch-onchain.mjs --run >&2
+fi
+node stocks/extract-sources.mjs --run >&2
+node stocks/build-change-journal.mjs --run >&2
 # Rebuild the catalogue from retained live raw inputs plus the freshly deployed curated dossiers.
 # This creates issuer/token/funnel/health data before the API database load; no collector runs.
 node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$PUBLIC_BASE_URL" >&2
@@ -120,7 +130,7 @@ node stocks/build-release-artifacts.mjs --run --phase=base --base-url="$PUBLIC_B
 # took exclusive table locks that made overlapping jobs cancel each other). Then load the rebuilt
 # token snapshot and derive the queue from that database state before rendering review-aware pages.
 node stocks/apply-schema.mjs --run >&2
-node stocks/load-db.mjs --run --only=tokens,snapshots >&2
+node stocks/load-db.mjs --run --only=issuers,tokens,snapshots,claims,whatif >&2
 node stocks/build-release-artifacts.mjs --run --phase=pre-review --base-url="$PUBLIC_BASE_URL" >&2
 node stocks/build-review-queue.mjs --run >&2
 node stocks/build-release-artifacts.mjs --run --phase=surfaces --base-url="$PUBLIC_BASE_URL" >&2
@@ -166,6 +176,7 @@ rsync -a --delete \
 	--exclude '*.mjs' \
 	--exclude '*.cjs' \
 	--exclude '*.sh' \
+	--exclude '*.py' \
 	--exclude 'stocks/fixtures' \
 	"$REMOTE_REPO_DIR/" "$REMOTE_DOCROOT/"
 rm -f "$RELEASE_EXCLUDES"

@@ -325,6 +325,54 @@
         "summary": "No ownership; the markets were settled at their own prices when the venue closed.",
         "source": { "url": "https://docs.ventuals.com/overview/markets", "locator": "section 'Trade valuations, not shares'", "quote": "you do not have any underlying economic ownership in the company" }
       }
+    },
+    "securitize-stocks": {
+      "dividends": {
+        "status": "value",
+        "summary": "Cash distributions pass through in the settlement stablecoin, net of tax and fees; small dividends can be consumed by processing charges.",
+        "source": {
+          "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+          "locator": "section 8.3",
+          "quote": "settlement stablecoin"
+        }
+      },
+      "voting": {
+        "status": "value",
+        "summary": "CET votes are expected to pass through; SM handles uninstructed votes under its proxy policy, which was not obtained.",
+        "source": {
+          "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+          "locator": "section 8.6",
+          "quote": "expected to pass through"
+        }
+      },
+      "information": {
+        "status": "unknown",
+        "summary": "Corporate-action notices are documented. Direct meeting attendance and a complete shareholder information-rights route were not established.",
+        "source": {
+          "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+          "locator": "sections 8.4 and 8.6",
+          "quote": null
+        }
+      },
+      "splits": {
+        "status": "value",
+        "summary": "Mandatory actions are processed by SM against the underlying shares and then reflected in the account or token position.",
+        "source": {
+          "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+          "locator": "sections 8.2 and 8.5(b)",
+          "quote": "processed automatically"
+        }
+      },
+      "takeovers": {
+        "status": "value",
+        "summary": "Mandatory merger exchanges pass through; voluntary offers require an election by the broker deadline, usually earlier than the issuer deadline.",
+        "source": {
+          "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+          "locator": "section 8.2",
+          "quote": "affirmative election"
+        }
+      },
+      "reviewedAt": "2026-10-08T17:55:38.675773Z"
     }
   }
 }

@@ -92,7 +92,7 @@
     {
       "symbol": "SECZ (Solana, Token-2022)",
       "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
-      "source": "Identified via the Jupiter token registry (https://lite-api.jup.ag/tokens/v2/search?query=SECZ — isVerified true, name 'Securitize Corp.', icon https://metadata.securitize.io/secz_logo.png) and then confirmed on Solana mainnet 2026-09-16: Token-2022, TokenMetadata name 'Securitize Corp.', symbol 'SECZ', metadata URI https://metadata.securitize.io/secz.json (an issuer-controlled domain, which is the attribution evidence), supply 148,998.000000, created 2026-06-29. NOTE: Securitize has NOT published this address in any SEC filing or press release located, so attribution rests on the issuer-controlled metadata domain plus the registry's verified flag — weaker provenance than Bullish, which publishes its mint address on its own site."
+      "source": "https://stocks.securitize.io/ — official stocks-catalog entry for SECZ publishes the exact mint. Verified 2026-10-08; earlier metadata-only attribution is superseded."
     },
     {
       "symbol": "SECZ mint authority AND freeze authority (same address, apparent program PDA)",
@@ -107,7 +107,7 @@
     {
       "symbol": "IMPERSONATION WARNING — at least four pump.fun memecoins use the SECZ ticker and Securitize branding",
       "mint": "4wTKz6r4cFUg7PvjfpM5xZ6J1AcNaotSFpLwpouNpump",
-      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ read 2026-09-16 — this one (created 2026-09-13, 1,000,000,000 supply, pump.fun launchpad, mint and freeze authority disabled) plus 3vHkvGPk6MCBJzJbfKktmQpwtQXWST41whk42bDPpump, 2zwB9CMiJRaFjKpprsk3rJ6i9LDN1wrBurZne5Nypump and EFN8YfFYuuHjmizdcoWiBmdEe5b1xJMySJoocGuVpump, several linking to a real Securitize X post as their 'twitter' field. None is the security. Securitize publishing a canonical mint address would close this off."
+      "source": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ read 2026-09-16 — this one (created 2026-09-13, 1,000,000,000 supply, pump.fun launchpad, mint and freeze authority disabled) plus 3vHkvGPk6MCBJzJbfKktmQpwtQXWST41whk42bDPpump, 2zwB9CMiJRaFjKpprsk3rJ6i9LDN1wrBurZne5Nypump and EFN8YfFYuuHjmizdcoWiBmdEe5b1xJMySJoocGuVpump, several linking to a real Securitize X post as their 'twitter' field. None is the security. The official catalogue now publishes the real SECZ mint (2026-10-08); these historical impersonators do not match it."
     }
   ],
   "incidents": [
@@ -241,6 +241,11 @@
       "title": "Securitize Investor Help Center, \"What if I lost access to my wallet?\" - the issuer-side lost-key procedure for investors: email investorsupport@securitize.io, identity verification and a notarized affidavit; \"We can recover most tokens from lost wallets\" but recovery \"may not be possible\" in some circumstances. Generic to Securitize tokens, not SECZ-specific. Live page Cloudflare-blocked; text read from the Wayback capture of 2025-04-23 (identical in every capture since 2023-06-08).",
       "url": "https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
       "type": "docs"
+    },
+    {
+      "title": "Official stock catalogue — canonical SECZ Solana mint",
+      "url": "https://stocks.securitize.io/",
+      "accessedAt": "2026-10-08T17:55:38.675773Z"
     }
   ],
   "keyGovernance": {
@@ -706,15 +711,15 @@
       "accessedAt": "2026-09-17"
     },
     {
-      "schema": "no-canonical-mint-address-published",
-      "severity": "warning",
+      "schema": "canonical-mint-address-published",
+      "severity": "info",
       "observer": "rwa-sonar",
-      "observedAt": "2026-09-16",
-      "evidence": "https://lite-api.jup.ag/tokens/v2/search?query=SECZ",
-      "statement": "Securitize publishes no Solana or Avalanche contract address in any SEC filing or press release located, so attribution of mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED rests on its TokenMetadata URI pointing at metadata.securitize.io plus a registry verified flag. The gap is not theoretical: at least four pump.fun memecoins use the SECZ ticker and Securitize branding.",
-      "quote": "\"name\": \"Securitize Corp.\", \"symbol\": \"SECZ\", \"description\": \"Securitize, the world’s leader in tokenizing real-world assets is bringing the world onchain.\", \"image\": \"https://metadata.securitize.io/secz_logo.png\"",
-      "quoteNote": "metadata.securitize.io/secz.json in full, re-read 2026-09-17. This issuer-controlled document is the whole of the attribution chain, and it carries no address, CUSIP or ISIN. Re-searched the S-1, the 2026-07-08 8-K, the 10-Q, the Q2 earnings exhibit and the press release for the mint address prefix \"5Vzw\": zero hits.",
-      "accessedAt": "2026-09-17"
+      "observedAt": "2026-10-08",
+      "evidence": "https://stocks.securitize.io/",
+      "statement": "Resolved 2026-10-08: the official stock catalogue publishes SECZ mint 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED. Its identity no longer rests on metadata attribution alone.",
+      "quote": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "quoteNote": "Official server-rendered stocks-catalog JSON; resolves the earlier absence finding, not remaining register or custody questions. Prior finding no-canonical-mint-address-published dated 2026-09-16 is superseded by this exact-address publication.",
+      "accessedAt": "2026-10-08T17:55:38.675773Z"
     },
     {
       "schema": "reconciliation-output-not-published",
@@ -828,7 +833,6 @@
   ],
   "confidence": "medium-high",
   "openQuestions": [
-    "MINT ATTRIBUTION IS INFERRED, NOT PUBLISHED. Securitize has published no Solana contract address anywhere located. 5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED is attributed on the strength of its TokenMetadata URI pointing at metadata.securitize.io, matching name/symbol, the Token-2022 compliance extension set, a 2026-06-29 creation date (three days before listing) and a registry verified flag. That is strong circumstantial evidence, not issuer confirmation. Given four SECZ-branded impersonation mints on Solana, the single highest-value next step is asking Securitize IR to publish canonical addresses. Treat the address as high-confidence-but-unconfirmed until then.",
     "Where is the $295M? Press reports $295M of tokenized SECZ; the Solana mint holds 148,998 tokens (~$1.24M). The S-1 puts locked-up business-combination shares on Avalanche, so the balance is presumably there — but Securitize publishes no per-chain supply figures and nothing reconciles the headline to the chains. The Avalanche contract address should be identified and its supply read to close this.",
     "PARTLY ANSWERED (2026-09-18, re-examined 2026-09-23): before tokenization the holder is a registered holder in their own name, not a customer position behind the group's broker-dealer. Securitize's tokenize instructions route the holder through direct registration BEFORE any token exists — the broker DRS/DWACs the shares to Continental Stock Transfer, \"the transfer agent records you as the registered owner of the shares\", and only then \"Once your shares are registered directly on the transfer agent’s shareholder ledger, they can be converted into tokenized form\" (static source https://stocks.securitize.io/drs/brokers/general_instructions.md, step 5). The instructions stop there; the request form sends symbol, token id, quantity, the Continental account id and a wallet address to Securitize. What Continental's register shows AFTER conversion is not published — see the next register question.",
     "What is the correct name of the gatekeeping broker-dealer? The S-1 says 'Securities Markets, LLC'; Securitize's broker-dealer is publicly known as Securitize Markets, LLC. Most likely a typo in a registration statement, but it is the entity that controls who may hold the security, and it should be confirmed against the FINRA/SEC BD registration rather than assumed.",
@@ -876,7 +880,8 @@
     "https://continentalstock.com/for-shareholders/shareholder-faqs/",
     "https://delcode.delaware.gov/title8/c001/sc05/index.html",
     "https://www.law.cornell.edu/cfr/text/17/240.17Ad-16",
-    "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet"
+    "https://web.archive.org/web/20250423204425/https://investorsupport.securitize.io/hc/en-us/articles/7331990591127-What-if-I-lost-access-to-my-wallet",
+    "https://stocks.securitize.io/"
   ],
   "claims": [
     {
@@ -1542,7 +1547,7 @@
       "locator": "p. 47, tokenization risk factor",
       "accessedAt": "2026-09-17T15:12:54Z",
       "status": "confirmed",
-      "note": "Solana figures re-verified 2026-09-17: getTokenSupply 148,998.000000 at slot 447827107 and 116 Token-2022 accounts (the dossier counted 117 on 2026-09-16, so one account closed). The mint address itself is still published nowhere by Securitize — re-searched the S-1, the 8-K, the 10-Q, the Q2 earnings exhibit and the press release for \"5Vzw\": zero hits."
+      "note": "Solana figures re-verified 2026-09-17: getTokenSupply 148,998.000000 at slot 447827107 and 116 Token-2022 accounts (the dossier counted 117 on 2026-09-16, so one account closed). Identity update 2026-10-08: exact mint now appears in the official stock catalogue."
     },
     {
       "field": "products[2]",
@@ -1738,6 +1743,15 @@
       "accessedAt": "2026-09-23T19:22:50Z",
       "status": "confirmed",
       "note": "Before 2026-08-11 the SECZ freeze authority was the on-curve funded key B2Psxcut… itself; B2Psxcut… still co-signs registry calls that make the program thaw accounts (tx 4CYGoHpi…, 2026-08-12)."
+    },
+    {
+      "field": "sampleMints",
+      "quote": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "url": "https://stocks.securitize.io/",
+      "locator": "script#__REACT_QUERY_STATE__, stocks-catalog, symbol SECZ",
+      "accessedAt": "2026-10-08T17:55:38.675773Z",
+      "status": "confirmed",
+      "note": "Issuer-controlled publication now establishes the address, replacing metadata-only attribution."
     }
   ],
   "whatIf": [
@@ -1772,7 +1786,7 @@
     {
       "mode": "defrauded",
       "status": "documented",
-      "outcome": "You carry it. Securitize disclaims liability \"whatsoever\" for phishing, spoofing or other attacks, makes you indemnify it for any unauthorised use of your account, and caps everything at $1,000. The one structural protection is that a fraudster's wallet must itself be whitelisted before it can receive real SECZ — but Securitize has published no canonical mint address anywhere, and at least four pump.fun memecoins trade on the SECZ ticker with Securitize branding, so the fake-token half of this risk is wide open by omission.",
+      "outcome": "You carry it. Securitize disclaims liability \"whatsoever\" for phishing, spoofing or other attacks, makes you indemnify it for any unauthorised use of your account, and caps everything at $1,000. The one structural protection is that a fraudster's wallet must itself be whitelisted before it can receive real SECZ. The official catalogue now publishes the real SECZ address; verify that exact mint. Historical lookalike tickers are not the security.",
       "quote": "SECURITIZE SHALL NOT BEAR ANY LIABILITY, WHATSOEVER, FOR ANY DAMAGE OR INTERRUPTIONS CAUSED BY ANY COMPUTER VIRUSES OR OTHER MALICIOUS CODE THAT MAY AFFECT YOUR COMPUTER OR OTHER EQUIPMENT, OR ANY PHISHING, SPOOFING OR OTHER ATTACKS.",
       "url": "https://securitize.io/disclosure/terms-of-service-transfer-agent",
       "locator": "§10.3 Limitation of Liability",
@@ -1792,7 +1806,7 @@
         "Securitize Connect API docs, Wallets — https://sec-connect-api-docs.securitize.io/wallets",
         "https://lite-api.jup.ag/tokens/v2/search?query=SECZ (four SECZ-branded pump.fun mints)"
       ],
-      "note": "Supporting language: Securitize ToS §4 — \"You acknowledge that Securitize is not responsible for third-party access to your Securitize Account that results from theft or misappropriation of your Securitize Account\"; TA ToS §11(v) makes you indemnify Securitize for \"any unauthorized use of your Securitize Account\"; §10.3 caps aggregate liability at $1,000. Reporting channel: \"In the event that the User identifies unauthorized activity in the Securitize Account, such as errors, failures in operations and/or non-authorized operations, contact investorsupport@securitize.io\" (ToS §5). The remedy, if any, is the discretionary burn-and-reissue of keys-stolen. NO ANTI-IMPOSTOR DEFENCE IS PUBLISHED: this dossier's own finding no-canonical-mint-address-published records that no SEC filing or press release names a Solana or Avalanche address, so a holder cannot check a mint against an issuer list the way Superstate's and Galaxy's holders can. Publishing one address would close the whole class."
+      "note": "Updated 2026-10-08: issuer-controlled exact-mint catalogue closes the earlier identity gap. It does not resolve stolen-wallet recovery or share-register continuity."
     },
     {
       "mode": "death-inheritance",

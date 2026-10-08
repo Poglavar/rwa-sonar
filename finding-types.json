@@ -592,5 +592,68 @@
     "defaultSeverity": "info",
     "description": "Protocol documentation says the price aggregator falls back to another source when one goes stale, but the configured price chain errors instead, and the reserve has been observed stale for hours or days.",
     "howToVerify": "Compare the documentation's fallback statement with the decoded price chain (Kamino Scope OracleMappings: a MostRecentOf entry errors when any source is stale or the sources diverge) and with logged staleness windows (\"Price is too old\")."
+  },
+  {
+    "schema": "broker-books-control-entitlement-transfer",
+    "name": "Broker books complete the legal transfer",
+    "category": "legal",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "An on-chain transfer instructs the intermediary; the entitlement transfers when its books are updated.",
+    "howToVerify": "Read the account agreement provision identifying the authoritative ledger and when an entitlement order becomes effective."
+  },
+  {
+    "schema": "cash-redemption-not-available",
+    "name": "Cash redemption is unavailable",
+    "category": "settlement",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "Terms exclude cash redemption; a platform sale or conventional-share conversion is a different exit route.",
+    "howToVerify": "Read product-specific redemption exclusions and distinguish sale, cash redemption and in-kind conversion."
+  },
+  {
+    "schema": "self-custody-sipc-scope-unresolved",
+    "name": "Self-custody protection needs clarification",
+    "category": "legal",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "Expected protection of underlying share positions and exclusions for held-away wallet assets leave the combined case unresolved.",
+    "howToVerify": "Compare product disclosures with the account agreement custody election and SIPC exclusions; obtain account-specific confirmation."
+  },
+  {
+    "schema": "independent-cet-reserve-reconciliation-not-located",
+    "name": "No independent CET reserve reconciliation found",
+    "category": "custody",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "Issuer assertions and token supply have not been matched against an independent dated underlying-share statement.",
+    "howToVerify": "Look for a dated third-party reconciliation with per-share-class pool holdings and token liabilities."
+  },
+  {
+    "schema": "shared-cet-administrative-authority",
+    "name": "CETs share an administrative authority",
+    "category": "governance",
+    "polarity": "negative",
+    "defaultSeverity": "caution",
+    "description": "A common address controls delegate, pause and scaled-UI powers across the reviewed CET mints; its signing policy is unresolved.",
+    "howToVerify": "Compare finalized mint extension authorities and read the shared authority account; distinguish on-chain key form from off-chain approval policy."
+  },
+  {
+    "schema": "conventional-share-exit-documented",
+    "name": "Conventional-share exit is documented",
+    "category": "settlement",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "Terms provide a conversion and broker-transfer route; documentation alone does not verify completed execution.",
+    "howToVerify": "Read conversion conditions, receiving-broker eligibility, procedures and fees; separately look for an executed transfer."
+  },
+  {
+    "schema": "canonical-mint-address-published",
+    "name": "Issuer publishes the canonical mint",
+    "category": "disclosure",
+    "polarity": "neutral",
+    "defaultSeverity": "info",
+    "description": "An issuer-controlled catalogue names the exact mint, resolving prior identity attribution based only on metadata.",
+    "howToVerify": "Read the exact address from the official catalogue and compare it with the finalized mint account."
   }
 ]

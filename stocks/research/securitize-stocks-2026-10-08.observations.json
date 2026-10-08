@@ -1,0 +1,956 @@
+{
+  "_comment": "Dated primary-source observations for Securitize Stocks. Supply is a mint observation, never a reserve attestation or a measure of circulation.",
+  "reviewedAt": "2026-10-08T17:55:38.675773Z",
+  "catalogue": {
+    "url": "https://stocks.securitize.io/",
+    "locator": "script#__REACT_QUERY_STATE__; queryKey=[stocks-catalog]",
+    "dataUpdatedAt": 1791478689454,
+    "sha256": "e561407257b96316ea781e2cc2aad294676a0ba201f7900e2c7be04fb69f5888",
+    "accessedDate": "2026-10-08"
+  },
+  "chain": {
+    "url": "https://api.mainnet-beta.solana.com",
+    "method": "getMultipleAccounts",
+    "commitment": "finalized",
+    "slot": 454613378,
+    "observedAt": "2026-10-08T17:36:33.771067+00:00"
+  },
+  "items": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "mint": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "1bb255bb-462f-429b-9c69-eff18a9a5486",
+      "isin": "US0378331005",
+      "cusip": "037833100",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "152000000",
+      "mintAuthority": "AQYBEemPzcKpSYne3ZuB6pSjYMFDjwuvDhnskZSS8Upp",
+      "freezeAuthority": "AQYBEemPzcKpSYne3ZuB6pSjYMFDjwuvDhnskZSS8Upp",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD",
+            "name": "Apple - Securitize",
+            "symbol": "AAPL",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/aapl.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "AMZN",
+      "name": "Amazon.com, Inc.",
+      "mint": "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "354290f6-a021-48d8-a65e-443adce754d1",
+      "isin": "US0231351067",
+      "cusip": "023135106",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "200000000",
+      "mintAuthority": "5qJBojgj8ivykfMEAYFrUpsxNnS2aBbrFyeN91G9tenN",
+      "freezeAuthority": "5qJBojgj8ivykfMEAYFrUpsxNnS2aBbrFyeN91G9tenN",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "8kVtvtb8cj512xeweEchkNVUccvcXq2Yo7CvDPZpytBP",
+            "name": "Amazon.com - Securitize",
+            "symbol": "AMZN",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/amzn.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "CRCL",
+      "name": "Circle Internet Group, Inc.",
+      "mint": "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "557520e1-0244-45ed-b3b5-401f5d7d28f0",
+      "isin": "US1725731079",
+      "cusip": "172573107",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "620000000",
+      "mintAuthority": "FFicUA2br6ymkv5ydF48JpEo2m7qQXDCZVjxnabPtSR5",
+      "freezeAuthority": "FFicUA2br6ymkv5ydF48JpEo2m7qQXDCZVjxnabPtSR5",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "8NxJNxfZKW2ST1ZmNbthRoHbXB9yB4Gi7V7vVV3KH38h",
+            "name": "Circle - Securitize",
+            "symbol": "CRCL",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/crcl.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc. Class A",
+      "mint": "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "6f7f25ad-41a0-4a93-b7bf-56e748e98e93",
+      "isin": "US02079K3059",
+      "cusip": "02079K305",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "150000000",
+      "mintAuthority": "FX8voMHJWv5i2ZHSaBEK8DCuxw46bfs9JsB9uK6YdZFm",
+      "freezeAuthority": "FX8voMHJWv5i2ZHSaBEK8DCuxw46bfs9JsB9uK6YdZFm",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "2qXFRgxeYUkc19JBAzRvZZReAhVTWFd31m9qM2C3a2GK",
+            "name": "Alphabet Class A - Securitize",
+            "symbol": "GOOGL",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/googl.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": "Launch says GOOG; catalogue says GOOGL (Class A). Do not substitute GOOG or assume identical share rights."
+    },
+    {
+      "symbol": "META",
+      "name": "Meta Platforms, Inc. Class A",
+      "mint": "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "62e597a0-47be-4ff0-af8c-822ed957183b",
+      "isin": "US30303M1027",
+      "cusip": "30303M102",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "70000000",
+      "mintAuthority": "HytLpuUK1ij82zDTjaUo7X8jPzGMwkqAQkvyWxjjd9Y9",
+      "freezeAuthority": "HytLpuUK1ij82zDTjaUo7X8jPzGMwkqAQkvyWxjjd9Y9",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "3jVWyof7Ks14Kpd4GmKk6c8ktErxPMEwD9XR2VfJKeu1",
+            "name": "Meta Class A - Securitize",
+            "symbol": "META",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/meta.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft Corporation",
+      "mint": "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "9d12d26c-d30f-487e-8cdb-9ade28771f68",
+      "isin": "US5949181045",
+      "cusip": "594918104",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "95000000",
+      "mintAuthority": "2mEXCoqBgTijpkWFdTmi4dDAPAATnqop1w8iXP89LvoR",
+      "freezeAuthority": "2mEXCoqBgTijpkWFdTmi4dDAPAATnqop1w8iXP89LvoR",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "6V4gLu7aC63e6CTEJXu71wtx5FMrZ3FQoST7UXXqgPuQ",
+            "name": "Microsoft - Securitize",
+            "symbol": "MSFT",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/msft.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "MSTR",
+      "name": "Strategy Inc",
+      "mint": "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "858c6a58-888a-4f26-85c8-75cb142f0d7a",
+      "isin": "US5949724083",
+      "cusip": "594972408",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "326000000",
+      "mintAuthority": "Az7Zji4aK1YhmpQWKu2GMHDeaWWTgXFpjeTnx3eToE8D",
+      "freezeAuthority": "Az7Zji4aK1YhmpQWKu2GMHDeaWWTgXFpjeTnx3eToE8D",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "4V3ZstipcG21LbEB5usTx4VcJGjcsxKnrExPK1QwaJC1",
+            "name": "Strategy - Securitize",
+            "symbol": "MSTR",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/mstr.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "NFLX",
+      "name": "Netflix, Inc.",
+      "mint": "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "32ed74c9-a38c-4eb4-9054-ce83c51f2956",
+      "isin": "US64110L1061",
+      "cusip": "64110L106",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "920000000",
+      "mintAuthority": "m7KywJ2LVD5T61SzjHWZKw5Wc9sWSMRRN9kXQr3cGTg",
+      "freezeAuthority": "m7KywJ2LVD5T61SzjHWZKw5Wc9sWSMRRN9kXQr3cGTg",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "3i57nfnGeTccVgPfNG2PGAkdH7Mfs81mG2CwijtBTbcX",
+            "name": "Netflix - Securitize",
+            "symbol": "NFLX",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/nflx.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA Corporation",
+      "mint": "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "c191b458-2beb-43d4-996a-df8b5ed978c8",
+      "isin": "US67066G1040",
+      "cusip": "67066G104",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "211000000",
+      "mintAuthority": "8WP8xVrxNmVsGi7WJNG2WHi16rRTFfZAapTyzkuLJTac",
+      "freezeAuthority": "8WP8xVrxNmVsGi7WJNG2WHi16rRTFfZAapTyzkuLJTac",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "6yqHep7MGiy3tTkQv54BkjiATGdVszWZCp36j1VPCsF3",
+            "name": "NVIDIA - Securitize",
+            "symbol": "NVDA",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/nvda.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "PLTR",
+      "name": "Palantir Technologies Inc.",
+      "mint": "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "ae95e32e-ca50-4943-84a9-861610c03ebb",
+      "isin": "US69608A1088",
+      "cusip": "69608A108",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "260000000",
+      "mintAuthority": "4DVPr9BBJd4Qoe48p7dA9LdBLbLRmYuMV6PSnqU5QKyK",
+      "freezeAuthority": "4DVPr9BBJd4Qoe48p7dA9LdBLbLRmYuMV6PSnqU5QKyK",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "hRhNSeHmMDuUntu44WSu5D25gy8R35ctw3UG3HeCHKi",
+            "name": "Palantir - Securitize",
+            "symbol": "PLTR",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/pltr.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "SECZ",
+      "name": "Securitize Corp",
+      "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+      "issuer": "securitize",
+      "catalogueTokenId": "81266ec1-eb93-4e4f-bf20-8afc39fcb887",
+      "isin": "US81517B1017",
+      "cusip": "81517B101",
+      "catalogueTransferAgent": "CONTINENTAL_STOCK",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "148998000000",
+      "mintAuthority": "8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+      "freezeAuthority": "8TwererfKZwiBfKQs2bQmVRrezqeFG3JvrVsbpGaPbQs",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+            "metadataAddress": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED",
+            "name": "Securitize Corp.",
+            "symbol": "SECZ",
+            "updateAuthority": "D2kGPFTyGSeeTSCA1kEzKZNrdMvYKPLdZtrmAnnK6jCS",
+            "uri": "https://metadata.securitize.io/secz.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Existing SECZ dossier",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "SPCX",
+      "name": "Space Exploration Technologies Corp. Class A",
+      "mint": "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "a4522750-cb49-4077-8644-fd64dd2cb591",
+      "isin": "US84615Q1031",
+      "cusip": "84615Q103",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "302000000",
+      "mintAuthority": "4jxj5AFuAxYuPtTT67zyifhaiDa6k61wH2ELC8sYZqMV",
+      "freezeAuthority": "4jxj5AFuAxYuPtTT67zyifhaiDa6k61wH2ELC8sYZqMV",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "CkZoZ5vu2uuayHzJgavBjARyEeGrTMWMmbbt867jAFrj",
+            "name": "SpaceX Class A - Securitize",
+            "symbol": "SPCX",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/spcx.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla, Inc.",
+      "mint": "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv",
+      "issuer": "securitize-stocks",
+      "catalogueTokenId": "ff245488-8ee8-4295-9802-9c063f95adfb",
+      "isin": "US88160R1014",
+      "cusip": "88160R101",
+      "catalogueTransferAgent": "COMPUTERSHARE",
+      "transferAgentCaveat": "Catalogue label only; not independent proof of appointment for this CET or underlying share.",
+      "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "decimals": 6,
+      "supplyRaw": "133000000",
+      "mintAuthority": "8oeRLexjxYP8KBWTdT3gNrCDnDeguNXVSCTN5eDVRkBh",
+      "freezeAuthority": "8oeRLexjxYP8KBWTdT3gNrCDnDeguNXVSCTN5eDVRkBh",
+      "extensions": [
+        {
+          "extension": "metadataPointer",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "metadataAddress": "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv"
+          }
+        },
+        {
+          "extension": "pausableConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "paused": false
+          }
+        },
+        {
+          "extension": "defaultAccountState",
+          "state": {
+            "accountState": "frozen"
+          }
+        },
+        {
+          "extension": "permanentDelegate",
+          "state": {
+            "delegate": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR"
+          }
+        },
+        {
+          "extension": "scaledUiAmountConfig",
+          "state": {
+            "authority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "multiplier": "1",
+            "newMultiplier": "1",
+            "newMultiplierEffectiveTimestamp": 0
+          }
+        },
+        {
+          "extension": "tokenMetadata",
+          "state": {
+            "additionalMetadata": [],
+            "mint": "HMgreFGFGZswE8L2zF2hNeWaSunwFAV93gWiTB9tjFUv",
+            "name": "Tesla - Securitize",
+            "symbol": "TSLA",
+            "updateAuthority": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+            "uri": "https://metadata.securitize.io/tsla.json"
+          }
+        }
+      ],
+      "instrumentTermsBinding": "Programme-level review; authenticated order disclosure not inspected",
+      "identityCaveat": null
+    }
+  ],
+  "authorityObservation": {
+    "observedAt": "2026-10-08T17:43:46.968777+00:00",
+    "endpoint": "https://api.mainnet-beta.solana.com",
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getMultipleAccounts",
+      "params": [
+        [
+          "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+          "AQYBEemPzcKpSYne3ZuB6pSjYMFDjwuvDhnskZSS8Upp"
+        ],
+        {
+          "encoding": "jsonParsed",
+          "commitment": "finalized"
+        }
+      ]
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "result": {
+        "context": {
+          "apiVersion": "4.3.0",
+          "slot": 454614970
+        },
+        "value": [
+          {
+            "data": [
+              "",
+              "base64"
+            ],
+            "executable": false,
+            "lamports": 23745888,
+            "owner": "11111111111111111111111111111111",
+            "rentEpoch": 18446744073709551615,
+            "space": 0
+          },
+          null
+        ]
+      },
+      "id": 1
+    },
+    "addressClassification": {
+      "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR": "on-curve",
+      "AQYBEemPzcKpSYne3ZuB6pSjYMFDjwuvDhnskZSS8Upp": "off-curve",
+      "method": "stocks/lib/solana-address.mjs isOnCurve"
+    }
+  },
+  "tradeObservation": {
+    "url": "https://explorer.solana.com/tx/2ggjAjXokTeQRr3WggB2MxrbfKnHLTiANb4vCPQbUkZUQQJ4Gedd1d1cxSL3mdUziuRaAzhjnxakfAxp8s4dLrJt",
+    "signature": "2ggjAjXokTeQRr3WggB2MxrbfKnHLTiANb4vCPQbUkZUQQJ4Gedd1d1cxSL3mdUziuRaAzhjnxakfAxp8s4dLrJt",
+    "slot": 454600556,
+    "blockTime": 1791477524,
+    "observedAt": "2026-10-08T17:44:35.183980+00:00",
+    "successful": true,
+    "paidUsdc": "10",
+    "receivedAaplTokens": "0.029543",
+    "usdcFeeLeg": "0.01",
+    "outerProgram": "HFHR2StPa95U7xW9oiXPaPH2jNBrQtj9doEC6HtftKUU",
+    "liquidityProgram": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
+    "scope": "Observed secondary swap, not a verified off-chain share purchase, DRS transfer or cash redemption; participant identities unverified."
+  },
+  "documentFingerprints": [
+    {
+      "title": "Entitlement Token Disclosure",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Ff4e08e665f6c4dd5acd83a5cc7fda905?alt=media&token=25f5b338-6342-4e22-a8df-8524b558f798&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "effectiveDate": "2026-09-15",
+      "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "sha256": "9fd71988daaa2ef701950c01a71b7953c4eea7336b92240b870148cbb4172bcc"
+    },
+    {
+      "title": "Customer Brokerage Account Agreement",
+      "url": "https://cdn.builder.io/o/assets%2Fd39b51a544e84e2fbb2445f58c6c6f2c%2Fd0cf0550f96f4acd8a0fbc95ecd93878?alt=media&token=f44f0bf3-2984-4535-ae58-eba6fe4901ca&apiKey=d39b51a544e84e2fbb2445f58c6c6f2c",
+      "effectiveDate": null,
+      "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "sha256": "be87db707f81d3be7dce80c5211cb9c05d53f75c56c4a9b66ae19ea355e3ade7"
+    }
+  ]
+}

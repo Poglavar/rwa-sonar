@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The document watcher (EVIDENCE.md §2.1-§2.3): fetch every URL in stocks/data/sources.json with a
 // browser-like UA and conditional headers, normalise it to text (PDF through `pdftotext -layout`,
-// HTML stripped of chrome, JSON with sorted keys), hash it, and compare with the hash we stored
+// DOCX through bounded ZIP/XML extraction, HTML stripped of chrome, JSON with sorted keys), hash it, and compare with the hash we stored
 // last time. An unchanged source only moves `last_checked_at`; a changed one gets its raw bytes and
 // text kept on disk, a line diff, a keyword severity, and a `sonar.change_event` when the change
 // touches one of the §2.3 legal keywords. A 404/410 or a host that stopped resolving is a
@@ -11,6 +11,8 @@
 // this file is the IO, the pacing, the checkpointing and the run verdict.
 
 import { spawn } from 'node:child_process';
+import { bytesToText, pdfToText } from './lib/document-readers.mjs';
+import { docxToText } from './lib/docx.mjs';
 import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -30,13 +32,13 @@ import { diffLines, summariseDiff } from './lib/textdiff.mjs';
 import { refreshCollectorStatus } from './build-collector-status.mjs';
 import { partitionEventResolutions } from './lib/event-resolutions.mjs';
 import {
-    apiAnswerIsDocument, binaryMarker, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
-    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, driveDownloadUrl, dropboxDownloadUrl, extraCaFor, fileStamp, htmlDocumentText, isTextual,
-    looksLikePdf, looksLikeText, normaliseByKind, normaliseLines,
+    apiAnswerIsDocument, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
+    challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, driveDownloadUrl, dropboxDownloadUrl, extraCaFor, fileStamp,
+    looksLikePdf, looksLikeText, normaliseLines,
     ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
-    storedReading, userAgentFor, dossierQuotes, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
+    storedReading, userAgentFor, dossierQuotes, selectSourceIds, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
     ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
 } from './lib/watch.mjs';
 import { buildRows, nextState, settleExtractorUpgrade } from './lib/watch-rows.mjs';
@@ -95,6 +97,7 @@ USAGE
 OPTIONS
   --run              Actually fetch. Without it this help is printed and nothing runs.
   --only=<issuer>    Only sources attributed to this issuer slug (e.g. --only=prestocks).
+  --source=<ids>     Only the comma-separated source IDs (including shared protocol sources).
   --limit=<n>        Only the first n sources after filtering (smoke test).
   --force            Ignore today's checkpoint and look at every source again. Conditional
                      headers are still sent, so an unchanged document still answers 304.
@@ -118,8 +121,9 @@ WHAT A RUN DOES
   Sources are ordered round-robin by host, so the per-host pacing almost never has to block.
   Each fetch sends If-None-Match / If-Modified-Since from the stored version, so an unchanged
   document usually costs a 304. The kind is taken from the response's content-type (the URL is
-  only a guess), with the bytes overruling it for a PDF served as octet-stream: pdf ->
-  \`pdftotext -layout\` on stdin, html -> chrome stripped and tags removed, api -> JSON with keys
+  only a guess), with the bytes identifying PDF/DOCX downloads served as octet-stream: pdf ->
+  \`pdftotext -layout\` on stdin, docx -> visible Word XML text (including tables and notes),
+  html -> chrome stripped and tags removed, api -> JSON with keys
   sorted. Churn lines (bare dates, counters, cookie banners) are dropped before hashing, or every
   page with a clock on it would report a change every day.
 
@@ -182,12 +186,13 @@ WHAT A RUN DOES
 
 FILES
   stocks/data/sources.json                          input registry (extract-sources.mjs)
-  stocks/data/sources/<id>/<fetched_at>.{pdf,html,json,txt}   raw + normalised copies (gitignored)
+  stocks/data/sources/<id>/<fetched_at>.{pdf,docx,html,json,txt}   raw + normalised copies (gitignored)
   stocks/data/sources-state.json                    last hash/etag per URL (gitignored)
   stocks/data/raw/sources-<date>.json               per-source checkpoint, resumable (gitignored)
   sonar.source / sonar.source_version / sonar.change_event   the mirror in Postgres
 
 REQUIREMENTS
+  Python 3 on PATH for DOCX sources (standard-library ZIP/XML reader; no extra packages).
   \`pdftotext\` (poppler) on PATH for pdf sources — on macOS \`brew install poppler\`, on the server
   \`apt install poppler-utils\`. DATABASE_URL in ${join(REPO, '.env')} unless --no-db.`);
 }
@@ -207,30 +212,6 @@ async function assertPdftotext() {
         });
         // `pdftotext -v` exits 0 on some builds and 99 on others; either proves it is installed.
         child.on('close', () => resolvePromise());
-    });
-}
-
-/** PDF bytes -> layout-preserving text. stdin/stdout only: no temp file is ever written. */
-function pdfToText(buffer) {
-    return new Promise((resolvePromise, rejectPromise) => {
-        const child = spawn('pdftotext', ['-layout', '-', '-'], { stdio: ['pipe', 'pipe', 'pipe'] });
-        const chunks = [];
-        let err = '';
-        child.stdout.on('data', (d) => chunks.push(d));
-        child.stderr.on('data', (d) => { err += d; });
-        child.on('error', (e) => rejectPromise(new Error(`pdftotext: ${e.message}`)));
-        child.on('close', (code) => {
-            const text = Buffer.concat(chunks).toString('utf8');
-            // pdftotext exits non-zero on a damaged file but may still have produced pages.
-            if (code !== 0 && text.trim() === '') {
-                rejectPromise(new Error(`pdftotext exited ${code}: ${err.trim().slice(0, 200)}`));
-                return;
-            }
-            if (code !== 0) logWarn(`pdftotext exited ${code} but produced ${text.length} chars: ${err.trim().slice(0, 120)}`);
-            resolvePromise(text);
-        });
-        child.stdin.on('error', (e) => rejectPromise(new Error(`pdftotext stdin: ${e.message}`)));
-        child.stdin.end(buffer);
     });
 }
 
@@ -596,39 +577,6 @@ function progress(done, total, startedMs) {
     return `${done}/${total} · ${Math.round((done / total) * 100)}% · ETA ${mm}`;
 }
 
-/**
- * A fetched body -> `{kind, text, via, binary}`: PDF through pdftotext, textual payloads through
- * the kind's normaliser (HTML with the Next.js flight reader, lib/watch.mjs `htmlDocumentText`),
- * anything else watched as bytes. Shared by the live fetch and the Wayback fallback, so a capture
- * is read exactly the way the live page would have been.
- */
-async function bytesToText(buffer, contentType, url) {
-    let kind = kindFromContentType(contentType, url);
-    // Drive answers every download as `application/octet-stream`, so the bytes have the last
-    // word about what was served (lib/watch.mjs `looksLikePdf`).
-    if (kind !== 'pdf' && looksLikePdf(buffer)) kind = 'pdf';
-    if (kind === 'pdf') {
-        const pdfText = await pdfToText(buffer);
-        return {
-            kind, text: normaliseByKind('pdf', pdfText), quoteText: normaliseByKind('pdf', pdfText, { keepChurn: true }), via: 'pdf', binary: false
-        };
-    }
-    // Labelled bytes but really UTF-8 text (a Markdown file served as octet-stream): read it.
-    if (isTextual(contentType) || !contentType || looksLikeText(buffer)) {
-        if (kind === 'html') {
-            const read = htmlDocumentText(buffer.toString('utf8'));
-            return { kind, text: read.text, quoteText: read.quoteText, via: read.via, binary: false };
-        }
-        const body = buffer.toString('utf8');
-        return {
-            kind, text: normaliseByKind(kind, body), quoteText: normaliseByKind(kind, body, { keepChurn: true }), via: kind, binary: false
-        };
-    }
-    // Not text and not a PDF (a zip of attestations, say): watched as bytes.
-    const marker = binaryMarker(buffer, contentType);
-    return { kind, text: marker, quoteText: marker, via: 'binary', binary: true };
-}
-
 /** Character length of a stored text version, or null when there is none to read. */
 async function storedTextChars(textPath) {
     if (typeof textPath !== 'string' || textPath === '') return null;
@@ -666,7 +614,8 @@ async function watchOne(source, prev, options) {
     // "ignore today's checkpoint and look again", not "make the server send the body again". A 304
     // IS the answer we want — it is the cheapest possible "unchanged".
     const normalizerVersion = publisherNormalizerVersion(source.url, source.kind);
-    const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1);
+    const normalizerUpgrade = normalizerVersion > (prev?.normalizerVersion ?? 1)
+        || (source.kind === 'docx' && prev?.kind && prev.kind !== 'docx');
     // A page with a companion API (lib/companions.mjs) is fetched unconditionally: its etag
     // describes the shell, so a 304 would only confirm that the shell is still empty. A companion
     // with `liveValidators` (a build chunk: the URL is the document itself) keeps them.
@@ -1163,7 +1112,7 @@ async function storedVersionVerdict(prev, previousText, quotes) {
         }
     }
     const binary = prev?.via === 'binary' || /^binary \S+ \d+ bytes sha256:[0-9a-f]{64}$/.test(previousText.trim());
-    const kind = ext === 'pdf' ? 'pdf' : ext === 'json' && prev?.via !== 'notion' ? 'api' : 'html';
+    const kind = ['pdf', 'docx'].includes(ext) ? ext : ext === 'json' && prev?.via !== 'notion' ? 'api' : 'html';
     return classifyFresh({ kind, via: prev?.via ?? null, text: previousText, quoteText: previousText, raw: buffer, binary, quotes, textPath: null });
 }
 
@@ -1282,12 +1231,13 @@ async function reviewStoredCopy(result, prev, { needQuotes, quotes = [] }) {
     };
     const rawPath = prev?.rawPath ?? null;
     const ext = typeof rawPath === 'string' ? rawPath.split('.').pop() : null;
-    if (!rawPath || (ext === 'pdf' && !needQuotes)) return needQuotes ? readStoredText() : null;
+    if (!rawPath || (['pdf', 'docx'].includes(ext) && !needQuotes)) return needQuotes ? readStoredText() : null;
     let reading = null;
     let payload = null;
     try {
         const buffer = await readFile(join(REPO, rawPath));
-        payload = ext === 'pdf' ? await pdfToText(buffer) : buffer.toString('utf8');
+        payload = ext === 'pdf' ? await pdfToText(buffer)
+            : ext === 'docx' ? await docxToText(buffer) : buffer.toString('utf8');
         reading = storedReading({ rawExt: ext, via: prev?.via ?? null, payload });
     } catch (err) {
         logWarn(`${result.url}: stored raw copy ${rawPath} unreadable (${err.code || err.message}) — quote check uses the stored text`);
@@ -1296,7 +1246,7 @@ async function reviewStoredCopy(result, prev, { needQuotes, quotes = [] }) {
         const text = stripPublisherChrome(result.url, reading.text);
         const quoteText = stripPublisherChrome(result.url, reading.quoteText);
         const stored = await classifyFresh({
-            kind: reading.kind, via: prev?.via ?? null, text, quoteText, raw: ext === 'pdf' ? '' : payload, quotes, textPath: null
+            kind: reading.kind, via: prev?.via ?? null, text, quoteText, raw: ['pdf', 'docx'].includes(ext) ? '' : payload, quotes, textPath: null
         });
         if (!stored.readable) {
             result.status = 'unreadable';
@@ -1410,8 +1360,8 @@ async function main() {
     // outcome for diagnostics without overwriting the canonical full-run heartbeat consumed by
     // collector health and operations alerts.
     const onlyBlocked = Boolean(flags['only-blocked']);
-    if (flags.only || flags.limit || onlyBlocked) {
-        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: flags.only, limit: flags.limit, onlyBlocked }));
+    if (flags.only || flags.limit || onlyBlocked || flags.source) {
+        runStatsFile = join(REPO, sourceWatchStatsFileName({ only: flags.only, limit: flags.limit, onlyBlocked, sources: flags.source }));
     }
     const pace = flags.pace ? Number(flags.pace) : HOST_PACE_MS;
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
@@ -1448,6 +1398,7 @@ async function main() {
         sources = sources.filter((s) => s.issuer === flags.only);
         if (sources.length === 0) throw new Error(`no sources for issuer ${flags.only}`);
     }
+    if (flags.source) sources = selectSourceIds(sources, flags.source);
     // A retired source (stocks/data/retired-sources.json, via extract-sources.mjs) is gone for good:
     // it is not fetched, and its row and state say `retired` with the reason and date.
     const retiredSources = sources.filter((s) => s.retired);

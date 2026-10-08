@@ -116,6 +116,8 @@ describe('each dossier counts its what-if answers and links to them', () => {
             const file = dossierFileFor(issuer.slug, files);
             expect(file === null ? `no dossier for ${issuer.slug}` : file).toMatch(/\.json$/);
         }
+        expect(dossierFileFor('securitize', files)).toBe('securitize-secz.json');
+        expect(dossierFileFor('securitize-stocks', files)).toBe('securitize-stocks.json');
         // `bullish` is filed as bullish-blsh.json; an ambiguous prefix must not be guessed.
         expect(dossierFileFor('bullish', ['bullish-blsh.json'])).toBe('bullish-blsh.json');
         expect(dossierFileFor('a', ['a-1.json', 'a-2.json'])).toBeNull();

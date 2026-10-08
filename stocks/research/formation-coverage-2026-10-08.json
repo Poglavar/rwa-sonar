@@ -1,0 +1,65 @@
+{
+  "_comment": "Read-only audit of live published coverage before the local research additions. A source being registered or returning HTTP 200 is not proof of a captured merger.",
+  "reviewedAt": "2026-10-08T17:55:38.675773Z",
+  "announcementAt": "2026-10-07T22:43:16.000Z",
+  "sourceRegistry": {
+    "url": "https://rwasonar.com/api/sources?limit=1000",
+    "total": 643,
+    "returned": 643,
+    "relevant": [
+      {
+        "id": "fccf8d348703",
+        "url": "https://www.orca.so/",
+        "kind": "html",
+        "title": "shared:[55].website",
+        "issuer_slug": null,
+        "first_seen_at": "2026-09-17T17:32:25.000Z",
+        "last_checked_at": "2026-10-08T03:23:55.000Z",
+        "last_changed_at": "2026-09-17T17:32:25.000Z",
+        "check_every": {
+          "days": 1
+        },
+        "archive_url": "https://web.archive.org/web/20260918101344/https://www.orca.so/",
+        "status": "ok",
+        "content_hash": "c5f6b581fff6086d799367938e6ba4326186f38cf6b90f1a09800e04bdb6081d",
+        "http_status": 200,
+        "error": null,
+        "read_via": "html",
+        "capture_at": null,
+        "claims": 0,
+        "versions": 2
+      }
+    ]
+  },
+  "watcherEvents": {
+    "url": "https://rwasonar.com/api/changes?since=2026-10-07T00%3A00%3A00Z&limit=500",
+    "total": 718,
+    "returnedAcrossPages": 718,
+    "mergerMatched": 0,
+    "note": "Reviewed both pages for Formation/Orca/Loopscale merger text; unrelated uses of capital formation excluded."
+  },
+  "publicEventFeed": {
+    "url": "https://rwasonar.com/api/events?limit=200",
+    "live": true,
+    "returned": 200,
+    "mergerMatched": 0,
+    "scope": "Newest 200 events, supplemented by full since-date watcher audit and curated source file."
+  },
+  "protocolCoverage": {
+    "url": "https://rwasonar.com/protocols/index.json",
+    "total": 192,
+    "byProtocol": {
+      "orca": 26,
+      "loopscale": 8
+    },
+    "note": "Protocol integration coverage existed; it did not record the combined operating team."
+  },
+  "conclusion": "Merger not captured in reviewed live events or curated research. Only Orca homepage was registered; Loopscale and Formation FAQs were absent. Website read status was ok after announcement but unchanged, which does not establish why the announcement was missed.",
+  "preparedSources": [
+    "https://x.com/formation_so/status/2107965006578921623",
+    "https://docs.orca.so/formation/faqs",
+    "https://docs.loopscale.com/resources/formation",
+    "https://formation.so"
+  ],
+  "activation": "Local protocol-organization/source and curated-event additions only; no deployment, scheduled run, database write or notification."
+}

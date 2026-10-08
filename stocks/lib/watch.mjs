@@ -18,11 +18,20 @@ export function sourceId(url) {
 }
 
 /** Full runs own the collector heartbeat; targeted repair/smoke runs get scoped diagnostics. */
-export function sourceWatchStatsFileName({ only = null, limit = null, onlyBlocked = false } = {}) {
-    if (!only && !limit && !onlyBlocked) return '.last-source-watch-stats.json';
-    const scope = [onlyBlocked ? 'only-blocked' : null, only || null, limit ? `limit-${limit}` : null]
+export function sourceWatchStatsFileName({ only = null, limit = null, onlyBlocked = false, sources = null } = {}) {
+    if (!only && !limit && !onlyBlocked && !sources) return '.last-source-watch-stats.json';
+    const scope = [sources ? `sources-${sourceId(sources)}` : null, onlyBlocked ? 'only-blocked' : null, only || null, limit ? `limit-${limit}` : null]
         .filter(Boolean).join('-').replace(/[^a-z0-9-]+/gi, '-').toLowerCase();
     return `.last-source-watch-stats-${scope}.json`;
+}
+
+/** Explicit source IDs support a bounded first read of shared organizational documents. */
+export function selectSourceIds(sources, value) {
+    const ids = String(value).split(',').map((id) => id.trim()).filter(Boolean);
+    if (!ids.length || ids.some((id) => !/^[a-f0-9]{12}$/.test(id))) throw new Error('--source expects comma-separated 12-character source IDs');
+    const known = new Set(sources.map((source) => sourceId(source.url)));
+    if (ids.some((id) => !known.has(id))) throw new Error('--source contains an unknown or filtered-out source ID');
+    return sources.filter((source) => ids.includes(sourceId(source.url)));
 }
 
 /**
@@ -54,7 +63,7 @@ export function fileStamp(isoTs) {
 
 /** Extension for the raw copy of a fetch, by the kind the server actually served. */
 export function rawExtension(kind) {
-    if (kind === 'pdf') return 'pdf';
+    if (kind === 'pdf' || kind === 'docx') return kind;
     if (kind === 'api') return 'json';
     return 'html';
 }
@@ -325,7 +334,7 @@ export function pdfTextToText(text, { keepChurn = false } = {}) {
 
 /** Normalise by kind. The kind is the one the CONTENT-TYPE said, not the one the URL guessed. */
 export function normaliseByKind(kind, payload, { keepChurn = false } = {}) {
-    if (kind === 'pdf') return pdfTextToText(payload, { keepChurn });
+    if (kind === 'pdf' || kind === 'docx') return pdfTextToText(payload, { keepChurn });
     if (kind === 'api') return jsonToText(payload, { keepChurn });
     const read = htmlDocumentText(payload);
     return keepChurn ? read.quoteText : read.text;
@@ -344,8 +353,8 @@ export function normaliseByKind(kind, payload, { keepChurn = false } = {}) {
 export function storedReading({ rawExt, via = null, payload }) {
     if (typeof payload !== 'string') return null;
     if (via === 'binary') return null;
-    if (rawExt === 'pdf') {
-        return { kind: 'pdf', text: pdfTextToText(payload), quoteText: pdfTextToText(payload, { keepChurn: true }) };
+    if (rawExt === 'pdf' || rawExt === 'docx') {
+        return { kind: rawExt, text: pdfTextToText(payload), quoteText: pdfTextToText(payload, { keepChurn: true }) };
     }
     if (rawExt === 'json' && via === 'notion') {
         let doc;
@@ -1410,7 +1419,7 @@ export function parseSpnStatus(body, requestedUrl = null) {
 // --- provenance ------------------------------------------------------------------------------
 
 /** Every `read_via` value db/2026-09-23-sonar-source-provenance.sql accepts. */
-export const READ_VIA = ['live', 'html', 'next-flight', 'pdf', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'];
+export const READ_VIA = ['live', 'html', 'next-flight', 'pdf', 'docx', 'api', 'binary', 'notion', 'drive', 'wayback', 'companion'];
 
 /**
  * Which reader produced the text a source row now stands on (`sonar.source.read_via`): the

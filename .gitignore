@@ -39,6 +39,9 @@ stocks-watchlist-changes.json
 # stocks/data/issuers/, so a new dossier file would never have been committed.
 /templates/
 /issuers/
+# Curated dossiers remain visible even when a local exclude ignores generated issuer pages.
+!/stocks/data/issuers/
+!/stocks/data/issuers/*.json
 /protocols/
 /comparisons/
 

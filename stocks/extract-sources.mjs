@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Builds the source registry (EVIDENCE.md §5.1): every http(s) URL the 12 issuer dossiers and
-// canonical-parties.json cite, with the field path that cites it, deduped by normalised URL and
-// classified pdf/html/api. Writes stocks/data/sources.json, which stocks/watch-sources.mjs then
+// Builds the source registry (EVIDENCE.md §5.1): every http(s) URL cited by issuer dossiers,
+// canonical-parties.json and protocol-organizations.json, with its citing field path, deduped
+// by normalised URL and classified pdf/html/api. Writes stocks/data/sources.json, which stocks/watch-sources.mjs then
 // fetches, hashes and diffs. Pure extraction lives in lib/sources.mjs; this file only does the IO
 // and the run summary.
 
@@ -14,6 +14,7 @@ import { log, logWarn, parseArgs, readJson, ts, writeJson } from './lib/io.mjs';
 const HERE = import.meta.dirname;
 const ISSUER_DIR = join(HERE, 'data', 'issuers');
 const PARTIES_FILE = join(HERE, 'data', 'canonical-parties.json');
+const PROTOCOL_ORGANIZATIONS_FILE = join(HERE, 'data', 'protocol-organizations.json');
 const RETIRED_FILE = join(HERE, 'data', 'retired-sources.json');
 const DEFAULT_OUT = join(HERE, 'data', 'sources.json');
 
@@ -30,7 +31,8 @@ OPTIONS
   --help         This text.
 
 WHAT IT DOES
-  Walks every dossier in stocks/data/issuers/*.json and stocks/data/canonical-parties.json,
+  Walks every dossier in stocks/data/issuers/*.json, stocks/data/canonical-parties.json,
+  and stocks/data/protocol-organizations.json,
   string by string, and collects every http(s) URL with the field path it appeared in — so
   \`documents[3].url\`, \`findings[2].evidence\` and a URL buried in \`redemption.fees\` prose are all
   picked up. A \`whatIf[]\` citation is labelled by its failure MODE rather than its array index
@@ -62,6 +64,8 @@ async function loadDossiers() {
     const parties = await readJson(PARTIES_FILE, null);
     if (parties) dossiers.push({ slug: null, doc: parties });
     else logWarn(`${PARTIES_FILE} absent — its URLs are not in the registry`);
+    const organizations = await readJson(PROTOCOL_ORGANIZATIONS_FILE, null);
+    if (organizations) dossiers.push({ slug: null, doc: organizations });
     return { dossiers, files };
 }
 
@@ -74,7 +78,7 @@ async function main() {
     const out = typeof flags.out === 'string' ? flags.out : DEFAULT_OUT;
 
     const { dossiers, files } = await loadDossiers();
-    log(`extract-sources: ${files.length} dossiers${dossiers.length > files.length ? ' + canonical-parties.json' : ''}`);
+    log(`extract-sources: ${files.length} dossiers${dossiers.length > files.length ? ' + shared party/organization sources' : ''}`);
 
     const registry = buildRegistry(dossiers, { generatedAt: ts() });
     const { truncated } = registry;

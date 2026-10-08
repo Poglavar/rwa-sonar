@@ -19,7 +19,13 @@ describe('the curated rights file', () => {
     it('answers all five rights for every issuer programme, each with a source', () => {
         const slugs = JSON.parse(fs.readFileSync(fixture('stocks-issuers.json'), 'utf8')).issuers.map((row) => row.slug);
         expect(validateHolderRights(DATA, slugs)).toEqual([]);
-        expect(Object.keys(DATA.issuers).sort()).toEqual([...slugs].sort());
+        // Runtime catalogue fixtures are historical; new reviewed programmes must also be covered.
+        const aliases = { 'securitize-secz': 'securitize', 'bullish-blsh': 'bullish', 'backpack-securities-spcx': 'backpack-securities' };
+        const current = fs.readdirSync(path.join(__dirname, 'data', 'issuers'))
+            .filter((file) => file.endsWith('.json')).map((file) => file.slice(0, -5))
+            .map((slug) => aliases[slug] ?? slug);
+        expect(validateHolderRights(DATA, current)).toEqual([]);
+        expect(Object.keys(DATA.issuers).sort()).toEqual(current.sort());
     });
 
     it('gives "yes" only where the holder owns the share itself (registered share, same class)', () => {
@@ -50,7 +56,7 @@ describe('rows and headline', () => {
     it('sums up each kind of programme in one line', () => {
         expect(holderRightsHeadline(holderRightsRows(DATA.issuers['superstate-opening-bell']))).toBe('All five shareholder rights');
         expect(holderRightsHeadline(holderRightsRows(DATA.issuers['xstocks-backed'])))
-            .toBe('No shareholder rights; the issuer passes through dividends and splits');
+            .toBe('Rights passed through: dividends and splits');
         expect(holderRightsHeadline(holderRightsRows(DATA.issuers.prestocks))).toBe('No shareholder rights');
     });
 });
@@ -60,7 +66,7 @@ describe('markup', () => {
         const html = holderRightsStripHtml(holderRightsRows(DATA.issuers['ondo-global-markets']), { href: '#holder-rights' });
         for (const right of RIGHTS) expect(html).toContain(`</span>${right.label.replace('&', '&amp;')}<span class="rights-sr">`);
         expect(html).toContain(`<li class="rights-chip rights-discretion" title="Voting: ${STATUSES.discretion.label}. You can state a voting preference through Broadridge; Ondo does not have to follow it.">`);
-        expect(html).toContain('aria-label="No shareholder rights; the issuer passes through dividends"');
+        expect(html).toContain('aria-label="Rights passed through: dividends"');
         expect(html).toContain('<a class="rights-more" href="#holder-rights">');
     });
 
