@@ -2,8 +2,9 @@
 // is asked about (one per source + content hash, never one already judged), what the prompt shows
 // (a bounded change text that SAYS when it was cut, the dossier fields and claims that cite the
 // URL), what a model answer must satisfy (schema, 80 words, and quotes that are verbatim in the
-// change — a paraphrase makes the judgment invalid), what the estimate costs, and the whole
-// collect -> validate -> SQL path through the shared batch library with a fake Anthropic client.
+// change — a paraphrase makes the judgment invalid), and the whole submit -> collect -> validate ->
+// SQL path through the shared LLM layer (agents/lib/llm-cost/llm.mjs createLlm) with a fake
+// Anthropic client: the layer's default model is what is submitted and what the cost is priced at.
 // The legal-term diff below is the real one the watcher stored for event 189 (tekedia.com,
 // 2026-09-22), trimmed: a "fee" keyword hit that is a course price list — cosmetic to a holder.
 
@@ -12,9 +13,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-    CHANGE_TEXT_LIMIT, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, boundText, buildJudgmentSql,
-    buildPrompt, changeTextFor, dedupeKey, estimateCost, estimateTokens, fragmentInChange,
-    directResultItem, isStalledBatch, judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
+    CHANGE_TEXT_LIMIT, JUDGMENT_SCHEMA, PROMPT_VERSION, boundText, buildJudgmentSql,
+    buildPrompt, changeTextFor, customIdFor, dedupeKey, estimateTokens, fragmentInChange,
+    directItem, isStalledBatch, judgeRequest, judgmentRow, judgmentRows, previousVersion, selectCandidates, validateJudgment, windowAround
 } from './lib/change-judge.mjs';
 
 const DDL = readFileSync(new URL('../db/2026-09-23-sonar-change-judgment.sql', import.meta.url), 'utf8');
@@ -185,12 +186,12 @@ describe('prompt', () => {
         expect(previousVersion(versions, '2026-09-20T10:00:00Z')).toBeNull();
     });
 
-    test('the batch request asks for the strict JSON schema', () => {
+    test('the judge request is a model-free description with the strict JSON schema', () => {
         const [candidate] = selectCandidates([legalTerm(7)]);
         const p = buildPrompt(candidate, { source, claims, change: changeTextFor(candidate, {}) });
-        const req = batchRequest(candidate, p, { model: 'claude-sonnet-5', maxTokens: 8000, effort: 'medium' });
-        expect(req.custom_id).toBe('evt-7');
-        expect(req.params.output_config.format).toEqual({ type: 'json_schema', schema: JUDGMENT_SCHEMA });
+        expect(customIdFor(candidate)).toBe('evt-7');
+        // No model, effort, thinking or max_tokens: those are the shared layer's (defaults.json).
+        expect(judgeRequest(p)).toEqual({ system: p.system, content: p.user, schema: JUDGMENT_SCHEMA });
         expect(JUDGMENT_SCHEMA.additionalProperties).toBe(false);
         expect(JUDGMENT_SCHEMA.required.sort()).toEqual(Object.keys(JUDGMENT_SCHEMA.properties).sort());
     });
@@ -249,94 +250,129 @@ describe('validateJudgment', () => {
 });
 
 describe('cost', () => {
-    test('estimateCost: tokens × fixture rate, halved for a batch', () => {
-        const rate = { input: 2, output: 10 };
-        expect(estimateCost({ inputTokens: 1_000_000, outputTokens: 0 }, rate, { batch: false })).toBeCloseTo(2, 10);
-        expect(estimateCost({ inputTokens: 2000, outputTokens: 1200 }, rate)).toBeCloseTo((2000 * 2 + 1200 * 10) / 1e6 / 2, 12);
-        expect(() => estimateCost({ inputTokens: 1, outputTokens: 1 }, { input: 2 })).toThrow(/rate/);
-    });
-
     test('estimateTokens is chars / 4, rounded up', () => {
         expect(estimateTokens('abcde')).toBe(2);
         expect(estimateTokens('')).toBe(0);
     });
 });
 
-describe('end to end through the shared batch library with a fake Anthropic client', () => {
+describe('end to end through the shared LLM layer with a fake Anthropic client', () => {
     let ledgerDir;
-    let batchLib;
+    let llmLib;
+    let costLib;
 
     beforeAll(async () => {
         // index.cjs reads LLM_COST_DIR at load time, so it must point at a temp dir BEFORE import:
         // this test must never append to the real ~/.agents-llm-cost ledger.
         ledgerDir = mkdtempSync(join(tmpdir(), 'change-judge-ledger-'));
         process.env.LLM_COST_DIR = ledgerDir;
-        const lib = new URL('../../agents/lib/llm-cost/batch.mjs', import.meta.url);
-        batchLib = await import(lib.href);
+        llmLib = await import(new URL('../../agents/lib/llm-cost/llm.mjs', import.meta.url).href);
+        costLib = await import(new URL('../../agents/lib/llm-cost/index.mjs', import.meta.url).href);
     });
     afterAll(() => rmSync(ledgerDir, { recursive: true, force: true }));
+    const readLedger = () => readFileSync(join(ledgerDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
 
-    test('submit, collect, validate and build the SQL; per-item cost and the ledger line are recorded', async () => {
-        const events = [legalTerm(21), legalTerm(22, { hash: 'h2', url: 'https://example.com/tekedia', diff: TEKEDIA_DIFF }), legalTerm(23, { hash: 'h3' })];
-        const candidates = selectCandidates(events);
-        const pending = {};
-        const requests = [];
-        for (const c of candidates) {
-            const p = buildPrompt(c, { source: {}, claims: [], change: changeTextFor(c, {}) });
-            const req = batchRequest(c, p, { model: 'claude-sonnet-5', maxTokens: 8000, effort: 'medium' });
-            requests.push(req);
-            pending[req.custom_id] = { candidate: c, changeText: p.changeText };
-        }
-        const answers = {
-            'evt-21': GOOD,
-            'evt-22': { material: true, severity: 'warning', affects: ['fees'], summary: 'A fee "went up".', quotedChange: ['membership fee doubled'], confidence: 0.4 }
-        };
+    /** A fake SDK-shaped client whose batch answers `answers[custom_id]` as `model`. */
+    function fakeClient({ answers, model, submitted = [] }) {
         const usage = { input_tokens: 2000, output_tokens: 1000, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
-        const submitted = [];
-        const client = {
+        return {
+            usage,
+            submitted,
             messages: {
+                create: async () => { throw new Error('no online call expected'); },
                 batches: {
                     create: async ({ requests: r }) => { submitted.push(...r); return { id: 'msgbatch_fake' }; },
                     retrieve: async () => ({ processing_status: 'ended', request_counts: { processing: 0, succeeded: 2, errored: 1 } }),
                     results: async () => (async function* () {
-                        for (const id of ['evt-21', 'evt-22']) {
-                            yield { custom_id: id, result: { type: 'succeeded', message: { stop_reason: 'end_turn', usage, content: [{ type: 'text', text: JSON.stringify(answers[id]) }] } } };
+                        for (const [id, answer] of Object.entries(answers)) {
+                            if (answer === 'errored') {
+                                yield { custom_id: id, result: { type: 'errored', error: { type: 'error', error: { type: 'overloaded_error', message: 'Overloaded' } } } };
+                                continue;
+                            }
+                            const stop = answer === 'max_tokens' ? 'max_tokens' : 'end_turn';
+                            const text = answer === 'max_tokens' ? '{"material": tr' : JSON.stringify(answer);
+                            yield { custom_id: id, result: { type: 'succeeded', message: { model, stop_reason: stop, usage, content: [{ type: 'thinking', thinking: 'x' }, { type: 'text', text }] } } };
                         }
-                        yield { custom_id: 'evt-23', result: { type: 'errored' } };
                     })()
                 }
             }
         };
+    }
 
-        const batchId = await batchLib.submitBatch({ client, provider: 'anthropic', requests });
-        expect(submitted.map((r) => r.custom_id)).toEqual(['evt-23', 'evt-22', 'evt-21']);
-        await batchLib.awaitBatch({ client, provider: 'anthropic', batchId, pollMs: 1 });
-        const items = batchLib.collectBatch({ client, provider: 'anthropic', batchId, model: 'claude-sonnet-5', repo: 'rwa-sonar', script: 'judge-changes' });
+    test('submit at the layer default model, collect, validate and build the SQL; per-item cost and ledger lines', async () => {
+        const defaults = llmLib.DEFAULTS.providers.anthropic;
+        const events = [legalTerm(21), legalTerm(22, { hash: 'h2', url: 'https://example.com/tekedia', diff: TEKEDIA_DIFF }), legalTerm(23, { hash: 'h3' }), legalTerm(24, { hash: 'h4' })];
+        const candidates = selectCandidates(events);
+        const answers = {
+            'evt-21': GOOD,
+            'evt-22': { material: true, severity: 'warning', affects: ['fees'], summary: 'A fee "went up".', quotedChange: ['membership fee doubled'], confidence: 0.4 },
+            'evt-23': 'errored',
+            'evt-24': 'max_tokens'
+        };
+        const client = fakeClient({ answers, model: defaults.model });
+        const llm = llmLib.createLlm({ client, repo: 'rwa-sonar', script: 'judge-changes', meta: { promptVersion: PROMPT_VERSION } });
+        const pending = {};
+        const requests = [];
+        for (const c of candidates) {
+            const p = buildPrompt(c, { source: {}, claims: [], change: changeTextFor(c, {}) });
+            requests.push(llm.batchRequest(customIdFor(c), judgeRequest(p)));
+            pending[customIdFor(c)] = { candidate: c, changeText: p.changeText };
+        }
+
+        const batchId = await llm.submitBatch(requests);
+        expect(client.submitted.map((r) => r.custom_id)).toEqual(['evt-24', 'evt-23', 'evt-22', 'evt-21']);
+        // The model is the layer's default and nothing else: a repo-pinned model fails here.
+        for (const r of client.submitted) {
+            expect(r.params.model).toBe(defaults.model);
+            expect(r.params.output_config.effort).toBe(defaults.effort);
+            expect(r.params.output_config.format).toEqual({ type: 'json_schema', schema: JUDGMENT_SCHEMA });
+            for (const k of ['thinking', 'temperature', 'top_p', 'tool_choice', 'fallbacks', 'betas']) expect(r.params).not.toHaveProperty(k);
+        }
+        await llm.awaitBatch(batchId, { pollMs: 1 });
         const rows = [];
-        for await (const row of judgmentRows(items, pending, { model: 'claude-sonnet-5', batchId })) rows.push(row);
+        for await (const row of judgmentRows(llm.collectBatch(batchId, { schema: JUDGMENT_SCHEMA }), pending, { model: llm.model, batchId })) rows.push(row);
 
         const byEvent = Object.fromEntries(rows.map((r) => [r.changeEventId, r]));
-        const perItem = (2000 * 2 + 1000 * 10) / 1e6 / 2; // Sonnet 5 at 2/10 online, halved in batch
-        expect(byEvent[21].status).toBe('valid');
+        const perItem = costLib.computeCost(defaults.model, client.usage, { batch: true });
+        expect(perItem).toBeGreaterThan(0);
+        expect(byEvent[21]).toMatchObject({ status: 'valid', model: defaults.model, batchId: 'msgbatch_fake' });
         expect(byEvent[21].costUsd).toBeCloseTo(perItem, 12);
         expect(byEvent[22].status).toBe('invalid');
         expect(byEvent[22].rejectedQuotes).toEqual(['membership fee doubled']);
         expect(byEvent[22].judgment.quotedChange).toEqual([]);
         expect(byEvent[23]).toMatchObject({ status: 'error', costUsd: 0, judgment: null });
+        expect(byEvent[23].reasons[0]).toMatch(/Overloaded/);
+        // A truncated answer was paid for: invalid (not retried), with its real cost.
+        expect(byEvent[24]).toMatchObject({ status: 'invalid', judgment: null });
+        expect(byEvent[24].costUsd).toBeCloseTo(perItem, 12);
+        expect(byEvent[24].reasons[0]).toMatch(/^max_tokens: /);
 
-        const ledger = readFileSync(join(ledgerDir, 'ledger.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
-        expect(ledger).toHaveLength(2);
-        expect(ledger[0]).toMatchObject({ repo: 'rwa-sonar', script: 'judge-changes', model: 'claude-sonnet-5', batch: true, batchId: 'msgbatch_fake' });
-        expect(ledger.reduce((a, r) => a + r.cost_usd, 0)).toBeCloseTo(perItem * 2, 12);
+        const ledger = readLedger().filter((r) => r.batchId === 'msgbatch_fake');
+        expect(ledger).toHaveLength(3);
+        expect(ledger[0]).toMatchObject({ repo: 'rwa-sonar', script: 'judge-changes', model: defaults.model, batch: true, promptVersion: PROMPT_VERSION });
+        expect(ledger.reduce((a, r) => a + r.cost_usd, 0)).toBeCloseTo(perItem * 3, 12);
 
         const { sql, rows: n, table } = buildJudgmentSql(rows);
         expect(table).toBe('sonar.change_judgment');
-        expect(n).toBe(3);
+        expect(n).toBe(4);
         expect(sql).toContain('ON CONFLICT (change_event_id, model, prompt_version) DO UPDATE');
         expect(sql).toContain("WHERE j.status = 'error'");
         expect(sql).toContain(`"promptVersion":"${PROMPT_VERSION}"`);
         expect(sql).toContain('"quotedChange":["Redemptions are suspended until further notice"');
         expect(sql).not.toContain('"quotedChange":["membership fee doubled"]');
+    });
+
+    test('a batch checkpointed under an older model resumes: priced at the model that answered, keyed on the checkpoint model', async () => {
+        const [c] = selectCandidates([legalTerm(31)]);
+        const p = buildPrompt(c, { source: {}, claims: [], change: changeTextFor(c, {}) });
+        const cp = { batchId: 'msgbatch_old', model: 'claude-sonnet-5', pending: { 'evt-31': { candidate: c, changeText: p.changeText } } };
+        const client = fakeClient({ answers: { 'evt-31': GOOD }, model: 'claude-sonnet-5' });
+        const llm = llmLib.createLlm({ client, repo: 'rwa-sonar', script: 'judge-changes' });
+        const rows = [];
+        for await (const row of judgmentRows(llm.collectBatch(cp.batchId, { schema: JUDGMENT_SCHEMA }), cp.pending, { model: cp.model, batchId: cp.batchId })) rows.push(row);
+        expect(rows).toHaveLength(1);
+        expect(rows[0]).toMatchObject({ status: 'valid', model: 'claude-sonnet-5' });
+        expect(rows[0].costUsd).toBeCloseTo(costLib.computeCost('claude-sonnet-5', client.usage, { batch: true }), 12);
     });
 
     test('an unknown custom_id is an error, not a guess', async () => {
@@ -357,22 +393,33 @@ describe('DDL', () => {
     });
 });
 
-describe('directResultItem (the --direct fallback)', () => {
-    test('an online message becomes the same item a collected batch yields', () => {
-        const message = {
-            content: [{ type: 'thinking', thinking: 'x' }, { type: 'text', text: '{"material":false}' }],
-            usage: { input_tokens: 501, output_tokens: 103, cache_read_input_tokens: 7, cache_creation_input_tokens: 0 }
-        };
-        expect(directResultItem('evt-1', message)).toEqual({
-            customId: 'evt-1', message, text: '{"material":false}',
-            usage: { input_tokens: 501, output_tokens: 103, cache_read_input_tokens: 7, cache_creation_input_tokens: 0 }
-        });
+describe('directItem (the --direct fallback)', () => {
+    const [candidate] = selectCandidates([legalTerm(41)]);
+    const changeText = REDEMPTION_DIFF;
+    const usage = { input_tokens: 501, output_tokens: 103, cache_read_input_tokens: 7, cache_creation_input_tokens: 0 };
+
+    test("a complete() result becomes the item a collected batch yields, without the raw response", () => {
+        const result = { text: JSON.stringify(GOOD), data: GOOD, model: 'claude-opus-5-5', usage, costUsd: 0.01, stopReason: 'end_turn', raw: { big: true } };
+        const item = directItem('evt-41', result);
+        expect(item).toEqual({ customId: 'evt-41', text: JSON.stringify(GOOD), data: GOOD, model: 'claude-opus-5-5', usage, costUsd: 0.01, stopReason: 'end_turn' });
+        expect(judgmentRow({ candidate, changeText, item, model: 'claude-opus-5-5', batchId: 'direct' })).toMatchObject({ status: 'valid', costUsd: 0.01, inputTokens: 501 });
     });
 
-    test('missing usage counts as zero tokens, never NaN', () => {
-        expect(directResultItem('evt-2', { content: [] }).usage).toEqual({
-            input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0
-        });
+    test('a paid output failure (LlmOutputError) is an invalid reading with its cost and tokens', () => {
+        const err = Object.assign(new Error('llm-cost/llm: refused (cyber)'), { name: 'LlmOutputError', reason: 'refusal', model: 'claude-opus-5-5', costUsd: 0.002, raw: { usage } });
+        const row = judgmentRow({ candidate, changeText, item: directItem('evt-41', err), model: 'claude-opus-5-5', batchId: 'direct' });
+        expect(row).toMatchObject({ status: 'invalid', costUsd: 0.002, inputTokens: 501, outputTokens: 103, judgment: null });
+        expect(row.reasons).toEqual(['refusal: llm-cost/llm: refused (cyber)']);
+    });
+
+    test('a failed request (HTTP, network) is an error row: no charge, retried next run', () => {
+        const row = judgmentRow({ candidate, changeText, item: directItem('evt-41', new Error('anthropic POST /v1/messages -> HTTP 529: Overloaded')), model: 'm', batchId: 'direct' });
+        expect(row).toMatchObject({ status: 'error', costUsd: 0, inputTokens: 0, judgment: null });
+    });
+
+    test('a paid answer without a price is refused, never stored as free', () => {
+        const err = Object.assign(new Error('truncated'), { name: 'LlmOutputError', reason: 'max_tokens', costUsd: null, raw: {} });
+        expect(() => judgmentRow({ candidate, changeText, item: directItem('evt-41', err), model: 'm', batchId: 'direct' })).toThrow(/unknown price/);
     });
 });
 

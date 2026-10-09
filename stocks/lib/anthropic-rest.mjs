@@ -1,8 +1,11 @@
-// A dependency-free Anthropic REST client exposing exactly the surface the shared batch library
-// (agents/lib/llm-cost/batch.cjs) drives — `messages.batches.create / retrieve / results / cancel`
-// — plus `messages.countTokens` for the dry run. The stocks pipeline has zero npm dependencies by
-// design, which is why this is raw HTTP (Messages Batches API, anthropic-version 2023-06-01) and not
-// @anthropic-ai/sdk. The key is passed in by the caller from .env and is never logged.
+// A dependency-free Anthropic REST client presenting the slice of the @anthropic-ai/sdk shape that the
+// shared LLM layer (agents/lib/llm-cost/llm.cjs createLlm, and batch.cjs under it) drives —
+// `messages.create` and `messages.batches.create / retrieve / results / cancel` — plus
+// `messages.countTokens` for the dry run. It deliberately has no `messages.stream` and no
+// `beta.messages`: the layer then sends online calls as plain non-streaming `messages.create`
+// without the refusal-fallback beta (it checks for both and falls back). The stocks pipeline has
+// zero npm dependencies by design, which is why this is raw HTTP (anthropic-version 2023-06-01) and
+// not the SDK. The key is passed in by the caller from .env and is never logged.
 
 const API = 'https://api.anthropic.com';
 const VERSION = '2023-06-01';
@@ -70,8 +73,8 @@ export function createAnthropicClient({ apiKey, baseUrl = API, fetchImpl = globa
 
     return {
         messages: {
-            // One online call, full price. Used only by the judge's --direct fallback for a batch
-            // that the Batch API accepts but never processes.
+            // One online call, full price (the layer's complete()). Used only by the judge's --direct
+            // fallback for a batch that the Batch API accepts but never processes.
             create: (params) => call('POST', '/v1/messages', params),
             countTokens: (params) => call('POST', '/v1/messages/count_tokens', params),
             batches: {

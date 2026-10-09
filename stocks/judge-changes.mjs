@@ -18,8 +18,8 @@ import { describeUrl, psql } from './lib/psql.mjs';
 import { diffLines } from './lib/textdiff.mjs';
 import { sourceId } from './lib/watch.mjs';
 import {
-    JUDGED_KINDS, JUDGMENT_SCHEMA, PROMPT_VERSION, batchRequest, buildJudgmentSql, buildPrompt,
-    STALLED_BATCH_MS, changeTextFor, customIdFor, directResultItem, estimateCost, estimateTokens, isStalledBatch, judgmentRow, judgmentRows,
+    JUDGED_KINDS, JUDGMENT_SCHEMA, PROMPT_VERSION, buildJudgmentSql, buildPrompt, STALLED_BATCH_MS,
+    changeTextFor, customIdFor, directItem, estimateTokens, isStalledBatch, judgeRequest, judgmentRow, judgmentRows,
     previousVersion, selectCandidates
 } from './lib/change-judge.mjs';
 
@@ -29,17 +29,13 @@ const CHECKPOINT_DIR = join(HERE, 'data', 'raw', 'change-judge');
 const REPO_NAME = 'rwa-sonar';
 const SCRIPT = 'judge-changes';
 
-// Claude Sonnet 5: the current-generation cost-effective model (USD 2/10 per MTok online, 1/5 in a
-// batch) with structured outputs and Batch API support. A materiality read of a bounded diff is a
-// classification with a short justification — the "cheaper model as LLM judge" case — and every
-// verdict is shown as a model assessment beside the diff, never alone. `--model=claude-opus-5`
-// is the step up if a sample shows Sonnet missing material changes.
-const DEFAULT_MODEL = 'claude-sonnet-5';
-const EFFORT = 'medium';
-const MAX_TOKENS = 8000;
-// Assumed output per item for the ESTIMATE only: ~300 tokens of JSON plus adaptive thinking at
-// medium effort. The ceiling (MAX_TOKENS) is printed beside it; the stored cost is the real one.
-const EST_OUTPUT_TOKENS = 1200;
+// The model, its effort and max_tokens are NOT chosen here: the shared layer
+// (agents/lib/llm-cost/llm.cjs) takes them from its defaults.json, and the run logs what it got.
+// Assumed output per item for the ESTIMATE only (thinking counts as output): Opus 5.5 at high
+// effort averaged 483 output tokens over 7 judgments of these prompts, max 959 (judge-with-cli,
+// 2026-09-30); Sonnet 5 at medium averaged 256 over 320. The ceiling (the layer's max_tokens) is
+// printed beside it; the stored cost is the real one.
+const EST_OUTPUT_TOKENS = 1000;
 const DEFAULT_LIMIT = 5;
 const LARGE_LIMIT = 25;
 const POLL_MS = 60_000;
@@ -50,7 +46,7 @@ const DIRECT_LIMIT = 10;
 
 
 function usage() {
-    console.log(`Usage: node stocks/judge-changes.mjs [--dry-run | --run] [--limit=N] [--model=ID] [--allow-large] [--direct]
+    console.log(`Usage: node stocks/judge-changes.mjs [--dry-run | --run] [--limit=N] [--allow-large] [--direct]
 
 Asks a model whether each unjudged document change (sonar.change_event kinds ${JUDGED_KINDS.join(', ')})
 alters what a holder owns, can do, or can have done to them. One candidate per change: events of
@@ -64,7 +60,6 @@ call is also appended to the shared ledger (agents/lib/llm-cost, \`llm-cost --re
   --run           submit ONE Message Batches batch of the newest --limit candidates, poll every
                   ${POLL_MS / 1000} s, collect, validate, store each item as it arrives.
   --limit=N       items in the batch (default ${DEFAULT_LIMIT}; more than ${LARGE_LIMIT} needs --allow-large).
-  --model=ID      default ${DEFAULT_MODEL} (must be priced in agents/lib/llm-cost/rates.json).
   --allow-large   permit --limit above ${LARGE_LIMIT}. Do not use without the owner's approval.
   --export=FILE   write the next --limit unjudged changes' prompts as JSON lines (no model call,
                   nothing stored). A change judged by ANY model is skipped. For the CLI judge:
@@ -79,15 +74,17 @@ call is also appended to the shared ledger (agents/lib/llm-cost, \`llm-cost --re
 A submitted batch is checkpointed under stocks/data/raw/change-judge/<batch id>.json before polling,
 so a killed run resumes that batch on the next --run instead of paying for a second one.
 
+Model, effort and max_tokens come from the shared layer's defaults
+(agents/lib/llm-cost/defaults.json, via $LLM_COST_LIB or ../agents/lib/llm-cost); every run logs them.
 Needs DATABASE_URL and, for --run, ANTHROPIC_API_KEY in ${join(REPO, '.env')}.
-Prompt version ${PROMPT_VERSION}; effort ${EFFORT}; max_tokens ${MAX_TOKENS}.`);
+Prompt version ${PROMPT_VERSION}.`);
 }
 
 async function loadLlmCost(env) {
     const dir = env.LLM_COST_LIB || join(REPO, '..', 'agents', 'lib', 'llm-cost');
     const index = await import(pathToFileURL(join(dir, 'index.mjs')).href);
-    const batch = await import(pathToFileURL(join(dir, 'batch.mjs')).href);
-    return { ...index, ...batch, dir };
+    const llm = await import(pathToFileURL(join(dir, 'llm.mjs')).href);
+    return { ...index, ...llm, dir };
 }
 
 async function queryJson(url, sql, label) {
@@ -166,6 +163,7 @@ async function prepare(candidate, source) {
 const usd = (v) => `$${v.toFixed(4)}`;
 
 async function countInputTokens(client, model, prompt) {
+    // count_tokens needs a model; it is the layer's default (llm.model), never one chosen here.
     const res = await client.messages.countTokens({
         model, system: prompt.system, messages: [{ role: 'user', content: prompt.user }]
     });
@@ -173,7 +171,10 @@ async function countInputTokens(client, model, prompt) {
     return res.input_tokens + estimateTokens(JSON.stringify(JUDGMENT_SCHEMA));
 }
 
-async function estimate(items, { model, rate, client }) {
+/** Batch-priced estimate per item, by the shared computeCost at the layer's default model. */
+async function estimate(items, { lib, model, maxTokens, client }) {
+    const batchUsd = (inputTokens, outputTokens) => lib.computeCost(model,
+        { input_tokens: inputTokens, output_tokens: outputTokens }, { batch: true });
     const rows = [];
     for (const item of items) {
         const inputTokens = client
@@ -182,8 +183,8 @@ async function estimate(items, { model, rate, client }) {
         rows.push({
             item,
             inputTokens,
-            usd: estimateCost({ inputTokens, outputTokens: EST_OUTPUT_TOKENS }, rate),
-            ceilingUsd: estimateCost({ inputTokens, outputTokens: MAX_TOKENS }, rate)
+            usd: batchUsd(inputTokens, EST_OUTPUT_TOKENS),
+            ceilingUsd: batchUsd(inputTokens, maxTokens)
         });
     }
     return rows;
@@ -212,11 +213,11 @@ async function writeCheckpoint(cp) {
     await rename(`${path}.tmp`, path);
 }
 
-async function collect({ client, llm, cp, dbUrl }) {
+async function collect({ llm, cp, dbUrl }) {
     log(`batch ${cp.batchId}: waiting (${Object.keys(cp.pending).length} item(s), polling every ${POLL_MS / 1000} s)`);
     const started = Date.now();
-    await llm.awaitBatch({
-        client, provider: 'anthropic', batchId: cp.batchId, pollMs: POLL_MS,
+    await llm.awaitBatch(cp.batchId, {
+        pollMs: POLL_MS,
         onProgress: (s) => log(`batch ${cp.batchId}: ${s.status} · ${s.succeeded} succeeded · ${s.errored} errored · `
             + `${s.processing} processing · ${Math.round((Date.now() - started) / 1000)} s`)
     });
@@ -226,10 +227,10 @@ async function collect({ client, llm, cp, dbUrl }) {
             + 'their ledger lines are appended again by the shared collector (a partial-collection resume only)');
     }
     const totals = { items: 0, valid: 0, invalid: 0, error: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, usd: 0 };
-    const items = llm.collectBatch({
-        client, provider: 'anthropic', batchId: cp.batchId, model: cp.model, repo: REPO_NAME, script: SCRIPT,
-        meta: { promptVersion: PROMPT_VERSION }
-    });
+    // Priced and ledgered per item by the layer, at the model that answered. The row is keyed on
+    // cp.model — the model this batch was submitted with, persisted in the checkpoint — so a batch
+    // submitted before a defaults.json change resumes under the identity it was asked with.
+    const items = llm.collectBatch(cp.batchId, { schema: JUDGMENT_SCHEMA });
     for await (const row of judgmentRows(items, cp.pending, { model: cp.model, batchId: cp.batchId })) {
         const customId = customIdFor({ eventId: row.changeEventId });
         if (already.has(customId)) continue;
@@ -262,26 +263,24 @@ async function collect({ client, llm, cp, dbUrl }) {
  * The --direct fallback: one online call per item, costed at full price, stored and ledgered as it
  * arrives. An item already judged is not a candidate, so a rerun never pays twice.
  */
-async function judgeDirect({ client, llm, dbUrl, model, items }) {
+async function judgeDirect({ llm, dbUrl, items }) {
     if (items.length > DIRECT_LIMIT) {
         logError(`--direct is limited to ${DIRECT_LIMIT} item(s) at full price; got ${items.length}`);
         return 1;
     }
     const totals = { items: 0, valid: 0, invalid: 0, error: 0, usd: 0 };
     for (const p of items) {
-        const request = batchRequest(p.candidate, p.prompt, { model, maxTokens: MAX_TOKENS, effort: EFFORT });
+        const customId = customIdFor(p.candidate);
         let item;
         try {
-            item = directResultItem(request.custom_id, await client.messages.create(request.params));
-            item.costUsd = llm.computeCost(model, item.usage, { batch: false });
-            llm.record({ repo: REPO_NAME, script: SCRIPT, model, usage: item.usage, cost_usd: item.costUsd, batch: false,
-                meta: { promptVersion: PROMPT_VERSION, customId: request.custom_id, mode: 'direct' } });
+            // Priced (online, full price) and ledgered by the layer itself.
+            item = directItem(customId, await llm.complete({ ...judgeRequest(p.prompt), meta: { customId, mode: 'direct' } }));
         } catch (err) {
-            item = { customId: request.custom_id, error: err.message };
+            item = directItem(customId, err);
         }
         const { event, ...candidate } = p.candidate;
         const row = judgmentRow({ candidate: { ...candidate, event: { id: event.id, kind: event.kind } },
-            changeText: p.prompt.changeText, item, model, batchId: 'direct' });
+            changeText: p.prompt.changeText, item, model: llm.model, batchId: 'direct' });
         const sql = buildJudgmentSql([row]);
         await psql(dbUrl, wrapTransaction(sql.sql), sql.table);
         totals.items += 1;
@@ -293,7 +292,7 @@ async function judgeDirect({ client, llm, dbUrl, model, items }) {
             + (row.reasons.length ? ` · ${row.reasons.join('; ')}` : ''));
     }
     log(`direct run: ${totals.items} item(s) (${totals.valid} valid, ${totals.invalid} invalid, ${totals.error} error) · `
-        + `total ${usd(totals.usd)} (online, full price, ${model})`);
+        + `total ${usd(totals.usd)} (online, full price, ${llm.model})`);
     return totals.error ? 1 : 0;
 }
 
@@ -370,7 +369,10 @@ async function main() {
     }
     if (typeof flags.import === 'string') return importAnswers({ dbUrl, file: flags.import });
     const apiKey = env.ANTHROPIC_API_KEY || null;
-    const model = typeof flags.model === 'string' ? flags.model : DEFAULT_MODEL;
+    if (flags.model !== undefined) {
+        logError('--model was removed: the model comes from agents/lib/llm-cost/defaults.json for every repo');
+        return 1;
+    }
     const limit = flags.limit === undefined ? DEFAULT_LIMIT : Number(flags.limit);
     if (!Number.isInteger(limit) || limit < 1) {
         logError(`--limit must be a positive integer, got ${flags.limit}`);
@@ -387,19 +389,22 @@ async function main() {
         return 1;
     }
 
-    const llm = await loadLlmCost(env);
-    const rateInfo = llm.ratesFor(model); // throws on an unpriced model: no guessed prices
-    const rate = { input: rateInfo.input, output: rateInfo.output };
-    log(`${run ? 'RUN' : 'DRY RUN'} · db ${describeUrl(dbUrl)} · model ${model} (${rateInfo.source}: $${rate.input}/$${rate.output} `
-        + `per MTok online, half in a batch) · prompt ${PROMPT_VERSION} · effort ${EFFORT} · llm-cost ${llm.dir}`);
-
+    const lib = await loadLlmCost(env);
     const client = apiKey ? createAnthropicClient({ apiKey }) : null;
+    // A dry run without a key has no client to build the layer on; resolveCall is the same
+    // defaults.json lookup createLlm makes.
+    const llm = client ? lib.createLlm({ client, repo: REPO_NAME, script: SCRIPT, meta: { promptVersion: PROMPT_VERSION } }) : null;
+    const { model, effort } = llm ?? lib.resolveCall('anthropic');
+    const maxTokens = lib.DEFAULT_MAX_TOKENS;
+    const rateInfo = lib.ratesFor(model); // throws on an unpriced model: no guessed prices
+    log(`${run ? 'RUN' : 'DRY RUN'} · db ${describeUrl(dbUrl)} · model ${model} (${rateInfo.source}: $${rateInfo.input}/$${rateInfo.output} `
+        + `per MTok online, half in a batch) · effort ${effort} · max_tokens ${maxTokens} · prompt ${PROMPT_VERSION} · llm-cost ${lib.dir}`);
 
     if (run) {
         const open = (await readCheckpoints()).filter((cp) => !cp.done);
         const stalled = open.filter((cp) => isStalledBatch(cp, Date.now()));
         for (const cp of stalled) {
-            const info = await client.messages.batches.cancel(cp.batchId);
+            const info = await llm.cancelBatch(cp.batchId);
             logWarn(`batch ${cp.batchId} submitted ${cp.submittedAt} is still ${info.processing_status} after `
                 + `${STALLED_BATCH_MS / 3600_000} h: canceled (unprocessed requests are not billed); this run judges directly`);
             cp.done = true;
@@ -411,7 +416,7 @@ async function main() {
             const cp = open[0];
             log(`resuming batch ${cp.batchId} submitted ${cp.submittedAt} (${Object.keys(cp.pending).length} item(s)); `
                 + 'no new batch is submitted until it is collected');
-            const totals = await collect({ client, llm, cp, dbUrl });
+            const totals = await collect({ llm, cp, dbUrl });
             return totals.error ? 1 : 0;
         }
     }
@@ -429,9 +434,9 @@ async function main() {
 
     const batchItems = prepared.slice(0, limit);
     const countedBy = client ? 'count-tokens endpoint' : 'ESTIMATE: characters / 4 (no ANTHROPIC_API_KEY in .env)';
-    const batchEst = await estimate(batchItems, { model, rate, client });
-    const allEst = client ? [...batchEst, ...(await estimate(prepared.slice(limit), { model, rate, client: null }))]
-        : await estimate(prepared, { model, rate, client: null });
+    const batchEst = await estimate(batchItems, { lib, model, maxTokens, client });
+    const allEst = client ? [...batchEst, ...(await estimate(prepared.slice(limit), { lib, model, maxTokens, client: null }))]
+        : await estimate(prepared, { lib, model, maxTokens, client: null });
 
     if (!run) {
         log('candidates (newest first; * = in the next batch):');
@@ -447,7 +452,7 @@ async function main() {
     }
 
     log(`cost estimate — input tokens by ${countedBy}; output assumed ${EST_OUTPUT_TOKENS} tok/item `
-        + `(ceiling ${MAX_TOKENS}); batch rates $${rate.input / 2}/$${rate.output / 2} per MTok:`);
+        + `(ceiling ${maxTokens}); batch rates $${rateInfo.input / 2}/$${rateInfo.output / 2} per MTok:`);
     for (const r of batchEst) {
         console.log(`    event ${String(r.item.candidate.eventId).padStart(4)} · in ${String(r.inputTokens).padStart(6)} tok · `
             + `est ${usd(r.usd)} · ceiling ${usd(r.ceilingUsd)}`);
@@ -460,19 +465,19 @@ async function main() {
         return 0;
     }
 
-    if (flags.direct) return judgeDirect({ client, llm, dbUrl, model, items: batchItems });
+    if (flags.direct) return judgeDirect({ llm, dbUrl, items: batchItems });
 
-    const requests = batchItems.map((p) => batchRequest(p.candidate, p.prompt, { model, maxTokens: MAX_TOKENS, effort: EFFORT }));
-    const batchId = await llm.submitBatch({ client, provider: 'anthropic', requests });
+    const requests = batchItems.map((p) => llm.batchRequest(customIdFor(p.candidate), judgeRequest(p.prompt)));
+    const batchId = await llm.submitBatch(requests);
     const pending = {};
     for (const p of batchItems) {
         const { event, ...candidate } = p.candidate;
         pending[customIdFor(p.candidate)] = { candidate: { ...candidate, event: { id: event.id, kind: event.kind } }, changeText: p.prompt.changeText };
     }
-    const cp = { batchId, model, promptVersion: PROMPT_VERSION, submittedAt: ts(), pending, collected: [], done: false };
+    const cp = { batchId, model: llm.model, promptVersion: PROMPT_VERSION, submittedAt: ts(), pending, collected: [], done: false };
     await writeCheckpoint(cp);
     log(`batch ${batchId} submitted: ${requests.length} item(s), est ${usd(sum(batchEst, 'usd'))}; checkpoint written`);
-    const totals = await collect({ client, llm, cp, dbUrl });
+    const totals = await collect({ llm, cp, dbUrl });
     // An errored item is not a judgment: the run does not report success while any exists.
     return totals.error ? 1 : 0;
 }

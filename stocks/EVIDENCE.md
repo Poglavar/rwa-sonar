@@ -224,7 +224,8 @@ its source is marked `changed` (it is not marked false), a change event is raise
 - **Change judge** (`stocks/judge-changes.mjs`, `lib/change-judge.mjs`; PM2 `rwa-judge`, 06:47
   UTC). This is the §2.3 LLM judge. Once a day it sends one Message Batches batch of the 10 newest unjudged
   `legal-term`/`document-gone`/`quote-lost` changes, one item per change (events with the same
-  source and content hash are judged once), to `claude-sonnet-5`. It asks whether the change
+  source and content hash are judged once), to the shared LLM layer's default model (`agents/lib/llm-cost/defaults.json`:
+  `claude-opus-5-5` at high effort since 2026-10-09; `claude-sonnet-5` at medium before). It asks whether the change
   alters what a holder owns, can do, or can have done to them. Each answer goes to
   `sonar.change_judgment` with its tokens and `cost_usd`, and to the shared `llm-cost` ledger. An answer whose
   `quotedChange` fragments are not verbatim in the change text, or that says a change is material

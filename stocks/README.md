@@ -1818,10 +1818,13 @@ the judge had only run from the laptop. A server run needs:
 
 - `ANTHROPIC_API_KEY` in `/root/code/rwa-sonar/.env`: **absent** there today (only
   `DATABASE_URL` is set) on 2026-09-23. Adding it is the owner's decision; no key was copied.
-- The shared cost library: the script loads `$LLM_COST_LIB`, defaulting to
-  `../agents/lib/llm-cost` next to the repo. On `do` that is `/root/code/agents/lib/llm-cost`,
-  which **exists** (index.mjs, batch.mjs, rates.json pricing the default `claude-sonnet-5`), so
-  `LLM_COST_LIB` is not needed there as long as `/root/code/agents` is kept pulled. Its ledger is
+- The shared LLM layer: the script loads `$LLM_COST_LIB`, defaulting to
+  `../agents/lib/llm-cost` next to the repo (`/root/code/agents/lib/llm-cost` on `do`), and calls
+  the model through its `llm.mjs` `createLlm` over the repo's own dependency-free REST client
+  (`stocks/lib/anthropic-rest.mjs`). The model, effort and max_tokens are the layer's
+  (`defaults.json`; claude-opus-5-5 at high effort since 2026-10-09 — before that the judge pinned
+  claude-sonnet-5 at medium), never chosen here; there is no `--model`. It needs `llm.mjs`,
+  `defaults.json`, `index.mjs` and `rates.json` there, so `/root/code/agents` must be kept pulled. Its ledger is
   `~/.agents-llm-cost/ledger.jsonl` on that host (`LLM_COST_DIR` overrides), separate from the
   laptop's.
 - The table: `sonar.change_judgment` did **not** exist in prod `geodata` on 2026-09-23

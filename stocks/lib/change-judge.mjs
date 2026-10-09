@@ -2,7 +2,8 @@
 // the document changes worth a model's reading, build the one bounded prompt per change, check what
 // the model returned against the words it was shown, and render the SQL that stores the verdict in
 // sonar.change_judgment. No network, no filesystem and no clock here; stocks/judge-changes.mjs does
-// the IO, the batch and the accounting. A judgment is a MODEL ASSESSMENT shown beside the diff —
+// the IO and the batch, and the shared llm-cost layer (agents/lib/llm-cost/llm.cjs) picks the model
+// and does the accounting. A judgment is a MODEL ASSESSMENT shown beside the diff —
 // never the only signal — so a quote the model cannot back with the diff's own words makes the
 // whole judgment `invalid` rather than letting a paraphrase be stored as a quotation.
 
@@ -370,36 +371,19 @@ export function estimateTokens(text) {
     return Math.ceil(String(text ?? '').length / 4);
 }
 
-/**
- * Dollars for `inputTokens` + `outputTokens` at `rate` ({ input, output } USD per million, ONLINE
- * rates as in agents/lib/llm-cost/rates.json); batch halves it, as the shared library does.
- */
-export function estimateCost({ inputTokens, outputTokens }, rate, { batch = true } = {}) {
-    const n = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
-    if (!rate || typeof rate.input !== 'number' || typeof rate.output !== 'number') {
-        throw new Error('estimateCost needs a rate with numeric input and output');
-    }
-    return ((n(inputTokens) * rate.input + n(outputTokens) * rate.output) / 1e6) * (batch ? 0.5 : 1);
-}
-
 /** A batch custom_id (Anthropic: ^[a-zA-Z0-9_-]{1,64}$) for one candidate. */
 export function customIdFor(candidate) {
     return `evt-${candidate.eventId}`;
 }
 
-/** The Message Batches request for one candidate. */
-export function batchRequest(candidate, prompt, { model, maxTokens, effort }) {
-    return {
-        custom_id: customIdFor(candidate),
-        params: {
-            model,
-            max_tokens: maxTokens,
-            system: prompt.system,
-            messages: [{ role: 'user', content: prompt.user }],
-            thinking: { type: 'adaptive' },
-            output_config: { effort, format: { type: 'json_schema', schema: JUDGMENT_SCHEMA } }
-        }
-    };
+/**
+ * What one judgment asks, in the shared layer's terms (agents/lib/llm-cost/llm.cjs): the same
+ * description goes to `llm.batchRequest(customId, …)` and to `llm.complete(…)`. It names no model,
+ * effort or thinking — the layer takes those from its defaults.json, so a model switch is one edit
+ * there rather than here.
+ */
+export function judgeRequest(prompt) {
+    return { system: prompt.system, content: prompt.user, schema: JUDGMENT_SCHEMA };
 }
 
 /**
@@ -417,28 +401,48 @@ export function isStalledBatch(checkpoint, nowMs) {
 }
 
 /**
- * An online Messages response shaped like the shared batch collector's item
- * (`{ customId, message, text, usage }`), so the --direct fallback feeds the same judgmentRow.
- * Anthropic reports input and cache tokens disjoint, which is what computeCost expects.
+ * Output failures the shared layer reports as errors although the call was answered and billed: a
+ * refusal, an answer cut at max_tokens, text that is not JSON. They carry their cost and are stored
+ * `invalid` (a reading that failed, not retried); an `errored` item or a failed request produced
+ * nothing, costs nothing, and is stored `error` so the next run retries it.
  */
-export function directResultItem(customId, message) {
-    return {
-        customId,
-        message,
-        text: Array.isArray(message?.content) ? message.content.map((part) => part.text || '').join('') : '',
-        usage: {
-            input_tokens: message?.usage?.input_tokens ?? 0,
-            output_tokens: message?.usage?.output_tokens ?? 0,
-            cache_read_input_tokens: message?.usage?.cache_read_input_tokens ?? 0,
-            cache_creation_input_tokens: message?.usage?.cache_creation_input_tokens ?? 0
-        }
-    };
+export const PAID_OUTPUT_FAILURES = new Set(['refusal', 'max_tokens', 'invalid_json']);
+
+/**
+ * The --direct fallback's `llm.complete()` outcome as the item `llm.collectBatch()` would have
+ * yielded, so both feed the same judgmentRow. `outcome` is the resolved result, or what it threw:
+ * an LlmOutputError carries the cost, model and raw response of a paid answer; any other error
+ * (HTTP, network) means no answer and no charge.
+ */
+export function directItem(customId, outcome) {
+    if (!(outcome instanceof Error)) {
+        const { raw, ...result } = outcome ?? {};
+        return { customId, ...result };
+    }
+    if (outcome.name === 'LlmOutputError') {
+        const u = outcome.raw?.usage ?? {};
+        return {
+            customId, error: outcome.message, reason: outcome.reason, model: outcome.model ?? null,
+            costUsd: outcome.costUsd ?? null,
+            usage: {
+                input_tokens: u.input_tokens ?? 0,
+                output_tokens: u.output_tokens ?? 0,
+                cache_read_input_tokens: u.cache_read_input_tokens ?? 0,
+                cache_creation_input_tokens: u.cache_creation_input_tokens ?? 0
+            }
+        };
+    }
+    return { customId, error: outcome.message, reason: 'errored', costUsd: null };
 }
 
 /**
- * One sonar.change_judgment row from a collected batch item. `item` is what the shared library's
- * collectBatch yields ({ customId, text, usage, costUsd } or { customId, error }). An errored item
- * is billed nothing by the Batch API, so its cost is 0 and it is retried by the next run.
+ * One sonar.change_judgment row from a collected item. `item` is what the shared layer's
+ * llm.collectBatch yields ({ customId, text, data, model, usage, costUsd, stopReason } or
+ * { customId, error, reason, costUsd }), a `directItem`, or a CLI answer from --import
+ * ({ customId, text, usage, costUsd: 0 } or { customId, error }). An errored item is billed nothing
+ * by the Batch API, so its cost is 0 and it is retried by the next run; a paid output failure
+ * (PAID_OUTPUT_FAILURES) is an `invalid` reading with its real cost. `model` is the identity the
+ * judgment is keyed on (the model the batch was submitted with), as loadJudgedKeys reads it back.
  */
 export function judgmentRow({ candidate, changeText, item, model, batchId, promptVersion = PROMPT_VERSION }) {
     const base = {
@@ -453,13 +457,18 @@ export function judgmentRow({ candidate, changeText, item, model, batchId, promp
         cacheReadTokens: item.usage?.cache_read_input_tokens ?? 0,
         cacheCreationTokens: item.usage?.cache_creation_input_tokens ?? 0
     };
-    if (item.error) {
+    const paidFailure = Boolean(item.error) && PAID_OUTPUT_FAILURES.has(item.reason);
+    if (item.error && !paidFailure) {
         return { ...base, status: 'error', costUsd: 0, reasons: [String(item.error)], rejectedQuotes: [], judgment: null };
     }
     if (typeof item.costUsd !== 'number' || !Number.isFinite(item.costUsd)) {
         throw new Error(`no cost for ${item.customId}: refusing to store a judgment with an unknown price`);
     }
-    const stop = item.message?.stop_reason;
+    if (paidFailure) {
+        return { ...base, status: 'invalid', costUsd: item.costUsd, reasons: [`${item.reason}: ${item.error}`],
+            rejectedQuotes: [], judgment: null };
+    }
+    const stop = item.stopReason;
     const parsed = parseJudgmentText(item.text ?? '');
     const checked = parsed.error
         ? { status: 'invalid', judgment: null, reasons: [parsed.error], rejectedQuotes: [] }
