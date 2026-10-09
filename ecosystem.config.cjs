@@ -137,8 +137,7 @@ module.exports = {
             // batch of the newest unjudged document changes, costed per item into
             // sonar.change_judgment. 25 items a day (about $0.31 at Opus 5.5 batch rates, the shared
             // llm-cost default since 9 Oct; $0.13 at Sonnet 5 before; raised from 10 on 30 Sep by the
-            // owner, when 10 a day let a 243-change backlog grow); a backlog is judged with the
-            // Claude CLI on the laptop (stocks/judge-with-cli.mjs). Needs ANTHROPIC_API_KEY in .env.
+            // owner, when 10 a day let a 243-change backlog grow). Needs ANTHROPIC_API_KEY in .env.
             name: 'rwa-judge',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/judge-changes.mjs',

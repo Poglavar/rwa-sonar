@@ -438,8 +438,7 @@ export function directItem(customId, outcome) {
 /**
  * One sonar.change_judgment row from a collected item. `item` is what the shared layer's
  * llm.collectBatch yields ({ customId, text, data, model, usage, costUsd, stopReason } or
- * { customId, error, reason, costUsd }), a `directItem`, or a CLI answer from --import
- * ({ customId, text, usage, costUsd: 0 } or { customId, error }). An errored item is billed nothing
+ * { customId, error, reason, costUsd }) or a `directItem`. An errored item is billed nothing
  * by the Batch API, so its cost is 0 and it is retried by the next run; a paid output failure
  * (PAID_OUTPUT_FAILURES) is an `invalid` reading with its real cost. `model` is the identity the
  * judgment is keyed on (the model the batch was submitted with), as loadJudgedKeys reads it back.
