@@ -54,7 +54,9 @@ body[data-research-page="report"] #researchScope { color: var(--rwa-muted); font
 .report-header-controls { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; margin: 22px 0 32px; }
 .report-header-controls > label { max-width: 420px; font-size: 13px; }
 .report-header-controls details { margin: 0; max-width: 100%; position: relative; }
-.report-header-controls summary { padding: 10px 14px; border: 1px solid var(--rwa-line); border-radius: 8px; font-size: 14px; }
+.report-header-controls summary, .report-header-controls .report-back-chart { padding: 10px 14px; border: 1px solid var(--rwa-line); border-radius: 8px; font-size: 14px; }
+.report-header-controls .report-back-chart { color: var(--rwa-ink); text-decoration: none; font-weight: 600; }
+.report-header-controls .report-back-chart:hover { background: var(--rwa-panel); }
 .report-header-controls details[open] label { display: block; position: absolute; z-index: 5; top: 50px; left: 0; padding: 14px; width: min(420px,calc(100vw - 40px)); background: var(--rwa-panel); border: 1px solid var(--rwa-line); border-radius: 10px; }
 .report-shell { display: grid; grid-template-columns: 180px minmax(0,1fr); gap: 44px; align-items: start; }
 .report-topic-nav { position: sticky; top: 92px; }
