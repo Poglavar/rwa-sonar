@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// The daily case-law watcher (next-steps.md "Next engineering iteration" item 2): searches
-// CourtListener (opinions and RECAP dockets) and the SEC's litigation-release and
+// The case-law watcher (next-steps.md "Next engineering iteration" item 2): searches
+// CourtListener (RECAP dockets) and the SEC's litigation-release and
 // administrative-proceeding feeds for every issuer's legal entities and key parties, stores each
 // case in sonar.litigation_case, follows the dockets that name a party in the caption for new
 // entries, and raises a sonar.change_event of kind `litigation` for every NEW case or entry.
@@ -10,16 +10,16 @@
 //
 // The decisions (query derivation, parsing, match levels, what is an event, the SQL) are in
 // lib/caselaw.mjs and unit tested in caselaw.test.js; this file is the IO: pacing, retries, psql,
-// the per-task checkpoint and the one Telegram summary.
+// the circular queue's state file and the one Telegram summary.
 
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import {
     COURTLISTENER_SEARCH, SEC_FEEDS, backoffMs, buildCaseUpsertSql, buildQueryRunSql,
     buildReadCasesQuery, buildReadQueriesQuery, courtListenerUrl, deriveQueries, entryEvent, foldHits,
     formatTelegramSummary, latestEntryFromDocuments, matchSecItems, normaliseStoredRows, parseCourtListenerResults,
-    activeQuotaStops, hoursSince, MIN_PASS_INTERVAL_MS, parseSecFeed, passPlan, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
+    activeQuotaStops, FEED_INTERVAL_MS, parseSecFeed, QUOTA_STOP_MS, queueHealth, queueOrder, quotaExhaustion, rankRows, reconcileQueue, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -35,7 +35,7 @@ const QUERIES_FILE = join(HERE, 'data', 'caselaw-queries.json');
 const EXTRA_FILE = join(HERE, 'data', 'caselaw-extra.json');
 const REVIEWED_FILE = join(HERE, 'data', 'caselaw-reviewed.json');
 const STATS_FILE = join(REPO, '.last-caselaw-watch-stats.json');
-const CHECKPOINT_FILE = join(REPO, '.caselaw-watch-checkpoint.json');
+const QUEUE_FILE = join(REPO, '.caselaw-watch-queue.json');
 const RUN_STARTED_MS = Date.now();
 
 const DEFAULT_PACE_MS = 1500;
@@ -43,13 +43,12 @@ const DEFAULT_PACE_MS = 1500;
 const TOKEN_PACE_MS = 12_500;
 const MAX_ATTEMPTS = 4;
 const TIMEOUT_MS = 30_000;
-const DEFAULT_ENTRY_CHECKS = 30;
-/** A pass checkpoint untouched for this long was abandoned (the job stopped running) and is not resumed. */
-const CHECKPOINT_MAX_AGE_MS = 72 * 3600 * 1000;
+/** A run stops taking tasks after this, so it never overlaps the next hourly run. */
+const RUN_BUDGET_MS = 50 * 60 * 1000;
 const CL_USER_AGENT = 'rwa-sonar caselaw-watch (contact@rwasonar.com)';
 
 function usage() {
-    console.log(`watch-caselaw.mjs — case-law watcher (hourly runs, one pass a day at most): CourtListener + SEC releases per issuer party
+    console.log(`watch-caselaw.mjs — case-law watcher (hourly runs over a circular queue): CourtListener + SEC releases per issuer party
 
 USAGE
   node stocks/watch-caselaw.mjs --run [options]
@@ -60,10 +59,10 @@ OPTIONS
                      Without it the file is only compared, and a stale file is a warning.
   --only=<issuer>    Only the queries watched for this issuer slug.
   --limit=<n>        Only the first n queries (smoke test).
-  --entries=<n>      Dockets checked for new entries per run, default ${DEFAULT_ENTRY_CHECKS} (0 skips the pass).
+  --no-entries       Skip the docket-entry checks.
   --pace=<ms>        Minimum gap between requests to one host, default ${DEFAULT_PACE_MS} ms (${TOKEN_PACE_MS} ms with a token).
   --no-sec           Skip the two SEC feeds.
-  --fresh            Ignore a checkpoint left by an interrupted run and start over.
+  --fresh            Forget the queue order: every task counts as never done.
   --no-db            Search and print only: no state is read or written, so nothing is an event.
   --no-telegram      Never send the summary, whatever is in .env. It is still logged.
   --help             This text.
@@ -74,14 +73,15 @@ WHAT A RUN DOES
      agent, custodian, parent and security agent, expanded to the legal names the dossier spells out
      ("Kraken" -> "Payward, Inc."), with a stoplist for over-broad bare names; plus the manual
      additions in stocks/data/caselaw-extra.json (the two known D. Del. dockets).
-  2. Per phrase: CourtListener v4 search, type=o (opinions) and type=r (RECAP dockets), exact phrase,
-     newest filing first, first page (20). Per known docket: a docketNumber search in its court.
+  2. Per phrase: CourtListener v4 search, type=r (RECAP dockets), exact phrase, newest filing first,
+     first page (20). Opinions (type=o) are no longer searched: 1 hit against RECAP's 81, at double
+     the requests (2026-10-10). Per known docket: a docketNumber search in its court.
   3. The SEC litigation-release and administrative-proceeding RSS feeds (25 newest items each),
      matched locally against every phrase; a warning when the feed no longer reaches back to the
      previous poll.
-  4. Up to --entries dockets (caption matches, known dockets, confirmed) get their newest RECAP entry
+  4. Every followed docket (caption matches, known dockets, confirmed) gets its newest RECAP entry
      read (type=rd, newest first).
-  5. Each task is written to Postgres in one transaction as it finishes (the checkpoint): the cases
+  5. Each task is written to Postgres in one transaction as it finishes: the cases
      (sonar.litigation_case), the search run (sonar.litigation_query) and its events.
   6. A query's FIRST run is a baseline: everything is recorded and nothing is raised. After that a new
      case -> one change_event per issuer (kind litigation, severity caution when the name is in the
@@ -90,14 +90,17 @@ WHAT A RUN DOES
   7. ONE Telegram summary when there are events or failures (a quota stop is pacing, not news);
      ${relative(REPO, STATS_FILE)}; exit 1 if any request failed.
 
-PASSES AND RESUME
-  A pass runs every task once. It needs more requests than CourtListener allows in a day, so it is
-  spread over hourly runs: every finished task is in the DB and in ${relative(REPO, CHECKPOINT_FILE)},
-  each run skips what the pass already did, and a quota stop carries over so the next run spends no
-  request rediscovering it. A complete pass is kept (completedAt) and the next pass starts
-  ${MIN_PASS_INTERVAL_MS / 3600000} h after the previous one started; until then a run does nothing. A checkpoint untouched for
-  ${CHECKPOINT_MAX_AGE_MS / 3600000} h is abandoned. The stats carry passTasksDone/passTasksTotal and lastPassAgeHours. --only,
-  --limit and --no-db runs never touch the checkpoint. Each run stamps its own events (detected_at).
+THE QUEUE
+  Steps 2-4 are tasks in one circular queue (${relative(REPO, QUEUE_FILE)}: each task's lastDoneAt).
+  A run takes never-done tasks first, then the least recently done, and keeps going until the
+  CourtListener quota stops it (or ${RUN_BUDGET_MS / 60000} min pass); the next hourly run carries on from there. So every
+  run spends the whole quota, and one round over all tasks takes as long as the quota needs: as the
+  dossiers name more parties or more dockets are followed, a round grows from one day to two or
+  three on its own. The SEC feeds have no quota and run once per ${FEED_INTERVAL_MS / 3600000} h. A quota stop is kept in
+  the file so the next run spends no request rediscovering it. A failed task keeps its place at the
+  front. The stats carry queueTasks, neverDone and oldestTaskAgeHours (the stalest task's age, about
+  the length of a round). --only, --limit and --no-db runs never touch the queue. Each run stamps
+  its own events (detected_at).
 
 LIMITS AND KEYS
   CourtListener's search API answers without a key (verified 2026-09-23). Its documented limits for
@@ -106,7 +109,7 @@ LIMITS AND KEYS
   and then the pace is raised to ${TOKEN_PACE_MS} ms. 429 and 5xx are retried with backoff (Retry-After obeyed),
   except a 429 saying the quota is back in more than ${QUOTA_STOP_MS / 60000} min ("Expected available in N seconds" or
   Retry-After): then no further request goes to that host this run, the remaining tasks are counted as
-  skipped for quota (not failures) and wait in the pass for the next hourly run (quotaExhausted in the stats).
+  skipped for quota (not failures) and keep their place in the queue (quotaExhausted in the stats).
   sec.gov is sent the declared User-Agent from lib/watch.mjs.
 
 PM2
@@ -211,22 +214,6 @@ function queriesDocument({ queries, dropped, priorNotWatched }) {
     };
 }
 
-async function readCheckpoint(fresh) {
-    if (fresh) return null;
-    try {
-        const info = await stat(CHECKPOINT_FILE);
-        const cp = JSON.parse(await readFile(CHECKPOINT_FILE, 'utf8'));
-        if (Date.now() - info.mtimeMs > CHECKPOINT_MAX_AGE_MS) {
-            logWarn(`checkpoint ${relative(REPO, CHECKPOINT_FILE)} is older than ${CHECKPOINT_MAX_AGE_MS / 3600000} h — not resumed`);
-            return null;
-        }
-        return cp;
-    } catch (err) {
-        if (err.code === 'ENOENT') return null;
-        throw err;
-    }
-}
-
 function progress(done, total, startedMs) {
     const pct = total === 0 ? 100 : Math.round((done / total) * 100);
     const elapsed = (Date.now() - startedMs) / 1000;
@@ -257,8 +244,6 @@ async function main() {
     } else {
         log(`courtlistener: no COURTLISTENER_API_TOKEN in .env — running keyless, paced at ${paceMs} ms`);
     }
-    const entryLimit = flags.entries === undefined ? DEFAULT_ENTRY_CHECKS : Number(flags.entries);
-    if (!Number.isFinite(entryLimit) || entryLimit < 0) throw new Error(`--entries must be >= 0, got ${flags.entries}`);
     const clHeaders = { 'user-agent': CL_USER_AGENT, ...(token ? { authorization: `Token ${token}` } : {}) };
     const secHeaders = { 'user-agent': userAgentFor('www.sec.gov') };
 
@@ -303,62 +288,51 @@ async function main() {
     const firstRunEver = runs.size === 0;
     if (firstRunEver && dbUrl) log('db: no search has ever run — this run is the BASELINE: everything is recorded, nothing is raised');
 
-    // --- the pass checkpoint ------------------------------------------------------------------
-    // One pass runs every task once and may span several hourly runs (see passPlan). A scoped run
-    // covers only some tasks, so it neither reads nor writes the checkpoint: it must not complete a pass.
+    // --- the queue ----------------------------------------------------------------------------
+    // Every task, every run: the queue order decides what runs first and the quota decides how much
+    // runs (see queueOrder). A scoped run covers only some tasks, so it neither reads nor writes the
+    // queue state: it runs its tasks in order and leaves the round where it was.
     const scoped = Boolean(flags.only || flags.limit || flags['no-db']);
-    if (scoped) logWarn('scoped run (--only / --limit / --no-db): the pass checkpoint is neither read nor written');
-    const stored = scoped ? null : await readCheckpoint(Boolean(flags.fresh));
-    const plan = passPlan(stored);
-    if (plan.action === 'idle') {
-        log(`pass: the pass of ${stored.startedAt} completed at ${stored.completedAt}; the next starts at ${plan.nextPassAt} — nothing to do`);
-        await writeJson(STATS_FILE, {
-            watchStatus: 'ok', idle: true, generatedAt: ts(), lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
-            queries: queries.length, tasksCompleted: 0, requests: 0, failures: 0, skippedForQuota: 0, events: 0,
-            passStartedAt: stored.startedAt, passComplete: true, nextPassAt: plan.nextPassAt,
-            lastPassCompletedAt: plan.lastPassCompletedAt, lastPassAgeHours: hoursSince(plan.lastPassCompletedAt)
-        });
-        return;
-    }
-    const checkpoint = plan.action === 'resume' ? stored : null;
-    // Each run stamps its own events: a pass can span days, and stored state already keeps a case
-    // found by an earlier run of the pass from being raised again.
+    if (scoped) logWarn('scoped run (--only / --limit / --no-db): the queue state is neither read nor written');
     const detectedAt = ts(new Date(RUN_STARTED_MS));
-    const passStartedAt = checkpoint?.startedAt ?? detectedAt;
-    const done = new Set(checkpoint?.done ?? []);
-    let entryKeys = checkpoint?.entryKeys ?? null;
-    if (checkpoint) log(`pass: resuming the pass of ${passStartedAt} — ${done.size} task(s) already done will be skipped`);
-    else if (!scoped) log(`pass: starting a new pass${plan.lastPassCompletedAt ? ` (the previous completed at ${plan.lastPassCompletedAt})` : ''}`);
-    for (const [host, stop] of activeQuotaStops(checkpoint?.quotaStops)) {
+    const tasks = [];
+    for (const q of queries) {
+        // RECAP dockets only: opinion search for the same names found 1 hit against RECAP's 81 and
+        // doubled the requests (2026-10-10).
+        if (q.kind === 'docket') tasks.push({ id: `docket:${q.courtId}:${q.docketNumber}`, kind: 'docket', query: q });
+        else tasks.push({ id: `r:${q.id}`, kind: 'search', type: 'r', query: q });
+    }
+    if (!flags['no-sec']) for (const feed of SEC_FEEDS) tasks.push({ id: `feed:${feed.id}`, kind: 'feed', feed });
+    if (!flags['no-entries']) {
+        // Every followed docket, not a capped sample: the queue gets round to all of them.
+        const pinned = new Set([...previous.values()].filter((r) => (r.queries ?? []).some((q) => q.startsWith('docket '))).map((r) => r.key));
+        const followed = selectEntryChecks([...previous.values()], { limit: Number.MAX_SAFE_INTEGER, pinned });
+        for (const r of followed) tasks.push({ id: `entries:${r.key}`, kind: 'entries', key: r.key });
+    }
+    const stored = scoped || flags.fresh ? null : await readJson(QUEUE_FILE, null);
+    if (flags.fresh) logWarn('--fresh: the queue order is forgotten; every task counts as never done');
+    const queue = reconcileQueue(stored?.tasks, tasks.map((t) => t.id), detectedAt);
+    for (const [host, stop] of activeQuotaStops(stored?.quotaStops)) {
         quotaStops.set(host, stop);
         log(`${host}: quota exhausted until ${stop.resumeAt} (found by an earlier run) — its tasks wait, no request is spent`);
     }
-    const saveCheckpoint = async (completedAt = null) => {
+    const ordered = scoped ? tasks : queueOrder(tasks, queue);
+    const before = queueHealth(queue);
+    log(`queue: ${tasks.length} task(s) (${tasks.filter((t) => t.kind === 'search').length} searches, ${tasks.filter((t) => t.kind === 'docket').length} known dockets,`
+        + ` ${tasks.filter((t) => t.kind === 'feed').length} feeds, ${tasks.filter((t) => t.kind === 'entries').length} docket-entry checks);`
+        + ` ${before.neverDone} never done, stalest ${before.oldestTaskAgeHours ?? 0} h old; ${ordered.length} due this run`);
+    const saveQueue = async () => {
         if (scoped) return;
-        await writeJson(CHECKPOINT_FILE, {
-            startedAt: passStartedAt, done: [...done], entryKeys, completedAt,
-            lastPassCompletedAt: completedAt ?? plan.lastPassCompletedAt,
-            quotaStops: Object.fromEntries(quotaStops)
-        });
+        await writeJson(QUEUE_FILE, { tasks: queue, quotaStops: Object.fromEntries(quotaStops) });
     };
-
-    // --- the tasks ----------------------------------------------------------------------------
-    const tasks = [];
-    for (const q of queries) {
-        if (q.kind === 'docket') tasks.push({ id: `docket:${q.courtId}:${q.docketNumber}`, kind: 'docket', query: q });
-        else for (const type of ['r', 'o']) tasks.push({ id: `${type}:${q.id}`, kind: 'search', type, query: q });
-    }
-    if (!flags['no-sec']) for (const feed of SEC_FEEDS) tasks.push({ id: `feed:${feed.id}`, kind: 'feed', feed });
 
     const failures = [];
     const events = [];
     const touched = new Set();
     const hitsBySource = {};
-    let skipped = 0;
     let skippedForQuota = 0;
     let completed = 0;
     let baselineRecords = 0;
-    const loopStartedMs = Date.now();
 
     /** One task's results into Postgres, in one transaction — this is the checkpoint. */
     const persist = async ({ rows = [], run = null, taskEvents = [] }) => {
@@ -447,58 +421,39 @@ async function main() {
         throw new Error(`unknown task kind ${task.kind}`);
     };
 
-    const execute = async (list, label) => {
+    const execute = async (list) => {
         const startedMs = Date.now();
         for (let i = 0; i < list.length; i += 1) {
             const task = list[i];
-            if (done.has(task.id)) {
-                skipped += 1;
-                continue;
+            if (Date.now() - RUN_STARTED_MS > RUN_BUDGET_MS) {
+                log(`run budget of ${RUN_BUDGET_MS / 60000} min used — the remaining ${list.length - i} task(s) wait for the next run`);
+                break;
             }
             try {
                 const outcome = await runTask(task);
-                done.add(task.id);
+                queue[task.id] = { ...queue[task.id], lastDoneAt: ts() };
                 completed += 1;
-                await saveCheckpoint();
-                log(`${label} [${progress(i + 1, list.length, startedMs)}] ${task.id.slice(0, 70)} — ${outcome}`);
+                await saveQueue();
+                log(`${task.kind} [${progress(i + 1, list.length, startedMs)}] ${task.id.slice(0, 70)} — ${outcome}`);
             } catch (err) {
                 if (err instanceof QuotaExhaustedError) {
                     // Logged once where the quota ran out; one line per skipped task would be spam.
                     skippedForQuota += 1;
                     continue;
                 }
+                // A failed task keeps its place at the front of the queue and is retried next run.
                 failures.push(`${task.id}: ${err.message}`);
-                logError(`${label} [${progress(i + 1, list.length, startedMs)}] ${task.id} FAILED — ${err.message}`);
+                logError(`${task.kind} [${progress(i + 1, list.length, startedMs)}] ${task.id} FAILED — ${err.message}`);
             }
         }
     };
 
-    await execute(tasks, 'search');
-    const passTasks = [...tasks];
-
-    // --- docket entries -----------------------------------------------------------------------
-    if (entryLimit > 0) {
-        const pinned = new Set([...previous.values()].filter((r) => (r.queries ?? []).some((q) => q.startsWith('docket '))).map((r) => r.key));
-        // Chosen once per pass and kept in the checkpoint: re-choosing "least recently checked" in each
-        // hourly run would keep picking fresh dockets and the pass would never complete.
-        if (!entryKeys) entryKeys = selectEntryChecks([...previous.values()], { limit: entryLimit, pinned }).map((r) => r.key);
-        const eligible = selectEntryChecks([...previous.values()], { limit: Number.MAX_SAFE_INTEGER, pinned }).length;
-        log(`entries: ${entryKeys.length} docket(s) to check this pass of ${eligible} followed (cap ${entryLimit}, least recently checked first)`);
-        const entryTasks = entryKeys.filter((key) => previous.has(key)).map((key) => ({ id: `entries:${key}`, kind: 'entries', key }));
-        passTasks.push(...entryTasks);
-        await execute(entryTasks, 'entries');
-    }
-
-    // --- the pass -----------------------------------------------------------------------------
-    const passDone = passTasks.filter((t) => done.has(t.id)).length;
-    const passComplete = passDone === passTasks.length;
-    const completedAt = passComplete ? ts() : null;
-    await saveCheckpoint(completedAt);
-    const lastPassCompletedAt = completedAt ?? plan.lastPassCompletedAt;
+    await execute(ordered);
+    await saveQueue();
+    const health = queueHealth(queue);
     if (!scoped) {
-        log(passComplete
-            ? `pass: COMPLETE — all ${passTasks.length} task(s) of the pass of ${passStartedAt} done; the next starts at ${ts(new Date(Date.parse(passStartedAt) + MIN_PASS_INTERVAL_MS))}`
-            : `pass: ${passDone}/${passTasks.length} task(s) of the pass of ${passStartedAt} done — the rest run next hour`);
+        log(`queue: ${completed} task(s) done this run; ${health.neverDone} never done; stalest task ${health.oldestTaskAgeHours ?? 0} h old`
+            + ` (about how long one round over all ${health.queueTasks} takes now)`);
     }
 
     // --- report -------------------------------------------------------------------------------
@@ -509,7 +464,7 @@ async function main() {
     for (const r of recorded) byLevel[r.matchLevel] = (byLevel[r.matchLevel] ?? 0) + 1;
     const [quotaHost, quotaStop] = [...quotaStops.entries()][0] ?? [null, null];
     const quota = quotaStop ? { host: quotaHost, resumeAt: quotaStop.resumeAt, skipped: skippedForQuota } : null;
-    log(`watch-caselaw: ${completed} task(s) done, ${skipped} skipped from the checkpoint, ${skippedForQuota} skipped for quota,`
+    log(`watch-caselaw: ${completed} task(s) done, ${skippedForQuota} skipped for quota,`
         + ` ${failures.length} failed · ${counters.requests} request(s) (${counters.retries} retries) · ${(durationMs / 1000).toFixed(0)} s`);
     log(`watch-caselaw: hits per source — ${Object.entries(hitsBySource).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}`);
     log(`watch-caselaw: ${recorded.length} distinct record(s) seen — caption ${byLevel.caption}, party ${byLevel.party}, text ${byLevel.text};`
@@ -534,7 +489,6 @@ async function main() {
         queries: queries.length,
         tasks: tasks.length,
         tasksCompleted: completed,
-        tasksSkipped: skipped,
         quotaExhausted: Boolean(quota),
         skippedForQuota,
         quotaResumeAt: quota?.resumeAt ?? null,
@@ -550,12 +504,7 @@ async function main() {
         failures: failures.length,
         failureReasons: failures.slice(0, 20),
         scoped,
-        passStartedAt,
-        passTasksDone: passDone,
-        passTasksTotal: passTasks.length,
-        passComplete,
-        lastPassCompletedAt,
-        lastPassAgeHours: hoursSince(lastPassCompletedAt)
+        ...health
     };
     await writeJson(STATS_FILE, stats);
 
@@ -577,7 +526,7 @@ async function main() {
         return;
     }
     if (quota) {
-        // A clean quota stop: the skipped tasks stay in the pass checkpoint and run next hour.
+        // A clean quota stop: the skipped tasks keep their place in the queue and run next hour.
         log(`watch-caselaw: done for this hour — ${skippedForQuota} task(s) wait for ${quota.host} (quota back at ${quota.resumeAt})`);
         return;
     }

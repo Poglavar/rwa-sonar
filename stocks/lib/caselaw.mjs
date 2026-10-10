@@ -753,8 +753,8 @@ export function quotaExhaustion({ status, retryAfter = null, body = '', now = Da
  * and a non-zero exit for it read as a crash every day. Exit 1 is kept for real failures.
  */
 export function runOutcome({ failures = 0 } = {}) {
-    // A quota stop is not part of the verdict: a pass is spread over hourly runs on purpose, and a
-    // pass that stops completing shows as lastPassAgeHours instead (see passPlan).
+    // A quota stop is not part of the verdict: the queue runs into the quota on purpose every
+    // hour, and a queue falling behind shows as oldestTaskAgeHours instead (see queueHealth).
     return {
         watchStatus: failures > 0 ? 'partial' : 'ok',
         exitCode: failures > 0 ? 1 : 0
@@ -762,37 +762,53 @@ export function runOutcome({ failures = 0 } = {}) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Passes: one pass runs every task once, spread over as many hourly runs as the quota needs
+// The circular queue: every run takes the least recently processed tasks first and keeps going
+// until the quota stops it; the next run carries on. A round over all tasks takes as long as the
+// quota needs, and grows on its own as the dossiers name more parties or the followed dockets grow.
 // ---------------------------------------------------------------------------------------------
 
-/** A new pass starts at most once a day, counted from the previous pass's start. */
-export const MIN_PASS_INTERVAL_MS = 24 * 3600 * 1000;
+/** The SEC feeds have no quota and list every recent release, so once a day is enough. */
+export const FEED_INTERVAL_MS = 20 * 3600 * 1000;
 
 /**
- * What a run does with the stored pass checkpoint: `resume` an unfinished pass, stay `idle` while the
- * last complete pass started under a day ago, or `start` a new pass. CourtListener allows 125
- * authenticated requests a day and a pass needs more, so passes follow each other at the pace the
- * quota allows; until 2026-10-10 every run discarded its checkpoint and redid the same first 52 tasks.
+ * The stored queue brought in line with this run's tasks: a new task joins (addedAt now, never
+ * done), a task no longer derived leaves, everything else keeps its lastDoneAt.
+ * @returns {Record<string, {addedAt:string, lastDoneAt:string|null}>}
  */
-export function passPlan(checkpoint, now = Date.now()) {
-    if (!checkpoint) return { action: 'start', lastPassCompletedAt: null };
-    if (!checkpoint.completedAt) return { action: 'resume', lastPassCompletedAt: checkpoint.lastPassCompletedAt ?? null };
-    const nextPassAt = Date.parse(checkpoint.startedAt) + MIN_PASS_INTERVAL_MS;
-    if (Number.isFinite(nextPassAt) && now < nextPassAt) {
-        return { action: 'idle', nextPassAt: new Date(nextPassAt).toISOString(), lastPassCompletedAt: checkpoint.completedAt };
-    }
-    return { action: 'start', lastPassCompletedAt: checkpoint.completedAt };
+export function reconcileQueue(stored = {}, taskIds = [], now = new Date().toISOString()) {
+    const queue = {};
+    for (const id of taskIds) queue[id] = stored?.[id] ?? { addedAt: now, lastDoneAt: null };
+    return queue;
+}
+
+/**
+ * This run's order: never-processed tasks first, then the least recently processed, ties by id.
+ * A feed task is left out until FEED_INTERVAL_MS after it last ran.
+ */
+export function queueOrder(tasks, queue, now = Date.now()) {
+    const lastDone = (t) => queue[t.id]?.lastDoneAt ?? '';
+    return tasks
+        .filter((t) => t.kind !== 'feed' || !queue[t.id]?.lastDoneAt || now - Date.parse(queue[t.id].lastDoneAt) >= FEED_INTERVAL_MS)
+        .sort((a, b) => lastDone(a).localeCompare(lastDone(b)) || a.id.localeCompare(b.id));
+}
+
+/**
+ * How far behind the queue is: oldestTaskAgeHours is the age of the stalest task (since it was last
+ * done, or since it joined if never), i.e. roughly how long one round over every task takes now.
+ */
+export function queueHealth(queue, now = Date.now()) {
+    const entries = Object.values(queue ?? {});
+    const ages = entries.map((e) => now - Date.parse(e.lastDoneAt ?? e.addedAt)).filter(Number.isFinite);
+    return {
+        queueTasks: entries.length,
+        neverDone: entries.filter((e) => !e.lastDoneAt).length,
+        oldestTaskAgeHours: ages.length ? Math.round(Math.max(...ages) / 360000) / 10 : null
+    };
 }
 
 /** Quota stops still in force, as [host, stop] — carried over so a run does not spend a request rediscovering one. */
 export function activeQuotaStops(stops = {}, now = Date.now()) {
     return Object.entries(stops ?? {}).filter(([, stop]) => Date.parse(stop?.resumeAt) > now);
-}
-
-/** Hours since an ISO time, one decimal; null when there is no time (a pass never completed). */
-export function hoursSince(iso, now = Date.now()) {
-    const at = typeof iso === 'string' ? Date.parse(iso) : NaN;
-    return Number.isFinite(at) ? Math.round((now - at) / 360000) / 10 : null;
 }
 
 // ---------------------------------------------------------------------------------------------

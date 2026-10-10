@@ -93,10 +93,10 @@ module.exports = {
             // RECAP dockets plus the SEC litigation-release / administrative-proceeding feeds, per
             // issuer legal entity and party; writes sonar.litigation_case / litigation_query and
             // `litigation` change events for review. Never sets a what-if answer to `litigated`.
-            // Hourly since 2026-10-10: the token allows 50 requests an hour and 125 a day, below one
-            // ~170-request pass, so a pass resumes across hourly runs (at most one new pass a day);
-            // a run with nothing left to do exits at once. One Telegram summary only when there are
-            // new events or failures.
+            // Hourly since 2026-10-10 over a circular queue: each run takes the least recently done
+            // tasks until the token's quota (50 an hour, 125 a day) stops it, and the next run carries
+            // on, so a round over every task takes as long as the quota needs. One Telegram summary
+            // only when there are new events or failures.
             name: 'rwa-watch-caselaw',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-caselaw.mjs',

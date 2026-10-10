@@ -17,7 +17,7 @@ import {
     formatTelegramSummary, issuerBrand, latestEntryFromDocuments, matchLevel, matchSecItems,
     normalisePhrase, normaliseStoredRows, parseCourtListenerResults, parseSecFeed, QUOTA_STOP_MS, quotaExhaustion,
     quotaWaitSeconds, rankRows, retryable,
-    activeQuotaStops, hoursSince, passPlan, reviewIndex, runOutcome, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
+    activeQuotaStops, queueHealth, queueOrder, reconcileQueue, reviewIndex, runOutcome, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -437,15 +437,38 @@ describe('retry and pacing decisions', () => {
         expect(runOutcome({ failures: 2 })).toEqual({ watchStatus: 'partial', exitCode: 1 });
     });
 
-    test('a pass resumes until complete, then the next starts a day after the last one started', () => {
+    test('the queue takes never-done tasks first, then the least recently done, and skips feeds run in the last 20 h', () => {
         const NOW = Date.parse('2026-10-11T10:23:00Z');
-        expect(passPlan(null, NOW)).toEqual({ action: 'start', lastPassCompletedAt: null });
-        expect(passPlan({ startedAt: '2026-10-10T04:23:00Z', done: ['a'], lastPassCompletedAt: '2026-10-09T20:00:00Z' }, NOW))
-            .toEqual({ action: 'resume', lastPassCompletedAt: '2026-10-09T20:00:00Z' });
-        expect(passPlan({ startedAt: '2026-10-11T04:23:00Z', completedAt: '2026-10-11T08:00:00Z' }, NOW))
-            .toEqual({ action: 'idle', nextPassAt: '2026-10-12T04:23:00.000Z', lastPassCompletedAt: '2026-10-11T08:00:00Z' });
-        expect(passPlan({ startedAt: '2026-10-10T04:23:00Z', completedAt: '2026-10-11T09:00:00Z' }, NOW))
-            .toEqual({ action: 'start', lastPassCompletedAt: '2026-10-11T09:00:00Z' });
+        const tasks = [
+            { id: 'r:b', kind: 'search' }, { id: 'r:a', kind: 'search' }, { id: 'r:new', kind: 'search' },
+            { id: 'feed:recent', kind: 'feed' }, { id: 'feed:stale', kind: 'feed' }, { id: 'entries:k', kind: 'entries' }
+        ];
+        const queue = {
+            'r:a': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-10T12:00:00Z' },
+            'r:b': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-09T12:00:00Z' },
+            'r:new': { addedAt: '2026-10-11T10:00:00Z', lastDoneAt: null },
+            'feed:recent': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-11T01:00:00Z' },
+            'feed:stale': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-10T08:00:00Z' },
+            'entries:k': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-11T09:00:00Z' }
+        };
+        expect(queueOrder(tasks, queue, NOW).map((t) => t.id)).toEqual(['r:new', 'r:b', 'feed:stale', 'r:a', 'entries:k']);
+    });
+
+    test('reconciling keeps each task its history, adds new tasks and drops retired ones', () => {
+        const stored = { 'r:a': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-10T12:00:00Z' }, 'r:gone': { addedAt: 'x', lastDoneAt: null } };
+        expect(reconcileQueue(stored, ['r:a', 'r:new'], '2026-10-11T10:00:00Z')).toEqual({
+            'r:a': { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-10T12:00:00Z' },
+            'r:new': { addedAt: '2026-10-11T10:00:00Z', lastDoneAt: null }
+        });
+    });
+
+    test('queue health is the age of the stalest task, counting a never-done task from when it joined', () => {
+        const NOW = Date.parse('2026-10-12T12:00:00Z');
+        expect(queueHealth({
+            a: { addedAt: '2026-10-01T00:00:00Z', lastDoneAt: '2026-10-12T00:00:00Z' },
+            b: { addedAt: '2026-10-10T12:00:00Z', lastDoneAt: null }
+        }, NOW)).toEqual({ queueTasks: 2, neverDone: 1, oldestTaskAgeHours: 48 });
+        expect(queueHealth({}, NOW)).toEqual({ queueTasks: 0, neverDone: 0, oldestTaskAgeHours: null });
     });
 
     test('only quota stops still in force are carried into the next run', () => {
@@ -455,10 +478,6 @@ describe('retry and pacing decisions', () => {
         expect(activeQuotaStops(undefined, NOW)).toEqual([]);
     });
 
-    test('a pass that never completed has no age, never a zero', () => {
-        expect(hoursSince(null)).toBeNull();
-        expect(hoursSince('2026-10-10T00:00:00Z', Date.parse('2026-10-11T06:00:00Z'))).toBe(30);
-    });
 });
 
 describe('SQL and DDL', () => {
