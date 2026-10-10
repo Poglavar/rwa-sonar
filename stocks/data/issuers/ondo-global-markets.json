@@ -199,7 +199,7 @@
           },
           {
             "label": "Sanity-check admin source",
-            "url": "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
+            "url": "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
             "locator": "SetLastPrice and USDC oracle sanity-check paths",
             "accessedAt": "2026-09-20T07:53:18Z"
           }
@@ -1082,7 +1082,7 @@
     "https://www.dropbox.com/scl/fo/7rlmba8f49nvbp3xwz1of/ABv0vSjd6cIDAUTIlwm2KwA?rlkey=hokf0tffqvezfmsto25cvpovs&dl=0",
     "https://github.com/ondoprotocol/global-markets-solana",
     "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/token_manager.rs",
-    "https://github.com/ondoprotocol/global-markets-solana/blob/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
+    "https://raw.githubusercontent.com/ondoprotocol/global-markets-solana/main/programs/ondo-gm/src/instructions/sanity_checker_admin_operations.rs",
     "https://github.com/Squads-Protocol/v4/blob/main/programs/squads_multisig_program/src/state/multisig.rs",
     "https://www.sec.gov/files/ctf-written-input-ondo-finance-041326.pdf",
     "https://solana.com/news/ondo-global-markets-tokenized-stocks-etfs-solana",
