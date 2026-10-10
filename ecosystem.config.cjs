@@ -89,18 +89,20 @@ module.exports = {
             merge_logs: true
         },
         {
-            // Daily case-law watcher (stocks/watch-caselaw.mjs --help): CourtListener opinions and
+            // Case-law watcher (stocks/watch-caselaw.mjs --help): CourtListener opinions and
             // RECAP dockets plus the SEC litigation-release / administrative-proceeding feeds, per
             // issuer legal entity and party; writes sonar.litigation_case / litigation_query and
             // `litigation` change events for review. Never sets a what-if answer to `litigated`.
-            // Keyless, ~160 requests paced 1.5 s apart, a few minutes. One Telegram summary only
-            // when there are new events or failures.
+            // Hourly since 2026-10-10: the token allows 50 requests an hour and 125 a day, below one
+            // ~170-request pass, so a pass resumes across hourly runs (at most one new pass a day);
+            // a run with nothing left to do exits at once. One Telegram summary only when there are
+            // new events or failures.
             name: 'rwa-watch-caselaw',
             cwd: '/root/code/rwa-sonar',
             script: 'stocks/watch-caselaw.mjs',
             args: '--run',
             interpreter: 'node',
-            cron_restart: '23 4 * * *',
+            cron_restart: '23 * * * *',
             autorestart: false,
             watch: false,
             env: { TZ: 'UTC' },

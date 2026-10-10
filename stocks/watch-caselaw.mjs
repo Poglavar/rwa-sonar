@@ -12,14 +12,14 @@
 // lib/caselaw.mjs and unit tested in caselaw.test.js; this file is the IO: pacing, retries, psql,
 // the per-task checkpoint and the one Telegram summary.
 
-import { readdir, readFile, rm, stat } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import {
     COURTLISTENER_SEARCH, SEC_FEEDS, backoffMs, buildCaseUpsertSql, buildQueryRunSql,
     buildReadCasesQuery, buildReadQueriesQuery, courtListenerUrl, deriveQueries, entryEvent, foldHits,
     formatTelegramSummary, latestEntryFromDocuments, matchSecItems, normaliseStoredRows, parseCourtListenerResults,
-    parseSecFeed, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
+    activeQuotaStops, hoursSince, MIN_PASS_INTERVAL_MS, parseSecFeed, passPlan, QUOTA_STOP_MS, quotaExhaustion, rankRows, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
@@ -44,12 +44,12 @@ const TOKEN_PACE_MS = 12_500;
 const MAX_ATTEMPTS = 4;
 const TIMEOUT_MS = 30_000;
 const DEFAULT_ENTRY_CHECKS = 30;
-/** A checkpoint older than this belongs to an earlier day's run and is not resumed. */
-const CHECKPOINT_MAX_AGE_MS = 6 * 3600 * 1000;
+/** A pass checkpoint untouched for this long was abandoned (the job stopped running) and is not resumed. */
+const CHECKPOINT_MAX_AGE_MS = 72 * 3600 * 1000;
 const CL_USER_AGENT = 'rwa-sonar caselaw-watch (contact@rwasonar.com)';
 
 function usage() {
-    console.log(`watch-caselaw.mjs — daily case-law watcher: CourtListener + SEC releases per issuer party
+    console.log(`watch-caselaw.mjs — case-law watcher (hourly runs, one pass a day at most): CourtListener + SEC releases per issuer party
 
 USAGE
   node stocks/watch-caselaw.mjs --run [options]
@@ -87,13 +87,17 @@ WHAT A RUN DOES
      case -> one change_event per issuer (kind litigation, severity caution when the name is in the
      caption or among the parties, info when only in the text), and a newer docket entry -> caution.
      Cases marked \`dismissed\` in stocks/data/caselaw-reviewed.json are recorded but raise nothing.
-  7. ONE Telegram summary when there are events, failures or an exhausted quota; ${relative(REPO, STATS_FILE)}; exit 1 if
-     any request failed. A quota stop with no failure is watchStatus partial in the stats but exits 0.
+  7. ONE Telegram summary when there are events or failures (a quota stop is pacing, not news);
+     ${relative(REPO, STATS_FILE)}; exit 1 if any request failed.
 
-RESUME
-  Every finished task is in the DB and in ${relative(REPO, CHECKPOINT_FILE)}. A run killed part-way
-  is resumed by the next run within ${CHECKPOINT_MAX_AGE_MS / 3600000} h (same detected_at, finished tasks skipped and counted);
-  the file is removed when a run completes.
+PASSES AND RESUME
+  A pass runs every task once. It needs more requests than CourtListener allows in a day, so it is
+  spread over hourly runs: every finished task is in the DB and in ${relative(REPO, CHECKPOINT_FILE)},
+  each run skips what the pass already did, and a quota stop carries over so the next run spends no
+  request rediscovering it. A complete pass is kept (completedAt) and the next pass starts
+  ${MIN_PASS_INTERVAL_MS / 3600000} h after the previous one started; until then a run does nothing. A checkpoint untouched for
+  ${CHECKPOINT_MAX_AGE_MS / 3600000} h is abandoned. The stats carry passTasksDone/passTasksTotal and lastPassAgeHours. --only,
+  --limit and --no-db runs never touch the checkpoint. Each run stamps its own events (detected_at).
 
 LIMITS AND KEYS
   CourtListener's search API answers without a key (verified 2026-09-23). Its documented limits for
@@ -102,11 +106,11 @@ LIMITS AND KEYS
   and then the pace is raised to ${TOKEN_PACE_MS} ms. 429 and 5xx are retried with backoff (Retry-After obeyed),
   except a 429 saying the quota is back in more than ${QUOTA_STOP_MS / 60000} min ("Expected available in N seconds" or
   Retry-After): then no further request goes to that host this run, the remaining tasks are counted as
-  skipped for quota (not failures), and the run ends promptly as partial (quotaExhausted in the stats).
+  skipped for quota (not failures) and wait in the pass for the next hourly run (quotaExhausted in the stats).
   sec.gov is sent the declared User-Agent from lib/watch.mjs.
 
 PM2
-  ecosystem.config.cjs app \`rwa-watch-caselaw\`: daily at 04:23 UTC, --run, autorestart off (the schema is applied at deploy: stocks/apply-schema.mjs).
+  ecosystem.config.cjs app \`rwa-watch-caselaw\`: hourly at :23 UTC, --run, autorestart off (the schema is applied at deploy: stocks/apply-schema.mjs).
 
 FILES
   stocks/data/caselaw-queries.json    the derived query set, generated (--write-queries), reviewed, committed
@@ -299,12 +303,44 @@ async function main() {
     const firstRunEver = runs.size === 0;
     if (firstRunEver && dbUrl) log('db: no search has ever run — this run is the BASELINE: everything is recorded, nothing is raised');
 
-    // --- checkpoint ---------------------------------------------------------------------------
-    const checkpoint = await readCheckpoint(Boolean(flags.fresh));
-    const detectedAt = checkpoint?.detectedAt ?? ts(new Date(RUN_STARTED_MS));
+    // --- the pass checkpoint ------------------------------------------------------------------
+    // One pass runs every task once and may span several hourly runs (see passPlan). A scoped run
+    // covers only some tasks, so it neither reads nor writes the checkpoint: it must not complete a pass.
+    const scoped = Boolean(flags.only || flags.limit || flags['no-db']);
+    if (scoped) logWarn('scoped run (--only / --limit / --no-db): the pass checkpoint is neither read nor written');
+    const stored = scoped ? null : await readCheckpoint(Boolean(flags.fresh));
+    const plan = passPlan(stored);
+    if (plan.action === 'idle') {
+        log(`pass: the pass of ${stored.startedAt} completed at ${stored.completedAt}; the next starts at ${plan.nextPassAt} — nothing to do`);
+        await writeJson(STATS_FILE, {
+            watchStatus: 'ok', idle: true, generatedAt: ts(), lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
+            queries: queries.length, tasksCompleted: 0, requests: 0, failures: 0, skippedForQuota: 0, events: 0,
+            passStartedAt: stored.startedAt, passComplete: true, nextPassAt: plan.nextPassAt,
+            lastPassCompletedAt: plan.lastPassCompletedAt, lastPassAgeHours: hoursSince(plan.lastPassCompletedAt)
+        });
+        return;
+    }
+    const checkpoint = plan.action === 'resume' ? stored : null;
+    // Each run stamps its own events: a pass can span days, and stored state already keeps a case
+    // found by an earlier run of the pass from being raised again.
+    const detectedAt = ts(new Date(RUN_STARTED_MS));
+    const passStartedAt = checkpoint?.startedAt ?? detectedAt;
     const done = new Set(checkpoint?.done ?? []);
-    if (checkpoint) log(`checkpoint: resuming the run of ${detectedAt} — ${done.size} task(s) already done will be skipped`);
-    const saveCheckpoint = () => writeJson(CHECKPOINT_FILE, { startedAt: checkpoint?.startedAt ?? detectedAt, detectedAt, done: [...done] });
+    let entryKeys = checkpoint?.entryKeys ?? null;
+    if (checkpoint) log(`pass: resuming the pass of ${passStartedAt} — ${done.size} task(s) already done will be skipped`);
+    else if (!scoped) log(`pass: starting a new pass${plan.lastPassCompletedAt ? ` (the previous completed at ${plan.lastPassCompletedAt})` : ''}`);
+    for (const [host, stop] of activeQuotaStops(checkpoint?.quotaStops)) {
+        quotaStops.set(host, stop);
+        log(`${host}: quota exhausted until ${stop.resumeAt} (found by an earlier run) — its tasks wait, no request is spent`);
+    }
+    const saveCheckpoint = async (completedAt = null) => {
+        if (scoped) return;
+        await writeJson(CHECKPOINT_FILE, {
+            startedAt: passStartedAt, done: [...done], entryKeys, completedAt,
+            lastPassCompletedAt: completedAt ?? plan.lastPassCompletedAt,
+            quotaStops: Object.fromEntries(quotaStops)
+        });
+    };
 
     // --- the tasks ----------------------------------------------------------------------------
     const tasks = [];
@@ -438,14 +474,31 @@ async function main() {
     };
 
     await execute(tasks, 'search');
+    const passTasks = [...tasks];
 
     // --- docket entries -----------------------------------------------------------------------
     if (entryLimit > 0) {
         const pinned = new Set([...previous.values()].filter((r) => (r.queries ?? []).some((q) => q.startsWith('docket '))).map((r) => r.key));
-        const checks = selectEntryChecks([...previous.values()], { limit: entryLimit, pinned });
+        // Chosen once per pass and kept in the checkpoint: re-choosing "least recently checked" in each
+        // hourly run would keep picking fresh dockets and the pass would never complete.
+        if (!entryKeys) entryKeys = selectEntryChecks([...previous.values()], { limit: entryLimit, pinned }).map((r) => r.key);
         const eligible = selectEntryChecks([...previous.values()], { limit: Number.MAX_SAFE_INTEGER, pinned }).length;
-        log(`entries: ${checks.length} docket(s) to check of ${eligible} followed (cap ${entryLimit}, least recently checked first)`);
-        await execute(checks.map((r) => ({ id: `entries:${r.key}`, kind: 'entries', key: r.key })), 'entries');
+        log(`entries: ${entryKeys.length} docket(s) to check this pass of ${eligible} followed (cap ${entryLimit}, least recently checked first)`);
+        const entryTasks = entryKeys.filter((key) => previous.has(key)).map((key) => ({ id: `entries:${key}`, kind: 'entries', key }));
+        passTasks.push(...entryTasks);
+        await execute(entryTasks, 'entries');
+    }
+
+    // --- the pass -----------------------------------------------------------------------------
+    const passDone = passTasks.filter((t) => done.has(t.id)).length;
+    const passComplete = passDone === passTasks.length;
+    const completedAt = passComplete ? ts() : null;
+    await saveCheckpoint(completedAt);
+    const lastPassCompletedAt = completedAt ?? plan.lastPassCompletedAt;
+    if (!scoped) {
+        log(passComplete
+            ? `pass: COMPLETE — all ${passTasks.length} task(s) of the pass of ${passStartedAt} done; the next starts at ${ts(new Date(Date.parse(passStartedAt) + MIN_PASS_INTERVAL_MS))}`
+            : `pass: ${passDone}/${passTasks.length} task(s) of the pass of ${passStartedAt} done — the rest run next hour`);
     }
 
     // --- report -------------------------------------------------------------------------------
@@ -470,7 +523,7 @@ async function main() {
     log(`watch-caselaw: ${events.length} event(s)`);
     for (const e of events.slice(0, 20)) log(`  [${e.severity}] ${e.subjectId}: ${e.summary}`);
 
-    const outcome = runOutcome({ failures: failures.length, quotaExhausted: Boolean(quota) });
+    const outcome = runOutcome({ failures: failures.length });
     const stats = {
         watchStatus: outcome.watchStatus,
         generatedAt: ts(),
@@ -495,12 +548,19 @@ async function main() {
         events: events.length,
         eventsBySeverity: events.reduce((acc, e) => ({ ...acc, [e.severity]: (acc[e.severity] ?? 0) + 1 }), {}),
         failures: failures.length,
-        failureReasons: failures.slice(0, 20)
+        failureReasons: failures.slice(0, 20),
+        scoped,
+        passStartedAt,
+        passTasksDone: passDone,
+        passTasksTotal: passTasks.length,
+        passComplete,
+        lastPassCompletedAt,
+        lastPassAgeHours: hoursSince(lastPassCompletedAt)
     };
     await writeJson(STATS_FILE, stats);
-    await rm(CHECKPOINT_FILE, { force: true });
 
-    if ((events.length > 0 || failures.length > 0 || quota) && !flags['no-telegram']) {
+    // Telegram is for events and failures. A quota stop is the pass being paced, not news.
+    if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
         await postTelegram(formatTelegramSummary({
             events, failures, queries: queries.length, requests: counters.requests, durationMs, recorded: recorded.length, quota
@@ -517,8 +577,8 @@ async function main() {
         return;
     }
     if (quota) {
-        // A clean quota stop: partial in the stats, exit 0 — the skipped tasks run next time.
-        logWarn(`watch-caselaw: PARTIAL — 0 failures, ${skippedForQuota} task(s) skipped: ${quota.host} quota exhausted until ${quota.resumeAt}`);
+        // A clean quota stop: the skipped tasks stay in the pass checkpoint and run next hour.
+        log(`watch-caselaw: done for this hour — ${skippedForQuota} task(s) wait for ${quota.host} (quota back at ${quota.resumeAt})`);
         return;
     }
     log(`watch-caselaw: done (${COURTLISTENER_SEARCH} + ${SEC_FEEDS.length} SEC feeds)`);

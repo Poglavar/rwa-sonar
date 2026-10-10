@@ -17,7 +17,7 @@ import {
     formatTelegramSummary, issuerBrand, latestEntryFromDocuments, matchLevel, matchSecItems,
     normalisePhrase, normaliseStoredRows, parseCourtListenerResults, parseSecFeed, QUOTA_STOP_MS, quotaExhaustion,
     quotaWaitSeconds, rankRows, retryable,
-    reviewIndex, runOutcome, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
+    activeQuotaStops, hoursSince, passPlan, reviewIndex, runOutcome, saysUnrelated, secFeedGap, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -432,11 +432,32 @@ describe('retry and pacing decisions', () => {
         expect(quotaExhaustion({ status: 429, retryAfter: '600', now: NOW }, { thresholdMs: 60_000 })).not.toBeNull();
     });
 
-    test('a clean quota stop is partial but exits 0; any real failure exits 1 (the 2026-10-07 run: 50 done, 86 skipped, 0 failed)', () => {
-        expect(runOutcome({ failures: 0, quotaExhausted: true })).toEqual({ watchStatus: 'partial', exitCode: 0 });
-        expect(runOutcome({ failures: 1, quotaExhausted: true })).toEqual({ watchStatus: 'partial', exitCode: 1 });
-        expect(runOutcome({ failures: 2, quotaExhausted: false })).toEqual({ watchStatus: 'partial', exitCode: 1 });
-        expect(runOutcome({ failures: 0, quotaExhausted: false })).toEqual({ watchStatus: 'ok', exitCode: 0 });
+    test('a quota stop is pacing, not a verdict; any real failure is partial and exits 1', () => {
+        expect(runOutcome({ failures: 0 })).toEqual({ watchStatus: 'ok', exitCode: 0 });
+        expect(runOutcome({ failures: 2 })).toEqual({ watchStatus: 'partial', exitCode: 1 });
+    });
+
+    test('a pass resumes until complete, then the next starts a day after the last one started', () => {
+        const NOW = Date.parse('2026-10-11T10:23:00Z');
+        expect(passPlan(null, NOW)).toEqual({ action: 'start', lastPassCompletedAt: null });
+        expect(passPlan({ startedAt: '2026-10-10T04:23:00Z', done: ['a'], lastPassCompletedAt: '2026-10-09T20:00:00Z' }, NOW))
+            .toEqual({ action: 'resume', lastPassCompletedAt: '2026-10-09T20:00:00Z' });
+        expect(passPlan({ startedAt: '2026-10-11T04:23:00Z', completedAt: '2026-10-11T08:00:00Z' }, NOW))
+            .toEqual({ action: 'idle', nextPassAt: '2026-10-12T04:23:00.000Z', lastPassCompletedAt: '2026-10-11T08:00:00Z' });
+        expect(passPlan({ startedAt: '2026-10-10T04:23:00Z', completedAt: '2026-10-11T09:00:00Z' }, NOW))
+            .toEqual({ action: 'start', lastPassCompletedAt: '2026-10-11T09:00:00Z' });
+    });
+
+    test('only quota stops still in force are carried into the next run', () => {
+        const NOW = Date.parse('2026-10-10T05:00:00Z');
+        const stops = { 'www.courtlistener.com': { resumeAt: '2026-10-10T05:23:01Z' }, 'www.sec.gov': { resumeAt: '2026-10-10T04:00:00Z' } };
+        expect(activeQuotaStops(stops, NOW).map(([host]) => host)).toEqual(['www.courtlistener.com']);
+        expect(activeQuotaStops(undefined, NOW)).toEqual([]);
+    });
+
+    test('a pass that never completed has no age, never a zero', () => {
+        expect(hoursSince(null)).toBeNull();
+        expect(hoursSince('2026-10-10T00:00:00Z', Date.parse('2026-10-11T06:00:00Z'))).toBe(30);
     });
 });
 
