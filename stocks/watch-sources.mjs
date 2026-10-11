@@ -21,6 +21,7 @@ import { rootCertificates } from 'node:tls';
 
 import { readEnvFile } from './lib/env.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
+import { applyArchiveCapture, markArchiveCapturePending } from './lib/archive-repair.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { fetchNotionPageText, isNotionSiteHost } from './lib/notion.mjs';
 import { companionFor, companionNote, companionText, currentNextChunk, wantsCompanion } from './lib/companions.mjs';
@@ -35,7 +36,7 @@ import {
     apiAnswerIsDocument, blockVendor, buildChangeEventSql, buildClaimCheckSql, buildSourceSql, buildVersionSql,
     challengeInBody, checkQuotes, conditionalHeaders, decideOutcome, driveDownloadUrl, dropboxDownloadUrl, extraCaFor, fileStamp,
     looksLikePdf, looksLikeText, normaliseLines,
-    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveMissingTargets, archiveRefusal, buildArchiveUrlSql, captureIsRecent, parseArchiveLocation,
+    ARCHIVE_GIVE_UP_AFTER, DEFAULT_USER_AGENT, archivableUrl, archiveIsPending, archiveMissingTargets, archiveRecoveryVerdict, archiveRefusal, archiveTargetsWithVersionRefs, buildArchiveUrlSql, buildArchiveVersionRefsSql, captureIsRecent, parseArchiveLocation,
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, selectSourceIds, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
@@ -106,10 +107,14 @@ OPTIONS
                      today's checkpoint for them; writes .last-source-watch-stats-only-blocked.json,
                      never the heartbeat. Combine with --no-db to measure a fallback change.
   --archive-missing-only
-                     Fetch nothing: submit only the sources whose stored state has no archive
-                     URL (not gone/error, already read once) to Save Page Now, and write each
-                     capture to sources-state.json and sonar.source.archive_url as it lands.
-                     Respects --only/--limit; leaves the watch heartbeat alone.
+                     Fetch nothing: submit sources with no archive or an explicitly pending
+                     current-version archive (not gone/error) to Save Page Now. Writes each
+                     capture and preserves a replaced capture in sources-state.json. Respects
+                     --source/--only/--limit; leaves the watch heartbeat alone. For a bounded
+                     retry of already-archived rows, add --retry-existing and select their IDs:
+                     --archive-missing-only --retry-existing --source=<ids> --limit=10.
+  --retry-existing   With --archive-missing-only, explicitly retry selected rows even when they
+                     already have an archive URL. Requires --source and --limit<=10.
   --archive          Push every NEW version — and any source with no archive yet — to the
                      Wayback Machine (1 request / ${ARCHIVE_PACE_MS / 1000}s, reusing a capture under ${ARCHIVE_REUSE_WITHIN} old). Failures are logged
                      and never fatal. Measure a run without it first.
@@ -657,6 +662,9 @@ async function watchOne(source, prev, options) {
         rawPath: null,
         textPath: null,
         archiveUrl: prev?.archiveUrl ?? null,
+        archiveContentHash: prev?.archiveContentHash ?? null,
+        archivePending: prev?.archivePending === true,
+        archiveHistory: Array.isArray(prev?.archiveHistory) ? prev.archiveHistory : [],
         status: null,
         reason: null,
         error: null,
@@ -1294,14 +1302,16 @@ async function loadToPostgres(rows, { url }) {
 }
 
 /**
- * `--archive-missing-only`: close the archive gap without a watch run. Each capture is written to
- * the state file (re-read just before, so a concurrent run's changes survive) and to Postgres as
- * it lands, so a kill loses at most the capture in flight; a rerun skips what is archived.
+ * `--archive-missing-only`: close missing and pending-version archive gaps without a watch run.
+ * Each capture is written to state and Postgres as it lands, so a kill loses at most the capture
+ * in flight; replaced captures stay in state history and older version rows.
  */
-async function archiveMissing(sources, { noDb }) {
+async function archiveMissing(sources, { noDb, retryExisting = false }) {
     const startedMs = Date.now();
-    const { targets, skipped } = archiveMissingTargets(sources, await readJson(STATE_FILE, {}));
-    log(`archive-missing: ${targets.length} of ${sources.length} source(s) without an archive`
+    const initialState = await readJson(STATE_FILE, {});
+    let { targets, skipped } = archiveMissingTargets(sources, initialState, { retryExisting });
+    const pending = targets.filter((target) => target.pending).length;
+    log(`archive-missing: ${targets.length} of ${sources.length} source(s) without a current archive (${pending} pending refresh)`
         + ` (skipped: ${skipped.archived} archived, ${skipped.gone} gone, ${skipped.error} error,`
         + ` ${skipped.unchecked} never read, ${skipped.archiveHost} on the archive itself)`);
     let dbUrl = null;
@@ -1310,6 +1320,15 @@ async function archiveMissing(sources, { noDb }) {
         dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
         if (!dbUrl) logWarn('archive-missing: DATABASE_URL is not set — state file only');
         else log(`db: ${describeUrl(dbUrl)}`);
+    }
+    if (dbUrl && targets.length) {
+        const query = buildArchiveVersionRefsSql(targets.map((target) => ({ ...target, id: sourceId(target.url) })));
+        const refs = await psql(dbUrl, query.sql, 'archive-missing version guard preflight', ['-t', '-A']);
+        targets = archiveTargetsWithVersionRefs(
+            targets.map((target) => ({ ...target, id: sourceId(target.url) })),
+            refs
+        );
+        log(`db: verified ${query.rows} archive target source/version guard(s) before capture`);
     }
     const failed = [];
     let archived = 0;
@@ -1321,22 +1340,38 @@ async function archiveMissing(sources, { noDb }) {
         const saved = await archiveUrl(target.url);
         const at = `[${progress(index + 1, targets.length, startedMs)}]`;
         if (!saved.archiveUrl) {
-            failed.push({ url: target.url, status: target.status, error: saved.error });
-            logWarn(`${at} archive failed for ${target.url} (${target.status}): ${saved.error}`);
+            const retry = await markArchiveCapturePending({
+                target,
+                readState: () => readJson(STATE_FILE, {}),
+                writeState: (state) => writeJson(STATE_FILE, state)
+            });
+            failed.push({ url: target.url, status: target.status, error: saved.error, retryable: retry.marked });
+            logWarn(`${at} archive failed for ${target.url} (${target.status}): ${saved.error}`
+                + (retry.marked ? ' — current version remains pending for a later run' : ' — source advanced; state left unchanged'));
             continue;
         }
-        const state = await readJson(STATE_FILE, {});
-        if (state[target.url] && !state[target.url].archiveUrl) {
-            state[target.url].archiveUrl = saved.archiveUrl;
-            await writeJson(STATE_FILE, state);
-        }
-        if (dbUrl) {
-            const update = buildArchiveUrlSql([{ id: sourceId(target.url), archiveUrl: saved.archiveUrl }]);
-            await psql(dbUrl, wrapTransaction(update.sql), update.table);
-        }
+        const applied = await applyArchiveCapture({
+            target,
+            archiveUrl: saved.archiveUrl,
+            readState: () => readJson(STATE_FILE, {}),
+            writeState: (state) => writeJson(STATE_FILE, state),
+            persistDatabase: async (currentTarget, currentArchiveUrl) => {
+                if (!dbUrl) return;
+                const update = buildArchiveUrlSql([{
+                    id: sourceId(currentTarget.url), archiveUrl: currentArchiveUrl,
+                    expectedArchiveUrl: currentTarget.archiveUrl,
+                    contentHash: currentTarget.contentHash,
+                    versionFetchedAt: currentTarget.versionFetchedAt,
+                    expectedVersionArchiveUrl: currentTarget.expectedVersionArchiveUrl
+                }]);
+                await psql(dbUrl, wrapTransaction(update.sql), update.table);
+            }
+        });
         archived += 1;
-        log(`${at} archived ${target.url} -> ${saved.archiveUrl}`);
+        log(`${at} archived ${target.url} -> ${saved.archiveUrl}`
+            + (applied.applied ? '' : ' (state advanced during capture; left current reference unchanged)'));
     }
+    const verdict = archiveRecoveryVerdict(failed.length);
     await writeJson(runStatsFile, {
         mode: 'archive-missing-only',
         lastRunStartedAt: RUN_STARTED_AT,
@@ -1344,9 +1379,11 @@ async function archiveMissing(sources, { noDb }) {
         targets: targets.length,
         skipped,
         archived,
-        failed
+        failed,
+        ...verdict
     });
-    log(`archive-missing: archived ${archived}/${targets.length}, ${failed.length} failed`
+    process.exitCode = verdict.exitCode;
+    log(`archive-missing: status=${verdict.runStatus}, archived ${archived}/${targets.length}, ${failed.length} failed`
         + ` — details in ${relative(REPO, runStatsFile)}`);
 }
 
@@ -1367,6 +1404,9 @@ async function main() {
     if (!Number.isFinite(pace) || pace < 0) throw new Error(`--pace must be a number of ms, got ${flags.pace}`);
 
     const archiveMissingOnly = Boolean(flags['archive-missing-only']);
+    if (flags['retry-existing'] && (!archiveMissingOnly || !flags.source || !flags.limit || Number(flags.limit) > 10)) {
+        throw new Error('--retry-existing requires --archive-missing-only, --source=<ids>, and --limit<=10');
+    }
     if (archiveMissingOnly) runStatsFile = join(REPO, '.last-source-archive-missing-stats.json');
     if (flags.archive || archiveMissingOnly) {
         const env = await readEnvFile(join(REPO, '.env'));
@@ -1415,7 +1455,7 @@ async function main() {
         sources = sources.slice(0, limit);
     }
     if (archiveMissingOnly) {
-        await archiveMissing(sources, { noDb: Boolean(flags['no-db']) });
+        await archiveMissing(sources, { noDb: Boolean(flags['no-db']), retryExisting: Boolean(flags['retry-existing']) });
         return;
     }
     // A Google Drive file link is registered as `html` (that is what the viewer page is) but
@@ -1539,30 +1579,43 @@ async function main() {
         // A source read from a capture older than WAYBACK_STALE_DAYS asks for a fresh capture, so
         // the next run reads this week's page rather than re-confirming a months-old one.
         const staleCapture = result.via === 'wayback' && captureIsStale(result.captureTimestamp, Date.now());
-        const wantsArchive = flags.archive && !archiveGaveUp && result.status !== 'gone'
+        const wantsArchive = flags.archive && result.status !== 'gone'
             && result.status !== 'error' && result.status !== 'throttled' && archivableUrl(result.url)
-            && (result.status === 'changed' || !result.archiveUrl || staleCapture);
+            && (result.status === 'changed' || !result.archiveUrl || staleCapture || archiveIsPending(result));
         if (wantsArchive) {
-            const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
-            if (gap > 0) await sleep(gap);
-            lastArchiveMs = Date.now();
-            const saved = await archiveUrl(result.url);
-            if (saved.archiveUrl) {
-                result.archiveUrl = saved.archiveUrl;
-                archived += 1;
-                archiveFailureStreak = 0;
-                log(`archived ${result.url} -> ${saved.archiveUrl}`);
+            if (archiveGaveUp) {
+                result.archivePending = true;
             } else {
-                archiveFailures += 1;
-                archiveFailureStreak += 1;
-                logWarn(`archive failed for ${result.url}: ${saved.error}`);
-                // The archive being offline, or refusing anonymous saves, is one fact about the
-                // archive — not 300 facts about our sources. Each attempt costs 5 s of pacing, so
-                // say it once and stop trying for the rest of the run.
-                if (archiveFailureStreak >= ARCHIVE_GIVE_UP_AFTER) {
-                    archiveGaveUp = saved.error;
-                    logWarn(`archive-unavailable: ${ARCHIVE_GIVE_UP_AFTER} consecutive failures`
-                        + ` (${saved.error}) — no further saves attempted this run`);
+                const gap = ARCHIVE_PACE_MS - (Date.now() - lastArchiveMs);
+                if (gap > 0) await sleep(gap);
+                lastArchiveMs = Date.now();
+                const saved = await archiveUrl(result.url);
+                if (saved.archiveUrl) {
+                    if (result.archiveUrl && result.archiveUrl !== saved.archiveUrl) {
+                        result.archiveHistory = [...result.archiveHistory, {
+                            archiveUrl: result.archiveUrl,
+                            contentHash: result.archiveContentHash ?? null
+                        }];
+                    }
+                    result.archiveUrl = saved.archiveUrl;
+                    result.archiveContentHash = result.contentHash ?? null;
+                    result.archivePending = false;
+                    archived += 1;
+                    archiveFailureStreak = 0;
+                    log(`archived ${result.url} -> ${saved.archiveUrl}`);
+                } else {
+                    result.archivePending = true;
+                    archiveFailures += 1;
+                    archiveFailureStreak += 1;
+                    logWarn(`archive failed for ${result.url}: ${saved.error}`);
+                    // The archive being offline, or refusing anonymous saves, is one fact about the
+                    // archive — not 300 facts about our sources. Each attempt costs 5 s of pacing, so
+                    // say it once and stop trying for the rest of the run.
+                    if (archiveFailureStreak >= ARCHIVE_GIVE_UP_AFTER) {
+                        archiveGaveUp = saved.error;
+                        logWarn(`archive-unavailable: ${ARCHIVE_GIVE_UP_AFTER} consecutive failures`
+                            + ` (${saved.error}) — no further saves attempted this run`);
+                    }
                 }
             }
         }
@@ -1649,7 +1702,8 @@ async function main() {
         for (const r of results) for (const q of r.rebaselined ? [] : (r.quotes?.lost ?? [])) logWarn(`    ${q.slug} ${q.kind} ${q.ref}: ${r.url}`);
     }
     if (flags.archive) {
-        log(`watch-sources: archived ${archived}, archive failures ${archiveFailures}`
+        const archivePending = results.filter((r) => r.status !== 'gone' && r.status !== 'error' && archiveIsPending(r)).length;
+        log(`watch-sources: archived ${archived}, archive failures ${archiveFailures}, pending ${archivePending}`
             + (archiveGaveUp ? ` — gave up after ${ARCHIVE_GIVE_UP_AFTER} in a row: ${archiveGaveUp}` : ''));
     }
 
@@ -1757,6 +1811,7 @@ async function main() {
         quotesNotCheckable: quoteTotals.notCheckable,
         archived,
         archiveFailures,
+        archivePending: results.filter((r) => r.status !== 'gone' && r.status !== 'error' && archiveIsPending(r)).length,
         extractorUpgrade: { firstReads: upgradedReads.length, rebaselined: rebaselined.length },
         throttled: throttled.length,
         throttledSources: throttled.slice(0, 20).map((result) => ({ url: result.url, runs: result.throttledRuns, reason: result.reason })),

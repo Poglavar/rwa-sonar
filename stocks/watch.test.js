@@ -38,10 +38,11 @@ import {
     apiAnswerIsDocument,
     userAgentFor,
     parseSpnStatus, quoteFound, quoteFragments, quoteKey, spnBusy, spnTransient,
-    archivableUrl, archiveMissingTargets, buildArchiveUrlSql, captureIsRecent, spnAlreadyCaptured,
+    archivableUrl, archiveIsPending, archiveMissingTargets, archiveRecoveryVerdict, archiveTargetsWithVersionRefs, buildArchiveUrlSql, buildArchiveVersionRefsSql, captureIsRecent, spnAlreadyCaptured,
     READ_VIA, htmlDocumentText, isTickerLine, quoteVerdicts, readProvenance, storedReading, substantiveChanges
 } from './lib/watch.mjs';
 import { diffLines } from './lib/textdiff.mjs';
+import { applyArchiveCapture, markArchiveCapturePending } from './lib/archive-repair.mjs';
 
 const FIXTURES = new URL('./fixtures/sources/', import.meta.url);
 const JS_SHELL_TEXT_LIMIT = 600;
@@ -1270,34 +1271,174 @@ describe('ticker widgets and news-list churn do not raise a keyword severity (so
 });
 
 describe('archive gap pass (--archive-missing-only)', () => {
-    test('targets only read, archivable sources that still have no archive URL', () => {
+    test('archive-only stats and process verdict mark capture failures partial', () => {
+        expect(archiveRecoveryVerdict(0)).toEqual({ runStatus: 'ok', exitCode: 0 });
+        expect(archiveRecoveryVerdict(7)).toEqual({ runStatus: 'partial', exitCode: 1 });
+        expect(() => archiveRecoveryVerdict(-1)).toThrow(/non-negative integer/);
+    });
+
+    test('targets read, archivable sources with no archive or a current-version archive pending', () => {
         const sources = ['https://a.test', 'https://b.test', 'https://c.test', 'https://d.test',
-            'https://e.test', 'https://f.test', 'https://web.archive.org/cdx/search/cdx?url=x.test*'].map((url) => ({ url }));
+            'https://e.test', 'https://f.test', 'https://g.test', 'https://h.test', 'https://web.archive.org/cdx/search/cdx?url=x.test*'].map((url) => ({ url }));
         const state = {
             'https://a.test': { status: 'ok', archiveUrl: 'https://web.archive.org/web/1/https://a.test' },
             'https://b.test': { status: 'blocked', archiveUrl: null },
             'https://c.test': { status: 'gone', archiveUrl: null },
             'https://d.test': { status: 'error', archiveUrl: null },
-            'https://e.test': { status: 'changed', archiveUrl: '' }
+            'https://e.test': { status: 'changed', archiveUrl: '' },
+            'https://f.test': { status: 'changed', archiveUrl: 'https://web.archive.org/web/1/https://f.test', contentHash: 'new', archiveContentHash: 'old' },
+            'https://g.test': { status: 'ok', archiveUrl: 'https://web.archive.org/web/1/https://g.test', contentHash: 'same', archiveContentHash: 'same' }
         };
         const { targets, skipped } = archiveMissingTargets(sources, state);
-        expect(targets).toEqual([{ url: 'https://b.test', status: 'blocked' }, { url: 'https://e.test', status: 'changed' }]);
-        expect(skipped).toEqual({ archived: 1, unchecked: 1, gone: 1, error: 1, archiveHost: 1 });
+        expect(targets).toEqual([
+            { url: 'https://b.test', status: 'blocked', pending: false, archiveUrl: null, contentHash: null, archiveContentHash: null, expectedVersionArchiveUrl: null, versionFetchedAt: null },
+            { url: 'https://e.test', status: 'changed', pending: false, archiveUrl: '', contentHash: null, archiveContentHash: null, expectedVersionArchiveUrl: null, versionFetchedAt: null },
+            { url: 'https://f.test', status: 'changed', pending: true, archiveUrl: 'https://web.archive.org/web/1/https://f.test', contentHash: 'new', archiveContentHash: 'old', expectedVersionArchiveUrl: null, versionFetchedAt: null }
+        ]);
+        expect(skipped).toEqual({ archived: 2, unchecked: 1, gone: 1, error: 1, archiveHost: 1 });
+        expect(archiveIsPending(state['https://f.test'])).toBe(true);
+        const forced = archiveMissingTargets(sources, state, { retryExisting: true });
+        expect(forced.targets.map((target) => target.url)).toContain('https://g.test');
+        expect(forced.targets.find((target) => target.url === 'https://g.test').expectedVersionArchiveUrl)
+            .toBe('https://web.archive.org/web/1/https://g.test');
         expect(archivableUrl('https://web.archive.org/cdx/search/cdx?url=remora.markets*')).toBe(false);
         expect(archivableUrl('https://www.sec.gov/x')).toBe(true);
         expect(archivableUrl('not a url')).toBe(false);
     });
 
-    test('fills only NULL archive_url rows, by source id', () => {
+    test('archive refresh is guarded by the old reference and updates only that version row', () => {
         const { sql, rows } = buildArchiveUrlSql([
-            { id: 'abc123def456', archiveUrl: 'https://web.archive.org/web/20260923110000/https://b.test' },
+            {
+                id: 'abc123def456', archiveUrl: 'https://web.archive.org/web/20260923110000/https://b.test',
+                expectedArchiveUrl: 'https://web.archive.org/web/1/https://b.test', contentHash: 'version-2',
+                versionFetchedAt: '2026-09-23T11:00:00Z',
+                expectedVersionArchiveUrl: null
+            },
             { id: 'nothing', archiveUrl: null }
         ]);
         expect(rows).toBe(1);
         expect(sql).toMatch(/UPDATE sonar\.source AS s SET archive_url/);
-        expect(sql).toMatch(/s\.archive_url IS NULL/);
+        expect(sql).toMatch(/s\.archive_url IS NOT DISTINCT FROM/);
+        expect(sql).toMatch(/s\.content_hash IS NOT DISTINCT FROM/);
+        expect(sql).toMatch(/UPDATE sonar\.source_version AS v SET archive_url/);
+        expect(sql).toMatch(/archive_url = x\.r->>'archiveUrl', updated_at = now\(\)/);
+        expect(sql).toMatch(/v\.content_hash = x\.r->>'contentHash'/);
+        expect(sql).toMatch(/v\.fetched_at = \(x\.r->>'versionFetchedAt'\)::timestamptz/);
+        expect(sql).toContain('version-2');
         expect(sql).toContain('abc123def456');
         expect(sql).not.toContain('nothing');
+    });
+
+    test('DB preflight resolves the archive URL from the exact current version row', () => {
+        const targets = [
+            { id: 'abc123def456', url: 'https://a.test', archiveUrl: 'source-ref', contentHash: 'hash-1', versionFetchedAt: '2026-09-27T03:28:55Z' },
+            { id: 'fedcba654321', url: 'https://b.test', archiveUrl: null, contentHash: null, versionFetchedAt: null }
+        ];
+        const query = buildArchiveVersionRefsSql(targets);
+        expect(query.rows).toBe(2);
+        expect(query.sql).toContain('s.content_hash IS NOT DISTINCT FROM');
+        expect(query.sql).toContain('s.archive_url IS NOT DISTINCT FROM');
+        expect(query.sql).toContain("v.fetched_at = (x.r->>'versionFetchedAt')::timestamptz");
+        expect(query.sql).toContain('version_count');
+
+        const resolved = archiveTargetsWithVersionRefs(targets, JSON.stringify([
+            { id: 'abc123def456', sourceMatches: true, versionCount: 1, versionArchiveUrl: 'version-ref' },
+            { id: 'fedcba654321', sourceMatches: true, versionCount: 0, versionArchiveUrl: null }
+        ]));
+        expect(resolved[0].expectedVersionArchiveUrl).toBe('version-ref');
+        expect(resolved[1].expectedVersionArchiveUrl).toBeNull();
+    });
+
+    test('DB preflight refuses stale, missing, ambiguous, or unidentifiable versions', () => {
+        const target = { id: 'abc123def456', url: 'https://a.test', archiveUrl: null, contentHash: 'hash-1', versionFetchedAt: '2026-09-27T03:28:55Z' };
+        expect(() => buildArchiveVersionRefsSql([{ ...target, versionFetchedAt: null }])).toThrow(/no version timestamp/);
+        expect(() => archiveTargetsWithVersionRefs([target], JSON.stringify([
+            { id: target.id, sourceMatches: false, versionCount: 1, versionArchiveUrl: null }
+        ]))).toThrow(/changed before capture/);
+        for (const versionCount of [0, 2]) {
+            expect(() => archiveTargetsWithVersionRefs([target], JSON.stringify([
+                { id: target.id, sourceMatches: true, versionCount, versionArchiveUrl: null }
+            ]))).toThrow(new RegExp(`has ${versionCount} exact current-version rows`));
+        }
+    });
+
+    test('database failure leaves a pending archive capture retryable', async () => {
+        const url = 'https://f.test';
+        const state = {
+            [url]: {
+                status: 'changed', contentHash: 'current-hash', archiveContentHash: 'old-hash', archivePending: true,
+                archiveUrl: 'https://web.archive.org/web/1/https://f.test', archiveHistory: []
+            }
+        };
+        const target = archiveMissingTargets([{ url }], state).targets[0];
+        let writes = 0;
+        await expect(applyArchiveCapture({
+            target,
+            archiveUrl: 'https://web.archive.org/web/2/https://f.test',
+            readState: async () => structuredClone(state),
+            writeState: async () => { writes += 1; },
+            persistDatabase: async () => { throw new Error('database unavailable'); }
+        })).rejects.toThrow('database unavailable');
+        expect(writes).toBe(0);
+        expect(state[url]).toMatchObject({ archivePending: true, archiveUrl: 'https://web.archive.org/web/1/https://f.test' });
+        expect(archiveMissingTargets([{ url }], state).targets).toHaveLength(1);
+    });
+
+    test('failed retry marks only the unchanged target version pending for the daily run', async () => {
+        const url = 'https://a.test';
+        const target = { url, archiveUrl: 'https://web.archive.org/web/1/https://a.test', contentHash: 'hash-1' };
+        const state = { [url]: { status: 'ok', archiveUrl: target.archiveUrl, contentHash: 'hash-1', archivePending: false } };
+        let written;
+        const retry = await markArchiveCapturePending({
+            target,
+            readState: async () => structuredClone(state),
+            writeState: async (next) => { written = next; }
+        });
+        expect(retry).toEqual({ marked: true, changed: true });
+        expect(written[url]).toMatchObject({ archivePending: true, archiveUrl: target.archiveUrl, contentHash: 'hash-1' });
+        expect(archiveMissingTargets([{ url }], written).targets).toHaveLength(1);
+    });
+
+    test('failed retry does not mark or overwrite a source that advanced during capture', async () => {
+        const url = 'https://a.test';
+        const target = { url, archiveUrl: 'https://web.archive.org/web/1/https://a.test', contentHash: 'hash-1' };
+        const advanced = { [url]: { status: 'changed', archiveUrl: 'https://web.archive.org/web/2/https://a.test', contentHash: 'hash-2', archivePending: false } };
+        let writes = 0;
+        const retry = await markArchiveCapturePending({
+            target,
+            readState: async () => structuredClone(advanced),
+            writeState: async () => { writes += 1; }
+        });
+        expect(retry).toEqual({ marked: false });
+        expect(writes).toBe(0);
+        expect(advanced[url]).toMatchObject({ archiveUrl: 'https://web.archive.org/web/2/https://a.test', contentHash: 'hash-2', archivePending: false });
+    });
+
+    test('archive replacement preserves distinct source-level and exact-version captures', async () => {
+        const url = 'https://a.test';
+        const state = {
+            [url]: {
+                status: 'ok', contentHash: 'current-hash', archiveUrl: 'https://web.archive.org/web/20261004/https://a.test',
+                archiveContentHash: null, archiveHistory: []
+            }
+        };
+        const target = {
+            url, contentHash: 'current-hash', archiveUrl: state[url].archiveUrl,
+            expectedVersionArchiveUrl: 'https://web.archive.org/web/20260927/https://a.test'
+        };
+        let written;
+        const applied = await applyArchiveCapture({
+            target,
+            archiveUrl: 'https://web.archive.org/web/20261011/https://a.test',
+            readState: async () => structuredClone(state),
+            writeState: async (next) => { written = next; },
+            persistDatabase: async () => {}
+        });
+        expect(applied.applied).toBe(true);
+        expect(written[url].archiveHistory).toEqual([
+            { archiveUrl: target.archiveUrl, contentHash: null },
+            { archiveUrl: target.expectedVersionArchiveUrl, contentHash: 'current-hash' }
+        ]);
     });
 
     test('a declined repeat snapshot is resolved to a recent capture, never an old one', () => {

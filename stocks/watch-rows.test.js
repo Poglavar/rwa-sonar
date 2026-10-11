@@ -75,6 +75,41 @@ describe('an extractor upgrade re-baselines silently; a real change after it doe
     });
 });
 
+describe('archive references belong to a content version', () => {
+    const oldArchive = 'https://web.archive.org/web/20260901000000/https://www.cysec.gov.cy/en-GB/public-info/announcements/';
+    test('a failed archive for changed content keeps old evidence but does not attach it to the new version', () => {
+        const prev = { ...storedV2, contentHash: 'hash-v2', archiveUrl: oldArchive, archiveContentHash: 'hash-v2' };
+        const result = {
+            ...changedRead({ fetchedAt: '2026-10-02T02:00:00Z', hash: 'hash-v3', prev }),
+            archiveUrl: oldArchive, archiveContentHash: 'hash-v2', archivePending: true,
+            archiveHistory: []
+        };
+        const state = nextState([result], { [URL_]: prev })[URL_];
+        const rows = buildRows([result], { [URL_]: prev });
+        expect(state).toMatchObject({
+            archiveUrl: oldArchive, archiveContentHash: 'hash-v2', archivePending: true,
+            versionFetchedAt: '2026-10-02T02:00:00Z'
+        });
+        expect(rows.sources[0].archiveUrl).toBe(oldArchive);
+        expect(rows.versions[0].archiveUrl).toBeNull();
+    });
+
+    test('a successful retry preserves the old capture in history and attaches the new one to its version', () => {
+        const prev = { ...storedV2, contentHash: 'hash-v2', archiveUrl: oldArchive, archiveContentHash: 'hash-v2' };
+        const result = {
+            ...changedRead({ fetchedAt: '2026-10-02T02:00:00Z', hash: 'hash-v3', prev }),
+            archiveUrl: 'https://web.archive.org/web/20261002030000/https://www.cysec.gov.cy/en-GB/public-info/announcements/',
+            archiveContentHash: 'hash-v3', archivePending: false,
+            archiveHistory: [{ archiveUrl: oldArchive, contentHash: 'hash-v2' }]
+        };
+        const state = nextState([result], { [URL_]: prev })[URL_];
+        const rows = buildRows([result], { [URL_]: prev });
+        expect(state).toMatchObject({ archiveUrl: result.archiveUrl, archiveContentHash: 'hash-v3', archivePending: false });
+        expect(state.archiveHistory).toContainEqual({ archiveUrl: oldArchive, contentHash: 'hash-v2' });
+        expect(rows.versions[0].archiveUrl).toBe(result.archiveUrl);
+    });
+});
+
 describe('a throttled read writes nothing and keeps the stored state', () => {
     const capture = 'https://web.archive.org/web/20260129134841/https://remoramarkets.xyz/legal-documentation/privacy-policy';
     const stored = { ...storedV2, id: 'db0acd299783', normalizerVersion: HTML_EXTRACTOR_VERSION };

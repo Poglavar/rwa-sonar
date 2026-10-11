@@ -233,6 +233,19 @@ describe('Loopscale freeze episodes from its Pyth accounts', () => {
         expect(fresh.emit).toEqual([]);
     });
 
+    test('keeps the account batch context slot as episode evidence across split reads', () => {
+        const nowTs = unixFromIso('2026-09-24T18:00:00Z');
+        const first = applyPythReading(null, { publishTs: tsla.publishTs, nowTs, session: 'open', maxAgeS: 900 },
+            { ...meta, readContextSlot: 123, clockContextSlot: 122 });
+        expect(freezeRow(first.emit[0]).evidence).toMatchObject({ readContextSlot: 123, lastReadContextSlot: 123, clockContextSlot: 122 });
+        const next = applyPythReading(first.state, { publishTs: tsla.publishTs, nowTs: nowTs + 60, session: 'open', maxAgeS: 900 },
+            { ...meta, readContextSlot: 456, clockContextSlot: 455 });
+        expect(freezeRow(next.emit[0]).evidence).toMatchObject({ readContextSlot: 123, lastReadContextSlot: 456, lastClockContextSlot: 455 });
+        const closed = applyPythReading(first.state, { publishTs: nowTs + 120, nowTs: nowTs + 120, session: 'open', maxAgeS: 900,
+            firstUpdate: { signature: 'fresh', blockTime: nowTs + 120 } }, { ...meta, readContextSlot: 789, clockContextSlot: 788 });
+        expect(freezeRow(closed.emit[0]).evidence).toMatchObject({ endReadContextSlot: 789, endClockContextSlot: 788 });
+    });
+
     test('ends at the first update after the start, looked up only when the account moved', () => {
         const nowTs = unixFromIso('2026-09-24T18:00:00Z');
         const { state } = applyPythReading(null, { publishTs: tsla.publishTs, nowTs, session: 'open', maxAgeS: 900 }, meta);

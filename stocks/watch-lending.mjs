@@ -30,7 +30,7 @@ import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } fro
 import { parseSchedule, sessionAt } from './lib/market-hours.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { base58Encode } from './lib/solana-address.mjs';
-import { DEFAULT_RPC, getAccountsWithContext, rpcCall } from './lib/solana-rpc.mjs';
+import { DEFAULT_RPC, accountBatchSize, chunk as chunkAccounts, getAccountsWithContext, rpcCall } from './lib/solana-rpc.mjs';
 import { refreshCollectorStatus } from './build-collector-status.mjs';
 
 const HERE = import.meta.dirname;
@@ -64,6 +64,7 @@ OPTIONS
   --max-pages=<n>    Max signature pages (${PAGE} each) listed per account per run (default ${DEFAULT_MAX_PAGES}).
   --only=<list>      Protocols to watch, comma-separated: kamino, jupiter-lend, nest, loopscale.
   --rpc=<url>        RPC endpoint (default SOLANA_RPC_URL from .env, else ${DEFAULT_RPC}).
+  Account batch size defaults to 100; set SOLANA_RPC_MAX_ACCOUNTS in .env for provider limits.
   --no-db            Keep nothing: start every account at --since, print what was found, write no rows.
   --print            Print every liquidation and freeze episode found this run.
   --tx-cache=<dir>   Keep every transaction read as <dir>/<signature>.json and read it from there next
@@ -185,6 +186,7 @@ async function main() {
     }
     const env = await readEnvFile(join(REPO, '.env'));
     const rpc = typeof flags.rpc === 'string' ? flags.rpc : (env.SOLANA_RPC_URL || DEFAULT_RPC);
+    const maxAccounts = accountBatchSize(process.env.SOLANA_RPC_MAX_ACCOUNTS || env.SOLANA_RPC_MAX_ACCOUNTS);
     const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
     const noDb = Boolean(flags['no-db']);
     const budget = flags.budget === undefined ? DEFAULT_BUDGET : Number(flags.budget);
@@ -201,6 +203,7 @@ async function main() {
         rpcHost = new URL(rpc).host;
     } catch { /* the URL itself is never logged */ }
     log(`watch-lending: rpc ${rpcHost}, budget ${budget} transaction(s), new accounts start ${since}`);
+    log(`watch-lending: getMultipleAccounts batch size ${maxAccounts}`);
 
     // --- the watch list ------------------------------------------------------------------------
     const tokens = (await readJson(join(REPO, 'stocks-tokens.json'), null))?.tokens;
@@ -240,12 +243,21 @@ async function main() {
 
     // --- 1. the chain's clock and the Pyth accounts ---------------------------------------------
     const pythAccounts = accounts.filter((a) => a.role === 'pyth-price');
-    const readNow = await getAccountsWithContext([CLOCK_SYSVAR, ...pythAccounts.map((a) => a.account)], { rpc, encoding: 'base64' });
+    // Clock time and Pyth feeds are read in separate, ordered requests so every batch retains its
+    // own context slot. A split aggregate must never be represented as if all values shared one slot.
+    const clockRead = await getAccountsWithContext([CLOCK_SYSVAR], { rpc, encoding: 'base64', maxAccounts });
     counter.getMultipleAccounts += 1;
-    const clockData = readNow.value[0] ? Buffer.from(readNow.value[0].data[0], 'base64') : null;
+    const clockData = clockRead.value[0] ? Buffer.from(clockRead.value[0].data[0], 'base64') : null;
     const nowTs = clockData ? Number(clockData.readBigInt64LE(32)) : null;
     if (nowTs === null) throw new Error('Clock sysvar could not be read: no chain time for this run');
-    log(`chain clock ${isoFromUnix(nowTs)} (slot ${readNow.slot})`);
+    log(`chain clock ${isoFromUnix(nowTs)} (slot ${clockRead.slot})`);
+    const pythReads = new Map();
+    for (const batch of chunkAccounts(pythAccounts, maxAccounts)) {
+        const { slot, value } = await getAccountsWithContext(batch.map((a) => a.account), { rpc, encoding: 'base64', maxAccounts });
+        counter.getMultipleAccounts += 1;
+        batch.forEach((account, index) => pythReads.set(account.account, { value: value[index] ?? null, slot }));
+        log(`pyth accounts: read ${batch.length} in context slot ${slot ?? '?'}`);
+    }
 
     // --- 2. list every account since its checkpoint ------------------------------------------------
     const listed = accounts.filter((a) => dueForListing(a.role, scan.get(a.account)?.listedAt, Date.now()));
@@ -378,14 +390,15 @@ async function main() {
 
     // --- 6. Pyth accounts (Loopscale) ----------------------------------------------------------------
     const session = schedule ? sessionAt(schedule, nowTs * 1000) : 'unknown';
-    for (let i = 0; i < pythAccounts.length; i += 1) {
-        const a = pythAccounts[i];
-        const decoded = readNow.value[i + 1] ? decodePriceUpdateV2(readNow.value[i + 1].data[0]) : null;
+    for (const a of pythAccounts) {
+        const pythRead = pythReads.get(a.account);
+        const decoded = pythRead?.value ? decodePriceUpdateV2(pythRead.value.data[0]) : null;
         if (!decoded) {
             failures.push({ kind: 'account', subject: a.account, reason: `${a.account}: not a readable PriceUpdateV2 account` });
             continue;
         }
-        const meta = { protocol: 'loopscale', marketId: a.marketId, mint: a.mint, symbol: watch.stockMints[a.mint], account: a.account };
+        const meta = { protocol: 'loopscale', marketId: a.marketId, mint: a.mint, symbol: watch.stockMints[a.mint], account: a.account,
+            readContextSlot: pythRead.slot, clockContextSlot: clockRead.slot };
         let reading = applyPythReading(states.get(a.account), { publishTs: decoded.publishTs, nowTs, session, maxAgeS: a.maxAgeS }, meta);
         if (reading.needsFirstUpdate) {
             const openStart = states.get(a.account).open.startedTs;
@@ -408,12 +421,12 @@ async function main() {
     const liqRows = new Map();
     for (const liq of liquidations) liqRows.set(`${liq.signature}|${liq.invocation}`, liquidationRow(liq, watch));
     const obligations = [...new Set([...liqRows.values()].filter((r) => r.protocol === 'kamino' && r.position && !r.borrower).map((r) => r.position))];
-    for (let i = 0; i < obligations.length; i += 100) {
-        const chunk = obligations.slice(i, i + 100);
+    for (let i = 0; i < obligations.length; i += maxAccounts) {
+        const batch = obligations.slice(i, i + maxAccounts);
         try {
-            const { value } = await getAccountsWithContext(chunk, { rpc, encoding: 'base64' });
+            const { value } = await getAccountsWithContext(batch, { rpc, encoding: 'base64', maxAccounts });
             counter.getMultipleAccounts += 1;
-            const owners = new Map(chunk.map((o, k) => [o, value[k] ? obligationOwner(value[k].data[0], base58Encode) : null]));
+            const owners = new Map(batch.map((o, k) => [o, value[k] ? obligationOwner(value[k].data[0], base58Encode) : null]));
             for (const row of liqRows.values()) if (owners.get(row.position)) row.borrower = owners.get(row.position);
         } catch (err) {
             failures.push({ kind: 'account', subject: 'obligations', reason: `obligation owners: ${err.message}` });

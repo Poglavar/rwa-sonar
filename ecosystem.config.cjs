@@ -1,8 +1,16 @@
+const path = require('node:path');
 // PM2 definition for the server-side collectors and API behind the tokenized-stocks pages, run from the
-// repo clone /root/code/rwa-sonar on the production host. Keys (SOLANA_RPC_URL, COINGECKO_API_KEY,
+// repository clone on the production host. Keys (SOLANA_RPC_URL, COINGECKO_API_KEY,
 // PYTH_API_KEY) live in the clone's .env, which the scripts read themselves; nothing secret here.
 // CoinGecko runs in one quota-capped rotating batch per day; DexScreener refreshes every six hours.
 // Restart with the FILE so PM2 re-reads it: `pm2 restart ecosystem.config.cjs --only <name> --update-env`.
+// Paused by the owner on 2026-10-11 to conserve Solana RPC quota. Keep definitions for
+// an explicit future resume; exclude them so a deploy cannot restart the readers.
+const pausedSolanaJobs = new Set([
+    'rwa-trades', 'rwa-watch-chain', 'rwa-watch-lending', 'rwa-watch-powers',
+    'rwa-refresh', 'rwa-redemptions', 'rwa-watch-reserves'
+]);
+
 module.exports = {
     apps: [
         {
@@ -16,7 +24,7 @@ module.exports = {
             // ≈ 10k/day, so the budget drops to 125: 24 × (16 + 125 + ~5) ≈ 3.5k calls/day — the
             // same daily RPC load spread over 24 fresher samples (3,000 vs 3,200 transactions/day).
             name: 'rwa-trades',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/fetch-recent-trades.mjs',
             args: '--run --every=3600 --budget=125 --sync-db --pin=HzG4UEc8BgZj8ViNaKxDcvWYobZ2BwAqi6xv792DS4ua --publish-dir=/var/www/rwasonar',
             interpreter: 'node',
@@ -34,7 +42,7 @@ module.exports = {
             // cite, diffs the normalised text, records versions and change events in schema
             // sonar. Needs poppler-utils (pdftotext) on the host. Run-and-exit, like the refresh.
             name: 'rwa-watch',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-sources.mjs',
             args: '--run --archive',
             interpreter: 'node',
@@ -53,7 +61,7 @@ module.exports = {
             // Telegram is disabled here: the central bot monitor folds its outcome into the one
             // morning digest instead of this hourly job messaging independently.
             name: 'rwa-watch-chain',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-chain.mjs',
             args: '--run --no-telegram',
             interpreter: 'node',
@@ -76,7 +84,7 @@ module.exports = {
             // of rwa-watch-chain (:07) and the refresh (:17). Telegram-free: the stats file feeds
             // the collector status and the central monitor.
             name: 'rwa-watch-lending',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-lending.mjs',
             args: '--run --budget=1000',
             interpreter: 'node',
@@ -98,7 +106,7 @@ module.exports = {
             // on, so a round over every task takes as long as the quota needs. One Telegram summary
             // only when there are new events or failures.
             name: 'rwa-watch-caselaw',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-caselaw.mjs',
             args: '--run',
             interpreter: 'node',
@@ -122,7 +130,7 @@ module.exports = {
             // Alchemy mainnet quota. Telegram off: its noticeLines reach the morning digest through the
             // central monitor, like rwa-watch-chain.
             name: 'rwa-redemptions',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/observe-redemptions.mjs',
             args: '--run --no-telegram --budget=3000',
             interpreter: 'node',
@@ -141,7 +149,7 @@ module.exports = {
             // llm-cost default since 9 Oct; $0.13 at Sonnet 5 before; raised from 10 on 30 Sep by the
             // owner, when 10 a day let a 243-change backlog grow). Needs ANTHROPIC_API_KEY in .env.
             name: 'rwa-judge',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/judge-changes.mjs',
             args: '--run --limit=25',
             interpreter: 'node',
@@ -158,17 +166,17 @@ module.exports = {
             // 127.0.0.1:3300, proxied by nginx at https://rwasonar.com/api/. DATABASE_URL comes
             // from the clone's .env through Node's --env-file, so no secret sits in this file.
             name: 'rwa-sonar-api',
-            cwd: '/root/code/rwa-sonar/api',
+            cwd: path.join(__dirname, 'api'),
             script: 'src/server.js',
             interpreter: 'node',
-            node_args: '--env-file=/root/code/rwa-sonar/.env',
+            node_args: '--env-file=' + path.join(__dirname, '.env'),
             autorestart: true,
             max_restarts: 50,
             restart_delay: 5000,
             watch: false,
             env: { TZ: 'UTC', PORT: '3300', HOST: '127.0.0.1' },
-            error_file: '/root/code/rwa-sonar/logs/rwa-sonar-api-error.log',
-            out_file: '/root/code/rwa-sonar/logs/rwa-sonar-api-out.log',
+            error_file: path.join(__dirname, 'logs/rwa-sonar-api-error.log'),
+            out_file: path.join(__dirname, 'logs/rwa-sonar-api-out.log'),
             merge_logs: true
         },
         {
@@ -179,11 +187,11 @@ module.exports = {
             // WATCH_DELIVERY_KEY in the clone's .env (see api/README.md). NOT in deploy-to-server.sh's
             // start list: start it by hand once the watch bot and its webhook are set up.
             name: 'rwa-watch-digest',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'api/src/jobs/run-watch-digests.js',
             args: '--run',
             interpreter: 'node',
-            node_args: '--env-file=/root/code/rwa-sonar/.env',
+            node_args: '--env-file=' + path.join(__dirname, '.env'),
             cron_restart: '50 * * * *',
             autorestart: false,
             watch: false,
@@ -196,7 +204,7 @@ module.exports = {
             // Run-and-exit refresh (fetch → build → cards → install into the docroot), four times a
             // day. autorestart is off on purpose: exiting is the normal end of a run.
             name: 'rwa-refresh',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/refresh-on-server.sh',
             interpreter: 'bash',
             cron_restart: '17 */6 * * *',
@@ -211,7 +219,7 @@ module.exports = {
             // Legal-entity status and insolvency of every trust-chain party (stocks/watch-entities.mjs
             // --help): GLEIF, Zefix, the UK Gazette (Companies House when a key is set). About a minute.
             name: 'rwa-watch-entities',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-entities.mjs',
             args: '--run',
             interpreter: 'node',
@@ -227,7 +235,7 @@ module.exports = {
             // Do the tokens' multipliers follow the underlying's splits and dividends (stocks/watch-
             // corporate-actions.mjs --help)? Yahoo chart data, ~25 min; after the 00:04/00:30 UTC updates.
             name: 'rwa-watch-corporate-actions',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-corporate-actions.mjs',
             args: '--run',
             interpreter: 'node',
@@ -243,7 +251,7 @@ module.exports = {
             // Regulator notices naming a trust-chain party (stocks/watch-regulators.mjs --help): 23 daily
             // sources (SEC, FINRA, CFTC, FCA, FINMA, BaFin, ESMA, CBI, FMA-LI, CIMA, MAS, SMV, ASIC).
             name: 'rwa-watch-regulators',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-regulators.mjs',
             args: '--run',
             interpreter: 'node',
@@ -259,7 +267,7 @@ module.exports = {
             // The FCA warnings feed carries only its newest 20, and 20+ appear a day: read hourly, with
             // its own stats file (.last-regulators-watch-stats-fca-warnings.json).
             name: 'rwa-watch-regulators-fca',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-regulators.mjs',
             args: '--run --only=fca-warnings',
             interpreter: 'node',
@@ -275,7 +283,7 @@ module.exports = {
             // Issuer reserve figures against Solana supply per token (stocks/watch-reserves.mjs --help):
             // xStocks' proof-of-reserves API and Superstate's register. About 30 s.
             name: 'rwa-watch-reserves',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-reserves.mjs',
             args: '--run',
             interpreter: 'node',
@@ -292,7 +300,7 @@ module.exports = {
             // token's freeze, mint, pause, delegate, multiplier and fee-config keys and their Squads
             // multisigs; holder-affecting uses and multisig changes stored, routine ones counted per day.
             name: 'rwa-watch-powers',
-            cwd: '/root/code/rwa-sonar',
+            cwd: __dirname,
             script: 'stocks/watch-powers.mjs',
             args: '--run --budget=1500',
             interpreter: 'node',
@@ -304,5 +312,5 @@ module.exports = {
             out_file: './logs/rwa-watch-powers-out.log',
             merge_logs: true
         }
-    ]
+    ].filter(app => !pausedSolanaJobs.has(app.name))
 };

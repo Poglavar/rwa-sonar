@@ -1311,13 +1311,19 @@ export function archivableUrl(url) {
 }
 
 /**
- * Which sources an `--archive-missing-only` pass submits to Save Page Now: those whose stored
- * state has no `archiveUrl`. A `gone` or `error` source has nothing live to archive (the daily
- * run skips them for the same reason), and a source with no state yet has never been read — the
- * next watch run archives it on first sight. `blocked` stays in: the archive fetches from its own
- * network, and often gets what our host is refused. Returns the targets and a count per skip reason.
+ * Which sources an `--archive-missing-only` pass submits to Save Page Now: those with no stored
+ * `archiveUrl`, or whose `archivePending`/archive content hash says the reference belongs to an
+ * older version. `gone` and `error` sources have nothing live to archive. A source with no state
+ * has never been read, so the next watch run archives it on first sight. `blocked` stays in: the
+ * archive fetches from its own network, and often gets what our host is refused.
  */
-export function archiveMissingTargets(sources, state) {
+export function archiveIsPending(row) {
+    return row?.archivePending === true
+        || (typeof row?.contentHash === 'string' && typeof row?.archiveContentHash === 'string'
+            && row.contentHash !== row.archiveContentHash);
+}
+
+export function archiveMissingTargets(sources, state, { retryExisting = false } = {}) {
     const targets = [];
     const skipped = { archived: 0, unchecked: 0, gone: 0, error: 0, archiveHost: 0 };
     for (const source of Array.isArray(sources) ? sources : []) {
@@ -1330,32 +1336,132 @@ export function archiveMissingTargets(sources, state) {
             skipped.unchecked += 1;
             continue;
         }
-        if (typeof row.archiveUrl === 'string' && row.archiveUrl !== '') {
-            skipped.archived += 1;
-            continue;
-        }
         if (row.status === 'gone' || row.status === 'error') {
             skipped[row.status] += 1;
             continue;
         }
-        targets.push({ url: source.url, status: row.status ?? null });
+        const versionPending = archiveIsPending(row);
+        const pending = versionPending || retryExisting;
+        if (typeof row.archiveUrl === 'string' && row.archiveUrl !== '' && !pending) {
+            skipped.archived += 1;
+            continue;
+        }
+        targets.push({
+            url: source.url,
+            status: row.status ?? null,
+            pending,
+            archiveUrl: row.archiveUrl ?? null,
+            contentHash: row.contentHash ?? null,
+            archiveContentHash: row.archiveContentHash ?? null,
+            versionFetchedAt: row.versionFetchedAt ?? row.lastChangedAt ?? row.firstSeenAt ?? null,
+            expectedVersionArchiveUrl: versionPending ? null : (row.archiveUrl || null)
+        });
     }
     return { targets, skipped };
 }
 
 /**
- * Fill `sonar.source.archive_url` for rows that have none. Only NULLs are written: a full watch
- * run that archived a newer version meanwhile keeps its own capture.
+ * Fill missing archives and replace stale ones only if the source and exact content-version rows
+ * still match what we read. The final guard deliberately aborts the transaction if either row has
+ * advanced, so callers never clear pending state after a no-op optimistic update.
  */
 export function buildArchiveUrlSql(updates, { tag = 'sonar' } = {}) {
     const items = (Array.isArray(updates) ? updates : [])
         .filter((u) => typeof u?.id === 'string' && typeof u?.archiveUrl === 'string' && u.archiveUrl !== '');
-    const doc = { rows: items.map((u) => ({ id: u.id, archiveUrl: u.archiveUrl })) };
-    const sql = `WITH doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d)\n`
-        + 'UPDATE sonar.source AS s SET archive_url = x.r->>\'archiveUrl\', updated_at = now()\n'
-        + '  FROM doc, jsonb_array_elements(d->\'rows\') AS x(r)\n'
-        + ' WHERE s.id = x.r->>\'id\' AND s.archive_url IS NULL;';
+    const doc = { rows: items.map((u) => ({
+        id: u.id,
+        archiveUrl: u.archiveUrl,
+        expectedArchiveUrl: u.expectedArchiveUrl ?? null,
+        contentHash: u.contentHash ?? null,
+        versionFetchedAt: u.versionFetchedAt ?? null,
+        expectedVersionArchiveUrl: u.expectedVersionArchiveUrl ?? null
+    })) };
+    const sql = `WITH doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d),\n`
+        + 'source_update AS (\n'
+        + '  UPDATE sonar.source AS s SET archive_url = x.r->>\'archiveUrl\', updated_at = now()\n'
+        + '    FROM doc, jsonb_array_elements(d->\'rows\') AS x(r)\n'
+        + '   WHERE s.id = x.r->>\'id\' AND s.content_hash IS NOT DISTINCT FROM x.r->>\'contentHash\'\n'
+        + '     AND (s.archive_url IS NOT DISTINCT FROM x.r->>\'expectedArchiveUrl\'\n'
+        + '          OR s.archive_url = x.r->>\'archiveUrl\')\n'
+        + '  RETURNING s.id\n'
+        + '), version_update AS (\n'
+        + '  UPDATE sonar.source_version AS v SET archive_url = x.r->>\'archiveUrl\', updated_at = now()\n'
+        + '    FROM doc, jsonb_array_elements(d->\'rows\') AS x(r), source_update AS u\n'
+        + '   WHERE u.id = x.r->>\'id\' AND v.source_id = x.r->>\'id\'\n'
+        + '     AND v.content_hash = x.r->>\'contentHash\'\n'
+        + '     AND v.fetched_at = (x.r->>\'versionFetchedAt\')::timestamptz\n'
+        + '     AND (v.archive_url IS NOT DISTINCT FROM x.r->>\'expectedVersionArchiveUrl\'\n'
+        + '          OR v.archive_url = x.r->>\'archiveUrl\')\n'
+        + '  RETURNING v.id\n'
+        + ') SELECT 1 / CASE\n'
+        + '    WHEN (SELECT count(*) FROM source_update) = jsonb_array_length(d->\'rows\')\n'
+        + '     AND (SELECT count(*) FROM version_update) = (\n'
+        + '         SELECT count(*) FROM jsonb_array_elements(d->\'rows\') AS x(r)\n'
+        + '          WHERE NULLIF(x.r->>\'contentHash\', \'\') IS NOT NULL)\n'
+        + '    THEN 1 ELSE 0 END FROM doc;';
     return { table: 'sonar.source', rows: items.length, sql };
+}
+
+/** Read the live archive ref for each exact current version before an archive retry. */
+export function buildArchiveVersionRefsSql(targets, { tag = 'sonar' } = {}) {
+    const rows = (Array.isArray(targets) ? targets : []).map((target) => ({
+        id: target.id,
+        expectedArchiveUrl: target.archiveUrl ?? null,
+        contentHash: target.contentHash ?? null,
+        versionFetchedAt: target.versionFetchedAt ?? null
+    }));
+    const missingTimestamp = rows.find((row) => row.contentHash && !row.versionFetchedAt);
+    if (missingTimestamp) throw new Error(`archive-missing: source ${missingTimestamp.id} has a content hash but no version timestamp`);
+    const doc = { rows };
+    const sql = `WITH doc AS (SELECT ${jsonbLiteral(doc, tag)} AS d),\n`
+        + 'checked AS (\n'
+        + '  SELECT x.r->>\'id\' AS id,\n'
+        + '         EXISTS (SELECT 1 FROM sonar.source s WHERE s.id = x.r->>\'id\'\n'
+        + '           AND s.content_hash IS NOT DISTINCT FROM x.r->>\'contentHash\'\n'
+        + '           AND s.archive_url IS NOT DISTINCT FROM x.r->>\'expectedArchiveUrl\') AS source_matches,\n'
+        + '         (SELECT count(*) FROM sonar.source_version v WHERE v.source_id = x.r->>\'id\'\n'
+        + '           AND v.content_hash = x.r->>\'contentHash\'\n'
+        + '           AND v.fetched_at = (x.r->>\'versionFetchedAt\')::timestamptz) AS version_count,\n'
+        + '         (SELECT v.archive_url FROM sonar.source_version v WHERE v.source_id = x.r->>\'id\'\n'
+        + '           AND v.content_hash = x.r->>\'contentHash\'\n'
+        + '           AND v.fetched_at = (x.r->>\'versionFetchedAt\')::timestamptz LIMIT 1) AS version_archive_url\n'
+        + '    FROM doc, jsonb_array_elements(d->\'rows\') AS x(r)\n'
+        + ') SELECT COALESCE(jsonb_agg(jsonb_build_object(\'id\', id, \'sourceMatches\', source_matches,\n'
+        + '  \'versionCount\', version_count, \'versionArchiveUrl\', version_archive_url) ORDER BY id), \'[]\'::jsonb)::text FROM checked;';
+    return { rows: rows.length, sql };
+}
+
+/** Validate the preflight result and attach each exact version row's live archive ref to its target. */
+export function archiveTargetsWithVersionRefs(targets, result) {
+    let checked;
+    try {
+        checked = JSON.parse(result);
+    } catch (err) {
+        throw new Error(`archive-missing: couldn't parse version guard preflight: ${err.message}`);
+    }
+    if (!Array.isArray(checked)) throw new Error('archive-missing: version guard preflight was not a row list');
+    const byId = new Map(checked.map((row) => [row.id, row]));
+    if (byId.size !== checked.length || byId.size !== targets.length) {
+        throw new Error(`archive-missing: version guard preflight returned ${byId.size} unique rows for ${targets.length} targets`);
+    }
+    return targets.map((target) => {
+        const id = target.id;
+        const row = byId.get(id);
+        if (!row || row.sourceMatches !== true) throw new Error(`archive-missing: source ${id} changed before capture; refusing retry`);
+        if (target.contentHash) {
+            if (row.versionCount !== 1) {
+                throw new Error(`archive-missing: source ${id} has ${row.versionCount} exact current-version rows; expected one`);
+            }
+            return { ...target, expectedVersionArchiveUrl: row.versionArchiveUrl ?? null };
+        }
+        return { ...target, expectedVersionArchiveUrl: null };
+    });
+}
+
+/** Archive-only retries have a separate verdict; any per-source capture failure is a partial run. */
+export function archiveRecoveryVerdict(failedCount) {
+    if (!Number.isInteger(failedCount) || failedCount < 0) throw new Error('archive-missing: failed count must be a non-negative integer');
+    return { runStatus: failedCount ? 'partial' : 'ok', exitCode: failedCount ? 1 : 0 };
 }
 
 /** `/web/20260917150655/https://x/y` or a full archived URL -> the absolute archived URL. */

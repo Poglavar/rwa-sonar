@@ -445,17 +445,23 @@ export function applyPythReading(state, { publishTs, nowTs, session, maxAgeS, fi
     if (open && publishTs > open.startedTs) {
         if (firstUpdate === null) return { state, emit: [], needsFirstUpdate: true };
         const endedTs = Number.isFinite(firstUpdate.blockTime) && firstUpdate.blockTime > open.startedTs ? firstUpdate.blockTime : publishTs;
-        return { state: { open: null }, emit: [{ ...open, endedTs, endSignature: firstUpdate.signature ?? null, endBasis: 'first-update' }], needsFirstUpdate: false };
+        return { state: { open: null }, emit: [{ ...open, endedTs, endSignature: firstUpdate.signature ?? null, endBasis: 'first-update',
+            evidence: { ...open.evidence, endReadContextSlot: meta.readContextSlot ?? null,
+                endClockContextSlot: meta.clockContextSlot ?? null } }], needsFirstUpdate: false };
     }
     if (open) {
-        const next = { ...open, lastSeenStaleTs: nowTs, staleObservations: open.staleObservations + 1 };
+        const next = { ...open, lastSeenStaleTs: nowTs, staleObservations: open.staleObservations + 1,
+            evidence: { ...open.evidence, lastReadContextSlot: meta.readContextSlot ?? null,
+                lastClockContextSlot: meta.clockContextSlot ?? null } };
         return { state: { open: next }, emit: [next], needsFirstUpdate: false };
     }
     if (session === 'open' && nowTs - publishTs > (maxAgeS ?? 900) + PYTH_GRACE_S) {
         const episode = newEpisode(meta, {
             startedTs: publishTs, lastSeenStaleTs: nowTs, staleObservations: 1, startBasis: 'publish-time',
             observation: 'pyth-account-age', cause: 'stale-oracle-account',
-            evidence: { account: meta.account, maxAgeS: maxAgeS ?? null, ageAtDetectionS: nowTs - publishTs }
+            evidence: { account: meta.account, maxAgeS: maxAgeS ?? null, ageAtDetectionS: nowTs - publishTs,
+                readContextSlot: meta.readContextSlot ?? null, lastReadContextSlot: meta.readContextSlot ?? null,
+                clockContextSlot: meta.clockContextSlot ?? null, lastClockContextSlot: meta.clockContextSlot ?? null }
         });
         return { state: { open: episode }, emit: [episode], needsFirstUpdate: false };
     }

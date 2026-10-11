@@ -150,6 +150,17 @@ its source is marked `changed` (it is not marked false), a change event is raise
   a capture more than 7 days old (`WAYBACK_STALE_DAYS`) is sent to Save Page Now, and the next
   run reads the new capture. Before this, businesswire.com was being watched through a capture of
   2026-06-08, and every daily `ok` re-confirmed a page three months old.
+- **A failed save for a changed version stays pending.** `sources-state.json` records the content
+  hash the current `archiveUrl` was saved for. If Save Page Now fails after a live change, the old
+  capture stays in place as historical evidence and `archivePending` remains true; the next
+  `--archive-missing-only` pass retries that URL and preserves the replaced capture in
+  `archiveHistory`. Bound a repair of already-archived failures to at most ten selected registry
+  entries with `node stocks/watch-sources.mjs --run --archive-missing-only --retry-existing
+  --source=<comma-separated-source-ids> --limit=10`. Ordinary missing/pending retries do not need
+  `--retry-existing`.
+  `archiveFailures` counts failed attempts; `archivePending` counts eligible unresolved captures
+  after the run. Both are reported separately from `watchStatus`, which continues to describe
+  source-reading failures only because archiving is optional.
 - **Cited Wayback links are read raw.** A source that is itself a `web.archive.org/web/<ts>/<url>`
   link is fetched as the `…/web/<ts>id_/<url>` capture. Fetched as cited, the Wayback toolbar
   ("About this capture", TIMESTAMPS) came with it and was recorded as a document change (event 2056,

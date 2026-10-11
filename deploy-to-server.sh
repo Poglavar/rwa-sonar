@@ -14,7 +14,7 @@
 set -euo pipefail
 
 REMOTE_HOST="${REMOTE_HOST:-do}"
-REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-/root/code/rwa-sonar}"
+REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-code/rwa-sonar}"
 REMOTE_DOCROOT="${REMOTE_DOCROOT:-/var/www/rwasonar}"
 CLONE_URL="${CLONE_URL:-git@github-personal:Poglavar/rwa-sonar.git}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-https://rwasonar.com}"
@@ -56,6 +56,7 @@ echo "Deploying rwa-sonar — server pulls ${BRANCH} on ${REMOTE_HOST}"
 
 DEPLOY_SHA=$(ssh "$REMOTE_HOST" "REMOTE_REPO_DIR='$REMOTE_REPO_DIR' REMOTE_DOCROOT='$REMOTE_DOCROOT' CLONE_URL='$CLONE_URL' BRANCH='$BRANCH' PUBLIC_BASE_URL='$PUBLIC_BASE_URL' REFRESH_CATALOGUE='$REFRESH_CATALOGUE' bash -s" <<'EOF'
 set -euo pipefail
+REMOTE_REPO_DIR="$(realpath -m "$REMOTE_REPO_DIR")"
 if [ ! -d "$REMOTE_REPO_DIR/.git" ]; then
 	mkdir -p "$(dirname "$REMOTE_REPO_DIR")"
 	git clone --quiet "$CLONE_URL" "$REMOTE_REPO_DIR"
@@ -210,15 +211,15 @@ flock -u 9
 # on each run, so it already runs the new code; restarting one starts a run immediately, and a
 # refresh run holds the release lock for ~13 minutes, which made the next deploy wait on it.
 # They are restarted only when ecosystem.config.cjs changed, so PM2 re-reads their settings.
-if command -v pm2 >/dev/null && pm2 describe rwa-trades >/dev/null 2>&1; then
+if command -v pm2 >/dev/null && pm2 describe rwa-sonar-api >/dev/null 2>&1; then
 	# Non-fatal: the mirror above is already done, and a job mid-restart makes PM2 answer
 	# "Process not found"; the file (not the name) is passed so PM2 re-reads it.
 	# Remove the retired one-off source watcher before persisting the canonical process set.
 	pm2 delete rwa-watch-first >/dev/null 2>&1 || true
-	APPS="rwa-trades rwa-sonar-api"
+	APPS="rwa-sonar-api"
 	if [ -z "$PREV_SHA" ] || ! git diff --quiet "$PREV_SHA" HEAD -- ecosystem.config.cjs; then
-		APPS="$APPS rwa-watch rwa-refresh rwa-watch-chain rwa-watch-lending rwa-watch-caselaw rwa-judge rwa-redemptions"
-		APPS="$APPS rwa-watch-entities rwa-watch-corporate-actions rwa-watch-regulators rwa-watch-regulators-fca rwa-watch-reserves rwa-watch-powers"
+		APPS="$APPS rwa-watch rwa-watch-caselaw rwa-judge"
+		APPS="$APPS rwa-watch-entities rwa-watch-corporate-actions rwa-watch-regulators rwa-watch-regulators-fca"
 		echo "ecosystem.config.cjs changed: restarting the scheduled jobs too" >&2
 	fi
 	for app in $APPS; do

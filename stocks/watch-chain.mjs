@@ -34,7 +34,7 @@ import { buildOwnerLabels } from './lib/holders.mjs';
 import { byString, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import {
-    DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, fetchMintAccounts, getAccountsWithContext,
+    DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, accountBatchSize, fetchMintAccounts, getAccountsWithContext,
     getTokenAccountsByOwner
 } from './lib/solana-rpc.mjs';
 import { postTelegram } from './lib/telegram.mjs';
@@ -65,6 +65,7 @@ OPTIONS
   --only=<issuer>   Only this issuer's mints (e.g. --only=xstocks-backed).
   --limit=<n>       Only the first n mints after filtering (smoke test).
   --rpc=<url>       RPC endpoint (default SOLANA_RPC_URL from .env, else ${DEFAULT_RPC}).
+  Account batch size defaults to ${MAX_ACCOUNTS_PER_REQUEST}; set SOLANA_RPC_MAX_ACCOUNTS in .env for provider limits.
   --wallets=<n>     Labelled wallets to read, default ${WALLET_LIMIT} (0 skips the treasury pass).
   --metadata=<n>    Metadata documents to fetch, default ${METADATA_LIMIT} (0 skips them).
   --no-db           Read and compare nothing; fetch, parse and print only. No previous state is
@@ -157,17 +158,17 @@ function progress(done, total, startedMs) {
  * key's position in some unrelated memecoin is not evidence about a tokenized share, and keeping it
  * would make the table unbounded.
  */
-async function readWallets(watched, { rpc, watchedMints, failures }) {
+async function readWallets(watched, { rpc, watchedMints, failures, maxAccounts }) {
     const balances = [];
     if (watched.length === 0) return balances;
 
     const labelByWallet = new Map(watched.map((w) => [w.wallet, w.label]));
     const addresses = watched.map((w) => w.wallet);
     let noAccount = 0;
-    for (let i = 0; i < addresses.length; i += MAX_ACCOUNTS_PER_REQUEST) {
-        const batch = addresses.slice(i, i + MAX_ACCOUNTS_PER_REQUEST);
+    for (let i = 0; i < addresses.length; i += maxAccounts) {
+        const batch = addresses.slice(i, i + maxAccounts);
         const observedAt = ts();
-        const { value } = await getAccountsWithContext(batch, { rpc });
+        const { value } = await getAccountsWithContext(batch, { rpc, maxAccounts });
         batch.forEach((wallet, idx) => {
             const entry = value[idx] ?? null;
             // A null entry is the RPC saying the account does not exist, and an address with no
@@ -188,7 +189,7 @@ async function readWallets(watched, { rpc, watchedMints, failures }) {
                 amount: uiAmount(String(lamports), SOL_DECIMALS)
             });
         });
-        if (i + MAX_ACCOUNTS_PER_REQUEST < addresses.length) await sleep(BATCH_PACE_MS);
+        if (i + maxAccounts < addresses.length) await sleep(BATCH_PACE_MS);
     }
     if (noAccount) log(`wallets: ${noAccount} labelled address(es) have no account on chain — recorded as 0 SOL`);
 
@@ -267,6 +268,7 @@ async function main() {
     const startedMs = RUN_STARTED_MS;
     const env = await readEnvFile(join(REPO, '.env'));
     const rpc = typeof flags.rpc === 'string' ? flags.rpc : (env.SOLANA_RPC_URL || DEFAULT_RPC);
+    const maxAccounts = accountBatchSize(process.env.SOLANA_RPC_MAX_ACCOUNTS || env.SOLANA_RPC_MAX_ACCOUNTS);
     const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
     const walletLimit = flags.wallets === undefined ? WALLET_LIMIT : Number(flags.wallets);
     const metadataLimit = flags.metadata === undefined ? METADATA_LIMIT : Number(flags.metadata);
@@ -278,6 +280,7 @@ async function main() {
         rpcHost = new URL(rpc).host;
     } catch { /* reported as unparseable; the URL itself is never logged */ }
     log(`watch-chain: rpc ${rpcHost}`);
+    log(`watch-chain: getMultipleAccounts batch size ${maxAccounts}`);
 
     const universe = await readJson(TOKENS_FILE, null);
     const allTokens = universe?.tokens;
@@ -321,7 +324,7 @@ async function main() {
     let read = 0;
     await fetchMintAccounts(tokens.map((t) => t.mint), {
         rpc,
-        batchSize: MAX_ACCOUNTS_PER_REQUEST,
+        batchSize: maxAccounts,
         paceMs: BATCH_PACE_MS,
         onBatch: (results, meta) => {
             const observedAt = ts();
@@ -414,7 +417,7 @@ async function main() {
     log(`wallets: ${labels.size} labelled address(es), reading ${watched.length}`
         + `${skipped ? `, ${skipped} not read this run (cap ${walletLimit})` : ''}`);
     const watchedMints = new Set(tokens.map((t) => t.mint));
-    const balances = await readWallets(watched, { rpc, watchedMints, failures });
+    const balances = await readWallets(watched, { rpc, watchedMints, failures, maxAccounts });
     const treasuryEvents = walletMoves(previousBalances, balances, { issuerByWallet });
     events.push(...treasuryEvents);
 
@@ -461,8 +464,8 @@ async function main() {
         eventsBySeverity: bySeverity,
         failures: failures.length,
         failureReasons: failures.slice(0, 20).map((f) => f.reason),
-        rpcCalls: Math.ceil(tokens.length / MAX_ACCOUNTS_PER_REQUEST)
-            + (watched.length ? Math.ceil(watched.length / MAX_ACCOUNTS_PER_REQUEST) + watched.length : 0)
+        rpcCalls: Math.ceil(tokens.length / maxAccounts)
+            + (watched.length ? Math.ceil(watched.length / maxAccounts) + watched.length : 0)
     };
     await writeJson(STATS_FILE, stats);
     const collectorOutputs = [join(REPO, 'stocks-collector-status.json')];

@@ -10,6 +10,16 @@ export const MAX_ACCOUNTS_PER_REQUEST = 100;
 // enough on 2026-09-24 while the trade collector ran, 31 s is.
 export const BACKOFF_MS = [1000, 2000, 4000, 8000, 16000];
 
+/** Provider-specific account cap; Solana's protocol maximum remains 100. */
+export function accountBatchSize(value) {
+    if (value === undefined || value === null || value === '') return MAX_ACCOUNTS_PER_REQUEST;
+    const size = Number(value);
+    if (!Number.isInteger(size) || size < 1 || size > MAX_ACCOUNTS_PER_REQUEST) {
+        throw new Error(`SOLANA_RPC_MAX_ACCOUNTS must be an integer from 1 to ${MAX_ACCOUNTS_PER_REQUEST}, got ${value}`);
+    }
+    return size;
+}
+
 export function chunk(items, size = MAX_ACCOUNTS_PER_REQUEST) {
     if (size < 1) throw new Error(`chunk size must be >= 1, got ${size}`);
     const out = [];
@@ -69,9 +79,11 @@ export async function rpcCall(method, params, options = {}) {
  * these values were true. The hourly chain watcher (stocks/watch-chain.mjs) stores it beside each
  * state it records, so a change event can name the slot rather than only our clock.
  */
-export async function getAccountsWithContext(pubkeys, { rpc = DEFAULT_RPC, timeoutMs = 60000, encoding = 'jsonParsed', dataSlice = null } = {}) {
-    if (pubkeys.length > MAX_ACCOUNTS_PER_REQUEST) {
-        throw new Error(`getMultipleAccounts takes at most ${MAX_ACCOUNTS_PER_REQUEST} pubkeys, got ${pubkeys.length}`);
+export async function getAccountsWithContext(pubkeys, { rpc = DEFAULT_RPC, timeoutMs = 60000, encoding = 'jsonParsed', dataSlice = null,
+    maxAccounts = MAX_ACCOUNTS_PER_REQUEST } = {}) {
+    const limit = accountBatchSize(maxAccounts);
+    if (pubkeys.length > limit) {
+        throw new Error(`getMultipleAccounts takes at most ${limit} pubkeys for this request, got ${pubkeys.length}`);
     }
     // `dataSlice` ({offset, length}) needs a binary encoding; length 0 reads only owner/lamports,
     // the cheapest way to learn which program owns an address.
@@ -129,11 +141,12 @@ export async function getTokenAccountsByOwner(owner, { rpc = DEFAULT_RPC, timeou
  * watcher records beside each state and the daily fetcher ignores.
  */
 export async function fetchMintAccounts(mints, { rpc = DEFAULT_RPC, batchSize = MAX_ACCOUNTS_PER_REQUEST, paceMs = 400, onBatch = null } = {}) {
-    const batches = chunk(mints, batchSize);
+    const size = accountBatchSize(batchSize);
+    const batches = chunk(mints, size);
     const all = [];
     for (let i = 0; i < batches.length; i += 1) {
         const batch = batches[i];
-        const { slot, value: accounts } = await getAccountsWithContext(batch, { rpc });
+        const { slot, value: accounts } = await getAccountsWithContext(batch, { rpc, maxAccounts: size });
         const results = batch.map((mint, idx) => ({ mint, account: accounts[idx] ?? null }));
         const missing = results.filter((r) => r.account === null).length;
         log(`RPC batch ${i + 1}/${batches.length}: ${batch.length} mints, ${missing} account(s) not found`);

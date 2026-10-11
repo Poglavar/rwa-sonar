@@ -28,7 +28,7 @@ import {
 } from './lib/powers.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
 import { isOnCurve } from './lib/solana-address.mjs';
-import { DEFAULT_RPC, getAccountsWithContext, rpcCall } from './lib/solana-rpc.mjs';
+import { DEFAULT_RPC, accountBatchSize, chunk as chunkAccounts, getAccountsWithContext, rpcCall } from './lib/solana-rpc.mjs';
 import { decodeSquadsMultisig } from './lib/squads.mjs';
 import { postTelegram } from './lib/telegram.mjs';
 import { XSTOCKS_ISSUER_WALLETS } from './lib/xstocks-float.mjs';
@@ -68,6 +68,7 @@ OPTIONS
   --max-pages=<n>    Max signature pages (${PAGE} each) listed per address per run (default ${DEFAULT_MAX_PAGES}).
   --only=<list>      Issuers to watch, comma-separated slugs (e.g. xstocks-backed,ondo-global-markets).
   --rpc=<url>        RPC endpoint (default SOLANA_RPC_URL from .env, else ${DEFAULT_RPC}).
+  Account batch size defaults to 100; set SOLANA_RPC_MAX_ACCOUNTS in .env for provider limits.
   --no-db            Keep nothing: start every address at --since, print what was found, write no rows or stats.
   --no-telegram      Log the summary instead of sending it.
   --print            Print every non-routine use found this run.
@@ -120,6 +121,7 @@ async function main() {
     }
     const env = await readEnvFile(join(REPO, '.env'));
     const rpc = typeof flags.rpc === 'string' ? flags.rpc : (env.SOLANA_RPC_URL || DEFAULT_RPC);
+    const maxAccounts = accountBatchSize(process.env.SOLANA_RPC_MAX_ACCOUNTS || env.SOLANA_RPC_MAX_ACCOUNTS);
     const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL || null;
     const noDb = Boolean(flags['no-db']);
     const budget = flags.budget === undefined ? DEFAULT_BUDGET : Number(flags.budget);
@@ -140,6 +142,7 @@ async function main() {
         rpcHost = new URL(rpc).host;
     } catch { /* the URL itself is never logged */ }
     log(`watch-powers: rpc ${rpcHost}, budget ${budget} transaction(s), never-listed keys start ${since} (routine-only keys ${routineSince})${only ? `, only ${[...only].join(', ')}` : ''}`);
+    log(`watch-powers: getMultipleAccounts batch size ${maxAccounts}`);
 
     const counter = { getMultipleAccounts: 0, getSignaturesForAddress: 0, getTransaction: 0 };
     const call = async (method, params) => {
@@ -154,11 +157,12 @@ async function main() {
     const selected = tokens.filter((t) => !only || only.has(t.issuer));
     if (selected.length === 0) throw new Error(`--only matched no issuer (${[...only].join(', ')})`);
     const mintAccounts = {};
-    for (let i = 0; i < selected.length; i += 100) {
-        const chunk = selected.slice(i, i + 100).map((t) => t.mint);
-        const { value } = await getAccountsWithContext(chunk, { rpc });
+    for (let i = 0; i < selected.length; i += maxAccounts) {
+        const mintBatch = selected.slice(i, i + maxAccounts).map((t) => t.mint);
+        const { slot, value } = await getAccountsWithContext(mintBatch, { rpc, maxAccounts });
         counter.getMultipleAccounts += 1;
-        chunk.forEach((m, k) => { mintAccounts[m] = value[k]; });
+        mintBatch.forEach((m, k) => { mintAccounts[m] = value[k]; });
+        log(`mint account batch ${Math.floor(i / maxAccounts) + 1}: ${mintBatch.length} account(s), context slot ${slot ?? '?'}`);
     }
     const watch = buildWatchList(mintAccounts, selected, { only });
     if (watch.unreadable.length) {
@@ -318,14 +322,15 @@ async function main() {
         }
     }
 
-    // Multisig configuration as it stands now (one call), for the record and as a cross-check.
+    // Each configuration batch retains its own context slot; never imply one slot for split reads.
     const multisigs = [...multisigSet()];
     const configChanges = [];
     if (multisigs.length) {
         try {
-            const { value } = await getAccountsWithContext(multisigs, { rpc, encoding: 'base64' });
-            counter.getMultipleAccounts += 1;
-            multisigs.forEach((address, k) => {
+            for (const batch of chunkAccounts(multisigs, maxAccounts)) {
+                const { slot, value } = await getAccountsWithContext(batch, { rpc, encoding: 'base64', maxAccounts });
+                counter.getMultipleAccounts += 1;
+                batch.forEach((address, k) => {
                 const decoded = value[k] ? decodeSquadsMultisig(value[k].data[0]) : null;
                 const entry = watched.get(address);
                 if (!decoded) { failures.push(`multisig ${address}: not a readable Squads v4 account`); return; }
@@ -340,10 +345,11 @@ async function main() {
                     logWarn(`squads: multisig ${address} configuration differs from the last read (threshold ${before.threshold}→${config.threshold}, `
                         + `time lock ${before.timeLockSeconds}→${config.timeLockSeconds}, members ${before.members.length}→${config.members.length})`);
                 }
-                entry.state = { ...entry.state, config, configReadAt: RUN_STARTED_AT };
+                entry.state = { ...entry.state, config, configReadAt: RUN_STARTED_AT, configReadSlot: slot };
                 log(`squads: ${address} threshold ${config.threshold} of ${config.members.length}, time lock ${config.timeLockSeconds} s, `
-                    + `config authority ${config.configAuthority ?? 'none (the multisig itself)'}`);
-            });
+                    + `config authority ${config.configAuthority ?? 'none (the multisig itself)'} (read slot ${slot ?? '?'})`);
+                });
+            }
         } catch (err) {
             failures.push(`multisig accounts: ${err.message}`);
         }
@@ -419,10 +425,10 @@ async function main() {
 
         // Owners the transaction did not reveal (a closed or untouched account): the account as it is now.
         const unknown = [...new Set(newUses.filter((u) => u.targetAccount && !u.targetOwner && u.mint).map((u) => u.targetAccount))];
-        for (let i = 0; i < unknown.length; i += 100) {
-            const part = unknown.slice(i, i + 100);
+        for (let i = 0; i < unknown.length; i += maxAccounts) {
+            const part = unknown.slice(i, i + maxAccounts);
             try {
-                const { value } = await getAccountsWithContext(part, { rpc });
+                const { value } = await getAccountsWithContext(part, { rpc, maxAccounts });
                 counter.getMultipleAccounts += 1;
                 const owners = new Map(part.map((acc, k) => [acc, value[k]?.data?.parsed?.info?.owner ?? null]));
                 for (const u of newUses) {

@@ -70,9 +70,15 @@ export function nextState(results, previous = {}) {
             firstSeenAt: prev?.firstSeenAt ?? result.fetchedAt,
             lastCheckedAt: result.fetchedAt,
             lastChangedAt: result.status === 'changed' ? result.fetchedAt : (prev?.lastChangedAt ?? null),
+            versionFetchedAt: result.status === 'changed' || result.versionRecorded === true
+                ? result.fetchedAt
+                : (prev?.versionFetchedAt ?? prev?.lastChangedAt ?? prev?.firstSeenAt ?? result.fetchedAt),
             textPath: result.textPath ?? prev?.textPath ?? null,
             rawPath: result.rawPath ?? prev?.rawPath ?? null,
             archiveUrl: result.archiveUrl ?? prev?.archiveUrl ?? null,
+            archiveContentHash: result.archiveContentHash ?? prev?.archiveContentHash ?? null,
+            archivePending: result.archivePending === true,
+            archiveHistory: Array.isArray(result.archiveHistory) ? result.archiveHistory : (prev?.archiveHistory ?? []),
             versions: (prev?.versions ?? 0)
                 + (result.status === 'changed' || result.versionRecorded === true ? 1 : 0),
             // Only a read that produced text is read by the new extraction generation; a refusal or an
@@ -172,7 +178,9 @@ export function buildRows(results, previousState = {}, { checkEvery = CHECK_EVER
                 textChars: result.textChars,
                 textPath: result.textPath,
                 rawPath: result.rawPath,
-                archiveUrl: result.archiveUrl,
+                // An older capture can remain visible on the source row while this changed
+                // version's new capture is pending. Never attach that old capture to this version.
+                archiveUrl: result.archivePending ? null : result.archiveUrl,
                 etag: result.etag,
                 lastModified: result.lastModified,
                 diffSummary: result.diff?.summary == null ? (archived ? archivedPrefix.trim() : null) : `${archivedPrefix}${result.diff.summary}`,
