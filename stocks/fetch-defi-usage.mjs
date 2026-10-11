@@ -45,10 +45,9 @@ const LOOPSCALE_VAULTS_URL = 'https://tars.loopscale.com/v1/markets/lending_vaul
 // are paced like fetch-holders.mjs.
 const RPC_PACE_MS = 350;
 let SOLANA_RPC_URL = DEFAULT_RPC;
-// getProgramAccounts goes to the public endpoint: Alchemy's free tier throttles it on the first call
-// (measured 2026-09-24, see fetch-defi-footprint.mjs). The Loan listing is one call, ~5,900 accounts
-// × 365 bytes of collateral slots, answered in about a second on 2026-09-24.
-const LOAN_SCAN_RPC = DEFAULT_RPC;
+// Keep the large getProgramAccounts listing on its separately configured Helius endpoint; Alchemy's
+// free tier throttles this call. Other Solana reads in this script use SOLANA_RPC_URL.
+let LOAN_SCAN_RPC = DEFAULT_RPC;
 
 function rpcLabel(url) {
     try {
@@ -292,7 +291,7 @@ async function fetchLoopscaleVaults() {
 }
 
 /**
- * Loopscale scan: one getProgramAccounts (public RPC) listing every Loan account with only its five
+ * Loopscale scan: one getProgramAccounts listing every Loan account with only its five
  * collateral slots, then full reads (configured RPC) of each Loan that names a tracked mint, then
  * the MarketInformation and Strategy accounts those Loans' ledgers point at. Throws on RPC failure:
  * an empty result here would read as "no Loopscale use", i.e. a removal.
@@ -387,7 +386,8 @@ INPUTS
   stocks/data/defi-integrations.json plus the keyless Kamino (cross-market registry AND every market's
   reserve list), Jupiter Lend, Nest, Project 0 and Save registries; Kamino stock reserves and composite
   product positions (Kamino obligations) are decoded from the chain;
-  every Loopscale Loan account (getProgramAccounts on the public RPC), the Loans holding a tracked
+  every Loopscale Loan account (getProgramAccounts; defaults to public RPC unless
+  SOLANA_PROGRAM_ACCOUNTS_RPC_URL is configured), the Loans holding a tracked
   mint read and decoded on Solana (SOLANA_RPC_URL from ../.env): open principal per exact token
 
 OUTPUT
@@ -404,6 +404,9 @@ async function main() {
     const env = await readEnvFile(ENV_PATH);
     if (typeof env.SOLANA_RPC_URL === 'string' && env.SOLANA_RPC_URL !== '') SOLANA_RPC_URL = env.SOLANA_RPC_URL;
     else logWarn(`rpc: no SOLANA_RPC_URL in ${ENV_PATH} — using the throttled public endpoint`);
+    if (typeof env.SOLANA_PROGRAM_ACCOUNTS_RPC_URL === 'string' && env.SOLANA_PROGRAM_ACCOUNTS_RPC_URL !== '') {
+        LOAN_SCAN_RPC = env.SOLANA_PROGRAM_ACCOUNTS_RPC_URL;
+    }
     const [tokenDb, venues, meteora, curated] = await Promise.all([
         readJson(TOKENS_PATH),
         readJson(VENUES_PATH, { fetchedAt: null, items: [] }),
