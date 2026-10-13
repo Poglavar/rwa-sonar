@@ -142,3 +142,9 @@ stocks/data/cmc-tokenized.json
 next-steps.md
 
 /monitoring-map.json
+
+# Job state written on the server. Deploy scripts run `git clean -fd`, which deletes untracked files
+# that are NOT ignored; ignored ones survive (2026-10-13).
+.caselaw-watch-queue.json
+.last-*-stats.json
+.last-*-stats-*.json
