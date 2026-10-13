@@ -1,0 +1,482 @@
+{
+  "id": "ondo-global-markets",
+  "name": "Ondo Global Markets (Ondo Stocks)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "ondo-global-markets"
+    ],
+    "catalogueNames": [
+      "Ondo Global Markets"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "ondo-global-markets"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/ondo-global-markets.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json and stocks/data/holder-rights.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json and attestations-db.json (entry 'Ondo Global Markets')",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario stock-templates.ts (template ondo-global-markets--token-2022-pausable-rebase, AAPLon)",
+      "asOf": "2026-09-23"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "debt-secured",
+    "legalForm": "Blockchain-based tracker certificate (a debt instrument) issued by a BVI SPV and constituted as a Swiss ledger-based security under arts. 973d et seqq. CO, with a first-priority perfected security interest in the collateral held by a security agent for the tokenholders",
+    "says": "The holder is a creditor of Ondo Global Markets (BVI) Limited for a cash or stablecoin amount tracking the total return of one referenced share or ETF (times the shares-per-token multiplier), with a sole pro rata claim, through Ankura as Security Agent, on the collateral allocated to that token type and no further recourse. No shareholder voting or information rights, no physical delivery under the Sales Terms, and no rights at all for a Prohibited Person."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 268,
+      "example": {
+        "symbol": "AAPLon",
+        "mint": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo"
+      },
+      "readable": false,
+      "note": "RWA Sonar's universe assigns 268 Solana mints to the programme (2026-09-20); the dossier's authority read covered all 268."
+    },
+    {
+      "chain": "Ethereum, BNB Chain and HyperEVM (via bridge)",
+      "standard": "unknown",
+      "readable": false,
+      "note": "EVM deployments; their contracts were not read in this restatement. Alpaca's in-kind ITN route runs only on Ethereum and BNB Chain."
+    }
+  ],
+  "parties": [
+    {
+      "id": "ogm",
+      "name": "Ondo Global Markets (BVI) Limited",
+      "role": "issuer",
+      "note": "BVI business company described as a bankruptcy-remote SPV; 90.01% owned by Flux Finance Inc. (an Ondo Foundation subsidiary) and 9.99% by Ondo Finance Inc."
+    },
+    {
+      "id": "ondo-finance",
+      "name": "Ondo Finance Inc.",
+      "role": "platform",
+      "note": "Tokenizer and service provider (Greenwich, Connecticut). Per the Sales Terms it signs the off-chain price attestations and controls the mint, freeze, pause and scaled-UI authorities.",
+      "keys": [
+        {
+          "address": "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD",
+          "controls": "mint, pause and scaled-UI multiplier authority of every Ondo GM mint",
+          "kind": "PDA of the upgradeable program XzTT4XB8m7sLD2xi6snefSasaswsKCxx5Tifjondogm"
+        },
+        {
+          "address": "EfMUASGwCsPBafiPi8rwdZfUJSUt7pxAoxayR39PVpMr",
+          "controls": "program upgrade and root roles (vault 9ECeczLtFZDYE3NX6G7uNw5BUGjoJAu1kFyEihA5hMaM)",
+          "kind": "Squads v4 multisig 4 of 7, 7,200-second time lock"
+        },
+        {
+          "address": "51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+          "controls": "freeze authority",
+          "kind": "Squads v4 vault of multisig CDCCa8…, 3 of 8, no time lock"
+        },
+        {
+          "address": "5AzscwfVv7bJtmtYNc41mM68gVFzQKjGoy64GZoukgGn",
+          "controls": "multiplier updates (UpdateMultiplierRole)",
+          "kind": "hot key, not publicly attributed"
+        }
+      ]
+    },
+    {
+      "id": "alpaca",
+      "name": "Alpaca Securities LLC",
+      "role": "custodian",
+      "note": "SEC-registered, FINRA-member broker-dealer (New York); holds the equities and ETFs through the DTC indirect holding system; also Fiat Account Provider and Broker."
+    },
+    {
+      "id": "bitgo",
+      "name": "BitGo Trust Company, Inc.",
+      "role": "custodian",
+      "note": "Sioux Falls, South Dakota; holds fiat, stablecoins and tokens."
+    },
+    {
+      "id": "ankura",
+      "name": "Ankura Trust Company, LLC",
+      "role": "trustee",
+      "note": "Security Agent for the Secured Parties (tokenholders) and, separately, Verification Agent under the Sales Terms."
+    },
+    {
+      "id": "fma",
+      "name": "Liechtenstein Financial Market Authority",
+      "role": "regulator"
+    },
+    {
+      "id": "finra",
+      "name": "FINRA",
+      "role": "regulator",
+      "note": "Alpaca's broker-dealer membership; named here as the natural signer of its credential."
+    },
+    {
+      "id": "counsel",
+      "name": "Insolvency counsel to the issuer (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "ogm",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Ondo Global Markets (BVI) Limited, a BVI business company and SPV, owned 90.01% by Flux Finance Inc. (an Ondo Foundation subsidiary) and 9.99% by Ondo Finance Inc., which acts as Tokenizer.",
+      "today": {
+        "state": "published",
+        "where": "Base Prospectus approved 11.11.2025 and the Sales Terms"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "ogm",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the programme's collateral accounts",
+      "says": "Custody arrangement: Alpaca Securities LLC holds the equities and ETFs through the DTC indirect holding system and the trading and clearing accounts; BitGo Trust Company, Inc. holds fiat and stablecoins. The custodian may do no securities lending or proprietary transactions with the collateral 'except as expressly permitted by law or the Issuer'.",
+      "today": {
+        "state": "published",
+        "where": "FMA-filed Final Terms (11.11.2025) and Sales Terms s.3.2 name the custodians; the account agreements themselves are not among the sources, so A cannot commit to them by hash"
+      }
+    },
+    {
+      "id": "H-alpaca",
+      "signer": "alpaca",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "ogm",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of each referenced security, and cash, for Ondo Global Markets (BVI) Limited in the trading and clearing accounts under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Ankura's daily report itemises long market value of positions and the Alpaca trading and clearing accounts; Alpaca publishes nothing itself. stock-templates.ts reads 'Alpaca and BitGo sign holds', which no source shows."
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "H-bitgo",
+      "signer": "bitgo",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "ogm",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold this USD, USDC and these Ondo Stocks tokens for Ondo Global Markets (BVI) Limited under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Ankura's daily report lists 'USD at BitGo' and 'Ondo Stocks in Custodian Wallet - BitGo'; BitGo publishes nothing itself"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "ogm",
+      "type": "declaration",
+      "form": "token",
+      "about": "each Ondo GM mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: each token is a blockchain-based tracker certificate (debt instrument) whose redemption amount tracks the total return of the referenced share or ETF, dividends reinvested net of 30% US withholding through the shares-per-token multiplier; allocation: the collateral set out in the Token Specifications for that token type, on which its holders have a sole pro rata claim. NVDAon carries ISIN VGG7001AAH73.",
+      "today": {
+        "state": "published",
+        "where": "Base Prospectus (FMA, 11.11.2025), per-asset Final Terms and PRIIPs KIDs, Sales Terms; the NVDAon Final Terms name Ethereum Mainnet only, and whether a supplement covers the Solana issuance is open"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "ledger",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "each Ondo GM mint",
+      "says": "The contract addresses are the register of these Ledger-Based Securities, and transfer is effected by transfer on that ledger under arts. 973d et seqq. CO. Registration of a security interest is 'technically not supported by the Securities Ledger'.",
+      "today": {
+        "state": "published",
+        "where": "Sales Terms, 'Register and source code', citing https://ondo.finance/global-markets"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "security",
+      "signer": "ankura",
+      "type": "security-interest",
+      "about": "the collateral accounts at Alpaca and BitGo",
+      "for": "the Secured Parties: the holders of each token type, pro rata on that type's collateral",
+      "says": "First-priority perfected security interest in the collateral, perfected by account control agreements with Alpaca (New York law) and BitGo (South Dakota law) under a New York-law Collateral Agreement; recourse limited to the collateral proceeds.",
+      "today": {
+        "state": "reported",
+        "where": "Sales Terms; Ankura publishes reports as Verification Agent, not as Security Agent"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "security-ack",
+      "signer": "ogm",
+      "type": "concur",
+      "refs": [
+        "security"
+      ],
+      "about": "the security agent's statement",
+      "says": "The issuer grants and acknowledges the security interest.",
+      "today": {
+        "state": "published",
+        "where": "Sales Terms"
+      }
+    },
+    {
+      "id": "coverage",
+      "signer": "ankura",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the Ondo Stocks programme, all mints and chains together",
+      "says": "As of 8:00pm ET on 2026-09-15: Total Assets $1,257,853,141.27 against Total Liabilities $1,156,926,839.49, Asset-to-Obligation Ratio 108.72%, pooled across Ondo Stocks, USDon and USDY; reviewed 'based solely on account data and reports submitted by Issuer' and read-only access, and s.8.3 disclaims responsibility for the accuracy of what it is given.",
+      "today": {
+        "state": "published",
+        "where": "Signed daily PDFs (248 from 2025-10-01 to 2026-09-15) in a Dropbox folder linked from the app.ondo.finance bundle, within the three-business-day schedule; not at ondo.finance/global-markets as Sales Terms s.8.1(b) requires. stock-templates.ts quotes the 2026-09-10 report (108.02%)."
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "per-type",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "allocated",
+      "about": "each Ondo GM mint",
+      "says": "The collateral allocated to this token type, how much of it is the referenced share and how much is Other Collateral (cash, stablecoins, listed or unlisted book-entry instruments, liquid crypto), as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "The daily report is pooled and does not split Standard from Other Collateral per series"
+      }
+    },
+    {
+      "id": "eligible",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each Ondo GM mint",
+      "says": "Holding is open to anyone on chain; only Onboarded Purchasers (full KYC, non-US, not a Prohibited Person, and in several jurisdictions professional or accredited) may mint or redeem, KYC is a condition precedent to redemption, and a Prohibited Person 'shall have no rights under any Offering Documents'. Minimum $1.00.",
+      "today": {
+        "state": "published",
+        "where": "Sales Terms and docs.ondo.finance eligibility and investing-and-redeeming pages"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "dividend",
+      "signer": "ondo-finance",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "each Ondo GM mint",
+      "says": "Dividend reinvested net of withholding: the shares-per-token multiplier becomes M (AAPLon 1.003376073740221, NVDAon 1.0017152487959897, as read on 2026-09-16).",
+      "today": {
+        "state": "onchain",
+        "where": "The program PDA writes the scaled-UI multiplier on each mint, on the instruction of hot key 5Azsc…, which no source attributes and whose updates the program does not range-check"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "prospectus",
+      "signer": "fma",
+      "type": "certification",
+      "event": "other",
+      "about": "the issuer's wallet",
+      "says": "Base Prospectus for a 'Program for the issuance of tokenized Securities' approved under Art. 8(1) of Regulation (EU) 2017/1129 on 11.11.2025, valid to 11.11.2026; approval attests completeness, comprehensibility and consistency only.",
+      "today": {
+        "state": "reported",
+        "where": "Stated in the Base Prospectus; the FMA's own register was not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "alpaca-credential",
+      "signer": "finra",
+      "type": "credential",
+      "about": "Alpaca's wallet",
+      "says": "Registered broker-dealer and FINRA member (role custodian).",
+      "today": {
+        "state": "not-checked",
+        "where": "The Sales Terms carry Alpaca's covenant to stay registered; BrokerCheck exists but was not read for Alpaca in the sources"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "remoteness",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "the issuer's wallet",
+      "says": "In our opinion the SPV would not be consolidated with Ondo Finance Inc. or the Ondo Foundation group, and holders may rely on this.",
+      "today": {
+        "state": "unnamed",
+        "where": "The issuer describes an independent director, segregated books and a non-petition covenant; no third-party insolvency opinion was found and no counsel is named"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "other-collateral",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each Ondo GM mint",
+      "says": "The Base Prospectus lets 'Other Collateral' (cash, stablecoins, listed or unlisted book-entry instruments, liquid crypto) stand in for the shares, with an overcollateralisation factor not located in the public text; the daily report does not say how much of the collateral is shares. The reports are also not posted where the Sales Terms require.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings collateral-may-be-non-share-instruments and verification-report-not-at-contractual-location"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with pausable, scaled-UI amount, confidential-transfer mint, a transfer hook initialised with no program, default account state not frozen and no permanent delegate. Mint, pause and multiplier sit with a PDA of the upgradeable Ondo GM program, whose upgrade sits with a 4-of-7 Squads vault with a 7,200-second time lock; freeze sits with a 3-of-8 Squads vault with no time lock; emergency pause with a 1-of-9 vault.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier keyGovernance and authorityFacts (finalized RPC reads 2026-09-20 and 2026-09-24)"
+    },
+    {
+      "id": "multiplier-in-use",
+      "says": "The multiplier differs from 1 on 156 of the 268 live mints, written through the program on the instruction of one hot key.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar dossier keyGovernance"
+    },
+    {
+      "id": "freeze-used",
+      "says": "The freeze authority has five transactions in its history, including one freezeAccount and one thawAccount between 2026-04-27 and 2026-05-01.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar dossier finding freeze-authority-has-been-exercised"
+    },
+    {
+      "id": "redemption-burns",
+      "says": "Redemption burns the token: 219 direct redemptions by 6 whitelisted wallets across 101 tokens paid USD 49,041.87 in USDC between 2026-09-22T23:31Z and 2026-09-23T18:18Z, one wallet making 132 of them.",
+      "observedAt": "2026-09-23",
+      "source": "RWA Sonar dossier redemption.successfulRedemptionEvidence"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem and how",
+      "says": "Onboarded Purchasers only, for USDon or USDC against an Ondo-signed secp256k1 quote, 24/5 (24/7 for a named subset), with Purchaser Fees of up to 0.1% and Ondo keeping the spread; physical delivery excluded. Alpaca's ITN lets authorised participants redeem in kind on Ethereum and BNB Chain only. Stays in the Sales Terms and onboarding."
+    },
+    {
+      "topic": "Powers reserved in the terms",
+      "says": "The Tokenizer may freeze, rescind transfers made in breach of the Sales Terms, cancel tokens 'with or without making any payment therefor', pause, and execute orders of courts recognised in the BVI; the issuer may replace the Underlying or call and redeem a whole series. Only freeze and pause are wired on chain."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Primary-market quotes derive from the NYSE or NASDAQ price and are checked on chain against a last_price written by an Ondo key, not a Pyth equity feed; Pyth checks only the USDC leg. Secondary DEX liquidity is thin."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "Swiss law for the tokens and Sales Terms, with Swiss Rules arbitration seated in Zurich; New York law for the Collateral Agreement and the Alpaca control agreement, South Dakota law for BitGo's, Delaware law for the Administrative Services Agreement. Sold under Regulation S only."
+    },
+    {
+      "topic": "Voting",
+      "says": "Since 2026-04-28 holders can send non-binding voting preferences through Broadridge; the issuer need not follow them."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a secured tracker note",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Verification agent's coverage figure, under 7 days",
+        "minSigners": 1,
+        "maxAgeDays": 7,
+        "signers": "my-lens",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "security-interest",
+        "label": "The security agent's interest for holders",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A/H/T, a security interest and a dated coverage status give the outline, and Ankura's daily report is the rare third-party figure published under its own name. But the token cannot be read (Token-2022), the security interest cannot name the holders of a token type as a class, coverage is pooled across products and chains with no per-type allocation, and 'issuer-obligation' hides a secured note that a non-onboarded holder cannot redeem. The custodians publish nothing themselves."
+  }
+}

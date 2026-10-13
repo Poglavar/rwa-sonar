@@ -170,6 +170,9 @@ deck has no light/dark themes and the shim has no header.
   prices, trades, DeFi integrations, redemption observations, xStocks inventory. Built outputs are
   the `stocks-*.json` files at the root, also loaded into the Postgres schema `sonar`.
 - **Daily snapshots** (`stocks/data/history/<date>/`) are committed and are the product's history.
+- **Attestation restatements** (`rwa/data/restatements/`): every programme and token restated as typed attestations
+  ("X says Y about Z") in Tokenizario's vocabulary, with what each party already says and the vocabulary's gaps;
+  method and results in [`rwa/RESTATEMENT.md`](rwa/RESTATEMENT.md), built by `npm run rwa:restatements`.
 
 ## How it stays current
 
@@ -241,6 +244,7 @@ quoted or cached here remain under their own terms.
 - [`stocks/MODEL.md`](stocks/MODEL.md): the legal/technical grading model and its limits.
 - [`stocks/EVIDENCE.md`](stocks/EVIDENCE.md): claims, source watching, change detection and review.
 - [`stocks/findings.md`](stocks/findings.md): dated research notes.
+- [`rwa/RESTATEMENT.md`](rwa/RESTATEMENT.md): the database restated in Tokenizario's attestation vocabulary, and its gaps.
 - [`api/README.md`](api/README.md): API routes and private watch digests.
 - `ecosystem.config.cjs`, `stocks/refresh-on-server.sh`, `deploy-to-server.sh`: production jobs,
   refresh and publication.

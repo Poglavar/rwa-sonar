@@ -1,0 +1,313 @@
+{
+  "id": "oro-gold",
+  "name": "Oro GOLD",
+  "subjects": {
+    "researchProducts": [
+      "oro-gold"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Oro GOLD"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product oro-gold (ORO Labs Terms and Conditions 19 Jun 2025, ORO GOLD interface and redeem page)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, product table row ORO GOLD",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'Oro GOLD' and attestations-db.json (Oro GOLD instances)",
+      "asOf": "2026-09-16"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "none",
+    "claimKind": null,
+    "proposedClaimKind": null,
+    "legalForm": "Third-party-issued $GOLD token accessible through the ORO Labs interface; the actual issuer and legal form are unidentified",
+    "says": "No identified party owes the holder anything. ORO Labs, the only party named, says it neither issues, holds, controls nor executes $GOLD transactions and does not verify the backing; the 1:1 vaulted gold and 1 GOLD to 1 oz redemption are interface marketing for an issuer nobody names."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "unknown",
+      "count": 1,
+      "example": {
+        "symbol": "GOLD",
+        "mint": "GoLD…iw6A (abbreviated in the ORO app; full address not in the sources)"
+      },
+      "readable": false,
+      "note": "The research has no deployment row. The older catalogue (16 Sep 2026) calls it an SPL token at mint 'GoLDppdj…' holding 576.26 GOLD across 10,924 holders; the token program was not read."
+    }
+  ],
+  "parties": [
+    {
+      "id": "orolabs",
+      "name": "ORO Labs",
+      "role": "platform",
+      "note": "Interface provider only, by its own terms."
+    },
+    {
+      "id": "issuer",
+      "name": "The $GOLD issuer (not named)",
+      "role": "issuer",
+      "note": "ORO Labs' terms refer to independent third-party issuers and service providers without naming them. attestations-db.json cites an 'ORO Foundation' and a trust or foundation structure from an ORO GitBook (28 Feb 2026); the research did not confirm any such issuer."
+    },
+    {
+      "id": "vault",
+      "name": "The vault operator (not named)",
+      "role": "custodian",
+      "note": "Marketed as third-party vaults, UAE-based (older catalogue)."
+    },
+    {
+      "id": "auditor",
+      "name": "A reserve examiner (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "assayer",
+      "name": "An assayer of the bars (not named)",
+      "role": "inspector"
+    },
+    {
+      "id": "counsel",
+      "name": "Counsel (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "labs-profile",
+      "signer": "orolabs",
+      "type": "profile",
+      "about": "ORO Labs' wallet",
+      "says": "ORO Labs is a technical interface provider only. It is not the $GOLD issuer and neither issues, holds, controls nor executes token transactions; it does not verify or guarantee backing or storage claims, and third-party failure may cause loss.",
+      "today": {
+        "state": "published",
+        "where": "ORO Labs Terms and Conditions (19 Jun 2025), intro and §§1–2, 9–10"
+      }
+    },
+    {
+      "id": "T",
+      "signer": "issuer",
+      "type": "declaration",
+      "form": "token",
+      "about": "the Solana GOLD mint shown in the ORO app",
+      "says": "Token terms: one GOLD is backed 1:1 by vaulted physical gold and redeemable for one troy ounce, with home delivery in the UAE/Dubai; unit troy-oz.",
+      "today": {
+        "state": "unnamed",
+        "where": "The ORO app and redeem page display it; ORO Labs disclaims it and no issuer terms were found. The older catalogue's '1% fee, T+2 USDC settlement' is not in the research's sources."
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "issuer",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the $GOLD gold",
+      "says": "Custody arrangement: physical gold in third-party vaults, UAE-based.",
+      "today": {
+        "state": "unnamed",
+        "where": "Older catalogue only; the research found no named vault and no issuer agreement"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "vault",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "issuer",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N troy ounces for the $GOLD programme, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No vault operator is named in any source"
+      }
+    },
+    {
+      "id": "backed",
+      "signer": "issuer",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the Solana GOLD mint",
+      "says": "Reserves equal or exceed the tokens in circulation, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "attestations-db.json cites an oro.finance transparency page (28 Feb 2026); the research obtained no reconciled reserve report and ORO Labs says it does not verify backing"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "lent",
+      "signer": "issuer",
+      "type": "status",
+      "predicate": "lent",
+      "proposed": true,
+      "about": "the Solana GOLD mint",
+      "says": "N ounces of the reserve gold are out in institutional gold leasing pools behind the stGOLD variant, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The older catalogue describes stGOLD yield from gold leasing; attestations-db.json cites a GitBook page that vaulted gold is never lent without explicit holder action. The research did not review either."
+      },
+      "gaps": [
+        "reserves-lent"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the Solana GOLD mint",
+      "refs": [
+        "backed"
+      ],
+      "says": "Examined the gold against GOLD outstanding at a date, with the report hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "The older catalogue claims monthly third-party attestations; the research found no report and no named examiner"
+      }
+    },
+    {
+      "id": "assay",
+      "signer": "assayer",
+      "type": "inspection",
+      "about": "the bars under A",
+      "says": "The bars meet the LBMA and UAE Good Delivery standards.",
+      "today": {
+        "state": "unnamed",
+        "where": "attestations-db.json cites ORO token details (28 Feb 2026) and an on-chain 'Purity Check' attestation by Oro (18 Sep 2025); no assayer is named"
+      }
+    },
+    {
+      "id": "remoteness-opinion",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "the Solana GOLD mint",
+      "says": "The gold is held in a bankruptcy-remote trust or foundation for holders, who have a beneficial ownership interest, and holders may rely on this.",
+      "today": {
+        "state": "unnamed",
+        "where": "attestations-db.json cites the ORO GitBook's legal page for this structure; no opinion, issuer or trustee is identified and the research did not confirm it"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "interface-eligibility",
+      "signer": "orolabs",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the ORO interface",
+      "says": "Geographic and sanctions eligibility for using the ORO interface; onboarding and token eligibility belong to third-party providers.",
+      "today": {
+        "state": "published",
+        "where": "ORO Labs Terms and Conditions (research claim 'access')"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "issuer-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Solana GOLD mint",
+      "refs": [
+        "T"
+      ],
+      "says": "No issuer stands behind the token terms the ORO app displays. The issuer agreement, a named vault, a full official mint binding, independent reserve matching and the redemption obligor are all missing; OGold is a different programme.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research oro-gold, evidenceProfile 'Dependency and recourse review' (1 Oct 2026)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "holders",
+      "says": "576.26 GOLD across 10,924 holders at mint 'GoLDppdj…' (older catalogue status note); no authorities or token program were read.",
+      "observedAt": "2026-09-16",
+      "source": "rwa-assets-db.json 'Oro GOLD' statusNote"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who issues and redeems",
+      "says": "The redemption obligor, its minimum, fees, processing time and shipping conditions are with unidentified third parties; ORO Labs disclaims providing redemption."
+    },
+    {
+      "topic": "Interface terms",
+      "says": "ORO Labs' terms govern the interface only and disclaim third-party providers' solvency and responsibility."
+    }
+  ],
+  "recipe": {
+    "name": "Buy vaulted gold",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "An issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A vault's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Auditor's reserve examination, under 45 days",
+        "minSigners": 1,
+        "maxAgeDays": 45,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "A token trades, but the core of what the holder has cannot be said because nobody who could say it is identified: every T, A, holds, backed and audited statement has an unnamed signer. The only identified party, ORO Labs, publishes a disclaimer, which is what v3 can record. The difficulty is evidence, not vocabulary, though a lent predicate would be needed for the stGOLD leasing the older catalogue describes."
+  }
+}

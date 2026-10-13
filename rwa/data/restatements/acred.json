@@ -1,0 +1,373 @@
+{
+  "id": "acred",
+  "name": "Securitize Tokenized Apollo Diversified Credit Fund (ACRED)",
+  "subjects": {
+    "researchProducts": [
+      "acred"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Apollo ACRED"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product acred (Form D of 12 February 2025, launch announcement of 30 January 2025, ADCF prospectus disclosure of 29 April 2026)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Apollo ACRED) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar canonical parties stocks/data/canonical-parties.json (Securitize Transfer Agent LLC)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Pooled investment fund interest in Securitize Tokenized Apollo Diversified Credit Fund Ltd., a BVI feeder that invests substantially all its assets in Apollo Diversified Credit Fund (ADCF); class and offering terms not reviewed",
+    "says": "The holder owns an interest in the BVI feeder, not in ADCF or its loans; the feeder's value and liquidity depend on ADCF, whose repurchases are quarterly and may be prorated. The holder's register, exit and rank on the feeder's liquidation all rest on offering terms that were not obtained."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum, Solana, Aptos, Avalanche, Ink and Polygon (announced)",
+      "standard": "unknown",
+      "readable": false,
+      "note": "The launch announcement names these six networks; research recorded no deployment row and the older catalogue lists ERC-20 on Ethereum without an address."
+    }
+  ],
+  "parties": [
+    {
+      "id": "feeder",
+      "name": "Securitize Tokenized Apollo Diversified Credit Fund Ltd. (BVI)",
+      "role": "issuer"
+    },
+    {
+      "id": "securitize",
+      "name": "Securitize (announced transfer agent; operates Securitize Markets)",
+      "role": "transfer-agent",
+      "note": "Its name is in the feeder's name; canonical parties record Securitize Transfer Agent LLC as SEC-registered (File No. 084-06638), without tying that entity to ACRED."
+    },
+    {
+      "id": "adcf",
+      "name": "Apollo Diversified Credit Fund",
+      "role": "other",
+      "note": "The underlying fund, with its own SEC prospectus."
+    },
+    {
+      "id": "adcf-registrar",
+      "name": "ADCF's transfer agent (not named)",
+      "role": "registrar"
+    },
+    {
+      "id": "custodian",
+      "name": "Zodia (named only in the older catalogue)",
+      "role": "custodian"
+    },
+    {
+      "id": "administrator",
+      "name": "The feeder's administrator (not named)",
+      "role": "administrator"
+    },
+    {
+      "id": "auditor",
+      "name": "The feeder's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "feeder",
+      "type": "profile",
+      "about": "the feeder's wallet",
+      "says": "Securitize Tokenized Apollo Diversified Credit Fund Ltd., a BVI pooled investment fund, offered under a Form D notice of 12 February 2025.",
+      "today": {
+        "state": "published",
+        "where": "SEC Form D filed by the issuer (EDGAR CIK 2056038); no token address is tied to it in the sources"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "feeder",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the feeder's ADCF holding",
+      "says": "Custody arrangement: the feeder's interest in ADCF, and any cash, is kept by a named custodian (the older catalogue says Zodia).",
+      "today": {
+        "state": "not-checked",
+        "where": "The older catalogue records Apollo saying custody is at Zodia (11 April 2025) without a link; research named no custodian"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "feeder",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the feeder's assets under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only the older catalogue's unlinked attestation says so; the custodian publishes nothing"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "adcf-position",
+      "signer": "adcf-registrar",
+      "type": "register-entry",
+      "about": "the feeder's wallet",
+      "says": "Per ADCF's register, the feeder holds N ADCF shares, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The launch says the feeder invests substantially all its assets in ADCF; no source names ADCF's registrar or the feeder's position"
+      },
+      "gaps": [
+        "roles",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "feeder",
+      "type": "declaration",
+      "form": "token",
+      "about": "each ACRED token",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is an interest in the feeder; redemption at daily NAV as announced. Allocation: the feeder's ADCF holding under A.",
+      "today": {
+        "state": "reported",
+        "where": "Only the launch announcement (30 January 2025) and Form D describe it; the offering memorandum and subscription agreement were not obtained"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "securitize",
+      "type": "register-entry",
+      "about": "each ACRED holder's wallet",
+      "says": "Per the feeder register I keep as transfer agent, wallet W's holder owns N interests, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "Securitize is announced as transfer agent; no register entries or register-precedence clauses were found"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "feeder",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "each ACRED token",
+      "says": "Which record is title: the transfer agent's register or the chain.",
+      "today": {
+        "state": "not-published",
+        "where": "Definitive register-precedence clauses were not reviewed"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "securitize",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each ACRED token",
+      "says": "Only qualifying investors onboarded through Securitize Markets may subscribe.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement of 30 January 2025 on Securitize's investor site; research marks it stale, and current eligibility terms were not reviewed"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "administrator",
+      "type": "valuation",
+      "about": "each ACRED token",
+      "says": "Net asset value per interest is X on date D (basis: the feeder's dealing NAV).",
+      "today": {
+        "state": "unnamed",
+        "where": "Securitize's primary-market page showed NAV $1,110 and $95.4M asset value on 16 September 2026 (older catalogue); no source names who strikes the NAV"
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the feeder's wallet",
+      "says": "Audited the feeder's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No source names the feeder's auditor or a report"
+      }
+    },
+    {
+      "id": "ta-credential",
+      "signer": "sec",
+      "type": "credential",
+      "about": "Securitize's wallet",
+      "says": "Securitize Transfer Agent LLC is a registered transfer agent (File No. 084-06638).",
+      "today": {
+        "state": "reported",
+        "where": "RWA Sonar canonical parties; the SEC register was not read in this restatement, and the ACRED contracting entity was not confirmed"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "liquidity-mismatch",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each ACRED token",
+      "refs": [
+        "T"
+      ],
+      "says": "Daily-NAV redemption was announced for the feeder, but ADCF's own repurchases are quarterly and may be prorated when oversubscribed (ADCF prospectus disclosure, 29 April 2026). The announcement does not prove an unconditional or completed redemption, and how the feeder funds daily exits is not documented.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product acred (claim exit; asset module Feeder liquidity)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "no-mint",
+      "says": "No ACRED mint or contract address is recorded in research or the older catalogue, so nothing was read on any chain.",
+      "observedAt": "2026-10-01",
+      "source": "RWA Sonar research product acred (deployments: none) and rwa-assets-db.json (contractAddress empty)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption and liquidity",
+      "says": "Feeder minimums, fees, the operative redemption route and how it is funded stay in the feeder's offering memorandum; ADCF repurchases do not give tokenholders a direct redemption right."
+    },
+    {
+      "topic": "Fees",
+      "says": "The older catalogue says a 1.5% management fee with no carry; research did not review the fees."
+    },
+    {
+      "topic": "DeFi wrapper",
+      "says": "The older catalogue says an sACRED wrapper is used for leverage loops on Morpho, Kamino and Drift Institutional; a wrapper holder's position was not reviewed and is a separate instrument."
+    },
+    {
+      "topic": "Offering status",
+      "says": "Form D is a notice of an exempt offering, not SEC approval or the holder contract."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a private-credit feeder interest",
+    "outcome": "buy",
+    "author": "A qualifying investor",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The feeder's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The transfer agent's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": [
+          "register"
+        ]
+      },
+      {
+        "type": "register-entry",
+        "label": "The underlying fund's register shows the feeder's position, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": [
+          "adcf-position"
+        ]
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per interest, under 2 days",
+        "minSigners": 1,
+        "maxAgeDays": 2,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited feeder accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The feeder-into-fund chain can be outlined in v3: a T for the feeder, a register entry for the holder, and a register entry about the feeder's ADCF position. But no mint address is known, so nothing can be read; ownership-interest hides that this is a feeder interest whose liquidity depends on another fund; and which record prevails is a proposal. Most of the parties who would have to sign are unnamed, and the custodian is named only in an unlinked catalogue entry."
+  }
+}

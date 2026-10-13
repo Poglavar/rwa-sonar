@@ -1,0 +1,412 @@
+{
+  "id": "xstocks-backed",
+  "name": "Kraken xStocks (Backed Assets)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "xstocks-backed"
+    ],
+    "catalogueNames": [
+      "Kraken xStocks"
+    ],
+    "mechanisms": [
+      "xstocks"
+    ],
+    "universeIssuers": [
+      "xstocks-backed"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-26",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/xstocks-backed.json",
+      "asOf": "2026-09-23"
+    },
+    {
+      "source": "Tokenizario mechanisms.ts XSTOCKS and stock-templates.ts",
+      "asOf": "2026-09-26"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "debt-secured",
+    "legalForm": "Bearer tracker certificate: a Swiss-law ledger-based security (Art. 973d CO) issued by a Jersey SPV, with a first-ranking pledge over the collateral allocated to that product",
+    "says": "The holder is a creditor of Backed Assets (JE) Limited for a cash amount tracking one share of the underlying, secured only on that product's collateral. No shareholder, dividend or voting rights; no physical delivery under the prospectus route."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 828,
+      "example": {
+        "symbol": "AAPLx",
+        "mint": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp"
+      },
+      "readable": false,
+      "note": "Count is the issuer's own registry on 2026-09-20; RWA Sonar's universe assigns 833 Solana mints to the programme."
+    },
+    {
+      "chain": "Ethereum, Arbitrum, Mantle, TON, Ink, BNB Smart Chain, Tron, X Layer, Optimism",
+      "standard": "other",
+      "readable": false,
+      "note": "ERC-20 on the EVM chains, native standards on TON and Tron."
+    }
+  ],
+  "parties": [
+    {
+      "id": "backed",
+      "name": "Backed Assets (JE) Limited",
+      "role": "issuer",
+      "keys": [
+        {
+          "address": "7pt9tkctJPK7PPNQJ77GKg8ZffSF6QxoMiCFYHxrtaCj",
+          "controls": "mint authority of every xStocks mint",
+          "kind": "hot-key"
+        },
+        {
+          "address": "JDq14BWvqCRFNu1krb12bcRpbGtJZ1FLEakMw6FdxJNs",
+          "controls": "freeze and pause",
+          "kind": "multisig 2 of 4, no time lock"
+        },
+        {
+          "address": "5aMNNLQJwAEeoemTEMkv5NVjqKwvvefRYCQ5Z67HFvEq",
+          "controls": "permanent delegate, transfer-hook and metadata authority",
+          "kind": "multisig 2 of 3, no time lock"
+        }
+      ]
+    },
+    {
+      "id": "custodians",
+      "name": "Product custodians: InCore Bank AG, Maerki Baumann & Co. AG, GTN Europe Financial Services Limited, Alpaca (the prospectus names Alpaca Crypto LLC, the product page Alpaca Securities LLC)",
+      "role": "custodian"
+    },
+    {
+      "id": "agent",
+      "name": "Security Agent Services AG",
+      "role": "trustee",
+      "note": "Direct representative of the investors for the pledge; replaceable by the issuer at its sole discretion."
+    },
+    {
+      "id": "tnf",
+      "name": "The Network Firm",
+      "role": "auditor",
+      "note": "Runs the attestation API with read-only access to the custody accounts; relayed by Chainlink Proof of Reserve."
+    },
+    {
+      "id": "fma",
+      "name": "Liechtenstein Financial Market Authority",
+      "role": "regulator"
+    },
+    {
+      "id": "kraken",
+      "name": "Kraken (Payward)",
+      "role": "platform",
+      "note": "Owns Backed through Payward and Backed Finance AG; provides all tokenization services under a services agreement that does not guarantee the issuer's obligations."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "backed",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Backed Assets (JE) Limited, a Jersey SPV owned by Backed Finance AG and, through Payward, by Kraken.",
+      "today": {
+        "state": "published",
+        "where": "Base prospectus (approved 8 May 2026)"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "backed",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for each product's collateral account",
+      "says": "Custody arrangement: the custodians keep the underlying shares for Backed in a dedicated sub-account per product, with no commingling between products.",
+      "today": {
+        "state": "published",
+        "where": "Base prospectus and product pages describe it; the custody agreements are not public, so A cannot commit to them by hash"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodians",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "backed",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of the underlying for Backed under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Backed's proof-of-reserves API serves per-provider holdings; no custodian publishes them itself"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "backed",
+      "type": "declaration",
+      "form": "token",
+      "about": "each xStocks mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is a claim for the cash value of one underlying share (adjusted by the multiplier); allocation: the shares in this product's account under A.",
+      "today": {
+        "state": "published",
+        "where": "Base prospectus, final terms per product, issuer's mint registry"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "pledge",
+      "signer": "agent",
+      "type": "security-interest",
+      "about": "each product's collateral account",
+      "for": "the holders of that product, pro rata",
+      "says": "First-ranking pledge over the collateral account for all investors in the product; enforced on an issuer default with pro-rata distribution.",
+      "today": {
+        "state": "reported",
+        "where": "Base prospectus; the security agent publishes nothing itself"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "pledge-ack",
+      "signer": "backed",
+      "type": "concur",
+      "refs": [
+        "pledge"
+      ],
+      "about": "the security agent's statement",
+      "says": "The issuer acknowledges the pledge.",
+      "today": {
+        "state": "published",
+        "where": "Base prospectus (the issuer grants it)"
+      }
+    },
+    {
+      "id": "segregated",
+      "signer": "custodians",
+      "type": "status",
+      "predicate": "allocated",
+      "about": "each xStocks mint",
+      "says": "The shares backing this product sit in its own account, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "Base prospectus, citing InCore's contractual undertakings"
+      }
+    },
+    {
+      "id": "backed-status",
+      "signer": "backed",
+      "type": "status",
+      "predicate": "backed",
+      "about": "each xStocks mint",
+      "says": "Shares held for this product against circulating supply, as of time T (daily, or when reserves move by over 10%).",
+      "today": {
+        "state": "published",
+        "where": "https://api.xstocks.fi/api/v2/public/proof-of-reserves (issuer-served, symbol-keyed; 826 of 828 products on 2026-09-20)"
+      },
+      "gaps": [
+        "reserve-structure",
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "tnf-audit",
+      "signer": "tnf",
+      "type": "certification",
+      "event": "audited",
+      "about": "each xStocks mint",
+      "says": "Examined the custody balances behind the reserve figures, with scope, period and report hash.",
+      "today": {
+        "state": "reported",
+        "where": "Backed says The Network Firm feeds the attestation API; no signed report from it was found"
+      },
+      "gaps": [
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "lent",
+      "signer": "backed",
+      "type": "status",
+      "predicate": "lent",
+      "about": "each xStocks mint",
+      "says": "N of this product's shares are lent to the prime borrower, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "The prospectus promises regular publication of lent amounts; none were found on the API or product pages"
+      },
+      "gaps": [
+        "reserves-lent"
+      ],
+      "proposed": true
+    },
+    {
+      "id": "dividend",
+      "signer": "backed",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "each xStocks mint",
+      "says": "Dividend reinvested: the multiplier becomes M from date D (AAPLx: 1.00326901 from 8 August 2026).",
+      "today": {
+        "state": "onchain",
+        "where": "The rebase key writes the scaled-UI multiplier on each mint"
+      }
+    },
+    {
+      "id": "prospectus-approval",
+      "signer": "fma",
+      "type": "certification",
+      "event": "other",
+      "about": "the issuer's wallet",
+      "says": "Base prospectus approved under the EU Prospectus Regulation on 8 May 2026, valid to 7 May 2027 (ref. 20260508_384472).",
+      "today": {
+        "state": "reported",
+        "where": "Cited in the prospectus; the FMA's register was not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "custodian-credential",
+      "signer": "fma",
+      "type": "credential",
+      "about": "each custodian's wallet",
+      "says": "Licensed bank or broker under its home regulator (FINMA, FCA, FinCEN registration).",
+      "today": {
+        "state": "not-checked",
+        "where": "Licences exist in public registers that this restatement did not read"
+      }
+    },
+    {
+      "id": "lending-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each xStocks mint",
+      "says": "The issuer may lend the collateral under a master securities lending agreement; lent shares leave the custody account.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding collateral-may-be-lent-to-prime-borrower"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with a permanent delegate (move or burn any balance) behind a 2-of-3 Squads vault with no time lock, freeze and pause behind a 2-of-4 Squads vault with no time lock, a hot mint key and a hot rebase key, shared across all 828 mints.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar dossier keyGovernance (finalized getMultipleAccounts)"
+    },
+    {
+      "id": "delegate-unused",
+      "says": "No transfer or burn on Solana names the permanent delegate as authority across 1,845 transactions from 10 Jun 2025 to 23 Sep 2026.",
+      "observedAt": "2026-09-23",
+      "source": "RWA Sonar powers page"
+    },
+    {
+      "id": "redemption-not-burn",
+      "says": "Redeemed tokens are de-activated by transfer back to an issuer wallet, not burned, so supply overstates the public float.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar flows page (stocks-flows.json)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "KYC-approved direct clients outside the US, UK, Canada and Australia, from $5,000, paid in cash by T+5; the gated xPort channel returns shares to an Alpaca account. Stays in the prospectus and Backed's onboarding."
+    },
+    {
+      "topic": "Freeze, pause, move and burn",
+      "says": "The terms let Backed freeze and pause; lost tokens are cancelled only after a Zug court rules, after a public notice of at least a month. Stays in the prospectus and Swiss law; the chain shows the capability."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Chainlink is the official oracle for prices and corporate actions; markets set the token price."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a tracker certificate",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Independent reserve examination, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Collateral segregated for this product",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "predicate": "allocated"
+        }
+      },
+      {
+        "type": "security-interest",
+        "label": "The security agent's pledge for holders",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The structure is A/H/T plus a pledge for the class of holders, so its outline can be said. The token cannot be read (Token-2022 on every chain), the pledge cannot name holders as a class, and 'issuer-obligation' hides that the claim is secured debt payable only in cash. The issuer publishes most of its own side; the custodians, the security agent and the reserve examiner publish nothing in their own name."
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "id": "cropto-crow",
+  "name": "Cropto wheat token (CROW)",
+  "subjects": {
+    "researchProducts": [
+      "cropto-crow"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "cropto"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts CROPTO (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": null,
+    "legalForm": "A token AgriFintech Financial Technologies Inc. describes as backed by wheat at one kilogram per token; the reviewed sources do not establish allocated title, a delivery right or what exactly the issuer owes the holder",
+    "says": "The holder has whatever the issuer's terms give, which the reviewed sources do not define: the product page describes a quantity backing, not title to identified wheat or a right to delivery. No current redemption procedure was established."
+  },
+  "tokens": [
+    {
+      "chain": "Polygon",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "CROW",
+        "mint": "0x0Da0BD2f57A27A70665D53db4eA71E1f26F77a46"
+      },
+      "readable": false,
+      "note": "Contract named in the issuer's Polygon guide; other networks the issuer may represent were not established."
+    }
+  ],
+  "parties": [
+    {
+      "id": "cropto",
+      "name": "AgriFintech Financial Technologies Inc. (Cropto)",
+      "role": "issuer"
+    },
+    {
+      "id": "warehouse",
+      "name": "The wheat warehouse operator (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "inspector",
+      "name": "A wheat inspector (none named)",
+      "role": "inspector"
+    },
+    {
+      "id": "auditor",
+      "name": "The reserve auditor (not identified)",
+      "role": "auditor",
+      "note": "The report index describes external auditors; who signed the latest report was not verified."
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "cropto",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "AgriFintech Financial Technologies Inc., issuer of Cropto's agricultural tokens.",
+      "today": {
+        "state": "published",
+        "where": "Cropto website (cropto.io); the contract's admin keys are not tied to the issuer in the sources"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "cropto",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the wheat in warehouses",
+      "says": "Custody arrangement: Cropto places the agricultural products it acquires in audited warehouses, with records of product type, quantity and storage location.",
+      "today": {
+        "state": "published",
+        "where": "Cropto's process and FAQ and the wheat page; no warehouse, site or lot is named"
+      }
+    },
+    {
+      "id": "T",
+      "signer": "cropto",
+      "type": "declaration",
+      "form": "token",
+      "about": "the CROW contract on Polygon",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one CROW is backed by one kilogram of wheat; tokens are issued after the wheat is acquired and stored. Allocation: the wheat held under A.",
+      "today": {
+        "state": "published",
+        "where": "CROW product page and the issuer's Polygon guide; neither defines what the issuer owes the holder or a delivery right"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "H",
+      "signer": "warehouse",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "cropto",
+      "refs": [
+        "A"
+      ],
+      "says": "We have these identified wheat lots for the issuer, at these sites, on this date; their warehouse receipts are attached.",
+      "today": {
+        "state": "unnamed",
+        "where": "No warehouse operator is named"
+      }
+    },
+    {
+      "id": "lot-inspection",
+      "signer": "inspector",
+      "type": "inspection",
+      "about": "the wheat lots under A",
+      "says": "I inspected the weight, grade, moisture and condition of these lots on this date; the measurement report is the evidence.",
+      "today": {
+        "state": "unnamed",
+        "where": "No inspector or lot-level evidence is named"
+      }
+    },
+    {
+      "id": "backed-status",
+      "signer": "cropto",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the CROW contract on Polygon",
+      "says": "At this date, these net kilograms back this total live token supply across the represented networks, with inventory movements and exceptions reconciled.",
+      "today": {
+        "state": "not-checked",
+        "where": "The reserve-report index lists a 2025 report and earlier ones; the 2025 report could not be read, so its figures were not checked"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "reserve-audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the CROW contract on Polygon",
+      "says": "I examined the reserve reconciliation for a stated period, physical stocks against token supply, with the report's scope, exceptions and hash.",
+      "today": {
+        "state": "not-checked",
+        "where": "Cropto's index says external auditors compare physical stocks with token supply; the 2025 report could not be read, so who signed it and its qualifications were not checked"
+      }
+    },
+    {
+      "id": "redemption",
+      "signer": "cropto",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "the CROW contract on Polygon",
+      "says": "Redeemed N tokens and delivered N kilograms of wheat (or paid) to the holder.",
+      "today": {
+        "state": "not-published",
+        "where": "The reviewed sources describe no current redemption procedure, minimums, fees or delivery conditions"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "review-scope",
+      "signer": "tokenizario",
+      "type": "note",
+      "about": "the CROW contract on Polygon",
+      "says": "The guide names the token contract but not its admin powers; the controls for issuing, pausing, upgrades and transfers were not verified. A trade on an exchange or CroptoDEX moves tokens and records no hand-over of wheat.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (CROPTO), read 8 October 2026"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Issuance and grain",
+      "says": "Buying grain, controlling issuance and reconciling warehouse stocks stay with Cropto and its counterparties."
+    },
+    {
+      "topic": "Redemption terms",
+      "says": "What is owed, minimum quantities, fees and delivery conditions belong in the issuer's terms; the sources did not establish them."
+    },
+    {
+      "topic": "Trading",
+      "says": "Access through exchanges and CroptoDEX stays with those venues."
+    }
+  ],
+  "recipe": {
+    "name": "Assess wheat backing",
+    "outcome": "hold",
+    "author": "A commodity buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Kilograms against total token supply, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Warehouse 'I have it' statements, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Reserve audit, under 120 days",
+        "minSigners": 1,
+        "maxAgeDays": 120,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "Fungible wheat fits A/H/T with kilograms, a backed status and an audit, so the outline can be said. The token is an ERC-20 on Polygon the reader cannot read, a reserve across represented networks has no structured form, and the claim kind cannot be chosen because the sources do not say what the issuer owes. No warehouse, inspector or auditor is identified, and the one reserve report could not be read."
+  }
+}

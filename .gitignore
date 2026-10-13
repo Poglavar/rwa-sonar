@@ -119,6 +119,8 @@ stocks/data/event-first-seen.json
 /stocks-exits.json
 /stocks-schematics.json
 /stocks-events.json
+# Tokenizario restatement summary (rwa/build-restatements.mjs), rebuilt from rwa/data/restatements/.
+/rwa-restatements.json
 /stocks/data/venues.json
 /stocks/data/holders.json
 /stocks/data/meteora.json

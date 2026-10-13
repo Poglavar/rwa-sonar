@@ -1,0 +1,388 @@
+{
+  "id": "deaton-trch1",
+  "name": "Jurassic Finance TRCH1 (Deaton Triceratops skull)",
+  "subjects": {
+    "researchProducts": [
+      "deaton-trch1"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "deaton"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts DEATON (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748 (mint-facts.json, key trch1)",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "contingent",
+    "legalForm": "Contingent contractual entitlement under Cayman-law token terms issued by Jurassic Finance Labs S.P., a segregated portfolio of Futarchy Governance SPC: a pro-rata share, in USDC, of the net proceeds if the skull is sold or insured as a total loss, granted by an unnamed Cayman SPV under a Linkage Deed",
+    "says": "The holder is owed a pro-rata USDC share of the net proceeds only if the skull is sold or paid out as a total loss; the terms call the token 'not a share' and give no ownership of the skull. TRCH1 holders have no vote, no redemption and no buyback; RAWR holders decide any sale through MetaDAO futarchy with the operator's written consent, and nothing obliges anyone ever to sell."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "classic-spl",
+      "count": 1,
+      "example": {
+        "symbol": "TRCH1",
+        "mint": "DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB"
+      },
+      "readable": true,
+      "note": "Classic SPL, 9 decimals, mint and freeze authorities revoked (chain read 13 October 2026)."
+    }
+  ],
+  "parties": [
+    {
+      "id": "issuer",
+      "name": "Jurassic Finance Labs S.P.",
+      "role": "issuer",
+      "note": "A segregated portfolio of Futarchy Governance SPC, Cayman Islands. Its 3-of-4 Squads multisig is admin, escrow and treasury of the sale and can upgrade the sale program; the sources give no address for it."
+    },
+    {
+      "id": "spv",
+      "name": "The SPV (an unnamed Cayman company)",
+      "role": "other",
+      "note": "Has sole title to the skull and grants the holders' rights under a Linkage Deed. The terms do not name it."
+    },
+    {
+      "id": "museum",
+      "name": "A US museum (not named)",
+      "role": "custodian",
+      "note": "Expected to exhibit the skull on loan."
+    },
+    {
+      "id": "appraiser",
+      "name": "An independent appraiser (not named)",
+      "role": "appraiser",
+      "note": "Its value sets the minimum insurance and the fallback purchase price."
+    },
+    {
+      "id": "insurer",
+      "name": "The skull's insurer (not named)",
+      "role": "insurer",
+      "note": "The terms require all-risks cover payable to the SPV."
+    },
+    {
+      "id": "rally",
+      "name": "Rally (RSE Collection), series #DEATON",
+      "role": "other",
+      "note": "A US fractional platform whose series bought the skull in 2020; the cited SEC filing is an RSE Archive Form 1-K."
+    },
+    {
+      "id": "futarchy",
+      "name": "RAWR futarchy (MetaDAO)",
+      "role": "governance",
+      "note": "The market in which RAWR token holders decide any sale of the skull."
+    },
+    {
+      "id": "ironnode",
+      "name": "IronNode",
+      "role": "auditor",
+      "note": "Audited the sale program, 30 July to 11 August 2026."
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "issuer",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Jurassic Finance Labs S.P., a segregated portfolio of Futarchy Governance SPC, Cayman Islands. CIMA does not license or supervise it.",
+      "today": {
+        "state": "published",
+        "where": "TRCH1 terms (Google Docs). The mint has no mint or freeze authority, so no on-chain key ties any wallet to the issuer; the sale multisig is the only issuer-controlled key and the sources give no address"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "issuer",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the skull",
+      "says": "Custody arrangement: an SPV, a Cayman company, has sole title to the skull and may not pledge or lend it; the skull is expected to go on loan to a US museum.",
+      "today": {
+        "state": "published",
+        "where": "TRCH1 terms; they do not name the SPV or the museum, so A cannot name its custodian"
+      }
+    },
+    {
+      "id": "T",
+      "signer": "issuer",
+      "type": "declaration",
+      "form": "token",
+      "about": "the TRCH1 mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one TRCH1 is a pro-rata share, in USDC, of the net proceeds if the skull is sold or insured as a total loss; 'not a share', no ownership of the skull, no vote, no redemption or buyback. Allocation: one item, the Triceratops prorsus skull (Hell Creek Formation, North Dakota; 31 of 56 skull elements) held under A, against 1,000,000 tokens issued.",
+      "today": {
+        "state": "published",
+        "where": "TRCH1 terms; the token's metadata carries no hash of them"
+      },
+      "gaps": [
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "linkage",
+      "signer": "spv",
+      "type": "concur",
+      "refs": [
+        "T"
+      ],
+      "about": "the issuer's token terms",
+      "says": "The SPV grants the token holders' entitlement under the Linkage Deed, with the deed linked.",
+      "today": {
+        "state": "unnamed",
+        "where": "The SPV is not named and the Linkage Deed was not found"
+      }
+    },
+    {
+      "id": "backed-status",
+      "signer": "issuer",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the TRCH1 mint",
+      "says": "As of date, the SPV has title to the skull against the outstanding supply (999,798 tokens on 8 October 2026), with the title summary the terms promise.",
+      "today": {
+        "state": "not-published",
+        "where": "The terms promise a verification page with the Linkage Deed, hashes, a title summary and reports twice a year; no such page was found on 8 October 2026"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "museum",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "spv",
+      "refs": [
+        "A"
+      ],
+      "says": "We have the skull, on loan, for the SPV, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No museum is named; the loan is only expected"
+      }
+    },
+    {
+      "id": "provenance-handoff",
+      "signer": "rally",
+      "type": "handoff",
+      "about": "the skull",
+      "says": "Series #DEATON handed the skull to its next owner, on date.",
+      "today": {
+        "state": "not-published",
+        "where": "It is not public who sold the skull after Rally's series bought it; no hand-over or receipt between 2020 and the SPV is published"
+      }
+    },
+    {
+      "id": "paid-2020",
+      "signer": "rally",
+      "type": "valuation",
+      "about": "the skull",
+      "says": "Paid $250,000 for the skull in 2020, basis paid; series #DEATON then sold 11,400 interests at $25.",
+      "today": {
+        "state": "published",
+        "where": "Rally's SEC filing (RSE Archive Form 1-K for 2021)"
+      }
+    },
+    {
+      "id": "appraisal",
+      "signer": "appraiser",
+      "type": "valuation",
+      "about": "the skull",
+      "says": "The skull is worth X, basis appraisal, as of date; this figure sets the minimum insurance and the fallback purchase price.",
+      "today": {
+        "state": "unnamed",
+        "where": "The terms rely on an independent appraisal; no appraiser or figure is named"
+      }
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the skull",
+      "says": "All-risks cover of at least the skull's cost or its latest appraisal, loss payee the SPV, for the period.",
+      "today": {
+        "state": "unnamed",
+        "where": "The terms require the cover and name no insurer. The website says the museum pays the insurance, which the terms do not say"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "sale-decision",
+      "signer": "futarchy",
+      "type": "certification",
+      "event": "decision",
+      "proposed": true,
+      "about": "the skull",
+      "says": "RAWR holders approved a sale of the skull through futarchy, with the proposal linked; the operator's written consent is also needed, and the SPV would then sign the sale.",
+      "today": {
+        "state": "not-published",
+        "where": "The RAWR market exists on MetaDAO (futard.io); no sale proposal was reported"
+      },
+      "gaps": [
+        "governance-decision"
+      ]
+    },
+    {
+      "id": "program-audit",
+      "signer": "ironnode",
+      "type": "certification",
+      "event": "audited",
+      "about": "the sale program",
+      "says": "Audited the sale program at two named commits, 30 July to 11 August 2026: 24 findings, 14 fixed; no finding lets anyone steal funds.",
+      "today": {
+        "state": "published",
+        "where": "IronNode audit report (Google Drive). It came before deployment and names another program address; there is no verifiable build"
+      },
+      "gaps": [
+        "program-subject"
+      ]
+    },
+    {
+      "id": "market-flag",
+      "signer": "tokenizario",
+      "type": "flag",
+      "refs": [
+        "T"
+      ],
+      "about": "the issuer's token terms",
+      "says": "The terms say the issuer will not support any market in the token, but the sale multisig moved the treasury tokens into trading pools. On 8 October 2026 the multisig still had 633,512 USDC and no payment for the skull from it showed on chain (a payment made another way is still possible).",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (DEATON), read 8 October 2026"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Classic SPL mint, 9 decimals; mint authority and freeze authority are none, no extensions. Nobody can mint, freeze or move TRCH1.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply-and-burns",
+      "says": "Supply 999,795.237621849 TRCH1. Against the 1,000,000 issued, 204.762378151 have been burned (Tokenizario counted about 202 on 8 October 2026).",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "metadata",
+      "says": "Token metadata is immutable and carries no hashes of the terms, deed or reports.",
+      "observedAt": "2026-10-08",
+      "source": "Tokenizario mechanisms.ts DEATON"
+    },
+    {
+      "id": "sale-multisig",
+      "says": "One 3-of-4 Squads multisig is admin, escrow and treasury of the sale and can upgrade the sale program; it held 633,512 USDC with no payment for the skull on chain.",
+      "observedAt": "2026-10-08",
+      "source": "Tokenizario mechanisms.ts DEATON"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who decides a sale",
+      "says": "RAWR holders through MetaDAO futarchy, with the operator's written consent; TRCH1 holders take no part. Nothing obliges a sale. Stays in the terms and the futarchy program."
+    },
+    {
+      "topic": "Fallback purchase",
+      "says": "If the structure fails, a company related to the founders may buy the skull at its appraised value. Stays in the terms."
+    },
+    {
+      "topic": "The raise",
+      "says": "Jurassic Finance's own launchpad sold 950,000 tokens at $0.6947 in USDC from 17 August 2026, no fee, no lockup, US persons excluded; the 660,000 USDC cap filled on 16 September from 359 contributions; 600,000 USDC is for the skull, about 60,000 USDC and 50,000 tokens go to the treasury; an unfilled cap would have refunded. Stays in the sale program."
+    },
+    {
+      "topic": "Law and disputes",
+      "says": "Cayman law, confidential arbitration at CI-MAC in George Town, no class actions. Offered in the EU under MiCA's small-offer exemption, so no white paper was published."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a share of a fossil's sale",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "concur",
+        "label": "The SPV attests the same",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "status",
+        "label": "SPV title against supply, under 180 days",
+        "minSigners": 1,
+        "maxAgeDays": 180,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A museum's 'I have it' statement, under 180 days",
+        "minSigners": 1,
+        "maxAgeDays": 180,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "A valuation, under a year",
+        "minSigners": 1,
+        "maxAgeDays": 365,
+        "signers": "any",
+        "matches": [
+          "appraisal"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "TRCH1 is classic SPL, so the reader can read it, and A/H/T plus valuations outlines the structure. The core does not fit: the holder has a contingent claim payable only on a sale or total loss, which 'issuer-obligation' hides, and the sale is decided by another token's holders, which has no typed form. The SPV, museum, appraiser and insurer are all unnamed, so none of the statements that would back the claim has a signer today."
+  }
+}

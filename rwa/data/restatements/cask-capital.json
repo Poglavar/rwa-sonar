@@ -1,0 +1,280 @@
+{
+  "id": "cask-capital",
+  "name": "Cask Capital whisky fraction (Staiosha #933-2)",
+  "subjects": {
+    "researchProducts": [
+      "cask-capital"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "cask-capital"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts CASK_CAPITAL (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "nft",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": null,
+    "proposedClaimKind": "co-ownership",
+    "legalForm": "Co-ownership unit in one identified physical cask (Staiosha #933-2), one of 20 units, as Cask Capital's listing and terms describe it; each unit is recorded by one Hedera HTS NFT serial; Dutch law, Amsterdam courts",
+    "says": "Per the issuer, the holder co-owns the physical cask with the other unit holders and has no share in Cask Capital; the whisky stays in an unnamed bonded warehouse. Fractional owners have limited rights, physical delivery depends on the asset and the stake, and no court has tested the description as title."
+  },
+  "tokens": [
+    {
+      "chain": "Hedera",
+      "standard": "hts-nft",
+      "example": {
+        "symbol": "CASK-9332",
+        "mint": "0.0.10443090"
+      },
+      "readable": false,
+      "note": "One HTS NFT collection per cask, one serial per fractional unit (issuer's token guide); the listing describes 20 units."
+    }
+  ],
+  "parties": [
+    {
+      "id": "cask",
+      "name": "Cask Capital",
+      "role": "issuer",
+      "note": "Platform and issuer of the cask's co-ownership record; keeps card buyers' serials in its own wallet until claimed."
+    },
+    {
+      "id": "warehouse",
+      "name": "The bonded warehouse operator (not named)",
+      "role": "custodian",
+      "note": "A licensed custody partner, per the issuer."
+    },
+    {
+      "id": "inspector",
+      "name": "A cask inspector (none named)",
+      "role": "inspector"
+    },
+    {
+      "id": "valuer",
+      "name": "The independent valuer (not named)",
+      "role": "appraiser",
+      "note": "The annual portfolio valuation service the issuer mentions."
+    },
+    {
+      "id": "insurer",
+      "name": "The cask's insurer (not named)",
+      "role": "insurer"
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "cask",
+      "type": "profile",
+      "about": "the issuer's Hedera account",
+      "says": "Cask Capital, platform and issuer of fractional cask co-ownership records on Hedera.",
+      "today": {
+        "state": "published",
+        "where": "Terms and user agreement (caskcapital.io/terms); the HTS keys were not inspected, so no key is tied to Cask Capital"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "sheet",
+      "signer": "cask",
+      "type": "declaration",
+      "about": "HTS collection 0.0.10443090",
+      "says": "Asset sheet: cask #933-2 at Staiosha, an ex-Laphroaig quarter cask filled on 16 January 2025, divided into 20 co-ownership units, one HTS NFT serial per unit; five years of bonded storage and insurance included; the co-ownership terms linked.",
+      "today": {
+        "state": "published",
+        "where": "Staiosha listing and HTS token guide on caskcapital.io"
+      },
+      "gaps": [
+        "reader-scope",
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "cask",
+      "type": "register-entry",
+      "about": "each unit of the collection",
+      "says": "Our register records this buyer's unit, including any serial we keep in our custody wallet for a card buyer.",
+      "today": {
+        "state": "not-published",
+        "where": "The checkout guide says a card buyer's serial can stay in Cask Capital's wallet until claimed; no register is published"
+      }
+    },
+    {
+      "id": "record",
+      "signer": "cask",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "HTS collection 0.0.10443090",
+      "says": "Our ownership record (or the Hedera serial holder) decides who owns a unit when the two differ.",
+      "today": {
+        "state": "not-published",
+        "where": "The reviewed terms and guides do not say which record prevails when the platform's beneficial-owner record and the Hedera holder differ"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligible",
+      "signer": "cask",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "HTS collection 0.0.10443090",
+      "says": "Only eligible, verified buyers may buy or receive units.",
+      "today": {
+        "state": "published",
+        "where": "Terms and user agreement; whether HTS keys enforce it on chain was not checked"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "H",
+      "signer": "warehouse",
+      "type": "holds",
+      "about": "the cask the asset sheet names",
+      "for": "the co-owners of cask #933-2",
+      "refs": [
+        "sheet"
+      ],
+      "says": "We have cask #933-2 at this site for its co-owners, as of date; the warehouse record is attached.",
+      "today": {
+        "state": "unnamed",
+        "where": "The listing does not name the warehouse operator"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "cask-inspection",
+      "signer": "inspector",
+      "type": "inspection",
+      "about": "the cask the asset sheet names",
+      "says": "I measured this cask's liquid volume, alcohol strength and condition on this date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No inspector is named; the original fill figures are not a current measurement"
+      }
+    },
+    {
+      "id": "cask-valuation",
+      "signer": "valuer",
+      "type": "valuation",
+      "about": "the cask the asset sheet names",
+      "says": "This cask is worth X, basis appraisal, as of date, with the report; not a forecast return.",
+      "today": {
+        "state": "unnamed",
+        "where": "Cask Capital says it uses annual independent portfolio valuations; the valuer is not named and no valuation of this cask was found"
+      }
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the cask the asset sheet names",
+      "says": "This cask is covered for the period, with the insured party and loss payee named.",
+      "today": {
+        "state": "unnamed",
+        "where": "The listing includes insurance; no insurer, policy or loss payee is named"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "powers-note",
+      "signer": "tokenizario",
+      "type": "note",
+      "about": "HTS collection 0.0.10443090",
+      "says": "The terms describe suspending accounts and cancelling tokens the platform keeps for buyers, and restrict transfers to eligible buyers; the HTS admin, supply, freeze and wipe keys were not inspected. The marketplace launch announcement lists cask redemption, resale, buyback and lending as planned features.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (CASK_CAPITAL), read 8 October 2026"
+      },
+      "gaps": [
+        "reserved-powers",
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Storage charges and lien",
+      "says": "Unpaid storage can lead to a lien or a sale. Stays in the terms."
+    },
+    {
+      "topic": "Co-owner decisions and delivery",
+      "says": "Delivery or sale decisions among all co-owners, bottling and whether a fraction can leave as bottles stay with the platform, its warehouse and the cask's terms."
+    },
+    {
+      "topic": "Payment and withdrawal",
+      "says": "Hedera USDC or card through Stripe; withdrawal of serials the platform keeps for card buyers. Stays with the platform."
+    },
+    {
+      "topic": "Law",
+      "says": "Dutch law, courts of Amsterdam."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a cask fraction",
+    "outcome": "buy",
+    "author": "A cask collector",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Fraction, cask identity and co-ownership terms",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "register-entry",
+        "label": "Register entry linking buyer and unit",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "holds",
+        "label": "A warehouse's 'I have it' statement, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "any"
+      },
+      {
+        "type": "inspection",
+        "label": "Cask inspection, under a year",
+        "minSigners": 1,
+        "maxAgeDays": 365,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A share in one cask, a register and a warehouse's holds outline the structure. The reader cannot read Hedera, the warehouse cannot hold the cask for the co-owners as a class, and nothing says whether the platform's register or the Hedera serial prevails, which matters because card buyers' serials sit in Cask Capital's wallet. The warehouse, inspector, valuer and insurer are all unnamed, so only the issuer speaks today."
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "id": "fobxx",
+  "name": "Franklin OnChain U.S. Government Money Fund (FOBXX, BENJI)",
+  "subjects": {
+    "researchProducts": [
+      "fobxx"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Franklin Templeton FOBXX"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product fobxx (prospectus effective 1 August 2026)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Franklin Templeton FOBXX) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Share of a registered US money-market fund (Franklin OnChain U.S. Government Money Fund), recorded in a blockchain-integrated shareholder record that the transfer agent controls",
+    "says": "The holder owns fund shares recorded by Franklin Templeton Investor Services, LLC as transfer agent, not any particular Treasury security. The transfer agent can correct errors or unauthorized transactions in the record, so a token balance is not bearer title; redemption is by request on business days and may be delayed or suspended."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "BENJI",
+        "mint": "5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1"
+      },
+      "readable": false,
+      "note": "Research calls this a historical address whose official identity as the fund's mint was not verified; the older catalogue lists the token standard as SPL, but the chain read shows Token-2022."
+    },
+    {
+      "chain": "Other chains",
+      "standard": "unknown",
+      "readable": false,
+      "note": "The prospectus says cross-chain moves burn shares on one chain and reissue them on another; research recorded only the Solana row."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "Franklin OnChain U.S. Government Money Fund",
+      "role": "issuer"
+    },
+    {
+      "id": "ta",
+      "name": "Franklin Templeton Investor Services, LLC",
+      "role": "transfer-agent",
+      "note": "Processes redemptions and controls the blockchain-integrated shareholder record. It carries the manager's Franklin Templeton name; the sources do not state common control."
+    },
+    {
+      "id": "jpm",
+      "name": "JPMorgan (custodian)",
+      "role": "custodian"
+    },
+    {
+      "id": "manager",
+      "name": "Franklin Templeton (the fund's manager)",
+      "role": "administrator",
+      "note": "Research says the manager values the portfolio; no separate fund administrator is named."
+    },
+    {
+      "id": "pwc",
+      "name": "PricewaterhouseCoopers LLP",
+      "role": "auditor",
+      "note": "Named only in the older catalogue."
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "Franklin OnChain U.S. Government Money Fund, a registered money-market fund managed by Franklin Templeton; Franklin Templeton Investor Services, LLC is transfer agent.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus effective 1 August 2026 (SEC filing 485BPOS); no mint authority is tied to the fund"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's portfolio account",
+      "says": "Custody arrangement: JPMorgan is the fund's custodian for its government securities, cash and repurchase agreements.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus, section Custodian; the custody agreement itself is not public, so A cannot commit to it by hash"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "jpm",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the fund's government securities, cash and repo collateral under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only the prospectus names JPMorgan; JPMorgan publishes no holdings for the fund"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the BENJI Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: tokens record fund shares in the transfer agent's blockchain-integrated shareholder record; transfers only between approved wallets; the transfer agent may correct errors or unauthorized transactions; cross-chain moves burn and reissue shares. Allocation: the fund's whole portfolio under A, shared by every share on every chain.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus effective 1 August 2026 (Blockchain Integrated Recordkeeping; Buying and Selling Shares); the prospectus does not name the Solana mint, and research did not bind this address to it"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reserved-powers",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "ta",
+      "type": "register-entry",
+      "about": "each BENJI holder's wallet",
+      "says": "Per the shareholder record I control, the account behind wallet W holds N fund shares, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "The prospectus describes the record; per-holder entries are not public"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the BENJI Solana mint",
+      "says": "The shareholder record the transfer agent controls, integrated with the blockchain, is the record of ownership; the transfer agent may correct it, so the token follows the record.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus, Blockchain Integrated Recordkeeping; research notes the correction authority is distinct from bearer title"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the BENJI Solana mint",
+      "says": "Holding and transfer need an approved account and an approved wallet; user-managed wallets are limited to eligible institutional investors.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus effective 1 August 2026"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "manager",
+      "type": "valuation",
+      "about": "the BENJI Solana mint",
+      "says": "Net asset value per share is X on date D (basis: the manager's daily valuation of the portfolio).",
+      "today": {
+        "state": "published",
+        "where": "Franklin Templeton's fund page shows a daily NAV (older catalogue, 28 January 2026). The older catalogue also calls this NAV on-chain, but the mint read found no NAV field on the mint."
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the BENJI Solana mint",
+      "says": "At least 99.5% of the fund's assets are government securities, cash and qualifying repurchase agreements, against all shares outstanding on every chain, as of date.",
+      "today": {
+        "state": "published",
+        "where": "The prospectus states the mandate; the older catalogue cites a composition disclosure on Franklin Templeton's site (31 December 2025). Research obtained no current holdings reconciliation."
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "pwc",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for the period ending 31 December 2025, with the report's hash.",
+      "today": {
+        "state": "not-checked",
+        "where": "The older catalogue names PwC with an EDGAR N-CSR search link; research did not obtain or read the report"
+      }
+    },
+    {
+      "id": "fund-registration",
+      "signer": "sec",
+      "type": "credential",
+      "about": "the fund's wallet",
+      "says": "The fund is a registered investment company (money-market fund) whose registration statement is effective.",
+      "today": {
+        "state": "not-checked",
+        "where": "The prospectus is filed on EDGAR (485BPOS, effective 1 August 2026); the SEC's registration records were not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "custody-discrepancy",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the BENJI Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "The older catalogue records Franklin Templeton saying the underlying is custodied at Anchorage Digital (8 November 2025); the prospectus of 1 August 2026 names JPMorgan as custodian. The prospectus wins.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar attestations-db.json against research product fobxx"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "program",
+      "says": "Token-2022 mint, 9 decimals, supply 409,952.078556536 on Solana.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "who-can-move-it",
+      "says": "The mint's own address, 5Tu84fKBpe9vfXeotjvfvWdWbAjy3hqsExvuHgFqFxA1, is mint authority, freeze authority, permanent delegate, transfer-hook authority and metadata authority. The transfer hook runs program huk3EPrNreTdUUjVKVkGSGKF1WC4P9BiUKBkn2kFWnP. Who holds the key is not in the sources.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "catalogue-supply",
+      "says": "The older catalogue recorded 110,460.74 on the Solana BENJI leg on 16 September 2026.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar older catalogue rwa-assets-db.json"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption",
+      "says": "Requests through the app or portal on business days; payment normally by USD ACH or wire within seven days, with exceptions; the prospectus permits delays and suspension. Minimums depend on the account."
+    },
+    {
+      "topic": "Corrections and cross-chain moves",
+      "says": "The transfer agent may correct errors or unauthorized transactions, and moves between chains burn and reissue shares. Stays in the prospectus; the chain shows the permanent delegate and freeze authority that can carry out corrections."
+    },
+    {
+      "topic": "Failure",
+      "says": "Recovery priorities and how a blockchain outage would be resolved were not established."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a registered money-market fund share",
+    "outcome": "buy",
+    "author": "An approved investor",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The fund's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The transfer agent's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per share, under 2 days",
+        "minSigners": 1,
+        "maxAgeDays": 2,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited fund accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "This is the clearest fund structure in the batch: a public prospectus names the transfer agent, the custodian and the record that counts. v3 can outline it, but the mint is Token-2022 and cannot be read; ownership-interest hides that the holder has a registered share; the record that prevails, the eligibility rules and the NAV basis can only be proposals. The fund publishes most of its own side, while the custodian, the transfer agent and the auditor say nothing in their own name."
+  }
+}

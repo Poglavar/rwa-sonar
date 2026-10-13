@@ -1,0 +1,400 @@
+{
+  "id": "republic-mirror",
+  "name": "RepublicX Mirror Notes (rSPAX)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "republic-mirror"
+    ],
+    "catalogueNames": [],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/republic-mirror.json (republic.com/rspax and /mirror and the Republic Europe campaign page read from Wayback captures, SEC EDGAR Form D, SpaceX 424B4, Jupiter token search)",
+      "asOf": "2026-09-24"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "debt-unsecured",
+    "legalForm": "Contingent Payout Note: a senior unsecured, non-interest-bearing debt security of RepublicX LLC (Delaware), with a keepwell agreement of OpenDeal Inc. whose terms are unpublished, represented by tokens on a proprietary Republic security-token standard on Solana",
+    "says": "The holder is a senior unsecured creditor of RepublicX for a pro rata share of the value of a SpaceX common share, payable in USD or a stablecoin after the earlier of a Qualified Liquidity Event or maturity (3 November 2035), less fees inside the Reference Price. RepublicX holds nothing against the notes, and the holder has no equity in SpaceX, RepublicX or Republic; the payout formula and the keepwell are not public."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "unknown",
+      "readable": false,
+      "note": "Republic says the notes are represented by tokens minted 'using a Republic-created security token asset standard'. No mint address is published in any filing or page, and Jupiter searches return only impersonation memecoins (2026-09-17)."
+    }
+  ],
+  "parties": [
+    {
+      "id": "republicx",
+      "name": "RepublicX LLC",
+      "role": "issuer",
+      "note": "Delaware LLC formed in 2025, SEC CIK 0002080279, New York; manager OpenDeal Inc.; sole named director Jeffrey Vier. 'The innovation arm of Republic'."
+    },
+    {
+      "id": "opendeal",
+      "name": "OpenDeal Inc.",
+      "role": "other",
+      "note": "Republic group parent and manager of RepublicX; gives the keepwell agreement behind the notes."
+    },
+    {
+      "id": "portal",
+      "name": "OpenDeal Portal LLC d/b/a Republic",
+      "role": "distributor",
+      "note": "SEC-registered funding portal for the Reg CF leg."
+    },
+    {
+      "id": "republic-europe",
+      "name": "Seedrs Limited (trading as Republic Europe)",
+      "role": "distributor",
+      "note": "FCA firm reference number 550317; approved the UK/EU campaign as a financial promotion on 17 September 2025 and acts as custodian of investors' positions on that channel."
+    },
+    {
+      "id": "calc-agent",
+      "name": "RepublicX's designated calculation agent (not named)",
+      "role": "other"
+    },
+    {
+      "id": "spacex",
+      "name": "Space Exploration Technologies Corp. (SpaceX)",
+      "role": "other",
+      "note": "Referenced company, not a party: 'SpaceX has not reviewed, endorsed, or participated in this offering in any capacity.' SEC CIK 0001181412."
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "fca",
+      "name": "Financial Conduct Authority",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "republicx",
+      "type": "profile",
+      "about": "the issuer's wallet (not identified)",
+      "says": "RepublicX LLC, a Delaware LLC formed in 2025 (CIK 0002080279), managed by OpenDeal Inc., the Republic group parent; in the business of providing asset tokenization services.",
+      "today": {
+        "state": "published",
+        "where": "rSPAX offering page and Form D; no wallet or mint authority is named anywhere, so the profile has nothing to bind to"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "republicx",
+      "type": "declaration",
+      "form": "token",
+      "about": "the rSPAX tokens (mint not published)",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: tokenized interests in Contingent Payout Notes, a debt security of RepublicX. No periodic interest; pays 'a pro rata portion of the value of a common share of SpaceX' after the earlier of a Qualified Liquidity Event or the Maturity Date (November 3, 2035), within 30 calendar days and subject to lock-ups, in USD, USDC or another stablecoin chosen by the issuer. Reference Price $275 (Yahoo! Finance, 9/2/25); a later tranche at $2.50 per token, implied share price $687.50. Senior unsecured; on an Event of Default principal is due at the investor's option. Allocation: none.",
+      "today": {
+        "state": "published",
+        "where": "republic.com/rspax (Wayback captures 20250916201851 and 20260918135722, which differ); the Note, subscription agreement and payout formula are behind the investment checkout, and no mint is named"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "republicx",
+      "type": "declaration",
+      "form": "custody",
+      "about": "the note proceeds",
+      "says": "Custody arrangement: none. 'Proceeds received from note issuances are not segregated or earmarked in any way and are not required to be invested in SpaceX shares or any other specific asset'; they fund RepublicX's general corporate purposes, and the notes are repaid 'from funds available to RepublicX from its business and operations'.",
+      "today": {
+        "state": "published",
+        "where": "rSPAX offering page FAQ 'Am I investing in a fund?'"
+      }
+    },
+    {
+      "id": "keepwell",
+      "signer": "opendeal",
+      "type": "note",
+      "about": "the rSPAX tokens",
+      "says": "Keepwell agreement of OpenDeal Inc. in support of RepublicX's payment obligations under the Notes, with its cap, triggers, term and who may enforce it.",
+      "today": {
+        "state": "reported",
+        "where": "Only RepublicX's offering page mentions it ('aside from that certain keepwell agreement of OpenDeal Inc., as discussed in the Offering Documents'); its terms are not published"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "offering",
+      "signer": "republicx",
+      "type": "note",
+      "about": "the rSPAX tokens",
+      "says": "Offered in concurrent legs: Regulation Crowdfunding to all US residents via OpenDeal Portal LLC ('The Issuer has filed a Form C with the ... SEC'), Rule 506(c) to verified accredited investors, and Regulation S outside the United States.",
+      "today": {
+        "state": "published",
+        "where": "rSPAX offering page panels and Important Disclosures block"
+      }
+    },
+    {
+      "id": "form-d",
+      "signer": "republicx",
+      "type": "certification",
+      "event": "other",
+      "about": "the rSPAX tokens",
+      "says": "Form D (file no. 021-565769): Rule 506(c), security type debt, first sale 2025-11-28, $585,205 sold of $3,500,000, 199 investors, no non-accredited investors, offering closed.",
+      "today": {
+        "state": "published",
+        "where": "SEC EDGAR, RepublicX's own filing (Form D and Form D/A are its whole filing history)"
+      }
+    },
+    {
+      "id": "form-c-flag",
+      "signer": "researcher",
+      "type": "flag",
+      "about": "RepublicX's offering statement",
+      "refs": [
+        "offering",
+        "form-d"
+      ],
+      "says": "Untrue as to the Form C: EDGAR holds no Form C for RepublicX, and full-text search returns no hit for 'rSpaceX' or 'Contingent Payout Note' (2026-09-17). Reg CF requires a Form C before any offer.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings marketed-exemption-differs-from-filed-exemption and no-offering-disclosure-document-filed (both critical)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "portal-credential",
+      "signer": "sec",
+      "type": "credential",
+      "about": "OpenDeal Portal LLC's wallet",
+      "says": "Registered funding portal.",
+      "today": {
+        "state": "not-checked",
+        "where": "Stated on the offering page; the SEC and FINRA portal registers were not read"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "promoter-credential",
+      "signer": "fca",
+      "type": "credential",
+      "about": "Republic Europe's wallet",
+      "says": "Seedrs Limited (t/a Republic Europe) is authorised and regulated, firm reference number 550317. This regulates the promoter, not the note.",
+      "today": {
+        "state": "not-checked",
+        "where": "Stated on the Republic Europe campaign page; the FCA register was not read"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "republicx",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the rSPAX tokens",
+      "says": "Reg CF: all US residents, $50 to $5,000; Rule 506(c): verified accredited investors, from $100 on the later tranche; Reg S: non-US persons only. Tokens are locked for 12 months after issuance and delivered only to a Republic Wallet; 'Any transfer in violation of the restrictions is void'; secondary trading only on venues RepublicX chooses, with KYC/AML.",
+      "today": {
+        "state": "published",
+        "where": "rSPAX offering page FAQ; no token-level allowlist or freeze can be checked, because no mint is published"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "listing",
+      "signer": "spacex",
+      "type": "certification",
+      "event": "listing",
+      "about": "the rSPAX tokens' reference company",
+      "says": "IPO priced at $135.00 a share; Class A common stock approved to list on Nasdaq and Nasdaq Texas as 'SPCX' (424B4 filed 2026-06-12).",
+      "today": {
+        "state": "published",
+        "where": "SpaceX's prospectus on SEC EDGAR; on RepublicX's definition this is a Qualified Liquidity Event"
+      }
+    },
+    {
+      "id": "split",
+      "signer": "spacex",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "the rSPAX tokens' reference company",
+      "says": "Five-for-one forward stock split of Class A, Class B and Class C Common Stock effected on 4 May 2026.",
+      "today": {
+        "state": "published",
+        "where": "SpaceX 424B4, Note 1 to the financial statements"
+      }
+    },
+    {
+      "id": "adjustment",
+      "signer": "calc-agent",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "the rSPAX tokens",
+      "refs": [
+        "split",
+        "T"
+      ],
+      "says": "Adjustment to the Notes for SpaceX's 2026-05-04 split and the Class C reclassification: the Reference Price on a post-split basis and the share class whose value is paid.",
+      "today": {
+        "state": "unnamed",
+        "where": "The page names only 'RepublicX's designated calculation agent'; no adjustment has been published"
+      }
+    },
+    {
+      "id": "payout",
+      "signer": "republicx",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "the rSPAX tokens",
+      "refs": [
+        "listing",
+        "adjustment"
+      ],
+      "says": "Paid X USD or USDC per note to holders after the Qualified Liquidity Event, computed under the Note's payout formula.",
+      "today": {
+        "state": "not-published",
+        "where": "Nothing located shows any payment; the lock-ups and 'a reasonable time period' still run"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "basis-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the rSPAX tokens",
+      "refs": [
+        "T",
+        "split",
+        "listing"
+      ],
+      "says": "A $275 Reference Price struck on pre-split shares is $55 post-split, so against the $135.00 IPO price the payout differs roughly fivefold depending on the basis, and nothing published says which applies. The payout is computed by the obligor's own calculation agent with no published method or dispute mechanism.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier incident of 2026-06-12 and finding payout-valuation-issuer-determined"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "impersonation-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the mint 79VE8a7seB6wdZaHMvhTCJUYQsWvDJPGhpZpjKsoNe9x",
+      "says": "Not the RepublicX note: a one-billion-supply launchpad memecoin named 'rSpaceX', created on the day of Republic's announcement, with about four times as many holders as the closed Form D offering had investors. RepublicX publishes no canonical mint, so no reader can tell its token from this one.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding no-canonical-mint-address-published"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "no-mint",
+      "says": "No genuine Mirror Note mint was located: Jupiter searches for rSPAX, rSpaceX, rOpenAI and rANTHROPIC return only impersonation tokens. A restricted token would plausibly be absent from an aggregator, so this is not proof that none exists.",
+      "observedAt": "2026-09-17",
+      "source": "RWA Sonar dossier custodyVerification and sampleMints (Jupiter token search)"
+    },
+    {
+      "id": "impersonator",
+      "says": "79VE8a7seB6wdZaHMvhTCJUYQsWvDJPGhpZpjKsoNe9x 'rSpaceX': classic SPL Token, supply 997,884,479.34, 768 holders, first pool 2025-06-25T13:12:44Z; also GgWZbw7Z… ('SPCX'/'rSpaceX'), Dc3AjVi3… ('rSpaceX') and AfdbLoS6… ('rOpenAI').",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar dossier sampleMints (Jupiter token search)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Payout formula and keepwell",
+      "says": "'Described in the Notes and the Offering Documents', which are not public; the governing-law clause of the instrument is also unread."
+    },
+    {
+      "topic": "Changing terms",
+      "says": "The offering page was rewritten between captures (bankruptcy and tender offer added as triggers, issuer-chosen stablecoin, dated maturity, removal of the $275 proportion); nothing says which version governs an earlier note."
+    },
+    {
+      "topic": "Fees",
+      "says": "A premium is built into the Reference Price and other platform fees reduce the payout; no rate is published. RepublicX pays Republic Core $150,000 onboarding and $75,000 a quarter (Republic Core Form C-AR)."
+    },
+    {
+      "topic": "Secondary market",
+      "says": "'Designed to be tradable on INX ... subject to market conditions and eligibility', at RepublicX's full discretion; 'investors should not expect a secondary market to develop'."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a mirror note",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The issuer's token terms (T) on a published mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        },
+        "matches": []
+      },
+      {
+        "type": "credential",
+        "label": "The distributor's registration, from the regulator",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "other"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "The reference company's listing",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "event": "listing"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "The holder's position is clear on the issuer's own pages: senior unsecured debt of RepublicX with nothing held against it. But no mint is published, so no statement in Tokenizario can be about the token at all, while the only readable 'rSpaceX' mint is an impersonator. What the holder will actually be paid depends on an unpublished formula and an unnamed calculation agent's choice of basis after the split, so the core cannot be said. Not 'not-a-token', because Republic states the notes are tokenized on Solana and a restricted mint could exist unseen."
+  }
+}

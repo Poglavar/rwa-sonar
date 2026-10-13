@@ -1,0 +1,423 @@
+{
+  "id": "prestocks",
+  "name": "PreStocks",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "prestocks"
+    ],
+    "catalogueNames": [
+      "PreStocks"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "prestocks"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/prestocks.json (Terms of Service last updated 2026-09-08, FAQ bundle, public token API, chain reads)",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/holder-rights.json and economics.json (prestocks)",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter search, 8 prestocks mints)",
+      "asOf": "2026-09-20"
+    },
+    {
+      "source": "rwa-assets-db.json and attestations-db.json (PreStocks)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario stock-templates.ts prestocks--token-2022-pausable-clawback-transfer-fee-rebase",
+      "asOf": "2026-09-23"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "synthetic",
+    "legalForm": "Bearer Token-2022 token that 'references economic exposure' to a designated pre-IPO company under BVI-law Terms of Service, issued by no named legal entity ('a distributed network of contributors'); no security interest, trust, custody relationship or bankruptcy-remote claim",
+    "says": "The holder has no ownership, voting, dividend, information or proprietary right in any company share, SPV or collateral, and no entitlement to redemption: only a right to request redemption for USDC or another agreed value, which the operator may decline or satisfy by pointing to on-chain liquidity. The counterparty against whom any contractual claim would run is not named and may be replaced without notice."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 8,
+      "example": {
+        "symbol": "SPACEX",
+        "mint": "PreANxuXjsy2pvisWWMNB6YaJNzr7681wJJr2rHsfTh"
+      },
+      "readable": false,
+      "note": "ANDURIL, ANTHROPIC, FIGUREAI, KALSHI, NEURALINK, OPENAI, POLYMARKET and SPACEX, all served by the issuer's API. An xAI page is in the sitemap with no API entry or mint (2026-09-16)."
+    }
+  ],
+  "parties": [
+    {
+      "id": "prestocks",
+      "name": "PreStocks (no legal entity named)",
+      "role": "issuer",
+      "note": "The ToS describes PreStocks as 'a distributed network of contributors'; the contracting entity 'may differ between products, tokens, jurisdictions, and points in time' and may be replaced 'at any time without notice'.",
+      "keys": [
+        {
+          "address": "WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+          "controls": "mint, freeze, permanent delegate, pause, metadata, transfer fee, withheld fee, transfer hook and scaled-UI rebase authority on all eight mints",
+          "kind": "Squads v4 vault index 0 of multisig 53Ab3Rqx1a5uiV7qmsX4qbdbrqstVDpnH4LoJGfsZsU8: 2 of 5 voting members (7 members, 2 initiate-only), time lock 0"
+        }
+      ]
+    },
+    {
+      "id": "holders-of-exposure",
+      "name": "The 'vetted holding entities' (not named)",
+      "role": "custodian",
+      "note": "FAQ: counterparty legal names are withheld 'because they require contractual confidentiality'."
+    },
+    {
+      "id": "attestor",
+      "name": "The third-party attestor (promised, not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "role": "other",
+      "note": "A referenced company, not a participant. Its investor warning says SPV transfers of its stock are void."
+    },
+    {
+      "id": "jupiter",
+      "name": "Jupiter",
+      "role": "venue",
+      "note": "Primary venue per the FAQ; Raydium, DFlow, Titan and Meteora-class AMMs also route the tokens."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "prestocks",
+      "type": "profile",
+      "about": "the vault WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "says": "PreStocks, 'a distributed network of contributors located around the world'. Not a broker-dealer, investment adviser, exchange operator, transfer agent, custodian or virtual asset service provider. No incorporated entity, jurisdiction of incorporation or member of the controlling multisig is named.",
+      "today": {
+        "state": "published",
+        "where": "PreStocks Terms of Service (2026-09-08) and site disclaimer; no entity is named anywhere in the public materials"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "prestocks",
+      "type": "declaration",
+      "form": "token",
+      "about": "each PreStocks mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: a bearer token that references economic exposure to one designated pre-IPO company and confers 'no ownership, voting, dividend, information, or other legal rights'; no legal, equitable, beneficial, security or proprietary interest in any collateralizing asset. Allocation: 'corresponding economic exposure' in any form the operator considers appropriate, changeable without notice; no explicit allocation per mint.",
+      "today": {
+        "state": "published",
+        "where": "Terms of Service section 'Pre-IPO Tokens' (Notion original behind url.prestocks.com/terms-of-service); the allocation is a menu of permitted forms, not a schedule"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "prestocks",
+      "type": "declaration",
+      "form": "custody",
+      "about": "the exposure behind each PreStocks mint",
+      "says": "Custody arrangement: each product 'is backed by one or more vetted holding entities that verifiably own the underlying exposure'. The exposure may be SPV, fund, feeder, series, nominee, trust or custodial interests, or a contractual, participation, forward, option, swap or other synthetic arrangement, other companies or baskets, cash, stablecoins or tokens. No custodian is named.",
+      "today": {
+        "state": "published",
+        "where": "FAQ and Terms of Service; A cannot name a custodian, because names are withheld as policy"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "holders-of-exposure",
+      "type": "holds",
+      "about": "A's exposure for each product",
+      "for": "prestocks",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the exposure to company C described in A for the PreStocks operator, of amount N, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No holding entity is named in any source"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed-status",
+      "signer": "prestocks",
+      "type": "status",
+      "predicate": "backed",
+      "about": "each PreStocks mint",
+      "says": "This token is backed 1:1 by SPV exposure that tracks the price of the underlying private company (the API's wording for ANTHROPIC). No figure, ratio date or report is given.",
+      "today": {
+        "state": "published",
+        "where": "Issuer's public token API description (prestocks.com/api/prestocks); unsigned, no figures; the ToS states supply 'is not automatically reduced' when exposure fails"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "attestation",
+      "signer": "attestor",
+      "type": "certification",
+      "event": "audited",
+      "about": "each PreStocks mint",
+      "refs": [
+        "backed-status"
+      ],
+      "says": "Third-party attestation report confirming that all PreStocks are fully backed, to be 'published periodically or available on request if costs are covered'.",
+      "today": {
+        "state": "unnamed",
+        "where": "No attestor is named; CoinDesk reported on 2026-05-13 that no report had been published, and /attestations, /transparency, /proof-of-reserve and /reserves all returned HTTP 404 on 2026-09-16 and 2026-09-17"
+      }
+    },
+    {
+      "id": "mark",
+      "signer": "prestocks",
+      "type": "valuation",
+      "about": "each PreStocks mint",
+      "says": "markPrice, 'the gross price per share of the referenced company': for example SPACEX 144.38 and ANTHROPIC 1008.37 on 2026-09-16.",
+      "today": {
+        "state": "published",
+        "where": "Issuer's public token API; the mark is issuer-determined and unaudited, and no third party publishes a competing price"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "rebase",
+      "signer": "prestocks",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "the SPACEX and OPENAI mints",
+      "says": "The balance multiplier changed: SPACEX newMultiplier 5 effective 2026-06-10T04:30:00Z, OPENAI newMultiplier 1.4861347 effective 2026-07-17T16:30:00Z, and why.",
+      "today": {
+        "state": "not-published",
+        "where": "The multipliers are written on chain by the vault; no public explanation of either change was found"
+      }
+    },
+    {
+      "id": "listing",
+      "signer": "prestocks",
+      "type": "certification",
+      "event": "listing",
+      "about": "the mint of the company that lists",
+      "says": "Company C completed its IPO on date D: the token becomes convertible on chain into an equivalent tokenized public stock, with a typical 6-month lockup, and expires worthless 9 months after the IPO.",
+      "today": {
+        "state": "not-published",
+        "where": "The FAQ fixes the conversion window and expiry; no source records a listing certified for any PreStocks product, and the ToS names no party to certify one"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "prestocks",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each PreStocks mint",
+      "says": "Any non-US, non-Restricted holder may request redemption; a request creates no entitlement, and fulfilment is subject to eligibility, verification, minimum sizes, timing, fees and costs the operator may adjust without notice. On-chain trading needs no KYC.",
+      "today": {
+        "state": "published",
+        "where": "Terms of Service and FAQ; no redemption address, form, minimum or procedure was found on the OPENAI product page on 2026-09-22"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "redemption",
+      "signer": "prestocks",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "each PreStocks mint",
+      "says": "Redeemed N tokens of product P for X USDC on date D.",
+      "today": {
+        "state": "not-published",
+        "where": "No successful redemption was observed or published"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "anthropic-warning",
+      "signer": "anthropic",
+      "type": "note",
+      "about": "the ANTHROPIC mint",
+      "says": "'We do not permit special purpose vehicles to acquire Anthropic stock and any transfer of shares to an SPV are void under our transfer restrictions'; third parties selling exposure through tokenized securities or other mechanisms are 'likely either engaged in fraud or offering an investment that may have no value'.",
+      "today": {
+        "state": "published",
+        "where": "Anthropic investor warning (support.claude.com article 13704655), May 2026; it does not name PreStocks"
+      }
+    },
+    {
+      "id": "backing-flag",
+      "signer": "researcher",
+      "type": "flag",
+      "about": "the issuer's backed status for ANTHROPIC",
+      "refs": [
+        "backed-status",
+        "anthropic-warning"
+      ],
+      "says": "The 1:1 SPV-backing claim for ANTHROPIC is contradicted by Anthropic's statement that SPV transfers of its shares are void, and no reserve report has ever been published. The supply was never reduced.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier openQuestions and findings no-reserve-verification-published and holder-ranks-as-unsecured-creditor"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "no-restore-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each PreStocks mint",
+      "refs": [
+        "T"
+      ],
+      "says": "The ToS lets the operator mint against exposure it 'reasonably expect[s] to be acquired', does not reduce supply when exposure is impaired, and 'may, but [is] under no obligation to' top it up. It also reserves freeze, clawback, burn and compulsory redemption at a value that may be nil.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings issuer-may-mint-against-expected-exposure, issuer-not-obliged-to-restore-collateral and attestation issuer-can-reverse-transactions"
+      },
+      "gaps": [
+        "research-finding",
+        "reserved-powers"
+      ]
+    },
+    {
+      "id": "entity-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the vault WV9PJN7XTmTLVwbutCLFxp8TyePee6Xq5mRq6Fti5Wc",
+      "refs": [
+        "profile"
+      ],
+      "says": "No incorporated issuer, SPV sponsor or counterparty is named anywhere; the only forum is LCIA arbitration seated in London under BVI law, with no named respondent. All seven multisig members are unidentified.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding issuer-legal-entity-not-publicly-identified (critical, 2026-09-16)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with permanent delegate, pausable config, mint and freeze authority, transfer-fee, transfer-hook and scaled-UI authority, all held by one Squads v4 vault (WV9PJN7X…) of multisig 53Ab3Rqx…: 2 of 5 voting members, time lock 0, transaction index 463, across all eight mints.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar dossier keyGovernance and authorityFacts (finalized getAccountInfo)"
+    },
+    {
+      "id": "transfer-fee",
+      "says": "transferFeeConfig charges 100 bps from epoch 1039 (50 bps from epoch 1032, 0 bps before), maximum fee u64::MAX; the same vault can set and withdraw the withheld fees.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar dossier redemption.fees and economics.json"
+    },
+    {
+      "id": "no-transfer-gate",
+      "says": "defaultAccountState is initialized and the transfer hook has a null programId, so transfers are not gated by an allowlist; the pause is currently off.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar dossier knownExtensions"
+    },
+    {
+      "id": "multipliers",
+      "says": "scaledUiAmountConfig multipliers: SPACEX 5 from 2026-06-10T04:30:00Z, OPENAI 1.4861347 from 2026-07-17T16:30:00Z; the other six mints read 1 with no pending change.",
+      "observedAt": "2026-09-17",
+      "source": "RWA Sonar dossier knownExtensions and incidents (getAccountInfo)"
+    },
+    {
+      "id": "supply",
+      "says": "Supply on 2026-09-20: ANTHROPIC 7,381.89 (36,206 holders), OPENAI 2,826.47, SPACEX 43,712.53, ANDURIL 11,805.86; 9 decimals on every mint.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem, and whether anyone must",
+      "says": "A discretionary request for USDC or 'another mutually agreed form of value', which the operator may answer by pointing to on-chain liquidity. Stays in the Terms of Service."
+    },
+    {
+      "topic": "Freeze, clawback, burn, compulsory redemption and fees",
+      "says": "The Terms reserve all of them without notice or consent, at a value that may be nil, and fees 'at the token, smart-contract, or program level' without any duty to explain them. Stays in the terms; the chain shows the capability."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "BVI law, 30 days' negotiation, then LCIA arbitration seated in London on an individual basis, with BVI courts as fallback. The BVI is also on the same document's Prohibited Jurisdictions list."
+    },
+    {
+      "topic": "Pricing",
+      "says": "No external price exists for the private companies; the token price diverged from the issuer's own mark in both directions on 2026-09-18 (OPENAI 11.4% above, SPACEX 21.9% below)."
+    }
+  ],
+  "recipe": {
+    "name": "Hold synthetic pre-IPO exposure",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "profile",
+        "label": "A named legal entity behind the mint's authority",
+        "minSigners": 1,
+        "signers": "any",
+        "matches": []
+      },
+      {
+        "type": "holds",
+        "label": "A named holding entity's holdings under A, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "An independent reserve attestation, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "Every type the structure needs exists (T, A, H, an audited certification), but nobody is named to sign any of them except an anonymous multisig, and the custodian and attestor are withheld by policy. What the holder has, a discretionary request with no entitlement against an unnamed counterparty, is neither an issuer obligation nor an ownership interest, so the core of the position cannot be said. The mints are Token-2022, so the reader cannot show the clawback, fee and rebase powers that matter most."
+  }
+}

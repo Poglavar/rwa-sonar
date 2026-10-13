@@ -1,0 +1,405 @@
+{
+  "id": "tbill",
+  "name": "OpenEden TBILL Fund",
+  "subjects": {
+    "researchProducts": [
+      "tbill"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "OpenEden TBILL"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product tbill (OpenEden TBILL docs, US and Non-US user agreements with TBILL schedules)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry OpenEden TBILL",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for OpenEden TBILL",
+      "asOf": "2026-03-02"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, TBILL row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "co-ownership",
+    "legalForm": "Tokenized economic interest in the TBILL fund, a BVI professional fund, redeemable under a private placement memorandum that was not reviewed; the issuing entity differs between the US and Non-US agreements",
+    "says": "OpenEden describes the token as a proportional economic interest in the fund, redeemable under the incorporated PPM. Which entity a given holder's claim runs against depends on which agreement onboarded them, and the sources do not establish the controlling register or insolvency priority."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "TBILL",
+        "mint": "0xdd50C053C096CB04A3e3362E2b622529EC5f2e8a"
+      },
+      "readable": false,
+      "note": "TBILL Vault v2 per OpenEden's address list; the catalogue notes migration of the Ethereum token to this address."
+    }
+  ],
+  "parties": [
+    {
+      "id": "institutional",
+      "name": "Treasury Bills Institutional Liquidity Limited",
+      "role": "issuer",
+      "note": "Named by the Non-US agreement and by the TBILL schedule of the US agreement."
+    },
+    {
+      "id": "international",
+      "name": "The entity named 'International' in the US agreement's preamble (full name not recorded in RWA Sonar's research)",
+      "role": "issuer"
+    },
+    {
+      "id": "openeden",
+      "name": "OpenEden",
+      "role": "platform",
+      "note": "Publishes the TBILL docs, the user agreements, the vault and the transparency page."
+    },
+    {
+      "id": "bny",
+      "name": "BNY",
+      "role": "other",
+      "note": "Named as manager in RWA Sonar's catalogue note of 16 September 2026; not in the research record."
+    },
+    {
+      "id": "admin",
+      "name": "The fund administrator (not named)",
+      "role": "administrator",
+      "note": "OpenEden's controls page describes administrator oversight of the multisig controls."
+    },
+    {
+      "id": "custodian",
+      "name": "The licensed custodian or broker (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "counsel",
+      "name": "Counsel on the bankruptcy-remote structure (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "regulator",
+      "name": "The fund's BVI regulator (not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile-institutional",
+      "signer": "institutional",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Treasury Bills Institutional Liquidity Limited, issuer of TBILL under the Non-US user agreement and the US agreement's TBILL schedule.",
+      "today": {
+        "state": "published",
+        "where": "Non-US user agreement preamble and Schedule 1; US agreement Schedule 1"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "profile-international",
+      "signer": "international",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "The issuer named in the preamble of the US user agreement, called 'International' where its own TBILL schedule says 'Institutional'.",
+      "today": {
+        "state": "published",
+        "where": "US user agreement preamble"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "terms-version"
+      ]
+    },
+    {
+      "id": "T-nonus",
+      "signer": "institutional",
+      "type": "declaration",
+      "form": "token",
+      "about": "the TBILL token, for holders onboarded under the Non-US agreement",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: TBILL is a proportional economic interest in the TBILL fund, transferable only between whitelisted wallets and redeemable under the incorporated PPM and subscription agreement; allocation: the fund's Treasury bills and USD cash.",
+      "today": {
+        "state": "published",
+        "where": "Non-US user agreement, Schedule 1 §§1.1–1.6 and 2.3; the PPM and subscription agreement it incorporates were not obtained"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "T-us",
+      "signer": "international",
+      "type": "declaration",
+      "form": "token",
+      "about": "the TBILL token, for holders onboarded under the US agreement",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: the same TBILL interest and redemption under a different incorporated offering document.",
+      "today": {
+        "state": "published",
+        "where": "US user agreement, Schedule 1 §§1.1–1.6; the incorporated offering document was not obtained"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "issuer-conflict",
+      "signer": "researcher",
+      "type": "flag",
+      "refs": [
+        "T-us",
+        "T-nonus"
+      ],
+      "about": "the two token declarations",
+      "says": "The US agreement's preamble names an 'International' entity while its own TBILL schedule and the Non-US agreement name Treasury Bills Institutional Liquidity Limited. One Ethereum contract serves both offerings, so the token cannot show which entity, and which PPM, a given wallet's claim runs against.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research tbill (rights claim and evidence profiles, 1 October 2026)"
+      },
+      "gaps": [
+        "research-finding",
+        "terms-version"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "institutional",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the TBILL token",
+      "says": "Which record controls legal title: the token ledger or an off-chain register.",
+      "today": {
+        "state": "not-published",
+        "where": "OpenEden's docs describe on-chain tokens and whitelisted addresses but not which record controls title"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "institutional",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's Treasury bills and cash",
+      "says": "Custody arrangement: the fund's US Treasury bills and USD cash are held with a licensed custodian or broker.",
+      "today": {
+        "state": "reported",
+        "where": "OpenEden's product docs describe licensed custody and brokerage without naming the provider; the older catalogue's Fireblocks row has no source link"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "institutional",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these Treasury bills and this USD cash for the fund under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is identified"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "institutional",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the TBILL token",
+      "says": "The fund holds US Treasury bills and USD cash against TBILL outstanding, as of date; the vault value was $245.9M on 16 September 2026.",
+      "today": {
+        "state": "reported",
+        "where": "OpenEden docs (composition) and the vault value in RWA Sonar's catalogue note; current holdings not independently verified"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "admin",
+      "type": "valuation",
+      "about": "one TBILL",
+      "says": "NAV per TBILL is X at the end of business day D.",
+      "today": {
+        "state": "unnamed",
+        "where": "OpenEden's transparency page says daily NAV reports are published (catalogue, 2 March 2026); who strikes the NAV is not named"
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the issuer's wallet",
+      "says": "Audited the fund's financial statements or holdings for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No auditor or report appears in the reviewed sources"
+      }
+    },
+    {
+      "id": "remote",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "the issuer's wallet",
+      "says": "In counsel's opinion the fund's assets are bankruptcy-remote from OpenEden and the platform, with stated reliance for holders.",
+      "today": {
+        "state": "unnamed",
+        "where": "OpenEden's transparency page highlights bankruptcy-remote protections (catalogue, 2 March 2026); no opinion or counsel is named"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "institutional",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the TBILL token",
+      "says": "Accredited or professional investors after onboarding and KYC; whitelisted wallets only; $100,000 initial subscription, then $1; transfers only between whitelisted wallets and subject to the PPM.",
+      "today": {
+        "state": "published",
+        "where": "US and Non-US user agreements, TBILL schedules; TBILL FAQ"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "fund-recognition",
+      "signer": "regulator",
+      "type": "credential",
+      "about": "the issuer's wallet",
+      "says": "The fund is a recognised BVI professional fund.",
+      "today": {
+        "state": "unnamed",
+        "where": "OpenEden calls it a BVI professional fund; no source names the regulator or a registration"
+      },
+      "gaps": [
+        "roles"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Onboarded holders, under the PPM of their own offering: normal redemption up to T+3 US business days through a FIFO queue that burns the token; an experimental instant USDC route on selected chains is liquidity-limited and excess requests queue. 5bp redemption fee; 30bp annual TER."
+    },
+    {
+      "topic": "Which offering applies",
+      "says": "The US and Non-US agreements incorporate different offering documents; the governing one is decided by the holder's onboarding, not by the token."
+    },
+    {
+      "topic": "Freeze, allowlist and upgrades",
+      "says": "OpenEden's docs describe a multisig, a treasury timelock and administrator oversight; redemptions burn the token. None of this was read on chain (the only token is an Ethereum ERC-20), and the powers the PPM grants were not reviewed."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "The docs name sovereign, market and liquidity risks; insolvency priority and recovery of the interest are not established."
+    }
+  ],
+  "recipe": {
+    "name": "Subscribe to a tokenized T-bill fund",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Token terms (T) from the entity that onboarded me",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings for the fund under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 3 days",
+        "minSigners": 1,
+        "maxAgeDays": 3,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Independent audit, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "Two token declarations by two named issuer entities over one contract, with a researcher's flag between them, says the documented inconsistency exactly. The holder's interest, the controlling register and the fund units still need proposals, and the token is an EVM contract. The custodian, administrator, auditor and counsel are all unnamed, so only the issuer side and OpenEden speak."
+  }
+}

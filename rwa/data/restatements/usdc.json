@@ -1,0 +1,423 @@
+{
+  "id": "usdc",
+  "name": "Circle USDC",
+  "subjects": {
+    "researchProducts": [
+      "usdc"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Circle USDC"
+    ],
+    "mechanisms": [
+      "usdc"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product usdc (USDC Terms 12 Dec 2025, MiCA Redemption Policy 15 Sep 2026, Deloitte August 2026 examination dated 29 Sep 2026)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario mechanisms.ts USDC",
+      "asOf": "2026-09-26"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, case 'USDC: a global reserve claim and a chain-specific supply'",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'Circle USDC' and attestations-db.json (Circle USDC instances)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "debt-unsecured",
+    "legalForm": "Stored value / e-money (holder context dependent): a conditional right to redeem US$1 per token against Circle Internet Financial, LLC under the USDC Terms outside the EEA, or against Circle France under the MiCA Redemption Policy in the EEA",
+    "says": "The holder has a non-interest-bearing claim on the Circle issuer for its context to be paid one dollar per token, exercisable directly only through a Circle Mint account (or, in the EEA, a verified retail request). The holder has no allocated dollar and no established priority over the reserves: the terms disclose uncertain court treatment and possible competing liens, so 'debt-unsecured' is the closest kind the sources support, not a settled ranking."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "classic-spl",
+      "count": 1,
+      "example": {
+        "symbol": "USDC",
+        "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      },
+      "readable": true,
+      "note": "Native Solana USDC from Circle's address listing; classic SPL, so the /fungible reader can hold A/H/T for it."
+    },
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "USDC",
+        "mint": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      "readable": false,
+      "note": "The research covers native USDC on Ethereum and Solana only; bridged and wrapped tokens are excluded. Circle issues on further chains that the research does not list."
+    }
+  ],
+  "parties": [
+    {
+      "id": "circle",
+      "name": "Circle Internet Financial, LLC (non-EEA); Circle France (EEA)",
+      "role": "issuer",
+      "note": "mechanisms.ts names the EEA issuer Circle Internet Financial Europe SAS; research.json calls it Circle France.",
+      "keys": [
+        {
+          "address": "BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG",
+          "controls": "mint authority of the Solana USDC mint",
+          "kind": "unknown"
+        },
+        {
+          "address": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+          "controls": "freeze authority of the Solana USDC mint",
+          "kind": "multisig 2 of 4 per mechanisms.ts (26 Sep 2026); not re-checked in today's read"
+        }
+      ]
+    },
+    {
+      "id": "fund",
+      "name": "Circle Reserve Fund (managed by BlackRock)",
+      "role": "custodian",
+      "note": "Money market fund holding about 88% of the reserves (mechanisms.ts)."
+    },
+    {
+      "id": "bny",
+      "name": "BNY",
+      "role": "sub-custodian",
+      "note": "Custodian of the Circle Reserve Fund's assets (mechanisms.ts)."
+    },
+    {
+      "id": "banks",
+      "name": "The banks holding the reserve cash (not named)",
+      "role": "custodian",
+      "note": "About $10.6B of cash in accounts for the benefit of USDC holders at banks the sources do not name (mechanisms.ts)."
+    },
+    {
+      "id": "deloitte",
+      "name": "Deloitte & Touche LLP",
+      "role": "auditor"
+    },
+    {
+      "id": "regulators",
+      "name": "Circle's licensing authorities (NYDFS per the older catalogue; the EEA authority for Circle France is not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "court",
+      "name": "A New York court (not named in the sources)",
+      "role": "other"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "circle",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Circle Internet Financial, LLC issues USDC under the USDC Terms outside the EEA; Circle France issues it under the MiCA Redemption Policy in the EEA.",
+      "today": {
+        "state": "published",
+        "where": "USDC Terms (12 Dec 2025) and MiCA Redemption Policy (15 Sep 2026); Circle's address listing names the native mints. No wallet of Circle signs a profile."
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "circle",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the USDC reserve",
+      "says": "Custody arrangement: the reserve is one pool for all USDC, about 88% in the Circle Reserve Fund (BNY custodian of its assets) and about $10.6B of cash at banks in accounts for the benefit of USDC holders; no assets are allocated to any chain or holder.",
+      "today": {
+        "state": "published",
+        "where": "Circle's reserve transparency page (research source 'reserves'); the split and BNY are from mechanisms.ts (26 Sep 2026). The custody and bank agreements are not public, so A cannot commit to them by hash."
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "H-fund",
+      "signer": "fund",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "circle",
+      "refs": [
+        "A"
+      ],
+      "says": "The fund holds the reserve assets invested in it, for Circle as its shareholder, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "Circle and mechanisms.ts describe it; no publication by the fund or BlackRock was in the sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "H-bny",
+      "signer": "bny",
+      "type": "holds",
+      "about": "the Circle Reserve Fund's custody account",
+      "for": "fund",
+      "refs": [
+        "H-fund"
+      ],
+      "says": "BNY holds the fund's Treasury repo, Treasury bills and cash, for the Circle Reserve Fund, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "mechanisms.ts; BNY publishes nothing about it in the sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "H-banks",
+      "signer": "banks",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "the holders of USDC, as a class",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold $N of reserve cash in accounts for the benefit of USDC holders, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "mechanisms.ts: the banks with about $10.6B of the cash are not named, so nobody can sign this"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "circle",
+      "type": "declaration",
+      "form": "token",
+      "about": "the Solana USDC mint EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one USDC is a conditional right to redeem US$1 from Circle, with no interest; unit USD. Allocation: none that is specific to Solana; the reserve under A backs USDC on every chain together.",
+      "today": {
+        "state": "published",
+        "where": "USDC Terms (non-EEA, 12 Dec 2025) and MiCA Redemption Policy (EEA, 15 Sep 2026). The explicit Solana allocation that /fungible compares with supply does not exist in any source."
+      },
+      "gaps": [
+        "reserve-structure",
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "circle",
+      "type": "status",
+      "predicate": "backed",
+      "about": "USDC on all chains",
+      "says": "As of 31 August 2026: reserve assets of $73,398,532,613 against 73,320,757,305 USDC in circulation as defined, which excludes specified unissued, access-denied and pending-burn tokens. Not a figure for Solana alone.",
+      "today": {
+        "state": "published",
+        "where": "Management's assertion in the Deloitte August 2026 examination report (p2). mechanisms.ts cites the earlier 31 July 2026 report ($71,904,101,332 for 71,826,453,410 USDC); the research's August figures are newer."
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "deloitte-exam",
+      "signer": "deloitte",
+      "type": "certification",
+      "event": "audited",
+      "about": "USDC on all chains",
+      "refs": [
+        "backed"
+      ],
+      "says": "Examined Circle's assertion of reserve coverage at 11 August and 31 August 2026; report dated 29 September 2026, with the report hash as evidence. Dated assurance, not live coverage, disputed title or insolvency ranking.",
+      "today": {
+        "state": "published",
+        "where": "Deloitte's signed examination report, hosted on Circle's site (research source 'reserve-august-2026')"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "circle",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "USDC on all chains",
+      "says": "Outside the EEA, only eligible holders with a registered Circle Mint account redeem at par, subject to the terms, restrictions and suspension. In the EEA, retail redeems by a verified web request to an eligible EEA USD bank account, targeting five business days, with no redemption fee; institutions use Circle Mint; sanctions checks can block and stress measures can suspend redemption.",
+      "today": {
+        "state": "published",
+        "where": "USDC Terms §§1–2, 8, 13, 17 and MiCA Redemption Policy §§2–5, 8"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "freeze-order",
+      "signer": "court",
+      "type": "certification",
+      "event": "court-order",
+      "proposed": true,
+      "about": "two Solana wallets holding USDC",
+      "says": "In May 2025 the court ordered about $57.6M of USDC in two wallets frozen; a later order in August lifted the freeze. The matching reserves moved to a segregated access-denied account.",
+      "today": {
+        "state": "reported",
+        "where": "mechanisms.ts (citing press coverage); the court's docket was not read and the case is not identified in the sources"
+      },
+      "gaps": [
+        "court-order"
+      ]
+    },
+    {
+      "id": "issuer-licence",
+      "signer": "regulators",
+      "type": "credential",
+      "about": "the issuer's wallet",
+      "says": "Circle Internet Financial, LLC holds US state money transmitter licences; Circle France is authorised in the EEA to issue USDC under MiCA.",
+      "today": {
+        "state": "not-checked",
+        "where": "The older catalogue names NYDFS; the MiCA policy implies EEA authorisation. No regulator's register was read."
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "custodian-credential",
+      "signer": "regulators",
+      "type": "credential",
+      "about": "BNY's and Deloitte's wallets",
+      "says": "BNY: custodian. Deloitte & Touche LLP: auditor.",
+      "today": {
+        "state": "not-checked",
+        "where": "Licences and registrations exist in public registers that this restatement did not read"
+      }
+    },
+    {
+      "id": "priority-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "USDC on all chains",
+      "says": "Insolvency priority is not established: the terms disclose uncertain court treatment and possible competing liens, and mechanisms.ts cites Circle's annual report that courts have not tested whether holders own the reserves and that holders could be treated as unsecured creditors. No completed redemption was observed.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research usdc: failure dimension 'unknown' in both contexts; exitDetails 'Documented route only'"
+      },
+      "gaps": [
+        "research-finding",
+        "legal-opinion"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Classic SPL Token, 6 decimals, no extensions: mint authority BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG, freeze authority 7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar, no permanent delegate. Circle can freeze an account but cannot move tokens out of it.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Solana supply 7,781,950,681.016586 USDC (raw 7781950681016586). Raw supply is not the examination's denominator: mechanisms.ts says Circle pre-mints some Solana tokens that wait in restricted Circle wallets until issued, and the examination excludes unissued tokens.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748; mechanisms.ts (26 Sep 2026)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Freeze and forfeiture",
+      "says": "Circle reserves blocklisting, freezing and compelled forfeiture under its terms and its access-denial policy, and gives no reason per freeze. The chain shows the freeze authority; the legal power stays in the terms."
+    },
+    {
+      "topic": "Who may redeem and how",
+      "says": "Circle Mint onboarding, the burn on redemption and the timing stay with Circle Mint and the EEA policy; holders without an account sell on a market."
+    },
+    {
+      "topic": "Courts and law",
+      "says": "Delaware law with JAMS arbitration for Circle Mint customers; in the EEA the commercial courts of Paris (mechanisms.ts). MiCA's par-redemption right is an EEA rule."
+    },
+    {
+      "topic": "Reserve trust structure",
+      "says": "Circle National Trust could hold a security interest over the reserves for holders; the OCC approved it in July 2026, not confirmed in operation (mechanisms.ts)."
+    }
+  ],
+  "recipe": {
+    "name": "Hold USDC as cash",
+    "outcome": "hold",
+    "author": "A company treasurer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Circle's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Status backed, under 35 days",
+        "minSigners": 1,
+        "maxAgeDays": 35,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Auditor's reserve examination, under 60 days",
+        "minSigners": 1,
+        "maxAgeDays": 60,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A custodian's holdings under A, under 35 days",
+        "minSigners": 1,
+        "maxAgeDays": 35,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "USDC is the one dollar token here that the reader can read (classic SPL), and 'issuer-obligation' in USD matches a dollar claim on Circle. But the backing cannot be bound to the mint: the reserve and its examination cover one global circulation, and v3 has no denominator across chains, so T has no Solana allocation (reserve-structure). Circle and Deloitte publish their side; the fund, BNY and the unnamed banks publish nothing in their own name, and who may redeem and the holder's ranking stay outside the typed statements."
+  }
+}

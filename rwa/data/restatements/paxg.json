@@ -1,0 +1,415 @@
+{
+  "id": "paxg",
+  "name": "Paxos Gold (PAXG)",
+  "subjects": {
+    "researchProducts": [
+      "paxg"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Paxos Gold"
+    ],
+    "mechanisms": [
+      "gold"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product paxg (PAX Gold Terms and Conditions 12 Dec 2025, contract repository, PAXG transparency index)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario mechanisms.ts PAXG (id gold)",
+      "asOf": "2026-09-26"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'Paxos Gold' and attestations-db.json (Paxos Gold instances)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "beneficial-interest",
+    "legalForm": "Beneficial, proportionate interest in allocated gold held by Paxos Trust Company, N.A.: one token represents one fine troy ounce, mapped to London Good Delivery bars under the PAX Gold Terms and Conditions",
+    "says": "The holder has a beneficial, pro-rata interest in allocated gold that Paxos keeps in vault custody, mapped to bars that Paxos may reassign; not a fixed bar and not a debt of Paxos. Physical or cash conversion runs only through Paxos for verified customers. Whether that interest survives a Paxos or custodian insolvency is not established."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "PAXG",
+        "mint": "0x45804880De22913dAFE09f4980848ECE6EcbAf78"
+      },
+      "readable": false,
+      "note": "The only deployment in the research, from Paxos's contract repository."
+    },
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "PAXG",
+        "mint": "5GgRAEmv8ZxF2PR5hY72Qs5x1bnQ6UK2RbTPoqJ3wSwW"
+      },
+      "readable": false,
+      "note": "From mechanisms.ts (on Solana since June 2026, arriving through Paxos's own program over LayerZero); not in the research's deployment rows."
+    }
+  ],
+  "parties": [
+    {
+      "id": "paxos",
+      "name": "Paxos Trust Company, N.A.",
+      "role": "issuer",
+      "note": "An OCC-chartered national trust bank since December 2025 (mechanisms.ts).",
+      "keys": [
+        {
+          "address": "vrmi2ELTKnUYZnNMiv6nkZv5SKptA2uu9nFSYrehgj1",
+          "controls": "mint authority of the Solana PAXG mint",
+          "kind": "unknown"
+        },
+        {
+          "address": "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk",
+          "controls": "freeze, permanent delegate, mint close, transfer-fee config, confidential transfer, transfer hook and metadata authority of the Solana PAXG mint",
+          "kind": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "vault",
+      "name": "The vault operator (not named)",
+      "role": "custodian",
+      "note": "LBMA-approved vaults in London. mechanisms.ts: Brink's ran the vault at launch and today's terms name no operator; the older catalogue still says Brink's."
+    },
+    {
+      "id": "kpmg",
+      "name": "KPMG LLP",
+      "role": "auditor",
+      "note": "Named on Paxos's transparency index as examination provider since February 2025."
+    },
+    {
+      "id": "refiners",
+      "name": "LBMA refiners (not named per bar)",
+      "role": "inspector"
+    },
+    {
+      "id": "insurer",
+      "name": "An insurer of the bars (not named)",
+      "role": "insurer"
+    },
+    {
+      "id": "occ",
+      "name": "Office of the Comptroller of the Currency",
+      "role": "regulator"
+    },
+    {
+      "id": "counsel",
+      "name": "Counsel to Paxos (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "paxos",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Paxos Trust Company, N.A., issuer of PAXG, a national trust bank chartered by the OCC.",
+      "today": {
+        "state": "published",
+        "where": "PAX Gold Terms and Conditions (12 Dec 2025); no Paxos wallet signs a profile"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "paxos",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the PAXG gold",
+      "says": "Custody arrangement: segregated allocated gold in LBMA-standard vault custody in London, held for PAXG holders; the vault operator is not named.",
+      "today": {
+        "state": "published",
+        "where": "PAX Gold Terms §§4–5 (research claim 'backing'); the custodian agreement is not public, so A cannot name the custodian or commit to its agreement by hash"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "vault",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "paxos, segregated for PAXG holders as a class",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N fine troy ounces in these bars for Paxos, segregated for PAXG holders, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "Today's terms do not name the vault operator, so nobody is known to sign it"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "paxos",
+      "type": "declaration",
+      "form": "token",
+      "about": "each PAXG token (Ethereum contract and Solana mint)",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is a beneficial, proportionate interest in one fine troy ounce of allocated gold; unit troy-oz. Allocation: the ounces under A, pro rata across PAXG on Ethereum and Solana together; storage fees may dilute tokens after notice.",
+      "today": {
+        "state": "published",
+        "where": "PAX Gold Terms §§4–5, 11, 14–15 (research assetModule); mechanisms.ts adds that there is no storage fee today and 30 days' notice for one"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reserve-structure",
+        "reader-scope",
+        "cross-chain-lock",
+        "fees"
+      ]
+    },
+    {
+      "id": "allocated",
+      "signer": "paxos",
+      "type": "status",
+      "predicate": "allocated",
+      "about": "each PAXG holder's wallet",
+      "says": "The bar serials mapped to this wallet's balance, as of date; the mapping may be reassigned.",
+      "today": {
+        "state": "published",
+        "where": "Paxos's bar-serial lookup for Ethereum and Solana wallets (mechanisms.ts); research ledger claim: allocations can change rather than fixing one permanent bar"
+      }
+    },
+    {
+      "id": "backed",
+      "signer": "paxos",
+      "type": "status",
+      "predicate": "backed",
+      "about": "PAXG on all chains",
+      "says": "Fine troy ounces in the vaults against PAXG outstanding, monthly.",
+      "today": {
+        "state": "published",
+        "where": "Paxos PAXG transparency index (monthly report buttons); the August report's figures were not obtained in the research"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "kpmg-exam",
+      "signer": "kpmg",
+      "type": "certification",
+      "event": "audited",
+      "about": "PAXG on all chains",
+      "refs": [
+        "backed"
+      ],
+      "says": "Examined the monthly report of ounces against tokens outstanding, with scope, date and report hash.",
+      "today": {
+        "state": "not-checked",
+        "where": "The transparency index lists monthly reports and names KPMG since February 2025; no report's contents were read (research evidenceProfile 'Independent custody attestation': not obtained)"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "assay",
+      "signer": "refiners",
+      "type": "inspection",
+      "about": "each Good Delivery bar under A",
+      "says": "Bar serial, weight and fineness when cast and assayed, to the London Good Delivery standard.",
+      "today": {
+        "state": "unnamed",
+        "where": "mechanisms.ts says LBMA refiners cast and assayed each bar; no refiner is named per bar in the sources"
+      }
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the bars under A",
+      "says": "The bars are insured for the insured party, for a period, against named risks, with a limit and a loss payee.",
+      "today": {
+        "state": "unnamed",
+        "where": "Neither the research nor mechanisms.ts mentions insurance for the PAXG bars"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "paxos",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "PAXG on all chains",
+      "says": "Direct conversion and physical delivery only for verified Paxos customers; physical bars need at least 430 PAXG plus fees, delivery arranged by the customer; cash conversion also exists. The older catalogue (16 Sep 2026) notes PAXG is unavailable in the EU.",
+      "today": {
+        "state": "published",
+        "where": "PAX Gold Terms (research claims 'access' and 'exit'); mechanisms.ts says bars are delivered to a vault in the UK"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "charter",
+      "signer": "occ",
+      "type": "credential",
+      "about": "the issuer's wallet",
+      "says": "Paxos Trust Company, N.A.: national trust bank, per its OCC charter since December 2025.",
+      "today": {
+        "state": "not-checked",
+        "where": "mechanisms.ts reports the charter; the OCC's own records were not read"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "title-opinion",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "each PAXG token",
+      "says": "Under New York law, the holder's beneficial interest in the allocated gold is not property of Paxos in its insolvency, and holders may rely on it.",
+      "today": {
+        "state": "unnamed",
+        "where": "No legal opinion is cited; research failure claim: insolvency priority and independent recovery were not established"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "custody-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each PAXG token",
+      "says": "The custodian agreement, a current independent reconciliation of gold to circulation and an independent recovery route are missing; the vault operator is not named. The older catalogue's Brink's custodian is not supported by today's terms.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research paxg, evidenceProfile 'Dependency and recourse review' (1 Oct 2026)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Solana mint 5GgRAEmv8ZxF2PR5hY72Qs5x1bnQ6UK2RbTPoqJ3wSwW is Token-2022, 6 decimals. One key, 2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk, is freeze authority, permanent delegate (move or burn any balance), mint-close authority, transfer-fee and withheld-fee authority, confidential-transfer authority, transfer-hook authority (no hook program set) and metadata authority. Mint authority vrmi2ELTKnUYZnNMiv6nkZv5SKptA2uu9nFSYrehgj1.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Solana supply 3,029.163078 PAXG (raw 3029163078). PAXG on Ethereum is not read; the global ounce figure covers both chains.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "ethereum-holders",
+      "says": "431,926 oz across 87,491 holders on chain (older catalogue status note).",
+      "observedAt": "2026-09-16",
+      "source": "rwa-assets-db.json 'Paxos Gold' statusNote"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Freeze and seizure",
+      "says": "Paxos may freeze or seize tokens on an order or in its sole discretion, and its permanent delegate can move them to a segregated Paxos wallet. Stays in the terms and New York law; the chain shows the capability."
+    },
+    {
+      "topic": "Who may redeem and fees",
+      "says": "Verified customers, 430 PAXG per bar plus fees, purchase fees from 1% down to 0.125% by size (mechanisms.ts), and any future storage fee. Stays in the terms."
+    },
+    {
+      "topic": "Courts",
+      "says": "New York law and AAA consumer arbitration in New York (mechanisms.ts)."
+    },
+    {
+      "topic": "Bar reallocation",
+      "says": "Paxos maps balances to bars and may reassign them; the app keeps no allocation of its own and shows Paxos's bar list as Paxos's status."
+    }
+  ],
+  "recipe": {
+    "name": "Buy allocated gold",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Paxos's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A vault's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Status allocated, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "any",
+        "params": {
+          "predicate": "allocated"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Auditor's gold examination, under 45 days",
+        "minSigners": 1,
+        "maxAgeDays": 45,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The outline is A/H/T with Paxos's own bar allocation and monthly ounce figures, which v3 can say. Neither deployment can be read (ERC-20 and Token-2022), the ounce figure covers Ethereum and Solana together with no per-chain denominator, and 'ownership-interest' does not say that the holder's interest is beneficial and pro rata. The vault operator is not named, so the H a buyer needs most has no signer. mechanisms.ts restates PAXG as an origin of kind thing; the research's proportionate beneficial interest reads closer to a share."
+  }
+}

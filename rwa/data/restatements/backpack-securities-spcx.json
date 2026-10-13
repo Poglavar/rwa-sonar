@@ -1,0 +1,458 @@
+{
+  "id": "backpack-securities-spcx",
+  "name": "Backpack Securities tokenized stocks (SPCX)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "backpack-securities-spcx"
+    ],
+    "catalogueNames": [
+      "Backpack Securities"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "backpack-securities"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/backpack-securities-spcx.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json and stocks/data/holder-rights.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json and attestations-db.json (entry 'Backpack Securities')",
+      "asOf": "2026-09-22"
+    },
+    {
+      "source": "Tokenizario stock-templates.ts (template backpack-securities--token-2022-pausable-clawback-rebase) and docs/rwa-sonar-mapping.md case 'Backpack SPCX'",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "contingent",
+    "legalForm": "Non-negotiable digital record of a pro rata beneficial entitlement (if any) under a BVI-law bare trust over a separate pool of the referenced shares, held by Trek Nexus Markets Ltd as trustee; the trustee's register, which names only Trek Forge Ltd, is conclusive",
+    "says": "A wallet holder is the on-chain holder 'for blockchain transfer purposes only': the beneficiary on the register is Trek Forge Ltd, a Backpack company, and the wallet holder has no redemption, distribution, instruction or enforcement right against the trust unless a Direct Redemption Contingency occurs and the trustee registers them. In practice value is realised by depositing the token into a KYC'd Backpack account, which burns it and credits a separate UCC Article 8 entitlement; there is no security interest and no right to any identified share."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 57,
+      "example": {
+        "symbol": "SPCX",
+        "mint": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb"
+      },
+      "readable": false,
+      "note": "RWA Sonar's universe assigns 57 Solana mints to Backpack Securities (2026-09-20), 55 read as Token-2022 and 2 (FWDI, USO) not yet read; Backpack's asset API had 56 with deposits and withdrawals enabled that day, out of 1,159 stock-address records."
+    }
+  ],
+  "parties": [
+    {
+      "id": "trek-nexus",
+      "name": "Trek Nexus Markets Ltd",
+      "role": "trustee",
+      "note": "BVI business company; issuer of record and bare trustee under a declaration of trust dated 2026-06-06 (the 'Instrument', unpublished)."
+    },
+    {
+      "id": "trek-forge",
+      "name": "Trek Forge Ltd",
+      "role": "holder",
+      "note": "BVI; the sole registered Tokenholder and beneficiary for the whole supply, and the asset-tokenization services provider."
+    },
+    {
+      "id": "backpack",
+      "name": "Trek Labs Ltd (Backpack Exchange)",
+      "role": "platform",
+      "note": "Operates the exchange where depositing the token burns it and credits a brokerage entitlement; Backpack Securities Global Limited (New Zealand, company 9406953) is the introducing broker and securities intermediary for that off-chain leg."
+    },
+    {
+      "id": "operator",
+      "name": "The supply program's operator (not named)",
+      "role": "other",
+      "note": "Neither authority key nor the program behind them is attributed to a named entity in any Backpack or Sunrise document.",
+      "keys": [
+        {
+          "address": "HK6jF79duLLLfCMRQFBSgo6CgQ5mF4tFMFU7CmKcXctZ",
+          "controls": "SPCX mint and scaled-UI multiplier authority",
+          "kind": "PDA of the upgradeable program FewRXXTzV2WwigvTQNsVanhEmCM9wzfNvoT1divNtbVH"
+        },
+        {
+          "address": "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a",
+          "controls": "freeze, permanent delegate, pause, metadata, transfer-hook and confidential-transfer authority",
+          "kind": "PDA of the same program"
+        },
+        {
+          "address": "ERc1sdq7Lwb74kjuage5foTpavWKxdwXHUvqfg2JX5gz",
+          "controls": "upgrade of the supply program",
+          "kind": "vault of Squads v4 multisig 94dzESDV7TjWWmvbY8YLE5AS7LNWfcBELHtndtErQ7gg, 3 of 6, no time lock"
+        }
+      ]
+    },
+    {
+      "id": "rqd",
+      "name": "RQD Clearing, LLC",
+      "role": "custodian",
+      "note": "Clearing Broker holding the shares in an omnibus account; the only broker named in the binding Brokerage ToS."
+    },
+    {
+      "id": "intermediary",
+      "name": "Intermediary Broker: Atomic Vaults Securities, LLC, or in some regions Trek Brokerage Services Limited",
+      "role": "sub-custodian",
+      "note": "Region-dependent: the support pages name the SEC-registered third party; the live SPCX page footer names a Backpack affiliate licensed, it says, by the Anjouan Offshore Finance Authority (unverified)."
+    },
+    {
+      "id": "finra",
+      "name": "FINRA (BrokerCheck)",
+      "role": "regulator"
+    },
+    {
+      "id": "examiner",
+      "name": "A reserve examiner for the share pool (none appointed)",
+      "role": "auditor"
+    },
+    {
+      "id": "counsel",
+      "name": "Trust and insolvency counsel (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "trek-nexus",
+      "type": "profile",
+      "about": "the trustee's wallet",
+      "says": "Trek Nexus Markets Ltd, a BVI business company acting solely as bare trustee, one of the Trek companies behind Backpack (Trek Labs Ltd runs the exchange, Trek Forge Ltd is the registered Tokenholder).",
+      "today": {
+        "state": "published",
+        "where": "Issuer Terms and Conditions (2026-06-10) and Schedule A of the User Agreement"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "trek-nexus",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the SPCX pool",
+      "says": "Custody arrangement: the trustee holds the Underlying Assets of each Approved Asset 'as legal owner or holder of record and as bare trustee', 'on bare trust strictly for the pro rata benefit of the relevant Tokenholders', as a separate pool with no cross-recourse, possibly in omnibus accounts and through regulated custodians it does not name.",
+      "today": {
+        "state": "published",
+        "where": "Issuer T&C cl. 3.5; the Instrument that creates the trust is unpublished, so A cannot commit to it by hash, and no document links the trust to the RQD account"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "trek-nexus",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "trek-forge",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N SpaceX shares in the SPCX pool on bare trust for the registered Tokenholder, observed at time T.",
+      "today": {
+        "state": "not-published",
+        "where": "No share count for the pool is published anywhere; the T&C impose no reporting obligation (cl. 4.8: information 'from time to time as determined by the Company'). stock-templates.ts has Trek Nexus sign holds; no source shows it doing so."
+      },
+      "gaps": [
+        "class-beneficiary",
+        "units"
+      ]
+    },
+    {
+      "id": "H-rqd",
+      "signer": "rqd",
+      "type": "holds",
+      "about": "the omnibus brokerage account",
+      "for": "an account holder no source names",
+      "says": "We hold N SpaceX shares in the omnibus account, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Backpack's Real Ownership page says RQD holds the shares in an omnibus account; RQD publishes nothing, and which entity's name is on the account is undocumented"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "trek-nexus",
+      "type": "declaration",
+      "form": "token",
+      "about": "each Backpack Securities mint (SPCX shown)",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: each token is 'a non-negotiable digital record evidencing a pro rata beneficial entitlement (if any)' in the pool for its Approved Asset, conferring no entitlement to any specific share; allocation: the whole SPCX pool under A.",
+      "today": {
+        "state": "published",
+        "where": "Issuer T&C cll. 1.18, 3.5, 3.6, hosted as unversioned Google Drive files; the token metadata's 'terms' field points to the User Agreement index, not a pinned document"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "trek-nexus",
+      "type": "register-entry",
+      "about": "all SPCX tokens",
+      "says": "Per our register of beneficiaries, Trek Forge Ltd (or its nominee or custodian) is the Tokenholder and sole beneficiary of every token referencing SPCX.",
+      "today": {
+        "state": "published",
+        "where": "Issuer T&C cl. 1.18 states the entry as a rule for as long as Backpack Exchange supports the tokens; the register itself is not published"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "register-prevails",
+      "signer": "trek-nexus",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "each Backpack Securities mint",
+      "says": "The Company's register of beneficiaries, 'not the blockchain record or Token itself', is conclusive; a wallet holder holds 'for blockchain transfer purposes only'.",
+      "today": {
+        "state": "published",
+        "where": "Issuer T&C cll. 1.18, 3.5 and 4.1"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "contingency",
+      "signer": "trek-nexus",
+      "type": "certification",
+      "event": "other",
+      "about": "each Backpack Securities mint",
+      "says": "A Direct Redemption Contingency has occurred (permanent cessation or insolvency of Backpack Exchange, redemptions suspended over 90 days, Trek Forge withdrawing, a final court order or regulatory directive, or the Company's own determination), so on-chain holders may apply to be registered and redeem.",
+      "today": {
+        "state": "not-published",
+        "where": "None has occurred or been tested; cl. 1.3 has no delisting limb although the Risk Disclosure says the contingency 'may include ... delisting'"
+      },
+      "gaps": [
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "pool-backed",
+      "signer": "trek-nexus",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the SPCX mint",
+      "says": "N SpaceX shares in the pool against the SPCX outstanding (43,248.128967 on 2026-09-16), as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "No share count is published against the supply; the only assurance offered is the legal assertion that under UCC 8-504 'each customer security entitlement must be backed 1:1', which concerns the brokerage leg, not the token pool"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "pool-examined",
+      "signer": "examiner",
+      "type": "certification",
+      "event": "audited",
+      "about": "the SPCX mint",
+      "says": "Examined the share pool against the tokens outstanding, with scope, date and report hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No verification agent, proof-of-reserve feed, attestation or auditor report on the pool exists; Backpack's proof of reserves covers exchange crypto only"
+      }
+    },
+    {
+      "id": "broker-credentials",
+      "signer": "finra",
+      "type": "credential",
+      "about": "the wallets of RQD Clearing and Atomic Vaults Securities",
+      "says": "RQD Clearing, LLC (CRD 134284, SEC 8-66826) and Atomic Vaults Securities, LLC (CRD 317194, SEC 8-70868) are registered broker-dealers and FINRA and SIPC members (role custodian).",
+      "today": {
+        "state": "published",
+        "where": "FINRA BrokerCheck, read by RWA Sonar 2026-09-17; it returns no record for any Backpack or Trek entity"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "eligible",
+      "signer": "trek-nexus",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each Backpack Securities mint",
+      "says": "Holding is open on chain; in the ordinary course only Trek Forge may request redemption, and value is reached by depositing into a KYC'd Backpack account outside the US, UK, UAE and Japan (not Backpack EU); no US person or Prohibited Person may be registered or redeem, and tokens may not be transferred to or for a US person.",
+      "today": {
+        "state": "published",
+        "where": "Issuer T&C cl. 4.1 and Backpack's eligibility-and-access page"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "trust-opinion",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "the SPCX pool",
+      "says": "In our opinion the bare trust over the SPCX pool is valid under BVI law and the pool would stay outside the insolvency of Trek Nexus and of the exchange, and holders may rely on this.",
+      "today": {
+        "state": "unnamed",
+        "where": "No opinion found; the Risk Disclosure gives no assurance 'that the trust structure will be recognised or enforceable in all circumstances' and warns an exchange-ledger holder 'may rank as an unsecured creditor of the exchange'"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "register-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each Backpack Securities mint",
+      "says": "The register that confers rights names one affiliate for 100% of the supply; a wallet holder has no redemption or enforcement right until a Direct Redemption Contingency, and the Risk Disclosure says withdrawn tokens 'may be economically worthless to you'. This is invisible from the chain, the metadata and the marketing pages.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding onchain-holder-not-in-authoritative-register (critical)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "regulated-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the trustee's wallet",
+      "says": "No Backpack or Trek entity is a registered broker-dealer: BrokerCheck and IAPD return no record, EDGAR holds no filing, and Backpack's US disclosures page lists only money transmission (FinCEN MSB 31000339714338). Press descriptions of a 'regulated broker-dealer arm' are unsupported.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier regulatoryStatus and parties.regulators"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with a permanent delegate (move or burn any balance), freeze, pause, metadata, transfer hook (no program set), confidential-transfer mint and scaled-UI amount; default account state not frozen. Mint and multiplier sit with one PDA and every other power with another PDA of the same program, upgradeable by a 3-of-6 Squads vault with no time lock (single deployer key until 2026-06-12).",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier keyGovernance and authorityFacts.upgrade (finalized RPC reads)"
+    },
+    {
+      "id": "deposit-burns",
+      "says": "Deposits are burned through the supply program (SupplyRedeemAndTransferExternal, burnChecked); withdrawals mint through SupplyCreateAndTransfer.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier authorityFacts.upgrade"
+    },
+    {
+      "id": "multiplier-unused",
+      "says": "The SPCX scaled-UI multiplier is 1 with no scheduled change.",
+      "observedAt": "2026-09-18",
+      "source": "RWA Sonar dossier discrepancy corporate-action-mechanism"
+    },
+    {
+      "id": "supply",
+      "says": "SPCX supply 42,439.666357 held by 33,061 wallets; the top-10 holders held 23.3%.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "How a holder exits",
+      "says": "Deposit to a KYC'd Backpack account, which burns the token and credits a UCC Article 8 entitlement at the brokerage leg; on redemption the trustee may deliver the pro rata shares or sell them and relay net cash (cl. 4.2, 4.6). ACATS and external broker transfers are 'not currently available'. Withdrawal costs about $0.50 in the token."
+    },
+    {
+      "topic": "Powers reserved in the terms",
+      "says": "The Company may blacklist, freeze or restrict transfer or redemption in its sole discretion and 'correct, reject or reverse any transaction', and 'may, but is not required to, provide notice' (cl. 8.2). The chain shows a permanent delegate behind an unattributed program."
+    },
+    {
+      "topic": "Corporate actions and voting",
+      "says": "Dividends are reinvested by the trustee; the binding Asset Tokenization ToS s.1.8 works distributions through the conversion rate rather than balances, unlike the marketing page. Voting follows the registered Tokenholder's (Trek Forge's) instructions only."
+    },
+    {
+      "topic": "Law and distribution",
+      "says": "BVI law for the Issuer T&C; New York UCC Article 8 for the off-chain entitlement. Regulation S, not offered in the US, UK, UAE, Japan or on Backpack EU; the tokens are not registered with the BVI FSC or any regulator. SpaceX does not participate."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Nasdaq NBBO during US sessions; on weekends Backpack's own order book with no reference market."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a trust entitlement in my own wallet",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Trustee's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "Trustee's register entry naming my wallet as beneficiary",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": []
+      },
+      {
+        "type": "holds",
+        "label": "Trustee's dated share count for the pool, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Independent examination of the pool, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A trustee's T, register entry and holds give the outline, and a register entry can show that the beneficiary is Trek Forge, not the wallet. But that the register prevails, that the trustee holds for the token's holders as a class, and that the wallet holder's right is contingent on an event all need proposals, and the token is Token-2022. Little is said by its signer: no share count, no examination, no named custodian of the pool."
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "id": "thbill",
+  "name": "Theo thBILL",
+  "subjects": {
+    "researchProducts": [
+      "thbill"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Theo thBILL"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product thbill (Theo thBILL page, Theo docs index, Libeara ULTRA launch release, Libeara release of 30 July 2025)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry Theo thBILL",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, row for Theo thBILL",
+      "asOf": "2026-01-05"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, thBILL row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": null,
+    "legalForm": "Theo tokenized Treasury strategy token; the holder's legal form, any direct fund interest and the issuing entity are not established from accessible Theo terms",
+    "says": "Theo markets thBILL as exposure to tokenized Treasury funds (ULTRA, and on one part of its page also FILQ), and Libeara calls it indirect exposure to the ULTRA strategy. No holder agreement names an obligor, a secured claim or a redemption debt, and a holder has no established route to ULTRA or FILQ. The proposed claim kind is left empty because the sources do not establish which one applies."
+  },
+  "tokens": [
+    {
+      "chain": "HyperEVM",
+      "standard": "unknown",
+      "readable": false,
+      "note": "From the older catalogue (1,298,496 thBILL on the HyperEVM leg on 16 September 2026); the research has no deployment row or address."
+    }
+  ],
+  "parties": [
+    {
+      "id": "theo",
+      "name": "Theo (issuing legal entity not identified)",
+      "role": "issuer"
+    },
+    {
+      "id": "ultra",
+      "name": "The ULTRA fund (legal entity not named in the research)",
+      "role": "issuer",
+      "note": "Tokenized US Treasuries fund launched by Libeara, Wellington and FundBridge Capital; the older catalogue calls Theo's holding tULTRA, a wrapped representation."
+    },
+    {
+      "id": "filq",
+      "name": "FILQ (issuer not described in the sources)",
+      "role": "issuer"
+    },
+    {
+      "id": "libeara",
+      "name": "Libeara",
+      "role": "platform",
+      "note": "Tokenization platform for ULTRA."
+    },
+    {
+      "id": "fundbridge",
+      "name": "FundBridge Capital",
+      "role": "other",
+      "note": "Named with Wellington and Libeara in ULTRA's manager, sub-adviser and tokenization roles; the research does not record which party holds which."
+    },
+    {
+      "id": "wellington",
+      "name": "Wellington Management",
+      "role": "other"
+    },
+    {
+      "id": "custodian",
+      "name": "The custodian of Theo's fund holdings (not named in the research)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "A reserve examiner for thBILL (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "regulator",
+      "name": "ULTRA's regulator (not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "theo",
+      "type": "profile",
+      "about": "Theo's wallet",
+      "says": "Theo, the platform that issues thBILL through its app; the issuing legal entity and contractual obligor are not identified.",
+      "today": {
+        "state": "published",
+        "where": "theo.xyz/thbill"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T-basket",
+      "signer": "theo",
+      "type": "declaration",
+      "form": "token",
+      "about": "the thBILL token",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: thBILL represents a basket of two tokenized Treasury funds, ULTRA and FILQ; allocation: not stated.",
+      "today": {
+        "state": "published",
+        "where": "theo.xyz/thbill, 'What is thBILL'; no holder terms and no current weights"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "T-ultra",
+      "signer": "theo",
+      "type": "declaration",
+      "form": "token",
+      "about": "the thBILL token",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: thBILL represents ULTRA holdings; allocation: not stated.",
+      "today": {
+        "state": "published",
+        "where": "theo.xyz/thbill, 'How it Works' minting flow"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "backing-conflict",
+      "signer": "researcher",
+      "type": "flag",
+      "refs": [
+        "T-basket",
+        "T-ultra"
+      ],
+      "about": "Theo's two token declarations",
+      "says": "Theo's page names ULTRA and FILQ as holdings while its minting flow says thBILL represents ULTRA only. The two cannot both be the allocation, and no weights or holder terms resolve it.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research thbill (backing claim 'conflicting', 30 September 2026)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "theo",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for Theo's fund holdings",
+      "says": "Custody arrangement: the tokenized fund interests behind thBILL are held in institutional custody.",
+      "today": {
+        "state": "published",
+        "where": "theo.xyz/thbill 'Institutional custody' section; the custodian is not recorded in the research, and the older catalogue's Zodia row has no source link"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "theo",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N ULTRA (and FILQ) units for Theo under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is identified"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "ultra-register",
+      "signer": "ultra",
+      "type": "register-entry",
+      "about": "Theo's holding of ULTRA",
+      "says": "Per ULTRA's register, Theo's vault holds N ULTRA units.",
+      "today": {
+        "state": "unnamed",
+        "where": "The ULTRA fund entity and its register keeper are not named in the research; the older catalogue calls Theo's holding tULTRA, a wrapped representation"
+      },
+      "gaps": [
+        "units",
+        "cross-chain-lock",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "theo",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the thBILL token",
+      "says": "Fund units held against thBILL outstanding, as of date; the page showed $175M+ TVL on 16 September 2026.",
+      "today": {
+        "state": "published",
+        "where": "theo.xyz/thbill (TVL figure, catalogue note); current weights and a reconciliation are not published"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "reserve-exam",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the thBILL token",
+      "says": "Examined Theo's fund holdings against thBILL outstanding as of date, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No thBILL-level reserve assurance was found"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "theo",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the thBILL token",
+      "says": "Who may mint and redeem, whether KYC applies to holding, and whether secondary holders from DeFi venues can redeem.",
+      "today": {
+        "state": "not-published",
+        "where": "The research found no eligibility terms on Theo's page; the older catalogue says minting and redemption require KYC, without a source the research could confirm"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "ultra-regulated",
+      "signer": "regulator",
+      "type": "credential",
+      "about": "the ULTRA fund's wallet",
+      "says": "ULTRA is a regulated tokenized Treasury fund under this regulator.",
+      "today": {
+        "state": "unnamed",
+        "where": "Libeara's release of 30 July 2025 calls it a regulated fund; no regulator is named in the research"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "recourse-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the thBILL token",
+      "says": "No thBILL holder agreement, ring-fencing, priority waterfall, contract controls or deployment row was established. Underlying fund risk is not direct holder recourse: the chain of claims runs holder → Theo (unidentified) → tULTRA wrapper → ULTRA, and no link above the holder is documented.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research thbill (claims and dependency review, 1 October 2026)"
+      },
+      "gaps": [
+        "research-finding",
+        "legal-characterisation"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "hyperevm-supply",
+      "says": "The HyperEVM leg held 1,298,496 thBILL. Not re-read in this restatement.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar catalogue note, rwa-assets-db.json Theo thBILL"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Theo markets T+0, 24/7 minting and redemption through its app; route terms, minimums, fees, underlying fund settlement, gates and suspensions are not disclosed. The older catalogue says underlying collateral settles within 4 business days."
+    },
+    {
+      "topic": "Basket rules",
+      "says": "The older catalogue says Theo's iToken standard enforces basket composition; that is a program rule, not reviewed."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "No mechanism is disclosed; recovery would depend on terms that were not found."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a Treasury strategy token",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "One token declaration (T) with an explicit allocation",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings of the fund units, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Reserve examination, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "The restatement can show only Theo's two inconsistent token declarations and a flag between them; every statement beneath them is unnamed. The core of what a holder has, a claim against an unidentified Theo entity over wrapped units of a fund, cannot be said, because v3 has no claim kind for it and no way to chain a wrapper to the fund units it holds. The evidence fails first: no holder terms, deployment or custodian were found."
+  }
+}

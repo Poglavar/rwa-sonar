@@ -1,0 +1,375 @@
+{
+  "id": "ustbl",
+  "name": "Spiko US T-Bills Money Market Fund (USTBL share class)",
+  "subjects": {
+    "researchProducts": [
+      "ustbl"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Spiko USTBL"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product ustbl (Spiko SICAV prospectus and articles dated 1 September 2026, Spiko transfers, addresses, NAV and dealing docs, published token contract)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry Spiko USTBL",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for Spiko USTBL",
+      "asOf": "2026-03-02"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, USTBL row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Registered share of the USD accumulating class (ISIN FR001400ODM9) of the US T-Bills sub-fund of Spiko SICAV, a French UCITS SICAV, with the shareholder register kept on a public blockchain instead of Euroclear France",
+    "says": "The holder is a shareholder of the SICAV: proportionate ownership of the sub-fund's assets and one vote per share, with the share registered to its validated wallet on the designated chain. Recovery priority, depositary-loss remedies and continuity without Spiko are not established."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "USTBL",
+        "mint": "0xe4880249745eAc5F1eD9d8F7DF844792D560e750"
+      },
+      "readable": false,
+      "note": "USTBL row in Spiko's address list, bound to the class by the prospectus; live permissions not checked."
+    }
+  ],
+  "parties": [
+    {
+      "id": "sicav",
+      "name": "Spiko SICAV – Spiko US T-Bills Money Market Fund",
+      "role": "issuer",
+      "note": "French UCITS SICAV sub-fund; the catalogue notes it is AMF-approved."
+    },
+    {
+      "id": "spiko-finance",
+      "name": "Spiko Finance",
+      "role": "registrar",
+      "note": "Keeps the shareholder register on public DLT and clears orders."
+    },
+    {
+      "id": "caceis-bank",
+      "name": "CACEIS Bank",
+      "role": "custodian",
+      "note": "Independent depositary and custodian named in the prospectus."
+    },
+    {
+      "id": "caceis-fa",
+      "name": "CACEIS Fund Administration",
+      "role": "administrator",
+      "note": "Fund accounting."
+    },
+    {
+      "id": "auditor",
+      "name": "The SICAV's statutory auditor (not recorded in RWA Sonar's research)",
+      "role": "auditor"
+    },
+    {
+      "id": "amf",
+      "name": "Autorité des marchés financiers (AMF)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "sicav",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Spiko SICAV, a French UCITS SICAV; USTBL is the USD accumulating share class (ISIN FR001400ODM9) of its US T-Bills money-market sub-fund. The EUR class has a different ISIN.",
+      "today": {
+        "state": "published",
+        "where": "Spiko SICAV prospectus, 1 September 2026"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "sicav",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USTBL token on Ethereum",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: each USTBL token is a registered share of the USD class, giving proportionate ownership of the sub-fund's assets and one vote per share; allocation: the shares entered on the DLT register.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus pp. 5, 8–10, 12, 21–24, and Spiko's addresses page"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "spiko-finance",
+      "type": "register-entry",
+      "about": "each validated USTBL wallet",
+      "says": "Per the shareholder register, this wallet holds N USTBL shares; the register is the token ledger on the designated chain.",
+      "today": {
+        "state": "onchain",
+        "where": "The DLT register on Ethereum (0xe488…e750) is the shareholder register Spiko Finance keeps (prospectus; transfers docs); who holds the mint and burn permissions on chain was not verified"
+      },
+      "gaps": [
+        "reader-scope",
+        "roles",
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "sicav",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the USTBL token",
+      "says": "The DLT register is the record of title: shares are registered on the designated chain rather than in Euroclear France, and transfers between validated wallets transfer ownership of the fund share.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus and Spiko's transfers docs; how a contested entry is resolved was not tested"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "sicav",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the sub-fund's assets",
+      "says": "Custody arrangement: CACEIS Bank, as independent depositary, keeps the US T-Bills sub-fund's assets.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus, 1 September 2026; the depositary agreement itself is not public in the sources"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "caceis-bank",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "sicav",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these US Treasury bills and this cash for the sub-fund under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "The prospectus names CACEIS Bank; CACEIS publishes nothing in the sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "sicav",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the USTBL token",
+      "says": "Sub-fund assets against USTBL shares outstanding, as of date; Spiko's data portal showed $172.90M AUM and NAV 1.0959 when RWA Sonar checked on 16 September 2026.",
+      "today": {
+        "state": "published",
+        "where": "data.spiko.io (catalogue note); the prospectus defines a short-term US Treasury mandate but not current holdings"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "caceis-fa",
+      "type": "valuation",
+      "about": "one USTBL",
+      "says": "NAV per USD-class share is X for dealing date D; orders received by 11:30 Paris time deal at the next NAV.",
+      "today": {
+        "state": "reported",
+        "where": "Spiko's NAV docs define the official NAV and list oracle and data providers; CACEIS Fund Administration, which keeps the accounts, publishes nothing itself in the sources"
+      },
+      "gaps": [
+        "nav-basis",
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the issuer's wallet",
+      "says": "Audited the SICAV's annual accounts for period P, with the report's hash.",
+      "today": {
+        "state": "not-checked",
+        "where": "The statutory auditor and any audit report are not recorded in RWA Sonar's research; the prospectus and annual report were not read for them"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "sicav",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the USTBL token",
+      "says": "Holding and transfer only between validated, allowlisted wallets after onboarding; US persons excluded; USD class minimum $1 initial and subsequent.",
+      "today": {
+        "state": "published",
+        "where": "Prospectus and Spiko's transfers docs"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "approval",
+      "signer": "amf",
+      "type": "certification",
+      "event": "other",
+      "about": "the issuer's wallet",
+      "says": "The US T-Bills sub-fund of Spiko SICAV is approved as a UCITS money-market fund.",
+      "today": {
+        "state": "reported",
+        "where": "Spiko's data portal calls it an AMF-approved sub-fund (catalogue note, 16 September 2026); the AMF's register was not read"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "contract-powers",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USTBL token",
+      "says": "Spiko's published EVM token code allows permission-controlled mint, burn, pause, ownership reset and UUPS upgrades; who holds those permissions on the deployed contract, with what threshold, was not verified.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research ustbl (controls claim, 1 October 2026), citing Spiko's Token.sol on GitHub"
+      },
+      "gaps": [
+        "research-finding",
+        "program-subject",
+        "reserved-powers"
+      ]
+    },
+    {
+      "id": "catalogue-conflict",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USTBL token",
+      "says": "RWA Sonar's older catalogue describes USTBL as Eurozone sovereign debt and an older attestation row names Anchorage Digital as custodian with no source link; the September 2026 prospectus gives a US Treasury mandate and CACEIS Bank as depositary, and this restatement follows the prospectus.",
+      "today": {
+        "state": "published",
+        "where": "rwa-assets-db.json and attestations-db.json against research.json"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Shareholders through Spiko's dealing workflow: orders by 11:30 Paris time on eligible business days at the next NAV, paid by bank transfer or eligible currency-matched stablecoins; stablecoin settlement may be refused or suspended. No prospectus subscription or redemption commission; the investor bears chain costs."
+    },
+    {
+      "topic": "Gates",
+      "says": "Net redemptions above 10% can trigger gates; deferred orders are irrevocable. Stays in the prospectus."
+    },
+    {
+      "topic": "Liquidation and depositary loss",
+      "says": "The articles describe liquidation (p. 79); depositary-loss remedies and continuity without Spiko are left to the prospectus and French law."
+    },
+    {
+      "topic": "Pricing",
+      "says": "The official NAV is defined in Spiko's NAV docs and distributed through listed oracle and data providers."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a registered fund share",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "SICAV's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "Registrar's entry for my wallet",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Depositary's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 3 days",
+        "minSigners": 1,
+        "maxAgeDays": 3,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited annual accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "This is the closest of the funds to a clean fit: the token is the register entry, the prospectus names the depositary and the administrator, and the issuer says the DLT register is the record of title. Saying that register prevails needs the authoritative-record proposal, the share needs a registered-holding kind and fund units, and the token is an Ethereum contract. CACEIS, the auditor and the AMF publish nothing in their own name in the sources."
+  }
+}

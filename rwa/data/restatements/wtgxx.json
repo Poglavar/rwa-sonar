@@ -1,0 +1,359 @@
+{
+  "id": "wtgxx",
+  "name": "WisdomTree Treasury Money Market Digital Fund (WTGXX)",
+  "subjects": {
+    "researchProducts": [
+      "wtgxx"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "WisdomTree WTGXX"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product wtgxx (WisdomTree Prime product page, prospectus access page, liquidity post of 17 June 2026, WTGXX fund FAQ)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry WisdomTree WTGXX",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for WisdomTree WTGXX",
+      "asOf": "2026-03-02"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, WTGXX row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Share class of a registered US money-market fund (WisdomTree Treasury Money Market Digital Fund); the current prospectus and the class-specific token terms were not reviewed",
+    "says": "The holder has, on WisdomTree's description, shares of a registered Treasury money-market fund held in a verified, whitelisted wallet. How a token balance relates to the transfer agent's shareholder register, and what a digital holder recovers if the platform or a service provider fails, are not established."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "unknown",
+      "readable": false,
+      "note": "The older catalogue says Ethereum ERC-20 with no contract address; the research has no deployment row."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "WisdomTree Treasury Money Market Digital Fund",
+      "role": "issuer",
+      "note": "Renamed from WisdomTree Government Money Market Digital Fund about 1 November 2025 (SEC 497 filing cited by the catalogue); WTGXX kept."
+    },
+    {
+      "id": "wisdomtree",
+      "name": "WisdomTree (WisdomTree Prime and WisdomTree Connect)",
+      "role": "platform"
+    },
+    {
+      "id": "wt-securities",
+      "name": "WisdomTree Securities",
+      "role": "venue",
+      "note": "Supplies dealer inventory for 24/7 secondary trading."
+    },
+    {
+      "id": "ta",
+      "name": "The fund's transfer agent (not named)",
+      "role": "transfer-agent"
+    },
+    {
+      "id": "custodian",
+      "name": "The fund's custodian (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "admin",
+      "name": "The fund's administrator (not named)",
+      "role": "administrator"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "WisdomTree Treasury Money Market Digital Fund, a registered US Treasury money-market fund seeking a stable $1 NAV; WTGXX shares are offered through WisdomTree Prime and WisdomTree Connect.",
+      "today": {
+        "state": "published",
+        "where": "WisdomTree product page and WTGXX fund FAQ"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the WTGXX token",
+      "says": "Token terms: each token is a WTGXX share of the fund, transferable only between verified, whitelisted wallets; allocation: the shares on the fund's register.",
+      "today": {
+        "state": "not-checked",
+        "where": "The current prospectus is linked from WisdomTree's regulatory page but was not reviewed; the FAQ is not the controlling document"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "ta",
+      "type": "register-entry",
+      "about": "each WTGXX holder's wallet",
+      "says": "Per the fund's shareholder register, this holder owns N WTGXX shares.",
+      "today": {
+        "state": "unnamed",
+        "where": "No transfer agent is named in the reviewed sources"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the WTGXX token",
+      "says": "Which record is the record of title: the transfer agent's register or the token ledger, and who may correct either.",
+      "today": {
+        "state": "not-checked",
+        "where": "The product page does not say; the prospectus that would was not reviewed"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's portfolio",
+      "says": "Custody arrangement: the fund's Treasury securities are held segregated with its custodian.",
+      "today": {
+        "state": "published",
+        "where": "The WTGXX FAQ states custody segregation; the custodian is not recorded in RWA Sonar's research"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these Treasury securities for the fund under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is named in the reviewed sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the WTGXX token",
+      "says": "Fund assets in Treasury securities against WTGXX shares outstanding, as of date.",
+      "today": {
+        "state": "published",
+        "where": "Product page (objective) and FAQ (an AUM example dated 30 April 2026); no current holdings figure was verified"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "admin",
+      "type": "valuation",
+      "about": "one WTGXX",
+      "says": "NAV per share is X, struck daily at 4pm ET on eligible business days.",
+      "today": {
+        "state": "unnamed",
+        "where": "The FAQ gives the NAV time; no administrator is named"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No auditor appears in the reviewed sources"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the WTGXX token",
+      "says": "US retail investors through WisdomTree Prime accounts and institutions through Connect onboarding; wallets verified and whitelisted; stablecoins only through a conversion service, not as direct subscriptions.",
+      "today": {
+        "state": "published",
+        "where": "WTGXX fund FAQ"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "dealer",
+      "signer": "wt-securities",
+      "type": "sale",
+      "about": "WTGXX in the dealer's inventory",
+      "says": "Standing offer to buy and sell WTGXX 24/7 against its inventory with 0 bps commission, while inventory lasts; depleted inventory pauses the route.",
+      "today": {
+        "state": "reported",
+        "where": "WisdomTree's liquidity post of 17 June 2026 and the FAQ; the dealer publishes no offer of its own in the sources"
+      },
+      "gaps": [
+        "affiliation"
+      ]
+    },
+    {
+      "id": "registration",
+      "signer": "sec",
+      "type": "credential",
+      "about": "the fund's wallet",
+      "says": "The fund is a registered investment company under the Investment Company Act of 1940.",
+      "today": {
+        "state": "not-checked",
+        "where": "The FAQ states 1940 Act status and the catalogue cites an SEC EDGAR 497 filing; EDGAR was not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "evidence-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the WTGXX token",
+      "says": "No deployment row, no token terms and no transfer-agent register provisions were reviewed; the older catalogue's attestation that WTGXX 'represents ownership' has no source link and expired on 6 April 2026. Secondary dealer liquidity is not fund redemption.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research wtgxx (evidence profiles, 1 October 2026) and attestations-db.json"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Primary dealing at the daily 4pm ET NAV, with a 3:30pm funding cutoff and T+0 settlement on eligible business days, under the prospectus, which was not reviewed. A direct fund redemption route for wallet holders is not established."
+    },
+    {
+      "topic": "Secondary liquidity",
+      "says": "WisdomTree Securities' dealer inventory is a separate route that can pause when depleted."
+    },
+    {
+      "topic": "Register corrections and controls",
+      "says": "Deployed administrators and any legal power to correct the register stay in the prospectus and the contract, neither of which was checked."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "1940 Act status and stated custody segregation do not settle every insolvency or record-dispute outcome."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a registered fund share",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Fund's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "Transfer agent's entry for my wallet",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings for the fund under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 3 days",
+        "minSigners": 1,
+        "maxAgeDays": 3,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A registered money-market fund share fits the fund-share pattern of T, a transfer agent's register entry, custody and NAV, but the register's precedence and the registered-holding kind need proposals and the token is outside the reader. The evidence is the bigger limit: no deployment, token terms or transfer agent were established, so most statements are unnamed or not checked."
+  }
+}

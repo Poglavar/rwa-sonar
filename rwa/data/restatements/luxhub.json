@@ -1,0 +1,241 @@
+{
+  "id": "luxhub",
+  "name": "LuxHub watch NFT (development)",
+  "subjects": {
+    "researchProducts": [
+      "luxhub"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "luxhub"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts LUXHUB (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "none",
+  "holderPosition": {
+    "originKind": "thing",
+    "claimKind": null,
+    "proposedClaimKind": null,
+    "legalForm": "None established: a development marketplace design in which an approved vendor lists one physical watch through an NFT and the payment sits in delivery escrow; no live watch token was found",
+    "says": "There is no holder today. If the documented design launches, a buyer would hold an NFT describing one watch sold by an approved vendor, with payment released from escrow on a delivery confirmation; the sources do not establish legal title, independent authentication, insurance or audited deployed code."
+  },
+  "tokens": [
+    {
+      "chain": "Solana devnet",
+      "standard": "other",
+      "readable": false,
+      "note": "Custom Anchor marketplace program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj, documented on devnet only; no watch NFT mint was identified and a mainnet launch is planned."
+    }
+  ],
+  "parties": [
+    {
+      "id": "seller",
+      "name": "An approved watch vendor (not named)",
+      "role": "issuer",
+      "note": "Would describe a particular watch and the sale terms."
+    },
+    {
+      "id": "inspector",
+      "name": "The watch authenticator (not named)",
+      "role": "inspector"
+    },
+    {
+      "id": "luxhub",
+      "name": "LuxHub",
+      "role": "platform",
+      "note": "Marketplace operator; describes its own delivery and dispute workflow and admin and multisig operations."
+    },
+    {
+      "id": "buyer",
+      "name": "The buyer (none yet)",
+      "role": "holder"
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "luxhub",
+      "type": "profile",
+      "about": "the operator's wallet",
+      "says": "LuxHub, operator of a watch marketplace with NFT and delivery-escrow flows, validated on Solana devnet.",
+      "today": {
+        "state": "published",
+        "where": "Public GitHub repository README (yoandryx/luxhub)"
+      }
+    },
+    {
+      "id": "sheet",
+      "signer": "seller",
+      "type": "declaration",
+      "about": "a watch NFT",
+      "says": "Asset sheet: this serial-numbered watch, with condition records, photos and authentication metadata, under the seller's linked terms.",
+      "today": {
+        "state": "unnamed",
+        "where": "No vendor or watch token is identified; the repository describes the listing design"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "seller",
+      "type": "holds",
+      "about": "a watch NFT",
+      "for": "the token holder",
+      "refs": [
+        "sheet"
+      ],
+      "says": "I have this watch for the token holder until it is delivered.",
+      "today": {
+        "state": "unnamed",
+        "where": "No vendor or physical inventory was identified"
+      }
+    },
+    {
+      "id": "authentication",
+      "signer": "inspector",
+      "type": "inspection",
+      "about": "a watch NFT",
+      "says": "I examined this watch's serial, movement, case, accessories and condition on this date; photos and the inspection report are attached.",
+      "today": {
+        "state": "unnamed",
+        "where": "No authenticator is named; the design stores authentication metadata"
+      }
+    },
+    {
+      "id": "offer",
+      "signer": "seller",
+      "type": "sale",
+      "about": "a watch NFT",
+      "says": "I offer the watch on these terms to the named buyer; the terms name the external escrow. This statement does not lock payment.",
+      "today": {
+        "state": "unnamed",
+        "where": "No sale is documented; the flows were validated on devnet only"
+      }
+    },
+    {
+      "id": "acceptance",
+      "signer": "buyer",
+      "type": "accept",
+      "refs": [
+        "offer"
+      ],
+      "about": "the seller's sale offer",
+      "says": "I accept that sale offer; acceptance alone proves neither payment nor delivery.",
+      "today": {
+        "state": "unnamed",
+        "where": "No buyer or sale is documented"
+      }
+    },
+    {
+      "id": "delivery",
+      "signer": "seller",
+      "type": "handoff",
+      "about": "a watch NFT",
+      "says": "I handed this watch to the named recipient; a carrier's custody would be its own step.",
+      "today": {
+        "state": "unnamed",
+        "where": "No delivery is documented"
+      }
+    },
+    {
+      "id": "receipt",
+      "signer": "buyer",
+      "type": "receipt",
+      "refs": [
+        "delivery"
+      ],
+      "about": "the seller's hand-over",
+      "says": "I received the watch named in that hand-over.",
+      "today": {
+        "state": "unnamed",
+        "where": "No delivery is documented"
+      }
+    },
+    {
+      "id": "escrow-payout",
+      "signer": "luxhub",
+      "type": "certification",
+      "event": "other",
+      "about": "a watch NFT",
+      "says": "The external escrow paid out, with its transaction linked. This records the payment; it does not execute the escrow and does not prove that the watch arrived.",
+      "today": {
+        "state": "not-published",
+        "where": "The README describes the escrow release after a delivery confirmation; no mainnet payout is documented"
+      }
+    },
+    {
+      "id": "review-scope",
+      "signer": "tokenizario",
+      "type": "note",
+      "about": "the LuxHub marketplace program",
+      "says": "No verified mainnet deployment, actual watch token or physical custody trail was established. Delivery confirmation is an input to the program and names no independent physical witness; admin-only minting, freeze and burn are documented capabilities, not verified authorities; the deployed code has no audit in the sources.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (LUXHUB), read 8 October 2026"
+      },
+      "gaps": [
+        "research-finding",
+        "program-subject"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Escrow release",
+      "says": "Locking funds, deciding which delivery confirmation releases the escrow, cancelling a sale and refunding belong to LuxHub's own program and operators."
+    },
+    {
+      "topic": "Exceptions",
+      "says": "Refunds, cancellations, shipping timeouts and escalated disputes, with admin and multisig operations, stay with LuxHub's program and its operators."
+    },
+    {
+      "topic": "Launch",
+      "says": "Mainnet deployment and vendor onboarding are listed as launch work; the separate fractional-pool product has different rights."
+    }
+  ],
+  "recipe": {
+    "name": "Assess a watch sale",
+    "outcome": "buy",
+    "author": "A watch buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Watch identity and seller's terms",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "inspection",
+        "label": "Watch authentication, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "any"
+      },
+      {
+        "type": "sale",
+        "label": "Sale offer naming its external escrow",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "not-a-token",
+    "summary": "No live watch token exists: the marketplace program is documented on Solana devnet only and no watch mint, vendor or inventory was identified. If it launches, v3 says a whole-watch sale well (asset sheet, holds, inspection, sale, accept, hand-over, receipt); the escrow program and who confirms delivery stay outside, and a program cannot be a statement's subject."
+  }
+}

@@ -1,0 +1,368 @@
+{
+  "id": "securitize-stocks",
+  "name": "Securitize Stocks (Convertible Entitlement Tokens)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "securitize-stocks"
+    ],
+    "catalogueNames": [],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/securitize-stocks.json",
+      "asOf": "2026-10-08"
+    },
+    {
+      "source": "RWA Sonar stocks/data/holder-rights.json (entry securitize-stocks)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "co-ownership",
+    "legalForm": "New York UCC Article 8 security entitlement to a share position credited on the books of Securitize Markets, LLC as securities intermediary, carried by a Convertible Entitlement Token (CET) that acts as an entitlement order; sponsorship by the referenced companies is not established",
+    "says": "The customer is beneficial owner of a share position credited on SM's books, separate from SM's proprietary holdings, with the pro rata property interest Article 8 gives an entitlement holder against SM's creditors. SM's books, not the chain, decide who holds it; there is no cash redemption, only a platform sale or conversion to a book-entry share moved by DRS to an accepting broker. It is neither an issuer-registered share nor a claim on the referenced company."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 12,
+      "example": {
+        "symbol": "AAPL",
+        "mint": "3J7XcwApkHKUKnNL6bbrA5pmFhCKZ3RB9VG63aAukBzD"
+      },
+      "readable": false,
+      "note": "The twelve mints in Securitize's official stocks catalogue (2026-10-08); none is yet in RWA Sonar's universe."
+    }
+  ],
+  "parties": [
+    {
+      "id": "sm",
+      "name": "Securitize Markets, LLC",
+      "role": "custodian",
+      "note": "Broker and securities intermediary for CETs; holds the underlying book-entry positions for customers; a Securitize group company.",
+      "keys": [
+        {
+          "address": "Ui3bQKRdTzNRv21sPuXTgmzuz4dLh3sH3B9Y5sxapSR",
+          "controls": "permanent delegate, pause, scaled-UI multiplier and metadata on all 12 mints",
+          "kind": "hot key (funded system-owned account); off-chain signing policy not visible"
+        }
+      ]
+    },
+    {
+      "id": "upstream",
+      "name": "SM's nominee or third-party custodian (not named)",
+      "role": "sub-custodian"
+    },
+    {
+      "id": "sebm",
+      "name": "Securitize Europe Brokerage and Markets, S.V., S.A.",
+      "role": "distributor",
+      "note": "EU reception and transmission under Spanish-law platform terms; whether an EU customer has the same direct claim on SM is unresolved."
+    },
+    {
+      "id": "finra",
+      "name": "FINRA",
+      "role": "regulator"
+    },
+    {
+      "id": "examiner",
+      "name": "An examiner of the share pools against the tokens (none appointed)",
+      "role": "auditor"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "sm",
+      "type": "profile",
+      "about": "SM's wallet",
+      "says": "Securitize Markets, LLC, an SEC-registered broker-dealer and FINRA/SIPC member, acting as securities intermediary for Convertible Entitlement Tokens; separate from issuer-sponsored SECZ.",
+      "today": {
+        "state": "published",
+        "where": "Entitlement Token Disclosure (dated 2026-09-15) and the Customer Brokerage Account Agreement"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "sm",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for each stock's CET share pool",
+      "says": "Custody arrangement: SM holds the underlying book-entry share positions for CET customers, separate from proprietary holdings, possibly through nominees or third-party custodians; no lending, no transfer of the underlying while CETs exist, and no use for unrelated proprietary trading.",
+      "today": {
+        "state": "published",
+        "where": "Entitlement Token Disclosure and launch statement; no stock-by-stock custody account or subcustodian agreement was located"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "sm",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "the customers holding each stock's CETs, pro rata",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of the referenced stock for the CET positions credited on our books, observed at time T.",
+      "today": {
+        "state": "not-published",
+        "where": "The 1:1 backing is an issuer statement; no dated CET share count is published"
+      },
+      "gaps": [
+        "class-beneficiary",
+        "units"
+      ]
+    },
+    {
+      "id": "H-upstream",
+      "signer": "upstream",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "sm",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of the referenced stock for Securitize Markets, LLC, free of liens, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "The upstream custodian or nominee is not named; upstream liens are unverified"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "sm",
+      "type": "declaration",
+      "form": "token",
+      "about": "each CET mint (AAPL shown)",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: a CET carries the customer's security entitlement to a share position credited on SM's books; it is 'not redeemable for cash' and can be converted to a book-entry share and moved by DRS to a DTCC-member broker that 'agrees to accept' it. Allocation: the customer positions credited under A.",
+      "today": {
+        "state": "published",
+        "where": "Entitlement Token Disclosure ss.2, 4.1, 4.5 and 4.6; the catalogue does not carry the order-specific disclosures, the agreement calls CETs 'Custodial' where the disclosure says 'Convertible', and the launch names GOOG while the catalogue lists GOOGL"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "books",
+      "signer": "sm",
+      "type": "register-entry",
+      "about": "each approved wallet",
+      "says": "Per our books, the customer linked to this wallet is entitlement holder of N shares of the referenced stock.",
+      "today": {
+        "state": "not-published",
+        "where": "Account statements are private to each customer; nothing is published"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "books-prevail",
+      "signer": "sm",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "refs": [
+        "books"
+      ],
+      "about": "each CET mint",
+      "says": "SM's books are the 'authoritative record': an on-chain transfer is an entitlement order, and the entitlement moves only when SM records the corresponding debit and credit.",
+      "today": {
+        "state": "published",
+        "where": "Customer Brokerage Account Agreement, 'SM as Securities Intermediary'; no recovery procedure for books and chain diverging was located"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "lien",
+      "signer": "sm",
+      "type": "security-interest",
+      "about": "each customer's carried account assets",
+      "says": "A 'continuing security interest' and lien over carried assets for the customer's obligations to SM; held-away wallet assets are excluded unless a separate control agreement exists.",
+      "today": {
+        "state": "published",
+        "where": "Customer Brokerage Account Agreement, 'Security Interest and Lien'"
+      }
+    },
+    {
+      "id": "eligible",
+      "signer": "sm",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each CET mint",
+      "says": "Only approved, KYC/AML-cleared customers trading from linked approved wallets; token accounts start frozen; SM may 'freeze or block' orders, transfers and accounts for compliance and risk reasons. EU customers come through SEBM.",
+      "today": {
+        "state": "published",
+        "where": "Customer Brokerage Account Agreement 'Compliance; Freezes and Blocks' and the Stocks FAQ; no current admission matrix by jurisdiction was verified"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "sipc",
+      "signer": "sm",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "each CET mint",
+      "says": "Underlying CET positions are expected to be treated as customer securities, but held-away self-custody assets are 'not covered by SIPC through SM'; how a wallet-held CET and its retained share are treated is not resolved.",
+      "today": {
+        "state": "published",
+        "where": "Customer Brokerage Account Agreement, SIPC section, and Risk Disclosures s.29(ii)"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "bd-credential",
+      "signer": "finra",
+      "type": "credential",
+      "about": "SM's wallet",
+      "says": "Registered broker-dealer, FINRA and SIPC member (role custodian).",
+      "today": {
+        "state": "not-checked",
+        "where": "SM says so in its documents; BrokerCheck was not read for this programme"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "reconciliation",
+      "signer": "examiner",
+      "type": "certification",
+      "event": "audited",
+      "about": "each CET mint",
+      "says": "Reconciled each stock's share pool and SM's customer books with the mint supply as of date, with any upstream liens.",
+      "today": {
+        "state": "unnamed",
+        "where": "No independent, dated CET reserve statement or reconciliation was located"
+      }
+    },
+    {
+      "id": "books-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each CET mint",
+      "says": "A live mint and a trade do not show that the share pool exists, is reconciled or is free of upstream liens; the 1:1 and no-lending statements are SM's own. Because SM's books decide, a reconciliation failure can separate what a wallet shows from what the holder can enforce.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings independent-cet-reserve-reconciliation-not-located and broker-books-control-entitlement-transfer"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Twelve Token-2022 mints with permanent delegate, pausable, default account state frozen, scaled-UI amount and metadata. Delegate, pause, multiplier and metadata sit with one funded system-owned key shared by all twelve; the AAPL mint and freeze authority is off-curve and its program and upgrade path were not resolved.",
+      "observedAt": "2026-10-08",
+      "source": "RWA Sonar dossier keyGovernance (finalized getMultipleAccounts, slots 454613378 and 454614970)"
+    },
+    {
+      "id": "trade-observed",
+      "says": "A finalized ExecuteSwap exchanged 10 USDC for 0.029543 AAPL tokens with a 0.01 USDC fee leg; a secondary exchange, not a DRS exit.",
+      "observedAt": "2026-10-08",
+      "source": "RWA Sonar dossier claims (getTransaction, slot 454600556)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "How a holder exits",
+      "says": "Sell on the platform (0.1% commission), or request book-entry conversion and a DRS transfer to a DTCC-member broker that accepts it ($30 plus the receiving broker's charges). No cash redemption; a completed DRS exit has not been observed. Conversion into an issuer-sponsored token would need the referenced company to adopt a programme."
+    },
+    {
+      "topic": "Corporate actions and votes",
+      "says": "SM processes mandatory actions and pays cash distributions in the settlement stablecoin net of charges and tax; voluntary actions need an election by SM's deadline; votes are expected to pass through, with uninstructed votes under a proxy policy that was not obtained."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "New York law and Article 8 for the account; FINRA or eligible exchange arbitration; Spanish law for EU platform terms. The account agreement prevails over the token disclosure in a conflict."
+    },
+    {
+      "topic": "Pricing",
+      "says": "NBBO with a 10 bps execution-protection band, trading 04:00 to 17:30 ET."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a broker entitlement in my own wallet",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "SM's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "SM's dated share count for the CET pool, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "SM's book entry for my wallet",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Independent reconciliation of pool, books and supply, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A/H/T fits an intermediary that holds shares for customers, and SM's lien is a plain security-interest. But the decisive fact, that SM's books and not the chain transfer the entitlement, needs the authoritative-record proposal; v3 has no claim kind for an Article 8 security entitlement; SM holds for its customers as a class; and the mints are Token-2022. SM publishes its terms, but no share count, book entry or reconciliation."
+  }
+}

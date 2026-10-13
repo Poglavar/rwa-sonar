@@ -1,0 +1,473 @@
+{
+  "id": "tessera",
+  "name": "Tessera T-Tokens",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "tessera"
+    ],
+    "catalogueNames": [
+      "Tessera"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "tessera"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/tessera.json (Terms and Conditions revised 2026-08-28, Disclosures last updated 2026-08-28, docs.tessera.pe, chain reads)",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter search, 3 tessera mints)",
+      "asOf": "2026-09-20"
+    },
+    {
+      "source": "rwa-assets-db.json and attestations-db.json (Tessera)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md case 'Tessera' and stock-templates.ts tessera--token-2022-transfer-fee",
+      "asOf": "2026-09-23"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "contingent",
+    "legalForm": "Stablecoin Loan Token: an unsecured loan participation in one Loan Series owed by a Panama issuer subsidiary of Tessera Works Foundation, repayable only out of Liquidity Event Proceeds that issuer receives, under Singapore law with SIAC arbitration",
+    "says": "The holder is an unsecured lender to one named Panama issuer (SPX, KLSH or OPAI Tessera Issuer Inc.) for its pro rata share of the series principal, payable in USDC or USDT only after the issuer divests its PE Investment, receives the proceeds and a Redemption Period opens; unclaimed amounts are forfeited after 90 days. No legal, beneficial or proprietary interest in the proceeds, the PE Investment or any issuer asset, and no shareholder rights."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 3,
+      "example": {
+        "symbol": "tSpaceX",
+        "mint": "TSPXcLV76s6V2zDiZQ18kBfcbnjaE2ZzNT3ga2Pd99v"
+      },
+      "readable": false,
+      "note": "tSpaceX, tKalshi (TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ) and tOpenAI (oPAiAikWTaFj9RYoRFD35ccfwhnMcB3ThgBZRHSkjTZ); 9 decimals."
+    }
+  ],
+  "parties": [
+    {
+      "id": "twf",
+      "name": "Tessera Works Foundation",
+      "role": "platform",
+      "note": "Panama foundation, folio 25063391. Owns each issuer subsidiary, publishes the Terms and Disclosures, announces the Redemption Start Date and may change the Terms in its sole discretion."
+    },
+    {
+      "id": "issuers",
+      "name": "SPX Tessera Issuer Inc. (T-SpaceX, folio 155779878), KLSH Tessera Issuer Inc. (T-Kalshi, folio 155774530), OPAI Tessera Issuer Inc. (T-OpenAI, folio 155785695)",
+      "role": "issuer",
+      "note": "Wholly owned Panama subsidiaries of TWF. KLSH was also the T-SpaceX issuer until SPX was substituted by novation with effect from 1 August 2026.",
+      "keys": [
+        {
+          "address": "EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+          "controls": "mint, transfer-fee config and metadata authority on all three mints, and upgrade authority of the Token Program and Referral Program",
+          "kind": "single key on chain (Fireblocks MPC per the docs), no time lock; held upgrades since 2026-01-28, when it replaced Squads multisig HimRFy5q…"
+        },
+        {
+          "address": "7n2PNcDXVDMK2m8dyV9cVPNY7p4jM4ZMHv7TzfibEt8o",
+          "controls": "freeze authority on all three mints",
+          "kind": "single nonce-based key, absent from the docs' Authorities & Security table; most likely Fireblocks-held"
+        }
+      ]
+    },
+    {
+      "id": "spc",
+      "name": "The Cayman Islands segregated portfolio company (not named)",
+      "role": "custodian",
+      "note": "Holds the PE exposure in one segregated portfolio per company."
+    },
+    {
+      "id": "auditors",
+      "name": "The independent auditors of the segregated portfolios (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "chainlink",
+      "name": "Chainlink (SmartData / DataLink streams)",
+      "role": "oracle"
+    },
+    {
+      "id": "accretion",
+      "name": "Accretion Labs",
+      "role": "auditor",
+      "note": "Audited the Token Program and the Referral Program (report A25TES1)."
+    },
+    {
+      "id": "counsel",
+      "name": "Singapore counsel (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "twf",
+      "type": "profile",
+      "about": "the authority wallet EXvTtxurWBUNNCtLojaN8ZBJFNJPZFSH3szoih9hh7YW",
+      "says": "Tessera Works Foundation, a Panama foundation (folio 25063391, Ricardo Arias Street, Advanced Tower Building, Panama City), owner of the three per-token Panama issuers.",
+      "today": {
+        "state": "published",
+        "where": "Terms and Conditions and Disclosures at terms.tessera.pe; no source ties the authority keys to TWF or a named issuer except the docs' authorities table"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "issuers",
+      "type": "declaration",
+      "form": "token",
+      "about": "each T-Token mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: tokens equal to the Stablecoin Loan Principal Amount, each the holder's proportion of the series principal (T-SpaceX 500,990.00 USDC, 13 January 2026; T-Kalshi 552,500.00 USDC; T-OpenAI 518,171.45 USDC). The issuer owes a pro rata share of the Liquidity Event Proceeds it actually receives, in USDC or USDT at its choice at 1:1; a purely contractual, unsecured obligation conferring no proprietary interest. Allocation: the proceeds of the one PE Investment named for the series.",
+      "today": {
+        "state": "published",
+        "where": "Terms and Conditions revised 2026-08-28 (s. 2.2) and the Disclosures register, published by TWF for the issuers; the issuers publish nothing in their own name"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "twf",
+      "type": "declaration",
+      "form": "custody",
+      "about": "the exposure behind each T-Token",
+      "says": "Custody arrangement: the private-equity exposure for each company is held in its own segregated portfolio within a Cayman Islands SPC, acquired as 'direct shares, contracts for shares, or similar instruments tracking company value'. No share custodian, broker or counterparty is named.",
+      "today": {
+        "state": "published",
+        "where": "docs.tessera.pe ('How do T-Tokens work?'); A cannot name the SPC or a custodian, and the loan is expressly not collateralised by the shares"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "spc",
+      "type": "holds",
+      "about": "the segregated portfolio for one company",
+      "for": "issuers",
+      "refs": [
+        "A"
+      ],
+      "says": "This segregated portfolio holds N units of exposure to company C, in the form F, for the series issuer's PE Investment, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The SPC is described but not named; no holding is published in its name"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "por",
+      "signer": "chainlink",
+      "type": "status",
+      "predicate": "backed",
+      "about": "each T-Token mint",
+      "says": "Audited asset count of the segregated portfolio against token supply, reserve ratio 1.00. The values are 'asset counts ... not dollar valuations', refreshed approximately monthly.",
+      "today": {
+        "state": "published",
+        "where": "Chainlink Data Streams tspacex-usd-smartdata-datalink, tkalshi-usd-smartdata-datalink, topenai--nav-streams: signed off-chain reports verifiable on chain, not Solana feed accounts; tKalshi marked deprecating with shutdown date 18 September 2026 (Chainlink directory, read 2026-09-24)"
+      },
+      "gaps": [
+        "oracle-feed",
+        "units"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditors",
+      "type": "certification",
+      "event": "audited",
+      "about": "each T-Token mint",
+      "refs": [
+        "por"
+      ],
+      "says": "Examined the holdings of the segregated portfolio, with the count, scope, date and report.",
+      "today": {
+        "state": "unnamed",
+        "where": "The docs say the auditors 'will be shown on this page' (future tense); no auditor is named and no report is published"
+      }
+    },
+    {
+      "id": "opinion",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "each T-Token mint",
+      "says": "Under Singapore law the product is a loan product, not a capital markets product.",
+      "today": {
+        "state": "unnamed",
+        "where": "TWF's docs assert 'a non-security legal opinion under Singapore law'; neither the opinion nor the firm is published, and nothing says who may rely on it"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "code-audit",
+      "signer": "accretion",
+      "type": "certification",
+      "event": "audited",
+      "about": "the Token Program TESQvsR4TmYxiroPPQgZpVRoSFG8pru4fsYr67iv6kf and Referral Program TESMgr3q4s1CK5nGz7bmkbMQBQeSt8N9wpZjTDWm2cY",
+      "says": "Security assessment A25TES1, completed 19 January 2026: 30 findings (0 critical, 0 high, 9 medium, 11 low, 10 informational), 17 fixed before mainnet and 13 acknowledged; Token-2022 scope 'transfer fees, metadata'.",
+      "today": {
+        "state": "published",
+        "where": "Full PDF report, linked from docs.tessera.pe/technicals/security-audits and hosted on cdn.tesseralab.co; both programs were upgraded since, last on 2026-08-11"
+      },
+      "gaps": [
+        "program-subject"
+      ]
+    },
+    {
+      "id": "novation",
+      "signer": "twf",
+      "type": "certification",
+      "event": "other",
+      "about": "the tSpaceX mint",
+      "says": "SPX Tessera Issuer Inc. was substituted for KLSH Tessera Issuer Inc. as the T-SpaceX Issuer by novation with effect from 1 August 2026; notice given 27 August and again 28 August 2026. No token is burned, cancelled, reissued or replaced (s. 11.7).",
+      "today": {
+        "state": "published",
+        "where": "Disclosures, last updated 28 August 2026"
+      },
+      "gaps": [
+        "affiliation",
+        "terms-version"
+      ]
+    },
+    {
+      "id": "cycle",
+      "signer": "twf",
+      "type": "certification",
+      "event": "other",
+      "about": "the tSpaceX mint",
+      "says": "T-SpaceX 'has entered its redemption event cycle'; no Liquidity Event Proceeds received, no Redemption Start Date announced and no Redemption Period commenced as at 28 August 2026. T-Kalshi and T-OpenAI have had no Liquidity Event.",
+      "today": {
+        "state": "published",
+        "where": "Disclosures, last updated 28 August 2026; nothing says what opened the cycle"
+      }
+    },
+    {
+      "id": "redemption",
+      "signer": "issuers",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "each T-Token mint",
+      "refs": [
+        "cycle"
+      ],
+      "says": "During the Redemption Period from date D, burned tokens were paid a Redemption Amount of X USDC or USDT per token.",
+      "today": {
+        "state": "not-published",
+        "where": "No Redemption Period has opened for any series"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "mark",
+      "signer": "twf",
+      "type": "valuation",
+      "about": "each T-Token mint",
+      "says": "markPrice and markValuation: T-OpenAI 812.79 ($950B), T-Kalshi 413.80 ($14B), T-SpaceX 423.00 ($800B) on 2026-09-16.",
+      "today": {
+        "state": "published",
+        "where": "rest-api.tessera.pe/v1/public/token-details; no methodology published"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "twf",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each T-Token mint",
+      "says": "Excluded Persons, including all US persons, and persons in 17 categories of Excluded Jurisdiction should not use Tessera; identity, AML/CFT and sanctions screening may be required at lending (s. 2.1(d)). The redemption right runs with the token to any holder.",
+      "today": {
+        "state": "published",
+        "where": "Terms revised 2026-08-28; the docs advertise 'no KYC' and permissionless access, and the chain enforces no allowlist"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "trigger-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each T-Token mint",
+      "refs": [
+        "T"
+      ],
+      "says": "The redemption docs describe the Liquidity Event as an IPO or a change of control; the prevailing Terms define it as the issuer's own divestment of all interests in the PE Investment. An IPO or takeover does not itself trigger redemption, and the 90-day clock starts only on receipt of proceeds in full.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier discrepancy liquidity-event-trigger (2026-09-18)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "keys-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each T-Token mint",
+      "says": "A freeze key the docs do not list was used on 2026-06-07 on two T-SpaceX accounts, each thawed within three minutes; one key without a time lock holds mint, fee config, metadata and program upgrade authority since the Squads multisig was replaced on 2026-01-28.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings undisclosed-freeze-authority-on-mint, freeze-authority-has-been-exercised and admin-keys-not-multisig"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "unsecured-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each T-Token mint",
+      "refs": [
+        "por"
+      ],
+      "says": "The loan is unsecured: 'the loan to the issuer entity is unsecured and is not collateralised by the underlying shares'. A 1.00 asset count shows supply discipline, not collateral value or a security interest; the segregated portfolio also shields its assets from the holders.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings holder-claim-is-unsecured-loan and bankruptcy-remoteness-claimed-not-evidenced"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with transferFeeConfig, metadataPointer and tokenMetadata only: no permanent delegate, pause, default-frozen accounts, transfer hook or scaled UI amount. Freeze authority 7n2PNc… (single key); mint and fee-config authority EXvTtx… (single key), which also upgrades the Token Program.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier knownExtensions, keyGovernance and authorityFacts (finalized reads)"
+    },
+    {
+      "id": "freeze-used",
+      "says": "Freeze key: 2 freezeAccount and 2 thawAccount transactions on 2026-06-07, all on the tSpaceX mint (2grbfzkj… frozen 08:08:50Z, thawed 08:11:16Z; 6b99iGSC… frozen 08:18:32Z, thawed 08:19:32Z).",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier findings (freeze-authority-has-been-exercised)"
+    },
+    {
+      "id": "transfer-fee",
+      "says": "20 bps transfer fee on every mint, maximum fee u64::MAX; withheld fees are withdrawn through Tessera's Token Program.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier knownExtensions and authorityFacts"
+    },
+    {
+      "id": "supply",
+      "says": "Supply 1,189.973352546 tSpaceX, 1,557.906620573 tKalshi and 684.795590336 tOpenAI: 421.01, 354.64 and 756.68 USDC of series principal per token.",
+      "observedAt": "2026-09-18",
+      "source": "RWA Sonar dossier pricing (slots 448072618-9)"
+    },
+    {
+      "id": "upgrades",
+      "says": "The Token Program was upgraded by EXvTtx… alone on 2026-01-28, 2026-06-05, 2026-06-26 and 2026-08-11 (slot 438629335).",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier authorityFacts.upgrade"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "When and how a holder is paid",
+      "says": "Burn to the Tessera contracts during a 90-day Redemption Period (10am Panama time on the start date to 10pm on the 90th day); after it the amount ceases to be claimable and the issuer is discharged. Stays in the Terms (s. 2.2)."
+    },
+    {
+      "topic": "Changes and substitutions",
+      "says": "TWF may change the Terms in its sole discretion with no notice period, consent or put; an issuer may be substituted by novation with notice by publication (ss. 9, 11.6, 11.7)."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "Singapore law; SIAC arbitration seated in Singapore, sole arbitrator; Singapore International Commercial Court for related proceedings."
+    },
+    {
+      "topic": "Freeze",
+      "says": "The only published rationale is automated threat response by Hypernative with independent co-approval, live since 1 June 2026 (Threat Monitoring docs). The Terms do not describe the freeze key."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Primary issuance through Alpha Vault pro-rata auctions and direct acquisition; secondary on Meteora and Jupiter. Nothing pins price to the mark, since redemption pays proceeds, not the mark."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a pre-IPO loan participation",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The series issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Asset count against supply, under 45 days",
+        "minSigners": 1,
+        "maxAgeDays": 45,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "A named auditor's examination of the portfolio, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        },
+        "matches": [
+          "audit"
+        ]
+      },
+      {
+        "type": "holds",
+        "label": "The segregated portfolio's holdings under A",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The outline can be said: named issuers sign T, TWF signs A and the event certifications, Chainlink carries a backed status, and Accretion's code audit is a real third-party report. The core is a contingent, unsecured claim payable only out of proceeds the issuer chooses to realise, which 'issuer-obligation' does not distinguish from a plain debt, and the asset counts are neither units v3 knows nor statements the reader can read. The SPC, its custodian, the portfolio auditors and counsel are all unnamed, and the mints are Token-2022."
+  }
+}

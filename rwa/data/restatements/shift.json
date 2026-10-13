@@ -1,0 +1,439 @@
+{
+  "id": "shift",
+  "name": "Shift leveraged Series tokens (SHIFT DAO LLC)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "shift"
+    ],
+    "catalogueNames": [
+      "Shift leveraged tokens"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "shift"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/shift.json (Master and Series 12-18 Operating Agreements, Terms of Use, Risk Disclosure, site-wide legal notice, GitBook docs, chain reads)",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter search, 8 shift mints)",
+      "asOf": "2026-09-20"
+    },
+    {
+      "source": "rwa-assets-db.json and attestations-db.json (Shift leveraged tokens)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario stock-templates.ts shift--token-2022-pausable-clawback-rebase",
+      "asOf": "2026-09-23"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "membership-interest",
+    "legalForm": "Membership interest in a designated Series of SHIFT DAO LLC, a Marshall Islands series DAO LLC (DAO Act 2022, LLC Act 1996 s.79 segregation), whose treasury is documented to hold one daily-reset leveraged or inverse ETF (Series 17: SPXL, ISIN US25459W8626; Series 12: Direxion Daily TSLA X2, ISIN US25460G2865)",
+    "says": "On the Series Operating Agreements the holder is a member and 'owner in the Series Assets', with 'treasury ownership only' and no voting, management, fiduciary or inspection rights. The issuer's own legal notice denies any 'legal title, or claims to the underlying Series Assets', no agreement names the mint it governs, and the two SpaceX mints have no Series or terms at all."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 8,
+      "example": {
+        "symbol": "TSL2L",
+        "mint": "6afjZE5Qv9WF5K1adBgTxtWyenJ7ZerH6BVAzmoSHFT"
+      },
+      "readable": false,
+      "note": "TSL2L, TSL1S, SOX3L, SOX3S, SPX3L, SPX3S (Series 12-15, 17, 18; addresses published by the issuer) and SPCX2L, SPCX2S (no Series, no published address); 8 decimals."
+    }
+  ],
+  "parties": [
+    {
+      "id": "shift",
+      "name": "SHIFT DAO LLC",
+      "role": "issuer",
+      "note": "Republic of the Marshall Islands. Signs each Series agreement 'solely in its limited and non-discretionary capacity as the administrative agent'; also chooses each Series' assets and may charge a percentage-of-treasury fee.",
+      "keys": [
+        {
+          "address": "CoghvrToe8SZTta5Q6cb2BnVki6WXXGMogeSiea5vNte",
+          "controls": "mint, freeze, permanent delegate, pause, metadata and scaled-UI authority of SPX3L (each of the eight mints has its own such key, e.g. TSL2L 21bymdv3CB8QFa5taouuTcrgTVLjH9vKVEScEKqKGRZd)",
+          "kind": "hot-key: unfunded off-chain keypair, fees paid by 2HfsYtL44s9FXVjit21VUfvW4fP6FvvqHHWNan6puTWz; appears in no Shift document"
+        }
+      ]
+    },
+    {
+      "id": "custodians",
+      "name": "DekaBank and ALPACADB LTD",
+      "role": "custodian",
+      "note": "Named as custodians of the Series Assets in the Risk Disclosure only."
+    },
+    {
+      "id": "holding-entity",
+      "name": "'A private entity that holds the backing assets' (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "mins",
+      "name": "MINS LLC",
+      "role": "other",
+      "note": "Initial nominee member of each Series (Majuro), with 'no economic entitlement or discretionary authority'; signed the Series 17 agreement on 2026-04-19."
+    },
+    {
+      "id": "chainlink",
+      "name": "Chainlink",
+      "role": "oracle",
+      "note": "Named in the docs as the Proof-of-Reserve verifier and mint gate."
+    },
+    {
+      "id": "jupiter",
+      "name": "Jupiter",
+      "role": "venue",
+      "note": "All eight mints listed and verified; 24/7 RFQ against market-maker liquidity."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "shift",
+      "type": "profile",
+      "about": "the eight per-mint authority keys",
+      "says": "SHIFT DAO LLC, a for-profit series DAO LLC of the Republic of the Marshall Islands, administrative agent of each designated Series. Not registered as an investment company, AIF, UCITS or investment firm; interests 'do not constitute public securities under RMI law'. No director or officer is named.",
+      "today": {
+        "state": "published",
+        "where": "Terms of Use, Series Operating Agreements and site-wide legal notice; none of the eight authority keys appears in any Shift document. A licence claim (international investment business, no. 10246-26) appears only on the vaults-only Terms and could not be checked against an RMI register"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "shift",
+      "type": "declaration",
+      "form": "token",
+      "about": "the Series 12-15, 17 and 18 mints",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: a person becomes a member of Series N by holding at least one token; 'Series 17 Members are owners in the Series 17 Assets', granted 'treasury ownership only'. Purchase price: the executed price of one share of the named ETF plus 0.1%. Allocation: the Series treasury, which holds the named leveraged ETF 1:1 (Series 17 SPXL; Series 12 Direxion Daily TSLA X2).",
+      "today": {
+        "state": "published",
+        "where": "Executed Series Operating Agreements on the GitBook legal hub; each locates its token in 'the Smart Contract located at an address and a blockchain to be determined', and Series 17 requires 'at least one (1) TSLA Short SHFT Token'"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "T-spacex",
+      "signer": "shift",
+      "type": "declaration",
+      "form": "token",
+      "about": "the SPCX2L and SPCX2S mints",
+      "says": "Token terms for the SpaceX 2x long and short tokens: Series, permitted assets, price formula and redemption.",
+      "today": {
+        "state": "not-published",
+        "where": "No Series Operating Agreement covers either mint; neither is in the docs' Series or contract-address tables, although both were minted (250 SPCX2L on 2026-06-16, 395.72 SPCX2S on 2026-06-24) and trade"
+      }
+    },
+    {
+      "id": "notice",
+      "signer": "shift",
+      "type": "note",
+      "about": "every Shift mint",
+      "says": "'The Series tokens provide their holders with economic exposure to the value of the Series Assets; holding the Tokens does not grant dividend rights, voting power, legal title, or claims to the underlying Series Assets.'",
+      "today": {
+        "state": "published",
+        "where": "Site-wide legal notice (shift-rwa.vercel.app/markets), dated 2026-04-29 in RWA Sonar's catalogue"
+      }
+    },
+    {
+      "id": "A",
+      "signer": "shift",
+      "type": "declaration",
+      "form": "custody",
+      "about": "each Series treasury",
+      "says": "Custody arrangement: 'Each Series relies on DekaBank ... and ALPACADB LTD ... as custodians of the Series Assets', held in 'dedicated accounts, separate from operational balances and from other clients' assets', through 'a private entity that holds the backing assets'.",
+      "today": {
+        "state": "published",
+        "where": "Risk Disclosure and Collateral & Custody page; the holding entity and the market maker are not named, and no account is identified per Series"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodians",
+      "type": "holds",
+      "about": "A's account for Series N",
+      "for": "the Series treasury, through the unnamed holding entity",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of the named ETF for this Series, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "Only Shift's Risk Disclosure names them; neither firm has published any confirmation, statement or holdings report tied to a Series"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "H-entity",
+      "signer": "holding-entity",
+      "type": "holds",
+      "about": "A's holding for Series N",
+      "for": "the Series treasury",
+      "refs": [
+        "A"
+      ],
+      "says": "For every Series Token in circulation we hold the corresponding ETF share, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The entity is described only as 'a private entity that holds the backing assets'"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed-status",
+      "signer": "shift",
+      "type": "status",
+      "predicate": "backed",
+      "about": "every Shift mint",
+      "says": "'For every Series Token in circulation, this entity holds the corresponding leveraged or inverse ETF on a 1:1 basis ... There are no fractional reserves. Tokens cannot be issued in excess of verified backing'; mint operations 'are gated by PoR feed'. No figure or date is given.",
+      "today": {
+        "state": "published",
+        "where": "Solution Overview and PoR pages of the docs; the PoR dashboard and attestation sections read '[TO BE UPDATED]'"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "por",
+      "signer": "chainlink",
+      "type": "status",
+      "predicate": "backed",
+      "about": "every Shift mint",
+      "says": "Verified reserve state of each Series against token supply, every block.",
+      "today": {
+        "state": "not-published",
+        "where": "Chainlink's reference-data directory (295 Ethereum-mainnet and 12 Solana-mainnet feeds, read 2026-09-18) carries no SHIFT feed; the integration has been announced as forthcoming since 2025-05-21"
+      },
+      "gaps": [
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "record",
+      "signer": "shift",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the Series 12-15, 17 and 18 mints",
+      "says": "Membership of Series N is held by holding its token: the token is the record of membership, and no other register of members is described.",
+      "today": {
+        "state": "published",
+        "where": "Series Operating Agreements, which define membership by token but never name the mint; Art. VI.2 denies members any right to inspect Series records"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "shift",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "every Shift mint",
+      "says": "Not offered to US or UK persons; elsewhere only to qualified investors or professional clients. A US or UK person who bypasses this 'may result in immediate freezing, confiscation, or forced liquidation of the associated tokens without recourse'; a Restricted Person is withdrawn as a member automatically.",
+      "today": {
+        "state": "published",
+        "where": "Site notice, Risk Disclosure and Series agreements, which give four different restriction lists"
+      },
+      "gaps": [
+        "eligibility",
+        "reserved-powers"
+      ]
+    },
+    {
+      "id": "redemption",
+      "signer": "shift",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "every Shift mint",
+      "says": "Repurchased N tokens of Series S from member M, settled from the treasury to the member's wallet by smart contract.",
+      "today": {
+        "state": "not-published",
+        "where": "The Series agreements grant it; the Technical Overview says mint and burn are B2B endpoints for market makers only, and no SHIFT program exists on chain"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "rebase",
+      "signer": "shift",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "the SOX3S mint",
+      "says": "The SOX3S balance multiplier is 0.1 because of event E on date D.",
+      "today": {
+        "state": "not-published",
+        "where": "The multiplier is on chain; no Shift document mentions it"
+      }
+    },
+    {
+      "id": "title-flag",
+      "signer": "researcher",
+      "type": "flag",
+      "about": "the issuer's token terms for Series 12-15, 17 and 18",
+      "refs": [
+        "T",
+        "notice",
+        "record"
+      ],
+      "says": "Untrue as a description of the traded tokens: the issuer's own legal notice says the tokens give no claim to the Series Assets, the agreements do not name the mint they govern (Series 17 names the wrong product), and the Series holds a third party's leveraged ETF rather than the referenced equity.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier holderClaim and finding holder-ranks-as-unsecured-creditor; Tokenizario stock-templates.ts reads it the same way"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "reserve-flag",
+      "signer": "researcher",
+      "type": "flag",
+      "about": "the issuer's backed status",
+      "refs": [
+        "backed-status"
+      ],
+      "says": "Untrue that minting is gated by proof of reserve: every observed issuance, including a batch top-up of all eight mints on 2026-08-24 08:48:20Z-08:48:30Z, is a bare Token-2022 mintTo signed by the mint's own key, with no SHIFT program, oracle or reserve account; SPCX2S was minted while the issuer's markets page called it not yet tradable.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings no-reserve-verification-published (critical) and issuer-may-mint-against-expected-exposure (critical)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "audit-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "every Shift mint",
+      "says": "The only audit Shift links is a Zokyo review (19 June 2025) of ARTokens GmbH's Ethereum contract aRtoken.sol; it names no SHIFT entity, Solana program or mint. No Shift program exists on chain to audit.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding no-public-smart-contract-audit"
+      },
+      "gaps": [
+        "research-finding",
+        "program-subject"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with permanent delegate, pausable config (unpaused), scaled UI amount, a transfer hook with null programId, defaultAccountState initialized and confidential transfers. On each mint one key holds mint, freeze, delegate, pause, metadata and scaled-UI authority: eight unfunded off-chain keypairs, no multisig, fees paid by 2HfsYt…",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar dossier keyGovernance and knownExtensions (RPC)"
+    },
+    {
+      "id": "multiplier",
+      "says": "SOX3S scaled-UI multiplier 0.1; the other seven mints read 1.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar dossier knownExtensions"
+    },
+    {
+      "id": "no-program",
+      "says": "No issuer program sits in the control path: each mint's own key signs raw Token-2022 mintTo; the mints were created on 2026-05-12 to 2026-06-11 by HJfhNwwa… with a plain setAuthority script.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier authorityFacts.upgrade and keyGovernance"
+    },
+    {
+      "id": "supply",
+      "says": "Supply on 2026-09-20: TSL2L 43,300.51 (541 holders), SPX3S 26,768.49, TSL1S 10,044.96, SOX3S 7,565.14, SOX3L 3,967.37, SPX3L 2,902.47, SPCX2S 395.72, SPCX2L 249.99; top-10 holder share above 81% on every mint.",
+      "observedAt": "2026-09-20",
+      "source": "RWA Sonar stocks/data/universe.json (Jupiter)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Which document controls",
+      "says": "The Series agreements, the Terms of Use, the Risk Disclosure and the site notice disagree on title, eligibility and redemption; nothing published ranks them."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "RMI law; ICDR arbitration seated in the RMI with a total bar on court actions for Series members, RMI courts for website users, and ICC arbitration with a class waiver on the vaults Terms."
+    },
+    {
+      "topic": "Fees and wind-down",
+      "says": "A percentage-of-treasury fee the Master DAO may charge is never quantified; on a Master Cancellation Event the Master DAO alone decides whether a Series continues or is wound up, at the Series' cost; cessation of membership gives no right to a distribution."
+    },
+    {
+      "topic": "Pricing",
+      "says": "No NAV or mark is published; users trade on market makers' RFQ quotes 'based on the underlying ETF's NAV, plus a spread', with weekend spreads given as up to ~3% and up to ~5% on two docs pages."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a Series membership token",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Series terms (T) that name this mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A named custodian's ETF holdings for the Series, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Reserve against supply from an independent oracle",
+        "minSigners": 1,
+        "signers": "my-lens",
+        "params": {
+          "predicate": "backed"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The outline can be said, and the defect is sayable too: the issuer's T and its own contrary notice side by side, flagged by a researcher. What the holder has, a series LLC membership interest whose link to the mint is undocumented, needs both the missing claim kind and a way to say which record is authoritative, both priority-1/2 gaps at the core. The custodians are named only by the issuer, the claimed Chainlink feed does not exist, the SpaceX mints have no terms, and every mint is Token-2022 under a single hot key."
+  }
+}

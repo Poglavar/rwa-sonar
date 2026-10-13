@@ -1,0 +1,271 @@
+{
+  "id": "baxus",
+  "name": "BAXUS bottle NFT",
+  "subjects": {
+    "researchProducts": [
+      "baxus"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "baxus"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-08",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts BAXUS (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    }
+  ],
+  "path": "nft",
+  "holderPosition": {
+    "originKind": "thing",
+    "claimKind": null,
+    "proposedClaimKind": null,
+    "legalForm": "Ownership of one identified physical bottle, as BAXUS's May 2024 terms describe each collectible NFT; the bottle is kept in BAXUS's own vault",
+    "says": "Per BAXUS's terms, the NFT is ownership of one bottle that BAXUS keeps in a numbered vault space; it is not a platform token or a fraction. Collecting the bottle needs a redemption, which destroys the NFT, and a delivery subject to age, destination and shipping requirements. The title claim is the operator's own description and has not been tested."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "unknown",
+      "readable": false,
+      "note": "One NFT per bottle, per BAXUS's terms. No individual bottle mint was identified, and the reviewed sources do not name the current token standard, so whether the NFT reader could read it is unknown."
+    }
+  ],
+  "parties": [
+    {
+      "id": "baxus",
+      "name": "BAXUS",
+      "role": "issuer",
+      "note": "Marketplace operator; describes the bottle NFT and its redemption terms."
+    },
+    {
+      "id": "vault",
+      "name": "The BAXUS vault",
+      "role": "custodian",
+      "note": "The operator's own custody team; the FAQ names a main logistics vault in New York. Not an independent reserve auditor."
+    },
+    {
+      "id": "authenticator",
+      "name": "A BAXUS authenticator",
+      "role": "inspector",
+      "note": "The person who examines and records each bottle at intake; part of the operator."
+    },
+    {
+      "id": "insurer",
+      "name": "The bottles' insurer (not named)",
+      "role": "insurer"
+    },
+    {
+      "id": "collector",
+      "name": "The redeeming collector",
+      "role": "holder"
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "baxus",
+      "type": "profile",
+      "about": "the operator's wallet",
+      "says": "BAXUS, operator of a marketplace for vaulted bottles, each represented by its own NFT.",
+      "today": {
+        "state": "published",
+        "where": "BAXUS terms (May 2024) and FAQ; no wallet or authority key is tied to BAXUS in the sources"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "sheet",
+      "signer": "baxus",
+      "type": "declaration",
+      "about": "each bottle NFT",
+      "says": "Asset sheet: this identified bottle, its intake record, its numbered vault space and its 3D scan, under the linked BAXUS terms, which describe the NFT as ownership of the bottle and allow smart-contract restrictions.",
+      "today": {
+        "state": "published",
+        "where": "BAXUS terms (May 2024) describe the model; no individual bottle's sheet or mint was checked"
+      },
+      "gaps": [
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "H",
+      "signer": "vault",
+      "type": "holds",
+      "about": "the bottle NFT",
+      "for": "the token holder",
+      "refs": [
+        "sheet"
+      ],
+      "says": "This bottle is in our numbered vault space, for the token holder, as of date; the intake record is the evidence.",
+      "today": {
+        "state": "not-checked",
+        "where": "BAXUS says it records each bottle in a numbered vault space; no individual bottle's vault record was checked. The vault is the operator itself"
+      },
+      "gaps": [
+        "affiliation"
+      ]
+    },
+    {
+      "id": "intake-inspection",
+      "signer": "authenticator",
+      "type": "inspection",
+      "about": "the bottle NFT",
+      "says": "I examined the seal, label, packaging and condition on this date; these photos and the 3D scan show what I saw.",
+      "today": {
+        "state": "not-checked",
+        "where": "BAXUS says it checks, authenticates and 3D-scans incoming bottles; no signed inspection of a chosen bottle was checked, and the authenticator is the operator's own"
+      },
+      "gaps": [
+        "affiliation"
+      ]
+    },
+    {
+      "id": "record",
+      "signer": "baxus",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the bottle NFT",
+      "says": "The NFT in the holder's own wallet (or the bottle shown in the BAXUS platform account) is the record of ownership of this bottle.",
+      "today": {
+        "state": "not-published",
+        "where": "The September 2026 wallet-setup guide asks holders to sign the transfer of their bottle NFTs into their own wallets; no source says which of the two records prevails"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the bottle NFT",
+      "says": "This bottle is covered against named risks for the period, with the insured party and loss payee named.",
+      "today": {
+        "state": "unnamed",
+        "where": "The FAQ says the bottles are insured; no insurer, policy, insured party or loss payee is named"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "fees-flag",
+      "signer": "tokenizario",
+      "type": "flag",
+      "refs": [
+        "sheet"
+      ],
+      "about": "the BAXUS terms the asset sheet links",
+      "says": "Storage fees conflict across four sources: the May 2024 terms give two free years; one FAQ answer says storage is free until collection, another says 2% a year with waivers; the September 2026 update says free with no end date. The FAQ gives a 10% selling fee.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (BAXUS), read 8 October 2026"
+      },
+      "gaps": [
+        "fees",
+        "research-finding"
+      ]
+    },
+    {
+      "id": "delivery",
+      "signer": "vault",
+      "type": "handoff",
+      "about": "the bottle NFT",
+      "says": "After redemption, I handed this bottle to the named collector (a carrier may add its own hand-over and receipt in between).",
+      "today": {
+        "state": "not-published",
+        "where": "The terms describe redemption, the burn and delivery; no completed delivery was documented"
+      }
+    },
+    {
+      "id": "receipt",
+      "signer": "collector",
+      "type": "receipt",
+      "refs": [
+        "delivery"
+      ],
+      "about": "the vault's hand-over",
+      "says": "I received the bottle in that hand-over.",
+      "today": {
+        "state": "not-published",
+        "where": "No completed redemption was documented; a burn of the NFT would not show it"
+      }
+    },
+    {
+      "id": "review-scope",
+      "signer": "tokenizario",
+      "type": "note",
+      "about": "the bottle NFT",
+      "says": "No individual bottle mint, matching vault record or signed inspection was checked; this is the published product model, not a verified bottle. The terms and FAQ do not establish the current token standard or the active authorities.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (BAXUS), read 8 October 2026"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Redemption and delivery",
+      "says": "Redemption destroys the NFT; BAXUS then arranges delivery, subject to age, destination and shipping requirements. Stays in BAXUS's terms and logistics."
+    },
+    {
+      "topic": "Restrictions",
+      "says": "The terms allow smart-contract restrictions on the NFT. Stays in the terms; the chain would show the capability once the mint is identified."
+    },
+    {
+      "topic": "Authentication, vault operations and selling fee",
+      "says": "BAXUS's authentication service, vault operations and the 10% selling fee stay with its platform and contracts."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a vaulted bottle",
+    "outcome": "buy",
+    "author": "A collector",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Bottle asset sheet with identifiers and terms",
+        "minSigners": 1,
+        "signers": "any"
+      },
+      {
+        "type": "holds",
+        "label": "The vault's 'I have it' statement for this bottle, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "any"
+      },
+      {
+        "type": "inspection",
+        "label": "Bottle inspection that records its condition",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "good",
+    "summary": "One NFT for one vaulted bottle is the case v3 was built for: an asset sheet, the vault's holds, an inspection, and a hand-over and receipt on redemption say the holder's position. What v3 cannot show is that the vault and the authenticator are the operator itself, which bottle record prevails, and the insurance. None of the statements is signed for a checked bottle today, and the token standard is not established."
+  }
+}

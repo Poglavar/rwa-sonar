@@ -1,0 +1,249 @@
+{
+  "_comment": "Where Tokenizario's vocabulary v3 (rwa/data/tokenizario-vocabulary.json) could not say what a researched product needs said. Each gap was surfaced by restating RWA Sonar's records as 'X says Y about Z' (rwa/data/restatements/); restatements and rwa/data/attestation-schema-map.json cite gaps by id, and rwa/restatement.test.js fails on an unknown id or an unused gap. A gap is a finding about the vocabulary, not about the product. Priority 1 blocks a whole class of real products; 2 forces a material fact into free text; 3 is a convenience.",
+  "asOf": "2026-10-13",
+  "gaps": [
+    {
+      "id": "reader-scope",
+      "title": "The reader cannot read most real tokens",
+      "cannotSay": "Any statement about a Token-2022 mint, an EVM contract, a Hedera token or an XRP Ledger token: the /fungible reader admits only classic SPL fungible mints and the NFT reader only Metaplex NonFungible on classic SPL.",
+      "whyItMatters": "Every tokenized stock on Solana (about 1,180 mints across nine programmes) and 8 of the 12 researched Solana fund, gold and dollar mints are Token-2022. A chain read on 13 October 2026 found classic SPL only for USDC, USDY, OUSG and TRCH1. Without Token-2022, the reader cannot show the extensions that matter most: permanent delegate, pause, transfer hook, default frozen accounts, scaled UI amount and transfer fee.",
+      "proposal": "Admit Token-2022 fungible mints in /fungible and read every extension into 'Who can move it' as chain facts. Next, an external scope per chain (EVM by chain id and contract) so a declaration can be about an Ethereum or Hedera token, even before its chain facts can be read.",
+      "effort": "reader",
+      "priority": 1
+    },
+    {
+      "id": "issuer-key-binding",
+      "title": "Nothing ties a signing wallet to the token's own authorities",
+      "cannotSay": "That a declaration or status was signed by the wallet that is this mint's mint authority, freeze authority, permanent delegate or metadata update authority, or by a member or vault of the Squads multisig that holds them. Nor who keeps that key: Bullish and Securitize sign through an MPC custody service, Superstate names Turnkey; a reader cannot see that the authority sits with a provider that also signs for other issuers.",
+      "whyItMatters": "Vocabulary v3 says a declaration 'does not establish that the wallet that signed it is the issuer'. For existing tokens this is the only credible identity link a reader can check: Backed, Ondo, Securitize, Superstate, Paxos and Circle all already control on-chain authority keys. Without it, a real issuer's signed declaration reads exactly like anyone's.",
+      "proposal": "A chain fact on every statement about a mint: 'signed by this mint's <authority>' (or by the Squads vault or a member that controls it). Test that a Squads v4 vault transaction can sign the SAS record and append it to the story registry.",
+      "effort": "reader",
+      "priority": 1
+    },
+    {
+      "id": "legal-characterisation",
+      "title": "Too few claim kinds for what the holder legally has",
+      "cannotSay": "A registered holding in the holder's own name, a beneficial interest under a trust, an in-rem co-ownership share of a pool, a secured or unsecured debt claim, a contingent claim payable only on an event, a membership interest in a series LLC, a synthetic or derivative exposure, or an express 'no claim at all'. Origin kinds are thing, claim, share or none; the fungible token declaration has only issuer-obligation and ownership-interest. Also missing: a limited-partnership interest (HLSCOPE, OUSG), a security entitlement against a broker under UCC Article 8 (Securitize Stocks), a parent's keepwell or guarantee behind the issuer (Republic Mirror), and the holder's rank against other creditors (USTB's protocol-redemption liquidity providers rank ahead of shareholders).",
+      "whyItMatters": "What the holder owns is the first question RWA Sonar answers, and the legal answer decides insolvency outcomes. A Superstate registered share, a Backpack bare-trust entitlement, an xStocks tracker certificate with a pledge and a Tessera loan participation all collapse into 'claim' or 'ownership-interest'. A trust beneficiary has an equitable proprietary interest; an unsecured noteholder ranks with general creditors.",
+      "proposal": "Extend claimKind: registered-holding, beneficial-interest (trust), co-ownership (pro rata in a pool), debt-secured, debt-unsecured, contingent, membership-interest, synthetic, none. Keep the terms link as the governing text. Add partnership-interest and security-entitlement, a credit-support field (guarantor, form), and a rank field (senior to, pari passu with, subordinated to whom).",
+      "effort": "vocabulary",
+      "priority": 1
+    },
+    {
+      "id": "legal-opinion",
+      "title": "No typed legal opinion",
+      "cannotSay": "'In my opinion, under the law of L, proposition P holds, as of date, addressed to A, and these persons may rely on it.' True sale, non-consolidation (bankruptcy remoteness), enforceability against the issuer, priority on insolvency, conveyance of rights on transfer, characterisation as a security or not.",
+      "whyItMatters": "In a securitisation, bankruptcy remoteness and true sale are not facts anyone can observe; they rest on counsel's opinions, and whether holders may rely on them is part of the opinion. RWA Sonar's schemas 'assets-bankruptcy-remote-from-issuer', 'holder-claim-priority-defined', 'token-holder-can-enforce-in-jurisdiction' and 'token-transfer-conveys-all-rights' all name a third-party lawyer as attester. A status or a note cannot say who may rely on it.",
+      "proposal": "A legal-opinion statement (or certification event 'legal-opinion') with: governing law, proposition from a fixed list, as-of date, addressee, reliance (holders may rely: yes or no), qualifications in the hashed document, signer credentialed as counsel.",
+      "effort": "vocabulary",
+      "priority": 1
+    },
+    {
+      "id": "class-beneficiary",
+      "title": "Custody and charges cannot be held for the holders as a class",
+      "cannotSay": "'I hold these shares for the holders of mint M, pro rata' or 'the security agent holds a pledge for all investors'. holds names one wallet or the current token holder; security-interest names its lender, not the class it secures.",
+      "whyItMatters": "Collective security is how tokenized stocks and notes protect holders: Security Agent Services AG pledges xStocks collateral for all investors, Ankura is security agent for Ondo Global Markets, Trek Nexus is bare trustee for Backpack's pool. A token holder's claim on a defaulting issuer depends on that collective arrangement, not on a statement about one wallet.",
+      "proposal": "Allow 'for' to be a class: { mint(s), basis: pro-rata } on holds and security-interest, with the beneficiary class bound to the exact token declaration.",
+      "effort": "vocabulary",
+      "priority": 1
+    },
+    {
+      "id": "court-order",
+      "title": "Court orders and cancellations have no typed form",
+      "cannotSay": "'Court C, in case K, ordered O (freeze, transfer, cancellation of lost tokens, reissue) about token T on date D.' A ruling must answer a flag and has no effect; there is no way for a court or its officer to resolve a contest between a token and its replacement.",
+      "whyItMatters": "RWA Sonar's maturity ladder puts 'the decisions of the legal system can affect the ledger' at the top (Level 4), and Tokenizario deliberately forbids forced transfers. The two meet at replacement tokens: Backed's prospectus cancels lost xStocks only after a Zug court rules, Circle froze about $57.6M under a New York order and later unfroze it. In Tokenizario a contest stays open forever unless the old holder yields, which a thief never does.",
+      "proposal": "A certification event 'court-order' with court, case reference and the order's operative words in the hashed document; let a ruling answer a contest of competing tokens as well as a flag, and rank rulings by a court credential.",
+      "effort": "vocabulary",
+      "priority": 1
+    },
+    {
+      "id": "reserve-structure",
+      "title": "Reserve and allocation figures have no structure across chains",
+      "cannotSay": "Assets of amount X in unit U against liabilities of amount Y over these mints on these chains, excluding unissued, access-denied and pending-burn tokens, as of time T. status 'backed' has a free-text value; the A/H/T allocation covers one classic SPL mint. holds cannot say that a quantity is an unallocated account, which is the account provider's debt, rather than bars in its possession (TER's 10 kg in London unallocated accounts; Paxos's unallocated redemption option).",
+      "whyItMatters": "Circle's examination reconciles one global reserve with USDC across every chain; Paxos reports ounces against PAXG on Ethereum and Solana; xStocks reports per product across ten chains. Dividing a global reserve by one chain's supply is wrong, and the vocabulary has no denominator field to stop it.",
+      "proposal": "A structured status 'backed' document: assets {amount, unit}, liabilities {amount, unit, scope: list of chain and mint}, exclusions, as-of. Reuse the A/H/T integer arithmetic.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "units",
+      "title": "Reserve units stop at metals, litres, items, USD and EUR",
+      "cannotSay": "Shares of a named security (by ISIN or FIGI), fund units of a share class, Treasury bills by face value, a Goldback, GBP, CHF or any other currency.",
+      "whyItMatters": "Every stock, fund and Treasury product in the database is reserved in shares, units or face value. 'item' loses which security the item is.",
+      "proposal": "A unit object: currency (ISO 4217), mass, volume, security {ISIN or FIGI}, fund-unit {share class}, item.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "authoritative-record",
+      "title": "Which register prevails cannot be said",
+      "cannotSay": "'My register is the record of title, and it prevails over the chain' or the reverse. A register-entry reports an entry; it does not say whether the register or the token is authoritative. Nor that a wallet holds tokens as nominee for buyers recorded on a platform register: Cask Capital keeps card buyers' NFT serials in its own wallet, BAXUS shows bottles in platform accounts before the NFT reaches the buyer, and Backpack's register names Trek Forge for 100% of the supply.",
+      "whyItMatters": "This is RWA Sonar's first maturity pillar (blockchainIsMainLedger). Superstate's master securityholder file prevails while its on-chain record mirrors it; Bullish's register of members at Equiniti prevails; xStocks are Swiss ledger-based securities where the ledger is the register; Backpack's trustee recognises an affiliate, not the wallet. A reader cannot tell a token that is title from a token that follows title.",
+      "proposal": "A status predicate 'authoritative-record' (value: chain, or the named register) signed by the issuer or registrar, with the legal basis in the hashed document.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "eligibility",
+      "title": "Who may hold, receive or redeem has no typed form",
+      "cannotSay": "Holding needs KYC; transfers only to an allowlist; US persons excluded; redemption only for onboarded customers above a minimum. Only status 'foreign-ownable' exists.",
+      "whyItMatters": "Eligibility decides whether a holder can exit at par, and it differs per product: xStocks redeem only for verified clients outside the US, UK, Canada and Australia above $5,000; BUIDL holds on an allowlist; PAXG bars need 430 tokens. A chain fact can show an allowlist (default frozen accounts); only a statement can say the rule behind it.",
+      "proposal": "A status predicate 'eligibility' with structured fields: kyc-to-hold, allowlist, excluded jurisdictions, who may redeem, minimum size, signed by the issuer and comparable with the chain facts.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "reserved-powers",
+      "title": "Powers reserved in the terms cannot be stated beside the chain powers",
+      "cannotSay": "'Under clause N of the terms, party X may freeze, seize, claw back, cancel, rebase or charge fees, in these circumstances.' The vocabulary reads chain powers and leaves the terms unmodelled.",
+      "whyItMatters": "RWA Sonar's powers page compares what keys can do with what the documents allow. Paxos may seize 'in its sole discretion'; Circle freezes under its access-denial policy; Superstate's transfer agent 'can reconstitute' tokens. A holder needs the legal permission and the technical capability side by side, and discrepancies between them are findings.",
+      "proposal": "A declaration section 'reserved powers' (power, holder, conditions, clause locator), compared by the reader with the chain powers, mismatches shown.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "insurance",
+      "title": "No statement says 'I insure it'",
+      "cannotSay": "An insurer covering identified property for an insured party, for a period, against named risks, with limits, deductibles, exclusions and a loss payee.",
+      "whyItMatters": "Vaulted bars, bottles, casks, a museum loan and tokenized funds all cite insurance. Who is the insured and who is the loss payee decides whether holders benefit: TRCH1's policy pays the SPV, XAUT warns that cover may be insufficient, xStocks says no government guarantees it.",
+      "proposal": "A status predicate 'insured' (or a cover statement) signed by the insurer: insured party, property, period, risks, limit, loss payee, in a hashed policy schedule.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "roles",
+      "title": "Credential roles miss most of the parties in a structure",
+      "cannotSay": "That a wallet is an issuer, transfer agent, trustee, security agent, depositary, fund administrator, broker-dealer, insurer, oracle, rating agency, servicer, calculation agent, legal counsel or a regulator. Roles are notary, inspector, registry, arbiter, custodian, auditor and other. Restating the funds and stocks also needed general partner, investment manager or sponsor, interface provider and calculation agent.",
+      "whyItMatters": "A recipe can require only those roles, so 'a transfer agent's register entry' or 'an administrator's NAV' cannot be required as such. RWA Sonar's canonical parties name dozens of transfer agents, trustees and agents.",
+      "proposal": "Add the roles above; credentials from regulators' registers (SEC transfer agents, FINMA, FCA) are the natural issuers.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "research-finding",
+      "title": "A researcher's dated finding has no typed home",
+      "cannotSay": "'I reviewed these sources on this date and finding F holds' (custodian not named, no reserve report, terms not retrievable, docs contradict chain), with F from a published catalogue. Only note (untyped) and flag (needs a statement to flag) exist.",
+      "whyItMatters": "Most of RWA Sonar's evidence is of this kind, and absence findings are only meaningful with their search scope and date. Without a type, a research wallet such as RWA Sonar's cannot attest in Tokenizario except as notes no recipe can count.",
+      "proposal": "A review statement: sources read (hashes), date, finding id from a referenced catalogue (RWA Sonar's finding-types.json is one), about a token, wallet or statement.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "oracle-feed",
+      "title": "Continuous on-chain attestations are not statements",
+      "cannotSay": "That a named oracle feed (Chainlink Proof of Reserve, an on-chain NAV, an issuer price account) is this party's standing status or valuation, updated each round. Some feeds are signed off-chain reports verified on chain (Tessera's Chainlink streams, one of them deprecated on 18 September 2026), not accounts with a latest round.",
+      "whyItMatters": "The strongest attestations real issuers publish today are already on chain: xStocks' and Tessera's Chainlink feeds, Ondo's oracle prices. Re-signing each round as a SAS record would be costly and lag the feed.",
+      "proposal": "A declaration 'attest by reference': signer S says feed account F carries its status backed or valuation; the reader shows the feed's latest round as S's statement, with round time as chain time.",
+      "effort": "reader",
+      "priority": 2
+    },
+    {
+      "id": "nav-basis",
+      "title": "A fund's NAV is not an opinion",
+      "cannotSay": "A dealing NAV struck by the administrator, or a market price from an index or feed. Valuation bases are appraisal, offer and paid.",
+      "whyItMatters": "Fund tokens deal at NAV; tracker certificates follow the reference share. Treating either as one wallet's opinion understates it.",
+      "proposal": "Valuation bases 'nav' and 'market', and the fund-administrator role.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "distribution-redemption",
+      "title": "Payouts and redemptions of fungible tokens cannot be recorded",
+      "cannotSay": "'Redeemed N tokens (burn signature) and paid X to the holder' or 'paid this dividend or coupon to holders of record at date D'. payment references only a sale or a notice to collect. Nor 'route R (redemption, physical delivery, cash-out, resale) is or is not available as of date', which decides whether a documented right can be used today (Obsidian has no redemption yet; Cask Capital lists exits as planned; Cropto publishes no procedure).",
+      "whyItMatters": "Redemption is where a claim meets reality: RWA Sonar observes Ondo and xStocks redemptions on chain, but only the issuer can say it paid. Corporate actions on stocks are multipliers on chain plus cash off chain.",
+      "proposal": "Let payment reference a burn or a certification (distribution, redemption), signed by the payer, with a holder's concur as receipt.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "program-subject",
+      "title": "Programs and code cannot be the subject of a statement",
+      "cannotSay": "'I audited program P at commit C, and the deployed bytes match' or 'upgrades of P need a 3-of-5 multisig with a 24-hour time lock'. about is a token or a wallet.",
+      "whyItMatters": "Sale programs, transfer hooks and vaults decide who can move a token. TRCH1's audit names a different program address than the one deployed; Loopscale's docs and its multisig disagree.",
+      "proposal": "Allow about = a program address, with certification 'audited' carrying the commit and a verifiable-build hash.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "cross-chain-lock",
+      "title": "A wrapped token's lockbox cannot be attested",
+      "cannotSay": "'Token A on chain 1 is backed by token B locked in contract C on chain 2' as anything a reader can check.",
+      "whyItMatters": "PAXG and XAUt0 reach Solana through LayerZero; USDhl wraps M. The holder's claim runs through a lock contract no wallet signs for.",
+      "proposal": "A chain fact read from the other chain: locked balance of B in C against supply of A, beside the bridge operator's declaration.",
+      "effort": "reader",
+      "priority": 3
+    },
+    {
+      "id": "fees",
+      "title": "Fees charged to holders have no typed form",
+      "cannotSay": "Storage, management, conversion, redemption and transfer fees, their caps and notice periods.",
+      "whyItMatters": "RWA Sonar treats fees as a first-class dimension; BAXUS's storage terms conflict across four sources. A fee can only appear in a notice to collect or free text.",
+      "proposal": "A declaration section 'fees' (fee, rate, basis, cap, notice), with payment referencing it.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "governance-decision",
+      "title": "Collective decisions have no typed form",
+      "cannotSay": "'Holders (or another token's holders) voted to sell the asset; result R under procedure P.'",
+      "whyItMatters": "TRCH1's skull is sold only if RAWR holders approve it in MetaDAO futarchy; funds and notes have holder votes and board resolutions.",
+      "proposal": "Certification event 'decision' with the procedure, the electorate (a mint or a register) and the result.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "affiliation",
+      "title": "Common control between signers cannot be said",
+      "cannotSay": "That the issuer, the custodian, the transfer agent, the platform and the venue are one group, or that a wallet acts for an affiliate. A profile has no parent; a credential has no 'controlled by'.",
+      "whyItMatters": "Tokenizario's answer to an issuer who also keeps the asset is separation of duties: independent wallets sign holds, inspections and reserve statements. That only works if a reader can tell independent from affiliated. Kraken owns Backed through Payward; Trek Forge and Trek Nexus are both Backpack companies; Securitize is issuer, transfer agent and venue for SECZ. Counting them as separate attesters overstates independence.",
+      "proposal": "A profile field 'controlled by' (wallet or named entity) that the controller concurs with, and a trust-summary line that counts attesters per independent group.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "reserves-lent",
+      "title": "Lent or re-pledged reserves cannot be stated",
+      "cannotSay": "'As of date, N of the reserved shares are lent to borrower B under a securities-lending agreement, against collateral C.' status 'allocated' says assets are set aside; nothing says how much of them is out on loan.",
+      "whyItMatters": "Backed may lend xStocks collateral to a prime borrower; lent shares leave the custody account and come back only if the borrower performs. A custodian's holds that excludes lent shares and an issuer's backed figure that includes them can both be true.",
+      "proposal": "A status predicate 'lent' (amount, borrower, collateral, as of) signed by the custodian or lending agent, beside holds.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "nested-backing",
+      "title": "A token cannot be backed by another token's position",
+      "cannotSay": "'My allocation is N units of fund F, recorded on F's register or held as F's token', as an allocation the reader can follow. A token declaration allocates only from a custody arrangement (A).",
+      "whyItMatters": "Funds of tokenized funds and wrappers are common: OUSG holds BUIDL, ACRED feeds ADCF, HLSCOPE feeds SCOPE, thBILL holds ULTRA and FILQ, USDhl wraps M. Without a typed link a reader can count the same Treasury bills twice, once in BUIDL's backing and again in OUSG's.",
+      "proposal": "Let T's allocation name another token's declaration or a register entry as its source, and make the reader subtract allocations already claimed downstream.",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "terms-version",
+      "title": "Which terms govern which tokens cannot be said",
+      "cannotSay": "'Terms version X supersedes Y from date D', 'obligor A replaced obligor B by novation', or 'wallets onboarded under offering O are bound by terms T'. A newer declaration sits beside an older one; nothing says which one binds a given holder.",
+      "whyItMatters": "Ondo's USDY names two issuers for one mint after a migration; Tessera's T-SpaceX obligor changed by novation; OpenEden's US and non-US agreements name different issuing entities for one TBILL contract; Spiko's share classes and USYC's deployments share terms only in part. The governing terms decide whom the holder can sue.",
+      "proposal": "A declaration field 'supersedes' (exact locator) with an effective date, a 'novation' certification signed by the outgoing and incoming obligor, and an 'applies to' scope (offering, class, wallets onboarded under it).",
+      "effort": "vocabulary",
+      "priority": 2
+    },
+    {
+      "id": "issuer-lifecycle",
+      "title": "Issuer and programme lifecycle has no typed events",
+      "cannotSay": "'This programme is closed to new issuance', 'is being wound down with outstanding tokens', 'was renamed', 'migrated to a new contract'. Only certification 'other' fits; yield is signed by a holder, not the issuer.",
+      "whyItMatters": "Remora wound down with about $2M of tokens still held across about 3,600 holders; Ventuals sunset its markets on 2026-06-15; Felix is sunsetting USDhl; OpenEden migrated TBILL contracts. A holder needs these as typed events to find them, and a recipe needs them as conditions.",
+      "proposal": "Certification events 'wind-down', 'issuance-closed', 'migrated' (to which mint) and 'renamed', signed by the issuer and countable in recipes.",
+      "effort": "vocabulary",
+      "priority": 3
+    },
+    {
+      "id": "liquidity-facility",
+      "title": "A standing liquidity facility has no typed form",
+      "cannotSay": "'Party P stands ready to buy or swap tokens up to capacity C at price rule R, and may pause.' A sale is one holder's offer to one buyer.",
+      "whyItMatters": "Several funds' practical exit is a facility rather than redemption: HLSCOPE's RLUSD swap of VBILL positions, USTB's protocol redemption 'subject to available liquidity', VBILL's RLUSD contract, JTRSY's instant liquidity and WisdomTree's dealer inventory. Whether it has capacity today decides the exit.",
+      "proposal": "A declaration section 'liquidity facility' (provider, capacity, price rule, pause conditions) and a dated status of remaining capacity.",
+      "effort": "vocabulary",
+      "priority": 3
+    }
+  ]
+}

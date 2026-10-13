@@ -6995,6 +6995,1935 @@
           "oro-redeem"
         ]
       }
+    },
+    {
+      "id": "deaton-trch1",
+      "name": "Jurassic Finance TRCH1 (Deaton Triceratops)",
+      "ticker": "TRCH1",
+      "originalName": "Jurassic Finance TRCH1 (Deaton Triceratops)",
+      "programmeId": "jurassic-finance-deaton",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "fossil",
+        "label": "Sale proceeds of one Triceratops skull (contingent; no ownership of the skull)"
+      },
+      "instrument": {
+        "id": "instrument:deaton-trch1",
+        "legalForm": "Contingent claim to a pro-rata USDC share of the net proceeds if the skull is sold or insured as a total loss, under Cayman-law token terms; expressly not a share",
+        "issuer": "Jurassic Finance Labs S.P., a segregated portfolio of Futarchy Governance SPC (Cayman Islands); an unnamed Cayman SPV holds title and grants the entitlement under a Linkage Deed",
+        "identity": "TRCH1 on Solana, mint DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB, as named in Tokenizario's review",
+        "scope": "TRCH1 terms as summarised by Tokenizario on 2026-10-08; Rally's earlier series #DEATON interests are a different instrument",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "trch1-terms",
+          "title": "TRCH1 terms",
+          "url": "https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar"
+        },
+        {
+          "id": "trch1-mint",
+          "title": "TRCH1 mint on Solscan",
+          "url": "https://solscan.io/token/DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Mint reference in mechanisms.ts: classic SPL, 9 decimals, mint and freeze authorities revoked, metadata immutable, 1,000,000 issued"
+        },
+        {
+          "id": "ironnode-audit",
+          "title": "IronNode audit of the TRCH1 sale program",
+          "url": "https://drive.google.com/file/d/1jmQTMTLSulwJirAc4zG8pY1I53i-MUFh/view",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Audit period 30 July to 11 August 2026; 24 findings, 14 fixed; names a program address other than the deployed one"
+        },
+        {
+          "id": "jurassic-site",
+          "title": "Jurassic Finance website",
+          "url": "https://jurassic.finance/",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Issuer website: speaks of ownership, and says the museum pays the insurance"
+        },
+        {
+          "id": "rally-1k",
+          "title": "RSE Archive Form 1-K for 2021 (Rally series #DEATON)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1768126/000176812622000033/rsearchive1k2021.htm",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Series #DEATON purchase of the skull for $250,000 in 2020; 11,400 interests at $25"
+        },
+        {
+          "id": "rawr-metadao",
+          "title": "RAWR on MetaDAO (futard.io launch)",
+          "url": "https://www.futard.io/launch/F5A6BchpqGbbBABtgRycJZGkqy2i5AgVJP1VKW5AGotG",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "RAWR futarchy market in which RAWR holders decide any sale of the skull"
+        },
+        {
+          "id": "solanafloor",
+          "title": "SolanaFloor: Jurassic Finance brings museum-grade Triceratops skull to Solana",
+          "url": "https://solanafloor.com/news/jurassic-finance-brings-museum-grade-triceratops-skull-to-solana",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "News coverage of the launch; not relied on for holder rights"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "TRCH1 holder (primary sale excluded US persons)",
+          "termsId": "deaton-trch1-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "Contingent claim: a pro-rata share, in USDC, of the net proceeds if the skull is sold or insured as a total loss. The terms call the token 'not a share' and give no ownership of the skull; TRCH1 holders have no vote and no redemption or buyback.",
+          "sourceIds": [
+            "trch1-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:rights",
+          "display": {
+            "tone": "condition",
+            "label": "Contingent claim on sale proceeds",
+            "reason": "Contingent claim: a pro-rata share, in USDC, of the net proceeds if the skull is sold or insured as a total loss. The terms call the token 'not a share' and give no ownership of the skull; TRCH1 holders have no vote and no redemption or buyback.",
+            "basis": "[\"rights\",\"supported\",\"source-statement\",\"Contingent claim: a pro-rata share, in USDC, of the net proceeds if the skull is sold or insured as a total loss. The terms call the token 'not a share' and give no ownership of the skull; TRCH1 holders have no vote and no redemption or buyback.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"}]]",
+            "note": "Holders own no part of the skull and are paid only if it is sold or lost; nothing obliges anyone to sell."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The classic SPL mint is the only holder record identified. The verification page the terms promise (Linkage Deed, hashes, title summary, twice-yearly reports) was not found and the token metadata carries no hashes, so whether the chain balance is conclusive for the entitlement is not established.",
+          "sourceIds": [
+            "trch1-terms",
+            "trch1-mint"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Which record counts is unclear",
+            "reason": "The classic SPL mint is the only holder record identified. The verification page the terms promise (Linkage Deed, hashes, title summary, twice-yearly reports) was not found and the token metadata carries no hashes, so whether the chain balance is conclusive for the entitlement is not established.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"The classic SPL mint is the only holder record identified. The verification page the terms promise (Linkage Deed, hashes, title summary, twice-yearly reports) was not found and the token metadata carries no hashes, so whether the chain balance is conclusive for the entitlement is not established.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\",\"trch1-mint\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"},{\"id\":\"trch1-mint\",\"title\":\"TRCH1 mint on Solscan\",\"url\":\"https://solscan.io/token/DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Mint reference in mechanisms.ts: classic SPL, 9 decimals, mint and freeze authorities revoked, metadata immutable, 1,000,000 issued\"}]]",
+            "note": "The classic SPL mint is the only holder record identified. The verification page the terms promise (Linkage Deed, hashes, title summary, twice-yearly reports) was not found and the token metadata carries no hashes, so whether the chain balance is conclusive for the entitlement is not established."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The terms say an unnamed Cayman SPV has sole title to the skull and may not pledge or lend it, and that the skull is expected to go on loan to a US museum. No SPV, museum or appraiser is named, the promised title summary was not found, and on 2026-10-08 no payment for the skull from the sale multisig (633,512 USDC still held) showed on chain; a payment made another way is still possible.",
+          "sourceIds": [
+            "trch1-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:backing",
+          "display": {
+            "tone": "unknown",
+            "label": "Title holder unnamed; acquisition not shown",
+            "reason": "The terms say an unnamed Cayman SPV has sole title to the skull and may not pledge or lend it, and that the skull is expected to go on loan to a US museum. No SPV, museum or appraiser is named, the promised title summary was not found, and on 2026-10-08 no payment for the skull from the sale multisig (633,512 USDC still held) showed on chain; a payment made another way is still possible.",
+            "basis": "[\"backing\",\"unknown\",\"analysis\",\"The terms say an unnamed Cayman SPV has sole title to the skull and may not pledge or lend it, and that the skull is expected to go on loan to a US museum. No SPV, museum or appraiser is named, the promised title summary was not found, and on 2026-10-08 no payment for the skull from the sale multisig (633,512 USDC still held) showed on chain; a payment made another way is still possible.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"}]]",
+            "note": "The terms say an unnamed Cayman SPV has sole title to the skull and may not pledge or lend it, and that the skull is expected to go on loan to a US museum. No SPV, museum or appraiser is named, the promised title summary was not found, and on 2026-10-08 no payment for the skull from the sale multisig (633,512 USDC still held) showed on chain; a payment made another way is still possible."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "supported",
+          "basis": "analysis",
+          "summary": "Mint and freeze authorities are revoked and metadata is immutable, so no key can mint, freeze or move TRCH1. One 3-of-4 Squads multisig is admin, escrow and treasury of the sale and can upgrade the sale program; it moved the treasury tokens into trading pools, although the terms say the issuer will not support any market in the token.",
+          "sourceIds": [
+            "trch1-mint",
+            "trch1-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:controls",
+          "display": {
+            "tone": "condition",
+            "label": "No token powers; sale multisig can upgrade",
+            "reason": "Mint and freeze authorities are revoked and metadata is immutable, so no key can mint, freeze or move TRCH1. One 3-of-4 Squads multisig is admin, escrow and treasury of the sale and can upgrade the sale program; it moved the treasury tokens into trading pools, although the terms say the issuer will not support any market in the token.",
+            "basis": "[\"controls\",\"supported\",\"analysis\",\"Mint and freeze authorities are revoked and metadata is immutable, so no key can mint, freeze or move TRCH1. One 3-of-4 Squads multisig is admin, escrow and treasury of the sale and can upgrade the sale program; it moved the treasury tokens into trading pools, although the terms say the issuer will not support any market in the token.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-mint\",\"trch1-terms\"],[{\"id\":\"trch1-mint\",\"title\":\"TRCH1 mint on Solscan\",\"url\":\"https://solscan.io/token/DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Mint reference in mechanisms.ts: classic SPL, 9 decimals, mint and freeze authorities revoked, metadata immutable, 1,000,000 issued\"},{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"}]]",
+            "note": "The token itself is fixed, but the sale multisig controls the raised USDC, the treasury tokens and the upgradeable sale program."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The primary sale on Jurassic Finance's own launchpad (from 17 August 2026, $0.6947 in USDC, no fee, no lockup) excluded US persons; the token is offered in the EU under MiCA's small-offer exemption, so no white paper was published. With the freeze authority revoked, transfers have no on-chain restriction.",
+          "sourceIds": [
+            "trch1-terms",
+            "jurassic-site",
+            "trch1-mint"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:access",
+          "display": {
+            "tone": "condition",
+            "label": "US persons excluded from the sale",
+            "reason": "The primary sale on Jurassic Finance's own launchpad (from 17 August 2026, $0.6947 in USDC, no fee, no lockup) excluded US persons; the token is offered in the EU under MiCA's small-offer exemption, so no white paper was published. With the freeze authority revoked, transfers have no on-chain restriction.",
+            "basis": "[\"access\",\"supported\",\"source-statement\",\"The primary sale on Jurassic Finance's own launchpad (from 17 August 2026, $0.6947 in USDC, no fee, no lockup) excluded US persons; the token is offered in the EU under MiCA's small-offer exemption, so no white paper was published. With the freeze authority revoked, transfers have no on-chain restriction.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\",\"jurassic-site\",\"trch1-mint\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"},{\"id\":\"jurassic-site\",\"title\":\"Jurassic Finance website\",\"url\":\"https://jurassic.finance/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Issuer website: speaks of ownership, and says the museum pays the insurance\"},{\"id\":\"trch1-mint\",\"title\":\"TRCH1 mint on Solscan\",\"url\":\"https://solscan.io/token/DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Mint reference in mechanisms.ts: classic SPL, 9 decimals, mint and freeze authorities revoked, metadata immutable, 1,000,000 issued\"}]]",
+            "note": "The primary sale excluded US persons; there is no MiCA white paper."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "No redemption or buyback. Holders are paid only if the skull is sold, which RAWR holders decide through MetaDAO futarchy with the operator's written consent, or insured as a total loss; nothing obliges anyone ever to sell. Otherwise the only exit is a market sale.",
+          "sourceIds": [
+            "trch1-terms",
+            "rawr-metadao"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:exit",
+          "display": {
+            "tone": "problem",
+            "label": "No redemption; sale decided by another token",
+            "reason": "No redemption or buyback. Holders are paid only if the skull is sold, which RAWR holders decide through MetaDAO futarchy with the operator's written consent, or insured as a total loss; nothing obliges anyone ever to sell. Otherwise the only exit is a market sale.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"No redemption or buyback. Holders are paid only if the skull is sold, which RAWR holders decide through MetaDAO futarchy with the operator's written consent, or insured as a total loss; nothing obliges anyone ever to sell. Otherwise the only exit is a market sale.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\",\"rawr-metadao\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"},{\"id\":\"rawr-metadao\",\"title\":\"RAWR on MetaDAO (futard.io launch)\",\"url\":\"https://www.futard.io/launch/F5A6BchpqGbbBABtgRycJZGkqy2i5AgVJP1VKW5AGotG\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"RAWR futarchy market in which RAWR holders decide any sale of the skull\"}]]",
+            "note": "TRCH1 holders cannot redeem and have no vote on the sale that would pay them."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "If the structure fails, a company related to the founders may buy the skull at its appraised value. Required all-risks insurance of at least cost or latest appraisal pays the SPV, while the website says the museum pays the insurance. The SPV, insurer and appraiser are not named; disputes go to confidential CI-MAC arbitration with no class actions, and CIMA does not license or supervise the issuer.",
+          "sourceIds": [
+            "trch1-terms",
+            "jurassic-site"
+          ],
+          "scope": {
+            "instrumentId": "instrument:deaton-trch1",
+            "contextId": "holder",
+            "termsId": "deaton-trch1-terms-2026-10-08",
+            "from": null
+          },
+          "id": "deaton-trch1:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rests on unnamed parties",
+            "reason": "If the structure fails, a company related to the founders may buy the skull at its appraised value. Required all-risks insurance of at least cost or latest appraisal pays the SPV, while the website says the museum pays the insurance. The SPV, insurer and appraiser are not named; disputes go to confidential CI-MAC arbitration with no class actions, and CIMA does not license or supervise the issuer.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"If the structure fails, a company related to the founders may buy the skull at its appraised value. Required all-risks insurance of at least cost or latest appraisal pays the SPV, while the website says the museum pays the insurance. The SPV, insurer and appraiser are not named; disputes go to confidential CI-MAC arbitration with no class actions, and CIMA does not license or supervise the issuer.\",{\"instrumentId\":\"instrument:deaton-trch1\",\"contextId\":\"holder\",\"termsId\":\"deaton-trch1-terms-2026-10-08\",\"from\":null},[\"trch1-terms\",\"jurassic-site\"],[{\"id\":\"trch1-terms\",\"title\":\"TRCH1 terms\",\"url\":\"https://docs.google.com/document/d/1S7PYNdDydaVau2a0cvA_cBkSdgrsti42lTQjMoOoEZE/edit\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holder entitlement ('not a share'), SPV title and no pledge or lending, insurance to the SPV, sale decision, no market support, verification page promise, Cayman law and CI-MAC arbitration; as summarised in Tokenizario's mechanisms.ts, not reread by RWA Sonar\"},{\"id\":\"jurassic-site\",\"title\":\"Jurassic Finance website\",\"url\":\"https://jurassic.finance/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Issuer website: speaks of ownership, and says the museum pays the insurance\"}]]",
+            "note": "If the structure fails, a company related to the founders may buy the skull at its appraised value. Required all-risks insurance of at least cost or latest appraisal pays the SPV, while the website says the museum pays the insurance. The SPV, insurer and appraiser are not named; disputes go to confidential CI-MAC arbitration with no class actions, and CIMA does not license or supervise the issuer."
+          }
+        }
+      ],
+      "deployments": [
+        {
+          "id": "solana:DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB",
+          "instrumentId": null,
+          "network": "Solana",
+          "address": "DeatoN4UYU2B658Lh4ZV1VXy1u2ros32UEwnAtCRv4nB",
+          "identity": "Mint named in Tokenizario's review (mechanisms.ts, 2026-10-08); binding to the TRCH1 terms not verified by RWA Sonar",
+          "sourceIds": [
+            "trch1-mint"
+          ],
+          "identityCheckedAt": "2026-10-08T00:00:00Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Not checked by RWA Sonar. Tokenizario's restatement chain read of 2026-10-13 (slot 456350748) found a classic SPL mint with no mint or freeze authority and supply 999,795.237621849."
+          }
+        }
+      ],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Holder terms (via Tokenizario review)",
+          "scope": "Entitlement, SPV title, insurance, sale decision, market support and governing law",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; RWA Sonar has not reread the terms, and the Linkage Deed was not found.",
+          "sourceIds": [
+            "trch1-terms"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Promised verification page",
+          "scope": "Linkage Deed, hashes, title summary and twice-yearly reports",
+          "availability": "promised-unpublished",
+          "limit": "The terms promise the page; no such page was found and the token metadata has no hashes.",
+          "sourceIds": [
+            "trch1-terms"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Sale program audit",
+          "scope": "Sale program code at two named commits",
+          "availability": "reviewed",
+          "limit": "The audit came before deployment and names another program address; there is no verifiable build, so the deployed program is not shown to be the audited code.",
+          "sourceIds": [
+            "ironnode-audit"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Custody, appraisal and insurance evidence",
+          "scope": "SPV title, museum custody, appraised value, insurance policy",
+          "availability": "not-obtained",
+          "limit": "No SPV, museum, appraiser or insurer is named, so none of them can be asked for evidence.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "Issuer → unnamed SPV with title → expected museum loan → RAWR futarchy sale decision → USDC proceeds to holders",
+          "availability": "reviewed",
+          "limit": "The SPV, custody, insurance and appraisal are unnamed; the sale depends on another token's holders and the operator's consent; no payment for the skull is visible.",
+          "sourceIds": [
+            "trch1-terms",
+            "rawr-metadao",
+            "rally-1k"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "Jurassic Finance Labs S.P.; the unnamed SPV grants the entitlement under the Linkage Deed",
+          "processor": "Not established; a payout follows only a sale or a total-loss insurance payment",
+          "onboarding": "None for secondary holders; the primary sale excluded US persons",
+          "entitlementOnTransfer": "The pro-rata entitlement follows the token under the terms; not tested",
+          "settlement": "USDC share of net proceeds, only on a sale or total loss",
+          "minimumAndFees": "Not stated",
+          "independentRoute": "None: no redemption or buyback; market sale only",
+          "availability": "No sale proposal or payout documented"
+        }
+      },
+      "assetModule": {
+        "label": "Triceratops skull (sale-proceeds claim)",
+        "summary": "Triceratops prorsus skull from the Hell Creek Formation, North Dakota, excavated by Dr Bobby Deaton from 1999 to 2001: 31 of 56 skull elements, about 60 to 65% by bone mass, on a steel armature. Rally's series #DEATON paid $250,000 in 2020; who sold it after that is not public. Holders own none of it.",
+        "sourceIds": [
+          "trch1-terms",
+          "rally-1k"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "contingent-claim",
+        "label": "Contingent proceeds claims",
+        "basis": "Structure category from reviewed product or programme description; shared category is not identical terms.",
+        "sourceIds": [
+          "trch1-terms"
+        ]
+      }
+    },
+    {
+      "id": "baxus",
+      "name": "BAXUS bottle",
+      "ticker": "Bottle NFT",
+      "originalName": "BAXUS bottle",
+      "programmeId": "baxus",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "spirits",
+        "label": "One identified bottle of spirits in BAXUS's vault"
+      },
+      "instrument": {
+        "id": "instrument:baxus",
+        "legalForm": "Bottle NFT that the terms describe as ownership of one physical bottle",
+        "issuer": "BAXUS (marketplace operator; legal entity not named in the reviewed summary)",
+        "identity": "One NFT per bottle on Solana, per the terms; no individual bottle mint identified and the token standard not named",
+        "scope": "BAXUS terms (May 2024), FAQ and 2026 articles; one bottle NFT, not a platform token or a fraction",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "baxus-terms",
+          "title": "BAXUS terms and conditions (May 2024)",
+          "url": "https://baxus.co/termsconditions",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage"
+        },
+        {
+          "id": "baxus-faq",
+          "title": "BAXUS FAQ",
+          "url": "https://baxus.co/faq",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Main logistics vault in New York; bottles insured; 10% selling fee; two conflicting storage answers (free until collection; 2% a year with waivers)"
+        },
+        {
+          "id": "baxus-wallet-setup",
+          "title": "Complete your BAXUS wallet setup (September 2026)",
+          "url": "https://baxus.co/the-baxus-vault/article/complete-your-baxus-wallet-setup",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Holders connect a wallet and sign the transfer of their bottle NFTs into it"
+        },
+        {
+          "id": "baxus-payments-storage",
+          "title": "Seven ways to pay on BAXUS (payments and storage update)",
+          "url": "https://baxus.co/the-baxus-vault/article/seven-ways-to-pay-on-baxus",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "September 2026 update: storage free with no end date"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "Bottle NFT holder",
+          "termsId": "baxus-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "BAXUS's May 2024 terms describe each collectible NFT as ownership of its physical asset; here, one NFT for one identified bottle in BAXUS's vault.",
+          "sourceIds": [
+            "baxus-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:rights",
+          "display": {
+            "tone": "condition",
+            "label": "Bottle ownership as the operator describes it",
+            "reason": "BAXUS's May 2024 terms describe each collectible NFT as ownership of its physical asset; here, one NFT for one identified bottle in BAXUS's vault.",
+            "basis": "[\"rights\",\"supported\",\"source-statement\",\"BAXUS's May 2024 terms describe each collectible NFT as ownership of its physical asset; here, one NFT for one identified bottle in BAXUS's vault.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-terms\"],[{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"}]]",
+            "note": "Ownership is the operator's own description; no individual bottle, mint or vault record was checked, and the title claim has not been tested."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "A bottle shown in a BAXUS platform account and an NFT in the holder's own wallet are two records; the September 2026 guide asks holders to sign the transfer of their NFTs into their wallets. No source says which record prevails.",
+          "sourceIds": [
+            "baxus-wallet-setup",
+            "baxus-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Platform record and wallet may differ",
+            "reason": "A bottle shown in a BAXUS platform account and an NFT in the holder's own wallet are two records; the September 2026 guide asks holders to sign the transfer of their NFTs into their wallets. No source says which record prevails.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"A bottle shown in a BAXUS platform account and an NFT in the holder's own wallet are two records; the September 2026 guide asks holders to sign the transfer of their NFTs into their wallets. No source says which record prevails.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-wallet-setup\",\"baxus-terms\"],[{\"id\":\"baxus-wallet-setup\",\"title\":\"Complete your BAXUS wallet setup (September 2026)\",\"url\":\"https://baxus.co/the-baxus-vault/article/complete-your-baxus-wallet-setup\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holders connect a wallet and sign the transfer of their bottle NFTs into it\"},{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"}]]",
+            "note": "A bottle shown in a BAXUS platform account and an NFT in the holder's own wallet are two records; the September 2026 guide asks holders to sign the transfer of their NFTs into their wallets. No source says which record prevails."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "BAXUS says it checks incoming bottles, authenticates and 3D-scans them and records each in a numbered vault space; its FAQ names a main logistics vault in New York and says the bottles are insured. These are the operator's own statements, not an independent inspection of a chosen bottle.",
+          "sourceIds": [
+            "baxus-faq"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:backing",
+          "display": {
+            "tone": "condition",
+            "label": "Operator-run vault and authentication",
+            "reason": "BAXUS says it checks incoming bottles, authenticates and 3D-scans them and records each in a numbered vault space; its FAQ names a main logistics vault in New York and says the bottles are insured. These are the operator's own statements, not an independent inspection of a chosen bottle.",
+            "basis": "[\"backing\",\"supported\",\"source-statement\",\"BAXUS says it checks incoming bottles, authenticates and 3D-scans them and records each in a numbered vault space; its FAQ names a main logistics vault in New York and says the bottles are insured. These are the operator's own statements, not an independent inspection of a chosen bottle.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-faq\"],[{\"id\":\"baxus-faq\",\"title\":\"BAXUS FAQ\",\"url\":\"https://baxus.co/faq\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Main logistics vault in New York; bottles insured; 10% selling fee; two conflicting storage answers (free until collection; 2% a year with waivers)\"}]]",
+            "note": "The vault and the authenticator are BAXUS itself; no independent inspection, vault record or insurer is named."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The terms allow smart-contract restrictions and describe burning the NFT on redemption; the current token standard and the actual mint, freeze and transfer authorities were not verified.",
+          "sourceIds": [
+            "baxus-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:controls",
+          "display": {
+            "tone": "unknown",
+            "label": "Token powers not verified",
+            "reason": "The terms allow smart-contract restrictions and describe burning the NFT on redemption; the current token standard and the actual mint, freeze and transfer authorities were not verified.",
+            "basis": "[\"controls\",\"unknown\",\"analysis\",\"The terms allow smart-contract restrictions and describe burning the NFT on redemption; the current token standard and the actual mint, freeze and transfer authorities were not verified.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-terms\"],[{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"}]]",
+            "note": "The terms allow smart-contract restrictions and describe burning the NFT on redemption; the current token standard and the actual mint, freeze and transfer authorities were not verified."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The reviewed sources do not state who may buy or hold a bottle NFT; delivery on redemption is subject to age, destination and shipping requirements.",
+          "sourceIds": [
+            "baxus-terms",
+            "baxus-wallet-setup"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:access",
+          "display": {
+            "tone": "unknown",
+            "label": "Eligibility not stated",
+            "reason": "The reviewed sources do not state who may buy or hold a bottle NFT; delivery on redemption is subject to age, destination and shipping requirements.",
+            "basis": "[\"access\",\"unknown\",\"analysis\",\"The reviewed sources do not state who may buy or hold a bottle NFT; delivery on redemption is subject to age, destination and shipping requirements.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-terms\",\"baxus-wallet-setup\"],[{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"},{\"id\":\"baxus-wallet-setup\",\"title\":\"Complete your BAXUS wallet setup (September 2026)\",\"url\":\"https://baxus.co/the-baxus-vault/article/complete-your-baxus-wallet-setup\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Holders connect a wallet and sign the transfer of their bottle NFTs into it\"}]]",
+            "note": "The reviewed sources do not state who may buy or hold a bottle NFT; delivery on redemption is subject to age, destination and shipping requirements."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "Redemption destroys the NFT and BAXUS then arranges delivery, subject to age, destination and shipping requirements. The FAQ gives a 10% selling fee. Storage terms conflict: two free years (May 2024 terms), free until collection or 2% a year with waivers (FAQ), free with no end date (September 2026 update).",
+          "sourceIds": [
+            "baxus-terms",
+            "baxus-faq",
+            "baxus-payments-storage"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:exit",
+          "display": {
+            "tone": "condition",
+            "label": "Redemption burns the NFT; storage fees conflict",
+            "reason": "Redemption destroys the NFT and BAXUS then arranges delivery, subject to age, destination and shipping requirements. The FAQ gives a 10% selling fee. Storage terms conflict: two free years (May 2024 terms), free until collection or 2% a year with waivers (FAQ), free with no end date (September 2026 update).",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Redemption destroys the NFT and BAXUS then arranges delivery, subject to age, destination and shipping requirements. The FAQ gives a 10% selling fee. Storage terms conflict: two free years (May 2024 terms), free until collection or 2% a year with waivers (FAQ), free with no end date (September 2026 update).\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-terms\",\"baxus-faq\",\"baxus-payments-storage\"],[{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"},{\"id\":\"baxus-faq\",\"title\":\"BAXUS FAQ\",\"url\":\"https://baxus.co/faq\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Main logistics vault in New York; bottles insured; 10% selling fee; two conflicting storage answers (free until collection; 2% a year with waivers)\"},{\"id\":\"baxus-payments-storage\",\"title\":\"Seven ways to pay on BAXUS (payments and storage update)\",\"url\":\"https://baxus.co/the-baxus-vault/article/seven-ways-to-pay-on-baxus\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"September 2026 update: storage free with no end date\"}]]",
+            "note": "Delivery has age, destination and shipping conditions, and four sources give different storage fees."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "BAXUS says the bottles are insured but names no insurer, policy or loss payee; the vault is the operator's own, and what happens to the bottles and holders if BAXUS fails is not addressed in the reviewed sources.",
+          "sourceIds": [
+            "baxus-faq",
+            "baxus-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:baxus",
+            "contextId": "holder",
+            "termsId": "baxus-terms-2026-10-08",
+            "from": null
+          },
+          "id": "baxus:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rights not verified",
+            "reason": "BAXUS says the bottles are insured but names no insurer, policy or loss payee; the vault is the operator's own, and what happens to the bottles and holders if BAXUS fails is not addressed in the reviewed sources.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"BAXUS says the bottles are insured but names no insurer, policy or loss payee; the vault is the operator's own, and what happens to the bottles and holders if BAXUS fails is not addressed in the reviewed sources.\",{\"instrumentId\":\"instrument:baxus\",\"contextId\":\"holder\",\"termsId\":\"baxus-terms-2026-10-08\",\"from\":null},[\"baxus-faq\",\"baxus-terms\"],[{\"id\":\"baxus-faq\",\"title\":\"BAXUS FAQ\",\"url\":\"https://baxus.co/faq\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Main logistics vault in New York; bottles insured; 10% selling fee; two conflicting storage answers (free until collection; 2% a year with waivers)\"},{\"id\":\"baxus-terms\",\"title\":\"BAXUS terms and conditions (May 2024)\",\"url\":\"https://baxus.co/termsconditions\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Collectible NFT as ownership of its physical asset; smart-contract restrictions; redemption burns the NFT; delivery subject to age, destination and shipping; two free years of storage\"}]]",
+            "note": "BAXUS says the bottles are insured but names no insurer, policy or loss payee; the vault is the operator's own, and what happens to the bottles and holders if BAXUS fails is not addressed in the reviewed sources."
+          }
+        }
+      ],
+      "deployments": [],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Operator terms, FAQ and articles (via Tokenizario review)",
+          "scope": "Ownership description, intake, storage, redemption and fees",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; these are the operator's own statements, and the fee descriptions conflict.",
+          "sourceIds": [
+            "baxus-terms",
+            "baxus-faq",
+            "baxus-wallet-setup",
+            "baxus-payments-storage"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Individual bottle evidence",
+          "scope": "Bottle mint, vault record and signed inspection for a chosen bottle",
+          "availability": "not-obtained",
+          "limit": "No individual bottle mint, matching vault record or signed inspection was checked.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "BAXUS → own vault and authenticators → bottle NFT → redemption burn and delivery",
+          "availability": "reviewed",
+          "limit": "Custody and authentication are not independent; insurer, token standard, authorities and failure treatment are not established.",
+          "sourceIds": [
+            "baxus-terms",
+            "baxus-faq"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "BAXUS",
+          "processor": "BAXUS (redemption and delivery)",
+          "onboarding": "Not stated beyond the age, destination and shipping requirements for delivery",
+          "entitlementOnTransfer": "Per the terms, ownership of the bottle follows the NFT; not tested",
+          "settlement": "Physical delivery of the bottle after the NFT is burned",
+          "minimumAndFees": "10% selling fee (FAQ); storage fees conflict across four sources",
+          "independentRoute": "Not established",
+          "availability": "Documented route only; no completed redemption checked"
+        }
+      },
+      "assetModule": {
+        "label": "Vaulted bottle",
+        "summary": "One identified bottle, authenticated, 3D-scanned and recorded in a numbered vault space by BAXUS; the FAQ names a main logistics vault in New York.",
+        "sourceIds": [
+          "baxus-terms",
+          "baxus-faq"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "collectible",
+        "label": "Single-asset collectibles",
+        "basis": "Structure category from reviewed product or programme description; shared category is not identical terms.",
+        "sourceIds": [
+          "baxus-terms"
+        ]
+      }
+    },
+    {
+      "id": "obsidian-xgldb",
+      "name": "Obsidian Goldback note",
+      "ticker": "xGLDB",
+      "originalName": "Obsidian Goldback note",
+      "programmeId": "obsidian-goldback",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "gold",
+        "label": "Goldback quantity owed by a company (no title to metal)"
+      },
+      "instrument": {
+        "id": "instrument:obsidian-xgldb",
+        "legalForm": "Note: the company's obligation for one Goldback (about 1/1000 troy ounce of gold) per token; the company owns the metal",
+        "issuer": "The company behind Obsidian / BLCKW3B (legal entity not named in the reviewed summary)",
+        "identity": "xGLDB on Solana; the issuer's supply page links the issued supply to mint 7k5rijzAsq2z9iA3vtxQR95rG6ib6yCXQDgnfRTaBmmy",
+        "scope": "Obsidian docs, product page and supply display as summarised by Tokenizario on 2026-10-08 (soft launch)",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "obs-docs",
+          "title": "Obsidian docs",
+          "url": "https://www.obs.gold/docs",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come"
+        },
+        {
+          "id": "obs-home",
+          "title": "Obsidian product and redemption status",
+          "url": "https://www.obs.gold/",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Live soft launch for creating and holding notes; delivery of metal and cash-out not available; future redemption flow"
+        },
+        {
+          "id": "obs-supply",
+          "title": "Obsidian issuer supply display",
+          "url": "https://www.obs.gold/app/supply",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Issued tokens compared with a read of the company's Alpine Gold Exchange account; says the read is not an audit and not title; links supply to the mint"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "xGLDB note holder",
+          "termsId": "obsidian-xgldb-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "One xGLDB is a note for one Goldback, about 1/1000 troy ounce of gold, owed by the company. The company owns the metal; holders get no title to a particular piece and no Alpine account.",
+          "sourceIds": [
+            "obs-docs"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:rights",
+          "display": {
+            "tone": "condition",
+            "label": "Claim on the company, not metal",
+            "reason": "One xGLDB is a note for one Goldback, about 1/1000 troy ounce of gold, owed by the company. The company owns the metal; holders get no title to a particular piece and no Alpine account.",
+            "basis": "[\"rights\",\"supported\",\"source-statement\",\"One xGLDB is a note for one Goldback, about 1/1000 troy ounce of gold, owed by the company. The company owns the metal; holders get no title to a particular piece and no Alpine account.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-docs\"],[{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"}]]",
+            "note": "The holder is the company's creditor for a quantity of metal and owns none of it."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The docs say notes move between Solana wallets, which changes the token holder; they do not say whether the chain balance is the record of the company's obligation.",
+          "sourceIds": [
+            "obs-docs",
+            "obs-supply"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Which record counts is unclear",
+            "reason": "The docs say notes move between Solana wallets, which changes the token holder; they do not say whether the chain balance is the record of the company's obligation.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"The docs say notes move between Solana wallets, which changes the token holder; they do not say whether the chain balance is the record of the company's obligation.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-docs\",\"obs-supply\"],[{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"},{\"id\":\"obs-supply\",\"title\":\"Obsidian issuer supply display\",\"url\":\"https://www.obs.gold/app/supply\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Issued tokens compared with a read of the company's Alpine Gold Exchange account; says the read is not an audit and not title; links supply to the mint\"}]]",
+            "note": "The docs say notes move between Solana wallets, which changes the token holder; they do not say whether the chain balance is the record of the company's obligation."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The company's metal is with Alpine Gold Exchange. The issuer's supply display compares issued tokens with a read of the company's Alpine account and says that read is neither an audit nor title in the holder's name; no fixed balance is presented as a current reserve check.",
+          "sourceIds": [
+            "obs-docs",
+            "obs-supply"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:backing",
+          "display": {
+            "tone": "condition",
+            "label": "Issuer-run account read; no audit",
+            "reason": "The company's metal is with Alpine Gold Exchange. The issuer's supply display compares issued tokens with a read of the company's Alpine account and says that read is neither an audit nor title in the holder's name; no fixed balance is presented as a current reserve check.",
+            "basis": "[\"backing\",\"supported\",\"source-statement\",\"The company's metal is with Alpine Gold Exchange. The issuer's supply display compares issued tokens with a read of the company's Alpine account and says that read is neither an audit nor title in the holder's name; no fixed balance is presented as a current reserve check.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-docs\",\"obs-supply\"],[{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"},{\"id\":\"obs-supply\",\"title\":\"Obsidian issuer supply display\",\"url\":\"https://www.obs.gold/app/supply\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Issued tokens compared with a read of the company's Alpine Gold Exchange account; says the read is not an audit and not title; links supply to the mint\"}]]",
+            "note": "The only reserve evidence is a display the issuer runs; no independent examination exists."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The mint, freeze and delegate authorities were not independently checked in the review; a note that can be sent does not show that those powers are absent.",
+          "sourceIds": [
+            "obs-docs"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:controls",
+          "display": {
+            "tone": "unknown",
+            "label": "Token powers not verified",
+            "reason": "The mint, freeze and delegate authorities were not independently checked in the review; a note that can be sent does not show that those powers are absent.",
+            "basis": "[\"controls\",\"unknown\",\"analysis\",\"The mint, freeze and delegate authorities were not independently checked in the review; a note that can be sent does not show that those powers are absent.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-docs\"],[{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"}]]",
+            "note": "The mint, freeze and delegate authorities were not independently checked in the review; a note that can be sent does not show that those powers are absent."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Obsidian describes a live soft launch for creating and holding notes; who may create or hold notes is not stated in the reviewed summary.",
+          "sourceIds": [
+            "obs-home",
+            "obs-docs"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:access",
+          "display": {
+            "tone": "unknown",
+            "label": "Eligibility not stated",
+            "reason": "Obsidian describes a live soft launch for creating and holding notes; who may create or hold notes is not stated in the reviewed summary.",
+            "basis": "[\"access\",\"unknown\",\"analysis\",\"Obsidian describes a live soft launch for creating and holding notes; who may create or hold notes is not stated in the reviewed summary.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-home\",\"obs-docs\"],[{\"id\":\"obs-home\",\"title\":\"Obsidian product and redemption status\",\"url\":\"https://www.obs.gold/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Live soft launch for creating and holding notes; delivery of metal and cash-out not available; future redemption flow\"},{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"}]]",
+            "note": "Obsidian describes a live soft launch for creating and holding notes; who may create or hold notes is not stated in the reviewed summary."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "Delivery of the metal and cash-out were not available on 2026-10-08; the website's redemption flow is future. Holders can keep or send the note.",
+          "sourceIds": [
+            "obs-home"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:exit",
+          "display": {
+            "tone": "problem",
+            "label": "No redemption today",
+            "reason": "Delivery of the metal and cash-out were not available on 2026-10-08; the website's redemption flow is future. Holders can keep or send the note.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Delivery of the metal and cash-out were not available on 2026-10-08; the website's redemption flow is future. Holders can keep or send the note.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-home\"],[{\"id\":\"obs-home\",\"title\":\"Obsidian product and redemption status\",\"url\":\"https://www.obs.gold/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Live soft launch for creating and holding notes; delivery of metal and cash-out not available; future redemption flow\"}]]",
+            "note": "There is no route from the note to metal or cash today."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The legal recourse for an unpaid note, the company's insolvency treatment and any security over the metal for holders were not established; no independent reserve examination exists.",
+          "sourceIds": [
+            "obs-docs",
+            "obs-supply"
+          ],
+          "scope": {
+            "instrumentId": "instrument:obsidian-xgldb",
+            "contextId": "holder",
+            "termsId": "obsidian-xgldb-terms-2026-10-08",
+            "from": null
+          },
+          "id": "obsidian-xgldb:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rights not verified",
+            "reason": "The legal recourse for an unpaid note, the company's insolvency treatment and any security over the metal for holders were not established; no independent reserve examination exists.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"The legal recourse for an unpaid note, the company's insolvency treatment and any security over the metal for holders were not established; no independent reserve examination exists.\",{\"instrumentId\":\"instrument:obsidian-xgldb\",\"contextId\":\"holder\",\"termsId\":\"obsidian-xgldb-terms-2026-10-08\",\"from\":null},[\"obs-docs\",\"obs-supply\"],[{\"id\":\"obs-docs\",\"title\":\"Obsidian docs\",\"url\":\"https://www.obs.gold/docs\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Note for one Goldback, about 1/1000 troy ounce; company owns the metal; no title or Alpine account for holders; notes move between wallets; send screen to come\"},{\"id\":\"obs-supply\",\"title\":\"Obsidian issuer supply display\",\"url\":\"https://www.obs.gold/app/supply\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Issued tokens compared with a read of the company's Alpine Gold Exchange account; says the read is not an audit and not title; links supply to the mint\"}]]",
+            "note": "The legal recourse for an unpaid note, the company's insolvency treatment and any security over the metal for holders were not established; no independent reserve examination exists."
+          }
+        }
+      ],
+      "deployments": [
+        {
+          "id": "solana:7k5rijzAsq2z9iA3vtxQR95rG6ib6yCXQDgnfRTaBmmy",
+          "instrumentId": null,
+          "network": "Solana",
+          "address": "7k5rijzAsq2z9iA3vtxQR95rG6ib6yCXQDgnfRTaBmmy",
+          "identity": "Mint the issuer's supply page links to the issued supply; holder-terms binding not verified",
+          "sourceIds": [
+            "obs-supply"
+          ],
+          "identityCheckedAt": "2026-10-08T00:00:00Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Not checked by RWA Sonar. Tokenizario's restatement chain read of 2026-10-13 (slot 456350748) found a Token-2022 mint with a live mint authority, no freeze authority and supply 428.6639."
+          }
+        }
+      ],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Issuer docs and product page (via Tokenizario review)",
+          "scope": "Obligation, custody, transfer and redemption status",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; the obligor's legal entity, terms and recourse are not established.",
+          "sourceIds": [
+            "obs-docs",
+            "obs-home"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Issuer account display",
+          "scope": "Issued tokens against a read of the company's Alpine account",
+          "availability": "reviewed",
+          "limit": "The issuer says the read is not an audit and not title; no fixed balance is presented as a current reserve check.",
+          "sourceIds": [
+            "obs-supply"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Independent reserve examination and custodian statement",
+          "scope": "Metal quantity against outstanding notes",
+          "availability": "not-obtained",
+          "limit": "No examiner is engaged, and Alpine Gold Exchange publishes nothing itself in the sources.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "Company → its Alpine Gold Exchange account → xGLDB note → planned redemption",
+          "availability": "reviewed",
+          "limit": "Holders are creditors of an unnamed company with no redemption today and no independent reserve evidence.",
+          "sourceIds": [
+            "obs-docs",
+            "obs-home",
+            "obs-supply"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "The company behind Obsidian / BLCKW3B (legal entity not named)",
+          "processor": "Not available; redemption is planned",
+          "onboarding": "Not stated",
+          "entitlementOnTransfer": "Sending the note changes the token holder; the company's metal stays with its custodian",
+          "settlement": "Planned metal delivery or cash-out; neither available on 2026-10-08",
+          "minimumAndFees": "Not stated",
+          "independentRoute": "Not established",
+          "availability": "Not available; planned"
+        }
+      },
+      "assetModule": {
+        "label": "Company-owned gold (Goldbacks)",
+        "summary": "The company owns the metal, held at Alpine Gold Exchange; one note is owed one Goldback, about 1/1000 troy ounce. Holders have no title to any piece.",
+        "sourceIds": [
+          "obs-docs",
+          "obs-supply"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "commodity-claim",
+        "label": "Commodity claims on an issuer",
+        "basis": "Structure category from reviewed product or programme description; shared category is not identical terms.",
+        "sourceIds": [
+          "obs-docs"
+        ]
+      }
+    },
+    {
+      "id": "cask-capital",
+      "name": "Cask Capital whisky fraction",
+      "ticker": "CASK-9332",
+      "originalName": "Cask Capital whisky fraction",
+      "programmeId": "cask-capital",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "whisky-cask",
+        "label": "Co-ownership unit in one whisky cask (Staiosha #933-2)"
+      },
+      "instrument": {
+        "id": "instrument:cask-capital",
+        "legalForm": "Co-ownership unit in one physical cask, one of 20, recorded by one Hedera HTS NFT serial; the issuer's description of ownership, not tested as title",
+        "issuer": "Cask Capital (platform and issuer of the co-ownership record)",
+        "identity": "HTS collection 0.0.10443090 for cask #933-2, per the issuer's token guide",
+        "scope": "Staiosha #933-2 listing, terms and issuer guides as summarised by Tokenizario on 2026-10-08; other casks are separate collections",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "cask-terms",
+          "title": "Cask Capital terms and user agreement",
+          "url": "https://www.caskcapital.io/terms",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law"
+        },
+        {
+          "id": "cask-staiosha",
+          "title": "Staiosha #933-2 fractional cask listing",
+          "url": "https://www.caskcapital.io/blog/staiosha-staoisha-fractional-cask",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "20 co-ownership units; ex-Laphroaig quarter cask filled 16 January 2025; five years of bonded storage and insurance included"
+        },
+        {
+          "id": "cask-hts-guide",
+          "title": "How to verify Cask Capital on HashScan",
+          "url": "https://www.caskcapital.io/blog/how-to-verify-cask-capital-on-hashscan",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Names HTS collection 0.0.10443090; one NFT collection per cask, one serial per fractional unit"
+        },
+        {
+          "id": "cask-checkout",
+          "title": "USDC vs card checkout on Hedera",
+          "url": "https://www.caskcapital.io/blog/usdc-vs-card-checkout-hedera",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Hedera USDC or Stripe card; a card buyer's serial can stay in Cask Capital's wallet until claimed"
+        },
+        {
+          "id": "cask-roadmap",
+          "title": "Cask Capital marketplace launch and roadmap",
+          "url": "https://www.caskcapital.io/blog/marketplace-launch",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Cask redemption, resale, buyback and lending listed as planned features"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "Co-owner of cask #933-2 (eligible, verified buyer)",
+          "termsId": "cask-capital-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The listing describes 20 co-ownership units in cask #933-2, an ex-Laphroaig quarter cask filled on 16 January 2025; a unit is a share in the physical cask, not in Cask Capital. Under the terms, fractional owners have limited rights.",
+          "sourceIds": [
+            "cask-staiosha",
+            "cask-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:rights",
+          "display": {
+            "tone": "condition",
+            "label": "Co-ownership unit in one cask",
+            "reason": "The listing describes 20 co-ownership units in cask #933-2, an ex-Laphroaig quarter cask filled on 16 January 2025; a unit is a share in the physical cask, not in Cask Capital. Under the terms, fractional owners have limited rights.",
+            "basis": "[\"rights\",\"supported\",\"source-statement\",\"The listing describes 20 co-ownership units in cask #933-2, an ex-Laphroaig quarter cask filled on 16 January 2025; a unit is a share in the physical cask, not in Cask Capital. Under the terms, fractional owners have limited rights.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-staiosha\",\"cask-terms\"],[{\"id\":\"cask-staiosha\",\"title\":\"Staiosha #933-2 fractional cask listing\",\"url\":\"https://www.caskcapital.io/blog/staiosha-staoisha-fractional-cask\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"20 co-ownership units; ex-Laphroaig quarter cask filled 16 January 2025; five years of bonded storage and insurance included\"},{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"}]]",
+            "note": "This is the issuer's description of ownership; no court has tested it as title, and fractional owners have limited rights."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "A card buyer's serial can stay in Cask Capital's wallet until claimed, so the platform's record of the beneficial owner and the Hedera holder can differ; the reviewed sources do not say which record prevails.",
+          "sourceIds": [
+            "cask-checkout",
+            "cask-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Platform record and Hedera holder can differ",
+            "reason": "A card buyer's serial can stay in Cask Capital's wallet until claimed, so the platform's record of the beneficial owner and the Hedera holder can differ; the reviewed sources do not say which record prevails.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"A card buyer's serial can stay in Cask Capital's wallet until claimed, so the platform's record of the beneficial owner and the Hedera holder can differ; the reviewed sources do not say which record prevails.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-checkout\",\"cask-terms\"],[{\"id\":\"cask-checkout\",\"title\":\"USDC vs card checkout on Hedera\",\"url\":\"https://www.caskcapital.io/blog/usdc-vs-card-checkout-hedera\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Hedera USDC or Stripe card; a card buyer's serial can stay in Cask Capital's wallet until claimed\"},{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"}]]",
+            "note": "A card buyer's serial can stay in Cask Capital's wallet until claimed, so the platform's record of the beneficial owner and the Hedera holder can differ; the reviewed sources do not say which record prevails."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The listing includes five years of bonded storage and insurance, and Cask Capital says it uses licensed custody partners and annual independent portfolio valuations. The warehouse operator, insurer and valuer are not named, and an NFT serial does not measure the liquid left or prove where the cask is.",
+          "sourceIds": [
+            "cask-staiosha",
+            "cask-hts-guide"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:backing",
+          "display": {
+            "tone": "unknown",
+            "label": "Warehouse, insurer and valuer not named",
+            "reason": "The listing includes five years of bonded storage and insurance, and Cask Capital says it uses licensed custody partners and annual independent portfolio valuations. The warehouse operator, insurer and valuer are not named, and an NFT serial does not measure the liquid left or prove where the cask is.",
+            "basis": "[\"backing\",\"unknown\",\"analysis\",\"The listing includes five years of bonded storage and insurance, and Cask Capital says it uses licensed custody partners and annual independent portfolio valuations. The warehouse operator, insurer and valuer are not named, and an NFT serial does not measure the liquid left or prove where the cask is.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-staiosha\",\"cask-hts-guide\"],[{\"id\":\"cask-staiosha\",\"title\":\"Staiosha #933-2 fractional cask listing\",\"url\":\"https://www.caskcapital.io/blog/staiosha-staoisha-fractional-cask\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"20 co-ownership units; ex-Laphroaig quarter cask filled 16 January 2025; five years of bonded storage and insurance included\"},{\"id\":\"cask-hts-guide\",\"title\":\"How to verify Cask Capital on HashScan\",\"url\":\"https://www.caskcapital.io/blog/how-to-verify-cask-capital-on-hashscan\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Names HTS collection 0.0.10443090; one NFT collection per cask, one serial per fractional unit\"}]]",
+            "note": "The listing includes five years of bonded storage and insurance, and Cask Capital says it uses licensed custody partners and annual independent portfolio valuations. The warehouse operator, insurer and valuer are not named, and an NFT serial does not measure the liquid left or prove where the cask is."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The terms restrict transfers to eligible buyers and describe suspending accounts and cancelling tokens the platform keeps for buyers. The HTS admin, supply, freeze and wipe keys were not inspected.",
+          "sourceIds": [
+            "cask-terms"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:controls",
+          "display": {
+            "tone": "condition",
+            "label": "Suspension and cancellation powers",
+            "reason": "The terms restrict transfers to eligible buyers and describe suspending accounts and cancelling tokens the platform keeps for buyers. The HTS admin, supply, freeze and wipe keys were not inspected.",
+            "basis": "[\"controls\",\"supported\",\"source-statement\",\"The terms restrict transfers to eligible buyers and describe suspending accounts and cancelling tokens the platform keeps for buyers. The HTS admin, supply, freeze and wipe keys were not inspected.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-terms\"],[{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"}]]",
+            "note": "The platform reserves powers over accounts and platform-held tokens; whether HTS keys enforce them is unchecked."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The terms require eligible, verified buyers. Purchase is by Hedera USDC or by card through Stripe.",
+          "sourceIds": [
+            "cask-terms",
+            "cask-checkout"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:access",
+          "display": {
+            "tone": "condition",
+            "label": "Eligible, verified buyers only",
+            "reason": "The terms require eligible, verified buyers. Purchase is by Hedera USDC or by card through Stripe.",
+            "basis": "[\"access\",\"supported\",\"source-statement\",\"The terms require eligible, verified buyers. Purchase is by Hedera USDC or by card through Stripe.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-terms\",\"cask-checkout\"],[{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"},{\"id\":\"cask-checkout\",\"title\":\"USDC vs card checkout on Hedera\",\"url\":\"https://www.caskcapital.io/blog/usdc-vs-card-checkout-hedera\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Hedera USDC or Stripe card; a card buyer's serial can stay in Cask Capital's wallet until claimed\"}]]",
+            "note": "Buying and receiving units requires verification as an eligible buyer."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "Physical delivery depends on the asset and the stake; cask redemption, resale, buyback and lending are listed as planned features in the marketplace launch announcement.",
+          "sourceIds": [
+            "cask-terms",
+            "cask-roadmap"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:exit",
+          "display": {
+            "tone": "condition",
+            "label": "Exits conditional or planned",
+            "reason": "Physical delivery depends on the asset and the stake; cask redemption, resale, buyback and lending are listed as planned features in the marketplace launch announcement.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"Physical delivery depends on the asset and the stake; cask redemption, resale, buyback and lending are listed as planned features in the marketplace launch announcement.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-terms\",\"cask-roadmap\"],[{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"},{\"id\":\"cask-roadmap\",\"title\":\"Cask Capital marketplace launch and roadmap\",\"url\":\"https://www.caskcapital.io/blog/marketplace-launch\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Cask redemption, resale, buyback and lending listed as planned features\"}]]",
+            "note": "A listed unit does not show that any exit is available today."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Unpaid storage can lead to a lien or a sale, and disputes go to Amsterdam under Dutch law. The treatment of co-owners if Cask Capital or the warehouse fails, the insurer and the loss payee were not established.",
+          "sourceIds": [
+            "cask-terms",
+            "cask-staiosha"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cask-capital",
+            "contextId": "holder",
+            "termsId": "cask-capital-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cask-capital:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rights not verified",
+            "reason": "Unpaid storage can lead to a lien or a sale, and disputes go to Amsterdam under Dutch law. The treatment of co-owners if Cask Capital or the warehouse fails, the insurer and the loss payee were not established.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"Unpaid storage can lead to a lien or a sale, and disputes go to Amsterdam under Dutch law. The treatment of co-owners if Cask Capital or the warehouse fails, the insurer and the loss payee were not established.\",{\"instrumentId\":\"instrument:cask-capital\",\"contextId\":\"holder\",\"termsId\":\"cask-capital-terms-2026-10-08\",\"from\":null},[\"cask-terms\",\"cask-staiosha\"],[{\"id\":\"cask-terms\",\"title\":\"Cask Capital terms and user agreement\",\"url\":\"https://www.caskcapital.io/terms\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Eligible, verified buyers; transfer restrictions; account suspension and cancelling platform-held tokens; delivery depends on asset and stake; limited rights of fractional owners; storage lien or sale; Amsterdam, Dutch law\"},{\"id\":\"cask-staiosha\",\"title\":\"Staiosha #933-2 fractional cask listing\",\"url\":\"https://www.caskcapital.io/blog/staiosha-staoisha-fractional-cask\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"20 co-ownership units; ex-Laphroaig quarter cask filled 16 January 2025; five years of bonded storage and insurance included\"}]]",
+            "note": "Unpaid storage can lead to a lien or a sale, and disputes go to Amsterdam under Dutch law. The treatment of co-owners if Cask Capital or the warehouse fails, the insurer and the loss payee were not established."
+          }
+        }
+      ],
+      "deployments": [
+        {
+          "id": "hedera:0.0.10443090",
+          "instrumentId": null,
+          "network": "Hedera",
+          "address": "0.0.10443090",
+          "identity": "HTS collection named in the issuer's token guide for cask #933-2",
+          "sourceIds": [
+            "cask-hts-guide"
+          ],
+          "identityCheckedAt": "2026-10-08T00:00:00Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "HTS admin, supply, freeze and wipe keys were not inspected."
+          }
+        }
+      ],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Issuer terms, listing and guides (via Tokenizario review)",
+          "scope": "Co-ownership description, eligibility, powers, custody and exits",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; the co-owners' agreement and the cask's own terms were not obtained.",
+          "sourceIds": [
+            "cask-terms",
+            "cask-staiosha",
+            "cask-hts-guide",
+            "cask-checkout",
+            "cask-roadmap"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Warehouse, inspection, valuation and insurance evidence",
+          "scope": "Cask location, current volume and strength, value and cover",
+          "availability": "not-obtained",
+          "limit": "No warehouse operator, inspector, valuer or insurer is named for this cask.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "Cask Capital register and custody wallet → HTS serials → unnamed bonded warehouse → planned exits",
+          "availability": "reviewed",
+          "limit": "Which record prevails, who holds the cask and which exits exist today are not established.",
+          "sourceIds": [
+            "cask-terms",
+            "cask-checkout",
+            "cask-roadmap"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "Cask Capital (platform)",
+          "processor": "Cask Capital",
+          "onboarding": "Eligible, verified buyer",
+          "entitlementOnTransfer": "Not established; the HTS serial holder and the platform register can differ",
+          "settlement": "Physical delivery depends on the asset and the stake; resale, buyback and lending are planned",
+          "minimumAndFees": "Not stated; unpaid storage can lead to a lien or sale",
+          "independentRoute": "Not established",
+          "availability": "Planned features per the launch announcement; no completed exit documented"
+        }
+      },
+      "assetModule": {
+        "label": "Whisky cask #933-2",
+        "summary": "Ex-Laphroaig quarter cask filled on 16 January 2025, at Staiosha, in an unnamed bonded warehouse; 20 co-ownership units; five years of storage and insurance included.",
+        "sourceIds": [
+          "cask-staiosha"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "co-ownership",
+        "label": "Co-ownership units",
+        "basis": "Structure category from reviewed product or programme description; shared category is not identical terms.",
+        "sourceIds": [
+          "cask-staiosha",
+          "cask-terms"
+        ]
+      }
+    },
+    {
+      "id": "cropto-crow",
+      "name": "Cropto wheat",
+      "ticker": "CROW",
+      "originalName": "Cropto wheat",
+      "programmeId": "cropto",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "wheat",
+        "label": "Wheat, one kilogram per token as the issuer describes (holder claim unverified)"
+      },
+      "instrument": {
+        "id": "instrument:cropto-crow",
+        "legalForm": "Token the issuer describes as backed by one kilogram of wheat; the holder's legal claim is not established",
+        "issuer": "AgriFintech Financial Technologies Inc. (Cropto)",
+        "identity": "CROW ERC-20 on Polygon, contract 0x0Da0BD2f57A27A70665D53db4eA71E1f26F77a46, per the issuer's Polygon guide",
+        "scope": "CROW product page, process and FAQ, reserve-report index and Polygon guide as summarised by Tokenizario on 2026-10-08",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "cropto-product",
+          "title": "Cropto wheat token product page",
+          "url": "https://www.cropto.io/tokens/cropto-wheat-token",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated"
+        },
+        {
+          "id": "cropto-home",
+          "title": "Cropto process and FAQ",
+          "url": "https://www.cropto.io/",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Acquire agricultural products, store them in audited warehouses, then issue tokens; access through exchanges and CroptoDEX"
+        },
+        {
+          "id": "cropto-por-index",
+          "title": "Cropto proof-of-reserve audit reports index",
+          "url": "https://www.cropto.io/transparency/proof-of-reserve-por-audit-reports",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "External auditors compare physical stocks with token supply; lists a 2025 report and earlier reports; the 2025 report could not be read"
+        },
+        {
+          "id": "cropto-guide",
+          "title": "Cropto guide (Polygon)",
+          "url": "https://assets-global.website-files.com/64a42c9ebf1ee641d8495c73/64eef990e3f0649a051de83e_Cropto_Guide_EN.pdf",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Names the CROW ERC-20 contract on Polygon; no admin powers named"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "CROW holder",
+          "termsId": "cropto-crow-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "AgriFintech Financial Technologies Inc. describes CROW as backed by wheat at one kilogram per token; the reviewed product page does not establish allocated title, a delivery right or what exactly the issuer owes the holder.",
+          "sourceIds": [
+            "cropto-product"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:rights",
+          "display": {
+            "tone": "unknown",
+            "label": "Legal claim not established",
+            "reason": "AgriFintech Financial Technologies Inc. describes CROW as backed by wheat at one kilogram per token; the reviewed product page does not establish allocated title, a delivery right or what exactly the issuer owes the holder.",
+            "basis": "[\"rights\",\"unknown\",\"analysis\",\"AgriFintech Financial Technologies Inc. describes CROW as backed by wheat at one kilogram per token; the reviewed product page does not establish allocated title, a delivery right or what exactly the issuer owes the holder.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-product\"],[{\"id\":\"cropto-product\",\"title\":\"Cropto wheat token product page\",\"url\":\"https://www.cropto.io/tokens/cropto-wheat-token\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated\"}]]",
+            "note": "AgriFintech Financial Technologies Inc. describes CROW as backed by wheat at one kilogram per token; the reviewed product page does not establish allocated title, a delivery right or what exactly the issuer owes the holder."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The issuer's guide documents an ERC-20 on Polygon; which record counts for the holder's claim, and which other networks are represented, were not established.",
+          "sourceIds": [
+            "cropto-guide",
+            "cropto-product"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Which record counts is unclear",
+            "reason": "The issuer's guide documents an ERC-20 on Polygon; which record counts for the holder's claim, and which other networks are represented, were not established.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"The issuer's guide documents an ERC-20 on Polygon; which record counts for the holder's claim, and which other networks are represented, were not established.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-guide\",\"cropto-product\"],[{\"id\":\"cropto-guide\",\"title\":\"Cropto guide (Polygon)\",\"url\":\"https://assets-global.website-files.com/64a42c9ebf1ee641d8495c73/64eef990e3f0649a051de83e_Cropto_Guide_EN.pdf\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Names the CROW ERC-20 contract on Polygon; no admin powers named\"},{\"id\":\"cropto-product\",\"title\":\"Cropto wheat token product page\",\"url\":\"https://www.cropto.io/tokens/cropto-wheat-token\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated\"}]]",
+            "note": "The issuer's guide documents an ERC-20 on Polygon; which record counts for the holder's claim, and which other networks are represented, were not established."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Cropto says it acquires agricultural products, places them in audited warehouses and then issues the tokens. The report index says external auditors compare physical stocks with token supply and lists a 2025 report, which could not be read; no warehouse operator, site or lot is named.",
+          "sourceIds": [
+            "cropto-home",
+            "cropto-product",
+            "cropto-por-index"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:backing",
+          "display": {
+            "tone": "unknown",
+            "label": "Reserve report not read",
+            "reason": "Cropto says it acquires agricultural products, places them in audited warehouses and then issues the tokens. The report index says external auditors compare physical stocks with token supply and lists a 2025 report, which could not be read; no warehouse operator, site or lot is named.",
+            "basis": "[\"backing\",\"unknown\",\"analysis\",\"Cropto says it acquires agricultural products, places them in audited warehouses and then issues the tokens. The report index says external auditors compare physical stocks with token supply and lists a 2025 report, which could not be read; no warehouse operator, site or lot is named.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-home\",\"cropto-product\",\"cropto-por-index\"],[{\"id\":\"cropto-home\",\"title\":\"Cropto process and FAQ\",\"url\":\"https://www.cropto.io/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Acquire agricultural products, store them in audited warehouses, then issue tokens; access through exchanges and CroptoDEX\"},{\"id\":\"cropto-product\",\"title\":\"Cropto wheat token product page\",\"url\":\"https://www.cropto.io/tokens/cropto-wheat-token\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated\"},{\"id\":\"cropto-por-index\",\"title\":\"Cropto proof-of-reserve audit reports index\",\"url\":\"https://www.cropto.io/transparency/proof-of-reserve-por-audit-reports\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"External auditors compare physical stocks with token supply; lists a 2025 report and earlier reports; the 2025 report could not be read\"}]]",
+            "note": "Cropto says it acquires agricultural products, places them in audited warehouses and then issues the tokens. The report index says external auditors compare physical stocks with token supply and lists a 2025 report, which could not be read; no warehouse operator, site or lot is named."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The guide names the token contract but not its admin powers; the controls for issuing, pausing, upgrades and transfers were not verified.",
+          "sourceIds": [
+            "cropto-guide"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:controls",
+          "display": {
+            "tone": "unknown",
+            "label": "Contract powers not verified",
+            "reason": "The guide names the token contract but not its admin powers; the controls for issuing, pausing, upgrades and transfers were not verified.",
+            "basis": "[\"controls\",\"unknown\",\"analysis\",\"The guide names the token contract but not its admin powers; the controls for issuing, pausing, upgrades and transfers were not verified.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-guide\"],[{\"id\":\"cropto-guide\",\"title\":\"Cropto guide (Polygon)\",\"url\":\"https://assets-global.website-files.com/64a42c9ebf1ee641d8495c73/64eef990e3f0649a051de83e_Cropto_Guide_EN.pdf\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Names the CROW ERC-20 contract on Polygon; no admin powers named\"}]]",
+            "note": "The guide names the token contract but not its admin powers; the controls for issuing, pausing, upgrades and transfers were not verified."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The site offers access through exchanges and CroptoDEX; holder eligibility and any KYC requirement were not established.",
+          "sourceIds": [
+            "cropto-home"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:access",
+          "display": {
+            "tone": "unknown",
+            "label": "Eligibility not stated",
+            "reason": "The site offers access through exchanges and CroptoDEX; holder eligibility and any KYC requirement were not established.",
+            "basis": "[\"access\",\"unknown\",\"analysis\",\"The site offers access through exchanges and CroptoDEX; holder eligibility and any KYC requirement were not established.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-home\"],[{\"id\":\"cropto-home\",\"title\":\"Cropto process and FAQ\",\"url\":\"https://www.cropto.io/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Acquire agricultural products, store them in audited warehouses, then issue tokens; access through exchanges and CroptoDEX\"}]]",
+            "note": "The site offers access through exchanges and CroptoDEX; holder eligibility and any KYC requirement were not established."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "No current redemption procedure, minimum quantities, fees or delivery conditions were established; a trade moves tokens but records no hand-over of wheat.",
+          "sourceIds": [
+            "cropto-home",
+            "cropto-product"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:exit",
+          "display": {
+            "tone": "unknown",
+            "label": "Redemption route not verified",
+            "reason": "No current redemption procedure, minimum quantities, fees or delivery conditions were established; a trade moves tokens but records no hand-over of wheat.",
+            "basis": "[\"exit\",\"unknown\",\"analysis\",\"No current redemption procedure, minimum quantities, fees or delivery conditions were established; a trade moves tokens but records no hand-over of wheat.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-home\",\"cropto-product\"],[{\"id\":\"cropto-home\",\"title\":\"Cropto process and FAQ\",\"url\":\"https://www.cropto.io/\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Acquire agricultural products, store them in audited warehouses, then issue tokens; access through exchanges and CroptoDEX\"},{\"id\":\"cropto-product\",\"title\":\"Cropto wheat token product page\",\"url\":\"https://www.cropto.io/tokens/cropto-wheat-token\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated\"}]]",
+            "note": "No current redemption procedure, minimum quantities, fees or delivery conditions were established; a trade moves tokens but records no hand-over of wheat."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Warehouse operators, sites and lots are not named, and the holder's recourse if the issuer or a warehouse fails was not established.",
+          "sourceIds": [
+            "cropto-product",
+            "cropto-por-index"
+          ],
+          "scope": {
+            "instrumentId": "instrument:cropto-crow",
+            "contextId": "holder",
+            "termsId": "cropto-crow-terms-2026-10-08",
+            "from": null
+          },
+          "id": "cropto-crow:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rights not verified",
+            "reason": "Warehouse operators, sites and lots are not named, and the holder's recourse if the issuer or a warehouse fails was not established.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"Warehouse operators, sites and lots are not named, and the holder's recourse if the issuer or a warehouse fails was not established.\",{\"instrumentId\":\"instrument:cropto-crow\",\"contextId\":\"holder\",\"termsId\":\"cropto-crow-terms-2026-10-08\",\"from\":null},[\"cropto-product\",\"cropto-por-index\"],[{\"id\":\"cropto-product\",\"title\":\"Cropto wheat token product page\",\"url\":\"https://www.cropto.io/tokens/cropto-wheat-token\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"One kilogram of wheat per token; records of product type, quantity and storage location; no allocated title or delivery right stated\"},{\"id\":\"cropto-por-index\",\"title\":\"Cropto proof-of-reserve audit reports index\",\"url\":\"https://www.cropto.io/transparency/proof-of-reserve-por-audit-reports\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"External auditors compare physical stocks with token supply; lists a 2025 report and earlier reports; the 2025 report could not be read\"}]]",
+            "note": "Warehouse operators, sites and lots are not named, and the holder's recourse if the issuer or a warehouse fails was not established."
+          }
+        }
+      ],
+      "deployments": [
+        {
+          "id": "polygon:0x0Da0BD2f57A27A70665D53db4eA71E1f26F77a46",
+          "instrumentId": null,
+          "network": "Polygon",
+          "address": "0x0Da0BD2f57A27A70665D53db4eA71E1f26F77a46",
+          "identity": "ERC-20 contract named in the issuer's Polygon guide",
+          "sourceIds": [
+            "cropto-guide"
+          ],
+          "identityCheckedAt": "2026-10-08T00:00:00Z",
+          "chainCheckedAt": null,
+          "controls": {
+            "state": "unknown",
+            "summary": "Admin, issuing, pause, upgrade and transfer controls were not checked."
+          }
+        }
+      ],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Issuer product page, process and guide (via Tokenizario review)",
+          "scope": "Kilogram backing, issuance process, contract and access",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; the holder terms and what is owed were not established.",
+          "sourceIds": [
+            "cropto-product",
+            "cropto-home",
+            "cropto-guide"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Reserve audit report",
+          "scope": "Physical wheat stocks against token supply",
+          "availability": "reviewed",
+          "limit": "Only the index was read; the linked 2025 report could not be read, so its figures, signer and qualifications are unknown.",
+          "sourceIds": [
+            "cropto-por-index"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Warehouse receipts and lot inspections",
+          "scope": "Named sites, lots, quantities and condition",
+          "availability": "not-obtained",
+          "limit": "No warehouse operator or lot-level evidence is named.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "AgriFintech → unnamed audited warehouses → CROW on Polygon → exchanges and CroptoDEX",
+          "availability": "reviewed",
+          "limit": "What is owed, the redemption route, the warehouses and the contract controls are not established.",
+          "sourceIds": [
+            "cropto-product",
+            "cropto-home",
+            "cropto-por-index"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "Not established; AgriFintech Financial Technologies Inc. is the issuer",
+          "processor": "Not established",
+          "onboarding": "Not established",
+          "entitlementOnTransfer": "Not established",
+          "settlement": "Market trades through exchanges and CroptoDEX; no wheat delivery route established",
+          "minimumAndFees": "Not stated",
+          "independentRoute": "Not established",
+          "availability": "No current redemption procedure documented"
+        }
+      },
+      "assetModule": {
+        "label": "Stored wheat (claimed)",
+        "summary": "Wheat the issuer says it buys and stores in audited warehouses at one kilogram per token; no site, lot or warehouse operator is named.",
+        "sourceIds": [
+          "cropto-product",
+          "cropto-home"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "unknown",
+        "label": "Structure unresolved",
+        "basis": "The reviewed terms do not establish a holder structure.",
+        "sourceIds": [
+          "cropto-product",
+          "cropto-home"
+        ]
+      }
+    },
+    {
+      "id": "luxhub",
+      "name": "LuxHub watch",
+      "ticker": "Watch NFT",
+      "originalName": "LuxHub watch",
+      "programmeId": "luxhub",
+      "addedFrom": "Tokenizario mechanisms.ts, read 2026-10-08",
+      "exposure": {
+        "id": "watch",
+        "label": "One physical watch sold through delivery escrow (development; devnet only)"
+      },
+      "instrument": {
+        "id": "instrument:luxhub",
+        "legalForm": "None established: a development design in which an approved vendor lists one watch through an NFT, with payment in delivery escrow",
+        "issuer": "An approved watch vendor (none named); LuxHub operates the marketplace",
+        "identity": "No watch NFT identified; the documented marketplace program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj is on Solana devnet",
+        "scope": "Public repository README and program as summarised by Tokenizario on 2026-10-08; whole-watch sales only, not the separate fractional-pool product",
+        "shareClass": null,
+        "issuanceVintage": null
+      },
+      "reviewedAt": "2026-10-08T00:00:00Z",
+      "sources": [
+        {
+          "id": "luxhub-repo",
+          "title": "LuxHub architecture and roadmap (GitHub)",
+          "url": "https://github.com/yoandryx/luxhub",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work"
+        },
+        {
+          "id": "luxhub-program",
+          "title": "LuxHub published marketplace program (Solana-Anchor)",
+          "url": "https://github.com/yoandryx/luxhub/tree/main/Solana-Anchor",
+          "documentDate": null,
+          "effectiveDate": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "locator": "Solana-Anchor directory: the published marketplace program with NFT and escrow flows; documented devnet program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj"
+        }
+      ],
+      "contexts": [
+        {
+          "id": "holder",
+          "label": "Prospective watch buyer (no live product)",
+          "termsId": "luxhub-terms-2026-10-08"
+        }
+      ],
+      "claims": [
+        {
+          "dimension": "rights",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The repository describes approved vendors listing physical watches through NFTs; no live watch token, seller terms or buyer legal title was established.",
+          "sourceIds": [
+            "luxhub-repo"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:rights",
+          "display": {
+            "tone": "unknown",
+            "label": "No live product; title not established",
+            "reason": "The repository describes approved vendors listing physical watches through NFTs; no live watch token, seller terms or buyer legal title was established.",
+            "basis": "[\"rights\",\"unknown\",\"analysis\",\"The repository describes approved vendors listing physical watches through NFTs; no live watch token, seller terms or buyer legal title was established.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"}]]",
+            "note": "The repository describes approved vendors listing physical watches through NFTs; no live watch token, seller terms or buyer legal title was established."
+          }
+        },
+        {
+          "dimension": "ledger",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The design records watches as NFTs in a custom program on devnet; no mainnet record and no rule on which record counts were found.",
+          "sourceIds": [
+            "luxhub-repo",
+            "luxhub-program"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:ledger",
+          "display": {
+            "tone": "unknown",
+            "label": "Which record counts is unclear",
+            "reason": "The design records watches as NFTs in a custom program on devnet; no mainnet record and no rule on which record counts were found.",
+            "basis": "[\"ledger\",\"unknown\",\"analysis\",\"The design records watches as NFTs in a custom program on devnet; no mainnet record and no rule on which record counts were found.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\",\"luxhub-program\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"},{\"id\":\"luxhub-program\",\"title\":\"LuxHub published marketplace program (Solana-Anchor)\",\"url\":\"https://github.com/yoandryx/luxhub/tree/main/Solana-Anchor\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Solana-Anchor directory: the published marketplace program with NFT and escrow flows; documented devnet program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj\"}]]",
+            "note": "The design records watches as NFTs in a custom program on devnet; no mainnet record and no rule on which record counts were found."
+          }
+        },
+        {
+          "dimension": "backing",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Condition records, photos and authentication metadata are a documented design; no vendor, physical inventory or custody trail was verified.",
+          "sourceIds": [
+            "luxhub-repo"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:backing",
+          "display": {
+            "tone": "unknown",
+            "label": "No physical inventory verified",
+            "reason": "Condition records, photos and authentication metadata are a documented design; no vendor, physical inventory or custody trail was verified.",
+            "basis": "[\"backing\",\"unknown\",\"analysis\",\"Condition records, photos and authentication metadata are a documented design; no vendor, physical inventory or custody trail was verified.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"}]]",
+            "note": "Condition records, photos and authentication metadata are a documented design; no vendor, physical inventory or custody trail was verified."
+          }
+        },
+        {
+          "dimension": "controls",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The README lists instructions for delivery confirmation, refunds, cancellation, admin-only minting, freeze and burn, and describes admin and multisig operations. These are documented capabilities on devnet, not verified mainnet authorities.",
+          "sourceIds": [
+            "luxhub-repo",
+            "luxhub-program"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:controls",
+          "display": {
+            "tone": "condition",
+            "label": "Admin mint, freeze and burn documented",
+            "reason": "The README lists instructions for delivery confirmation, refunds, cancellation, admin-only minting, freeze and burn, and describes admin and multisig operations. These are documented capabilities on devnet, not verified mainnet authorities.",
+            "basis": "[\"controls\",\"supported\",\"source-statement\",\"The README lists instructions for delivery confirmation, refunds, cancellation, admin-only minting, freeze and burn, and describes admin and multisig operations. These are documented capabilities on devnet, not verified mainnet authorities.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\",\"luxhub-program\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"},{\"id\":\"luxhub-program\",\"title\":\"LuxHub published marketplace program (Solana-Anchor)\",\"url\":\"https://github.com/yoandryx/luxhub/tree/main/Solana-Anchor\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Solana-Anchor directory: the published marketplace program with NFT and escrow flows; documented devnet program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj\"}]]",
+            "note": "The operator's documented powers include freezing and burning; deployed authorities are unverified."
+          }
+        },
+        {
+          "dimension": "access",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "Mainnet deployment and vendor onboarding are listed as launch work; who may buy or hold a watch NFT is not stated.",
+          "sourceIds": [
+            "luxhub-repo"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:access",
+          "display": {
+            "tone": "unknown",
+            "label": "Not launched; eligibility not stated",
+            "reason": "Mainnet deployment and vendor onboarding are listed as launch work; who may buy or hold a watch NFT is not stated.",
+            "basis": "[\"access\",\"unknown\",\"analysis\",\"Mainnet deployment and vendor onboarding are listed as launch work; who may buy or hold a watch NFT is not stated.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"}]]",
+            "note": "Mainnet deployment and vendor onboarding are listed as launch work; who may buy or hold a watch NFT is not stated."
+          }
+        },
+        {
+          "dimension": "exit",
+          "state": "supported",
+          "basis": "source-statement",
+          "summary": "The documented Anchor flow locks the NFT and the payment and releases them after delivery is confirmed; refunds, cancellations, shipping timeouts and escalated disputes are described. The confirmation is an input to the program, not an independent witness of the watch.",
+          "sourceIds": [
+            "luxhub-repo",
+            "luxhub-program"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:exit",
+          "display": {
+            "tone": "condition",
+            "label": "Escrow releases on a delivery confirmation",
+            "reason": "The documented Anchor flow locks the NFT and the payment and releases them after delivery is confirmed; refunds, cancellations, shipping timeouts and escalated disputes are described. The confirmation is an input to the program, not an independent witness of the watch.",
+            "basis": "[\"exit\",\"supported\",\"source-statement\",\"The documented Anchor flow locks the NFT and the payment and releases them after delivery is confirmed; refunds, cancellations, shipping timeouts and escalated disputes are described. The confirmation is an input to the program, not an independent witness of the watch.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\",\"luxhub-program\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"},{\"id\":\"luxhub-program\",\"title\":\"LuxHub published marketplace program (Solana-Anchor)\",\"url\":\"https://github.com/yoandryx/luxhub/tree/main/Solana-Anchor\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"Solana-Anchor directory: the published marketplace program with NFT and escrow flows; documented devnet program kW2w2pHhAP8hFGRLganziunchKu6tjaXyomvF6jxNpj\"}]]",
+            "note": "Who confirms delivery and who resolves exceptions decides the trade; the program cannot see the watch."
+          }
+        },
+        {
+          "dimension": "failure",
+          "state": "unknown",
+          "basis": "analysis",
+          "summary": "The public architecture does not establish the buyer's legal title, independent authentication, insurance or an audit of deployed code.",
+          "sourceIds": [
+            "luxhub-repo"
+          ],
+          "scope": {
+            "instrumentId": "instrument:luxhub",
+            "contextId": "holder",
+            "termsId": "luxhub-terms-2026-10-08",
+            "from": null
+          },
+          "id": "luxhub:holder:failure",
+          "display": {
+            "tone": "unknown",
+            "label": "Recovery rights not verified",
+            "reason": "The public architecture does not establish the buyer's legal title, independent authentication, insurance or an audit of deployed code.",
+            "basis": "[\"failure\",\"unknown\",\"analysis\",\"The public architecture does not establish the buyer's legal title, independent authentication, insurance or an audit of deployed code.\",{\"instrumentId\":\"instrument:luxhub\",\"contextId\":\"holder\",\"termsId\":\"luxhub-terms-2026-10-08\",\"from\":null},[\"luxhub-repo\"],[{\"id\":\"luxhub-repo\",\"title\":\"LuxHub architecture and roadmap (GitHub)\",\"url\":\"https://github.com/yoandryx/luxhub\",\"documentDate\":null,\"effectiveDate\":null,\"checkedAt\":\"2026-10-08T00:00:00Z\",\"locator\":\"README: vendor listings with condition records, photos and authentication metadata; delivery escrow; refunds, cancellations, timeouts, disputes; admin and multisig operations; devnet validation; mainnet deployment and vendor onboarding as launch work\"}]]",
+            "note": "The public architecture does not establish the buyer's legal title, independent authentication, insurance or an audit of deployed code."
+          }
+        }
+      ],
+      "deployments": [],
+      "evidenceProfiles": [
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Public repository (via Tokenizario review)",
+          "scope": "Marketplace design, escrow flow, admin powers and launch status",
+          "availability": "reviewed",
+          "limit": "Summarised by Tokenizario on 2026-10-08; a feature list is evidence of a design, not of live sales, custody or program security.",
+          "sourceIds": [
+            "luxhub-repo",
+            "luxhub-program"
+          ]
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": null,
+          "method": "Mainnet deployment and watch evidence",
+          "scope": "Deployed program, watch NFT, vendor, inventory and authentication",
+          "availability": "not-obtained",
+          "limit": "Only a devnet program is documented; no watch token, vendor or inventory was identified.",
+          "sourceIds": []
+        },
+        {
+          "sourcePeriod": null,
+          "checkedAt": "2026-10-08T00:00:00Z",
+          "method": "Dependency and recourse review",
+          "scope": "Vendor → watch NFT → LuxHub escrow program → delivery confirmation → payout",
+          "availability": "reviewed",
+          "limit": "No live product; who confirms delivery, who releases payment and the buyer's title are not established.",
+          "sourceIds": [
+            "luxhub-repo",
+            "luxhub-program"
+          ]
+        }
+      ],
+      "exitDetails": {
+        "holder": {
+          "obligor": "Not established; the vendor would sell the watch",
+          "processor": "LuxHub escrow program (devnet design)",
+          "onboarding": "Not stated; vendor onboarding is launch work",
+          "entitlementOnTransfer": "Not established",
+          "settlement": "Escrowed payment released after delivery confirmation (documented design)",
+          "minimumAndFees": "Not stated",
+          "independentRoute": "Not established",
+          "availability": "Not launched; devnet only"
+        }
+      },
+      "assetModule": {
+        "label": "Physical watch (design only)",
+        "summary": "Approved vendors would list serial-numbered watches with condition records, photos and authentication metadata; no watch or inventory was identified.",
+        "sourceIds": [
+          "luxhub-repo"
+        ]
+      },
+      "kind": "instrument",
+      "structure": {
+        "id": "unknown",
+        "label": "Structure unresolved",
+        "basis": "The reviewed terms do not establish a holder structure.",
+        "sourceIds": [
+          "luxhub-repo"
+        ]
+      }
     }
   ]
 }

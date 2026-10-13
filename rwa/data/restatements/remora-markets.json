@@ -1,0 +1,391 @@
+{
+  "id": "remora-markets",
+  "name": "Remora Markets rStocks (wound down)",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "remora-markets"
+    ],
+    "catalogueNames": [
+      "Remora Markets"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-09-24",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/remora-markets.json (archived 2025 and 2026 sites, press on the Step Finance wind-down, RWA.xyz, chain reads)",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "rwa-assets-db.json and attestations-db.json (Remora Markets)",
+      "asOf": "2026-09-16"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": null,
+    "legalForm": "Undocumented: a platform-issued Token-2022 token asserted to be backed 1:1 by a share or metal held through an unnamed regulated custodian; no terms, prospectus or note conditions were ever published in readable form, and no issuing entity or governing law is named",
+    "says": "When the platform ran, a KYC-verified account holder could mint against USDC and redeem through the platform for USDC; holding the token alone never entitled the bearer to the underlying. Since the wind-down of 23-24 February 2026 there is no redemption right, no process and no market, and the nature, ranking and enforceability of the claim, and the party it runs against, are unknown."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "example": {
+        "symbol": "TSLAr",
+        "mint": "FJug3z58gssSTDhVNkTse5fP8GRZzuidf9SRtfB2RhDe"
+      },
+      "readable": false,
+      "note": "Equity rStocks from 2025-09-02 (TSLAr, NVDAr, CRCLr, SPYr, MSTRr and others) and metal rTokens from 2026-01-16 (GLDr, SLVr, CPERr, PPLTr, PALLr); no full count is established in the sources, and RWA Sonar's universe carries none of them. Mints and supply remain live."
+    }
+  ],
+  "parties": [
+    {
+      "id": "remora",
+      "name": "Remora Markets (issuing legal entity not named; formerly Moose Capital)",
+      "role": "issuer",
+      "keys": [
+        {
+          "address": "DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb",
+          "controls": "mint, freeze, pause, permanent delegate, metadata and scaled-UI authority on every rToken mint",
+          "kind": "Squads v4 vault index 0 of multisig 7QsgDVkiM2285Mvi5TUf1gtHj1QzcqMyix6Rgrcqko35: 2 of 3, time lock 0, config immutable; members unidentified"
+        }
+      ]
+    },
+    {
+      "id": "step-labs",
+      "name": "Step Labs LLC",
+      "role": "platform",
+      "note": "The 2026 Privacy Policy defines it as 'Remora Markets', 'we' or 'us', the operator of the website and service; no jurisdiction, address or registration number, and no statement that it issued the tokens."
+    },
+    {
+      "id": "step-finance",
+      "name": "Step Finance",
+      "role": "other",
+      "note": "Parent: acquired Moose Capital in December 2024 and ran the platform as Remora Markets ('Step Foundation' on the 2026 About page)."
+    },
+    {
+      "id": "custodian",
+      "name": "The regulated custodian (not named)",
+      "role": "custodian",
+      "note": "'Wealth Management providers regulated in UAE' (2025); 'a regulated custodian (see legal documentation)' (2026). A BitGo attribution cannot be corroborated."
+    },
+    {
+      "id": "auditor",
+      "name": "The proof-of-reserve auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "licensor",
+      "name": "The licensing authority (not named)",
+      "role": "regulator"
+    },
+    {
+      "id": "manifest",
+      "name": "Manifest",
+      "role": "venue",
+      "note": "Order-book DEX that carried the wind-down exit liquidity from 2026-03-02."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "step-labs",
+      "type": "profile",
+      "about": "the authority vault DQSTm2WtpKBdpKx9t2cYL9Ja8fe7v4yEVEtA7NnSsdqb",
+      "says": "Step Labs LLC, 'Remora Markets', operator of the website and service; does not deliberately direct the offering at the USA or any sanctioned or prohibited country.",
+      "today": {
+        "state": "published",
+        "where": "2026 remoramarkets.xyz Privacy Policy, readable only in the Wayback capture of 2026-01-29; it gives no jurisdiction and does not tie the company to the mints or the vault"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "remora",
+      "type": "declaration",
+      "form": "token",
+      "about": "each rToken mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: what the holder of an rToken is owed, by whom, and from which allocated shares or metal.",
+      "today": {
+        "state": "not-published",
+        "where": "The 2025 Terms & Conditions, Whitepaper, KYC Info and Privacy Policy pages were empty stubs created within 25 seconds on 2025-02-25; the 2026 Terms of Use was listed in the sitemap but never archived. Both domains are now dead"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "how-it-works",
+      "signer": "remora",
+      "type": "note",
+      "about": "each rToken mint",
+      "says": "Deposit USDC, mint at the current price on traditional exchanges, withdraw the RWAs to your own non-custodial wallet on Solana; redeem through the platform for USDC. KYC for individuals, KYB for businesses; not available in the United States or Europe.",
+      "today": {
+        "state": "published",
+        "where": "How It Works and About pages, archived 2025-03-10 and 2025-03-25; the operator and the site are gone"
+      }
+    },
+    {
+      "id": "A",
+      "signer": "remora",
+      "type": "declaration",
+      "form": "custody",
+      "about": "the shares and metals behind the rTokens",
+      "says": "Custody arrangement: each tokenized equity is 'held through a regulated custodian (see legal documentation)'; 'Custodial services managed by Wealth Management providers regulated in UAE'. No custodian is named.",
+      "today": {
+        "state": "published",
+        "where": "Archived 2025 About page and 2026 site; the Service Providers page that would name the custodian was never archived with content"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's custody account",
+      "for": "remora",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N shares of each referenced security, and M ounces of each metal, for Remora Markets, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No readable source names the custodian"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed-status",
+      "signer": "remora",
+      "type": "status",
+      "predicate": "backed",
+      "about": "each rToken mint",
+      "says": "'CUSTODIED SHARES' beside 'TOKEN SUPPLY' per product, for example TSLAr 3,079 / 3,079, with no custodian, date or attestor.",
+      "today": {
+        "state": "published",
+        "where": "2026 products page, Wayback capture of 2026-01-29 only"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "por-audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "each rToken mint",
+      "refs": [
+        "backed-status"
+      ],
+      "says": "Monthly proof-of-reserve audit of the custodied shares and metals against token supply.",
+      "today": {
+        "state": "unnamed",
+        "where": "The About page claimed 'Monthly Proof of Reserve audits'; no auditor is named and no report, feed or oracle was ever found"
+      }
+    },
+    {
+      "id": "licence",
+      "signer": "licensor",
+      "type": "credential",
+      "about": "the issuer's wallet",
+      "says": "Holds an asset management licence.",
+      "today": {
+        "state": "unnamed",
+        "where": "The 2025 About page claimed an 'Asset management license in premium offshore jurisdictions'; no regulator, licence number or jurisdiction was ever given"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "wind-down",
+      "signer": "step-finance",
+      "type": "certification",
+      "event": "other",
+      "about": "the issuer's wallet",
+      "says": "Step Finance winds down all operations with immediate effect, including Remora Markets, after failing to secure financing or an acquisition (2026-02-23), following the 2026-01-31 compromise of its treasury (261,854 SOL, about $28.9M).",
+      "today": {
+        "state": "reported",
+        "where": "PANews and Solana Compass report the announcement; Step's own announcement is not among the sources"
+      }
+    },
+    {
+      "id": "still-backed",
+      "signer": "remora",
+      "type": "status",
+      "predicate": "backed",
+      "about": "each rToken mint",
+      "says": "All rTokens are still fully backed at a 1:1 ratio; a process for holders to exchange them for USDC is being developed.",
+      "today": {
+        "state": "reported",
+        "where": "PANews (2026-02-23), quoting Remora; no figure, custodian or evidence"
+      }
+    },
+    {
+      "id": "exit-liquidity",
+      "signer": "remora",
+      "type": "certification",
+      "event": "other",
+      "about": "each rToken mint",
+      "says": "USDC exit liquidity deployed on Manifest on 2026-03-02, priced at the prior Friday's market close and routable through Jupiter and Titan.",
+      "today": {
+        "state": "reported",
+        "where": "Solana Compass; by 2026-09-18 the book appears in no aggregator and Jupiter answers TOKEN_NOT_TRADABLE"
+      }
+    },
+    {
+      "id": "redemption",
+      "signer": "remora",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "each rToken mint",
+      "refs": [
+        "still-backed"
+      ],
+      "says": "Redeemed N rTokens for X USDC under the announced redemption process.",
+      "today": {
+        "state": "not-published",
+        "where": "No redemption process was ever published or observed"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "wound-down-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each rToken mint",
+      "refs": [
+        "still-backed",
+        "wind-down"
+      ],
+      "says": "The operator is gone and the 1:1 backing claim has never been evidenced, while about $2M of rTokens across about 3,600 holders remains outstanding and the 2-of-3 vault can still mint, freeze, pause and seize every rToken. Residual holders have no exit.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings issuer-has-wound-down (critical) and winddown-exit-liquidity-at-stale-mark; redemption recorded unavailable on 2026-09-18"
+      },
+      "gaps": [
+        "research-finding",
+        "issuer-lifecycle"
+      ]
+    },
+    {
+      "id": "no-terms-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each rToken mint",
+      "refs": [
+        "T"
+      ],
+      "says": "No token document names the issuing entity, its jurisdiction, its licence or its governing law; the only company a primary source names is Step Labs LLC, as website operator, and no match for it was found in SEC EDGAR or GLEIF (2026-09-23).",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier findings no-token-terms-published and issuer-legal-entity-not-publicly-identified (both critical)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with permanent delegate, pausable config (unpaused), scaled UI amount (multiplier 1, never used), defaultAccountState initialized and confidential transfers, and no transfer hook. Every authority is Squads v4 vault DQSTm2… of multisig 7QsgDV…, 2 of 3, time lock 0, config immutable.",
+      "observedAt": "2026-09-18",
+      "source": "RWA Sonar dossier keyGovernance and knownExtensions (RPC getAccountInfo, Squads decode)"
+    },
+    {
+      "id": "vault-still-active",
+      "says": "The vault's last transaction, a Squads VaultTransactionExecute wrapping a plain Token-2022 transfer, was on 2026-09-10.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier authorityFacts.upgrade"
+    },
+    {
+      "id": "supply",
+      "says": "Outstanding supply TSLAr 1,238.996656657, NVDAr 1,190.998328212 and GLDr 138.512544270 (9 decimals); no burn retired the programme.",
+      "observedAt": "2026-09-18",
+      "source": "RWA Sonar dossier incidents (RPC)"
+    },
+    {
+      "id": "no-market",
+      "says": "Residual 2025 pools hold $13.47 across four TSLAr pools, $0.30 on GLDr and $1,040.51 on NVDAr.",
+      "observedAt": "2026-09-18",
+      "source": "RWA Sonar dossier redemption (api-v3.raydium.io)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Originally KYC- or KYB-verified platform account holders, through the platform, for USDC; nothing replaced that after the wind-down. No terms survive to say what a holder may enforce."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "Unknown: no readable source states a governing law, forum or dispute clause."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Minting was priced at the platform's own mark from traditional exchanges; the exit book used a stale Friday close; third-party valuations disagree by more than two orders of magnitude (CoinGecko ~$138.9M, RWA.xyz $1.87M, DefiLlama $479,846)."
+    }
+  ],
+  "recipe": {
+    "name": "Claim against a wound-down issuer",
+    "outcome": "claim",
+    "author": "A residual holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Token terms (T) naming who owes what",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A named custodian's holdings under A, after the wind-down",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "An independent reserve examination after the wind-down",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "Not 'not-a-token': the mints, about $2M of supply across about 3,600 holders and the 2-of-3 vault that controls them are still live, so there is a token to restate. But the core cannot be said, because no terms were ever published, no issuer, custodian, auditor or licensor is named, and the only surviving statements are the operator's own unsupported 1:1 claims, now reported by the press. v3 can record the wind-down, the exit-liquidity event and the absence of everything else, which is the honest record of this programme."
+  }
+}

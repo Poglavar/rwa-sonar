@@ -1,0 +1,414 @@
+{
+  "id": "jtrsy",
+  "name": "Janus Henderson Anemoy Treasury Fund (JTRSY)",
+  "subjects": {
+    "researchProducts": [
+      "jtrsy"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Janus Henderson JTRSY"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product jtrsy (Anemoy fund page, Centrifuge pool page, Janus Henderson announcement of 13 September 2024, Centrifuge deployments, Anemoy business continuity notice)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry Janus Henderson JTRSY",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for Janus Henderson JTRSY",
+      "asOf": "2026-03-01"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, JTRSY row",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Share in a BVI professional fund (Janus Henderson Anemoy Treasury Fund, issuer shown as Anemoy Capital SPC Ltd.), represented by the JTRSY token; constitutional documents not reviewed",
+    "says": "The issuer says each token represents an ownership share in the BVI fund and is prima facie evidence of ownership under BVI law. Prima facie evidence is not conclusive title, and the sources do not establish investor priority if the fund, the SPV, the custodian or the manager fails."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum, Base and Arbitrum",
+      "standard": "erc-20",
+      "count": 3,
+      "example": {
+        "symbol": "JTRSY",
+        "mint": "0x8c213ee79581ff4984583c6a801e5263418c4b86"
+      },
+      "readable": false,
+      "note": "One address on three chains, per Centrifuge's deployment list; class and terms binding not verified."
+    },
+    {
+      "chain": "Avalanche, Plume and BNB Smart Chain",
+      "standard": "erc-20",
+      "count": 3,
+      "example": {
+        "symbol": "JTRSY",
+        "mint": "0xa5d465251fbcc907f5dd6bb2145488dfc6a2627b"
+      },
+      "readable": false
+    },
+    {
+      "chain": "Monad and Pharos",
+      "standard": "erc-20",
+      "count": 2,
+      "example": {
+        "symbol": "JTRSY",
+        "mint": "0xc18e6f730896971a79d748e8dea61067a9bc6040"
+      },
+      "readable": false
+    },
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "JTRSY",
+        "mint": "JTRu97Z4oduVwfVBWdf1fSAz8h7CBBPqEo4Jco9fZPj"
+      },
+      "readable": false,
+      "note": "Token-2022 with supply 0 on 13 October 2026."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "Anemoy Capital SPC Ltd. (Janus Henderson Anemoy Treasury Fund)",
+      "role": "issuer",
+      "note": "BVI professional fund; formerly the Anemoy Liquid Treasury Fund (LTF). The issuer name is as shown on the Centrifuge pool page."
+    },
+    {
+      "id": "janus",
+      "name": "Janus Henderson",
+      "role": "other",
+      "note": "Named in the manager and sub-adviser role in its announcement of 13 September 2024."
+    },
+    {
+      "id": "centrifuge",
+      "name": "Centrifuge",
+      "role": "platform",
+      "note": "Hosts the pool page and publishes the deployment list for nine chains."
+    },
+    {
+      "id": "admin",
+      "name": "The fund administrator (not named)",
+      "role": "administrator"
+    },
+    {
+      "id": "custodian",
+      "name": "The fund's custodian (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "regulator",
+      "name": "The fund's BVI regulator (not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "Anemoy Capital SPC Ltd., issuer of the Janus Henderson Anemoy Treasury Fund, a BVI professional fund formerly called the Anemoy Liquid Treasury Fund; Janus Henderson acts in the manager and sub-adviser role.",
+      "today": {
+        "state": "published",
+        "where": "anemoy.io fund page; the issuer entity name appears on the Centrifuge pool page; Janus Henderson's announcement of 13 September 2024"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the JTRSY token on each of nine chains",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: each JTRSY token represents an ownership share in the BVI fund and is prima facie evidence of ownership under BVI law; allocation: the fund's JTRSY shares.",
+      "today": {
+        "state": "published",
+        "where": "anemoy.io fund page (token ownership statement); the offering memorandum and constitutional documents were not obtained"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the JTRSY token",
+      "says": "The token is prima facie evidence of ownership under BVI law and the product is fully on-chain: the chain is the presumptive record, rebuttable under the fund's documents.",
+      "today": {
+        "state": "published",
+        "where": "anemoy.io fund page; it does not say which record wins a dispute, nor whether a separate register of members exists"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "admin",
+      "type": "register-entry",
+      "about": "each JTRSY holder's wallet",
+      "says": "Per the fund's records, this holder owns N JTRSY shares.",
+      "today": {
+        "state": "unnamed",
+        "where": "The research names a fund administrator in the token workflow but not who it is; no off-chain register entries are published"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's Treasury bills",
+      "says": "Custody arrangement: the fund's US Treasury bills are held for it by its custodian, inside a bankruptcy-remote SPV structure.",
+      "today": {
+        "state": "not-published",
+        "where": "The issuer claims a bankruptcy-remote SPV and lists service providers on the pool page, but the research records no custodian; the older catalogue's Coinbase Custody row has no source link"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these Treasury bills for the fund under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is identified"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "JTRSY on all nine chains",
+      "says": "The fund holds US Treasury bills against all JTRSY outstanding across Ethereum, Base, Arbitrum, Avalanche, Plume, BNB Smart Chain, Solana, Monad and Pharos, as of date.",
+      "today": {
+        "state": "published",
+        "where": "anemoy.io describes the strategy; no holdings figure was verified. The catalogue counted 582.5M JTRSY on Ethereum on 16 September 2026"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "admin",
+      "type": "valuation",
+      "about": "one JTRSY",
+      "says": "NAV per share is X for the daily dealing date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No administrator or NAV publication is recorded in the sources"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No auditor or audit report appears in the reviewed sources"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the JTRSY token",
+      "says": "Eligible professional investors only, after issuer onboarding, from a $500,000 minimum (0.25% fee stated).",
+      "today": {
+        "state": "reported",
+        "where": "Centrifuge pool page; the indicative page may not be the governing fee schedule"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "fund-recognition",
+      "signer": "regulator",
+      "type": "credential",
+      "about": "the fund's wallet",
+      "says": "The fund is a recognised BVI professional fund.",
+      "today": {
+        "state": "unnamed",
+        "where": "The issuer calls it a BVI professional fund; no source names the regulator or a registration number"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "solana-empty",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Solana JTRSY mint",
+      "says": "The Solana mint is in the official deployment list but had supply 0 at slot 456350748: no JTRSY circulates on Solana, and every share sits on the other eight chains.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario restatement chain read, 13 October 2026; deployment list in RWA Sonar research jtrsy"
+      },
+      "gaps": [
+        "research-finding",
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "recourse-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the JTRSY token",
+      "says": "Constitutional documents, custody terms, deployed control roles and an independent recovery route are not established; the business continuity notice still refers to LTF and does not guarantee execution. Prima facie ownership evidence is not conclusive title.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research jtrsy (dependency and recourse review, 1 October 2026)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 mint JTRu…9fZPj, 6 decimals. One key, 3JiU6sJt94WcD6r7EFTUnJo6By9DJ9WJxovRGfY9oseb, is mint authority, freeze authority, permanent delegate (it can move or burn any balance) and metadata update authority; the metadata pointer authority is Eg37TXi7ojfPT4kQPFUu6umtvz3cCN2Xif5TgQKDd68C. A default-account-state extension is present (the read did not record the default state).",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Solana supply 0.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Daily fund redemption, usually T+0 or T+1 per the pool page, for onboarded professional investors under the fund's terms. No redemption was tested."
+    },
+    {
+      "topic": "Instant liquidity",
+      "says": "A third-party instant liquidity facility is described on the pool page; it is a separate route, not a substitute for fund redemption, and its terms and the provider's recourse were not reviewed."
+    },
+    {
+      "topic": "Freeze, move and burn",
+      "says": "The Solana mint shows a permanent delegate and freeze authority; the fund documents that would authorise their use were not reviewed."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "Investor priority on the failure of the SPV, custodian or manager depends on BVI law and the fund's documents, which were not reviewed."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a tokenized fund share",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Fund's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings for the fund under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 7 days",
+        "minSigners": 1,
+        "maxAgeDays": 7,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited financial statements, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The issuer's own words fit a token declaration and a proposed authoritative-record status: the token is prima facie evidence of ownership. That presumption is only a proposal in v3, the share needs a registered-holding kind and fund units, and eight of nine deployments are EVM while the ninth is an empty Token-2022 mint. The administrator, custodian, auditor and regulator are not named."
+  }
+}

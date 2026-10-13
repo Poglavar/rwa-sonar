@@ -1,0 +1,434 @@
+{
+  "id": "superstate-opening-bell",
+  "name": "Opening Bell by Superstate",
+  "subjects": {
+    "researchProducts": [],
+    "issuerDossiers": [
+      "superstate-opening-bell"
+    ],
+    "catalogueNames": [
+      "Opening Bell by Superstate"
+    ],
+    "mechanisms": [],
+    "universeIssuers": [
+      "superstate-opening-bell"
+    ]
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar issuer dossier stocks/data/issuers/superstate-opening-bell.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar stocks/data/universe.json and stocks/data/holder-rights.json",
+      "asOf": "2026-09-24"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json and attestations-db.json (entry 'Opening Bell by Superstate')",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario stock-templates.ts (template superstate-opening-bell--token-2022-clawback-allowlist-rebase, FWDI) and docs/rwa-sonar-mapping.md",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748 (USTB mint, for the shared freeze authority)",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Registered common stock of the listed company in book-entry form, represented by Token-2022 tokens on Solana; the holder is a holder of record in their own name in Superstate's Subsidiary Securityholder Records, which feed the Recordkeeping Transfer Agent's Master Securityholder File",
+    "says": "The holder owns the company's share itself, of the same class and CUSIP as the listed stock, with the rights of any registered shareholder (votes and dividends through the transfer agents), and no SPV, custodian or nominee in between. Holding and transfer need a KYC'd, allowlisted wallet; burning converts the token back to a book-entry share, not to cash."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 4,
+      "example": {
+        "symbol": "FWDI",
+        "mint": "7GzQgf6DPo6ZANjnbhe9tNCpkGTv3zqHbsDx74jyQf9"
+      },
+      "readable": false,
+      "note": "FWDI and GLXY are token- and trade-enabled; EXOD has both flags off with 60 tokens outstanding; HSDT has supply 0 and Solana Company says it has not issued Tokenized HSDT (2026-09-17)."
+    },
+    {
+      "chain": "Ethereum and Linea",
+      "standard": "unknown",
+      "readable": false,
+      "note": "SBET (SharpLink) and the Direct Issuance Program contracts; not read in this restatement."
+    }
+  ],
+  "parties": [
+    {
+      "id": "companies",
+      "name": "The listed companies: Forward Industries, Inc. (FWDI), Galaxy Digital Inc. (GLXY), Exodus Movement, Inc. (EXOD), Solana Company (HSDT)",
+      "role": "issuer",
+      "note": "SEC-reporting companies; each issues its own shares and signs a Digital Transfer Agency Agreement with Superstate."
+    },
+    {
+      "id": "superstate",
+      "name": "Superstate Services LLC",
+      "role": "transfer-agent",
+      "note": "SEC-registered transfer agent (File No. 84-06972) acting as Digital Transfer Agent; mints the tokens and runs the Allowlist program. Key management through Turnkey, with no threshold disclosed.",
+      "keys": [
+        {
+          "address": "CWdsNnEuCYzxBjjd9dxvhYuatVHY2cGsMNNJcKsGFSqq",
+          "controls": "FWDI mint and scaled-UI (split) authority; each mint has its own such key",
+          "kind": "hot key"
+        },
+        {
+          "address": "2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x",
+          "controls": "freeze authority and permanent delegate of all four Solana equity mints",
+          "kind": "signer of the upgradeable Allowlist program HFkKyweJDUuGer5KaCst5qZSYD5aapKaD7xzdNaoRtfA"
+        },
+        {
+          "address": "2ccHdavxJ3eZ4aUy39sHmykFhiKkuvtomyRLRULrwkMA",
+          "controls": "upgrade of the Allowlist program and allowlist administration",
+          "kind": "hot key, no time lock"
+        }
+      ]
+    },
+    {
+      "id": "rta",
+      "name": "The Recordkeeping Transfer Agent (Equity Stock Transfer for FWDI; not named for the other companies)",
+      "role": "transfer-agent",
+      "note": "Keeps the Master Securityholder File and the 'On chain Eligible Shares Record' that Superstate debits and credits."
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "macro",
+      "name": "0xMacro",
+      "role": "auditor"
+    },
+    {
+      "id": "examiner",
+      "name": "An examiner of the register against the chain (none appointed)",
+      "role": "auditor"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "superstate",
+      "type": "profile",
+      "about": "Superstate's admin wallet",
+      "says": "Superstate Services LLC, a Delaware LLC in New York and SEC-registered transfer agent (File No. 84-06972), Digital Transfer Agent for the listed companies; not the issuer of the shares.",
+      "today": {
+        "state": "published",
+        "where": "superstate.com/terms (September 2025) and docs.superstate.com"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "companies",
+      "type": "declaration",
+      "form": "token",
+      "about": "each Opening Bell mint (FWDI shown)",
+      "says": "Token terms: each token is one of our book-entry shares 'represented by digital tokens recorded on the Solana blockchain', the same class and CUSIP as the listed stock (FWDI 349862409, EXOD 30209R106); 'All issued shares, regardless of form, represent identical rights.' Allocation: the shares in the On chain Eligible Shares Record.",
+      "today": {
+        "state": "published",
+        "where": "Forward Industries 10-K, Galaxy 8-K, and the Digital Transfer Agency Agreement s.1.9 and Schedule B filed as EX-10.7 to Exodus's 10-K"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "entry-holder",
+      "signer": "superstate",
+      "type": "register-entry",
+      "about": "each holder's wallet",
+      "says": "Per our Subsidiary Securityholder Records, the person behind this wallet (name, physical address and TIN on file) is holder of record of N FWDI shares.",
+      "today": {
+        "state": "not-published",
+        "where": "Holder identities stay private; /v1/balances answers only with an API key scoped to the holder's own entity"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "entry-total",
+      "signer": "superstate",
+      "type": "register-entry",
+      "about": "the FWDI mint",
+      "says": "Per our records, 7,280,819.20 FWDI shares are tokenized on Solana out of 8,723,436.10 in total (2026-09-16).",
+      "today": {
+        "state": "published",
+        "where": "https://api.superstate.com/v2/instruments (circulating_supply, total_supply), public and unauthenticated"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "entry-master",
+      "signer": "rta",
+      "type": "register-entry",
+      "about": "the FWDI mint",
+      "says": "Per the Master Securityholder File, N FWDI shares are held as On chain Eligible Shares, alongside certificated shares and book-entry shares at DTC or the RTA.",
+      "today": {
+        "state": "not-published",
+        "where": "Equity Stock Transfer publishes nothing about the tokenized shares; the DTAA gives the issuer, RTA and regulators inspection rights with no published output"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "master-prevails",
+      "signer": "companies",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "each Opening Bell mint",
+      "says": "The Master Securityholder File kept by the RTA is the record of ownership, 'inclusive of ... On chain Eligible Shares maintained by Superstate as part of its Subsidiary Security holder Records'; the chain mirrors the subsidiary record.",
+      "refs": [
+        "entry-master",
+        "entry-holder"
+      ],
+      "today": {
+        "state": "published",
+        "where": "DTAA ss.1.7, 1.8, 1.10 and Schedule A s.2.1. Contradicted by Superstate's Terms s.14.1 ('maintains the Issuer's official master securityholder file') and by Galaxy's 8-K ('records legal ownership onchain in real time'); no document says which controls in a dispute"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "allowlist",
+      "signer": "superstate",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each Opening Bell mint",
+      "says": "Tokenized shares 'may only be transferred to or held by digital wallet addresses of persons or decentralized exchange pools on the Allowlist'; a wallet is added only after KYC (government ID with real-time image capture, SSN, date of birth) and AML and sanctions screening. No accredited status needed; open globally except US-sanctioned jurisdictions; Kamino collateral use only for ex-US holders.",
+      "today": {
+        "state": "published",
+        "where": "DTAA Schedule A s.3.4, Terms ss.3.3 and 5.2; the allowlist itself is enumerable on chain (827 accounts on 2026-09-16)"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "ta-registration",
+      "signer": "sec",
+      "type": "credential",
+      "about": "Superstate's admin wallet",
+      "says": "Registered transfer agent under Exchange Act s.17A(c)(2), File No. 084-06972 (TA-1 2025-02-03, effective 2025-03-05, amended 2025-05-05 and 2026-03-25; TA-2 2026-03-26) (role registry).",
+      "today": {
+        "state": "published",
+        "where": "SEC EDGAR filings under CIK 0002054806, read by RWA Sonar 2026-09-17; not bound to any wallet"
+      },
+      "gaps": [
+        "roles",
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "split",
+      "signer": "superstate",
+      "type": "certification",
+      "event": "corporate-action",
+      "about": "each Opening Bell mint",
+      "says": "Split applied: the share multiplier becomes M from date D. FWDI and HSDT read 1, with no change scheduled.",
+      "today": {
+        "state": "onchain",
+        "where": "Scaled-UI multiplier on each mint, written by that mint's hot key, and equity_info.current_split_multiplier in the instruments API; never exercised"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "allowlist-audit",
+      "signer": "macro",
+      "type": "certification",
+      "event": "audited",
+      "about": "the Allowlist program that holds freeze and permanent delegate",
+      "says": "Audit superstate-7 of the Solana Allowlist program (report dated 2025-05-05): 2 Critical, 1 High and 3 Low issues, all addressed. Its trust model notes the program can burn any balance through the permanent delegate.",
+      "today": {
+        "state": "published",
+        "where": "https://0xmacro.com/library/audits/superstate-7; no audit of the equity token program itself was located"
+      },
+      "gaps": [
+        "program-subject"
+      ]
+    },
+    {
+      "id": "reconciliation",
+      "signer": "examiner",
+      "type": "certification",
+      "event": "audited",
+      "about": "each Opening Bell mint",
+      "says": "Reconciled the On chain Eligible Shares Record and Superstate's subsidiary records with the mint supply as of date, with any breaks.",
+      "today": {
+        "state": "unnamed",
+        "where": "No reconciliation report or third-party attestation exists; the Terms put the burden on the holder ('you are responsible for notifying us')"
+      }
+    },
+    {
+      "id": "total-flag",
+      "signer": "researcher",
+      "type": "flag",
+      "refs": [
+        "entry-total"
+      ],
+      "about": "Superstate's published tokenized total for FWDI (and GLXY)",
+      "says": "Untrue by 0.1 share: the API reports 7,280,819.20 FWDI against an on-chain supply of 7,280,819.10 (GLXY 13,399.282876 against 13,399.182876), because Kamino's 0.1 reserve seed is counted in both 'Defi_Kamino' and 'AdminSeed-Kamino'. Superstate's own asset page shows 7,280,819.10. Still unchanged on 2026-09-23.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier finding register-and-chain-supply-differ (reason: untrue)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "holders-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the FWDI mint",
+      "says": "Of 481 FWDI token accounts only five hold a balance, and 43.4% of tokenized FWDI sits in Kamino's reserve vault, almost all of it from one obligation: at most six economic holders on Solana, two of them with 91.3%.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar dossier openQuestions (answered 2026-09-23)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 with default account state frozen, a permanent delegate equal to the freeze authority (a signer of the upgradeable Allowlist program, itself upgradeable by one hot key with no time lock), scaled-UI amount under a per-mint hot key, metadata; no transfer hook and no pause.",
+      "observedAt": "2026-09-24",
+      "source": "RWA Sonar dossier keyGovernance and authorityFacts.upgrade (finalized RPC reads)"
+    },
+    {
+      "id": "every-account-born-frozen",
+      "says": "Every token account is created frozen; the Allowlist program creates and thaws it in one transaction.",
+      "observedAt": "2026-09-17",
+      "source": "RWA Sonar dossier attestation transfers-restricted-to-whitelist (slot 447827103)"
+    },
+    {
+      "id": "supply",
+      "says": "FWDI supply 7,280,819.1 on Solana at slot 447827016; GLXY 13,399.182876.",
+      "observedAt": "2026-09-17",
+      "source": "RWA Sonar dossier incident 2026-09-16 (getTokenSupply)"
+    },
+    {
+      "id": "shared-authority",
+      "says": "The same address 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x is freeze authority and permanent delegate of Superstate's USTB fund mint CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2, so one program signer controls both the equities and the fund.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "burn-address",
+      "says": "Redemption is a transfer to the shared Solana equity burn address 2u8YwJTykTreziHBN5QwE7Bi2SyN8M2MicCscthtph9E, after which the book-entry balance updates.",
+      "observedAt": "2026-09-17",
+      "source": "RWA Sonar dossier redemption and sampleMints (instruments API)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Burn to book-entry",
+      "says": "An allowlisted holder with a KYC'd Superstate account sends tokens to the burn address and gets book-entry shares, then a DRS transfer to a broker to sell on Nasdaq; no cash on burn; 'several business days' per the Terms, 'could take up to multiple weeks' per Forward Industries' 10-K."
+    },
+    {
+      "topic": "Powers reserved",
+      "says": "Superstate's admin can mint, add or remove wallets from the allowlist and 'forcibly burn' a balance 'if required by exogenous legal circumstances'; its design document limits the burn to seizure by court order or reconstitution and not for tokens in a DeFi protocol."
+    },
+    {
+      "topic": "Dividends and votes",
+      "says": "Paid through the RTA in cash or shares at the holder's election; proxy materials through the RTA; no on-chain voting. None of these companies pays a dividend today."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "New York law for the Terms and the DTAA; arbitration in New York (JAMS for investors, AAA for issuers); Securities Act registration and Exchange Act s.17A rules apply."
+    },
+    {
+      "topic": "Pricing",
+      "says": "The token has no exchange venue; the Nasdaq price is reachable only through burn and DRS. Superstate publishes a Nasdaq Pyth feed and an index feed per equity for DeFi."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a registered share in my own wallet",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The company's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "A transfer agent's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": [
+          "entry-holder"
+        ]
+      },
+      {
+        "type": "status",
+        "label": "Which register prevails (proposed predicate)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "predicate": "authoritative-record"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Register-to-chain reconciliation, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        },
+        "matches": [
+          "reconciliation"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The closest fit in the batch: an origin of kind share plus transfer-agent register entries says what the holder has, and no custody or reserve is needed because the token is the share. What keeps it partial is precedence: three published documents disagree on which register governs, and v3 cannot say it at all; the token is Token-2022, the transfer agent's role is not a credential role, and nobody publishes a reconciliation, which is how a 0.1-share double count went unseen."
+  }
+}

@@ -1,0 +1,398 @@
+{
+  "id": "ter",
+  "name": "TER Gold",
+  "subjects": {
+    "researchProducts": [
+      "ter"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "TER Gold"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product ter (TER official site, unreadable Terms PDF, Asset Statements index, gold verification audit dated 7 Sep 2026, asset statement to 14 Sep 2026)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, product table row TER Gold",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'TER Gold' and attestations-db.json (TER Gold instances)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": null,
+    "legalForm": "Digital gold token; the holder's legal form is not established from accessible operative terms (the linked Terms PDF could not be read)",
+    "says": "The official site says each TER represents 0.01 g of 99.99% gold held in the holder's name, which reads as an ownership interest in pooled gold; the contractual right and the obligor are unverified. Part of the reported gold is unallocated bullion account balances, which are claims on account providers, not gold the holder could own."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "TER",
+        "mint": "9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ"
+      },
+      "readable": false,
+      "note": "Mint from the research deployment row (address displayed by the official TER site). The research source locator abbreviates the site's mint as 'A1KL…2iVkAzhVUZ', which does not match this mint's prefix."
+    }
+  ],
+  "parties": [
+    {
+      "id": "gmca",
+      "name": "Gelephu Mindfulness City Authority",
+      "role": "issuer",
+      "note": "Issuer as stated by the current official TER page.",
+      "keys": [
+        {
+          "address": "9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+          "controls": "mint, freeze, permanent delegate and metadata authority (the mint's own address)",
+          "kind": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "dkbank",
+      "name": "DK Bank (Digital Kidu Bank)",
+      "role": "distributor",
+      "note": "Exclusive distributor and onboarding bank per the official site. The older catalogue calls it the gold custodian; the research does not support that."
+    },
+    {
+      "id": "vaults",
+      "name": "The vault operators (not named)",
+      "role": "custodian",
+      "note": "Hold the 111 kg of vault inventory in the 14 September statement; the research does not name them."
+    },
+    {
+      "id": "bullion-banks",
+      "name": "The London unallocated bullion account providers (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "raa",
+      "name": "Royal Audit Authority",
+      "role": "inspector",
+      "note": "Physically inspected the Bhutan gold on 17 June and 24 July 2026 (report linked as 'TER Gold Verification Audit')."
+    },
+    {
+      "id": "examiner",
+      "name": "An examiner of reserves against issued TER (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "insurer",
+      "name": "An insurer of the gold (not named)",
+      "role": "insurer"
+    },
+    {
+      "id": "rma",
+      "name": "Royal Monetary Authority of Bhutan",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "gmca",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Gelephu Mindfulness City Authority, issuer of TER; DK Bank is the exclusive distributor.",
+      "today": {
+        "state": "published",
+        "where": "Official TER product site (research source 'ter-site')"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "gmca",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the TER gold",
+      "says": "Custody arrangement: gold in vaults plus balances in unallocated London bullion accounts, inventoried in the issuer's asset statements.",
+      "today": {
+        "state": "published",
+        "where": "TER asset statement to 14 September 2026 (p1 totals, vault inventories and unallocated accounts); no custody agreement is published and the vault operators are not named"
+      }
+    },
+    {
+      "id": "H-vaults",
+      "signer": "vaults",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "gmca",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold 111 kg of gold for the TER programme, as of 14 September 2026.",
+      "today": {
+        "state": "unnamed",
+        "where": "The figure is the issuer's own inventory; the vault operators are not named"
+      }
+    },
+    {
+      "id": "H-unallocated",
+      "signer": "bullion-banks",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "gmca",
+      "refs": [
+        "A"
+      ],
+      "says": "The account holder has a credit balance of 10 kg of gold in an unallocated account with us, as of 14 September 2026; no specific bars.",
+      "today": {
+        "state": "unnamed",
+        "where": "The issuer's statement reports the balances; the account providers are not named"
+      }
+    },
+    {
+      "id": "T",
+      "signer": "gmca",
+      "type": "declaration",
+      "form": "token",
+      "about": "the Solana TER mint 9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one TER represents 0.01 g of 99.99% fine gold held in the holder's name; unit g. Allocation: the gold under A.",
+      "today": {
+        "state": "published",
+        "where": "Official TER site only; the operative TER Token Terms and Conditions (Google Drive PDF) returned a sign-in shell and were not read, so T cannot commit to them by hash"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "allocated",
+      "signer": "gmca",
+      "type": "status",
+      "predicate": "allocated",
+      "about": "the Solana TER mint",
+      "says": "As of 14 September 2026, 111 kg is in vault inventories; 10 kg is not allocated (unallocated London bullion accounts).",
+      "today": {
+        "state": "published",
+        "where": "TER asset statement to 14 September 2026"
+      }
+    },
+    {
+      "id": "backed",
+      "signer": "gmca",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the Solana TER mint",
+      "says": "121 kg of gold reported as of 14 September 2026, against TER outstanding; the site describes TER as 100% backed by gold.",
+      "today": {
+        "state": "published",
+        "where": "TER asset statement (14 Sep 2026); the '100% backed' wording is from the TER FAQ per attestations-db.json (28 Feb 2026). The statement gives no liability figure, so it is not a reconciliation to supply."
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "raa-inspection",
+      "signer": "raa",
+      "type": "inspection",
+      "about": "the gold in Bhutan under A",
+      "says": "Physically inspected the gold held in Bhutan on 17 June and 24 July 2026; report dated 7 September 2026. Excludes physical inspection of overseas vaults, token issuance, blockchain transactions and the adequacy of reserves against issued TER.",
+      "today": {
+        "state": "published",
+        "where": "Gold verification audit report linked from the TER site (pp5–7, Appendix C p9); the research lists it as 'DK Limited audit report PDF'"
+      }
+    },
+    {
+      "id": "reserve-exam",
+      "signer": "examiner",
+      "type": "certification",
+      "event": "audited",
+      "about": "the Solana TER mint",
+      "refs": [
+        "backed"
+      ],
+      "says": "Examined the gold, allocated and unallocated, against TER outstanding at a date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No party examines reserves against issued TER; the Royal Audit Authority's inspection expressly excludes it"
+      }
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the gold under A",
+      "says": "The gold is insured for the insured party, for a period, against named risks, with a limit and a loss payee.",
+      "today": {
+        "state": "unnamed",
+        "where": "The research's failure claim: physical verification does not establish insurance; no insurer is named"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "gmca",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the Solana TER mint",
+      "says": "Buying and redeeming need a DK Bank account with KYC and TER Portal login with DK Bank credentials; 5 TER purchase minimum; 0.25% redemption fee; exit by sale to a bank account or collection of 20 g coins or 1 kg bars at Bhutan Duty-Free Shops. Physical minimums and timing are not stated.",
+      "today": {
+        "state": "published",
+        "where": "Official TER site (research claims 'access' and 'exit')"
+      },
+      "gaps": [
+        "eligibility",
+        "fees"
+      ]
+    },
+    {
+      "id": "distributor-licence",
+      "signer": "rma",
+      "type": "credential",
+      "about": "DK Bank's wallet",
+      "says": "DK Bank is a licensed digital bank regulated by the Royal Monetary Authority of Bhutan.",
+      "today": {
+        "state": "not-checked",
+        "where": "Older catalogue and the GMC FAQ cited in attestations-db.json (28 Feb 2026); the regulator's register was not read"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "terms-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Solana TER mint",
+      "says": "The operative holder terms could not be read, so the holder's property right, the obligor, title on transfer, the precedence of the chain over DK Bank's records and any recovery route are unverified; current fully allocated 1:1 coverage is not established.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research ter (claims 'rights', 'ledger', 'backing', 'failure'; exitDetails obligor 'Not established')"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "coverage-arithmetic",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Solana TER mint",
+      "refs": [
+        "allocated"
+      ],
+      "says": "At 0.01 g per TER, the 11,606,617 TER read on 16 September 2026 correspond to 116.07 kg; the 14 September statement's vault gold is 111 kg, with 10 kg more unallocated. The dates differ by two days and the statement gives no liability figure.",
+      "today": {
+        "state": "not-published",
+        "where": "Arithmetic in this restatement on the older catalogue's supply note and the research's asset statement; RWA Sonar has not published it as a finding"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022, 6 decimals. The mint's own address 9T6TPrY5HmifiR9Bhi6H4Bo8oHhfexvhNQ2iVkAzhVUZ is its mint authority, freeze authority, permanent delegate (move or burn any balance), metadata-pointer and metadata update authority.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Supply 11,754,606 TER (raw 11754606000000), which at the stated 0.01 g per token is 117.54606 kg.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Freeze, seizure and recovery",
+      "says": "No freeze, seizure, upgrade or emergency recovery provision was verified from accessible material, although the chain shows a freeze authority and a permanent delegate. Stays in the unread terms."
+    },
+    {
+      "topic": "Visa deposit use",
+      "says": "The older catalogue says TER serves as the deposit for Bhutan's Digital Nomad Visa programme; that rule stays with the programme."
+    },
+    {
+      "topic": "Distribution and portal",
+      "says": "DK Bank onboarding, the TER Portal and the duty-free collection points stay with DK Bank and the issuer."
+    }
+  ],
+  "recipe": {
+    "name": "Buy vaulted gold",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "A vault's holdings under A, under 60 days",
+        "minSigners": 1,
+        "maxAgeDays": 60,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "inspection",
+        "label": "An inspection of the gold, under 180 days",
+        "minSigners": 1,
+        "maxAgeDays": 180,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Reserves examined against supply, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The issuer's own side can be said: T from the site, an inventory split into allocated and unallocated gold, and the Royal Audit Authority's inspection, which it publishes. But the operative terms are unreadable, so no claim kind can be chosen with confidence, and the mint is Token-2022 with a permanent delegate the reader cannot show. No vault, account provider or examiner of reserves against supply is named, so every holds and the audited certification have no signer."
+  }
+}

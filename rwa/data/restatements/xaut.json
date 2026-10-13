@@ -1,0 +1,366 @@
+{
+  "id": "xaut",
+  "name": "Tether Gold (XAUT)",
+  "subjects": {
+    "researchProducts": [
+      "xaut"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Tether Gold"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product xaut (Gold Token Terms 9 Sep 2025, Fee Schedule 27 Jan 2025, ISAE 3000R reports at 31 Mar 2026 and 30 Jun 2026)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, case 'XAUT: dated bullion assurance and the insurance boundary'",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario mechanisms.ts PAXG (id gold), contrast paragraph on XAUt0",
+      "asOf": "2026-09-26"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'Tether Gold' and attestations-db.json (Tether Gold instances)",
+      "asOf": "2026-09-16"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "co-ownership",
+    "legalForm": "Undivided specific interest in one fine troy ounce of allocated bullion in the Gold Reserves, under TG Commodities, S.A. de C.V.'s Gold Token Terms of Sale and Service (updated 9 Sep 2025)",
+    "says": "The holder has an undivided ownership interest in gold bars held by a custodian, reallocated among bars on transfer, plus a limited claim against the custodian as a third-party beneficiary, pursued at the holder's own cost. Direct purchase and redemption need a verified Tether Gold account; custody loss falls on the holders of the affected bars, and insolvency priority was not tested."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "XAUT",
+        "mint": "0x68749665FF8D2d112Fa859AA293F07A622782F38"
+      },
+      "readable": false,
+      "note": "The only deployment in the research (official upgrade notice, 8 Nov 2021)."
+    },
+    {
+      "chain": "Solana and other chains (XAUt0)",
+      "standard": "unknown",
+      "readable": false,
+      "note": "mechanisms.ts: XAUt0 is a claim on XAUt locked in an Ethereum contract that Everdawn Labs runs; the older catalogue calls it an additional omnichain build. No XAUt0 mint is in the research or today's chain read."
+    }
+  ],
+  "parties": [
+    {
+      "id": "tg",
+      "name": "TG Commodities, S.A. de C.V.",
+      "role": "issuer",
+      "note": "An El Salvador sociedad anónima de capital variable in the Tether group. The older catalogue calls it TG Commodities Limited; the research's current terms win."
+    },
+    {
+      "id": "custodian",
+      "name": "The bullion custodian (not named)",
+      "role": "custodian",
+      "note": "The terms describe bars held by a custodian in Switzerland; no custodian agreement is published. attestations-db.json names Fireblocks with no source link, which the research does not support."
+    },
+    {
+      "id": "bdo",
+      "name": "BDO",
+      "role": "auditor",
+      "note": "Reasonable assurance (ISAE 3000 Revised) on the reserves at 30 June 2026."
+    },
+    {
+      "id": "refiners",
+      "name": "The refiners or assayers of the bars (not named)",
+      "role": "inspector"
+    },
+    {
+      "id": "insurer",
+      "name": "An insurer of the bars (not named)",
+      "role": "insurer"
+    },
+    {
+      "id": "everdawn",
+      "name": "Everdawn Labs",
+      "role": "platform",
+      "note": "Runs the Ethereum lock contract behind XAUt0 (mechanisms.ts)."
+    },
+    {
+      "id": "counsel",
+      "name": "Counsel (not named)",
+      "role": "counsel"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "tg",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "TG Commodities, S.A. de C.V., an El Salvador company, issuer of XAU₮ under the Gold Token Terms of Sale and Service.",
+      "today": {
+        "state": "published",
+        "where": "Gold Token Terms (gold.tether.to/legal, updated 9 Sep 2025); the issuer also publishes a Relevant Information Document (attestations-db.json, 1 Mar 2026)"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "tg",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the Gold Reserves",
+      "says": "Custody arrangement: specific allocated bullion bars held by a custodian for XAUT holders, who are third-party beneficiaries of the custody contract; delivery in Switzerland.",
+      "today": {
+        "state": "published",
+        "where": "Gold Token Terms §§3, 4.3–4.7, 5.4–5.6; the custodian agreement is not published, so A cannot name the custodian or commit to its agreement by hash"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "the holders of XAUT, as a class",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these bars, N fine troy ounces, for XAUT holders under A, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No source names the custodian; mechanisms.ts calls it an unnamed Swiss custodian"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "tg",
+      "type": "declaration",
+      "form": "token",
+      "about": "the Ethereum XAUT contract 0x68749665FF8D2d112Fa859AA293F07A622782F38",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: each token reflects an undivided specific ownership interest in one fine troy ounce of gold in the Gold Reserves; transfer delivers that interest, which may be reallocated among bars; unit troy-oz. Allocation: the bars under A.",
+      "today": {
+        "state": "published",
+        "where": "Gold Token Terms (research claims 'rights' and 'ledger')"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "tg",
+      "type": "status",
+      "predicate": "backed",
+      "about": "XAUT on all chains",
+      "says": "As of 30 June 2026: 707,747.139 fine troy ounces against 707,747.090000 XAUT issued, the issued figure including unsold inventory.",
+      "today": {
+        "state": "published",
+        "where": "Reserve figures in the BDO report at 30 June 2026 (pp5–7), dated 31 July 2026"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "bdo-exam",
+      "signer": "bdo",
+      "type": "certification",
+      "event": "audited",
+      "about": "XAUT on all chains",
+      "refs": [
+        "backed"
+      ],
+      "says": "Reasonable assurance under ISAE 3000 (Revised) on the gold reserves at 30 June 2026, with procedures including inventory and reconciliation to the token liability on chain; report dated 31 July 2026, hash as evidence. Point in time only; not a financial statement audit or a recovery opinion.",
+      "today": {
+        "state": "published",
+        "where": "BDO's signed report on gold.tether.to (ISAE_3000R_-_Opinion_TGRR_30.06.2026); the previous report is at 31 March 2026"
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "assay",
+      "signer": "refiners",
+      "type": "inspection",
+      "about": "each bar under A",
+      "says": "Bar serial, weight and fineness to the London Good Delivery standard.",
+      "today": {
+        "state": "unnamed",
+        "where": "The older catalogue says London Good Delivery bars; the research names no refiner or assayer"
+      }
+    },
+    {
+      "id": "insured",
+      "signer": "insurer",
+      "type": "status",
+      "predicate": "insured",
+      "proposed": true,
+      "about": "the bars under A",
+      "says": "The bars are insured for the insured party, for a period, against named risks, with a limit and a loss payee.",
+      "today": {
+        "state": "unnamed",
+        "where": "The terms warn that insurance may be insufficient and that custody loss falls on affected bar holders; no insurer, policy or loss payee is named"
+      },
+      "gaps": [
+        "insurance"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "tg",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "XAUT on all chains",
+      "says": "Eligible persons may hold; purchase and redemption with the issuer only for verified customers after eligibility screening; 50 XAUt purchase minimum; generally 430 XAUt per bar for physical delivery in Switzerland, or an issuer-arranged Swiss sale with fiat proceeds; 0.25% purchase and redemption fee plus delivery or brokerage costs.",
+      "today": {
+        "state": "published",
+        "where": "Gold Token Terms and Fee Schedule (27 Jan 2025); research exitDetails"
+      },
+      "gaps": [
+        "eligibility",
+        "fees"
+      ]
+    },
+    {
+      "id": "xaut0-lock",
+      "signer": "everdawn",
+      "type": "declaration",
+      "about": "XAUt0 tokens on Solana and other chains",
+      "says": "XAUt0 is backed by XAUt locked in an Ethereum contract that Everdawn Labs runs.",
+      "today": {
+        "state": "reported",
+        "where": "mechanisms.ts contrast (26 Sep 2026); the research covers Ethereum XAUT only and no Everdawn Labs publication was in the sources"
+      },
+      "gaps": [
+        "cross-chain-lock",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "priority-opinion",
+      "signer": "counsel",
+      "type": "certification",
+      "event": "legal-opinion",
+      "proposed": true,
+      "about": "the Ethereum XAUT contract",
+      "says": "Under the governing law, the holder's undivided interest in the bars is not property of TG Commodities or the custodian in their insolvency, and holders may rely on it.",
+      "today": {
+        "state": "unnamed",
+        "where": "No legal opinion is cited; the research says applicable-law analysis and judicial treatment were not verified"
+      },
+      "gaps": [
+        "legal-opinion"
+      ]
+    },
+    {
+      "id": "recourse-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Ethereum XAUT contract",
+      "says": "Holder recourse against the custodian is a third-party-beneficiary claim pursued at the holder's own cost; custody loss, underinsurance, unpaid custodian fees and custodian insolvency may impair recovery. No completed redemption was observed.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research xaut, failure claim, assetModule and scenario 'custodian-fails' (claim and custody conditional, exit unknown)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "supply",
+      "says": "707,747 XAUT outstanding (older catalogue status note); live Ethereum authorities, bridge dependencies and controller governance were not checked in the research.",
+      "observedAt": "2026-09-16",
+      "source": "rwa-assets-db.json 'Tether Gold' statusNote; research deployment controls 'unknown'"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Freeze and suspension",
+      "says": "The terms permit service suspension and token freezing for legal or discretionary compliance reasons. Stays in the terms; the Ethereum authorities were not read."
+    },
+    {
+      "topic": "Bar reallocation",
+      "says": "The interest may be reallocated among specific bars automatically on transfer, so no holder has a permanent bar serial."
+    },
+    {
+      "topic": "Third-party-beneficiary claim",
+      "says": "Who may sue the custodian, at whose cost and under which contract stays in the terms and the custody agreement, which is not published."
+    },
+    {
+      "topic": "Law and forum",
+      "says": "mechanisms.ts: BVI law and CPR arbitration, issuer in El Salvador."
+    }
+  ],
+  "recipe": {
+    "name": "Buy allocated gold",
+    "outcome": "buy",
+    "author": "A buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Auditor's reserve assurance, under 120 days",
+        "minSigners": 1,
+        "maxAgeDays": 120,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "TG Commodities' terms and BDO's dated assurance can be said as T, status backed and an audited certification, and BDO publishes in its own name. The custodian is not named, so H has no signer, and the holder's real protection, a third-party-beneficiary claim against that custodian, cannot be said for holders as a class. The token is ERC-20 (and XAUt0 sits behind a lock contract), so the reader cannot read it, and insurance has no statement."
+  }
+}

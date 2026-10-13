@@ -1,0 +1,426 @@
+{
+  "id": "ustb",
+  "name": "Invesco Short Duration US Government Securities Fund (USTB, formerly Superstate USTB)",
+  "subjects": {
+    "researchProducts": [
+      "ustb"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Superstate USTB"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product ustb (superstate.com/assets/ustb product page, Form D/A of 7 July 2026, Superstate instrument registry, Invesco USTB investor docs)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Superstate USTB) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar canonical parties stocks/data/canonical-parties.json (Superstate Services LLC, 0xMacro) and event-resolutions.json (superstate.com/assets share count)",
+      "asOf": "2026-10-08"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Pooled investment fund interest (USTB, CUSIP 86851T204) in Invesco Short Duration US Government Securities Fund, a series of a Delaware statutory trust; the trust instrument and current private placement memorandum were not reviewed",
+    "says": "The holder has an interest in a trust series that holds short-duration US government securities, with Superstate Services as transfer agent; the product page describes ownership in token or book-entry form. The manager may compulsorily redeem, and on the fund's insolvency the claims of protocol-redemption liquidity providers rank ahead of shareholders."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "USTB",
+        "mint": "CCz3SGVziFeLYk2xfEstkiqJfYkjaSWb2GCABYsVcjo2"
+      },
+      "readable": false,
+      "note": "Official product address in Superstate's instrument registry; its binding to an exact offering or class is unresolved."
+    },
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "example": {
+        "symbol": "USTB",
+        "mint": "0x43415eB6ff9DB7E26A15b704e7A3eDCe97d31C4e"
+      },
+      "readable": false,
+      "note": "Official product address; the older catalogue lists the token as ERC-20 on Ethereum."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "Invesco Short Duration US Government Securities Fund (a series of a Delaware statutory trust)",
+      "role": "issuer"
+    },
+    {
+      "id": "invesco",
+      "name": "Invesco Advisers (manager since 2026)",
+      "role": "other",
+      "note": "Replaced Superstate as manager; the fund was renamed and kept the USTB ticker (older catalogue status note)."
+    },
+    {
+      "id": "superstate-ta",
+      "name": "Superstate Services LLC (transfer agent)",
+      "role": "transfer-agent",
+      "note": "Canonical parties record it as an SEC-registered transfer agent, File No. 84-06972; Superstate also runs the product page and instrument registry."
+    },
+    {
+      "id": "bny",
+      "name": "BNY Mellon (custodian)",
+      "role": "custodian"
+    },
+    {
+      "id": "nav-fund-services",
+      "name": "NAV Fund Services (valuation)",
+      "role": "administrator"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "macro",
+      "name": "0xMacro",
+      "role": "auditor",
+      "note": "Smart-contract auditor of Superstate's USTB and USCC contracts."
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "Invesco Short Duration US Government Securities Fund, a series of a Delaware statutory trust, offering pooled fund interests under a Form D notice (amended 7 July 2026); formerly Superstate Short Duration US Government Securities Fund.",
+      "today": {
+        "state": "published",
+        "where": "SEC Form D/A (EDGAR CIK 2004367); the registry's issuer_entity_name is a platform field, not a determination of the obligor, and no mint authority is tied to the fund"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's portfolio account",
+      "says": "Custody arrangement: BNY Mellon keeps the fund's short-duration US government securities as custodian.",
+      "today": {
+        "state": "reported",
+        "where": "Superstate's instrument registry and investor docs name BNY Mellon; the trust instrument and PPM are gated, so A cannot commit to them by hash"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "bny",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the fund's Treasury securities under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only Superstate names BNY Mellon; BNY Mellon publishes no holdings, and supply and NAV metadata do not verify custody"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USTB Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is one USTB fund interest, held in token or book-entry form; the manager may direct compulsory redemption and the transfer agent may reverse unauthorized portal activity; protocol-redemption liquidity providers' claims rank ahead of shareholders on insolvency. Allocation: the fund's whole portfolio under A, shared by USTB on every chain.",
+      "today": {
+        "state": "reported",
+        "where": "Superstate's product page risk disclosures and instrument registry; the PPM, subscription agreement and trust instrument were not reviewed"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reserved-powers",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "superstate-ta",
+      "type": "register-entry",
+      "about": "each USTB holder's wallet",
+      "says": "Per the shareholder record I keep as transfer agent, wallet W's holder owns N USTB interests, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "Superstate is named as transfer agent; per-holder entries are not public"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "superstate-ta",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the USTB Solana mint",
+      "says": "Which record is title after a ledger dispute: the transfer agent's book entry or the token.",
+      "today": {
+        "state": "not-published",
+        "where": "The product page describes token or book-entry ownership but does not say which register controls"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "superstate-ta",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the USTB Solana mint",
+      "says": "Only accredited investors and qualified purchasers, with allowlisted wallets, may hold; initial minimum $100,000 unless waived.",
+      "today": {
+        "state": "published",
+        "where": "Superstate's product page and Invesco USTB investor docs (subscribe, redeem, allowlisting)"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "nav-fund-services",
+      "type": "valuation",
+      "about": "the USTB Solana mint",
+      "says": "Net asset value per USTB is X on date D (basis: the fund's daily NAV).",
+      "today": {
+        "state": "reported",
+        "where": "Superstate's instrument registry names NAV Fund Services for valuation and carries NAV metadata; superstate.com/assets shows a daily NAV. The valuation agent publishes nothing in its own name."
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the USTB Solana mint",
+      "says": "Short-duration US government securities against 65,030,965 USTB shares outstanding across all chains (superstate.com/assets, about 22 September 2026), of which the Solana mint carries a small part.",
+      "today": {
+        "state": "reported",
+        "where": "Superstate's assets page publishes daily share counts and AUM; research did not verify holdings"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No source names the fund's auditor or a report"
+      }
+    },
+    {
+      "id": "contract-audit",
+      "signer": "macro",
+      "type": "certification",
+      "event": "audited",
+      "about": "the USTB token programs",
+      "says": "Audited Superstate's USTB and USCC contracts, with the commit and report.",
+      "today": {
+        "state": "published",
+        "where": "0xMacro's audit library, per RWA Sonar canonical parties; whether it covers the deployed Solana program was not checked"
+      },
+      "gaps": [
+        "program-subject"
+      ]
+    },
+    {
+      "id": "ta-credential",
+      "signer": "sec",
+      "type": "credential",
+      "about": "Superstate Services' wallet",
+      "says": "Superstate Services LLC is a registered transfer agent (File No. 84-06972).",
+      "today": {
+        "state": "reported",
+        "where": "RWA Sonar canonical parties; the SEC register was not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "custody-discrepancy",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USTB Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "The older catalogue records Superstate saying the underlying is custodied at Komainu (17 October 2025, no link); the current registry and investor docs name BNY Mellon. The current sources win.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar attestations-db.json against research product ustb"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "priority-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USTB Solana mint",
+      "refs": [
+        "T"
+      ],
+      "says": "Fast USDC liquidity has a price in rank: the product page says protocol-redemption liquidity providers' claims rank ahead of shareholders on the fund's insolvency, so shareholders are not at parity with every creditor of the fund.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product ustb (claim failure)"
+      },
+      "gaps": [
+        "research-finding",
+        "liquidity-facility"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "program",
+      "says": "Token-2022 mint, 6 decimals, supply 174,211.250846 USTB on Solana; scaled-UI multiplier 1.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "who-can-move-it",
+      "says": "Mint authority, metadata authority and scaled-UI authority: EfkJFKtVcpo8sgQGWLoaYcutxNdmqed81wdCcpn7egdz. Freeze authority and permanent delegate (move or burn any balance): 2Yq4T3mPNfjtEyTxSbRjRKqLf1pwbTasuCQrWe6QpM7x. A DefaultAccountState extension is present; its state was not decoded in this read. Who holds the keys is not in the sources.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption",
+      "says": "Immediate USDC payouts including non-business days, subject to available liquidity; USD requests before 1pm ET described as same-day; Protocol Redeem has dynamic limits and runs when available. No redemption was tested."
+    },
+    {
+      "topic": "Compulsory redemption and reversals",
+      "says": "The manager may direct compulsory redemption and the transfer agent may reverse unauthorized portal activity; the chain shows a permanent delegate and freeze authority that can carry them out."
+    },
+    {
+      "topic": "Fees",
+      "says": "Stated management fee 0.15%; the actual fund documents are gated."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a tokenized Treasury fund interest",
+    "outcome": "buy",
+    "author": "A qualified purchaser",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The fund's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The transfer agent's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per interest, under 2 days",
+        "minSigners": 1,
+        "maxAgeDays": 2,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited fund accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        },
+        "matches": [
+          "audit"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "Every service provider is named (Invesco, BNY Mellon, NAV Fund Services, Superstate Services as transfer agent), so the A/H/T, register and NAV outline can be said in v3. But the Solana mint is Token-2022 with a permanent delegate and default account state, so it cannot be read; ownership-interest hides a registered trust-series interest; the record that prevails and the eligibility rules are proposals; and the ranking of liquidity providers ahead of shareholders can be said only in text. Superstate publishes almost everything; the fund, custodian and valuation agent say nothing in their own name."
+  }
+}

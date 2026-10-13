@@ -1,0 +1,402 @@
+{
+  "id": "usyc",
+  "name": "Circle USYC (Hashnote International Short Duration Fund Ltd.)",
+  "subjects": {
+    "researchProducts": [
+      "usyc"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Circle USYC"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product usyc (Circle USYC product page, Circle Help article, Hashnote deployment list)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry Circle USYC",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for Circle USYC",
+      "asOf": "2026-06-04"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, USYC row",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Shares of Hashnote International Short Duration Fund Ltd., a Cayman Islands mutual fund (issuer's description), represented by the USYC token; the fund's offering and constitutional documents were not reviewed",
+    "says": "The holder has, on Circle's description, a share in the Cayman fund, recorded in a fund register that the fund administrator updates to mirror token movements. The sources do not say whether the register or the token prevails, what the holder recovers in an insolvency, or that the holder has any claim against Circle."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "USYC",
+        "mint": "0x136471a34f6ef19fE571EFFC1CA711fdb8E49f2b"
+      },
+      "readable": false,
+      "note": "Listed in Hashnote's official deployment list; class and terms binding not verified."
+    },
+    {
+      "chain": "BNB Smart Chain",
+      "standard": "erc-20",
+      "count": 1,
+      "example": {
+        "symbol": "USYC",
+        "mint": "0x8D0fA28f221eB5735BC71d3a0Da67EE5bC821311"
+      },
+      "readable": false,
+      "note": "Listed as a BEP20 token; the research treats it as the same exposure, not an additional backing pool."
+    },
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "USYC",
+        "mint": "7LWanZteUKtvFjv4MHYgKXXdAuCQYFPJysL9pxxdRQGn"
+      },
+      "readable": false,
+      "note": "Token-2022 per the chain read of 13 October 2026, so outside the /fungible reader."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "Hashnote International Short Duration Fund Ltd.",
+      "role": "issuer",
+      "note": "Cayman Islands mutual fund on the issuer's description; Hashnote's fund was acquired by Circle in January 2025 (catalogue note)."
+    },
+    {
+      "id": "circle",
+      "name": "Circle",
+      "role": "platform",
+      "note": "Publishes the USYC product page and help article and runs the USDC subscription and redemption route; affiliated with the fund's sponsor after the acquisition."
+    },
+    {
+      "id": "admin",
+      "name": "The fund administrator (not named)",
+      "role": "administrator",
+      "note": "Circle Help says it mirrors ERC-20 movements to the fund register."
+    },
+    {
+      "id": "custodian",
+      "name": "The fund's custodian (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "regulator",
+      "name": "The fund's Cayman Islands regulator (not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "Hashnote International Short Duration Fund Ltd., a Cayman Islands mutual fund investing in short-dated US Treasuries and reverse repos; its shares are offered as USYC through Circle, which acquired Hashnote's fund in January 2025.",
+      "today": {
+        "state": "reported",
+        "where": "Circle's USYC product page describes the fund; the fund's own offering documents were not reviewed"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USYC token on Ethereum, BNB Smart Chain and Solana",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: USYC is a tokenized representation of shares in Hashnote International Short Duration Fund Ltd.; yield accrues through the token price; allocation: the fund's shares as entered in its register.",
+      "today": {
+        "state": "reported",
+        "where": "Circle product page; Hashnote's deployment list names the three contracts but no source binds each to a share class or to terms"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "admin",
+      "type": "register-entry",
+      "about": "each USYC holder's wallet",
+      "says": "Per the fund register, this holder owns N shares; ERC-20 movements are mirrored into the register.",
+      "today": {
+        "state": "unnamed",
+        "where": "Circle Help describes the administrator mirroring token movements to the register; the administrator is not named and publishes no entries"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the USYC token",
+      "says": "Which record is the record of title in a dispute: the fund register kept by the administrator, or the token ledger.",
+      "today": {
+        "state": "not-published",
+        "where": "Circle Help describes mirroring only; no reviewed source says which record prevails"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's portfolio",
+      "says": "Custody arrangement: the fund's short-dated US Treasuries and reverse repo positions are held for the fund by its custodian under the custody agreement.",
+      "today": {
+        "state": "not-published",
+        "where": "Circle describes the portfolio but no reviewed source names a custodian or a custody agreement; the older catalogue row naming Zodia has no source link"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these Treasury bills and repo positions for the fund under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is identified"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the USYC token on all three chains",
+      "says": "The fund holds short-dated US Treasuries and reverse repos against all USYC outstanding on Ethereum, BNB Smart Chain and Solana, as of date. Circle's page showed $312.98M AUM when RWA Sonar checked on 16 September 2026.",
+      "today": {
+        "state": "reported",
+        "where": "Circle product page (composition and AUM); no holdings report reviewed"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "admin",
+      "type": "valuation",
+      "about": "one USYC",
+      "says": "NAV per share is X as of the dealing date; subscriptions and redemptions in USDC deal at it.",
+      "today": {
+        "state": "unnamed",
+        "where": "The sources name no administrator and record no NAV publication"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No auditor or audit report appears in the reviewed sources"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the USYC token",
+      "says": "Holding and dealing: non-US eligible investors only, after onboarding and KYC, from a $100,000 minimum, on supported networks; transfers only between allowlisted wallets.",
+      "today": {
+        "state": "reported",
+        "where": "Circle product page and Circle Help"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "fund-registration",
+      "signer": "regulator",
+      "type": "credential",
+      "about": "the fund's wallet",
+      "says": "The fund is a registered Cayman Islands mutual fund.",
+      "today": {
+        "state": "unnamed",
+        "where": "Circle calls it a Cayman Islands mutual fund; no source names the registration or the regulator. The older catalogue's 'issuer licensed' row is attested by Circle and links only Circle's homepage"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "recourse-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USYC token",
+      "says": "The reviewed product and help pages do not establish insolvency priority or asset recovery for holders, and fund constitutional and offering documents, the custody agreement and the disputed-register rules were not found. The global fund is one pool behind three chains; the Solana mint carried 120.728897 USYC on 13 October 2026, so the fund's AUM cannot be divided by Solana supply.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research usyc (failure claim and dependency review, 1 October 2026) and the chain read"
+      },
+      "gaps": [
+        "research-finding",
+        "reserve-structure"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 mint 7LWan…xdRQGn, 6 decimals. One key, DZ7j2YLDq7847t2HtCWaDQUTpLJ4BinPGsY8w9Aai63y, is mint authority, freeze authority, mint-close authority, permanent delegate (it can move or burn any balance) and transfer-hook authority. A second key, EMMxaez3JFNMRFdKZgnC3KtZck6gmSS4n6AMHXUMvPZL, holds the pause authority (not paused), the transfer-fee config and withheld-fee authorities and the confidential-transfer authorities. Metadata pointer and metadata update authority: 532g6pYdfV5fx1CK4AuTHVjdYrTiq2AZfpu4Jk4rVJLb.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "extensions",
+      "says": "Extensions present: mint close authority, permanent delegate, default account state (the read did not record the default state), transfer fee config, confidential transfer mint and fee config, transfer hook with no hook program set, metadata pointer, pausable config and token metadata.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Solana supply 120,728,897 base units = 120.728897 USYC.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may subscribe and redeem",
+      "says": "Non-US eligible investors onboarded by Circle, from $100,000, in USDC, subject to cutoffs, liquidity and published subscription, redemption and performance fees. No independent redemption route is established and no redemption was tested."
+    },
+    {
+      "topic": "Freeze, allowlist, move and burn",
+      "says": "Circle describes wallet allowlisting and transfer controls; the Solana mint shows a permanent delegate and pause. Which terms authorise their use was not reviewed."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "Investor priority and recovery depend on the fund's Cayman constitutional documents, which were not reviewed."
+    },
+    {
+      "topic": "Pricing",
+      "says": "Yield accrues through the token price; the dealing price is the fund's NAV under its offering terms."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a tokenized fund share",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Fund's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "Register entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings for the fund under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 7 days",
+        "minSigners": 1,
+        "maxAgeDays": 7,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited financial statements, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A fund share with a mirrored register fits the declaration, register-entry, holds and valuation types in outline. Which record prevails, the share as a registered holding and fund units need proposals, and the Solana mint is Token-2022. Every party behind Circle is unnamed: Circle speaks for the fund, and the administrator, custodian, auditor and regulator publish nothing in the sources."
+  }
+}

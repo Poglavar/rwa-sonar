@@ -1,0 +1,1693 @@
+{
+ "_comment": "How each schema in RWA Sonar's attestation-types.json and finding-types.json would be said in Tokenizario's vocabulary v3 (rwa/data/tokenizario-vocabulary.json). This is the bridge that restates every attestation and finding instance in the database as 'X says Y about Z' without retyping it: rwa/lib/restatement.js applies it. fit: exact = a v3 type says it; approximate = a v3 type carries it only in its hashed text, so a recipe cannot test it; chain-fact = the reader reads it from the chain and nobody signs it; reading = the reader derives it from other statements; absence = it means a statement is missing, which a recipe shows as Missing; terms = it stays in the committed terms document by design; gap = v3 cannot say it (see gaps); out-of-scope = market data that is neither. signer is a role: issuer, custodian, auditor, transfer-agent, registrar, regulator, counsel, administrator, oracle, inspector, researcher (RWA Sonar itself, for findings), anyone.",
+ "asOf": "2026-10-13",
+ "vocabulary": "v3",
+ "fits": [
+  "exact",
+  "approximate",
+  "chain-fact",
+  "reading",
+  "absence",
+  "terms",
+  "gap",
+  "out-of-scope"
+ ],
+ "signerRoles": [
+  "issuer",
+  "custodian",
+  "auditor",
+  "transfer-agent",
+  "registrar",
+  "regulator",
+  "counsel",
+  "administrator",
+  "oracle",
+  "inspector",
+  "researcher",
+  "anyone"
+ ],
+ "schemas": [
+  {
+   "schema": "admin-operations-require-multisig",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ],
+   "note": "Who can move it shows the authority; a Squads vault, its threshold and time lock are read from the multisig account."
+  },
+  {
+   "schema": "all-admin-operations-logged",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "note": "Every admin instruction is a transaction on chain; nobody needs to sign that it was logged."
+  },
+  {
+   "schema": "all-holders-kyc-verified",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "status",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "eligibility"
+   ],
+   "note": "Only status foreign-ownable exists; the rule and who checks it have no typed form."
+  },
+  {
+   "schema": "assets-bankruptcy-remote-from-issuer",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ],
+   "note": "A legal conclusion; it needs an opinion that says who may rely on it."
+  },
+  {
+   "schema": "blockchain-is-authoritative-record",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "status",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "authoritative-record"
+   ]
+  },
+  {
+   "schema": "chain-state-reconciled-with-offchain-register",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "register-entry",
+     "signer": "transfer-agent"
+    },
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ],
+   "note": "Per-holder register entries can be compared with token holders; a whole-supply reconciliation fits only in an audited certification's text."
+  },
+  {
+   "schema": "composed-product-degradation-conditions-identified",
+   "catalogue": "attestation",
+   "fit": "terms",
+   "note": "A disclosure in the terms; the declaration commits to the document by hash."
+  },
+  {
+   "schema": "contract-implements-standard-correctly",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "contract-logic-upgrades-subject-to-timelock",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "contract-no-critical-vulnerabilities",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "custodian-confirms-holding",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "holds",
+     "signer": "custodian"
+    }
+   ],
+   "note": "The H of A/H/T: the named custodian's dated quantity under the exact custody arrangement."
+  },
+  {
+   "schema": "custodian-regulated-under-regime",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "custodian"
+    }
+   ]
+  },
+  {
+   "schema": "customer-assets-segregated",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "status",
+     "signer": "custodian",
+     "predicate": "allocated"
+    }
+   ]
+  },
+  {
+   "schema": "failover-defined-for-asymmetric-rail-availability",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "financial-statements-audited",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "note": "About the issuer's wallet rather than a token; the audited entity is named only in the document."
+  },
+  {
+   "schema": "halt-triggers-defined-for-chain-exceptions",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "holder-claim-priority-defined",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "holder-claim-priority-defined-custodian-insolvency",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "issuer-lacks-transaction-reversal-authority",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope",
+    "reserved-powers"
+   ],
+   "note": "The chain shows no freeze or permanent delegate; whether the terms reserve such a power has no typed form."
+  },
+  {
+   "schema": "issuer-licensed-by-regulator",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "other"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "loss-allocation-defined-for-finality-failure-events",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "nav-per-token-is-x",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "valuation",
+     "signer": "administrator"
+    }
+   ],
+   "gaps": [
+    "nav-basis"
+   ]
+  },
+  {
+   "schema": "customer-assets-held-custody-only",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "status",
+     "signer": "custodian",
+     "predicate": "allocated"
+    }
+   ],
+   "note": "Off balance sheet custody reads as allocated; the accounting treatment stays in the document."
+  },
+  {
+   "schema": "parameter-changes-subject-to-timelock",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "payment-waterfall-computation-is-verifiable",
+   "catalogue": "attestation",
+   "fit": "terms",
+   "gaps": [
+    "distribution-redemption"
+   ]
+  },
+  {
+   "schema": "physical-asset-exists-at-location",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "holds",
+     "signer": "custodian"
+    },
+    {
+     "type": "sighting",
+     "signer": "inspector"
+    }
+   ]
+  },
+  {
+   "schema": "physical-asset-meets-quality-standard",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "inspection",
+     "signer": "inspector"
+    }
+   ]
+  },
+  {
+   "schema": "physical-asset-quantity-matches-supply",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "status",
+     "signer": "auditor",
+     "predicate": "backed"
+    },
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "note": "On one classic SPL mint the issuer's explicit allocation is compared with supply; across chains see reserve-structure."
+  },
+  {
+   "schema": "price-feed-provided-by-oracle",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "valuation",
+     "signer": "oracle"
+    }
+   ],
+   "gaps": [
+    "oracle-feed"
+   ]
+  },
+  {
+   "schema": "product-registered-under-regulation",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "regulator",
+     "event": "other"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "reconciliation-cadence-is",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "reserve-composition-disclosed",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "status",
+     "signer": "issuer",
+     "predicate": "backed"
+    }
+   ],
+   "gaps": [
+    "reserve-structure"
+   ],
+   "note": "The composition fits only in the hashed document."
+  },
+  {
+   "schema": "reserve-concentration-disclosed",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "status",
+     "signer": "issuer",
+     "predicate": "backed"
+    }
+   ],
+   "gaps": [
+    "reserve-structure"
+   ]
+  },
+  {
+   "schema": "reserve-independently-verified",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ]
+  },
+  {
+   "schema": "reserve-value-gte-token-supply",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "status",
+     "signer": "issuer",
+     "predicate": "backed"
+    }
+   ],
+   "gaps": [
+    "reserve-structure"
+   ],
+   "note": "Exact for one mint; a global reserve over many chains has no denominator field."
+  },
+  {
+   "schema": "reversal-authority-is-named-role",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "profile",
+     "signer": "issuer"
+    },
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "other"
+    }
+   ],
+   "gaps": [
+    "issuer-key-binding"
+   ]
+  },
+  {
+   "schema": "servicer-obligations-survive-token-transfer",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "settlement-final-after-n-confirmations",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "settlement-gap-documented",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "independent-smart-contract-security-audit-completed",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "stress-scenarios-disclosed",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "token-holder-can-enforce-against-borrower",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "token-holder-can-enforce-in-jurisdiction",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "token-holder-can-redeem-for-underlying",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "eligibility",
+    "distribution-redemption"
+   ],
+   "note": "The obligation is in the token declaration and its terms; who may redeem and whether anyone was paid have no typed form. For a single physical asset, a collection code and hand-over do it."
+  },
+  {
+   "schema": "token-holder-same-claim-priority",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "token-represents-full-ownership",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ],
+   "note": "An origin of kind thing says it for a token created in Tokenizario; an existing mint has only ownership-interest."
+  },
+  {
+   "schema": "token-transfer-conveys-all-rights",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "token-transfer-triggers-legal-assignment",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "top-dependencies-that-break-equivalence-identified",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "transfer-agent-is-sec-registered",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "registry"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "transfers-unrestricted",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ],
+   "note": "No allowlist, default-frozen accounts or transfer hook on the mint."
+  },
+  {
+   "schema": "underlying-custodied-at-named-custodian",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "note": "The A of A/H/T names the custodian; naming does not mean the custodian agreed, which takes its holds or concur."
+  },
+  {
+   "schema": "underlying-tokenized-product-independently-assessed",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "inspection",
+     "signer": "inspector"
+    }
+   ],
+   "note": "About the underlying token's own mint, e.g. BUIDL inside OUSG."
+  },
+  {
+   "schema": "reconciliation-has-no-open-breaks-as-of-date",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ]
+  },
+  {
+   "schema": "token-represents-direct-ownership",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "token-represents-fund-share",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "token-represents-equity",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "token-represents-tracker-certificate",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "token-confers-no-shareholder-rights",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "no-rehypothecation-of-customer-assets",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "status",
+     "signer": "custodian",
+     "predicate": "allocated"
+    }
+   ],
+   "gaps": [
+    "reserves-lent"
+   ]
+  },
+  {
+   "schema": "offchain-register-is-authoritative-record",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "status",
+     "signer": "registrar"
+    }
+   ],
+   "gaps": [
+    "authoritative-record"
+   ]
+  },
+  {
+   "schema": "zero-unresolved-reconciliation-breaks",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ]
+  },
+  {
+   "schema": "issuer-can-reverse-transactions",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope",
+    "reserved-powers"
+   ]
+  },
+  {
+   "schema": "issuer-cannot-reverse-transactions",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope",
+    "reserved-powers"
+   ]
+  },
+  {
+   "schema": "loss-allocation-defined-for-finality-breach",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "transfers-restricted-to-whitelist",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope",
+    "eligibility"
+   ]
+  },
+  {
+   "schema": "loss-allocation-preagreed-for-chain-reorg",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "reserve-proof",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "status",
+     "signer": "auditor",
+     "predicate": "backed"
+    },
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ]
+  },
+  {
+   "schema": "fund-factsheet",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "fund-prospectus",
+   "catalogue": "attestation",
+   "fit": "terms",
+   "note": "The prospectus is a terms document; a regulator's approval would be a certification by the regulator."
+  },
+  {
+   "schema": "issuer-terms-are-public",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "note": "The declaration commits to the exact terms bytes by SHA-256."
+  },
+  {
+   "schema": "issuer-regulatory-disclosure-document-published",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "issuer-registered-investment-adviser",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "other"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "daily-nav-published",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "valuation",
+     "signer": "administrator"
+    }
+   ],
+   "gaps": [
+    "nav-basis",
+    "oracle-feed"
+   ]
+  },
+  {
+   "schema": "bankruptcy-remote-structure-disclosed",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ],
+   "note": "The issuer can describe its SPV in the declaration; remoteness itself is counsel's opinion."
+  },
+  {
+   "schema": "issuer-website-claim-published",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "note",
+     "signer": "issuer"
+    }
+   ],
+   "note": "Marketing copy has no typed meaning."
+  },
+  {
+   "schema": "issuer-publishes-canonical-mint-address",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "issuer-key-binding"
+   ],
+   "note": "A declaration on each mint by the issuer's wallet; it proves the issuer only once the wallet is tied to the mint's authorities."
+  },
+  {
+   "schema": "entire-cap-table-tokenized",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "register-entry",
+     "signer": "transfer-agent"
+    }
+   ],
+   "gaps": [
+    "authoritative-record"
+   ]
+  },
+  {
+   "schema": "token-venue-is-a-regulated-exchange",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "other"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "onchain-authority-is-program-derived",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "corporate-actions-applied-via-onchain-multiplier",
+   "catalogue": "attestation",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "issuer",
+     "event": "corporate-action"
+    }
+   ],
+   "gaps": [
+    "reader-scope"
+   ],
+   "note": "The multiplier is a chain fact of the scaled-UI extension; the dividend itself is a corporate-action certification."
+  },
+  {
+   "schema": "allowlist-publicly-enumerable",
+   "catalogue": "attestation",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "redemption-rail-live",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "issuer",
+     "event": "other"
+    }
+   ],
+   "gaps": [
+    "distribution-redemption"
+   ]
+  },
+  {
+   "schema": "collateral-substitution-limits-disclosed",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "verification-report-published-at-contractual-location",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "auditor",
+     "event": "audited"
+    }
+   ],
+   "note": "The certification carries the report hash; the contractual location stays in the terms."
+  },
+  {
+   "schema": "non-security-legal-opinion-obtained",
+   "catalogue": "attestation",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "counsel"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "winddown-settlement-methodology-published",
+   "catalogue": "attestation",
+   "fit": "terms"
+  },
+  {
+   "schema": "vault-depositors-repaid-in-full-at-winddown",
+   "catalogue": "attestation",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "issuer",
+     "event": "completed"
+    }
+   ],
+   "gaps": [
+    "distribution-redemption"
+   ]
+  },
+  {
+   "schema": "mint-can-be-globally-paused",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "freeze-authority-has-been-exercised",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ],
+   "note": "Freeze and thaw instructions are in the mint's history; a reader can count them."
+  },
+  {
+   "schema": "authority-key-is-hot-wallet",
+   "catalogue": "finding",
+   "fit": "chain-fact"
+  },
+  {
+   "schema": "authority-key-is-multisig-controlled",
+   "catalogue": "finding",
+   "fit": "chain-fact"
+  },
+  {
+   "schema": "authority-keys-rotated-via-multisig",
+   "catalogue": "finding",
+   "fit": "chain-fact"
+  },
+  {
+   "schema": "admin-keys-not-multisig",
+   "catalogue": "finding",
+   "fit": "chain-fact"
+  },
+  {
+   "schema": "undisclosed-freeze-authority-on-mint",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "reserved-powers"
+   ],
+   "note": "A flag (untrue) on the issuer's declaration once declarations list reserved powers; today there is nothing typed to contradict."
+  },
+  {
+   "schema": "reversal-authority-key-unattributed",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "issuer-key-binding"
+   ]
+  },
+  {
+   "schema": "contract-upgradeable-without-timelock",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "no-public-smart-contract-audit",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "issuer-may-rebase-holder-balances",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "issuer-may-raise-fees-without-notice",
+   "catalogue": "finding",
+   "fit": "terms",
+   "gaps": [
+    "fees"
+   ]
+  },
+  {
+   "schema": "no-independent-party-in-structure",
+   "catalogue": "finding",
+   "fit": "reading",
+   "gaps": [
+    "affiliation"
+   ],
+   "note": "The trust summary counts distinct attesters; it cannot tell that they are one group."
+  },
+  {
+   "schema": "kyc-procedure-not-published",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "eligibility"
+   ]
+  },
+  {
+   "schema": "defi-utility-restricted-by-jurisdiction",
+   "catalogue": "finding",
+   "fit": "terms",
+   "gaps": [
+    "eligibility"
+   ]
+  },
+  {
+   "schema": "bankruptcy-remoteness-claimed-not-evidenced",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "holder-ranks-as-unsecured-creditor",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation",
+    "research-finding"
+   ]
+  },
+  {
+   "schema": "register-and-chain-supply-differ",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "reserve-structure"
+   ],
+   "note": "A flag (untrue) on the registrar's or issuer's figure; the reader could compute it if register entries carried totals."
+  },
+  {
+   "schema": "reconciliation-output-not-published",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "onchain-holder-not-in-authoritative-register",
+   "catalogue": "finding",
+   "fit": "reading",
+   "gaps": [
+    "authoritative-record"
+   ],
+   "note": "Visible when a register entry names an intermediary that is not the token holder; which record prevails has no typed form."
+  },
+  {
+   "schema": "custodian-not-named",
+   "catalogue": "finding",
+   "fit": "absence",
+   "note": "Nobody can sign holds; a recipe shows the custodian's statement missing."
+  },
+  {
+   "schema": "collateral-may-be-lent-to-prime-borrower",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "reserves-lent"
+   ]
+  },
+  {
+   "schema": "issuer-decides-authoritative-chain-on-fork",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "payout-valuation-issuer-determined",
+   "catalogue": "finding",
+   "fit": "terms",
+   "note": "The terms say who calculates; a reader sees that no independent valuation exists."
+  },
+  {
+   "schema": "no-external-reference-price-for-mark",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "nav-basis"
+   ]
+  },
+  {
+   "schema": "no-oracle-price-feed",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "oracle-feed"
+   ]
+  },
+  {
+   "schema": "issuer-set-price-sanity-check",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "no-nav-or-mark-published",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "nav-basis"
+   ]
+  },
+  {
+   "schema": "competitor-sourced-reference-price",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "research-finding"
+   ]
+  },
+  {
+   "schema": "transfer-fee-charged-on-chain",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "reader-scope"
+   ]
+  },
+  {
+   "schema": "operator-may-halt-and-force-settle",
+   "catalogue": "finding",
+   "fit": "terms",
+   "gaps": [
+    "reserved-powers"
+   ]
+  },
+  {
+   "schema": "settlement-gap-not-quantified",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "redemption-rail-not-operational",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "distribution-redemption"
+   ]
+  },
+  {
+   "schema": "holder-claim-is-unsecured-loan",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "collateral-may-be-non-share-instruments",
+   "catalogue": "finding",
+   "fit": "terms",
+   "gaps": [
+    "reserve-structure"
+   ]
+  },
+  {
+   "schema": "issuer-not-obliged-to-restore-collateral",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "issuer-may-mint-against-expected-exposure",
+   "catalogue": "finding",
+   "fit": "reading",
+   "note": "With A/H/T, allocation below supply shows; the permission itself stays in the terms."
+  },
+  {
+   "schema": "no-reserve-verification-published",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "reserve-composition-not-disclosed",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "reserve-structure"
+   ]
+  },
+  {
+   "schema": "product-is-synthetic-not-asset-backed",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "legal-characterisation"
+   ]
+  },
+  {
+   "schema": "no-token-terms-published",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "transfer-hook-claimed-but-not-deployed",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "reader-scope"
+   ],
+   "note": "A flag (untrue) on the claim, with the mint's empty hook slot as the chain fact."
+  },
+  {
+   "schema": "no-canonical-mint-address-published",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "issuer-key-binding"
+   ]
+  },
+  {
+   "schema": "verification-report-not-at-contractual-location",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ]
+  },
+  {
+   "schema": "no-offering-disclosure-document-filed",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "terms-not-retrievable-for-review",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "research-finding"
+   ]
+  },
+  {
+   "schema": "redemption-is-cash-settled-only",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "redemption-terms-not-published",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "unclaimed-redemption-proceeds-forfeited",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "marketed-exemption-differs-from-filed-exemption",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ]
+  },
+  {
+   "schema": "issuer-not-regulated-despite-consent",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "credential",
+     "signer": "regulator",
+     "role": "other"
+    }
+   ],
+   "gaps": [
+    "roles"
+   ]
+  },
+  {
+   "schema": "issuer-legal-entity-not-publicly-identified",
+   "catalogue": "finding",
+   "fit": "absence",
+   "gaps": [
+    "issuer-key-binding"
+   ]
+  },
+  {
+   "schema": "dex-liquidity-negligible-vs-supply",
+   "catalogue": "finding",
+   "fit": "out-of-scope",
+   "note": "Market data: neither a statement nor a Tokenizario chain fact."
+  },
+  {
+   "schema": "organic-volume-share-below-10-percent",
+   "catalogue": "finding",
+   "fit": "out-of-scope"
+  },
+  {
+   "schema": "holder-concentration-in-exchange-wallets",
+   "catalogue": "finding",
+   "fit": "reading",
+   "note": "Holders are chain facts; concentration is a reading of them."
+  },
+  {
+   "schema": "winddown-exit-liquidity-at-stale-mark",
+   "catalogue": "finding",
+   "fit": "out-of-scope"
+  },
+  {
+   "schema": "issuer-paused-trading-for-session",
+   "catalogue": "finding",
+   "fit": "out-of-scope",
+   "note": "Primary-market operations; a pause on the mint itself would be a chain fact."
+  },
+  {
+   "schema": "issuer-has-wound-down",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "anyone",
+     "event": "other"
+    }
+   ]
+  },
+  {
+   "schema": "token-expires-worthless-after-deadline",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "certification",
+     "signer": "issuer",
+     "event": "maturity"
+    }
+   ],
+   "note": "The window is in the terms; its close is a maturity certification."
+  },
+  {
+   "schema": "issuer-registry-and-reserve-lifecycle-mismatch",
+   "catalogue": "finding",
+   "fit": "approximate",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ]
+  },
+  {
+   "schema": "token-supply-zero-not-operational",
+   "catalogue": "finding",
+   "fit": "chain-fact"
+  },
+  {
+   "schema": "authority-keys-use-shared-signing-provider",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "affiliation"
+   ]
+  },
+  {
+   "schema": "collateral-priced-from-token-trading",
+   "catalogue": "finding",
+   "fit": "out-of-scope",
+   "note": "A lending market's configuration."
+  },
+  {
+   "schema": "collateral-oracle-suspended-around-corporate-action",
+   "catalogue": "finding",
+   "fit": "out-of-scope"
+  },
+  {
+   "schema": "collateral-oracle-stale-blocks-liquidation",
+   "catalogue": "finding",
+   "fit": "out-of-scope"
+  },
+  {
+   "schema": "protocol-docs-oracle-fallback-contradicted",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "flag",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "program-subject"
+   ]
+  },
+  {
+   "schema": "broker-books-control-entitlement-transfer",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "authoritative-record"
+   ]
+  },
+  {
+   "schema": "cash-redemption-not-available",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "self-custody-sipc-scope-unresolved",
+   "catalogue": "finding",
+   "fit": "gap",
+   "as": [
+    {
+     "type": "note",
+     "signer": "researcher"
+    }
+   ],
+   "gaps": [
+    "legal-opinion"
+   ]
+  },
+  {
+   "schema": "independent-cet-reserve-reconciliation-not-located",
+   "catalogue": "finding",
+   "fit": "absence"
+  },
+  {
+   "schema": "shared-cet-administrative-authority",
+   "catalogue": "finding",
+   "fit": "chain-fact",
+   "gaps": [
+    "affiliation"
+   ]
+  },
+  {
+   "schema": "conventional-share-exit-documented",
+   "catalogue": "finding",
+   "fit": "terms"
+  },
+  {
+   "schema": "canonical-mint-address-published",
+   "catalogue": "finding",
+   "fit": "exact",
+   "as": [
+    {
+     "type": "declaration",
+     "signer": "issuer"
+    }
+   ],
+   "gaps": [
+    "issuer-key-binding"
+   ]
+  }
+ ]
+}

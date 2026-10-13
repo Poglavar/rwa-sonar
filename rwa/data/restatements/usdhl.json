@@ -1,0 +1,332 @@
+{
+  "id": "usdhl",
+  "name": "Felix USDhl",
+  "subjects": {
+    "researchProducts": [
+      "usdhl"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Felix USDhl"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product usdhl (USDhl docs: About, Sunsetting, Security, Developers; Felix Terms & Conditions §10)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry Felix USDhl",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, row for Felix USDhl",
+      "asOf": "2026-02-06"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, USDhl row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": null,
+    "legalForm": "HyperEVM wrapper token of M0's M, bridged through Hyperlane; no holder instrument terms are published and the legal issuer is not identified",
+    "says": "Felix says USDhl is backed 1:1 by M, and its developer docs let a holder burn USDhl to receive Wrapped M on Ethereum. Whether the holder has any contractual claim against Felix, against M0 or over the Treasury collateral is not established, and the exit is into another token, not dollars. The proposed claim kind is left empty because no source establishes one."
+  },
+  "tokens": [
+    {
+      "chain": "HyperEVM",
+      "standard": "unknown",
+      "count": 1,
+      "example": {
+        "symbol": "USDhl",
+        "mint": "0xb50A96253aBDF803D85efcDce07Ad8becBc52BD5"
+      },
+      "readable": false,
+      "note": "Official deployment per Felix's developer docs; live authorities not checked. The catalogue counted 357,610 USDhl remaining on 16 September 2026."
+    }
+  ],
+  "parties": [
+    {
+      "id": "felix",
+      "name": "Felix (the platform operator; legal entity not identified)",
+      "role": "issuer"
+    },
+    {
+      "id": "m0",
+      "name": "M0 Foundation",
+      "role": "custodian",
+      "note": "Described by the Felix Terms as custodian of the Treasury collateral behind M."
+    },
+    {
+      "id": "hyperlane",
+      "name": "Hyperlane (portal on HyperEVM and Ethereum)",
+      "role": "other",
+      "note": "Bridge for the burn-and-unlock route; no wallet signs for its lock contract in the sources."
+    },
+    {
+      "id": "code-auditors",
+      "name": "Auditors of the USDhl M0 extension and the M0 protocol (listed on Felix's security page; names not recorded)",
+      "role": "auditor"
+    },
+    {
+      "id": "reserve-examiner",
+      "name": "A reserve examiner for USDhl against M (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "felix",
+      "type": "profile",
+      "about": "Felix's wallet",
+      "says": "Felix, which built and operates USDhl on HyperEVM; the legal issuer and obligor are not named.",
+      "today": {
+        "state": "published",
+        "where": "USDhl docs ('About USDhl') and Felix Terms & Conditions §10"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "felix",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USDhl token on HyperEVM",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: USDhl is a wrapper of M, backed 1:1 by M, with no issue or redeem fee; allocation: Wrapped M locked through the Hyperlane portal.",
+      "today": {
+        "state": "published",
+        "where": "USDhl docs and Felix Terms; no holder instrument terms define the claim"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "reader-scope",
+        "cross-chain-lock",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "felix",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the Treasury collateral behind M",
+      "says": "Custody arrangement: M0 Foundation keeps the short-term US Treasury collateral behind M.",
+      "today": {
+        "state": "published",
+        "where": "Felix Terms & Conditions; this is the M layer's custody, two steps below USDhl"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "m0",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "the M token's collateral pool, not USDhl holders",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these short-term US Treasuries as collateral for M, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Felix Terms describe M0 Foundation as custodian; nothing from M0 was reviewed"
+      },
+      "gaps": [
+        "units",
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "felix",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the USDhl token",
+      "says": "USDhl supply on HyperEVM is backed 1:1 by M bridged as Wrapped M, as of date.",
+      "today": {
+        "state": "published",
+        "where": "USDhl docs state the 1:1 claim without dated figures; no USDhl-to-M liability matching was obtained"
+      },
+      "gaps": [
+        "cross-chain-lock",
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "code-audit",
+      "signer": "code-auditors",
+      "type": "certification",
+      "event": "audited",
+      "about": "the USDhl M0 extension and the M0 protocol contracts",
+      "says": "Audited the contract code at commit C.",
+      "today": {
+        "state": "reported",
+        "where": "Felix's security page lists the audits; the reports' contents were not reviewed"
+      },
+      "gaps": [
+        "program-subject"
+      ]
+    },
+    {
+      "id": "reserve-exam",
+      "signer": "reserve-examiner",
+      "type": "certification",
+      "event": "audited",
+      "about": "the USDhl token",
+      "says": "Examined M and Wrapped M held against USDhl outstanding as of date, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No period-specific M or USDhl reserve reconciliation was found; code audits are not a reserve attestation"
+      }
+    },
+    {
+      "id": "sunset",
+      "signer": "felix",
+      "type": "certification",
+      "event": "other",
+      "about": "the USDhl token",
+      "says": "USDhl is being sunset: full sunset planned for early 2026, last rewards on 20 December (year not stated), protocol usable but no longer actively maintained; holders are encouraged to move to USDH.",
+      "today": {
+        "state": "published",
+        "where": "USDhl docs, 'Sunsetting USDhl'"
+      },
+      "gaps": [
+        "issuer-lifecycle"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "felix",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the USDhl token",
+      "says": "Who may mint and redeem, whether KYC applies and any transfer restrictions for remaining holders.",
+      "today": {
+        "state": "not-published",
+        "where": "Public docs give no current mint or redemption eligibility, KYC or transfer rules"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "chain-of-claims",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USDhl token",
+      "says": "The holder's position runs USDhl (HyperEVM) → Wrapped M locked through Hyperlane (Ethereum) → M → Treasury collateral held by M0 Foundation, and no link has a holder-facing legal term: no obligor, liability waterfall, ring-fencing or reserve claim is established. M is a separate instrument whose own terms were not reviewed.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research usdhl (claims and dependency review, 1 October 2026)"
+      },
+      "gaps": [
+        "research-finding",
+        "cross-chain-lock",
+        "legal-characterisation",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "custody-conflict",
+      "signer": "researcher",
+      "type": "flag",
+      "refs": [
+        "A"
+      ],
+      "about": "the custody declaration",
+      "says": "An older catalogue row has Felix confirming custody at Apex Custody (6 February 2026) with no source link; Felix's own Terms name M0 Foundation as custodian of the collateral. The Apex row is unsupported.",
+      "today": {
+        "state": "published",
+        "where": "attestations-db.json against research.json"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "remaining-supply",
+      "says": "357,610 USDhl remained on HyperEVM. Not re-read in this restatement.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar catalogue note, rwa-assets-db.json Felix USDhl"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Exit route",
+      "says": "Burn USDhl on HyperEVM and receive Wrapped M on Ethereum through the Hyperlane portal; delivery depends on message relaying, fees and the portal's operation, and execution after the maintenance sunset was not tested. No fiat payout is established."
+    },
+    {
+      "topic": "Controls",
+      "says": "Live keys, emergency powers and recovery procedures are not established; the sunset notice says maintenance will stop while the protocol stays usable."
+    },
+    {
+      "topic": "Rewards and fees",
+      "says": "The Felix Terms state no USDhl issue or redeem fee; the sunset notice gives 20 December (year not stated) as the last rewards date. Stays in Felix's terms."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a wrapped dollar token",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Operator's token terms (T) naming the obligor",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Backed 1:1 by the wrapped token, under 7 days",
+        "minSigners": 1,
+        "maxAgeDays": 7,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Reserve examination of the wrapper, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        },
+        "matches": [
+          "reserve-exam"
+        ]
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "poor",
+    "summary": "Felix's own words fit a token declaration and a 1:1 backed status, but what actually backs USDhl is Wrapped M locked in a bridge contract on another chain, which no one signs for and v3 cannot read, and the M layer's custody sits two steps below. The holder's claim, the obligor and any reserve claim are unknown, and the product is in wind-down. So the core of what the holder has cannot be said."
+  }
+}

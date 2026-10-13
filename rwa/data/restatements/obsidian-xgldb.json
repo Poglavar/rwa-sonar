@@ -1,0 +1,275 @@
+{
+  "id": "obsidian-xgldb",
+  "name": "Obsidian Goldback note (xGLDB)",
+  "subjects": {
+    "researchProducts": [
+      "obsidian-xgldb"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [],
+    "mechanisms": [
+      "obsidian"
+    ],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "Tokenizario mechanisms.ts OBSIDIAN (frontend/src/lib/mechanisms.ts)",
+      "asOf": "2026-10-08"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748 (mint-facts.json, key xgldb)",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": "debt-unsecured",
+    "legalForm": "A note: the issuing company's obligation for one Goldback (about 1/1000 troy ounce of gold) per xGLDB; the company owns the metal, which Alpine Gold Exchange keeps in the company's account. The obligor's exact legal entity is not named in the reviewed sources",
+    "says": "The holder has a claim on the company for a Goldback quantity, not title to any metal and no Alpine account; the sources describe no security over the metal for holders. Delivery and cash-out are not available today, so the holder can only keep or send the note."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "xGLDB",
+        "mint": "7k5rijzAsq2z9iA3vtxQR95rG6ib6yCXQDgnfRTaBmmy"
+      },
+      "readable": false,
+      "note": "The issuer's supply page links to this mint. The reviewed documents did not say which token program it uses; the chain read of 13 October 2026 shows Token-2022."
+    }
+  ],
+  "parties": [
+    {
+      "id": "obsidian",
+      "name": "Obsidian / BLCKW3B",
+      "role": "issuer",
+      "note": "The operator describing the company's obligation for metal."
+    },
+    {
+      "id": "agx",
+      "name": "Alpine Gold Exchange",
+      "role": "custodian",
+      "note": "Named custodian of the company's metal; not the custodian of an allocated Goldback for each holder."
+    },
+    {
+      "id": "auditor",
+      "name": "An independent reserve examiner (none engaged)",
+      "role": "auditor"
+    },
+    {
+      "id": "tokenizario",
+      "name": "Tokenizario",
+      "role": "researcher",
+      "note": "Reviewed the product's public sources on 8 October 2026 (mechanisms.ts)."
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "obsidian",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Obsidian / BLCKW3B, operator of the Goldback note for the company that owes the metal.",
+      "today": {
+        "state": "published",
+        "where": "Obsidian docs and website (obs.gold); nothing in the sources ties the mint's authority key to Obsidian"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "obsidian",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the company's Alpine Gold Exchange account",
+      "says": "Custody arrangement: Alpine Gold Exchange keeps the company's metal in the company's account; holders get no title to a particular piece and no Alpine account.",
+      "today": {
+        "state": "published",
+        "where": "Obsidian docs and website; the custody agreement is not public, so A cannot commit to it by hash"
+      }
+    },
+    {
+      "id": "T",
+      "signer": "obsidian",
+      "type": "declaration",
+      "form": "token",
+      "about": "the xGLDB mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one xGLDB is a note for one Goldback, about 1/1000 troy ounce of gold, owed by the company to the holder; the company owns the metal; physical redemption and cash-out are not available today. Allocation: the company's metal in its account under A.",
+      "today": {
+        "state": "published",
+        "where": "Obsidian docs and website; the first Goldback note on mainnet is dated 8 August 2026 and the app links the issued supply to the mint"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "H",
+      "signer": "agx",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "obsidian",
+      "refs": [
+        "A"
+      ],
+      "says": "We have the stated quantity of metal for the named company, as of date; an account or inventory record is attached.",
+      "today": {
+        "state": "reported",
+        "where": "Obsidian's website reads the company's Alpine Gold Exchange account; Alpine Gold Exchange publishes nothing itself in the sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed-status",
+      "signer": "obsidian",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the xGLDB mint",
+      "says": "At a stated time, the company's account has this quantity against this outstanding xGLDB supply, with the reconciliation and its unit conversion linked.",
+      "today": {
+        "state": "published",
+        "where": "Issuer's supply display (obs.gold/app/supply) compares issued tokens with a read of the Alpine account and says that read is neither an audit nor title in the holder's name; no fixed balance was presented as a current reserve check"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "reserve-exam",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the xGLDB mint",
+      "says": "I examined one reserve reconciliation, with its date, scope, exceptions and report hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No examiner is engaged in the sources; the website says its account read is not an audit"
+      }
+    },
+    {
+      "id": "redemption",
+      "signer": "obsidian",
+      "type": "certification",
+      "event": "redemption",
+      "proposed": true,
+      "about": "the xGLDB mint",
+      "says": "Redeemed N notes (burn signature) and delivered the metal or paid cash to the holder.",
+      "today": {
+        "state": "not-published",
+        "where": "Delivery of the metal and cash-out were not available on 8 October 2026; the website describes a future redemption flow"
+      },
+      "gaps": [
+        "distribution-redemption"
+      ]
+    },
+    {
+      "id": "review-scope",
+      "signer": "tokenizario",
+      "type": "note",
+      "about": "the xGLDB mint",
+      "says": "The mint's active authorities and the legal recourse for an unpaid note were not established; a note that can be sent does not show that mint, freeze or delegate powers are absent. Today's chain read shows a live mint authority.",
+      "today": {
+        "state": "published",
+        "where": "Tokenizario mechanisms.ts (OBSIDIAN), read 8 October 2026, and the restatement chain read of 13 October 2026"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "who-can-move-it",
+      "says": "Token-2022 mint, 4 decimals, no extensions in the read. Mint authority ApdPaboMRmZ9sqKUuv6B2FrifwTMxRheinQieHNL7vun; no freeze authority.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "supply",
+      "says": "Supply 428.6639 xGLDB (raw 4286639 at 4 decimals).",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "The company's obligation and recourse",
+      "says": "What the company owes, how an unpaid note is enforced and how holders rank stay in the issuer's terms and the law; the sources do not establish them."
+    },
+    {
+      "topic": "Redemption",
+      "says": "Metal delivery and cash-out are planned, not available. Stays with Obsidian's future redemption flow and its terms."
+    },
+    {
+      "topic": "Sending",
+      "says": "Notes can move between Solana wallets, which changes the holder while the company's metal stays with its custodian; the docs describe an in-app send screen as coming later."
+    }
+  ],
+  "recipe": {
+    "name": "Assess a metal-backed note",
+    "outcome": "hold",
+    "author": "A prospective token holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Issuer's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "status",
+        "label": "Reserve reconciliation, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "any",
+        "params": {
+          "predicate": "backed"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's own 'I have it' statement, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Independent reserve examination, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A/H/T says the outline: the company's custody account at Alpine Gold Exchange, a token that is the company's obligation, and the issuer's reserve display. The reader cannot read the mint (Token-2022), the unit has no typed form for a Goldback, and 'issuer-obligation' does not say that the holder is the company's creditor, with no security described and no redemption route today. Only the issuer publishes; the custodian and any examiner are silent or absent."
+  }
+}

@@ -1,0 +1,409 @@
+{
+  "id": "ousg",
+  "name": "Ondo Short-Term US Government Treasuries Fund (OUSG)",
+  "subjects": {
+    "researchProducts": [
+      "ousg"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Ondo OUSG"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product ousg (Ondo OUSG product page, documentation overview, redeeming page, address registry)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Ondo OUSG) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar sponsor API capture stocks/data/sponsor-apis.json (app.ondo.finance/api/v2/assets)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "membership-interest",
+    "legalForm": "Tokenized interest in a US limited partnership or fund vehicle, as Ondo describes it; the exact legal name was not confirmed and the offering and partnership documents were not obtained (the older catalogue names Ondo I LP, a 3(c)(7) fund offered under Reg D Rule 506(c))",
+    "says": "The holder has an interest in the OUSG vehicle, whose portfolio is itself made of other tokenized government-securities funds (including BUIDL) and cash equivalents; the holder has no direct claim on those funds' shares. Rank on insolvency of the vehicle, its custodian or Ondo was not established, and only onboarded qualified purchasers and accredited investors may transfer or redeem."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "classic-spl",
+      "count": 1,
+      "example": {
+        "symbol": "OUSG",
+        "mint": "i7u4r16TcsJTgq1kAG8opmVZyVnAKBwLKu6ZPMwzxNc"
+      },
+      "readable": true,
+      "note": "Listed in Ondo's address registry; supply is 0, so the Solana leg is empty."
+    },
+    {
+      "chain": "Ethereum",
+      "standard": "unknown",
+      "example": {
+        "symbol": "OUSG",
+        "mint": "0x1B19C19393e2d034D8Ff31ff34c81252FcBbee92"
+      },
+      "readable": false
+    },
+    {
+      "chain": "Polygon",
+      "standard": "unknown",
+      "example": {
+        "symbol": "OUSG",
+        "mint": "0xbA11C5effA33c4D6F8f593CFA394241CfE925811"
+      },
+      "readable": false
+    },
+    {
+      "chain": "XRP Ledger",
+      "standard": "other",
+      "example": {
+        "symbol": "OUSG",
+        "mint": "4F55534700000000000000000000000000000000.rHuiXXjHLpMP8ZE9sSQU5aADQVWDwv6h5p"
+      },
+      "readable": false
+    }
+  ],
+  "parties": [
+    {
+      "id": "vehicle",
+      "name": "The OUSG fund vehicle (exact legal name not confirmed; the older catalogue says Ondo I LP)",
+      "role": "issuer"
+    },
+    {
+      "id": "ondo",
+      "name": "Ondo Finance",
+      "role": "platform",
+      "note": "Runs the mint and redeem workflow, the KYC onboarding and the asset API."
+    },
+    {
+      "id": "custodian",
+      "name": "Zodia (named only in the older catalogue)",
+      "role": "custodian"
+    },
+    {
+      "id": "nav-consulting",
+      "name": "NAV Consulting (named only in the older catalogue)",
+      "role": "administrator"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "securitize",
+      "name": "Securitize (BUIDL's transfer agent and registrar)",
+      "role": "registrar",
+      "note": "Keeps the register of the BUIDL fund, one of OUSG's holdings."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "vehicle",
+      "type": "profile",
+      "about": "the vehicle's wallet",
+      "says": "The OUSG fund vehicle, a US limited partnership or fund structure tokenized by Ondo.",
+      "today": {
+        "state": "reported",
+        "where": "Only Ondo's product page and docs describe the vehicle, without its exact legal name; no mint authority is tied to it"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "vehicle",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the vehicle's holdings account",
+      "says": "Custody arrangement: the vehicle's fund shares, tokenized fund holdings and cash equivalents are kept by a named custodian (the older catalogue says Zodia).",
+      "today": {
+        "state": "not-checked",
+        "where": "The older catalogue cites an Ondo docs page naming Zodia (16 March 2025); research named no custodian"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "vehicle",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the vehicle's holdings under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only Ondo's docs, as cited by the older catalogue, say so; the custodian publishes nothing"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "vehicle",
+      "type": "declaration",
+      "form": "token",
+      "about": "the OUSG Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is a fund interest in the OUSG vehicle; transfers only between onboarded holders. Allocation: the vehicle's whole portfolio under A, shared by OUSG on every chain.",
+      "today": {
+        "state": "reported",
+        "where": "Ondo's documentation overview describes tokenized fund interests and transfers; the vehicle's offering and partnership documents are gated and were not reviewed"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units"
+      ]
+    },
+    {
+      "id": "buidl-position",
+      "signer": "securitize",
+      "type": "register-entry",
+      "about": "the BUIDL mint (GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr on Solana, and BUIDL on other chains)",
+      "says": "Per BUIDL's register, the OUSG vehicle holds N BUIDL shares, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "Ondo says the portfolio includes BUIDL; no source gives the vehicle's BUIDL position, and the BUIDL register is not public"
+      },
+      "gaps": [
+        "roles",
+        "reader-scope",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "vehicle",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the OUSG Solana mint",
+      "says": "Holdings of tokenized short-term US government securities funds, including BUIDL, and cash equivalents, against OUSG outstanding on every chain, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "Ondo's product page describes the portfolio; the older catalogue cites a reserve-at-least-supply claim on ondo.finance/ousg (11 September 2025). Research did not check current holdings."
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "nav-consulting",
+      "type": "valuation",
+      "about": "the OUSG Solana mint",
+      "says": "Net asset value per OUSG is X on date D, calculated daily (basis: the fund's dealing NAV).",
+      "today": {
+        "state": "reported",
+        "where": "The older catalogue cites Ondo's docs saying NAV Consulting calculates NAV daily (28 February 2026); research did not confirm the administrator"
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "price",
+      "signer": "ondo",
+      "type": "valuation",
+      "about": "the OUSG Solana mint",
+      "says": "OUSG is worth 116.571677 USD (16 September 2026).",
+      "today": {
+        "state": "published",
+        "where": "app.ondo.finance/api/v2/assets, captured 16 September 2026"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the vehicle's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "The older catalogue cites Ondo saying the fund is audited annually (period to 31 December 2024) but names no auditor"
+      }
+    },
+    {
+      "id": "which-record",
+      "signer": "vehicle",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the OUSG Solana mint",
+      "says": "Which record is title in a dispute: the vehicle's register or the chain.",
+      "today": {
+        "state": "not-published",
+        "where": "Ondo's docs describe transfers among onboarded investors but establish no register precedence"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "ondo",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the OUSG Solana mint",
+      "says": "Only qualified purchasers and accredited investors who complete KYC onboarding may hold, transfer and redeem; instant redemption from $5,000, standard redemption from $50,000.",
+      "today": {
+        "state": "published",
+        "where": "Ondo OUSG product page, documentation overview and redeeming page"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "overlap",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the OUSG Solana mint",
+      "refs": [
+        "backed",
+        "buidl-position"
+      ],
+      "says": "OUSG's backing and BUIDL's backing are overlapping exposure: the BUIDL shares in OUSG's portfolio are counted once, in BUIDL, and must not be added to OUSG's reserve as a second pool. OUSG on other chains is the same exposure, not extra backing.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product ousg (relationships: portfolio-holding, additional-network)"
+      },
+      "gaps": [
+        "research-finding",
+        "reserve-structure",
+        "nested-backing"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "program",
+      "says": "Classic SPL mint, 6 decimals, supply 0 on Solana; readable by the /fungible reader, which would show an empty leg.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "who-can-move-it",
+      "says": "One address, 6ViaRWzv7p56RfP1A9Hxy2ctu9kfE3XL43SxWuq3E4cE, is mint and freeze authority; no extensions. Who holds the key is not in the sources.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "catalogue-empty-leg",
+      "says": "The older catalogue also found the Solana supply at 0 on 16 September 2026, while Ondo's page showed $330.7M TVL; it says instant mint and redeem run on Ethereum only.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar older catalogue rwa-assets-db.json"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption",
+      "says": "Instant atomic USDC redemption and a standard route with different cutoffs and minimums ($5,000 and $50,000), subject to the product's rules; no redemption was tested."
+    },
+    {
+      "topic": "Fees and distributions",
+      "says": "The product page describes a fee waiver or cap subject to terms (the older catalogue: 0.15% management fee, waived until July 2026); class valuation, distribution rules and gates need the fund documents."
+    },
+    {
+      "topic": "Offering status",
+      "says": "The older catalogue says OUSG is offered under Reg D Rule 506(c) as a 3(c)(7) fund; that is an exemption from registration, not a registration."
+    },
+    {
+      "topic": "rOUSG and other chains",
+      "says": "rOUSG is a rebasing variant; Polygon and XRP Ledger tokens represent the same exposure, with bridge design and controls unverified."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a fund-of-tokenized-funds interest",
+    "outcome": "buy",
+    "author": "A qualified purchaser",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The vehicle's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The underlying fund's registrar confirms the vehicle's position, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per OUSG, under 2 days",
+        "minSigners": 1,
+        "maxAgeDays": 2,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited fund accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The Solana mint is classic SPL and readable, but empty. The fund-of-funds shape fits v3 well: BUIDL's registrar can make a register entry about the BUIDL mint for the OUSG vehicle. That BUIDL mint is Token-2022, though, and nothing can stop a reader from adding the two funds' backing together. The holder's legal form (an LP or fund interest) has no claim kind, and which record prevails is a proposal. Apart from Ondo itself, no party publishes anything in its own name, and the custodian and administrator are named only in the older catalogue."
+  }
+}

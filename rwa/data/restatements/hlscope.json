@@ -1,0 +1,359 @@
+{
+  "id": "hlscope",
+  "name": "Hamilton Lane SCOPE Securitize Tokenized Feeder (HLSCOPE)",
+  "subjects": {
+    "researchProducts": [
+      "hlscope"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Hamilton Lane SCOPE"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product hlscope (Form D/A of 1 August 2025, 2023 launch, SCOPE strategy page, TRON launch of 2 June 2026, VBILL/RLUSD facility announcement of 5 November 2025)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Hamilton Lane SCOPE) and attestations-db.json",
+      "asOf": "2026-09-16"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "membership-interest",
+    "legalForm": "Limited partnership interest in Hamilton Lane SCOPE Securitize Tokenized Feeder, LP (Delaware), whose general partner is Securitize Capital LLC; the feeder invests in Hamilton Lane's Senior Credit Opportunities Fund; partnership agreement not reviewed",
+    "says": "The holder is a limited partner in the Delaware feeder, not in the underlying SCOPE fund or its loans. LP rights, distributions, liquidity limits and rank all sit in a partnership agreement and offering terms that were not reviewed; secondary trading is not assured."
+  },
+  "tokens": [
+    {
+      "chain": "Ethereum, TRON and other chains",
+      "standard": "unknown",
+      "readable": false,
+      "note": "Research recorded no deployment row; the older catalogue lists ERC-20 on Ethereum without an address, and Securitize announced a TRON leg on 2 June 2026."
+    }
+  ],
+  "parties": [
+    {
+      "id": "feeder",
+      "name": "Hamilton Lane SCOPE Securitize Tokenized Feeder, LP (Delaware)",
+      "role": "issuer"
+    },
+    {
+      "id": "gp",
+      "name": "Securitize Capital LLC (general partner)",
+      "role": "governance",
+      "note": "Named as general partner in the Form D/A. It carries Securitize's name, as do the platform and the issuer; the sources do not describe the group structure."
+    },
+    {
+      "id": "securitize",
+      "name": "Securitize (platform)",
+      "role": "platform"
+    },
+    {
+      "id": "register-keeper",
+      "name": "The feeder's register keeper (not named)",
+      "role": "transfer-agent"
+    },
+    {
+      "id": "scope-registrar",
+      "name": "The SCOPE fund's register keeper (not named)",
+      "role": "registrar"
+    },
+    {
+      "id": "hamilton-lane",
+      "name": "Hamilton Lane (manager of the Senior Credit Opportunities Fund)",
+      "role": "other"
+    },
+    {
+      "id": "redstone",
+      "name": "RedStone (NAV oracle)",
+      "role": "oracle"
+    },
+    {
+      "id": "custodian",
+      "name": "The feeder's custodian (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "The feeder's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "feeder",
+      "type": "profile",
+      "about": "the feeder's wallet",
+      "says": "Hamilton Lane SCOPE Securitize Tokenized Feeder, LP, a Delaware limited partnership whose general partner is Securitize Capital LLC, offering pooled fund interests under a Form D notice (amended 1 August 2025).",
+      "today": {
+        "state": "published",
+        "where": "SEC Form D/A filed by the issuer (EDGAR CIK 1976710); no token address is tied to it in the sources"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "feeder",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the feeder's SCOPE holding",
+      "says": "Custody arrangement: the feeder's interest in the SCOPE fund and its VBILL liquidity position are kept by a named custodian.",
+      "today": {
+        "state": "not-published",
+        "where": "No source names a custodian for the feeder"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "custodian",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "feeder",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the feeder's assets under A, observed at time T.",
+      "today": {
+        "state": "unnamed",
+        "where": "No custodian is named in any source"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "scope-position",
+      "signer": "scope-registrar",
+      "type": "register-entry",
+      "about": "the feeder's wallet",
+      "says": "Per the Senior Credit Opportunities Fund's register, the feeder holds N interests, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The feeder's exposure to Hamilton Lane's evergreen senior credit strategy is described; no source names the underlying fund's register keeper or the feeder's position"
+      },
+      "gaps": [
+        "roles",
+        "nested-backing"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "feeder",
+      "type": "declaration",
+      "form": "token",
+      "about": "each HLSCOPE token",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is a limited partnership interest in the feeder, for qualified purchasers; exits generally on demand at the prior quarter's NAV, as described at launch. Allocation: the feeder's SCOPE holding under A.",
+      "today": {
+        "state": "reported",
+        "where": "Hamilton Lane's 2023 launch page and Securitize's announcements describe it, with dated liquidity language; the partnership agreement and offering memorandum were not obtained"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "register-keeper",
+      "type": "register-entry",
+      "about": "each HLSCOPE holder's wallet",
+      "says": "Per the feeder's register of limited partners, wallet W's holder owns N interests, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "The definitive LP register and its keeper require the partnership agreement, which was not reviewed"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "gp",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "each HLSCOPE token",
+      "says": "Which record is title: the feeder's LP register or the chain.",
+      "today": {
+        "state": "not-published",
+        "where": "Token and register conflict rules require the partnership agreement"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "securitize",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "each HLSCOPE token",
+      "says": "Only qualified purchasers may invest, through regulated feeder access; secondary trading is not assured.",
+      "today": {
+        "state": "published",
+        "where": "Securitize's TRON launch of 2 June 2026 (regulated access, secondary-market limits); the qualified-purchaser test comes from the 2023 launch, and current minimums were not reviewed"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "nav-oracle",
+      "signer": "redstone",
+      "type": "valuation",
+      "about": "each HLSCOPE token",
+      "says": "The feeder's NAV per interest is X at round R (basis: NAV published as an oracle feed).",
+      "today": {
+        "state": "reported",
+        "where": "Securitize's announcement of 5 November 2025 says redemption through the facility uses a RedStone NAV; the feed itself was not read"
+      },
+      "gaps": [
+        "nav-basis",
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the feeder's wallet",
+      "says": "Audited the feeder's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No source names the feeder's auditor or a report"
+      }
+    },
+    {
+      "id": "facility-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each HLSCOPE token",
+      "refs": [
+        "T",
+        "nav-oracle"
+      ],
+      "says": "An announced facility pays redeeming holders RLUSD to their wallet by swapping VBILL positions the feeder holds, priced by the RedStone NAV. The announcement does not establish the facility's capacity, a binding redemption entitlement or the LP agreement's restrictions, and it is separate from the underlying SCOPE fund's monthly liquidity.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product hlscope (evidence profile 'Announced auxiliary liquidity facility')"
+      },
+      "gaps": [
+        "research-finding",
+        "liquidity-facility"
+      ]
+    },
+    {
+      "id": "catalogue-type",
+      "signer": "researcher",
+      "type": "note",
+      "about": "each HLSCOPE token",
+      "says": "The older catalogue calls HLSCOPE tokenized private equity; research and the Form D/A show a feeder into a senior private-credit fund. The catalogue's 16 September 2026 figures were $4.29M AUM and 43 holders.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar rwa-assets-db.json against research product hlscope"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "no-mint",
+      "says": "No HLSCOPE mint or contract address is recorded in research or the older catalogue, so nothing was read on any chain.",
+      "observedAt": "2026-10-01",
+      "source": "RWA Sonar research product hlscope (deployments: none) and rwa-assets-db.json (contractAddress empty)"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption",
+      "says": "The 2023 launch described exits generally on demand at prior-quarter NAV; current binding terms, minimums and fees are unresolved and stay in the partnership agreement and offering terms."
+    },
+    {
+      "topic": "General partner powers",
+      "says": "The general partner's and administrator's powers over interests and tokens, distribution discretion and liquidity restrictions sit in the partnership agreement, which was not reviewed."
+    },
+    {
+      "topic": "Other SCOPE wrappers",
+      "says": "Alta and KAIO SCOPE wrappers are different instruments and are not restated here."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a private-credit LP feeder interest",
+    "outcome": "buy",
+    "author": "A qualified purchaser",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The feeder's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The LP register's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": [
+          "register"
+        ]
+      },
+      {
+        "type": "register-entry",
+        "label": "The underlying fund's register shows the feeder's position, under 90 days",
+        "minSigners": 1,
+        "maxAgeDays": 90,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        },
+        "matches": [
+          "scope-position"
+        ]
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per interest, under 95 days",
+        "minSigners": 1,
+        "maxAgeDays": 95,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A Delaware LP feeder into a credit fund can be outlined in v3 as T, register entries and a NAV, but it fits poorly in the details. No mint address is known; an LP interest has no claim kind (membership-interest is the nearest proposal); the general partner, the platform and the issuer all carry Securitize's name, which v3 cannot record as affiliation; and the oracle NAV behind the liquidity facility needs the oracle-feed proposal. Apart from the Form D, nothing that decides the holder's position is published by the party who would sign it."
+  }
+}

@@ -1,0 +1,379 @@
+{
+  "id": "usdy",
+  "name": "Ondo US Dollar Yield (USDY)",
+  "subjects": {
+    "researchProducts": [
+      "usdy"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Ondo USDY"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product usdy (USDY Basics, USDY Important Notes, Ondo address registry, rUSDY comparison)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (Ondo USDY) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar sponsor API capture stocks/data/sponsor-apis.json (app.ondo.finance/api/v2/assets)",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "claim",
+    "claimKind": "issuer-obligation",
+    "proposedClaimKind": null,
+    "legalForm": "Not established. The older catalogue calls USDY a tokenized yield-bearing note; research found the issuer and the governing issuance terms unresolved after a December 2025 migration: current notes name Ondo Global Markets (BVI), legacy references name Ondo USDY LLC",
+    "says": "The holder has some claim on an Ondo issuer for a dollar amount that accrues yield from short-term Treasuries and bank deposits, but which entity owes it, under which terms, with what security and in what rank cannot be said for any given token. Holding the token does not by itself meet the issuer's eligibility and onboarding rules for redemption."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "classic-spl",
+      "count": 1,
+      "example": {
+        "symbol": "USDY",
+        "mint": "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6"
+      },
+      "readable": true,
+      "note": "Official USDY mint in Ondo's address registry; the binding of this mint to an issuance vintage is unresolved."
+    },
+    {
+      "chain": "Other chains",
+      "standard": "unknown",
+      "readable": false,
+      "note": "Research recorded only the Solana deployment row. rUSDY wraps locked USDY and is a different instrument."
+    }
+  ],
+  "parties": [
+    {
+      "id": "ogm",
+      "name": "Ondo Global Markets (BVI) Limited",
+      "role": "issuer",
+      "note": "Named as USDY's issuer in the current USDY Important Notes."
+    },
+    {
+      "id": "usdy-llc",
+      "name": "Ondo USDY LLC",
+      "role": "issuer",
+      "note": "Named in legacy references that USDY Basics still carries after describing the December 2025 migration."
+    },
+    {
+      "id": "ondo",
+      "name": "Ondo Finance (app.ondo.finance)",
+      "role": "platform"
+    },
+    {
+      "id": "coinbase",
+      "name": "Coinbase Custody (named only in the older catalogue)",
+      "role": "custodian"
+    },
+    {
+      "id": "ankura",
+      "name": "Ankura Trust Company",
+      "role": "trustee",
+      "note": "Named in the older catalogue for reserve verification and holder claim priority; research does not assign either to the current issuance."
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "ogm",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "Ondo Global Markets (BVI) Limited, the current issuer of USDY.",
+      "today": {
+        "state": "published",
+        "where": "USDY Important Notes (docs.ondo.finance); no mint authority is tied to it in the sources"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T-current",
+      "signer": "ogm",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USDY Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: USDY issued by Ondo Global Markets (BVI) to eligible persons, accruing yield from short-term US Treasuries and bank deposits, redeemable through the Global Markets USDC route. Allocation: the reserve under A.",
+      "today": {
+        "state": "published",
+        "where": "USDY Important Notes and Basics describe it; the issuance agreement and any migration or novation evidence were not obtained, so T cannot commit to them by hash"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "terms-version"
+      ]
+    },
+    {
+      "id": "T-legacy",
+      "signer": "usdy-llc",
+      "type": "declaration",
+      "form": "token",
+      "about": "the USDY Solana mint",
+      "says": "Token terms: USDY issued by Ondo USDY LLC, redeemable by wire under the legacy route.",
+      "today": {
+        "state": "published",
+        "where": "USDY Basics keeps the legacy LLC routes after describing the December 2025 migration"
+      },
+      "gaps": [
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "vintage-conflict",
+      "signer": "researcher",
+      "type": "flag",
+      "about": "the two token declarations",
+      "refs": [
+        "T-current",
+        "T-legacy"
+      ],
+      "says": "Two issuers are named for one mint, and no source says which terms govern a given holder's tokens. Legacy security, guarantor and creditor-ranking conclusions cannot be carried over to issuance whose terms are not identified.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product usdy (claims rights and exit: conflicting)"
+      },
+      "gaps": [
+        "research-finding",
+        "terms-version"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "ogm",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for USDY's reserve accounts",
+      "says": "Custody arrangement: the Treasuries and bank deposits behind USDY are held by a named custodian (the older catalogue cites Coinbase Custody).",
+      "today": {
+        "state": "not-checked",
+        "where": "The older catalogue cites an Ondo docs page naming Coinbase Custody (30 January 2026); research named no custodian for the current issuance"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "coinbase",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "ogm",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the USDY reserve assets under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only Ondo's docs, as cited by the older catalogue, say so; the custodian publishes nothing"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the USDY Solana mint",
+      "says": "Short-term US Treasuries and bank demand deposits worth at least the USDY outstanding on every chain, as of date.",
+      "today": {
+        "state": "published",
+        "where": "USDY Basics describes the exposure; the older catalogue cites a reserves page (21 November 2025). Research did not verify current holdings."
+      },
+      "gaps": [
+        "reserve-structure"
+      ]
+    },
+    {
+      "id": "reserve-review",
+      "signer": "ankura",
+      "type": "certification",
+      "event": "audited",
+      "about": "the USDY Solana mint",
+      "says": "Verified the reserve balance against USDY outstanding, as of date, with the report's hash.",
+      "today": {
+        "state": "reported",
+        "where": "The older catalogue cites Ondo's docs (19 August 2025) for Ankura's verification; no Ankura report for USDY was read, and research does not assign it to the current issuance"
+      }
+    },
+    {
+      "id": "security",
+      "signer": "ankura",
+      "type": "security-interest",
+      "about": "USDY's reserve accounts",
+      "for": "USDY holders, pro rata",
+      "refs": [
+        "T-legacy"
+      ],
+      "says": "Holds security over the reserve for USDY holders, defining their claim priority on an issuer insolvency.",
+      "today": {
+        "state": "reported",
+        "where": "The older catalogue cites Ondo's trust-and-transparency page (28 February 2026) naming Ankura for holder claim priority; research found no security terms for the current vintage"
+      },
+      "gaps": [
+        "class-beneficiary"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the USDY Solana mint",
+      "says": "Which record is title: the chain or an issuer register.",
+      "today": {
+        "state": "not-published",
+        "where": "Research found no register-precedence rule for the current issuance; the older catalogue's claim that the blockchain is the authoritative record (ondo.finance/usdy, 1 August 2023) predates the migration"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "ogm",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the USDY Solana mint",
+      "says": "USDY is restricted to eligible persons, with onboarding and KYC; holding the token alone does not meet those requirements.",
+      "today": {
+        "state": "published",
+        "where": "USDY Important Notes"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "price",
+      "signer": "ondo",
+      "type": "valuation",
+      "about": "the USDY Solana mint",
+      "says": "USDY is worth 1.14641101 USD (16 September 2026); the API marked it not tradeable at that time.",
+      "today": {
+        "state": "published",
+        "where": "app.ondo.finance/api/v2/assets, captured 16 September 2026"
+      },
+      "gaps": [
+        "nav-basis"
+      ]
+    },
+    {
+      "id": "bearer-superseded",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the USDY Solana mint",
+      "refs": [
+        "eligibility"
+      ],
+      "says": "The older catalogue describes USDY as a bearer asset that anyone can buy, hold or transfer without onboarding or KYC, with bearer redemption; the current notes restrict eligibility and require onboarding. The catalogue description is superseded.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar rwa-assets-db.json against research product usdy"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "program",
+      "says": "Classic SPL mint, 6 decimals, supply 156,471,531.738738 USDY on Solana; readable by the /fungible reader.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "who-can-move-it",
+      "says": "Mint authority 8n2uiRUd1A9NN78PKESkJe6k6zMqtKCZh3MrK1j9qkB1; freeze authority 51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK. No permanent delegate, transfer hook or default-frozen accounts, so transfers are not gated by the token program, but any account can be frozen. Who holds the keys is not in the sources.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Redemption route",
+      "says": "Public materials show both a legacy wire route and a Global Markets USDC route; which applies, its timetable, minimum and fees are unresolved. Stays in the issuance terms of the holder's vintage."
+    },
+    {
+      "topic": "Security and creditor rank",
+      "says": "Whether a security agent holds collateral for the holders, any guarantor and the holders' rank on insolvency depend on terms that were not obtained."
+    },
+    {
+      "topic": "rUSDY",
+      "says": "rUSDY wraps locked USDY; it is not additional collateral and is a separate instrument."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a yield-bearing dollar note",
+    "outcome": "buy",
+    "author": "An onboarded buyer",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "One issuer's token terms (T) on the mint, with no competing T",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "certification",
+        "label": "Independent reserve verification, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      },
+      {
+        "type": "security-interest",
+        "label": "A security agent's charge for holders",
+        "minSigners": 1,
+        "signers": "any"
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The mint is classic SPL, so it is one of the few researched tokens the reader can hold A/H/T for. v3 can also show the real problem: two issuers' token terms for one mint, and a flag. But it cannot say what the claim is (claim kind unknown, security for the holders as a class, rank on insolvency), and which record prevails and who may redeem are only proposals. Most backing and security statements come only from Ondo's own docs as cited by the older catalogue."
+  }
+}

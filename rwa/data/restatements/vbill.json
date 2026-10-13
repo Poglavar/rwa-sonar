@@ -1,0 +1,413 @@
+{
+  "id": "vbill",
+  "name": "VanEck Treasury Fund Ltd. (VBILL)",
+  "subjects": {
+    "researchProducts": [
+      "vbill"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "VanEck VBILL"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product vbill (launch announcement of 13 May 2025, Securitize product page, RLUSD announcement of 23 September 2025)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar catalogue rwa-assets-db.json, entry VanEck VBILL",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar attestations-db.json, rows for VanEck VBILL",
+      "asOf": "2025-08-20"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, VBILL row",
+      "asOf": "2026-10-01"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Tokenized shares of VanEck Treasury Fund Ltd., a BVI professional fund, issued and recorded on supported blockchains with Securitize as transfer agent; the current constitutional and offering documents were not reviewed",
+    "says": "The holder has, on the launch announcement, shares of the BVI fund recorded on chain by Securitize as transfer agent. Which record prevails in a conflict, the ordinary redemption entitlement and the holder's position if the fund or a service provider fails are not established."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "unknown",
+      "count": 1,
+      "example": {
+        "symbol": "VBILL",
+        "mint": "34mJztT9am2jybSukvjNqRjgJBZqHJsHnivArx1P4xy1"
+      },
+      "readable": false,
+      "note": "From the older catalogue, which calls it SPL; not in today's chain read, so its program is unverified. If it is classic SPL, /fungible could read it."
+    },
+    {
+      "chain": "Other networks named in the launch announcement",
+      "standard": "unknown",
+      "readable": false,
+      "note": "The research has no deployment rows."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "VanEck Treasury Fund Ltd.",
+      "role": "issuer",
+      "note": "BVI professional fund launched 2025."
+    },
+    {
+      "id": "vaneck",
+      "name": "VanEck",
+      "role": "other",
+      "note": "Sponsor; an SEC-registered investment management firm per the catalogue."
+    },
+    {
+      "id": "securitize",
+      "name": "Securitize",
+      "role": "transfer-agent",
+      "note": "Transfer agent, administration and primary-market platform as announced."
+    },
+    {
+      "id": "statestreet",
+      "name": "State Street Bank and Trust Company",
+      "role": "custodian"
+    },
+    {
+      "id": "redstone",
+      "name": "RedStone",
+      "role": "oracle",
+      "note": "Daily NAV calculations per the launch announcement."
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "bvi-regulator",
+      "name": "The fund's BVI regulator (not named in the sources)",
+      "role": "regulator"
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "VanEck Treasury Fund Ltd., a BVI professional fund sponsored by VanEck, investing in cash, US Treasury bills and repurchase agreements collateralised by Treasuries.",
+      "today": {
+        "state": "published",
+        "where": "VanEck's launch announcement of 13 May 2025, published through Securitize and PR Newswire"
+      },
+      "gaps": [
+        "issuer-key-binding",
+        "affiliation"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the VBILL token on each supported network",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: VBILL tokens are shares of VanEck Treasury Fund Ltd., issued and recorded on supported blockchains; allocation: the fund's shares, recorded by Securitize.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement; the constitutional and offering documents were not reviewed and no deployment is bound to a class"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "securitize",
+      "type": "register-entry",
+      "about": "each VBILL holder's wallet",
+      "says": "Per the register we keep as transfer agent, this wallet holds N VBILL shares.",
+      "today": {
+        "state": "reported",
+        "where": "The launch announcement names Securitize as transfer agent; Securitize publishes no entries in the sources"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "prevails",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the VBILL token",
+      "says": "Which record prevails in a conflict: the on-chain record or the transfer agent's register.",
+      "today": {
+        "state": "not-published",
+        "where": "The announcement says shares are issued and recorded on chain; priority in a conflict is not stated"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's assets",
+      "says": "Custody arrangement: State Street Bank and Trust Company keeps the fund's assets.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement of 13 May 2025; the custody agreement is not public in the sources"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "statestreet",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold these Treasury bills, repos and cash for the fund under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "The launch announcement names State Street; State Street publishes nothing in the sources"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "VBILL on every network",
+      "says": "Cash, US Treasury bills and Treasury-collateralised repos against VBILL outstanding on all networks, as of date.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement (composition only); current holdings not verified, and the catalogue notes total AUM fell about 70% in the 30 days to 16 September 2026"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "redstone",
+      "type": "valuation",
+      "about": "one VBILL",
+      "says": "NAV per VBILL is X as of day D; the fund seeks a stable value around $1.00.",
+      "today": {
+        "state": "reported",
+        "where": "The launch announcement says RedStone provides daily NAV calculations; RedStone's own feed was not read"
+      },
+      "gaps": [
+        "nav-basis",
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No auditor appears in the reviewed sources"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the VBILL token",
+      "says": "Qualified purchasers only, with network-dependent minimum investments, onboarded by Securitize; transfers only among KYC-approved wallets.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement; Securitize's SEC submission of 7 May 2025 describes KYC-gated transfers among approved wallets (catalogue)"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "ta-registration",
+      "signer": "sec",
+      "type": "credential",
+      "about": "Securitize's wallet",
+      "says": "Securitize LLC is a registered transfer agent.",
+      "today": {
+        "state": "published",
+        "where": "SEC EDGAR transfer-agent filings, linked by RWA Sonar's catalogue"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "fund-recognition",
+      "signer": "bvi-regulator",
+      "type": "credential",
+      "about": "the fund's wallet",
+      "says": "The fund is a recognised BVI professional fund.",
+      "today": {
+        "state": "unnamed",
+        "where": "The announcement calls it a BVI professional fund; no source names the regulator or a registration"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "custody-conflict",
+      "signer": "researcher",
+      "type": "flag",
+      "refs": [
+        "A"
+      ],
+      "about": "the custody declaration",
+      "says": "An older catalogue row has VanEck confirming custody at Komainu (dated 16 March 2025, expired 16 March 2026), while the launch announcement and the research name State Street Bank and Trust Company. This restatement follows the announcement; the Komainu row is unsupported.",
+      "today": {
+        "state": "published",
+        "where": "attestations-db.json against research.json"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    },
+    {
+      "id": "exit-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the VBILL token",
+      "says": "The ordinary redemption entitlement and timing are not established from current public sources; RLUSD smart-contract functionality (announced 23 September 2025) is a separate off-ramp, not a fund redemption right.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research vbill (exit claim and dependency review, 1 October 2026)"
+      },
+      "gaps": [
+        "research-finding",
+        "distribution-redemption",
+        "liquidity-facility"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "solana-supply",
+      "says": "The Solana leg held 14,565,007 VBILL. Not re-read in this restatement.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar catalogue note, rwa-assets-db.json VanEck VBILL"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem",
+      "says": "Qualified purchasers under the fund's governing documents, which were not reviewed; the catalogue notes 24/7 minting via USDC and daily liquidity, with underlying T-bill settlement on a T+1 schedule."
+    },
+    {
+      "topic": "Stablecoin off-ramp",
+      "says": "RLUSD smart-contract functionality lets holders exchange through a contract; its capacity and recourse stay in its own terms."
+    },
+    {
+      "topic": "Fees",
+      "says": "The catalogue records a $100K minimum subscription and 0.20% management fee; the governing fee schedule was not reviewed."
+    },
+    {
+      "topic": "Insolvency and recovery",
+      "says": "Shareholder priority on failure of the fund or its service providers is left to BVI law and the fund documents."
+    }
+  ],
+  "recipe": {
+    "name": "Hold a tokenized fund share",
+    "outcome": "hold",
+    "author": "A holder",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "Fund's token terms (T)",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "Transfer agent's entry for my wallet",
+        "minSigners": 1,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "Custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "NAV under 3 days",
+        "minSigners": 1,
+        "maxAgeDays": 3,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited financial statements, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "The named service providers fill the fund-share pattern: State Street for H, Securitize for register entries, RedStone for NAV. Register precedence, the registered-holding kind and the NAV basis need proposals, and the deployments are unverified. Only VanEck's launch material speaks; the custodian, transfer agent and oracle are reported, not self-published."
+  }
+}

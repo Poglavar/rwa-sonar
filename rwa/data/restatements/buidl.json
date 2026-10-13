@@ -1,0 +1,385 @@
+{
+  "id": "buidl",
+  "name": "BlackRock USD Institutional Digital Liquidity Fund (BUIDL)",
+  "subjects": {
+    "researchProducts": [
+      "buidl"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "BlackRock BUIDL"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-13",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json, product buidl (transfer-agent and registrar agreement of 14 March 2024, launch announcement of 20 March 2024, Solana share-class announcement of 25 March 2025)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "RWA Sonar older catalogue rwa-assets-db.json (BlackRock BUIDL) and attestations-db.json",
+      "asOf": "2026-09-16"
+    },
+    {
+      "source": "RWA Sonar canonical parties stocks/data/canonical-parties.json (Securitize Transfer Agent LLC)",
+      "asOf": "2026-10-08"
+    },
+    {
+      "source": "Tokenizario restatement chain read, slot 456350748",
+      "asOf": "2026-10-13"
+    }
+  ],
+  "path": "fungible",
+  "holderPosition": {
+    "originKind": "share",
+    "claimKind": "ownership-interest",
+    "proposedClaimKind": "registered-holding",
+    "legalForm": "Non-voting participating share of BlackRock USD Institutional Digital Liquidity Fund Ltd., a BVI private fund, in a Solana share class whose supplement was not reviewed; Securitize keeps the issuer books as transfer agent and registrar",
+    "says": "The holder is a shareholder of the BVI fund, recorded in the issuer books that Securitize keeps; the transfer-agent agreement says the tokens authenticate ownership and transfers. The holder has no vote and no direct claim on the fund's Treasury bills, repos or cash, and the redemption and insolvency terms sit in a confidential offering memorandum that was not reviewed."
+  },
+  "tokens": [
+    {
+      "chain": "Solana",
+      "standard": "token-2022",
+      "count": 1,
+      "example": {
+        "symbol": "BUIDL",
+        "mint": "GyWgeqpy5GueU2YbkE8xqUeVEokCMMCEeUrfbtMw6phr"
+      },
+      "readable": false,
+      "note": "Research records this as the official Solana class address; the older catalogue lists the token standard as SPL, but the chain read shows Token-2022."
+    },
+    {
+      "chain": "Ethereum and other chains",
+      "standard": "unknown",
+      "readable": false,
+      "note": "The fund launched on Ethereum (announcement of 20 March 2024); the older catalogue says it moves cross-chain through Wormhole NTT. Research recorded only the Solana deployment row."
+    }
+  ],
+  "parties": [
+    {
+      "id": "fund",
+      "name": "BlackRock USD Institutional Digital Liquidity Fund Ltd. (BVI)",
+      "role": "issuer"
+    },
+    {
+      "id": "securitize",
+      "name": "Securitize (transfer agent and registrar under the agreement of 14 March 2024)",
+      "role": "transfer-agent",
+      "note": "Canonical parties record Securitize Transfer Agent LLC as SEC-registered (File No. 084-06638); research did not match the BUIDL agreement's contracting entity to that registration."
+    },
+    {
+      "id": "bny-custody",
+      "name": "BNY Mellon (custodian)",
+      "role": "custodian",
+      "note": "Named in the launch announcement; the same group is also named as administrator."
+    },
+    {
+      "id": "bny-admin",
+      "name": "BNY Mellon (fund administrator)",
+      "role": "administrator"
+    },
+    {
+      "id": "auditor",
+      "name": "The fund's auditor (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "sec",
+      "name": "US Securities and Exchange Commission",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "fund",
+      "type": "profile",
+      "about": "the fund's wallet",
+      "says": "BlackRock USD Institutional Digital Liquidity Fund Ltd., a British Virgin Islands fund, offered under a Form D notice; Securitize is its transfer agent and registrar.",
+      "today": {
+        "state": "reported",
+        "where": "The fund is identified in the transfer-agent agreement filed by Securitize and in Securitize's launch announcements; the older catalogue links a Form D of 18 March 2024. No mint authority is tied to the fund in any source."
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the fund's portfolio account",
+      "says": "Custody arrangement: BNY Mellon keeps the fund's cash, US Treasury bills and repurchase agreements as custodian.",
+      "today": {
+        "state": "reported",
+        "where": "The launch announcement on Securitize's investor site names BNY Mellon; the custody agreement and offering memorandum were not obtained, so A cannot commit to them by hash"
+      }
+    },
+    {
+      "id": "H",
+      "signer": "bny-custody",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "fund",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold the fund's cash, Treasury bills and repo collateral under A, observed at time T.",
+      "today": {
+        "state": "reported",
+        "where": "Only the launch announcement and a Securitize press release (13 March 2025, older catalogue) say BNY Mellon holds the assets; BNY Mellon publishes no holdings for the fund"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "fund",
+      "type": "declaration",
+      "form": "token",
+      "about": "the BUIDL Solana mint",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms: one token is one non-voting participating share of the fund's Solana share class; tokens authenticate ownership and transfers, and the registrar may reject improper transfers and implement stop-transfer notices. Allocation: the fund's whole portfolio under A, shared with every other share class and chain.",
+      "today": {
+        "state": "reported",
+        "where": "The share rights come from the transfer-agent agreement Securitize filed with the SEC; the Solana class supplement and the offering memorandum were not reviewed"
+      },
+      "gaps": [
+        "legal-characterisation",
+        "units",
+        "reserved-powers",
+        "reader-scope"
+      ]
+    },
+    {
+      "id": "register",
+      "signer": "securitize",
+      "type": "register-entry",
+      "about": "each BUIDL holder's wallet",
+      "says": "Per the issuer books I keep as registrar, wallet W's holder owns N shares of the Solana class, as of date.",
+      "today": {
+        "state": "not-published",
+        "where": "The agreement makes Securitize the authorized registrar that maintains the issuer books; per-holder entries are not public"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "which-record",
+      "signer": "securitize",
+      "type": "status",
+      "predicate": "authoritative-record",
+      "proposed": true,
+      "about": "the BUIDL Solana mint",
+      "says": "Which record is title in a conflict: the issuer books Securitize keeps, or the token, which the agreement says authenticates ownership and transfers.",
+      "today": {
+        "state": "not-published",
+        "where": "Research found no clause in the public agreement that settles precedence between the books and the chain"
+      },
+      "gaps": [
+        "authoritative-record"
+      ]
+    },
+    {
+      "id": "eligibility",
+      "signer": "securitize",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "the BUIDL Solana mint",
+      "says": "Only qualified investors may hold; transfers only to approved holders; the registrar may require documents before registering a transfer.",
+      "today": {
+        "state": "published",
+        "where": "Launch announcement (20 March 2024) and the filed transfer-agent agreement; the older catalogue also records Securitize saying all holders passed KYC (written input to the SEC, 7 May 2025)"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "nav",
+      "signer": "bny-admin",
+      "type": "valuation",
+      "about": "the BUIDL Solana mint",
+      "says": "Net asset value per share is X on date D (basis: the fund's dealing NAV).",
+      "today": {
+        "state": "reported",
+        "where": "The older catalogue records a NAV per token shown on Securitize's BlackRock page (26 April 2025); the administrator publishes nothing in its own name"
+      },
+      "gaps": [
+        "nav-basis",
+        "roles"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "fund",
+      "type": "status",
+      "predicate": "backed",
+      "about": "the BUIDL Solana mint",
+      "says": "The fund holds cash, US Treasury bills and repurchase agreements against all shares outstanding across share classes and chains, as of date.",
+      "today": {
+        "state": "reported",
+        "where": "Asset types appear in the launch materials and on Securitize's page (older catalogue, 26 April 2025); research did not verify the current portfolio"
+      },
+      "gaps": [
+        "reserve-structure",
+        "units"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "the fund's wallet",
+      "says": "Audited the fund's financial statements for period P, with the report's hash.",
+      "today": {
+        "state": "unnamed",
+        "where": "No source names the fund's auditor or a report"
+      }
+    },
+    {
+      "id": "ta-credential",
+      "signer": "sec",
+      "type": "credential",
+      "about": "Securitize's wallet",
+      "says": "Securitize Transfer Agent LLC is a registered transfer agent (File No. 084-06638).",
+      "today": {
+        "state": "reported",
+        "where": "RWA Sonar canonical parties and a Securitize press release (13 March 2025, older catalogue); the SEC register was not read in this restatement"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "terms-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the BUIDL Solana mint",
+      "refs": [
+        "T"
+      ],
+      "says": "The Solana share class was announced on 25 March 2025, but its supplement, the offering memorandum, the redemption timetable and fees, and the insolvency priority between classes were not obtained; no completed redemption was observed.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research, product buidl (claims exit and failure, evidence profile 'Offering memorandum / class supplement': not-obtained)"
+      },
+      "gaps": [
+        "research-finding",
+        "terms-version"
+      ]
+    }
+  ],
+  "chainFacts": [
+    {
+      "id": "program",
+      "says": "Token-2022 mint, 6 decimals, supply 931,061,169.15 BUIDL on Solana.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "who-can-move-it",
+      "says": "One address, APm3MWbXfMMKAWgsDVnxcAGbLjvRxubPu1A8a5SA2kbJ, is mint authority, freeze authority, permanent delegate (move or burn any balance), transfer-hook authority, metadata authority and mint-close authority. The transfer hook runs program FsE8mCJyvgMzqJbfHbJQm3iuf3cRZC6n2vZi1Q8rQCy2. Who holds the key is not in the sources.",
+      "observedAt": "2026-10-13",
+      "source": "Tokenizario restatement chain read, slot 456350748"
+    },
+    {
+      "id": "catalogue-supply",
+      "says": "The older catalogue recorded 993,191,100 BUIDL on the Solana leg and $2.68B fund AUM on 16 September 2026; supply on one chain is not the fund's share count.",
+      "observedAt": "2026-09-16",
+      "source": "RWA Sonar older catalogue rwa-assets-db.json"
+    }
+  ],
+  "outside": [
+    {
+      "topic": "Who may redeem, and how",
+      "says": "Redemption follows the confidential offering memorandum and the class terms; the timetable, minimum and fees were not established. Stays in the fund documents and Securitize's onboarding."
+    },
+    {
+      "topic": "Stop-transfer and corrections",
+      "says": "The registrar may reject improper transfers, require documents and implement stop-transfer notices; the chain shows a permanent delegate and freeze authority that can carry them out."
+    },
+    {
+      "topic": "Distributions and cross-chain moves",
+      "says": "The older catalogue says the fund distributes dividends daily and moves between chains through Wormhole NTT; research did not review the class distribution terms or the bridge."
+    },
+    {
+      "topic": "Insolvency",
+      "says": "Investor recovery and priority between share classes under BVI law were not established from the public agreement."
+    }
+  ],
+  "recipe": {
+    "name": "Buy a registered fund share",
+    "outcome": "buy",
+    "author": "A qualified investor",
+    "ingredients": [
+      {
+        "type": "declaration",
+        "label": "The fund's token terms (T) on the mint",
+        "minSigners": 1,
+        "signers": "any",
+        "params": {
+          "form": "token"
+        }
+      },
+      {
+        "type": "register-entry",
+        "label": "The registrar's entry for my wallet, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "registry"
+        }
+      },
+      {
+        "type": "holds",
+        "label": "The custodian's holdings under A, under 30 days",
+        "minSigners": 1,
+        "maxAgeDays": 30,
+        "signers": "credentialed",
+        "params": {
+          "role": "custodian"
+        }
+      },
+      {
+        "type": "valuation",
+        "label": "A NAV per share, under 2 days",
+        "minSigners": 1,
+        "maxAgeDays": 2,
+        "signers": "any"
+      },
+      {
+        "type": "certification",
+        "label": "Audited fund accounts, under 400 days",
+        "minSigners": 1,
+        "maxAgeDays": 400,
+        "signers": "credentialed",
+        "params": {
+          "event": "audited",
+          "role": "auditor"
+        }
+      }
+    ]
+  },
+  "verdict": {
+    "fit": "partial",
+    "summary": "A registered fund share with a transfer-agent register, a custodian and an administrator can be outlined in v3. But the token is Token-2022, so it cannot be read; ownership-interest hides that the holder is a registered shareholder; nothing can say whether the books or the chain prevail; and the NAV has no basis. Securitize publishes the most, while BNY Mellon, the auditor and the fund itself publish nothing about this token in their own name."
+  }
+}

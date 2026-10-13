@@ -1,0 +1,223 @@
+{
+  "id": "uranium-digital",
+  "name": "Uranium Digital",
+  "subjects": {
+    "researchProducts": [
+      "uranium-digital"
+    ],
+    "issuerDossiers": [],
+    "catalogueNames": [
+      "Uranium Digital"
+    ],
+    "mechanisms": [],
+    "universeIssuers": []
+  },
+  "restatedAt": "2026-10-13",
+  "evidenceAsOf": "2026-10-01",
+  "provenance": [
+    {
+      "source": "RWA Sonar research rwa/data/research.json product uranium-digital (official site uraniumdigital.com, Coming Soon page)",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Tokenizario docs/rwa-sonar-mapping.md, product table row Uranium Digital",
+      "asOf": "2026-10-01"
+    },
+    {
+      "source": "Older catalogue rwa-assets-db.json 'Uranium Digital' and attestations-db.json (Uranium Digital instances)",
+      "asOf": "2026-09-16"
+    }
+  ],
+  "path": "none",
+  "holderPosition": {
+    "originKind": "none",
+    "claimKind": null,
+    "proposedClaimKind": null,
+    "legalForm": "Unidentified; the official site labels the platform Coming Soon and identifies no issued holder instrument",
+    "says": "There is no holder: no token, ticker, mint, issuer legal entity or holder contract is published. The marketing describes a 24/7 platform for physically settled uranium with on-chain proof of reserves; nothing in it gives anyone a right today."
+  },
+  "tokens": [],
+  "parties": [
+    {
+      "id": "ud",
+      "name": "Uranium Digital (legal entity not identified)",
+      "role": "issuer",
+      "note": "Not to be conflated with uranium.io / xU3O8, a separately branded programme."
+    },
+    {
+      "id": "facility",
+      "name": "The conversion facility holding the uranium (not named)",
+      "role": "custodian"
+    },
+    {
+      "id": "auditor",
+      "name": "A reserve examiner (not named)",
+      "role": "auditor"
+    },
+    {
+      "id": "nuclear-regulator",
+      "name": "The licensing authority for nuclear material storage (not named)",
+      "role": "regulator"
+    },
+    {
+      "id": "researcher",
+      "name": "RWA Sonar",
+      "role": "researcher"
+    }
+  ],
+  "statements": [
+    {
+      "id": "profile",
+      "signer": "ud",
+      "type": "profile",
+      "about": "the issuer's wallet",
+      "says": "The legal entity behind Uranium Digital, its jurisdiction and the wallet it would issue from.",
+      "today": {
+        "state": "not-published",
+        "where": "The site names the brand only; no legal name, ticker or mint"
+      },
+      "gaps": [
+        "issuer-key-binding"
+      ]
+    },
+    {
+      "id": "T",
+      "signer": "ud",
+      "type": "declaration",
+      "form": "token",
+      "about": "a Uranium Digital token (none issued)",
+      "refs": [
+        "A"
+      ],
+      "says": "Token terms as marketed: one token represents one pound of yellowcake (uranium oxide concentrate) at recognized conversion facilities, physically deliverable; unit: pound, which v3 does not have.",
+      "today": {
+        "state": "not-published",
+        "where": "The one-pound description is in the older catalogue and attestations-db.json (2025); the research found no token or holder terms on the current site"
+      },
+      "gaps": [
+        "units",
+        "legal-characterisation"
+      ]
+    },
+    {
+      "id": "A",
+      "signer": "ud",
+      "type": "declaration",
+      "form": "custody",
+      "about": "a host record for the uranium",
+      "says": "Custody arrangement: yellowcake stored at named conversion facilities under a storage agreement.",
+      "today": {
+        "state": "not-published",
+        "where": "The older catalogue says 'recognized conversion facilities' without naming one; the research found no conversion facility, custodian or asset account. attestations-db.json's 'BitGo' custody entry is contradicted by its own other note and is not supported."
+      }
+    },
+    {
+      "id": "H",
+      "signer": "facility",
+      "type": "holds",
+      "about": "A's host record",
+      "for": "ud",
+      "refs": [
+        "A"
+      ],
+      "says": "We hold N pounds of U3O8 for Uranium Digital, as of date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No conversion facility is named in any source"
+      },
+      "gaps": [
+        "units"
+      ]
+    },
+    {
+      "id": "backed",
+      "signer": "ud",
+      "type": "status",
+      "predicate": "backed",
+      "about": "a Uranium Digital token (none issued)",
+      "says": "Uranium held against tokens outstanding, 1:1, with proof of reserves on chain.",
+      "today": {
+        "state": "not-published",
+        "where": "Site marketing asserts on-chain proof of reserves and 1:1 backing (attestations-db.json, 28 Feb 2026); no reserve report exists"
+      },
+      "gaps": [
+        "reserve-structure",
+        "oracle-feed"
+      ]
+    },
+    {
+      "id": "audit",
+      "signer": "auditor",
+      "type": "certification",
+      "event": "audited",
+      "about": "a Uranium Digital token (none issued)",
+      "refs": [
+        "backed"
+      ],
+      "says": "Examined the uranium held against tokens outstanding at a date.",
+      "today": {
+        "state": "unnamed",
+        "where": "No examiner is named"
+      }
+    },
+    {
+      "id": "eligibility",
+      "signer": "ud",
+      "type": "status",
+      "predicate": "eligibility",
+      "proposed": true,
+      "about": "a Uranium Digital token (none issued)",
+      "says": "Trading and physical delivery only for verified institutional participants.",
+      "today": {
+        "state": "not-published",
+        "where": "The older catalogue says so; the research found no eligibility, KYC process or delivery route on the current site"
+      },
+      "gaps": [
+        "eligibility"
+      ]
+    },
+    {
+      "id": "facility-licence",
+      "signer": "nuclear-regulator",
+      "type": "credential",
+      "about": "the conversion facility's wallet",
+      "says": "The facility is licensed to store and handle uranium oxide concentrate.",
+      "today": {
+        "state": "unnamed",
+        "where": "attestations-db.json notes that uranium custody requires specialised licensed facilities; neither facility nor regulator is named"
+      },
+      "gaps": [
+        "roles"
+      ]
+    },
+    {
+      "id": "prelaunch-finding",
+      "signer": "researcher",
+      "type": "note",
+      "about": "the Uranium Digital programme",
+      "says": "Pre-launch: the official site reads Coming Soon and publishes no issued instrument, chain, token, issuer legal identity, reserve report or settlement entitlement. No conclusion is drawn about a later launch.",
+      "today": {
+        "state": "published",
+        "where": "RWA Sonar research uranium-digital (all dimensions 'unknown'; evidenceProfile 'Official product site', 30 Sep 2026); older catalogue status 'not-launched' (16 Sep 2026)"
+      },
+      "gaps": [
+        "research-finding"
+      ]
+    }
+  ],
+  "chainFacts": [],
+  "outside": [
+    {
+      "topic": "Physical settlement",
+      "says": "The site advertises physical settlement, and the older catalogue notes that uranium custody needs specialised licensed facilities; any delivery route, minimum, fee or timing would stay in terms nobody has published."
+    },
+    {
+      "topic": "Funding",
+      "says": "The older catalogue records a $6.1M seed round led by Framework Ventures; it gives holders nothing."
+    }
+  ],
+  "verdict": {
+    "fit": "not-a-token",
+    "summary": "No token exists: the site is Coming Soon and publishes no mint, ticker, issuer entity or terms. What the marketing claims would need the issuer's T and A, a named conversion facility's holds in pounds of U3O8 (a unit v3 lacks), a reserve examiner and the facility's nuclear licence, and none of those signers is identified."
+  }
+}
