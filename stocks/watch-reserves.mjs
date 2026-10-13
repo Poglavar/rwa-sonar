@@ -20,7 +20,7 @@ import {
     parseStreaks, parseSuperstateInstruments, parseXstocksPor, planWrites, readingHash, reserveEvents, round, transitions, xstocksHasNextPage
 } from './lib/reserves.mjs';
 import { DEFAULT_RPC, chunk, getAccountsWithContext, getTokenAccountsByOwner, rpcCall } from './lib/solana-rpc.mjs';
-import { postTelegram } from './lib/telegram.mjs';
+import { postRunNotifications } from './lib/telegram.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 import { XSTOCKS_ISSUER_WALLETS, sumInventory } from './lib/xstocks-float.mjs';
 
@@ -333,8 +333,8 @@ async function main() {
     };
     await writeJson(STATS_FILE, stats);
 
-    const summary = formatSummary({ rows, failures, restricted, transitionsList: trans, durationMs });
-    if (summary && !flags['no-telegram']) await postTelegram(summary, { env });
+    const summary = formatSummary({ rows, failures: [], restricted, transitionsList: trans, durationMs });
+    if (!flags['no-telegram']) await postRunNotifications(summary, { env, failures, label: 'RWA Sonar reserves' });
     else if (summary) for (const line of summary.split('\n')) log(`summary | ${line}`);
     else log('watch-reserves: no shortfall, no stale proof, no failure — no Telegram message');
 

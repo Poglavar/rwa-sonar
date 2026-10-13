@@ -37,7 +37,7 @@ import {
     DEFAULT_RPC, MAX_ACCOUNTS_PER_REQUEST, accountBatchSize, fetchMintAccounts, getAccountsWithContext,
     getTokenAccountsByOwner
 } from './lib/solana-rpc.mjs';
-import { postTelegram } from './lib/telegram.mjs';
+import { postRunNotifications } from './lib/telegram.mjs';
 import { refreshCollectorStatus } from './build-collector-status.mjs';
 
 const HERE = import.meta.dirname;
@@ -474,10 +474,10 @@ async function main() {
     log(`watch-chain: wrote ${relative(REPO, STATS_FILE)} — ${stats.rpcCalls} RPC call(s) in ${(durationMs / 1000).toFixed(1)} s`);
 
     if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
-        await postTelegram(formatTelegramSummary({
-            events, failures, mintsRead: read, unchanged, changed: stats.changed,
+        await postRunNotifications(events.length ? formatTelegramSummary({
+            events, failures: [], mintsRead: read, unchanged, changed: stats.changed,
             walletsRead: watched.length, metadataFetched, durationMs, host: rpcHost
-        }), { env });
+        }) : null, { env, failures, label: 'RWA Sonar watch-chain' });
     } else if (!flags['no-telegram']) {
         log('watch-chain: no events and no failures — no Telegram message (one per run, only when there is news)');
     }

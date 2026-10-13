@@ -24,7 +24,7 @@ import {
     formatTelegramSummary, knownBlock, matchNotices, nameCore, normaliseStoredChecks, normaliseStoredMatches,
     parseBrokerCheckFirm, parseBrokerCheckSearch, runVerdict, selectSources
 } from './lib/regulators.mjs';
-import { postTelegram, telegramConfigured } from './lib/telegram.mjs';
+import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql, userAgentFor } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
@@ -448,7 +448,7 @@ async function main() {
 
     if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
-        await postTelegram(formatTelegramSummary({ events, failures, blocked: run.blocked, checks: all.length, noticesRead: stats.noticesRead, durationMs }), { env });
+        await postRunNotifications(events.length ? formatTelegramSummary({ events, failures: [], blocked: run.blocked, checks: all.length, noticesRead: stats.noticesRead, durationMs }) : null, { env, failures, label: 'RWA Sonar watch-regulators' });
     } else if (!flags['no-telegram']) {
         log('watch-regulators: no new matches and no failures — no Telegram message');
     }

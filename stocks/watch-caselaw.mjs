@@ -25,7 +25,7 @@ import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { postTelegram, telegramConfigured } from './lib/telegram.mjs';
+import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql, userAgentFor } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
@@ -511,9 +511,9 @@ async function main() {
     // Telegram is for events and failures. A quota stop is the pass being paced, not news.
     if ((events.length > 0 || failures.length > 0) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
-        await postTelegram(formatTelegramSummary({
-            events, failures, queries: queries.length, requests: counters.requests, durationMs, recorded: recorded.length, quota
-        }), { env });
+        await postRunNotifications(events.length ? formatTelegramSummary({
+            events, failures: [], queries: queries.length, requests: counters.requests, durationMs, recorded: recorded.length, quota
+        }) : null, { env, failures, label: 'RWA Sonar watch-caselaw' });
     } else if (!flags['no-telegram']) {
         log('watch-caselaw: no events and no failures — no Telegram message');
     }

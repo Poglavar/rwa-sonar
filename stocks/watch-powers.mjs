@@ -30,7 +30,7 @@ import { describeUrl, psql } from './lib/psql.mjs';
 import { isOnCurve } from './lib/solana-address.mjs';
 import { DEFAULT_RPC, accountBatchSize, chunk as chunkAccounts, getAccountsWithContext, rpcCall } from './lib/solana-rpc.mjs';
 import { decodeSquadsMultisig } from './lib/squads.mjs';
-import { postTelegram } from './lib/telegram.mjs';
+import { postRunNotifications } from './lib/telegram.mjs';
 import { XSTOCKS_ISSUER_WALLETS } from './lib/xstocks-float.mjs';
 
 const HERE = import.meta.dirname;
@@ -506,13 +506,13 @@ async function main() {
         failureReasons: failures.slice(0, 20)
     };
     if (!noDb) await writeJson(STATS_FILE, stats);
-    const text = summaryText({ holderRows, configRows, failures, stats });
-    if (text) {
+    const text = summaryText({ holderRows, configRows, failures: [], stats });
+    if (text || failures.length) {
         if (flags['no-telegram']) {
             log('--no-telegram: the summary is logged instead');
-            for (const line of text.split('\n')) log(`telegram | ${line}`);
+            for (const line of (text || '').split('\n')) log(`telegram | ${line}`);
         } else {
-            await postTelegram(text, { env });
+            await postRunNotifications(text, { env, failures, label: 'RWA Sonar powers' });
         }
     }
     log(`watch-powers: RPC ${Object.entries(counter).map(([k, v]) => `${k} ${v}`).join(', ')} in ${((Date.now() - RUN_STARTED_MS) / 1000).toFixed(0)} s`);

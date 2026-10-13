@@ -26,7 +26,7 @@ import {
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { postTelegram, telegramConfigured } from './lib/telegram.mjs';
+import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
@@ -490,10 +490,10 @@ async function run(flags, env) {
 
     if ((findings.length > 0 || failures.length > 0) && !flags['no-telegram']) {
         if (!telegramConfigured(env)) log('telegram: not configured in .env — the summary is logged instead');
-        await postTelegram(formatTelegramSummary({
-            findings, events: eventCount, failures, entitiesWatched: watchedEntities.size, resolved: watchedEntities.size,
+        await postRunNotifications(findings.length ? formatTelegramSummary({
+            findings, events: eventCount, failures: [], entitiesWatched: watchedEntities.size, resolved: watchedEntities.size,
             unresolved: unresolved.length, requests: counters.requests, durationMs
-        }), { env });
+        }) : null, { env, failures, label: 'RWA Sonar watch-entities' });
     } else if (!flags['no-telegram']) {
         log('watch-entities: no findings and no failures — no Telegram message');
     }

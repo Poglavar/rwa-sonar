@@ -26,7 +26,7 @@ import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
-import { postTelegram } from './lib/telegram.mjs';
+import { postRunNotifications } from './lib/telegram.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
@@ -393,7 +393,7 @@ async function main() {
     if (!noDb) await writeJson(STATS_FILE, stats);
 
     if ((fresh.length > 0 || failures.length > 0) && !flags['no-telegram']) {
-        await postTelegram(formatTelegramSummary({ counts, fresh, failures, tickers: actionsBySymbol.size, durationMs: stats.durationMs }), { env });
+        await postRunNotifications(fresh.length ? formatTelegramSummary({ counts, fresh, failures: [], tickers: actionsBySymbol.size, durationMs: stats.durationMs }) : null, { env, failures, label: 'RWA Sonar watch-corporate-actions' });
     } else if (!flags['no-telegram']) {
         log('telegram: no new findings and no failures — nothing sent');
     }

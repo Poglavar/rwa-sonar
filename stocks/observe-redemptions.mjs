@@ -38,7 +38,7 @@ import { fetchJson, log, logError, logWarn, parseArgs, readJson, sleep, ts, writ
 import { findProgramAddress, fromBase58 } from './lib/squads.mjs';
 import { base58 } from './lib/loopscale.mjs';
 import { DEFAULT_RPC } from './lib/solana-rpc.mjs';
-import { postTelegram } from './lib/telegram.mjs';
+import { postRunNotifications } from './lib/telegram.mjs';
 import { USDC_MINT, USDT_MINT } from './lib/trades.mjs';
 
 const HERE = import.meta.dirname;
@@ -613,7 +613,7 @@ async function tripwire(entry, slug, ctx) {
 // --- main ------------------------------------------------------------------------------------
 function noticesFor(slug, before, after) {
     const lines = [];
-    if (after.lastScan?.status === 'failed') lines.push(`${slug}: scan FAILED — ${after.lastScan.error}`);
+    // Scan failures go to the alert bot; these notices contain product findings only.
     if (after.observable === false) {
         const fresh = after.lastScan?.newEvents ?? 0;
         for (const e of fresh > 0 ? (after.tripwire?.events ?? []).slice(-fresh) : []) {
@@ -706,8 +706,9 @@ async function main() {
     data.generatedAt = data.lastRun.endedAt;
     await writeJson(outFile, data);
     log(`observe-redemptions: ${data.lastRun.status} · ${counter.calls} RPC call(s) ${JSON.stringify(counter.byMethod)} · wrote ${relative(REPO, outFile)}`);
-    if (notices.length && !flags['no-telegram']) {
-        await postTelegram(['RWA Sonar redemption observer', ...notices].join('\n'), { env });
+    if ((notices.length || failed.length) && !flags['no-telegram']) {
+        await postRunNotifications(notices.length ? ['RWA Sonar redemption observer', ...notices].join('\n') : null,
+            { env, failures: failed.map(slug => `${slug}: ${data.issuers[slug]?.lastScan?.error ?? 'scan failed'}`), label: 'RWA Sonar redemption observer' });
     } else if (notices.length) for (const line of notices) log(`notice | ${line}`);
     if (failed.length) {
         logError(`observe-redemptions: run NOT successful — failed: ${failed.join(', ')}`);
