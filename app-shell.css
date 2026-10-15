@@ -1,32 +1,27 @@
-/* Shared application shell for the stock workspace and its specialist research tools.
-   The palette deliberately avoids the familiar neon-green-on-black crypto dashboard look:
-   warm paper carries the reading surfaces, cobalt marks navigation, coral marks attention,
-   amber marks uncertainty, and green is reserved for an actual healthy state. */
-/* The one palette. Every page links this file and its own stylesheet aliases these tokens instead of
-   carrying a copy, so light and dark mode match across page families. The UI roles built from them
-   (buttons, toggles, links, eyebrows, headings, focus) are listed in README.md, "UI roles". */
+/* Honest Joe: warm paper, leaf-green navigation, and separate evidence status colors.
+   The shared palette applies to every report and research tool. */
 :root {
-    --rwa-ink: #172033;
-    --rwa-muted: #5d677b;
-    --rwa-paper: #f4f1e9;
-    --rwa-panel: #fffdf8;
-    --rwa-sunken: #eceff8;
-    --rwa-line: #d8d1c3;
+    --rwa-ink: #253a28;
+    --rwa-muted: #64715b;
+    --rwa-paper: #f8f6e9;
+    --rwa-panel: #fffef6;
+    --rwa-sunken: #edf1df;
+    --rwa-line: #d5dcc4;
     /* Borders of inputs and buttons: darker than --rwa-line so a control reads as a control. */
-    --rwa-control-line: #b8b1a4;
-    --rwa-cobalt: #3154d8;
-    --rwa-cobalt-dark: #203a9f;
-    --rwa-cobalt-soft: #e7ebff;
+    --rwa-control-line: #a1b08a;
+    --rwa-cobalt: #397443;
+    --rwa-cobalt-dark: #275a32;
+    --rwa-cobalt-soft: #e5eed6;
     /* Text on a cobalt fill; the cobalt turns light in dark mode, so this turns dark. */
     --rwa-on-accent: #ffffff;
-    --rwa-coral: #dd625b;
+    --rwa-coral: #c6744d;
     /* Coral for small text: --rwa-coral itself is 3.4:1 on paper, under WCAG AA. */
-    --rwa-coral-text: #a73532;
-    --rwa-amber: #9b5c08;
-    --rwa-green: #27735b;
-    --rwa-red: #a83e48;
-    --rwa-shadow: 0 22px 64px rgba(34, 45, 76, .12);
-    /* "New": the yellow that flags a new feature (the NEW badge, the planet links). */
+    --rwa-coral-text: #984329;
+    --rwa-amber: #986116;
+    --rwa-green: #27704b;
+    --rwa-red: #ac3e36;
+    --rwa-shadow: 0 22px 64px rgba(49, 70, 31, .09);
+    /* "New": the yellow that flags a new feature (the NEW badge, the fields links). */
     --rwa-new: #f5b800;
     --rwa-new-soft: #fff4c7;
     --rwa-new-line: #e2b33a;
@@ -41,23 +36,23 @@
 }
 
 :root:where([data-theme="dark"]) {
-    --rwa-ink: #f4f1e9;
-    --rwa-muted: #aeb5c7;
-    --rwa-paper: #192033;
-    --rwa-panel: #252d43;
-    --rwa-sunken: #20283b;
-    --rwa-line: #424b66;
-    --rwa-control-line: #59637f;
-    --rwa-cobalt: #91a6ff;
-    --rwa-cobalt-dark: #b9c6ff;
-    --rwa-cobalt-soft: #303a59;
-    --rwa-on-accent: #172033;
-    --rwa-coral: #ff7a72;
-    --rwa-coral-text: #ff9b94;
-    --rwa-amber: #f0b34d;
-    --rwa-green: #75c7a6;
-    --rwa-red: #ff8992;
-    --rwa-shadow: 0 24px 70px rgba(5, 10, 25, .32);
+    --rwa-ink: #f8f6e9;
+    --rwa-muted: #b8c5a6;
+    --rwa-paper: #1c2a20;
+    --rwa-panel: #283a2b;
+    --rwa-sunken: #223126;
+    --rwa-line: #465940;
+    --rwa-control-line: #657959;
+    --rwa-cobalt: #a6cd83;
+    --rwa-cobalt-dark: #c2dfa0;
+    --rwa-cobalt-soft: #364e32;
+    --rwa-on-accent: #253a28;
+    --rwa-coral: #f5ae7d;
+    --rwa-coral-text: #f0b793;
+    --rwa-amber: #eec775;
+    --rwa-green: #8bc99a;
+    --rwa-red: #f4a293;
+    --rwa-shadow: 0 24px 70px rgba(8, 20, 11, .25);
     --rwa-new: #facc15;
     --rwa-new-soft: #3a3421;
     --rwa-new-line: #8f7426;
@@ -136,60 +131,16 @@ h1 { font-family: var(--rwa-display); font-weight: 500; }
     white-space: nowrap;
 }
 
-/* The sonar wedge is a conic gradient whose start angle is a registered property, so it can
-   turn: the mark sweeps once on load (below) and rests in the top-right quadrant like the SVG logo. */
-@property --sonar-sweep {
-    syntax: "<angle>";
-    inherits: false;
-    initial-value: 0deg;
-}
-
 .app-brand-mark {
-    position: relative;
-    width: 34px;
-    height: 34px;
-    border: 2px solid var(--rwa-cobalt);
-    border-radius: 50%;
-    background: conic-gradient(from var(--sonar-sweep), color-mix(in srgb, var(--rwa-cobalt) 24%, transparent) 0deg 90deg, transparent 90deg) padding-box;
+    flex: none;
+    width: 42px;
+    height: 42px;
+    background: url('./images/honest-joe/hat.svg') center / contain no-repeat;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-    .app-brand-mark { animation: brand-sonar-sweep 1.4s cubic-bezier(.3, .1, .2, 1) .2s 1 both; }
-    .app-brand-mark::after { animation: brand-sonar-blip .9s ease-out 1.45s 1 both; }
-}
-
-@keyframes brand-sonar-sweep {
-    from { --sonar-sweep: -360deg; }
-    to { --sonar-sweep: 0deg; }
-}
-
-@keyframes brand-sonar-blip {
-    0% { transform: scale(1); }
-    35% { transform: scale(2); opacity: .55; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.app-brand-mark::before {
-    content: "";
-    position: absolute;
-    inset: 7px;
-    border: 1px solid color-mix(in srgb, var(--rwa-cobalt) 42%, transparent);
-    border-radius: 50%;
-}
-
-.app-brand-mark::after {
-    content: "";
-    position: absolute;
-    top: 6px;
-    right: 4px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--rwa-coral);
-}
-
-/* The planet link's copy in the Research menu, shown only when the row has no room (under 400 px). */
-.app-nav .planets-compact { display: none; }
+.app-brand { font-family: var(--rwa-display); font-size: 1.4rem; letter-spacing: -.04em; }
+/* The fields are another way to explore the same research. */
+/* The fields link's copy in the Research menu, shown only when the row has no room (under 400 px). */
+.app-nav .fields-compact { display: none; }
 
 /* NEW: the badge that flags a new feature, on every page family. */
 .badge-new {
@@ -204,23 +155,23 @@ h1 { font-family: var(--rwa-display); font-weight: 500; }
     text-transform: uppercase;
 }
 
-/* The way into the universe view beside the logo: a NEW badge and a ringed planet. The auto margin
+/* The way into the universe view beside the logo: a NEW badge and a field icon. The auto margin
    keeps it next to the brand while the nav stays at the right end of the row. */
-.app-planets {
+.app-fields {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     margin-right: auto;
     padding: 3px 8px 3px 4px;
-    border: 1px solid var(--rwa-new-line);
+    border: 1px solid var(--rwa-line);
     border-radius: 999px;
-    background: var(--rwa-new-soft);
+    background: var(--rwa-cobalt-soft);
     text-decoration: none;
 }
-.app-planets:hover { border-color: var(--rwa-new); }
-.app-planets-icon { width: 22px; height: 22px; }
-.app-planets-icon .planet { fill: var(--rwa-new); }
-.app-planets-icon .ring { fill: none; stroke: var(--rwa-ink); stroke-width: 1.6; }
+.app-fields:hover { border-color: var(--rwa-new); }
+.app-fields-icon { width: 22px; height: 22px; }
+.app-fields-icon .field { fill: var(--rwa-cobalt-soft); stroke: var(--rwa-cobalt); stroke-width: 1.5; }
+.app-fields-icon .crop { fill: none; stroke: var(--rwa-cobalt-dark); stroke-width: 1.7; stroke-linecap: round; }
 
 .app-nav {
     display: flex;
@@ -324,7 +275,7 @@ body.app-page {
     --link-color: var(--rwa-cobalt-dark);
     --card-bg: var(--rwa-panel);
     --sunken-bg: var(--rwa-sunken);
-    --header-bg: #e8e4da;
+    --header-bg: #e6ebd5;
     --header-text: var(--rwa-ink);
     --accent: var(--rwa-cobalt);
     /* Text on an accent-filled button; the accent turns light in dark mode. */
@@ -338,7 +289,7 @@ body.app-page {
     margin: 0;
     padding: 0 0 64px;
     background:
-        radial-gradient(circle at 88% 0, rgba(49, 84, 216, .11), transparent 28rem),
+        radial-gradient(circle at 88% 0, rgba(174, 199, 108, .15), transparent 28rem),
         var(--rwa-paper);
     color: var(--rwa-ink);
     font-family: var(--rwa-font);
@@ -349,7 +300,7 @@ body.app-page {
    every app page in dark mode until 2026-09-23. Values match card.css's dark block. */
 :where(html[data-theme="dark"]) body.app-page {
     color-scheme: dark;
-    --header-bg: #2b344b;
+    --header-bg: #344831;
     --sev-warning: #f0875c;
 }
 
@@ -412,9 +363,9 @@ body.app-page {
        a header without a menu (the cards) keeps all four. */
     .app-nav:has(> details) > a:nth-of-type(4) { display: none; }
     .app-nav .nav-compact-only { display: block; }
-    /* The planet link keeps only its planet; the pill's yellow still flags it as new. */
-    .app-planets .badge-new { display: none; }
-    .app-planets { padding: 3px; }
+    /* Narrow headers keep the fields icon and omit its label. */
+    .app-fields .badge-new { display: none; }
+    .app-fields { padding: 3px; }
     /* The theme switch keeps its 32px box but gets a 44px target like the links beside it. */
     .app-header .app-nav > .theme-switch::before { content: ""; position: absolute; inset: -6px 0 -6px -12px; }
     .app-page > :not(.page-header):not(dialog) { width: min(100% - 24px, 1180px); }
@@ -426,10 +377,10 @@ body.app-page {
 @media (max-width: 400px) {
     .app-header { gap: 14px; }
     .app-nav { gap: 10px; }
-    /* No room left for the planet link in the row: its copy heads the Research menu instead. */
-    .app-header .app-planets { display: none; }
+    /* No room left for the fields link in the row: its copy heads the Research menu instead. */
+    .app-header .app-fields { display: none; }
     .app-header .app-brand { margin-right: auto; }
-    .app-nav .planets-compact { display: block; }
+    .app-nav .fields-compact { display: block; }
 }
 
 /* Too narrow for the brand, the links, the menu and the theme switch in one row (under 360px): the
@@ -562,3 +513,11 @@ body.app-page {
 .event-title { color: var(--rwa-ink); font-size: .86rem; font-weight: 650; line-height: 1.38; text-decoration: none; overflow-wrap: anywhere; }
 .event-title:hover, .event-title:focus-visible { color: var(--rwa-cobalt-dark); text-decoration: underline; }
 .event-empty { color: var(--rwa-muted); font-size: .8rem; }
+
+/* Quiet farm detail on the shared reading surfaces. */
+.app-header { border-bottom-color: var(--rwa-line); }
+.app-fields { color: var(--rwa-cobalt-dark); font-size: .72rem; font-weight: 750; gap: 6px; }
+.app-fields > span { padding-right: 3px; }
+.app-fields:hover { border-color: var(--rwa-cobalt); }
+.app-page > .page-header { background-color: transparent; }
+@media (max-width: 720px) { .app-fields > span { display: none; } }

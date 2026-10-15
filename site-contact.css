@@ -88,7 +88,7 @@ body > .site-contact {
     max-width: none;
     margin: 0;
     padding: 24px max(16px, calc((100vw - 1080px) / 2)) 96px; /* clears the deck's fixed controls */
-    background: #172033;
+    background: #294832;
     color: #e8ecf8;
 }
 

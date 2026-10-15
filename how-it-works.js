@@ -1,4 +1,4 @@
-/* The observatory UI: render the retained monitoring inventory and animate a labelled schedule simulation. */
+/* The research farm UI: render the retained monitoring inventory and animate a labelled schedule simulation. */
 (function () {
     'use strict';
     const M = window.__rwaMonitoringMap;
@@ -44,7 +44,7 @@
         $('issuerSelect').value = filters.issuer; $('issuerSelect').disabled = false;
         $('sourceSearch').disabled = false; $('stateSelect').disabled = false;
         document.querySelectorAll('[data-view]').forEach((button) => { button.disabled = false; });
-        $('categoryFilters').innerHTML = '<button type="button" data-category="all">All missions</button>' + M.CATEGORIES.map((c) =>
+        $('categoryFilters').innerHTML = '<button type="button" data-category="all">All checks</button>' + M.CATEGORIES.map((c) =>
             `<button type="button" data-category="${c.id}" style="--category-color:${c.color}"><span class="category-dot" aria-hidden="true"></span>${c.label}</button>`).join('');
     }
     function refresh() {
@@ -82,7 +82,6 @@
         canvas.width = width * dpr; canvas.height = height * dpr;
         if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const svg = $('networkSvg'); svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        const grad = M.CATEGORIES.map((c) => `<radialGradient id="planet-${c.id}" cx="28%" cy="25%" r="78%"><stop offset="0" stop-color="#f2f0e3"/><stop offset=".2" stop-color="${c.color}"/><stop offset=".8" stop-color="${c.color}" stop-opacity=".25"/><stop offset="1" stop-color="#14202f"/></radialGradient>`).join('');
         const paths = nodes.map((node) => {
             const color = category(node.category).color;
             const { start, bend } = node;
@@ -96,7 +95,7 @@
             const selected = selectedSource === node.id;
             return `<g class="source-node${selected ? ' is-selected' : ''}" data-source="${escape(node.id)}" transform="translate(${node.x} ${node.y})" role="button" tabindex="0" aria-label="${escape(node.label)}, ${node.routes.length} routes, ${node.issuerIds.length} issuer or product scopes" aria-pressed="${selected}">`
                 + `<circle class="node-hit" r="${Math.max(node.radius + 8, 13)}"/><circle class="node-halo" r="${node.radius + 5}" stroke="${category(node.category).color}"/>`
-                + `<circle r="${node.radius}" fill="url(#planet-${node.category})" stroke="${category(node.category).color}" stroke-opacity=".3" stroke-width=".7"/></g>`;
+                + `<rect class="source-plot" x="${-node.radius}" y="${-node.radius}" width="${node.radius*2}" height="${node.radius*2}" rx="3" stroke="${category(node.category).color}"/><path d="M0 ${node.radius*.5}V${-node.radius*.45}m0 ${node.radius*.6}l${-node.radius*.4} ${-node.radius*.3}m${node.radius*.4} ${node.radius*.05}l${node.radius*.4} ${-node.radius*.3}" fill="none" stroke="${category(node.category).color}" stroke-width="1.2"/></g>`;
         }).join('');
         const sourceLabels = nodes.filter((node) => labels.has(node.id)).map((node) => {
             const label = labels.get(node.id);
@@ -109,7 +108,7 @@
             return `<g class="issuer-node${filters.issuer === issuer.id ? ' is-selected' : ''}" data-issuer="${escape(issuer.id)}" transform="translate(${x} ${y})" role="button" tabindex="0" aria-label="Follow ${escape(issuer.label)}"><circle class="node-hit" r="9" style="fill:transparent;stroke:none"/><circle r="${filters.issuer === issuer.id ? 4.5 : 2.7}"/></g>`;
         }).join('');
         const station = F.stationSvg(layout);
-        svg.innerHTML = `<defs>${grad}<radialGradient id="station-glow"><stop stop-color="#76c5d6" stop-opacity=".2"/><stop offset="1" stop-color="#76c5d6" stop-opacity="0"/></radialGradient></defs>`
+        svg.innerHTML = `<defs><radialGradient id="station-glow"><stop stop-color="#76c5d6" stop-opacity=".2"/><stop offset="1" stop-color="#76c5d6" stop-opacity="0"/></radialGradient></defs>`
             + `<ellipse class="orbit-ring" cx="${center.x}" cy="${center.y}" rx="${Math.max(90, width / 2 - 75)}" ry="${height / 2 - 63}"/>`
             + `<ellipse class="orbit-ring" cx="${center.x}" cy="${center.y}" rx="${orbitRadius}" ry="${orbitRadius * .77}"/>${paths}${sourceNodes}${issuerNodes}${station}${sourceLabels}`;
         if (focusId) svg.querySelector(`[data-${focusKind}="${CSS.escape(focusId)}"]`)?.focus({ preventScroll: true });
@@ -124,11 +123,11 @@
             if (selectedSource && flight.node.id !== selectedSource) continue;
             const pose = F.shipPose(flight, time, secondsPerHour);
             if (!pose) continue;
-            ctx.save(); ctx.translate(pose.x, pose.y); ctx.rotate(pose.angle);
+            ctx.save(); ctx.translate(pose.x, pose.y); ctx.scale(Math.cos(pose.angle) < 0 ? -1 : 1, 1);
             ctx.globalAlpha = selectedSource ? .8 : .42; ctx.strokeStyle = flight.color; ctx.lineWidth = .85;
             ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-20, 0); ctx.stroke();
             ctx.globalAlpha = selectedSource ? 1 : .88;
-            const shipWidth = selectedSource ? 25 : 22, shipHeight = shipWidth * shipSprite.naturalHeight / shipSprite.naturalWidth;
+            const shipWidth = selectedSource ? 29 : 25, shipHeight = shipWidth * shipSprite.naturalHeight / shipSprite.naturalWidth;
             ctx.drawImage(shipSprite, -shipWidth / 2, -shipHeight / 2, shipWidth, shipHeight);
             ctx.restore();
         }

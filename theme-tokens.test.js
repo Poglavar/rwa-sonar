@@ -54,6 +54,6 @@ describe('stocks page tokens (its own :root names, aliased to the shared palette
         expect(stocks).toMatch(/:root\s*\{[^}]*--button-text:\s*var\(--rwa-on-accent\)/);
         const darkBlocks = darkRules(css);
         expect(css).toMatch(/:root\s*\{[^}]*--rwa-on-accent:\s*#ffffff/);
-        expect(darkBlocks).toMatch(/--rwa-on-accent:\s*#172033/);
+        expect(darkBlocks).toMatch(/--rwa-on-accent:\s*#253a28/);
     });
 });

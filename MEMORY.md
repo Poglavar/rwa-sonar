@@ -94,3 +94,5 @@
 - Use a sci-fi research station and tiny research ships for the monitoring map, and put its looping fleet animation behind the homepage hero (user request, 2026-10-02).
 - 2026-10-08: Securitize Stocks CETs are a separate programme from SECZ: beneficial share ownership travels through an Article 8 entitlement recorded on broker books, with documented conversion/DRS distinct from cash redemption. Formation is recorded as the Orca/Loopscale organizational combination, without implying a protocol or contract migration.
 - 2026-10-08: Source monitoring reads DOCX agreements as visible document text, including tables and notes; changing an older binary baseline to extracted text does not raise a legal-terms change.
+
+- 2026-10-09: The hackathon is over. Retire its branch/worktree after preserving local files; main is the repository default. Replace the dark space/ice/dolphin theme with a sunny green farm and humorous Honest Joe artwork. Keep research evidence readable and separate from the metaphor.

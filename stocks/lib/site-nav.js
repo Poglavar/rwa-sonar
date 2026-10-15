@@ -48,10 +48,10 @@
     const esc = (value) => String(value).replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
     /** Cache-busting stamps for theme.js and its icon sprite. Bump when the file changes. */
-    const THEME_JS_VERSION = '20260924y';
-    const THEME_ICONS_VERSION = '20260924y';
+    const THEME_JS_VERSION = '20261009a';
+    const THEME_ICONS_VERSION = '20261009a';
     /** What the switch says before theme.js has read the stored choice (it relabels on load). */
-    const THEME_LABEL = 'Theme: Auto (follows your device)';
+    const THEME_LABEL = 'Theme: Light';
 
     /**
      * theme.js, synchronous, for the <head> of every page BEFORE its first stylesheet: it sets
@@ -71,20 +71,11 @@
         return `<button class="theme-switch" type="button" aria-label="${THEME_LABEL}" title="${THEME_LABEL}">`
             + `<svg class="theme-icon" aria-hidden="true" focusable="false">${use('auto')}${use('light')}${use('dark')}</svg></button>`;
     }
-    /**
-     * The way into the universe view (universe.html), beside the logo: a NEW badge and a ringed planet
-     * (the ring's back half, the planet over it, then the ring's front half, so the ring goes round).
-     * On a phone the row has no room for it: app-shell.css shows the planet alone under 720 px and,
-     * under 400 px, swaps it for the "See as planets" copy at the top of the Research menu.
-     */
-    const PLANETS_LABEL = 'New: see every tokenized stock as a planet';
-    const PLANETS_HTML = (root) => `<a class="app-planets" href="${root}universe.html" aria-label="${PLANETS_LABEL}" title="${PLANETS_LABEL}">`
-        + '<span class="badge-new">New</span>'
-        + '<svg class="app-planets-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
-        + '<g transform="rotate(-20 12 12)"><path class="ring" d="M1 12a11 3.6 0 0 1 22 0"/><circle class="planet" cx="12" cy="12" r="6.2"/>'
-        + '<path class="ring" d="M23 12a11 3.6 0 0 1-22 0"/></g></svg></a>';
+    /** A field map of the tokens and the structures they share. */
+    const FIELDS_HTML = (root) => `<a class="app-fields" href="${root}universe.html" aria-label="Explore the token fields" title="Explore the token fields">`
+        + '<svg class="app-fields-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="field" d="M3 10 12 5l9 5v10H3Z"/><path class="crop" d="M7 17v-5m0 3-2-2m2 1 2-2m4 5v-7m0 4-2-2m2 1 2-2m3 6v-5"/></svg><span>The fields</span></a>';
 
-    const THEME_MENU_HTML ='<button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Auto</span></button>';
+    const THEME_MENU_HTML ='<button class="theme-switch theme-switch-menu" type="button">Theme: <span class="theme-switch-state">Light</span></button>';
 
     /**
      * The header for a page `root` ('./' or '../') whose own nav entry is `current` (an href from
@@ -104,13 +95,13 @@
         const inMenu = RESEARCH.some((item) => item.href === current);
         const learn = PRIMARY.find((item) => item.href === 'learn/');
         return `<header class="app-header">`
-            + `<a class="app-brand" href="${root}index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>RWA Sonar</span></a>`
-            + PLANETS_HTML(root)
+            + `<a class="app-brand" href="${root}index.html"><span class="app-brand-mark" aria-hidden="true"></span><span>Honest Joe</span></a>`
+            + FIELDS_HTML(root)
             + `<nav class="app-nav" aria-label="Site navigation">`
             + PRIMARY.map((item) => link(item)).join('')
             + `<details class="app-nav-menu"><summary${inMenu ? ' aria-current="page"' : ''}>${MENU_LABEL}</summary><div>`
             + link(learn, 'nav-compact-only')
-            + `<a class="planets-compact" href="${root}universe.html"><span class="badge-new">New</span> See as planets</a>`
+            + `<a class="fields-compact" href="${root}universe.html">Explore the token fields</a>`
             + RESEARCH.map((item) => link(item)).join('')
             + THEME_MENU_HTML
             + `</div></details>${themeSwitchHtml(root)}</nav></header>`;

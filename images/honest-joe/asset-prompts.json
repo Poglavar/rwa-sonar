@@ -1,0 +1,14 @@
+{
+  "mode": "built-in image_gen",
+  "reference": "reference-comic.webp",
+  "assets": [
+    {
+      "file": "joe-and-friends.webp",
+      "prompt": "Use case: identity-preserve / illustration-story.\nAsset type: transparent website hero illustration for Honest Joe, a plain-speaking tokenization research guide.\nReference image: keep the exact illustrated character identity and funny deadpan ink-comic style of the supplied farmer: stocky elderly farmer, oversized pink nose, thick gray eyebrows and beard, battered straw hat, cream shirt, blue denim overalls and muddy work boots.\nCreate a NEW full-body composition, isolated on a genuinely transparent background. Joe stands on the left of the composition, one eyebrow raised, holding an open little paperwork ledger in one hand and a small gold token with a cow silhouette in his other hand. Beside him on the right stands an actual friendly, slightly goofy black-and-white dairy cow, looking sideways at the token with a knowing expression. A little rust-red hen stands near his boots. All three subjects fit completely with generous breathing room, no cropping. Just a few tiny grass tufts under their feet, no ground rectangle, no barn, no landscape, no shadow rectangle.\nSunny warm colors, leafy green accents, thick slightly wobbly charcoal outlines, subtle print texture, editorial comic charm, funny but competent. Simple readable silhouettes, two human arms and two hands only, natural animal anatomy.\nNo letters, no text, no captions, no speech bubbles, no logos, no watermarks. Wide 3:2 composition."
+    },
+    {
+      "file": "joe-inspects.webp",
+      "prompt": "Use case: identity-preserve. Asset type: transparent small website mascot illustration. Keep the exact funny stocky farmer identity and thick hand-inked comic style from the reference: gray beard, very large pink nose, bushy eyebrows, battered straw hat, cream shirt, blue denim overalls, muddy boots. Draw Joe alone, complete full body with plenty of margin, inspecting a paper document with a little magnifying glass, one skeptical raised eyebrow and an amused confident expression. Exactly two arms and two hands. Clean readable silhouette, simple warm sunny colors, subtle print texture, no background, no objects behind him, no gradients behind the silhouette, no floor rectangle. Genuinely transparent background. No text, no letters, no captions or speech bubbles."
+    }
+  ]
+}

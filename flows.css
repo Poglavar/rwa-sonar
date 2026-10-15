@@ -3,7 +3,7 @@
    steps were checked with the dataviz palette validator (CVD ΔE ≥ 19 in both modes). */
 
 body.app-page {
-    --fl-created: #3154d8;
+    --fl-created: var(--rwa-cobalt);
     --fl-redeemed: #dd625b;
     --fl-inventory: #b9b2a4;
     --fl-cov-full: #7d8699;

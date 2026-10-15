@@ -10,9 +10,9 @@
 .research-spot-wrap > .research-spot { max-width: 100%; }
 .learn-hero { grid-template-columns: minmax(0, 1fr) 230px; }
 .learn-hero .research-spot { max-width: 230px; }
-/* The patrol dolphin's sonar ring (motion.css) swells to 1.45x the dolphin before it settles, so the
-   dolphin sits centred in a column 1.45x its width and the ring never leaves the hero: a column
-   only as wide as the dolphin let the ring past the right edge and made a phone page scroll. */
+/* The watchful farmer's notification ring (motion.css) swells to 1.45x the farmer before it settles, so the
+   farmer sits centred in a column 1.45x its width and the ring never leaves the hero: a column
+   only as wide as the farmer let the ring past the right edge and made a phone page scroll. */
 .watch-intro { grid-template-columns: minmax(0, 1fr) 190px; padding: 42px 0 58px; border-bottom: 1px solid var(--line, var(--panel-border, #d9d2c6)); }
 .watch-intro .research-spot-wrap { width: 130px; justify-self: center; }
 .watch-intro h1 { max-width: none; margin: 0 0 .32em; font-size: clamp(2.4rem, 4.5vw, 4.4rem); }
@@ -35,3 +35,7 @@
     .research-spot-wrap > .research-spot { width: 100%; }
     .watch-intro .research-spot-wrap { width: 76px; justify-self: center; }
 }
+
+/* Joe stays a small guide beside the research, with room for the actual evidence. */
+.research-hero-art img { max-height: 330px; }
+.research-spot, .research-spot-wrap { max-width: 115px; }

@@ -1064,7 +1064,7 @@ function head({ title, description, pageUrl, version, ogTitleText, image = null,
         + '<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />\n'
         + siteNav.themeScriptHtml('../') + '\n'
         + seoHeadTags({ title, description, socialTitle: ogTitleText, url: pageUrl, type: 'article', image, jsonLd, sep: '\n' }) + '\n'
-        + '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />\n'
+        + '<link rel="icon" type="image/svg+xml" href="../images/honest-joe/hat.svg" />\n'
         + `<link rel="stylesheet" href="../app-shell.css${v}" /><link rel="stylesheet" href="../templates.css${v}" /><link rel="stylesheet" href="../weekly.css${v}" />${contactStylesheet('../')}</head><body>\n`
         + siteNav.siteHeaderHtml('../', 'weekly/latest.html') + '\n';
 }

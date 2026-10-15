@@ -10,8 +10,8 @@
     --trk-s1: #2a78d6; --trk-s2: #eb6834; --trk-s3: #1baf7a; --trk-s4: #eda100;
     --trk-s5: #e87ba4; --trk-s6: #008300; --trk-s7: #4a3aa7; --trk-s8: #e34948;
     --trk-other: #8a8f99;
-    --trk-band: rgba(49, 84, 216, .07);
-    --trk-band-holiday: rgba(49, 84, 216, .14);
+    --trk-band: rgba(134, 170, 75, .07);
+    --trk-band-holiday: rgba(134, 170, 75, .14);
     --trk-corner: rgba(168, 62, 72, .09);
     --trk-grid: rgba(23, 32, 51, .1);
 }

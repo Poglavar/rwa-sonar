@@ -21,9 +21,9 @@ describe('mode logic', () => {
         expect(resolveTheme('dark', false)).toBe('dark');
     });
 
-    test('nothing stored, or anything unrecognised, is Auto', () => {
-        for (const value of [null, undefined, '', 'Dark', 'sepia', 42]) expect(normalizeMode(value)).toBe('auto');
-        expect(resolveTheme(null, true)).toBe('dark');
+    test('new visitors start in sunshine, regardless of the device theme', () => {
+        for (const value of [null, undefined, '', 'Dark', 'sepia', 42]) expect(normalizeMode(value)).toBe('light');
+        expect(resolveTheme(null, true)).toBe('light');
         expect(resolveTheme('sepia', false)).toBe('light');
     });
 
@@ -32,7 +32,7 @@ describe('mode logic', () => {
         expect(nextMode('auto')).toBe('light');
         expect(nextMode('light')).toBe('dark');
         expect(nextMode('dark')).toBe('auto');
-        expect(nextMode(null)).toBe('light');
+        expect(nextMode(null)).toBe('dark');
     });
 
     test('the label names the mode, and Auto says it follows the device', () => {
@@ -95,7 +95,7 @@ describe('browser wiring', () => {
     });
 
     test('Auto follows a live device change; a forced theme does not', () => {
-        const auto = boot({ systemDark: true });
+        const auto = boot({ stored: 'auto', systemDark: true });
         expect([auto.mode(), auto.theme()]).toEqual(['auto', 'dark']);
         auto.systemChange(false);
         expect(auto.theme()).toBe('light');
@@ -104,14 +104,14 @@ describe('browser wiring', () => {
         expect(forced.theme()).toBe('dark');
     });
 
-    test('a click on either switch cycles the mode and remembers it; Auto clears the memory', () => {
-        const page = boot({ systemDark: true });
+    test('a click on either switch cycles the mode and remembers Auto explicitly', () => {
+        const page = boot({ stored: 'auto', systemDark: true });
         page.click();
         expect([page.mode(), page.theme(), page.stored()]).toEqual(['light', 'light', 'light']);
         page.click();
         expect([page.mode(), page.theme(), page.stored()]).toEqual(['dark', 'dark', 'dark']);
         page.click();
-        expect([page.mode(), page.theme(), page.stored()]).toEqual(['auto', 'dark', null]);
+        expect([page.mode(), page.theme(), page.stored()]).toEqual(['auto', 'dark', 'auto']);
         page.click(page.outside);
         expect(page.mode()).toBe('auto');
         expect(page.labels()).toEqual(['Theme: Auto (follows your device)', 'Theme: Auto (follows your device)']);
@@ -131,9 +131,9 @@ describe('browser wiring', () => {
 
     test('storage that throws on every access still gives a theme and a working switch', () => {
         const page = boot({ storage: 'throws', systemDark: true });
-        expect(page.theme()).toBe('dark');
-        expect(() => page.click()).not.toThrow();
         expect(page.theme()).toBe('light');
+        expect(() => page.click()).not.toThrow();
+        expect(page.theme()).toBe('dark');
     });
 });
 
@@ -166,7 +166,7 @@ describe('the theme is the attribute, not the media query', () => {
 
     test('dark rules key on data-theme with the specificity they had', () => {
         const shell = read('app-shell.css');
-        expect(shell).toContain(':root:where([data-theme="dark"]) {\n    --rwa-ink: #f4f1e9;');
+        expect(shell).toContain(':root:where([data-theme="dark"]) {\n    --rwa-ink: #f8f6e9;');
         expect(shell).toContain(':where(html[data-theme="dark"]) body.app-page {');
         expect(shell).toMatch(/:root\[data-theme="dark"\] \{ color-scheme: dark; \}/);
     });
@@ -185,7 +185,7 @@ function expectThemeFirst(html, root) {
 /** The header carries the icon switch in its row and the text copy in its Research menu. */
 function expectSwitch(html) {
     const header = (html.match(/<header class="app-header">[\s\S]*?<\/header>/) || [''])[0];
-    expect(header).toContain('<button class="theme-switch" type="button" aria-label="Theme: Auto (follows your device)"');
+    expect(header).toContain('<button class="theme-switch" type="button" aria-label="Theme: Light"');
     expect(header).toContain('<button class="theme-switch theme-switch-menu" type="button">');
     expect(header).toMatch(/images\/theme-icons\.svg\?v=\d{8}[a-z]#auto/);
 }

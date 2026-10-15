@@ -140,7 +140,7 @@ describe('watch patrol contact', () => {
 
     test('the text equivalent starts empty in a status region, beside the ring it describes', () => {
         const html = read('watch.html');
-        expect(html).toMatch(/<span id="patrolSpot" class="research-spot-wrap"><img class="research-spot dolphin-bob"[^>]*><span class="sonar-ping" aria-hidden="true"><\/span><\/span>/);
+        expect(html).toMatch(/<span id="patrolSpot" class="research-spot-wrap"><img class="research-spot joe-idle"[^>]*><span class="sonar-ping" aria-hidden="true"><\/span><\/span>/);
         expect(html).toMatch(/<p id="patrolContact" class="visually-hidden" role="status"><\/p>/);
     });
 });

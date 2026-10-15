@@ -886,13 +886,13 @@ describe('every real card', () => {
         }
     });
 
-    it('links each card to its own planet in the universe view, marked new', () => {
+    it('links each card to its own token field', () => {
         for (const { card, html } of rendered) {
-            const link = html.match(/<a class="planet-link" href="([^"]+)">(.*?)<\/a>/);
+            const link = html.match(/<a class="field-link" href="([^"]+)">(.*?)<\/a>/);
             expect(link?.[1]).toBe(`../universe.html#*/@${encodeURIComponent(card.slug)}`);
-            expect(link[2]).toContain('<span class="badge-new">New</span>');
+            expect(link[2]).toBe('Explore its field →');
             // In the page header, not buried further down the card.
-            expect(html.indexOf('class="planet-link"')).toBeLessThan(html.indexOf('</header>', html.indexOf('<header class="card-head">')));
+            expect(html.indexOf('class="field-link"')).toBeLessThan(html.indexOf('</header>', html.indexOf('<header class="card-head">')));
         }
     });
 

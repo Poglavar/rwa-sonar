@@ -13,9 +13,9 @@
     --green: var(--rwa-green);
     --shadow: var(--rwa-shadow);
     /* The dark bands (research story, follow, workspace call): navy in both themes. */
-    --band-bg: #172033;
-    --band-text: #c9d0de;
-    --band-accent: #b9c6ff;
+    --band-bg: #294832;
+    --band-text: #e0e8ca;
+    --band-accent: #f1d47b;
 }
 
 * { box-sizing: border-box; }
@@ -23,8 +23,8 @@ html { scroll-behavior: smooth; }
 body {
     margin: 0;
     background:
-        radial-gradient(circle at 82% 8%, rgba(49, 84, 216, 0.13), transparent 27rem),
-        linear-gradient(180deg, #fbfaf6 0, var(--paper) 38rem);
+        radial-gradient(circle at 82% 8%, rgba(192, 213, 126, 0.2), transparent 27rem),
+        linear-gradient(180deg, var(--paper) 0, var(--paper) 38rem);
     color: var(--ink);
 }
 a { color: inherit; }
@@ -34,22 +34,6 @@ main, footer { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
 
 /* Starts close under the header rule: the hero used to centre itself in a 650 px box below a 68 px pad. */
 .hero { display: grid; grid-template-columns: minmax(0, .88fr) minmax(460px, 1.12fr); align-items: start; gap: 72px; padding: 28px 0 72px; }
-/* A decorative fleet behind the existing stock search and comparison. */
-.hero[data-research-hero] { position: relative; isolation: isolate; padding-top: 38px; }
-.research-backdrop { position: absolute; z-index: -1; top: 0; bottom: 24px; left: min(-20px, calc((1180px - 100vw) / 2)); right: min(-20px, calc((1180px - 100vw) / 2)); overflow: hidden; background: #071323; }
-.research-backdrop video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.research-backdrop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,19,35,.82), rgba(7,19,35,.22) 75%), linear-gradient(0deg, rgba(7,19,35,.38), transparent 45%); }
-.hero[data-research-hero] .hero-copy { color: #f0f4ff; }
-.hero[data-research-hero] .hero-copy > .eyebrow { color: #c4d0f3; }
-.hero[data-research-hero] h1 span { color: #abbcff; }
-.hero[data-research-hero] .hero-lede, .hero[data-research-hero] .hero-proof { color: #c4d0e2; }
-.hero[data-research-hero] #snapshotTokens { color: #f0f4ff; }
-.hero[data-research-hero] .hero-actions .button { background: rgba(19,37,65,.94); color: #eef3ff; border-color: #7386b0; }
-.hero[data-research-hero] .hero-actions .button-primary { background: #4764df; border-color: #8096ff; }
-.hero[data-research-hero] .hero-actions .button-planets { border-color: #cbb576; }
-.hero[data-research-hero] .hero-actions .button:hover { background: #294671; }
-.research-backdrop-toggle { position: absolute; right: 0; top: 6px; z-index: 1; min-height: 28px; padding: 4px 10px; border: 1px solid #65768e; border-radius: 20px; background: #0d1b2de8; color: #d3deef; font: inherit; font-size: .65rem; cursor: pointer; }
-.research-backdrop-toggle[hidden] { display: none; }
 h1, h2, h3, p { text-wrap: pretty; }
 h1 { margin: 0; max-width: 680px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.4rem, 6.5vw, 6.1rem); font-weight: 500; letter-spacing: -.065em; line-height: .94; }
 h1 span { color: var(--violet); }
@@ -57,10 +41,8 @@ h1 span { color: var(--violet); }
 .hero-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 12px; margin-top: 30px; }
 /* Equal tiles keep all four entry points aligned, including wrapped labels. */
 .hero-actions .button { min-width: 0; min-height: 56px; padding: 12px 16px; text-align: center; text-wrap: balance; }
-.hero-actions .button-primary { box-shadow: 0 10px 24px rgba(49,84,216,.2); }
+.hero-actions .button-primary { box-shadow: 0 10px 24px rgba(59,104,48,.15); }
 /* The way into the universe view (universe.html), flagged as new. */
-.button-planets { gap: 8px; border-color: var(--rwa-new-line); background: var(--rwa-new-soft); }
-.button-planets:hover { border-color: var(--rwa-new); color: var(--rwa-ink); }
 .hero-proof { display: flex; align-items: flex-start; gap: 8px; margin: 20px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 .hero-proof .live-dot { flex: none; margin-top: .45em; }
 #snapshotTokens { color: var(--ink); font-weight: 800; }
@@ -214,7 +196,7 @@ h1 span { color: var(--violet); }
 .follow-actions { display: grid; gap: 10px; }
 .follow-actions .button:not(.button-primary) { border-color: #59637f; background: transparent; color: white; }
 /* On the navy band the cobalt fill keeps white text in both themes. */
-.follow-actions .button-primary, .workspace-cta .button-primary { border-color: #3154d8; background: #3154d8; color: #fff; }
+.follow-actions .button-primary, .workspace-cta .button-primary { border-color: var(--rwa-cobalt); background: var(--rwa-cobalt); color: #fff; }
 
 footer { display: flex; justify-content: space-between; gap: 30px; padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); font-size: .72rem; }
 footer p { max-width: 650px; margin: 0; }
@@ -312,7 +294,6 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
    build time; with motion allowed the script scrolls it (.is-scrolling); with reduced motion it is a
    static list of the newest six (.is-static, or the media query / .reduce-motion hook without script). */
 /* Wide screens: the search heads the right column, above the real example (as on a phone). */
-.hero { grid-template-areas: "copy search" "copy preview" "copy events"; }
 @media (min-width: 901px) { .hero { row-gap: 18px; } }
 .hero-copy { grid-area: copy; }
 .comparison-preview { grid-area: preview; align-self: end; }
@@ -331,18 +312,13 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 .latest-events-foot a { color: var(--violet-dark); font-weight: 760; text-decoration: none; }
 .latest-events-foot a:hover, .latest-events-foot a:focus-visible { text-decoration: underline; }
 @media (max-width: 900px) {
-    .hero { grid-template-areas: "copy" "search" "preview" "events"; }
-}
+    }
 /* Phone hero order: the hero text's children join the hero's own column, so the search follows the
    lede and sits in the first screen of a 375×812 phone (inside the example card it was ~1,220 px down,
    measured 25 Sep). Wider screens keep the grid above. */
 @media (max-width: 560px) {
     .hero { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
     .hero-copy { display: contents; }
-    .research-backdrop { left: -12px; right: -12px; }
-    .research-backdrop::after { background: linear-gradient(180deg, rgba(7,19,35,.72), rgba(7,19,35,.46) 45%, rgba(7,19,35,.8)); }
-    .research-backdrop video { height: min(100%, 900px); object-position: center top; }
-    .hero[data-research-hero] #heroTitle { color: #f0f4ff; }
     .hero-copy > .eyebrow { order: 1; }
     #heroTitle { order: 2; }
     .hero-lede { order: 3; }
@@ -370,7 +346,80 @@ footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-:where(html[data-theme="dark"]) body { background: radial-gradient(circle at 82% 8%, rgba(75, 104, 220, .18), transparent 27rem), linear-gradient(180deg, #20283d 0, var(--paper) 38rem); }
+:where(html[data-theme="dark"]) body { background: radial-gradient(circle at 82% 8%, rgba(113, 151, 80, .18), transparent 27rem), linear-gradient(180deg, #243928 0, var(--paper) 38rem); }
 /* The bands sit a step below the dark paper so they still read as bands. */
-:root:where([data-theme="dark"]) { --band-bg: #111827; }
+:root:where([data-theme="dark"]) { --band-bg: #18271d; }
 :where(html[data-theme="dark"]) .positioning-grid article.positioning-primary { background: var(--band-bg); }
+
+/* A sunny front gate, with quiet evidence cards immediately below it. */
+.hero { position: relative; grid-template-columns: 1fr 1fr; grid-template-areas: "copy art" "search art"; gap: 25px 44px; padding: 22px 0 60px; align-items: center; }
+.hero-copy { grid-area: copy; }
+.hero h1 { font-size: clamp(3.6rem, 5.9vw, 5.2rem); letter-spacing: -.058em; line-height: .99; }
+.hero .eyebrow { font-size: .69rem; letter-spacing: .11em; }
+.hero-lede { margin-top: 22px; font-size: 1.02rem; max-width: 47ch; line-height: 1.7; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 23px; }
+.hero-actions .button { min-height: 47px; padding: 11px 17px; font-size: .82rem; border-radius: 10px; }
+.hero-text-link { flex-basis: 100%; margin-top: 5px; font-size: .78rem; color: var(--violet-dark); text-decoration: none; font-weight: 700; }
+.hero-text-link:hover { text-decoration: underline; }
+.hero-proof { max-width: 56ch; font-size: .71rem; }
+.hero-search { box-shadow: none; background: var(--panel); padding: 15px 17px; border-color: var(--line); }
+.farm-hero-art { grid-area: art; position: relative; isolation: isolate; margin: 0 -20px 0 -25px; padding: 72px 0 35px; align-self: center; }
+.farm-hero-art::before { content: ''; position: absolute; z-index: -2; inset: 15px -12px 2px; border-radius: 46% 49% 30% 34%; background: linear-gradient(175deg, #eef0c9 14%, #e5efcb 60%, #bbd18d 60.5%, #dee6af 82%); transform: rotate(-3deg); }
+.farm-hero-art::after { content: ''; position: absolute; z-index: -1; left: 4%; right: 0; bottom: 10%; height: 20%; border-radius: 50%; background: #bad28b; transform: rotate(3deg); }
+.farm-hero-art img { position: relative; display: block; width: 100%; height: auto; z-index: 1; }
+.farm-hero-art figcaption { position: relative; z-index: 2; margin: 16px 0 0; text-align: center; color: #37512c; font: italic 1rem var(--rwa-display); }
+.farm-sun { position: absolute; z-index: -1; top: 9px; right: 12%; width: 108px; height: 108px; border-radius: 50%; background: #f5cb55; box-shadow: 0 0 0 15px #f4d87840, 0 0 0 32px #f4d87822; }
+.farm-cloud { position: absolute; z-index: -1; width: 76px; height: 22px; border-radius: 24px; background: #fffdf3; opacity: .85; }
+.farm-cloud::before { content: ''; position: absolute; width: 37px; height: 37px; left: 15px; bottom: 3px; border-radius: 50%; background: inherit; }
+.cloud-one { left: 4%; top: 45px; }
+.cloud-two { right: 0; top: 138px; transform: scale(.7); }
+.home-evidence { display: grid; grid-template-columns: 1.12fr 1fr; gap: 24px; margin: 0 0 55px; align-items: stretch; }
+.home-evidence > * { grid-area: auto; align-self: stretch; margin: 0; box-shadow: none; }
+.home-evidence .comparison-preview { padding: 25px; }
+.home-evidence .latest-events { padding: 23px; }
+.home-evidence .preview-title-row h2 { font-size: 2rem; }
+.home-evidence .latest-events-viewport { max-height: 20rem; }
+.home-evidence .latest-events.is-scrolling .latest-events-viewport { height: 20rem; }
+.research-story { background: var(--violet-soft); color: var(--ink); gap: 44px; padding: 40px; border: 1px solid var(--line); }
+.research-story-copy .eyebrow, .research-story-copy nav a { color: var(--violet-dark); }
+.research-story-copy > p:not(.eyebrow) { color: var(--muted); }
+.farm-questions { display: grid; gap: 10px; align-content: center; }
+.farm-questions a { display: flex; gap: 16px; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); color: var(--ink); text-decoration: none; }
+.farm-questions a:hover { border-color: var(--violet); }
+.farm-questions a > span { display: grid; place-items: center; flex: 0 0 34px; height: 34px; background: var(--violet-soft); color: var(--violet-dark); border-radius: 50%; font: 700 .75rem var(--rwa-font); }
+.farm-questions h3 { font: 500 1.3rem var(--rwa-display); margin: 2px 0 7px; }
+.farm-questions p { color: var(--muted); margin: 0; font-size: .82rem; line-height: 1.6; }
+footer { justify-content: center; text-align: center; flex-wrap: wrap; }
+footer > p { max-width: 720px; margin: 0; }
+footer nav { justify-content: center; }
+:root[data-theme="dark"] .farm-hero-art::before { background: linear-gradient(175deg, #456045 14%, #496841 60%, #66834f 60.5%, #526b3b 82%); }
+:root[data-theme="dark"] .farm-hero-art::after { background: #667e44; }
+:root[data-theme="dark"] .farm-hero-art figcaption { color: #f2efce; }
+@media (prefers-reduced-motion: no-preference) {
+    :root:not(.reduce-motion) .farm-cloud { animation: farm-cloud-drift 16s ease-in-out infinite alternate; }
+    :root:not(.reduce-motion) .cloud-two { animation-delay: -7s; }
+    :root:not(.reduce-motion) .farm-sun { animation: farm-sun-warmth 9s ease-in-out infinite alternate; }
+    @keyframes farm-cloud-drift { to { translate: 20px 0; } }
+    @keyframes farm-sun-warmth { to { box-shadow: 0 0 0 21px #f4d87840, 0 0 0 41px #f4d87822; } }
+}
+@media (max-width: 900px) {
+    .hero { grid-template-columns: 1.1fr 1fr; gap: 22px; }
+    .hero h1 { font-size: clamp(3rem, 6.5vw, 4.5rem); }
+    .farm-hero-art { margin: 0 -5px; }
+    .home-evidence { grid-template-columns: 1fr; }
+    .research-story { padding: 28px; gap: 26px; }
+}
+@media (max-width: 620px) {
+    .hero { display: grid; grid-template-columns: 1fr; grid-template-areas: "copy" "search" "art"; gap: 22px; padding: 15px 0 36px; }
+    .hero-copy { display: block; }
+    .hero h1 { font-size: clamp(3.3rem, 12.7vw, 4.6rem); }
+    .hero-lede { font-size: .96rem; margin-top: 18px; }
+    .hero .hero-search { margin: 0; }
+    .farm-hero-art { margin: 8px auto 0; width: min(100%, 420px); padding: 50px 0 20px; }
+    .farm-sun { width: 78px; height: 78px; }
+    .farm-hero-art::before { inset-inline: 0; }
+    .home-evidence { gap: 17px; }
+    .home-evidence .comparison-preview, .home-evidence .latest-events { padding: 18px; }
+    .research-story { grid-template-columns: 1fr; padding: 24px 18px; }
+    .farm-questions a { padding: 15px; }
+}

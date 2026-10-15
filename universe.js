@@ -1,11 +1,8 @@
-// The universe view: a walk through what tokenized stocks share. Every stop is a system built round a
-// centre: Solana (all tokens), a token (a planet, with the things it shares as moons on one ring per
-// dimension), or a filter (a moon such as a custodian or a key, with every token that shares it as a
-// planet). Any set of tokens can be grouped on any attribute, and the groups orbit as moons. Clicking
-// a body flies into it and it becomes the next centre. The data are tables (universe-view/index.json);
-// every grouping and lookup is a query in stocks/lib/universe-view-model.js (window.__rwaUniverseView).
-// This file is the three.js scene and the DOM wiring only. ?reduceMotion=1 turns off orbits and flights.
-// three.js is self-hosted (vendor/three/README.md): the site's CSP allows no CDN and no import map.
+// The token fields: planted plots show tokens and their shared structures around a central barn.
+// Search, grouping, evidence and deep links use stocks/lib/universe-view-model.js. Its legacy
+// planet/aspect/filter keys remain stable in saved URLs; the visual metaphor is a farm.
+// Only the camera moves between selections. ?reduceMotion=1 makes those transitions immediate.
+// Three.js is self-hosted because the site's content policy does not permit CDN scripts.
 import * as THREE from './vendor/three/0.186.1/three.module.js';
 import { OrbitControls } from './vendor/three/0.186.1/addons/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from './vendor/three/0.186.1/addons/CSS2DRenderer.js';
@@ -49,15 +46,17 @@ labelRenderer.domElement.className = 'labels';
 els.stage.appendChild(labelRenderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#030712');
+scene.background = new THREE.Color('#e5edcf');
+scene.fog = new THREE.Fog('#e5edcf', 500, 2600);
 const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 8000);
 camera.position.set(0, 93, 118);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.maxDistance = 1500;
+controls.maxPolarAngle = Math.PI * .47;
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+scene.add(new THREE.AmbientLight(0xfff9e8, 1.9));
 // Every centre is the sun of its own system: the light sits inside it.
 scene.add(new THREE.PointLight(0xfff1d6, 2.4, 0, 0));
 // A soft headlight from the camera's upper left. The centre's own light is inside it, so without this
@@ -86,210 +85,7 @@ resize();
 
 // --- textures and shared shapes -----------------------------------------------------------------
 
-const SPHERE = new THREE.SphereGeometry(1, 48, 24);
-
-function canvasTexture(width, height, paint) {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    paint(canvas.getContext('2d'), width, height);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    return texture;
-}
-
-const GLOW = canvasTexture(128, 128, (ctx, w, h) => {
-    const g = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
-    g.addColorStop(0, 'rgba(255,255,255,0.9)');
-    g.addColorStop(0.3, 'rgba(255,255,255,0.35)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-});
-
-/** Gas-giant bands in the issuer's colour, varied per token so neighbours do not look identical. */
-const bandCache = new Map();
-function bandTexture(color, seed) {
-    const key = `${color}:${Math.floor(seed * 6)}`;
-    if (bandCache.has(key)) return bandCache.get(key);
-    const base = new THREE.Color(color);
-    const texture = canvasTexture(256, 128, (ctx, w, h) => {
-        for (let y = 0; y < h; y += 1) {
-            const wave = Math.sin(y * 0.19 + seed * 40) * 0.5 + Math.sin(y * 0.05 + seed * 9) * 0.5;
-            ctx.fillStyle = `#${base.clone().offsetHSL(0, 0, wave * 0.09).getHexString()}`;
-            ctx.fillRect(0, y, w, 1);
-        }
-    });
-    bandCache.set(key, texture);
-    return texture;
-}
-
-/**
- * Each category's surface pattern (its `pattern` in the dimensions table) in its colour, so a
- * category reads by pattern as well as by hue. Drawn on an equirectangular 256×128 canvas; every
- * horizontal period divides 256 so the seam at the back of the sphere does not show. Cached: every
- * body of a category shares one texture, and clearing a system never disposes it.
- */
-const patternCache = new Map();
-function patternTexture(dimensionId) {
-    if (patternCache.has(dimensionId)) return patternCache.get(dimensionId);
-    const dim = dimensionById.get(dimensionId);
-    const base = new THREE.Color(dim?.color ?? '#e2e8f0');
-    const dark = `#${base.clone().offsetHSL(0, 0, -0.24).getHexString()}`;
-    const light = `#${base.clone().offsetHSL(0, -0.05, 0.12).getHexString()}`;
-    const texture = canvasTexture(256, 128, (ctx, w, h) => {
-        ctx.fillStyle = `#${base.getHexString()}`;
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = dark;
-        ctx.strokeStyle = dark;
-        switch (dim?.pattern) {
-            case 'meridians':
-                for (let x = 0; x < w; x += 32) ctx.fillRect(x, 0, 10, h);
-                break;
-            case 'grid':
-                for (let x = 0; x < w; x += 32) ctx.fillRect(x, 0, 3, h);
-                for (let y = 8; y < h; y += 16) ctx.fillRect(0, y, w, 3);
-                break;
-            case 'dots':
-                for (let y = 8, row = 0; y < h; y += 16, row += 1) {
-                    for (let x = (row % 2) * 8; x < w + 8; x += 16) {
-                        ctx.beginPath();
-                        ctx.arc(x, y, 4.5, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                break;
-            case 'checker':
-                for (let y = 0; y < h; y += 16) for (let x = (y / 16) % 2 ? 0 : 16; x < w; x += 32) ctx.fillRect(x, y, 16, 16);
-                break;
-            case 'diagonal':
-                ctx.lineWidth = 9;
-                for (let x = -h; x < w + h; x += 32) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x + h, h);
-                    ctx.stroke();
-                }
-                break;
-            case 'waves':
-                ctx.lineWidth = 4;
-                for (let y = 10; y < h; y += 18) {
-                    ctx.beginPath();
-                    for (let x = 0; x <= w; x += 2) ctx.lineTo(x, y + Math.sin((x / 64) * Math.PI * 2) * 5);
-                    ctx.stroke();
-                }
-                break;
-            case 'craters':
-                ctx.lineWidth = 2;
-                for (let i = 0; i < 26; i += 1) {
-                    const x = U.hash01(`${dimensionId}${i}`, 11) * w;
-                    const y = 12 + U.hash01(`${dimensionId}${i}`, 12) * (h - 24);
-                    const r = 4 + U.hash01(`${dimensionId}${i}`, 13) * 9;
-                    // Drawn twice, a width apart, so a crater on the seam wraps round.
-                    for (const dx of [0, -w, w]) {
-                        ctx.beginPath();
-                        ctx.arc(x + dx, y, r, 0, Math.PI * 2);
-                        ctx.fillStyle = dark;
-                        ctx.fill();
-                        ctx.strokeStyle = light;
-                        ctx.stroke();
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    });
-    patternCache.set(dimensionId, texture);
-    return texture;
-}
-
-/**
- * Lettering: a body's name written into its own surface, round the equator, so it turns with the body.
- * The surface is redrawn with a smooth belt along the equator (the pattern would drown the letters)
- * and the name on it, at least twice round so the side facing the camera always carries it. Tokens
- * wear it raised (embossed: letters lighter than the belt, and high in the bump map), everything else
- * cut in (engraved: darker, and low in the bump map), so the light catches the relief. The canvas is
- * twice as wide as tall, which keeps the letters undistorted at the equator. Each lettered body owns
- * its two textures; clearSystem disposes them.
- */
-const LETTERING_SIZES = { orbiter: [512, 256], centre: [1024, 512] };
-const RELIEF_BUMP = { emboss: 9, engrave: 9 };
-// How much a lettered body glows compared with a plain one: glow is flat light, and flattens relief.
-const LETTERED_GLOW = 0.45;
-
-/**
- * Writes the name round the canvas. `bevel` paints the relief into the colour too, so it reads at any
- * angle to the light: a raised letter has a highlight on its upper left and a shadow on its lower
- * right; a cut-in letter the other way round.
- */
-function drawName(ctx, w, h, text, fill, bevel = null) {
-    const fontPx = Math.round(h * 0.14);
-    ctx.font = `800 ${fontPx}px system-ui, -apple-system, "Segoe UI", sans-serif`;
-    ctx.textBaseline = 'middle';
-    const unit = `${text}   ·   `;
-    const width = ctx.measureText(unit).width;
-    // Whole copies only, spread evenly, so the seam at u = 0 / 1 never cuts a word (a long name is narrowed).
-    const copies = Math.max(2, Math.floor(w / width));
-    const step = w / copies;
-    const squeeze = Math.min(1, step / width);
-    const offset = Math.max(1, fontPx * 0.05);
-    const passes = bevel
-        ? [[bevel.upperLeft, -offset], [bevel.lowerRight, offset], [fill, 0]]
-        : [[fill, 0]];
-    for (const [colour, shift] of passes) {
-        ctx.fillStyle = colour;
-        for (let i = 0; i < copies; i += 1) {
-            ctx.save();
-            ctx.translate(i * step + shift, h / 2 + shift);
-            ctx.scale(squeeze, 1);
-            ctx.fillText(unit, 0, fontPx * 0.06);
-            ctx.restore();
-        }
-    }
-    return fontPx;
-}
-
-/** {map, bump} for a body: `base` is its shared pattern or band texture (or null for a plain `color`). */
-function letteredSurface({ base = null, color, text, relief, size }) {
-    const [w, h] = LETTERING_SIZES[size];
-    const tint = new THREE.Color(color);
-    const shade = (dl) => `#${tint.clone().offsetHSL(0, 0, dl).getHexString()}`;
-    const belt = shade(relief === 'emboss' ? -0.1 : 0.04);
-    const letters = shade(relief === 'emboss' ? 0.22 : -0.3);
-    const light = shade(0.4);
-    const dark = shade(-0.42);
-    const bevel = relief === 'emboss' ? { upperLeft: light, lowerRight: dark } : { upperLeft: dark, lowerRight: light };
-    const beltHeight = h * 0.24;
-    const map = canvasTexture(w, h, (ctx) => {
-        if (base) ctx.drawImage(base.image, 0, 0, w, h);
-        else {
-            ctx.fillStyle = `#${tint.getHexString()}`;
-            ctx.fillRect(0, 0, w, h);
-        }
-        ctx.fillStyle = belt;
-        ctx.fillRect(0, (h - beltHeight) / 2, w, beltHeight);
-        drawName(ctx, w, h, text, letters, bevel);
-    });
-    const bump = canvasTexture(w, h, (ctx) => {
-        ctx.fillStyle = '#808080';
-        ctx.fillRect(0, 0, w, h);
-        // A softened edge reads as a bevel rather than a cliff.
-        ctx.filter = `blur(${Math.max(1, h / 256)}px)`;
-        drawName(ctx, w, h, text, relief === 'emboss' ? '#ffffff' : '#000000');
-    });
-    // Heights, not colours: no sRGB decoding.
-    bump.colorSpace = THREE.NoColorSpace;
-    return { map, bump };
-}
-
-/** A lit sphere material over a lettered (or plain patterned) surface; its glow follows the surface. */
-function surfaceMaterial({ map, bump = null, relief = 'emboss', emissive, roughness = 0.8 }) {
-    return new THREE.MeshStandardMaterial({
-        color: 0xffffff, map, emissive: 0xffffff, emissiveMap: map, emissiveIntensity: bump ? emissive * LETTERED_GLOW : emissive, roughness, metalness: 0.05,
-        bumpMap: bump, bumpScale: bump ? RELIEF_BUMP[relief] : 1
-    });
-}
+const PLOT = new THREE.BoxGeometry(1.85, .3, 1.45);
 
 function ringLine(radius, color, opacity) {
     const points = [];
@@ -301,18 +97,14 @@ function ringLine(radius, color, opacity) {
         new THREE.LineBasicMaterial({ color, transparent: true, opacity, depthWrite: false }));
 }
 
-(function stars() {
-    const positions = new Float32Array(3000 * 3);
-    for (let i = 0; i < 3000; i += 1) {
-        const r = 1500 + Math.random() * 1500;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        positions.set([r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta)], i * 3);
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    scene.add(new THREE.Points(geometry, new THREE.PointsMaterial({ color: 0xc7d2fe, size: 1.4, sizeAttenuation: false })));
-})();
+// Soft ground and rows keep the view rooted in a field. They have no data meaning.
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshStandardMaterial({ color: '#dbe7be', roughness: 1 }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -.45;
+scene.add(ground);
+const rows = new THREE.GridHelper(4000, 200, '#b7ca94', '#cbd9ac');
+rows.position.y = -.43;
+scene.add(rows);
 
 // --- data ---------------------------------------------------------------------------------------
 
@@ -422,8 +214,7 @@ function clearSystem() {
     scene.remove(system.group);
     system.group.traverse((object) => {
         if (object.isCSS2DObject) object.element.remove();
-        if (object.geometry && object.geometry !== SPHERE) object.geometry.dispose();
-        for (const texture of object.userData.ownTextures ?? []) texture.dispose();
+        if (object.geometry && object.geometry !== PLOT) object.geometry.dispose();
         if (object.material) object.material.dispose();
     });
     system = null;
@@ -444,84 +235,45 @@ function makeLabel(text, className, dot, onClick) {
     return el;
 }
 
+/** A barn marks the current collection; its name and evidence stay in the panel. */
 function makeCentre(stop) {
     const group = new THREE.Group();
-    let radius;
-    let label;
-    if (isSun(stop)) {
-        radius = SUN_RADIUS;
-        // Unlit, so its engraving shows by colour alone.
-        const { map, bump } = letteredSurface({ color: '#ffcf6e', text: 'Solana', relief: 'engrave', size: 'centre' });
-        bump.dispose();
-        const sun = new THREE.Mesh(new THREE.SphereGeometry(radius, 64, 32), new THREE.MeshBasicMaterial({ map }));
-        sun.userData.ownTextures = [map];
-        group.add(sun);
-        const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: '#ffc46b', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
-        glow.scale.setScalar(radius * 6);
-        group.add(glow);
-        label = makeLabel('Solana', 'sun', '#ffd98a');
-    } else if (stop.kind === 'planet') {
-        radius = PLANET_CENTRE_RADIUS;
-        const token = IX.tokens[stop.token];
-        const color = tokenColor(stop.token);
-        const surface = letteredSurface({ base: bandTexture(color, U.hash01(token.slug, 3)), color, text: token.symbol, relief: 'emboss', size: 'centre' });
-        const mesh = new THREE.Mesh(SPHERE, surfaceMaterial({ ...surface, relief: 'emboss', emissive: 0.22 }));
-        mesh.userData.ownTextures = [surface.map, surface.bump];
-        mesh.scale.setScalar(radius);
-        group.add(mesh);
-        label = makeLabel(token.symbol, 'planet focus', color);
-    } else {
-        radius = MOON_CENTRE_RADIUS;
-        const attribute = stop.kind === 'aspect' ? null
-            : stop.without.length ? stop.without[stop.without.length - 1] : IX.values[stop.filters[stop.filters.length - 1]].attribute;
-        const dimensionId = stop.kind === 'aspect' ? stop.dimension : attributeById.get(attribute)?.dimension;
-        const color = dimensionById.get(dimensionId)?.color ?? '#e2e8f0';
-        const centreText = stop.kind === 'aspect' ? `${IX.tokens[stop.token].symbol} · ${stopLabel(stop)}` : stopLabel(stop);
-        const surface = letteredSurface({ base: patternTexture(dimensionId), color, text: centreText, relief: 'engrave', size: 'centre' });
-        const mesh = new THREE.Mesh(SPHERE, surfaceMaterial({ ...surface, relief: 'engrave', emissive: 0.26, roughness: 0.7 }));
-        mesh.userData.ownTextures = [surface.map, surface.bump];
-        mesh.scale.setScalar(radius);
-        group.add(mesh);
-        const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending }));
-        glow.scale.setScalar(radius * 4);
-        group.add(glow);
-        if (stop.kind === 'aspect') label = makeLabel(`${IX.tokens[stop.token].symbol} · ${stopLabel(stop)}`, 'moon focus', color);
-        else {
-            const tone = stop.without.length ? 'muted' : valueTone(stop.filters[stop.filters.length - 1]);
-            label = makeLabel(stopLabel(stop), 'moon focus', U.TONE_COLORS[tone]);
-        }
-    }
-    const labelObject = new CSS2DObject(label);
-    labelObject.position.set(0, radius * 1.2, 0);
-    group.add(labelObject);
-    return { group, radius, label: labelObject, labelText: label.textContent };
+    const radius = isSun(stop) ? SUN_RADIUS : stop.kind === 'planet' ? PLANET_CENTRE_RADIUS : MOON_CENTRE_RADIUS;
+    const barn = new THREE.Mesh(new THREE.BoxGeometry(radius*1.6, radius*1.1, radius*1.3), new THREE.MeshStandardMaterial({ color: '#c86b4b', roughness: 1 }));
+    barn.position.y = radius*.45;
+    group.add(barn);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(radius*1.43, radius*.8, 4), new THREE.MeshStandardMaterial({ color: '#526a3d', roughness: 1 }));
+    roof.rotation.y = Math.PI/4; roof.position.y = radius*1.36; roof.scale.z=.84;
+    group.add(roof);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(radius*.53, radius*.78, .035), new THREE.MeshStandardMaterial({ color: '#fae8b5', roughness: 1 }));
+    door.position.set(0, radius*.29, radius*.66); group.add(door);
+    const name = isSun(stop) ? 'Solana field' : stopLabel(stop);
+    const labelObject = new CSS2DObject(makeLabel(name, 'focus', '#397443'));
+    labelObject.position.set(0, radius*1.9, 0); group.add(labelObject);
+    if (!isSun(stop)) group.scale.setScalar(.5);
+    return { group, radius, label: labelObject, labelText: name };
 }
 
-/** One orbiting body: a tilted plane, a spinning arm, and the sphere with its label at the arm's end. */
-function makeOrbiter(parent, { orbit, size, color, texture = null, emissive = 0.15, label, dot, labelled, ringOpacity, item, relief = 'engrave' }) {
+/** One planted plot with a label; the existing grouping and click targets stay stable. */
+function makeOrbiter(parent, { orbit, size, color, label, dot, labelled, ringOpacity, item }) {
     const incl = new THREE.Group();
-    incl.rotation.x = orbit.tilt;
+    incl.rotation.x = 0;
     const spin = new THREE.Group();
     spin.rotation.y = orbit.angle;
     incl.add(spin);
     const anchor = new THREE.Group();
     anchor.position.set(orbit.radius, 0, 0);
     spin.add(anchor);
-    // A labelled body carries its name in its surface; the others (the outer planets of a crowded
-    // system) keep the shared texture, to spare the memory of a canvas pair each. A textured body glows
-    // through its own surface, so the glow never washes the pattern out.
-    const surface = labelled ? letteredSurface({ base: texture, color, text: label, relief, size: 'orbiter' }) : null;
-    const mesh = new THREE.Mesh(SPHERE, surface
-        ? surfaceMaterial({ ...surface, relief, emissive, roughness: 0.85 })
-        : new THREE.MeshStandardMaterial({
-            color: texture ? 0xffffff : color, map: texture, emissive: texture ? 0xffffff : color, emissiveMap: texture,
-            emissiveIntensity: emissive, roughness: 0.85, metalness: 0.05
-        }));
-    if (surface) mesh.userData.ownTextures = [surface.map, surface.bump];
+    // Plot area still carries the existing liquidity scale; plant color identifies its group.
+    const mesh = new THREE.Mesh(PLOT, new THREE.MeshStandardMaterial({ color: '#a98757', roughness: 1 }));
     mesh.scale.setScalar(size);
     anchor.add(mesh);
-    if (ringOpacity > 0) incl.add(ringLine(orbit.radius, color, ringOpacity));
-    const body = { orbit, size, spin, anchor, mesh, lettered: Boolean(surface), labelled, item };
+    const crop = new THREE.Mesh(new THREE.ConeGeometry(.35, .75, 5), new THREE.MeshStandardMaterial({ color, roughness: 1 }));
+    crop.position.y = .5; mesh.add(crop);
+    const leaf = new THREE.Mesh(new THREE.SphereGeometry(.25, 8, 5), new THREE.MeshStandardMaterial({ color: '#699449', roughness: 1 }));
+    leaf.scale.set(1.7,.4,.75); leaf.position.set(.23,.42,0); leaf.rotation.z=.45; mesh.add(leaf);
+    if (ringOpacity > 0) incl.add(ringLine(orbit.radius, '#839864', ringOpacity));
+    const body = { orbit, size, spin, anchor, mesh, labelled, item };
     const labelEl = makeLabel(label, 'orbiter', dot, () => enter(body));
     labelEl.addEventListener('pointerenter', () => setHover(body));
     labelEl.addEventListener('pointerleave', () => setHover(null));
@@ -591,12 +343,12 @@ function buildSystem(stop) {
             const dim = dimensionById.get(aspect.dimension);
             const n = aspect.shared.length + aspect.single.length;
             bodies.push(makeOrbiter(group, {
-                orbit: orbits[i], size: orbits[i].size, color: dim.color, texture: patternTexture(aspect.dimension), emissive: 0.3, label: `${dim.label} · ${n}`, dot: dim.color, labelled: true, ringOpacity: 0,
+                orbit: orbits[i], size: orbits[i].size, color: dim.color, label: `${dim.label} · ${n}`, dot: dim.color, labelled: true, ringOpacity: 0,
                 item: { kind: 'aspect', aspect }
             }));
             extent = Math.max(extent, radius + orbits[i].size);
         });
-        group.add(ringLine(radius, '#c7d2fe', 0.2));
+        group.add(ringLine(radius, '#839864', 0.2));
     } else if (stop.kind === 'aspect') {
         const aspect = IX.aspects(stop.token).find((a) => a.dimension === stop.dimension) ?? { shared: [], single: [] };
         singles = aspect.single.map((v) => ({ kind: 'value', v }));
@@ -607,7 +359,7 @@ function buildSystem(stop) {
             for (const orbit of ring.orbits) {
                 const v = IX.valueById.get(orbit.id);
                 bodies.push(makeOrbiter(group, {
-                    orbit, size, color, texture: patternTexture(stop.dimension), emissive: 0.3, label: IX.values[v].label, dot: U.TONE_COLORS[valueTone(v)], labelled: true, ringOpacity: 0,
+                    orbit, size, color, label: IX.values[v].label, dot: U.TONE_COLORS[valueTone(v)], labelled: true, ringOpacity: 0,
                     item: { kind: 'value', v }
                 }));
             }
@@ -630,7 +382,6 @@ function buildSystem(stop) {
             const orbit = U.planetOrbit(rank, item.key, centre.radius);
             bodies.push(makeOrbiter(group, {
                 orbit, size: item.size, color: item.color,
-                texture: item.kind === 'token' ? bandTexture(item.color, U.hash01(item.key, 3)) : patternTexture(attributeById.get(stop.groupBy)?.dimension),
                 emissive: item.kind === 'token' ? 0.12 : 0.3,
                 label: item.kind === 'group' ? `${item.label} · ${item.tokens.length}` : item.label,
                 dot: item.kind === 'group' ? U.TONE_COLORS[item.tone] : item.color,
@@ -691,7 +442,12 @@ function stepFlight(now) {
 
 function frame(sys) {
     controls.minDistance = sys.centre.radius * 1.3;
-    return fly(new THREE.Vector3(), U.frameDistance(sys.centre.radius, sys.extent, camera.aspect));
+    // Frame the space left by the inspector, rather than letting plots fall underneath it.
+    const panel = els.panel.getBoundingClientRect();
+    const freeWidth = innerWidth > 720 ? panel.left - 24 : innerWidth - 24;
+    const freeHeight = innerWidth > 720 ? innerHeight - 100 : panel.top - 100;
+    const inset = Math.max(innerWidth / Math.max(180, freeWidth), innerHeight / Math.max(180, freeHeight));
+    return fly(new THREE.Vector3(), U.frameDistance(sys.centre.radius, sys.extent, camera.aspect) * inset);
 }
 
 // --- the walk -----------------------------------------------------------------------------------
@@ -830,7 +586,7 @@ function renderPanel(cardError = null) {
         const template = DATA.templates?.[token.template] ?? null;
         els.kicker.textContent = `Token · ${issuer?.name ?? token.issuer ?? ''}`;
         els.title.textContent = token.symbol;
-        els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its moons still come from the tables.` : (token.name ?? '');
+        els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its connections still come from the tables.` : (token.name ?? '');
         els.details.innerHTML = detailsHtml([['Tracks', token.underlying], ['Price', money(token.priceUsd)], ['Liquidity', money(token.liquidityUsd)],
             ['Health', token.status], ...(template ? DATA.scenarios.map((s) => [s.label, template[s.id]?.headline]) : [])].filter(([, v]) => v));
         // One entry per dimension moon, previewing what is inside it.
@@ -841,7 +597,7 @@ function renderPanel(cardError = null) {
             const preview = inside.slice(0, 4).join(' · ') + (inside.length > 4 ? ` · and ${inside.length - 4} more` : '');
             return button(i, `${dim.label} · ${inside.length}`, preview, dim.color);
         }).join('');
-        els.children.innerHTML = `<p class="hint-line">Each moon is one side of ${esc(token.symbol)}: its legal structure, custody, rights, keys, DeFi use. `
+        els.children.innerHTML = `<p class="hint-line">Each plot opens one side of ${esc(token.symbol)}: its legal structure, custody, rights, keys, DeFi use. `
             + 'Open one to see what it has there, then open any of those to see every token that shares it.</p>'
             + `<h2>What ${esc(token.symbol)} is made of</h2>${list}`;
         els.link.hidden = false;
@@ -857,8 +613,8 @@ function renderPanel(cardError = null) {
         const relationOf = (v) => entry?.relations.get(IX.values[v].id)?.summary ?? null;
         els.kicker.textContent = `${token.symbol} · ${token.name ?? ''}`;
         els.title.textContent = dim?.label ?? stop.dimension;
-        els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its moons still come from the tables.`
-            : `What ${token.symbol} has here. Each moon is shared with other tokens; the number is how many. Open one to see them all.`;
+        els.summary.textContent = cardError ? `Could not read its card (${cardError.message}); its connections still come from the tables.`
+            : `What ${token.symbol} has here. Each plot is shared with other tokens; the number is how many. Open one to see them all.`;
         els.details.innerHTML = '';
         // Grouped by attribute (Custodian, Attestor…) within the dimension.
         const attributeOfValue = (v) => IX.values[v].attribute;
@@ -870,7 +626,7 @@ function renderPanel(cardError = null) {
                 + own.map(({ b, i }) => button(i, `${IX.values[b.item.v].label} · ${IX.byValue[b.item.v].length}`, relationOf(b.item.v), U.TONE_COLORS[valueTone(b.item.v)])).join('')
                 + alone.map((item) => lineItem(IX.values[item.v].label, relationOf(item.v), U.TONE_COLORS[valueTone(item.v)], `only ${token.symbol}`)).join('');
         }).join('');
-        els.children.innerHTML = `${sections}${system.singles.length ? `<p class="hint-line">What only ${esc(token.symbol)} has is listed without a moon.</p>` : ''}`;
+        els.children.innerHTML = `${sections}${system.singles.length ? `<p class="hint-line">What only ${esc(token.symbol)} has is listed without a separate plot.</p>` : ''}`;
         els.link.hidden = false;
         els.link.href = `./cards/${encodeURIComponent(token.slug)}.html`;
         els.link.textContent = 'Open its card →';
@@ -879,10 +635,10 @@ function renderPanel(cardError = null) {
 
     const tokens = stopTokens(stop);
     if (isSun(stop)) {
-        els.kicker.textContent = 'Universe';
+        els.kicker.textContent = 'The token fields';
         els.title.textContent = 'Tokenized stocks on Solana';
-        els.summary.textContent = `${IX.tokens.length.toLocaleString('en-US')} tokens. A planet is a token: its size is its pool liquidity, its colour its issuer. `
-            + 'Open a planet to see what it shares with others, or group them all by anything below.';
+        els.summary.textContent = `${IX.tokens.length.toLocaleString('en-US')} tokens. A plot is a token: its size reflects observed pool liquidity, its plant colour identifies the issuer. `
+            + 'Open a plot to see what it shares with others, or group them all by anything below.';
         els.details.innerHTML = '';
     } else {
         const labels = [...stop.filters.map((v) => IX.values[v].label), ...stop.without.map((a) => attributeById.get(a)?.none ?? a)];
@@ -1105,19 +861,8 @@ renderer.domElement.addEventListener('pointermove', (event) => {
 
 const projected = new THREE.Vector3();
 
-// A lettered body at least this many pixels in radius on screen shows its name in its surface (the text is
-// about half the radius tall); a smaller one shows the band-less body with the label above it.
-const LETTERING_MIN_PX = 30;
-const worldPoint = new THREE.Vector3();
-
-function screenRadius(object, radius, height) {
-    const distance = camera.position.distanceTo(object.getWorldPosition(worldPoint));
-    return distance > 0 ? (radius / (distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)))) * (height / 2) : Infinity;
-}
-
 /**
- * Each body shows its name one way: in its own surface when it is lettered and big enough on screen to read, else as
- * a label above it. Labels that would overlap one drawn before them are hidden, in body order (inner
+ * Field markers carry the names. Labels that would overlap one drawn before them are hidden, in body order (inner
  * rings and bigger pools first); the hovered body's label always shows. Boxes are estimated from the
  * text length.
  */
@@ -1125,23 +870,21 @@ function declutter() {
     if (!system) return;
     const rect = renderer.domElement.getBoundingClientRect();
     const placed = [];
-    const centreReadable = screenRadius(system.centre.group, system.centre.radius, rect.height) >= LETTERING_MIN_PX;
-    system.centre.label.visible = !centreReadable;
-    if (!centreReadable) {
+    system.centre.label.visible = true;
+    {
         // The centre's label is placed first, so no orbiting label hides under it.
-        projected.set(0, system.centre.radius * 1.2, 0).project(camera);
+        system.centre.label.getWorldPosition(projected).project(camera);
         const cx = (projected.x + 1) / 2 * rect.width;
         const cy = (1 - projected.y) / 2 * rect.height - 16;
         const cw = system.centre.labelText.length * 6.6 + 22;
         placed.push({ x0: cx - cw / 2, x1: cx + cw / 2, y0: cy - 9, y1: cy + 9 });
     }
     for (const body of system.bodies) {
-        const readable = body.lettered && screenRadius(body.anchor, body.size, rect.height) >= LETTERING_MIN_PX;
-        if (readable || !body.labelled) {
+        if (!body.labelled) {
             body.label.visible = body === hovered;
             continue;
         }
-        body.anchor.getWorldPosition(projected).project(camera);
+        body.label.getWorldPosition(projected).project(camera);
         const x = (projected.x + 1) / 2 * rect.width;
         const y = (1 - projected.y) / 2 * rect.height - 16;
         const w = body.label.element.textContent.length * 6.6 + 22;
@@ -1159,14 +902,7 @@ let frames = 0;
 function animate(now) {
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    if (!REDUCE && system) {
-        for (const body of system.bodies) {
-            body.spin.rotation.y += body.orbit.speed * dt;
-            body.mesh.rotation.y += dt * 0.12;
-        }
-        // The centre turns fast enough to carry its name past in about a minute.
-        system.centre.group.rotation.y += dt * 0.1;
-    }
+    // Plants stay rooted. Only the view moves when a visitor chooses a plot.
     stepFlight(now);
     controls.update();
     frames += 1;
@@ -1210,6 +946,6 @@ async function start() {
 start().catch((err) => {
     console.error(`[universe ${new Date().toISOString()}]`, err);
     els.kicker.textContent = 'Could not open';
-    els.title.textContent = 'Universe';
+    els.title.textContent = 'The token fields';
     els.summary.textContent = String(err.message ?? err);
 });

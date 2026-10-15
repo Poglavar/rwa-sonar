@@ -135,9 +135,9 @@ fails when a page drifts.
 | Role | Canonical style | Where |
 |---|---|---|
 | Site header | brand mark + "RWA Sonar", Explore · Compare · Changes · Learn, then the **Research** menu; muted links, current page ink and bold | `.app-header`, markup from `stocks/lib/site-nav.js` (`siteHeaderHtml`) |
-| Theme switch | last item of the header row: 32px icon button (half circle Auto, sun Light, moon Dark), control-line border, muted, cobalt on hover; a click cycles Auto → Light → Dark, remembered per browser. Under 360px it moves to the end of the Research menu as "Theme: …" | `.theme-switch`; `theme.js`, loaded first in every `<head>`, sets `<html data-theme>`, which every dark rule keys on (no `prefers-color-scheme` queries) |
+| Theme switch | last item of the header row: 32px icon button (half circle Auto, sun Light, moon Dark), control-line border, muted, leaf green on hover; sunny Light is the default, and a click cycles Light → Dark → Auto, remembered per browser. Under 360px it moves to the end of the Research menu as "Theme: …" | `.theme-switch`; `theme.js`, loaded first in every `<head>`, sets `<html data-theme>`, which every dark rule keys on (no `prefers-color-scheme` queries) |
 | Primary action | cobalt fill, `--rwa-on-accent` text, 8px radius, min 44px tall | `.button.button-primary` (on `<a>` or `<button>`) |
-| Secondary action | panel fill, control-line border, ink text, cobalt on hover | `.button` |
+| Secondary action | panel fill, control-line border, ink text, leaf green on hover | `.button` |
 | Filter chip / toggle, pressed | cobalt border, `--rwa-pressed-bg`, `--rwa-pressed-text`, weight 750 | `--rwa-pressed-*` in each page's `-active` / `[aria-pressed="true"]` rule |
 | View tabs | selected tab filled with ink | `.workspace-tabs` (stocks); `assets.html` keeps folder tabs with a cobalt top edge |
 | Text link | `--rwa-cobalt-dark`, underline offset .18em | `a` (per page, from the token) |

@@ -164,7 +164,7 @@
      */
     function drawMarquee(events, now) {
         var view = globalThis.__rwaEventsView;
-        // Under the ticker's line (the ticker and its planet link), above the name.
+        // Under the ticker's line (the ticker and its field link), above the name.
         var heading = document.querySelector('.card-head .card-title-row') || document.querySelector('.card-head h1');
         if (!heading || events.length === 0) return;
         var box = document.createElement('div');

@@ -51,10 +51,9 @@ describe('public methodology page', () => {
         expect(html).toContain('id="apiHealth"');
         expect(html).not.toMatch(/<script(?![^>]*\s(?:src=|type="application\/ld\+json"))/); // JSON-LD is inert data
     });
-    test('uses the full responsive survey scene with a descriptive alternative', () => {
-        expect(html).toContain('survey-team-v2-768.webp 768w');
-        expect(html).toContain('survey-team-v2.webp 1536w');
-        expect(html).toContain('Four headlamp-wearing dolphins survey the submerged part of an iceberg, with two farther away.');
+    test('introduces Joe with a descriptive image alternative', () => {
+        expect(html).toContain('images/honest-joe/joe-inspects.webp');
+        expect(html).toContain('Honest Joe takes a closer look at the paperwork.');
         expect(html).not.toContain('<source media=');
     });
 });

@@ -3101,9 +3101,9 @@ function crossChainText(card) {
     return ` · <span title="${escapeHtml(title)}"><b>${floor ? 'up to ' : ''}${pct}</b> of all tokenized ${escapeHtml(c.ticker)}, across chains and issuers</span>`;
 }
 
-/** The way into the universe view (universe.html), opened on this token's planet. */
-export function planetLinkHtml(card) {
-    return `<a class="planet-link" href="../universe.html#*/@${encodeURIComponent(card.slug)}"><span class="badge-new">New</span>See it as a planet →</a>`;
+/** Open the token fields on this exact token. */
+export function fieldLinkHtml(card) {
+    return `<a class="field-link" href="../universe.html#*/@${encodeURIComponent(card.slug)}">Explore its field →</a>`;
 }
 
 export function priceLineHtml(card) {
@@ -3388,7 +3388,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
                     { name: card.symbol ?? card.mint, url: pageUrl }])
             ])
         }),
-        '<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />',
+        '<link rel="icon" type="image/svg+xml" href="../images/honest-joe/hat.svg" />',
         `<link rel="alternate" type="application/json" href="./${escapeHtml(card.slug)}.json" />`,
         `<link rel="stylesheet" href="../card.css${v}" />`,
         `<link rel="stylesheet" href="../trustchain.css${v}" />`,
@@ -3398,7 +3398,7 @@ export function renderCard(card, { baseUrl = null, version = '', ogImage = null 
     // compact rather than spending the card budget on indentation repeated in every card.
     ].filter((line) => line !== null).join('');
 
-    const header = `<header class="card-head"><div class="card-title-row"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>${planetLinkHtml(card)}</div>` +
+    const header = `<header class="card-head"><div class="card-title-row"><h1>${escapeHtml(card.symbol ?? card.mint ?? 'token')}</h1>${fieldLinkHtml(card)}</div>` +
         `<p class="sub">${escapeHtml(card.name ?? '')}${card.underlyingTicker ? ` · tracks ${escapeHtml(card.underlyingTicker)}` : ''}` +
         `${card.instrumentType ? ` · ${escapeHtml(humanizeSlug(card.instrumentType))}` : ''}</p>` +
         solanaShareHtml(card) +

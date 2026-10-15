@@ -142,3 +142,6 @@ stocks/data/cmc-tokenized.json
 next-steps.md
 
 /monitoring-map.json
+
+# Generated image drafts and other local run output
+output/

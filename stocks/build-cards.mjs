@@ -54,7 +54,7 @@ const PYTH_ONCHAIN_PATH = join(HERE, 'data', 'pyth-onchain.json');
 const DEFAULT_OUT_DIR = 'cards';
 
 /** Cache-busting stamp on ../card.css, ../trustchain.css and ../card.js. Bump when any of them changes. */
-const ASSET_VERSION = '20260930honest';
+const ASSET_VERSION = '20261009a';
 
 function usage() {
     console.log(`build-cards.mjs — one static, shareable card per tokenized stock

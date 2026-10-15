@@ -30,7 +30,7 @@ export const SITE_IMAGE = {
 /** Search engines cut a meta description near here; og:description may run longer. */
 export const META_DESCRIPTION_MAX = 160;
 /** Cache-busting stamp for site-contact.css. Bump when it changes. */
-export const CONTACT_CSS_VERSION = '20260924i';
+export const CONTACT_CSS_VERSION = '20261009a';
 
 /** `text` cut to `max` characters at a word boundary with an ellipsis; whitespace collapsed. */
 export function clampText(text, max = META_DESCRIPTION_MAX) {
@@ -60,7 +60,7 @@ export function organizationLd(origin = SITE_ORIGIN) {
         '@id': `${origin}/#organization`,
         name: SITE_NAME,
         url: `${origin}/`,
-        logo: `${origin}/images/rwasonar-logo.svg`,
+        logo: `${origin}/images/honest-joe/hat.svg`,
         sameAs: [CONTACT_LINKS.x, CONTACT_LINKS.github, CONTACT_LINKS.telegramChannel, CONTACT_LINKS.telegramGroup]
     };
 }

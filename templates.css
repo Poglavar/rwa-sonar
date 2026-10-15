@@ -19,7 +19,7 @@
 :root:where([data-theme="dark"]) { --assertion: #b9d9ff; }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: radial-gradient(circle at 85% 0, rgba(49,84,216,.13), transparent 30rem), var(--bg); color: var(--text); line-height: 1.55; }
+body { margin: 0; background: radial-gradient(circle at 85% 0, rgba(134, 170, 75,.13), transparent 30rem), var(--bg); color: var(--text); line-height: 1.55; }
 a { color: var(--link); text-underline-offset: .18em; }
 footer nav { display: flex; flex-wrap: wrap; gap: 1rem; }
 main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 1rem 0 6rem; overflow-wrap: anywhere; }

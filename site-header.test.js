@@ -46,15 +46,15 @@ describe('the one site header', () => {
         expect(new Set(RESEARCH.map((item) => item.href)).size).toBe(RESEARCH.length);
     });
 
-    test('the header carries the NEW planet link right after the logo, at every page depth', () => {
+    test('the header carries the field-map link right after the logo, at every page depth', () => {
         for (const root of ['./', '../', '/']) {
             const header = siteHeaderHtml(root);
             const brandEnd = header.indexOf('</a>', header.indexOf('class="app-brand"')) + 4;
-            expect(header.slice(brandEnd)).toMatch(new RegExp(`^<a class="app-planets" href="${root.replace(/\./g, '\\.')}universe\\.html" aria-label="[^"]+"`));
-            expect(header).toContain('<span class="badge-new">New</span><svg class="app-planets-icon"');
+            expect(header.slice(brandEnd)).toMatch(new RegExp(`^<a class="app-fields" href="${root.replace(/\./g, '\\.')}universe\\.html" aria-label="[^"]+"`));
+            expect(header).toContain('<svg class="app-fields-icon"');
         }
         const css = read('app-shell.css');
-        expect(css).toMatch(/\.app-planets \{[^}]*margin-right: auto;/);
+        expect(css).toMatch(/\.app-fields \{[^}]*margin-right: auto;/);
         expect(css).toMatch(/:root:where\(\[data-theme="dark"\]\) \{[^}]*--rwa-new:/);
     });
 

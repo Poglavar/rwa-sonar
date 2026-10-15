@@ -638,11 +638,11 @@
         };
     }
 
-    /** How far back a material change still makes the patrol dolphin ping. */
+    /** How far back a material change still makes the watchful farmer ping. */
     const CONTACT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
     /**
-     * The patrol dolphin's contact: how many changes in `items` (an /api/changes page) the change
+     * The watchful farmer's contact: how many changes in `items` (an /api/changes page) the change
      * judge validly assessed as material and were detected within `windowMs` before `nowMs`, and the
      * line a screen reader hears for it. Null when there is none, so the ping and its text only ever
      * appear on a real material change. A detection time ahead of our clock still counts (the
@@ -1793,7 +1793,7 @@
     }
 
     /**
-     * The patrol dolphin pings once when the change judge called a change material in the last
+     * The watchful farmer pings once when the change judge called a change material in the last
      * 24 hours. Its own query, independent of the feed's filters, and re-checked in the page by
      * materialContact() so an API that ignored `material` or `since` could not make it ping.
      */
@@ -2026,7 +2026,7 @@
         els.claimList = document.getElementById('claimList');
         els.patrolSpot = document.getElementById('patrolSpot');
         els.patrolContact = document.getElementById('patrolContact');
-        els.patrolDolphin = els.patrolSpot ? els.patrolSpot.querySelector('.dolphin-bob') : null;
+        els.patrolJoe = els.patrolSpot ? els.patrolSpot.querySelector('.joe-idle') : null;
 
         if (apiLib === null) {
             setStatus('stocks/lib/api-base.js did not load, so this page cannot find the API.', true);
@@ -2034,9 +2034,9 @@
             return;
         }
         base = apiLib.apiBase();
-        // The patrol dolphin's lamp flickers while the evidence loads (motion.css), and stops once
+        // The watchful farmer's lamp flickers while the evidence loads (motion.css), and stops once
         // every section below has answered or failed.
-        els.patrolDolphin?.classList.add('is-searching');
+        els.patrolJoe?.classList.add('is-searching');
 
         const focusParams = new URLSearchParams(window.location.search);
         const requestedType = focusParams.get('type');
@@ -2094,7 +2094,7 @@
         try {
             await Promise.all(loads);
         } finally {
-            els.patrolDolphin?.classList.remove('is-searching');
+            els.patrolJoe?.classList.remove('is-searching');
         }
         // A source-subject event takes its title and its archive link from the registry, which
         // loads in parallel and may land after the feed. Re-shape from the rows as they arrived,

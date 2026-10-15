@@ -41,9 +41,9 @@ const LEARN_ROOT = { name: 'Learn', url: 'learn/' };
 export const SITE_PAGES = [
     {
         key: 'home', file: 'index.html', path: '',
-        title: 'RWA Sonar — inspect tokenized stocks on Solana',
-        description: 'The ticker is familiar. The token is mysterious. Compare Solana stock wrappers: holder rights, issuer controls, exits and the evidence behind each.',
-        imageTitle: 'The ticker is familiar. The token is mysterious.',
+        title: 'Honest Joe — a proper look at tokenized assets',
+        description: 'Honest Joe checks the assets, the paperwork and the keys behind tokenized products. Explore holder rights, controls, exits and the evidence behind every answer.',
+        imageTitle: 'Nice token. Where’s the cow?',
         kicker: 'Tokenized stocks on Solana', subtitle: 'What the holder owns, who can intervene, where it can be used and how to exit — with the evidence.',
         schema: 'home',
         stats: (d) => [

@@ -1,12 +1,12 @@
-/* Shared research-station geometry and flight poses for the interactive map and exported loops. */
+/* Shared research-farm geometry and tractor poses for the interactive map and exported loops. */
 (function (root, factory) {
     if (typeof module === 'object' && module.exports) module.exports = factory(require('./monitoring-map.js'));
     else root.__rwaResearchFleet = factory(root.__rwaMonitoringMap);
 })(typeof globalThis !== 'undefined' ? globalThis : this, function (M) {
     'use strict';
     const ASSETS = Object.freeze({
-        station: './images/research-fleet/station-v1.webp',
-        ship: './images/research-fleet/research-ship-v1.webp'
+        station: './images/honest-joe/barn.svg',
+        ship: './images/honest-joe/tractor.svg'
     });
     const escape = (value) => String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
@@ -43,7 +43,7 @@
         return `<g class="research-station" transform="translate(${scene.center.x} ${scene.center.y})" aria-hidden="true">`
             + `<circle r="${size * .68}" fill="url(#station-glow)"/>`
             + `<image class="research-station-image" href="${escape(href)}" x="${-size / 2}" y="${-size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`
-            + (withLabel ? `<text class="station-label" y="${scene.width < 600 ? 83 : 112}" text-anchor="middle">RWA SONAR</text><text class="station-subtitle" y="${scene.width < 600 ? 97 : 126}" text-anchor="middle">RESEARCH STATION</text>` : '') + '</g>';
+            + (withLabel ? `<text class="station-label" y="${scene.width < 600 ? 83 : 112}" text-anchor="middle">HONEST JOE</text><text class="station-subtitle" y="${scene.width < 600 ? 97 : 126}" text-anchor="middle">RESEARCH FARM</text>` : '') + '</g>';
     }
     return { ASSETS, buildFleet, shipPose, stationSvg };
 });

@@ -8,9 +8,9 @@
     const MODES = ['auto', 'light', 'dark'];
     const NAMES = { auto: 'Auto', light: 'Light', dark: 'Dark' };
 
-    /** A stored choice as a mode; nothing stored, or anything unrecognised, is Auto. */
+    /** Start in sunshine; a remembered Light, Dark or Auto choice is respected. */
     function normalizeMode(value) {
-        return MODES.includes(value) ? value : 'auto';
+        return MODES.includes(value) ? value : 'light';
     }
 
     /** The theme to draw: the chosen one, or in Auto the device's. */
@@ -46,8 +46,7 @@
         };
         const writeStored = (value) => {
             try {
-                if (value === 'auto') window.localStorage.removeItem(STORAGE_KEY);
-                else window.localStorage.setItem(STORAGE_KEY, value);
+                window.localStorage.setItem(STORAGE_KEY, value);
             } catch (err) {
                 // Not remembered; the switch still changes this page.
             }

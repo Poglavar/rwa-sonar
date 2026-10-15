@@ -17,7 +17,7 @@
     --link-color: var(--rwa-cobalt-dark);
     --card-bg: var(--rwa-panel);
     --sunken-bg: var(--rwa-sunken);
-    --header-bg: #e8e4da;
+    --header-bg: #e6ebd5;
     --header-text: var(--rwa-ink);
     --accent: var(--rwa-cobalt);
     --good: var(--rwa-green);
@@ -32,7 +32,7 @@
 
 :root:where([data-theme="dark"]) {
     color-scheme: dark;
-    --header-bg: #2b344b;
+    --header-bg: #344831;
 }
 
 * {
@@ -40,7 +40,7 @@
 }
 
 body {
-    background: radial-gradient(circle at 86% 0, rgba(49,84,216,.11), transparent 28rem), var(--page-bg);
+    background: radial-gradient(circle at 86% 0, rgba(134, 170, 75,.11), transparent 28rem), var(--page-bg);
     color: var(--page-text);
     font-size: 15px;
     line-height: 1.5;
@@ -136,16 +136,16 @@ h1 {
     color: var(--muted-text);
 }
 
-/* The ticker with its planet link to the right; wraps under it on a narrow screen. */
+/* The ticker with its field link to the right; wraps under it on a narrow screen. */
 .card-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
 
-/* The way into the universe view (cards.mjs planetLinkHtml). */
-.card-head .planet-link {
+/* Open the token fields (cards.mjs fieldLinkHtml). */
+.card-head .field-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     margin: 0;
-    padding: 5px 12px 5px 6px;
+    padding: 5px 12px;
     border: 1px solid var(--rwa-new-line);
     border-radius: 999px;
     background: var(--rwa-new-soft);
@@ -154,7 +154,7 @@ h1 {
     font-weight: 700;
     text-decoration: none;
 }
-.card-head .planet-link:hover { border-color: var(--rwa-new); }
+.card-head .field-link:hover { border-color: var(--rwa-new); }
 
 /* The price line under the title (cards.mjs priceLineHtml): price, premium, DEX liquidity, each sourced. */
 .card-head .price-line {

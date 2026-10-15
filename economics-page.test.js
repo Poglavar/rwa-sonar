@@ -150,7 +150,7 @@ describe('graphics and integration', () => {
         for (const file of ['index.html', 'pitch/index.html', 'methodology.html', 'learn/index.html',
             'watch.html', 'stocks.html', 'economics.html', 'design/dolphin-detectives/index.html']) {
             const html = readFileSync(join(__dirname, file), 'utf8');
-            const images = [...html.matchAll(/<img\b[^>]*src="([^"]*dolphin-detectives[^\"]+)"[^>]*>/g)];
+            const images = [...html.matchAll(/<img\b[^>]*src="([^"]*(?:dolphin-detectives|honest-joe)[^\"]+)"[^>]*>/g)];
             expect(images.length).toBeGreaterThan(0);
             for (const [tag, src] of images) {
                 expect(src).toMatch(/\.webp$/);

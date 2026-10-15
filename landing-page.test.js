@@ -140,9 +140,9 @@ describe('landing/app separation', () => {
         expect(html).toContain('Market size tells you what exists.');
         expect(html).toContain('RWA.xyz and DefiLlama');
         expect(html).toContain('L2BEAT, extended to RWAs');
-        expect(html).toContain('Claims versus reality');
+        expect(html).toContain('Tokenization, plain &amp; simple');
         expect(html).not.toContain('Why tokenize an asset at all?');
-        expect(html).toContain('The ticker is familiar.<br><span>The token is mysterious.</span>');
+        expect(html).toContain('Nice token.<br><span>Where’s the cow?</span>');
         expect(html).not.toContain('The token is not.');
         expect(html).not.toContain('not one score');
         expect(html).toContain('cannot tell us how many people own tokens');
@@ -174,17 +174,13 @@ describe('landing/app separation', () => {
         expect(form).toBeLessThan(hero.indexOf('<article class="comparison-preview"'));
         const css = readFileSync(join(__dirname, 'landing.css'), 'utf8');
         expect(css).toMatch(/\.hero-search \{ grid-area: search;/);
-        // On a wide screen the search heads the right column, above the real example.
-        expect(css).toMatch(/\.hero \{ grid-template-areas: "copy search" "copy preview" "copy events"; \}/);
-        const phone = css.slice(css.indexOf('/* Phone hero order'));
-        expect(phone).toMatch(/\.hero-copy \{ display: contents; \}/);
-        expect(phone).toMatch(/\.hero-search \{ order: 4;/);
-        expect(phone).toMatch(/\.hero-lede \{ order: 3;/);
+        expect(css).toContain('grid-template-areas: "copy art" "search art"');
+        expect(css).toContain('grid-template-areas: "copy" "search" "art"');
     });
 
-    test('offers the universe view among the hero actions, marked new', () => {
+    test('offers the token fields among the hero actions', () => {
         const actions = html.slice(html.indexOf('<div class="hero-actions">'), html.indexOf('</div>', html.indexOf('<div class="hero-actions">')));
-        expect(actions).toMatch(/<a class="button button-planets" href="\.\/universe\.html"><span class="badge-new">New<\/span>See as planets<\/a>/);
+        expect(actions).toContain('href="./universe.html">Take a walk through the fields →');
     });
 
     test('carries the canonical X identity across the main public surfaces', () => {
@@ -243,16 +239,15 @@ describe('landing/app separation', () => {
         for (const page of [html, stocks, whatif]) expect(page).not.toMatch(/\b(?:12|twelve) issuers?\b/i);
     });
 
-    test('introduces the night watch after the real comparison with responsive, deferred artwork', () => {
+    test('introduces the farm analogy after the real comparison with links to evidence', () => {
         const scene = html.match(/<section id="below-the-surface"[\s\S]*?<\/section>/)?.[0];
         expect(scene).toBeTruthy();
         expect(html.indexOf('AAPLx')).toBeLessThan(html.indexOf('id="below-the-surface"'));
         expect(html.indexOf('id="below-the-surface"')).toBeLessThan(html.indexOf('id="holdersChart"'));
-        expect(scene).toContain('night-watch-v2-768.webp 768w');
-        expect(scene).toContain('loading="lazy"');
+        expect(scene).toContain('Check the cow.<br>The deed. The gate.');
         expect(scene).toContain('href="./watch.html"');
         expect(scene).toContain('href="./methodology.html"');
-        expect(scene).toContain('An illustration of the research below the surface.');
+        expect(scene).toContain('The answers come from the documents and the chain.');
     });
 
     test('the previous general-RWA explorer remains available as its own app route', () => {

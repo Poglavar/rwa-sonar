@@ -18,7 +18,7 @@ describe('web-native pitch deck', () => {
             'We re-read every source every day.',
             'What Solana reveals about each token',
             'Research you can use today',
-            'Built to see below the surface.'
+            'Built to tell it straight.'
         ]) expect(html).toContain(heading);
         expect(html).toContain('rel="canonical" href="https://rwasonar.com/pitch/"');
         expect(html).toContain('href="../stocks.html?view=compare&compare=AAPL"');
@@ -35,13 +35,13 @@ describe('web-native pitch deck', () => {
         // The float, flows, powers and source figures are build-time regions (stocks/static-snapshot.test.js).
         for (const region of ['pitch-proof', 'pitch-powers-head', 'pitch-sources']) expect(html).toContain(`<!-- snapshot:${region}:start -->`);
         expect(html).toContain('PreStocks transfer fee 0.50%');
-        for (const step of ['Every real-world asset.', 'Deeper into the law.', 'A dolphin for every integration.']) expect(html).toContain(step);
+        for (const step of ['Every real-world asset.', 'Deeper into the law.', 'A watcher for every integration.']) expect(html).toContain(step);
         expect(html).toContain('Open source under the MIT licence');
         // Team facts are the owner's (supplied 24 Sep 2026); no placeholder is left on the public slide.
         expect(html).toContain('Built by <strong>Poglavar Svemira</strong>, a one-person team');
         for (const href of ['https://x.com/poglavars', 'https://t.me/svemirsky', 'https://github.com/Poglavar']) expect(html).toContain(`href="${href}"`);
         expect(html).not.toContain('Owner to add');
-        expect(html).toContain('https://github.com/Poglavar/rwa-sonar/tree/colosseum-worlds-fair');
+        expect(html).toContain('https://github.com/Poglavar/rwa-sonar/tree/main');
         expect(html).toContain('<meta name="twitter:site" content="@RWASonar" />');
         expect(html).toContain('href="https://x.com/RWASonar"');
         expect(html).not.toContain('Colosseum · 2026');
@@ -63,13 +63,13 @@ describe('web-native pitch deck', () => {
         expect(js).not.toContain('liveSnapshot');
     });
 
-    test('uses the wide night-watch scene on the existing cover, with text outside the image', () => {
+    test('uses Joe and the farm animals on the cover, with text outside the image', () => {
         const cover = html.match(/<section id="slide-1"[\s\S]*?<\/section>/)?.[0];
         expect(cover).toBeTruthy();
         expect(cover).toContain('class="cover-art"');
-        expect(cover).toContain('night-watch-v2-768.webp 768w');
-        expect(cover).toContain('width="1536" height="1024"');
-        expect(cover).toContain('<figcaption>The visible token is the tip of the structure.</figcaption>');
+        expect(cover).toContain('images/honest-joe/joe-and-friends.webp');
+        expect(cover).toContain('width="1100" height="733"');
+        expect(cover).toContain('<figcaption>Check the assets. Read the paperwork.</figcaption>');
         expect(cover).not.toContain('loading="lazy"');
         expect(html).not.toContain('class="sonar-visual"');
     });

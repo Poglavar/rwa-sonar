@@ -25,9 +25,9 @@ const CLAIM_DDL = readFileSync(join(__dirname, 'db', '2026-09-18-sonar-claims.sq
 // then with `unreadable` (the file the watcher applies).
 const SOURCE_STATUS_DDL = readFileSync(join(__dirname, 'db', '2026-10-02-sonar-source-retired.sql'), 'utf8');
 
-test('watch intro uses a small intrinsic patrol illustration and preserves monitoring details', () => {
-    expect(HTML).toContain('patrol-v1-256.webp');
-    expect(HTML).toContain('width="256" height="256"');
+test('watch intro uses a small Joe illustration and preserves monitoring details', () => {
+    expect(HTML).toContain('images/honest-joe/joe-inspects.webp');
+    expect(HTML).toContain('width="580" height="609"');
     expect(HTML).toContain('<summary>How monitoring works</summary>');
     expect(HTML).toContain('Observation times and review status remain with the evidence.');
 });

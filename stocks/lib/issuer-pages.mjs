@@ -266,7 +266,7 @@ export function renderIssuerPage({ issuer, tokens = [], templates = [], builtAt 
 <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 ${siteNav.themeScriptHtml('../')}
 ${issuerHead({ issuer, tokens, origin, canonical, ogImage })}
-<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
+<link rel="icon" type="image/svg+xml" href="../images/honest-joe/hat.svg" />
 ${contactStylesheet('../')}
 <link rel="stylesheet" href="../app-shell.css${v}" />
 <link rel="stylesheet" href="../templates.css${v}" />
@@ -314,5 +314,5 @@ export function renderIssuerIndex(issuers, { baseUrl = null, version = '', ogIma
             webPageLd({ origin, url: canonical, name: 'Issuer dossiers — RWA Sonar', description, type: 'CollectionPage' }),
             breadcrumbLd([{ name: 'RWA Sonar', url: `${origin}/` }, { name: 'Issuer dossiers', url: canonical }])])
     });
-    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />${siteNav.themeScriptHtml('../')}${head}<link rel="icon" type="image/svg+xml" href="../images/variant3.svg" /><link rel="stylesheet" href="../app-shell.css${v}" /><link rel="stylesheet" href="../templates.css${v}" />${contactStylesheet('../')}</head><body>${siteNav.siteHeaderHtml('../', 'issuers/')}<main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div></main>${contactFooterHtml('../')}</body></html>\n`;
+    return `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />${siteNav.themeScriptHtml('../')}${head}<link rel="icon" type="image/svg+xml" href="../images/honest-joe/hat.svg" /><link rel="stylesheet" href="../app-shell.css${v}" /><link rel="stylesheet" href="../templates.css${v}" />${contactStylesheet('../')}</head><body>${siteNav.siteHeaderHtml('../', 'issuers/')}<main><p class="eyebrow">Issuer programmes</p><h1>Who stands behind the token?</h1><p class="lede">One stable dossier per issuer programme: current holder claim, redemption route, control surface, backing evidence, discrepancies and exact Solana assets.</p><div class="template-grid">${cards}</div></main>${contactFooterHtml('../')}</body></html>\n`;
 }

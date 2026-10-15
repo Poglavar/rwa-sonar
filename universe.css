@@ -1,18 +1,18 @@
 /* The universe view: a full-screen three.js stage with the navigation bar, the info panel and the
-   body labels laid over it. Space is dark in either site theme, so this page sets its own palette. */
+   body labels laid over it. Sunny plots share the site’s warm paper and leaf-green palette. */
 
 :root {
-    --u-space: #030712;
-    --u-ink: #e5e9f5;
-    --u-muted: #97a3bf;
-    --u-line: rgba(151, 163, 191, 0.22);
-    --u-panel: rgba(10, 16, 32, 0.82);
-    --u-accent: #9db0ff;
-    --u-good: #4ade80;
-    --u-info: #7dd3fc;
-    --u-caution: #fbbf24;
-    --u-warning: #f87171;
-    color-scheme: dark;
+    --u-space: var(--rwa-paper);
+    --u-ink: var(--rwa-ink);
+    --u-muted: var(--rwa-muted);
+    --u-line: var(--rwa-line);
+    --u-panel: var(--rwa-panel);
+    --u-accent: var(--rwa-cobalt);
+    --u-good: var(--rwa-green);
+    --u-info: var(--rwa-cobalt-dark);
+    --u-caution: var(--rwa-amber);
+    --u-warning: var(--rwa-red);
+    color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -36,7 +36,7 @@ html, body {
     padding: 1px 7px;
     border: 1px solid transparent;
     border-radius: 999px;
-    background: rgba(3, 7, 18, 0.55);
+    background: var(--rwa-paper);
     color: var(--u-ink);
     font-size: 12px;
     font-weight: 600;
@@ -46,10 +46,10 @@ html, body {
     transform: translateY(-14px);
     user-select: none;
 }
-.body-label:hover, .body-label.hover { border-color: var(--u-accent); background: rgba(20, 30, 70, 0.85); }
+.body-label:hover, .body-label.hover { border-color: var(--u-accent); background: var(--rwa-panel); }
 .body-label.moon { font-size: 13px; }
 .body-label.focus { border-color: #fff; }
-.body-label.sun { color: #ffd98a; font-size: 14px; }
+.body-label.sun { color: var(--rwa-cobalt-dark); font-size: 14px; }
 .body-label::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--dot, #fff); }
 .body-label.sun::before { display: none; }
 
@@ -63,7 +63,7 @@ html, body {
     align-items: start;
     gap: 16px;
     padding: 14px 16px 24px;
-    background: linear-gradient(rgba(3, 7, 18, 0.92), rgba(3, 7, 18, 0));
+    background: linear-gradient(var(--rwa-paper), var(--rwa-paper));
     pointer-events: none;
 }
 .topbar > * { pointer-events: auto; }
@@ -91,7 +91,7 @@ html, body {
     padding: 12px 44px 12px 20px;
     border: 1px solid rgba(157, 176, 255, 0.45);
     border-radius: 999px;
-    background: rgba(10, 16, 32, 0.9);
+    background: var(--rwa-panel);
     box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(157, 176, 255, 0.06);
     color: var(--u-ink);
     font: inherit;
@@ -99,7 +99,7 @@ html, body {
     appearance: none;
 }
 .search input::placeholder { color: var(--u-muted); }
-.search input:focus { outline: none; border-color: var(--u-accent); box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(157, 176, 255, 0.22); }
+.search input:focus { outline: none; border-color: var(--u-accent); box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45), 0 0 0 4px color-mix(in srgb, var(--rwa-cobalt) 22%, transparent); }
 .search input::-webkit-search-cancel-button { display: none; }
 .search-key {
     position: absolute;
@@ -121,7 +121,7 @@ html, body {
     padding: 6px;
     border: 1px solid var(--u-line);
     border-radius: 14px;
-    background: rgba(10, 16, 32, 0.97);
+    background: var(--rwa-panel);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 .search-results .result {
@@ -133,7 +133,7 @@ html, body {
     border-radius: 8px;
     cursor: pointer;
 }
-.search-results .result:hover, .search-results .result[aria-selected="true"] { background: rgba(157, 176, 255, 0.14); }
+.search-results .result:hover, .search-results .result[aria-selected="true"] { background: var(--rwa-cobalt-soft); }
 .search-results .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dot, #fff); }
 .search-results strong { font-size: 14px; white-space: nowrap; }
 .search-results small { overflow: hidden; color: var(--u-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
@@ -153,7 +153,7 @@ html, body {
 }
 .kicker { margin: 0 0 6px; color: var(--u-accent); font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .panel h1 { margin: 0 0 10px; font: 500 30px/1.15 Georgia, serif; }
-.summary { margin: 0 0 14px; color: #cbd3e6; }
+.summary { margin: 0 0 14px; color: var(--u-muted); }
 
 .details { display: grid; grid-template-columns: minmax(90px, auto) 1fr; gap: 6px 12px; margin: 0 0 16px; font-size: 13px; }
 .details dt { color: var(--u-muted); }
@@ -190,7 +190,7 @@ html, body {
     padding: 8px 10px;
     border: 1px solid var(--u-line);
     border-radius: 8px;
-    background: rgba(10, 16, 32, 0.9);
+    background: var(--rwa-panel);
     color: var(--u-ink);
     font: inherit;
     font-size: 14px;
@@ -216,7 +216,7 @@ html, body {
     text-decoration: none;
     cursor: pointer;
 }
-.panel-actions a { background: #3154d8; border-color: #3154d8; }
+.panel-actions a { background: var(--rwa-cobalt); border-color: var(--rwa-cobalt); color: var(--rwa-on-accent); }
 
 .tone-good { --dot: var(--u-good); }
 .tone-info { --dot: var(--u-info); }
@@ -238,3 +238,13 @@ html, body {
     .panel h1 { font-size: 24px; }
     .hint { display: none; }
 }
+
+/* The labels are little field markers, with the same text and keyboard alternatives in the panel. */
+.body-label { border: 1px solid #bdc99f; border-radius: 6px; color: #29472d; background: #fffcec; box-shadow: 0 2px 3px #53653715; }
+.body-label:hover, .body-label.hover { background: #eff5dc; }
+.body-label.focus { border-color: #397443; }
+.body-label::before { border-radius: 2px; }
+.topbar { background: linear-gradient(var(--rwa-paper), transparent); }
+.search input { border-color: var(--rwa-control-line); box-shadow: 0 4px 20px #52673018; }
+.panel { border-color: var(--rwa-line); box-shadow: 0 12px 40px #3b532122; }
+.hint { color: #3a562c; background: #fffcefdf; border-radius: 8px; padding: 6px 10px; }

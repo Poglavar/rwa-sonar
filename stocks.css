@@ -17,7 +17,7 @@
     --link-color: var(--rwa-cobalt-dark);
     --card-bg: var(--rwa-panel);
     --sunken-bg: var(--rwa-sunken);
-    --header-bg: #e8e4da;
+    --header-bg: #e6ebd5;
     --header-text: var(--rwa-ink);
     --accent: var(--rwa-cobalt);
     --button-text: var(--rwa-on-accent);
@@ -31,7 +31,7 @@
 
 :root:where([data-theme="dark"]) {
     color-scheme: dark;
-    --header-bg: #2b344b;
+    --header-bg: #344831;
     --sev-warning: #f0875c;
 }
 
@@ -2579,7 +2579,7 @@ tr.asset-defunct td {
 body {
     margin: 0;
     background:
-        radial-gradient(circle at 82% 4%, rgba(49, 84, 216, 0.12), transparent 28rem),
+        radial-gradient(circle at 82% 4%, rgba(134, 170, 75, 0.12), transparent 28rem),
         linear-gradient(180deg, #fbfaf6 0, var(--page-bg) 38rem);
 }
 

@@ -34,7 +34,7 @@ function layoutHead({ title, description, socialDescription = null, canonical = 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     ${siteNav.themeScriptHtml('../')}
     ${seoHeadTags({ title, description, socialDescription, url: canonical, type, image, jsonLd, sep })}
-    <link rel="icon" type="image/svg+xml" href="../images/variant3.svg" />
+    <link rel="icon" type="image/svg+xml" href="../images/honest-joe/hat.svg" />
     <link rel="stylesheet" href="../app-shell.css${v}" />
     <link rel="stylesheet" href="../templates.css${v}" />
     ${contactStylesheet('../')}`;
