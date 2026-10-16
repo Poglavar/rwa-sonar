@@ -502,3 +502,17 @@ th.sort-active {
 .maturity-marks { display: flex; gap: 4px; }
 .maturity-marks span { letter-spacing: 1px; }
 .stage-badge { position: absolute; top: -4px; right: -4px; display: flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 50%; background: var(--rwa-cobalt); color: var(--rwa-on-accent); font-size: 10px; font-weight: 700; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); }
+
+/* Catalogue categories; light logo backing is a data requirement, independent of page theme. */
+:root { --asset-logo-backing:rgba(255,255,255,.96); --asset-logo-outline:rgba(148,163,184,.18); }
+.vocab-heading { margin:0; }
+.vocab-intro { margin:0 0 4px; line-height:1.5; }
+.definitions .vocab-stage { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; }
+.asset-sort { display:flex; align-items:center; min-height:24px; width:100%; border:0; padding:0; background:transparent; color:inherit; font:inherit; text-align:inherit; cursor:pointer; user-select:none; }
+.asset-sort:focus-visible,.asset-open:focus-visible { outline:2px solid var(--link-color); outline-offset:3px; }
+.blockchain-logo { max-width:24px; max-height:24px; object-fit:contain; display:block; }
+.asset-logo-wrap { position:relative; display:inline-block; line-height:0; }
+.table-asset-logo { max-width:48px; max-height:48px; object-fit:contain; display:block; }
+.table-asset-logo.asset-logo--needs-light-bg { background:var(--asset-logo-backing); border-radius:12px; padding:4px; box-sizing:border-box; box-shadow:0 0 0 1px var(--asset-logo-outline); }
+.asset-ticker { opacity:.6; font-size:.85em; margin-left:4px; }
+.asset-open { border:0; padding:0; background:transparent; color:inherit; font:inherit; text-align:inherit; cursor:pointer; }

@@ -106,7 +106,7 @@
         const issuerNodes = view.issuers.map((issuer, index) => {
             const angle = index / Math.max(1, view.issuers.length) * Math.PI * 2 - Math.PI / 2;
             const x = center.x + Math.cos(angle) * orbitRadius, y = center.y + Math.sin(angle) * orbitRadius * 0.77;
-            return `<g class="issuer-node${filters.issuer === issuer.id ? ' is-selected' : ''}" data-issuer="${escape(issuer.id)}" transform="translate(${x} ${y})" role="button" tabindex="0" aria-label="Follow ${escape(issuer.label)}"><circle class="node-hit" r="9" style="fill:transparent;stroke:none"/><circle r="${filters.issuer === issuer.id ? 4.5 : 2.7}"/></g>`;
+            return `<g class="issuer-node${filters.issuer === issuer.id ? ' is-selected' : ''}" data-issuer="${escape(issuer.id)}" transform="translate(${x} ${y})" role="button" tabindex="0" aria-label="Follow ${escape(issuer.label)}"><circle class="node-hit" r="9"/><circle r="${filters.issuer === issuer.id ? 4.5 : 2.7}"/></g>`;
         }).join('');
         const station = F.stationSvg(layout);
         svg.innerHTML = `<defs>${grad}<radialGradient id="station-glow"><stop stop-color="#76c5d6" stop-opacity=".2"/><stop offset="1" stop-color="#76c5d6" stop-opacity="0"/></radialGradient></defs>`

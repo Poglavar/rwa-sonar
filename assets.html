@@ -97,7 +97,7 @@
                     </div>
                 </div>
 
-                <h3 style="margin:0">The Four Pillars</h3>
+                <h3 class="vocab-heading">The Four Pillars</h3>
 
                 <ul class="definitions" aria-label="The four pillars">
                     <li>
@@ -139,30 +139,30 @@
                     </li>
                 </ul>
 
-                <h3 style="margin:0">How far the token is the official record</h3>
-                <p style="margin:0 0 4px;line-height:1.5">Four steps, each needing all the ones before it. An asset
+                <h3 class="vocab-heading">How far the token is the official record</h3>
+                <p class="vocab-intro">Four steps, each needing all the ones before it. An asset
                     that has not reached the first is recorded off-chain.</p>
                 <ul class="definitions" aria-label="How far the token is the official record">
-                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                    <li class="vocab-stage">
                         <span class="maturity-pill level-1">Chain is the record</span>
                         <span>the chain is the official record</span>
                     </li>
-                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                    <li class="vocab-stage">
                         <span class="maturity-pill level-2">Moves freely</span>
                         <span>and it moves without anyone’s approval</span>
                     </li>
-                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                    <li class="vocab-stage">
                         <span class="maturity-pill level-3">Redeem without the issuer</span>
                         <span>and the token alone redeems the asset</span>
                     </li>
-                    <li style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px">
+                    <li class="vocab-stage">
                         <span class="maturity-pill level-4">Theft can be reversed</span>
                         <span>and tokens can be moved by court order</span>
                     </li>
                 </ul>
 
-                <h3 style="margin:0">Other Properties</h3>
-                <p style="margin:0 0 4px;line-height:1.5">Additional properties that describe how complete and
+                <h3 class="vocab-heading">Other Properties</h3>
+                <p class="vocab-intro">Additional properties that describe how complete and
                     how durable the tokenization is.</p>
 
                 <ul class="definitions" aria-label="Other vocabulary definitions">
@@ -267,10 +267,10 @@
     <script src="assets.js?v=20260930nc"></script>
 
     <!-- Asset Modal -->
-    <div id="assetModal" class="modal" aria-hidden="true" style="display:none;">
+    <div id="assetModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAssetName" aria-hidden="true" hidden>
         <div class="modal-overlay" tabindex="-1" id="closeAssetOverlay"></div>
         <div class="modal-wrapper">
-            <button class="modal-close" id="closeAssetBtn">&times;</button>
+            <button class="modal-close" type="button" aria-label="Close asset" id="closeAssetBtn">&times;</button>
             <div class="modal-content asset-card-layout">
 
                 <!-- Left: Token Card -->
@@ -299,8 +299,8 @@
                         <div class="lens-header">
                             <div class="lens-title">Lens</div>
                             <div class="lens-add-wrapper">
-                                <button id="addAttestorBtn" class="lens-add-btn" title="Add Attestor">+</button>
-                                <div id="attestorDropdown" class="attestor-dropdown" style="display:none;">
+                                <button id="addAttestorBtn" type="button" aria-label="Add attestor" aria-controls="attestorDropdown" aria-expanded="false" class="lens-add-btn" title="Add Attestor">+</button>
+                                <div id="attestorDropdown" class="attestor-dropdown" hidden>
                                     <!-- Populated via JS -->
                                 </div>
                             </div>
@@ -309,20 +309,20 @@
                     </div>
 
                     <div class="dropdown-stack">
-                        <label>Recipe</label>
+                        <label for="recipeSelect">Recipe</label>
                         <select id="recipeSelect" class="sonar-select">
                             <option value="all">All Attestations</option>
                             <!-- Populated via JS -->
                         </select>
 
-                        <label>Attestation Type</label>
+                        <label for="onchainSelect">Attestation Type</label>
                         <select id="onchainSelect" class="sonar-select">
                             <option value="all">Onchain & Offchain</option>
                             <option value="onchain">Onchain Only</option>
                             <option value="offchain">Offchain Only</option>
                         </select>
 
-                        <label>Chain</label>
+                        <label for="chainSelect">Chain</label>
                         <select id="chainSelect" class="sonar-select" disabled>
                             <option value="all">All Chains</option>
                         </select>
@@ -333,10 +333,10 @@
     </div>
 
     <!-- Attestation Detail Modal -->
-    <div id="attestationModal" class="modal" aria-hidden="true" style="display:none; z-index: 1001;">
+    <div id="attestationModal" class="modal attestation-modal" role="dialog" aria-modal="true" aria-labelledby="attTitle" aria-hidden="true" hidden>
         <div class="modal-overlay" tabindex="-1" id="closeAttestationOverlay"></div>
         <div class="modal-wrapper small-wrapper">
-            <button class="modal-close" id="closeAttestationBtn">&times;</button>
+            <button class="modal-close" type="button" aria-label="Close attestation" id="closeAttestationBtn">&times;</button>
             <div class="modal-content">
                 <h3 id="attTitle" class="att-title"></h3>
                 <div class="att-details">
@@ -346,8 +346,8 @@
                     <div class="att-row"><strong>Expiry:</strong> <span id="attExpiry"></span></div>
                     <div class="att-row"><strong>Status:</strong> <span id="attStatus"></span></div>
                     <div class="att-row"><strong>Type:</strong> <span id="attType"></span></div>
-                    <div class="att-row" id="attNoteRow" style="display:none;"><strong>Note:</strong> <span id="attNote"
-                            style="font-size:12px; color:#a0aec0; text-align:right; max-width:250px;"></span></div>
+                    <div class="att-row" id="attNoteRow" hidden><strong>Note:</strong> <span id="attNote"
+                            class="att-note"></span></div>
                 </div>
                 <div class="att-actions">
                     <a id="attLink" href="#" target="_blank" class="att-link-btn">View Document</a>

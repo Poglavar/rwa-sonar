@@ -304,3 +304,6 @@
     .mission-footer a span { padding-left: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { .loading-orbit { animation: none; } }
+
+/* Larger transparent pointer target without changing issuer marks. */
+.issuer-node .node-hit { fill:transparent; stroke:none; }

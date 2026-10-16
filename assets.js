@@ -58,11 +58,11 @@ async function loadAssets() {
         assetsData = rows;
 
         thead.innerHTML = `<tr>${TABLE_COLUMNS.map(col =>
-            `<th style="cursor:pointer;user-select:none;" data-key="${escapeHtml(col.key)}">${escapeHtml(col.label)}<span class="sort-indicator"></span></th>`
+            `<th scope="col" data-key="${escapeHtml(col.key)}"><button type="button" class="asset-sort" aria-label="Sort by ${escapeHtml(col.label || (col.key === 'blockchain' ? 'blockchain' : 'asset image'))}">${escapeHtml(col.label)}<span class="sort-indicator" aria-hidden="true"></span></button></th>`
         ).join('')}</tr>`;
 
         thead.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', () => sortByColumn(th.getAttribute('data-key')));
+            th.querySelector('button').addEventListener('click', () => sortByColumn(th.getAttribute('data-key')));
         });
 
         sortByColumn('_maturityStage');
@@ -135,6 +135,7 @@ function updateSortIndicators() {
             ? (currentSort.ascending ? ' ↑' : ' ↓')
             : '';
         th.classList.toggle('sort-active', isActive);
+        th.setAttribute('aria-sort', isActive ? (currentSort.ascending ? 'ascending' : 'descending') : 'none');
     });
 }
 
@@ -142,7 +143,7 @@ function formatBlockchainCell(row) {
     const logo = row?.blockchain_logo;
     const name = escapeHtml(row?.blockchain ?? '');
     if (logo && isSafeUrl(logo)) {
-        return `<img src="${escapeHtml(logo)}" alt="${name}" title="${name}" loading="lazy" style="max-width:24px;max-height:24px;object-fit:contain;display:block" />`;
+        return `<img src="${escapeHtml(logo)}" alt="${name}" title="${name}" loading="lazy" class="blockchain-logo" />`;
     }
     return name;
 }
@@ -152,29 +153,16 @@ function formatImageCell(row) {
     if (!src || !isSafeUrl(src)) return '';
     const stage = computeMaturityStageNum(row);
     const badge = stage > 0 ? `<span class="stage-badge" title="${escapeHtml(LADDER.LEDGER_AXIS_WORDS[stage])}">${stage}</span>` : '';
-    const wrapperStyle = 'position:relative;display:inline-block;line-height:0';
-    const needsLightBg = row?.asset_image_background === 'light';
     const imageClass = row?.asset_image_background === 'light'
         ? 'table-asset-logo asset-logo--needs-light-bg'
         : 'table-asset-logo';
-    const imageStyle = [
-        'max-width:48px',
-        'max-height:48px',
-        'object-fit:contain',
-        'display:block',
-        needsLightBg ? 'background:rgba(255,255,255,0.96)' : '',
-        needsLightBg ? 'border-radius:12px' : '',
-        needsLightBg ? 'padding:4px' : '',
-        needsLightBg ? 'box-sizing:border-box' : '',
-        needsLightBg ? 'box-shadow:0 0 0 1px rgba(148,163,184,0.18)' : ''
-    ].filter(Boolean).join(';');
-    return `<div style="${wrapperStyle}"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="${imageClass}" style="${imageStyle}" />${badge}</div>`;
+    return `<div class="asset-logo-wrap"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="${imageClass}" />${badge}</div>`;
 }
 
 function formatNameCell(row) {
     const name = escapeHtml(row?.name ?? '');
-    const ticker = row?.ticker ? `<span style="opacity:0.6;font-size:0.85em;margin-left:4px">${escapeHtml(row.ticker)}</span>` : '';
-    return name + ticker;
+    const ticker = row?.ticker ? `<span class="asset-ticker">${escapeHtml(row.ticker)}</span>` : '';
+    return `<button type="button" class="asset-open">${name}${ticker}</button>`;
 }
 
 function formatLinksCell(row) {

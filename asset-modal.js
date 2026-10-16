@@ -228,9 +228,37 @@ if (typeof document !== 'undefined') {
         });
 
         // Modal Interaction
+        const modalTriggers = new WeakMap();
+        function setModalOpen(modal, open) {
+            if (open) modalTriggers.set(modal, document.activeElement);
+            modal.hidden = !open;
+            modal.classList.toggle('open', open);
+            modal.setAttribute('aria-hidden', String(!open));
+            if (open) modal.querySelector('button, a[href], select')?.focus();
+            else modalTriggers.get(modal)?.focus();
+        }
+        function closeDropdown() {
+            attestorDropdown.hidden = true;
+            addAttestorBtn?.setAttribute('aria-expanded', 'false');
+        }
+        document.addEventListener('keydown', (event) => {
+            const modal = !attestationModal.hidden ? attestationModal : !assetModal.hidden ? assetModal : null;
+            if (!modal) return;
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                if (!attestorDropdown.hidden) { closeDropdown(); addAttestorBtn.focus(); }
+                else if (modal === attestationModal) closeAttModal();
+                else closeModal();
+            }
+            if (event.key !== 'Tab') return;
+            const controls = Array.from(modal.querySelectorAll('button, a[href], select, [tabindex="0"]')).filter(el => !el.disabled && !el.closest('[hidden]') && el.getClientRects().length);
+            const first = controls[0], last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        });
         function closeModal() {
-            assetModal.style.display = 'none';
-            assetModal.setAttribute('aria-hidden', 'true');
+            setModalOpen(assetModal, false);
+            closeDropdown();
             currentAsset = null;
         }
 
@@ -238,8 +266,7 @@ if (typeof document !== 'undefined') {
         if (closeAssetOverlay) closeAssetOverlay.addEventListener('click', closeModal);
 
         function closeAttModal() {
-            attestationModal.style.display = 'none';
-            attestationModal.setAttribute('aria-hidden', 'true');
+            setModalOpen(attestationModal, false);
         }
         if (closeAttestationBtn) closeAttestationBtn.addEventListener('click', closeAttModal);
         if (closeAttestationOverlay) closeAttestationOverlay.addEventListener('click', closeAttModal);
@@ -249,13 +276,14 @@ if (typeof document !== 'undefined') {
             addAttestorBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 populateAttestorDropdown();
-                attestorDropdown.style.display = attestorDropdown.style.display === 'none' ? 'block' : 'none';
+                attestorDropdown.hidden = !attestorDropdown.hidden;
+                addAttestorBtn.setAttribute('aria-expanded', String(!attestorDropdown.hidden));
             });
         }
 
         document.addEventListener('click', (e) => {
             if (attestorDropdown && !e.target.closest('.lens-add-wrapper')) {
-                attestorDropdown.style.display = 'none';
+                closeDropdown();
             }
         });
 
@@ -276,11 +304,6 @@ if (typeof document !== 'undefined') {
             if (isSafeUrl(asset.asset_image)) modalAssetImage.src = asset.asset_image; else modalAssetImage.removeAttribute('src');
             modalAssetImage.alt = asset.name || 'Asset';
             modalAssetImage.classList.toggle('asset-logo--needs-light-bg', needsLightBg);
-            modalAssetImage.style.background = needsLightBg ? 'rgba(255, 255, 255, 0.96)' : '';
-            modalAssetImage.style.borderRadius = needsLightBg ? '16px' : '';
-            modalAssetImage.style.padding = needsLightBg ? '6px' : '';
-            modalAssetImage.style.boxSizing = needsLightBg ? 'border-box' : '';
-            modalAssetImage.style.boxShadow = needsLightBg ? '0 0 0 1px rgba(148, 163, 184, 0.18)' : '';
             if (modalAssetName) modalAssetName.textContent = asset.name || '';
             if (modalAssetTicker) modalAssetTicker.textContent = asset.ticker || '';
             if (isSafeUrl(asset.blockchain_logo)) modalChainImage.src = asset.blockchain_logo; else modalChainImage.removeAttribute('src');
@@ -304,8 +327,7 @@ if (typeof document !== 'undefined') {
             renderLensTags();
             renderCircles();
 
-            assetModal.style.display = 'flex';
-            assetModal.setAttribute('aria-hidden', 'false');
+            setModalOpen(assetModal, true);
         }
 
         function renderLensTags() {
@@ -314,7 +336,13 @@ if (typeof document !== 'undefined') {
             lens.attestors.forEach(attestor => {
                 const tag = document.createElement('div');
                 tag.className = 'lens-tag';
-                tag.innerHTML = `${attestor} <span class="remove-tag" data-attestor="${attestor}">&times;</span>`;
+                tag.textContent = attestor;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'remove-tag';
+                remove.textContent = '×';
+                remove.setAttribute('aria-label', `Remove ${attestor} from lens`);
+                tag.appendChild(remove);
                 tag.querySelector('.remove-tag').addEventListener('click', (e) => {
                     e.stopPropagation();
                     lens.attestors.delete(attestor);
@@ -333,7 +361,8 @@ if (typeof document !== 'undefined') {
 
             orderedAttestors.forEach(att => {
                 if (!lens.attestors.has(att.name)) {
-                    const item = document.createElement('div');
+                    const item = document.createElement('button');
+                    item.type = 'button';
                     item.className = 'attestor-item';
                     let label = att.name;
                     if (att.isIssuer) {
@@ -347,7 +376,7 @@ if (typeof document !== 'undefined') {
                         lens.attestors.add(att.name);
                         renderLensTags();
                         renderCircles();
-                        attestorDropdown.style.display = 'none';
+                        closeDropdown();
                     });
                     attestorDropdown.appendChild(item);
                 }
@@ -514,7 +543,8 @@ if (typeof document !== 'undefined') {
         }
 
         function createCircle(index, label, attestation, recipeItem) {
-            const circle = document.createElement('div');
+            const circle = document.createElement('button');
+            circle.type = 'button';
             circle.className = 'attestation-circle';
 
             const isEmpty = !attestation;
@@ -552,12 +582,12 @@ if (typeof document !== 'undefined') {
                     percentPassed = 0;
                 }
 
-                let color = '#48bb78'; // Green
-                if (isExpired) color = '#f56565';
-                else if (percentPassed > 75) color = '#f56565';
-                else if (percentPassed > 50) color = '#ecc94b';
+                let ringState = 'valid'; // Green
+                if (isExpired) ringState = 'expired';
+                else if (percentPassed > 75) ringState = 'expired';
+                else if (percentPassed > 50) ringState = 'warning';
 
-                if (attestation.status === 'revoked') color = '#f56565';
+                if (attestation.status === 'revoked') ringState = 'expired';
 
                 const size = CIRCLE_SIZE;
                 const strokeWidth = 3;
@@ -569,18 +599,14 @@ if (typeof document !== 'undefined') {
                 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                 svg.setAttribute('width', size);
                 svg.setAttribute('height', size);
-                svg.style.position = 'absolute';
-                svg.style.top = '0';
-                svg.style.left = '0';
+                svg.classList.add('attestation-ring');
 
                 // Background track
                 const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 bgCircle.setAttribute('cx', size / 2);
                 bgCircle.setAttribute('cy', size / 2);
                 bgCircle.setAttribute('r', radius);
-                bgCircle.setAttribute('fill', 'none');
-                bgCircle.setAttribute('stroke', '#4a5568');
-                bgCircle.setAttribute('stroke-width', strokeWidth);
+                bgCircle.classList.add('attestation-ring-track');
                 svg.appendChild(bgCircle);
 
                 // Filled arc
@@ -589,11 +615,8 @@ if (typeof document !== 'undefined') {
                     fgCircle.setAttribute('cx', size / 2);
                     fgCircle.setAttribute('cy', size / 2);
                     fgCircle.setAttribute('r', radius);
-                    fgCircle.setAttribute('fill', 'none');
-                    fgCircle.setAttribute('stroke', color);
-                    fgCircle.setAttribute('stroke-width', strokeWidth);
+                    fgCircle.classList.add('attestation-ring-value', `attestation-ring--${ringState}`);
                     fgCircle.setAttribute('stroke-dasharray', `${filled} ${gap}`);
-                    fgCircle.setAttribute('stroke-linecap', 'round');
                     fgCircle.setAttribute('transform', `rotate(-90 ${size / 2} ${size / 2})`);
                     svg.appendChild(fgCircle);
                 }
@@ -604,9 +627,7 @@ if (typeof document !== 'undefined') {
                     fullCircle.setAttribute('cx', size / 2);
                     fullCircle.setAttribute('cy', size / 2);
                     fullCircle.setAttribute('r', radius);
-                    fullCircle.setAttribute('fill', 'none');
-                    fullCircle.setAttribute('stroke', color);
-                    fullCircle.setAttribute('stroke-width', strokeWidth);
+                    fullCircle.classList.add('attestation-ring-value', `attestation-ring--${ringState}`);
                     svg.appendChild(fullCircle);
                 }
 
@@ -622,9 +643,9 @@ if (typeof document !== 'undefined') {
 
             // Position
             const pos = getCirclePosition(index, MAX_CIRCLES);
-            circle.style.position = 'absolute';
-            circle.style.left = `${pos.left}px`;
-            circle.style.top = `${pos.top}px`;
+            // Only data-derived coordinates cross the CSS boundary.
+            circle.style.setProperty('--circle-left', `${pos.left}px`);
+            circle.style.setProperty('--circle-top', `${pos.top}px`);
 
             // Click handler
             circle.addEventListener('click', (e) => {
@@ -653,22 +674,21 @@ if (typeof document !== 'undefined') {
             if (noteRow && noteSpan) {
                 if (att.note) {
                     noteSpan.textContent = att.note;
-                    noteRow.style.display = 'flex';
+                    noteRow.hidden = false;
                 } else {
-                    noteRow.style.display = 'none';
+                    noteRow.hidden = true;
                 }
             }
 
             const linkBtn = document.getElementById('attLink');
             if (att.link && att.link !== '#' && isSafeUrl(att.link)) {
                 linkBtn.href = att.link;
-                linkBtn.style.display = 'block';
+                linkBtn.hidden = false;
             } else {
-                linkBtn.style.display = 'none';
+                linkBtn.hidden = true;
             }
 
-            attestationModal.style.display = 'flex';
-            attestationModal.setAttribute('aria-hidden', 'false');
+            setModalOpen(attestationModal, true);
         }
 
         function openMissingAttestationDetails(recipeItem) {
@@ -688,17 +708,16 @@ if (typeof document !== 'undefined') {
                 const note = recipeItem.note || (typeDef ? typeDef.description : '');
                 if (note) {
                     noteSpan.textContent = note;
-                    noteRow.style.display = 'flex';
+                    noteRow.hidden = false;
                 } else {
-                    noteRow.style.display = 'none';
+                    noteRow.hidden = true;
                 }
             }
 
             const linkBtn = document.getElementById('attLink');
-            linkBtn.style.display = 'none';
+            linkBtn.hidden = true;
 
-            attestationModal.style.display = 'flex';
-            attestationModal.setAttribute('aria-hidden', 'false');
+            setModalOpen(attestationModal, true);
         }
     });
 }

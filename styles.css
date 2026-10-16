@@ -522,3 +522,38 @@ tr.asset-defunct td {
 a.tab-button {
     text-decoration: none;
 }
+
+/* Modal state and diagram presentation; SVG coordinates and expiry fractions stay data-driven. */
+.modal[hidden], .attestor-dropdown[hidden], .att-row[hidden], .att-link-btn[hidden] { display:none; }
+.attestation-modal { z-index:1001; }
+.att-note { font-size:12px; color:#a0aec0; text-align:right; max-width:250px; }
+.card-asset-img.asset-logo--needs-light-bg { background:var(--asset-logo-backing,rgba(255,255,255,.96)); border-radius:16px; padding:6px; box-sizing:border-box; box-shadow:0 0 0 1px var(--asset-logo-outline,rgba(148,163,184,.18)); }
+.attestation-circle { left:var(--circle-left); top:var(--circle-top); padding:0; }
+.attestation-circle:focus-visible,.attestor-item:focus-visible { outline:2px solid var(--rwa-cobalt); outline-offset:4px; }
+.attestation-ring { position:absolute; top:0; left:0; }
+.attestation-ring circle { fill:none; stroke-width:3; }
+.attestation-ring-track { stroke:#4a5568; }
+.attestation-ring-value { stroke-linecap:round; }
+.attestation-ring--valid { stroke:#48bb78; }
+.attestation-ring--expired { stroke:#f56565; }
+.attestation-ring--warning { stroke:#ecc94b; }
+button.attestor-item { display:block; width:100%; border:0; background:transparent; color:inherit; font:inherit; text-align:left; }
+
+.lens-tag button.remove-tag { border:0; padding:0; background:transparent; color:inherit; font:inherit; }
+
+/* Stack the explorer controls on narrow dialogs; retain the diagram's fixed coordinate space. */
+@media (max-width:680px) {
+    #assetModal .asset-card-layout { flex-direction:column; align-items:stretch; gap:30px; padding:20px 16px; box-sizing:border-box; max-height:90vh; }
+    #assetModal .token-card-section { width:100%; min-width:0; padding:12px 0; box-sizing:border-box; }
+    #assetModal .controls-section { flex:none; width:100%; min-width:0; }
+    #assetModal .lens-container { padding:16px; min-height:100px; box-sizing:border-box; }
+    #assetModal .lens-header { position:static; padding:0; margin-bottom:12px; background:transparent; }
+    #assetModal .lens-add-wrapper { position:static; }
+    #assetModal .attestor-dropdown { top:48px; left:12px; max-width:calc(100% - 24px); box-sizing:border-box; }
+    #assetModal .sonar-select { min-width:0; max-width:100%; box-sizing:border-box; }
+    #assetModal .lens-tag { min-width:0; max-width:100%; box-sizing:border-box; overflow-wrap:anywhere; }
+}
+@media (max-width:380px) {
+    #assetModal .token-card-section { position:relative; height:360px; }
+    #assetModal .token-card { position:absolute; flex:none; left:50%; top:50%; transform:translate(-50%,-50%) scale(.8); }
+}
