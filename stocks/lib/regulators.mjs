@@ -397,7 +397,10 @@ export const ROUTINE_FORMS = new Set(['3', '4', '5', '144', 'S-8', 'S-8 POS', '1
  */
 export function parseEdgarSearch(json, name) {
     const hits = json?.hits?.hits;
-    if (!Array.isArray(hits)) throw new Error('EDGAR full-text search: no hits array — the format changed');
+    if (!Array.isArray(hits)) {
+        throw new Error(`EDGAR full-text search for "${name?.phrase}": no hits array — the format changed: `
+            + JSON.stringify(json).slice(0, 200));
+    }
     const byAdsh = new Map();
     for (const hit of hits) {
         const s = hit?._source ?? {};
@@ -419,6 +422,20 @@ export function parseEdgarSearch(json, name) {
         });
     }
     return [...byAdsh.values()];
+}
+
+/**
+ * efts.sec.gov is AWS API Gateway in front of the search; besides its HTTP 500 {"message": …} it
+ * can answer HTTP 200 with an error envelope and no `hits` (2026-10-23 05:37: one request of 55,
+ * while the same queries read fine before and after). That is a transient upstream failure, retried
+ * like a 5xx, not a format change. Returns the reason for such a body, null for any other.
+ */
+export function edgarErrorBody(body) {
+    let json = null;
+    try { json = JSON.parse(body); } catch { return null; }
+    if (!json || typeof json !== 'object' || Array.isArray(json) || 'hits' in json) return null;
+    const message = json.errorMessage ?? json.message ?? json.error;
+    return message === undefined ? null : `HTTP 200 with an error body: ${JSON.stringify(json).slice(0, 200)}`;
 }
 
 /** BrokerCheck firm search → candidate firms. */
@@ -705,6 +722,7 @@ export const SOURCES = [
             url: `https://efts.sec.gov/LATEST/search-index?q=${encodeURIComponent(`"${n.phrase}"`)}&dateRange=custom`
                 + `&startdt=${addDays(today, -(windowDays ?? QUERY_WINDOW_DAYS))}&enddt=${today}`
         })),
+        transientBody: edgarErrorBody,
         parseEach: (body, req) => parseEdgarSearch(JSON.parse(body), req.name)
     },
     {

@@ -128,8 +128,10 @@ const counters = { requests: 0, retries: 0 };
 /**
  * `redirect: 'manual'` for hosts behind FINRA's WAF: a blocked client is sent a 307 to
  * error.waf.finra.org, and following it only surfaces as an opaque "fetch failed".
+ * `transientBody(text)` names a 200 body that is really an upstream error (EDGAR's error envelope):
+ * it is retried like a 5xx and, if it persists, is the request's error.
  */
-async function pacedFetch(url, { method = 'GET', body = null, headers = {}, paceMs = DEFAULT_PACE_MS, redirect = 'follow' } = {}) {
+async function pacedFetch(url, { method = 'GET', body = null, headers = {}, paceMs = DEFAULT_PACE_MS, redirect = 'follow', transientBody = null } = {}) {
     const host = new URL(url).host;
     // sec.gov's fair-access limit is 10 requests a second; one a second is well inside it.
     const pace = /(^|\.)sec\.gov$/.test(host) ? SEC_PACE_MS : paceMs;
@@ -155,10 +157,15 @@ async function pacedFetch(url, { method = 'GET', body = null, headers = {}, pace
             // Lenient decoding: some pages (CIMA) mix charsets; a mangled accent never matters to a name match.
             const text = new TextDecoder('utf-8').decode(await res.arrayBuffer());
             lastRequestEnd.set(host, Date.now());
-            if (res.ok) return text;
-            const challenge = res.headers.get('cf-mitigated') === 'challenge' || /Attention Required! \| Cloudflare/.test(text);
-            lastError = `HTTP ${res.status}${challenge ? ' (Cloudflare challenge/block)' : ''}: ${text.replace(/\s+/g, ' ').slice(0, 140)}`;
-            if (!retryable(res.status)) break;
+            const transient = res.ok && transientBody ? transientBody(text) : null;
+            if (res.ok && !transient) return text;
+            if (transient) {
+                lastError = transient;
+            } else {
+                const challenge = res.headers.get('cf-mitigated') === 'challenge' || /Attention Required! \| Cloudflare/.test(text);
+                lastError = `HTTP ${res.status}${challenge ? ' (Cloudflare challenge/block)' : ''}: ${text.replace(/\s+/g, ' ').slice(0, 140)}`;
+                if (!retryable(res.status)) break;
+            }
         } catch (err) {
             if (err.final) throw new Error(`${url}: ${err.message}`);
             lastRequestEnd.set(host, Date.now());
@@ -190,10 +197,20 @@ async function cacheRaw(source, raw, stamp) {
     return path;
 }
 
+/** A failed read still caches what it read, the body that failed to parse included, and says where. */
 async function collect(source, ctx) {
     const raw = [];
+    try {
+        return await collectInto(source, ctx, raw);
+    } catch (err) {
+        if (raw.length) err.message += ` (raw: ${relative(REPO, await cacheRaw(source, raw, ctx.stamp))})`;
+        throw err;
+    }
+}
+
+async function collectInto(source, ctx, raw) {
     const get = async (url, opts = {}) => {
-        const body = await pacedFetch(url, { paceMs: source.paceMs ?? DEFAULT_PACE_MS, ...opts });
+        const body = await pacedFetch(url, { paceMs: source.paceMs ?? DEFAULT_PACE_MS, transientBody: source.transientBody ?? null, ...opts });
         raw.push({ url, body });
         return body;
     };

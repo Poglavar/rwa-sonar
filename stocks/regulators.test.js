@@ -16,7 +16,7 @@ import {
     deriveWatchNames, distinctiveCore, fcaDates, feedGap, foldMatches, formatTelegramSummary, knownBlock, matchKey, matchNotices,
     nameCore, nameStrength, normaliseStoredChecks, normaliseStoredMatches, numericDate, parseAsicReleases,
     parseBafinMeasures, parseBafinNews, parseBrokerCheckFirm, parseBrokerCheckSearch, parseCbiUnauthorised,
-    parseCftcEnforcement, parseCima, parseCsv, parseEdgarSearch, parseEsmaNcasp, parseEsmaSanctions,
+    edgarErrorBody, parseCftcEnforcement, parseCima, parseCsv, parseEdgarSearch, parseEsmaNcasp, parseEsmaSanctions,
     parseFcaNews, parseFcaPublications, parseFcaWarnings, parseFinmaNews, parseFinmaWarnings, parseFinraDisciplinary,
     parseFmaLi, parseMasAlerts, parseSecPressReleases, parseSecSuspensions, parseSmvAlerts, rfc822Dates, runVerdict, selectSources, zonedToUtc
 } from './lib/regulators.mjs';
@@ -226,6 +226,19 @@ describe('parsers read the real payloads', () => {
             expect(n.publishedDate).toMatch(/^2026-/);
         }
         expect(new Set(list.map((n) => n.id)).size).toBe(list.length);
+    });
+
+    test('EDGAR full-text search: a 200 error envelope is a transient failure, a body without hits otherwise a format change', () => {
+        // efts.sec.gov's API Gateway envelope, the body it sends with its HTTP 500s.
+        expect(edgarErrorBody(fixture('edgar-fts-error-envelope.json'))).toMatch(/^HTTP 200 with an error body: .*Internal server error/);
+        expect(edgarErrorBody(JSON.stringify({ errorMessage: 'Task timed out' }))).toMatch(/Task timed out/);
+        // Real results, and bodies that are not an error envelope, are left to the parser.
+        expect(edgarErrorBody(fixture('edgar-fts-securitize-corp.json'))).toBeNull();
+        expect(edgarErrorBody(JSON.stringify({ results: [] }))).toBeNull();
+        expect(edgarErrorBody('<html>')).toBeNull();
+        expect(() => parseEdgarSearch({ results: [] }, byPhrase('Securitize Corp.')))
+            .toThrow('EDGAR full-text search for "Securitize Corp.": no hits array — the format changed: {"results":[]}');
+        expect(SOURCES.find((s) => s.id === 'sec-edgar-fts').transientBody).toBe(edgarErrorBody);
     });
 
     test('BrokerCheck: disclosures become an undated register notice whose id changes with the counts', () => {
