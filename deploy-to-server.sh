@@ -13,7 +13,7 @@
 # so production always matches GitHub. DEPLOY_ALLOW_DIRTY=1 bypasses in an emergency.
 set -euo pipefail
 
-REMOTE_HOST="${REMOTE_HOST:-do}"
+REMOTE_HOST="${REMOTE_HOST:-prod-de}"
 REMOTE_REPO_DIR="${REMOTE_REPO_DIR:-code/rwa-sonar}"
 REMOTE_DOCROOT="${REMOTE_DOCROOT:-/var/www/rwasonar}"
 CLONE_URL="${CLONE_URL:-git@github-personal:Poglavar/rwa-sonar.git}"
