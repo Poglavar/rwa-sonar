@@ -172,3 +172,13 @@ test('digest run fields map to job outcome and preserve missing completion times
         ok: true, failed: 0, configured: false } } })).jobs.find((job) => job.id === 'rwa-watch-digest');
     expect(notConfigured).toMatchObject({ observedAt: null, outcome: 'delivery not configured', failures: 0 });
 });
+
+test('collectors paused in the ecosystem file stay on the map as prepared, with their routes', () => {
+    const paused = ['rwa-watch-chain', 'rwa-watch-powers', 'rwa-watch-lending', 'rwa-trades', 'rwa-refresh', 'rwa-redemptions', 'rwa-watch-reserves'];
+    const base = fixture();
+    const data = build({ ...base, apps: base.apps.filter((app) => !paused.includes(app.name)) });
+    for (const id of paused) expect(data.jobs.find((job) => job.id === id)).toMatchObject({ state: 'prepared', cron: null });
+    expect(data.jobs.find((job) => job.id === 'mint-snapshot')).toMatchObject({ parentId: 'rwa-refresh', state: 'prepared' });
+    expect(data.jobs.find((job) => job.id === 'rwa-watch').state).toBe('configured');
+    expect(data.routes.filter((route) => route.jobId === 'rwa-watch-chain').every((route) => route.state === 'prepared')).toBe(true);
+});

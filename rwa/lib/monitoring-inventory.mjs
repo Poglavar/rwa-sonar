@@ -74,7 +74,13 @@ export function buildMonitoringInventory(input, generatedAt) {
         jobs.push(job); return job;
     };
     for (const app of apps) addJob(app.name);
-    for (const spec of REFRESH) addJob(spec.id, { ...spec, cadenceHours: spec.hours, parentId: 'rwa-refresh', cron: null });
+    // A collector paused in ecosystem.config.cjs keeps its definition but no schedule (seven Solana
+    // readers since 2026-10-11): it stays on the map as prepared instead of vanishing or breaking the
+    // routes that name it. The three conditional missions below decide their own state.
+    const conditional = ['rwa-watch-deployments', 'rwa-watch-sources', 'rwa-watch-fund-data'];
+    for (const id of Object.keys(JOBS)) if (!conditional.includes(id) && !apps.some((a) => a.name === id)) addJob(id, { state: 'prepared' });
+    const refreshState = apps.some((a) => a.name === 'rwa-refresh') ? 'configured' : 'prepared';
+    for (const spec of REFRESH) addJob(spec.id, { ...spec, cadenceHours: spec.hours, parentId: 'rwa-refresh', cron: null, state: refreshState });
     // A new collector in the refresh must be given a mission; silently dropping it would make the map misleading.
     const coveredScripts = new Set(REFRESH.map((s) => s.script));
     for (const [, script] of refreshScript.matchAll(/node (stocks\/fetch-[\w-]+\.mjs)/g)) {
