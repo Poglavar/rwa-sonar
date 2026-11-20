@@ -7,7 +7,7 @@
 # are never copied). Read-only on the server.
 set -euo pipefail
 
-REMOTE_HOST="${REMOTE_HOST:-do}"
+REMOTE_HOST="${REMOTE_HOST:-prod-de}"
 REMOTE_DOCROOT="${REMOTE_DOCROOT:-/var/www/rwasonar}"
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
