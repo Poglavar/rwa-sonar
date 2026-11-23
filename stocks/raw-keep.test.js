@@ -6,7 +6,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { isKeptName, keepRaw, listKept, planPrune, pruneKept, readKept } from './lib/raw-keep.mjs';
+import { isKeptName, keepRaw, listKept, openDayCache, planPrune, pruneKept, readKept } from './lib/raw-keep.mjs';
 
 let dir;
 beforeEach(() => {
@@ -56,5 +56,21 @@ describe('pruning', () => {
         expect(deleted).toHaveLength(2);
         expect((await listKept(dir))).toHaveLength(1);
         expect((await readKept((await listKept(dir))[0].path)).toString('utf8')).toBe('c');
+    });
+});
+
+describe('openDayCache', () => {
+    test('the same day keeps its files; a new day starts empty, so no day is kept twice', async () => {
+        const { writeFileSync, existsSync } = await import('node:fs');
+        const first = await openDayCache(dir, '2026-11-23');
+        writeFileSync(join(first.dir, 'AAPL@2026-08-15.json'), '{}');
+        const same = await openDayCache(dir, '2026-11-23');
+        expect(same.cleared).toBe(0);
+        expect(existsSync(join(same.dir, 'AAPL@2026-08-15.json'))).toBe(true);
+        const next = await openDayCache(dir, '2026-11-24');
+        expect(next.cleared).toBe(1);
+        expect(readdirSync(next.dir)).toEqual(['.date']);
+        // Dated directories of the old layout beside it are not touched (they are the prune script's).
+        expect(readdirSync(dir)).toEqual(['current']);
     });
 });

@@ -14,7 +14,7 @@
 // per-ticker checkpoint), actions are upserted every 50 symbols, and every write is an idempotent
 // upsert, so a killed run resumes where it stopped and a re-run the same day re-fetches nothing.
 
-import { mkdir, readdir } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import {
@@ -26,6 +26,8 @@ import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { isoDate, log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
+import { openDayCache } from './lib/raw-keep.mjs';
+import { stageFail, stageOk, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { postRunNotifications } from './lib/telegram.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -75,7 +77,8 @@ WHAT A RUN DOES
      ticker: any step of theirs is checked against nothing and is "unexplained").
   2. Corporate actions: one Yahoo chart v8 request per listing symbol for the window (+${PRICE_LEAD_DAYS} days of bars),
      paced ${DEFAULT_PACE_MS} ms, 429/5xx retried with backoff; each response cached for the UTC day in
-     ${relative(REPO, CACHE_ROOT)}/<date>/ (the checkpoint). Splits (numerator:denominator) and cash
+     ${relative(REPO, CACHE_ROOT)}/current/ (the checkpoint; emptied when a new day starts, so only
+     one day is ever kept). Splits (numerator:denominator) and cash
      dividends (amount, ex-date, the close before the ex-date) with Yahoo's own event time.
   3. Multiplier steps per mint from its configuration history (multiplier → newMultiplier at the mint's
      own effective timestamp), and the stretch over which that history is complete ("coverage").
@@ -284,8 +287,11 @@ async function main() {
     if (skipped.unmapped.length) logWarn(`no listing symbol for ${skipped.unmapped.length}: ${skipped.unmapped.slice(0, 10).join(', ')}`);
 
     // --- corporate actions, one symbol at a time (cached per UTC day) -----------------------------
-    const cacheDir = join(CACHE_ROOT, isoDate());
-    await mkdir(cacheDir, { recursive: true });
+    // One cache directory holding only today's responses: each day's response repeats the last
+    // ~100 days of bars, so keeping every day's was ~7 MB a day of near-copies (until 2026-11-23,
+    // <date>/ directories, which stocks/prune-run-caches.mjs removes).
+    const { dir: cacheDir, cleared } = await openDayCache(CACHE_ROOT, isoDate());
+    if (cleared) log(`cache: ${cleared} response(s) of an earlier day removed from ${relative(REPO, cacheDir)}`);
     const period1 = Math.floor((sinceMs - PRICE_LEAD_DAYS * 86_400_000) / 1000);
     const period2 = Math.floor(RUN_STARTED_MS / 1000);
     const actionsBySymbol = new Map();
@@ -294,6 +300,10 @@ async function main() {
     let pendingStore = [];
     let actionsFound = 0;
     let actionsStored = 0;
+    // INGEST (the Yahoo reads, cached for the day, and the actions they list) and PROCESSING (the
+    // reconciliation, its checks and events) are counted apart in the stats.
+    const ingest = stageTally();
+    const processing = stageTally();
     const fetchStartedMs = Date.now();
     for (let i = 0; i < toFetch.length; i += 1) {
         const symbol = toFetch[i];
@@ -308,14 +318,26 @@ async function main() {
                 actionsFound += parsed.actions.length;
                 pendingStore.push(...parsed.actions);
             }
+            stageOk(ingest);
         } catch (err) {
+            stageFail(ingest, 'fetch');
             failures.push(err.message);
             logWarn(`fetch failed: ${err.message}`);
         }
         if (!noDb && (pendingStore.length && ((i + 1) % STORE_EVERY === 0 || i === toFetch.length - 1))) {
-            await psql(dbUrl, wrapTransaction([buildActionUpsertSql(pendingStore)]), 'corporate actions');
-            actionsStored += pendingStore.length;
-            pendingStore = [];
+            // A failed write keeps the actions for the next batch: it never stops the next fetch.
+            try {
+                await psql(dbUrl, wrapTransaction([buildActionUpsertSql(pendingStore)]), 'corporate actions');
+                actionsStored += pendingStore.length;
+                pendingStore = [];
+            } catch (err) {
+                const last = i === toFetch.length - 1;
+                if (last) {
+                    stageFail(ingest, 'store-actions');
+                    failures.push(`storing ${pendingStore.length} corporate action(s) failed: ${err.message}`);
+                }
+                logError(`db: storing ${pendingStore.length} corporate action(s) failed${last ? '' : ' — retried with the next batch'}: ${err.message}`);
+            }
         }
         if ((i + 1) % 25 === 0 || i === toFetch.length - 1) {
             log(`symbols [${i + 1}/${toFetch.length}] ${actionsFound} action(s), ${counters.requests} request(s), ${counters.cached} from today's cache`
@@ -349,18 +371,31 @@ async function main() {
 
     // --- store -------------------------------------------------------------------------------------------
     if (!noDb) {
-        await psql(dbUrl, wrapTransaction(buildCheckSql(checks, { mints: reconciledMints, since, checkedAt: nowIso })), 'corporate action checks');
-        const events = actionEvents(checks, storedRows, nowIso);
-        if (events.length) await psql(dbUrl, wrapTransaction([buildChangeEventSql(events).sql]), 'corporate-action change events');
-        log(`db: ${events.length} corporate-action event(s) current (already stored ones are skipped)`);
-        const back = (await psql(dbUrl, `SELECT (SELECT count(*) FROM sonar.corporate_action) || '|' || (SELECT count(*) FROM sonar.corporate_action_check)
-            || '|' || (SELECT count(*) FROM sonar.corporate_action_check WHERE verdict IN ('late','wrong-ratio','missing','unexplained'));`, 'counts', ['-t', '-A'])).trim().split('|');
-        log(`db: ${back[0]} corporate action(s), ${back[1]} check(s) stored, ${back[2]} of them findings`);
+        let step = 'record-checks';
+        try {
+            await psql(dbUrl, wrapTransaction(buildCheckSql(checks, { mints: reconciledMints, since, checkedAt: nowIso })), 'corporate action checks');
+            step = 'record-events';
+            const events = actionEvents(checks, storedRows, nowIso);
+            if (events.length) await psql(dbUrl, wrapTransaction([buildChangeEventSql(events).sql]), 'corporate-action change events');
+            log(`db: ${events.length} corporate-action event(s) current (already stored ones are skipped)`);
+            step = 'count';
+            const back = (await psql(dbUrl, `SELECT (SELECT count(*) FROM sonar.corporate_action) || '|' || (SELECT count(*) FROM sonar.corporate_action_check)
+                || '|' || (SELECT count(*) FROM sonar.corporate_action_check WHERE verdict IN ('late','wrong-ratio','missing','unexplained'));`, 'counts', ['-t', '-A'])).trim().split('|');
+            log(`db: ${back[0]} corporate action(s), ${back[1]} check(s) stored, ${back[2]} of them findings`);
+            stageOk(processing);
+        } catch (err) {
+            // The actions are stored (ingest); the reconciliation is redone from them by the next run.
+            stageFail(processing, step);
+            failures.push(`processing failed at ${step}: ${err.message}`);
+            logError(`db: processing failed at ${step} — ${err.message}`);
+        }
     }
 
     const endedAt = ts();
+    const stages = stageStats(ingest, processing);
     const stats = {
-        watchStatus: failures.length ? 'partial' : 'ok',
+        watchStatus: worstStatus(failures.length ? 'partial' : 'ok', stages.ingestStatus, stages.processingStatus),
+        ...stages,
         generatedAt: endedAt,
         lastRunStartedAt: RUN_STARTED_AT,
         lastRunEndedAt: endedAt,
@@ -414,6 +449,8 @@ main().catch(async (err) => {
     try {
         await writeJson(STATS_FILE, {
             watchStatus: 'failed', generatedAt: ts(), lastRunStartedAt: RUN_STARTED_AT, lastRunEndedAt: ts(),
+            // A crash outside the per-symbol steps: which stage it hit is unknown, so both say failed.
+            ingestStatus: 'failed', processingStatus: 'failed',
             durationMs: Date.now() - RUN_STARTED_MS, failures: 1, failureReasons: [err.message]
         });
     } catch (statsError) {

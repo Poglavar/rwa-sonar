@@ -94,3 +94,31 @@ export async function pruneKept(dir, bounds = {}) {
     for (const f of doomed) await rm(f.path, { force: true });
     return doomed;
 }
+
+/**
+ * A same-day checkpoint directory `<root>/current`, holding only the given day's files: opened on a
+ * new day it is emptied first, so a job's per-day cache never accumulates one copy per day (the
+ * corporate-action watcher left ~7 MB a day behind before 2026-11-23). Returns { dir, cleared }:
+ * `cleared` counts the files of an earlier day that were removed.
+ */
+export async function openDayCache(root, date) {
+    const dir = join(root, 'current');
+    const marker = join(dir, '.date');
+    await mkdir(dir, { recursive: true });
+    let stored = null;
+    try {
+        stored = (await readFile(marker, 'utf8')).trim();
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+    let cleared = 0;
+    if (stored !== date) {
+        for (const name of await readdir(dir)) {
+            if (name === '.date') continue;
+            await rm(join(dir, name), { recursive: true, force: true });
+            cleared += 1;
+        }
+        await writeFile(marker, `${date}\n`, 'utf8');
+    }
+    return { dir, cleared };
+}
