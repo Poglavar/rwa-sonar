@@ -6,7 +6,7 @@ import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { isKeptName, keepRaw, listKept, openDayCache, planPrune, pruneKept, readKept } from './lib/raw-keep.mjs';
+import { isKeptName, keepRaw, listKept, openDayCache, planDatedCachePrune, planPrune, pruneKept, readKept } from './lib/raw-keep.mjs';
 
 let dir;
 beforeEach(() => {
@@ -72,5 +72,23 @@ describe('openDayCache', () => {
         expect(readdirSync(next.dir)).toEqual(['.date']);
         // Dated directories of the old layout beside it are not touched (they are the prune script's).
         expect(readdirSync(dir)).toEqual(['current']);
+    });
+});
+
+describe('planDatedCachePrune', () => {
+    test('only the old per-day caches before today, in their two places; nothing else', () => {
+        const entries = [
+            { area: 'raw', name: 'sources-2026-11-22.json' },
+            { area: 'raw', name: 'sources-2026-11-23.json' },
+            { area: 'raw', name: 'sources-checkpoint.json' },
+            { area: 'raw', name: 'sponsor-ondo-2026-10-07.json' },
+            { area: 'corporate-actions', name: '2026-10-01' },
+            { area: 'corporate-actions', name: '2026-11-23' },
+            { area: 'corporate-actions', name: 'current' }
+        ];
+        expect(planDatedCachePrune(entries, { today: '2026-11-23' })).toEqual([
+            { area: 'raw', name: 'sources-2026-11-22.json' },
+            { area: 'corporate-actions', name: '2026-10-01' }
+        ]);
     });
 });

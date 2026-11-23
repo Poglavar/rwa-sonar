@@ -122,3 +122,18 @@ export async function openDayCache(root, date) {
     }
     return { dir, cleared };
 }
+
+/**
+ * The run caches of the layout before 2026-11-23 that are now only near-copies: the document
+ * watcher's one checkpoint per day (`sources-<date>.json` in stocks/data/raw/) and the
+ * corporate-action watcher's one response directory per day (`<date>/` in
+ * stocks/data/raw/corporate-actions/). Today's are kept (a run may still be resuming from one).
+ * `entries` are names in those two directories, as { area: 'raw' | 'corporate-actions', name }.
+ */
+export function planDatedCachePrune(entries, { today }) {
+    return entries.filter(({ area, name }) => {
+        const m = area === 'raw' ? /^sources-(\d{4}-\d{2}-\d{2})\.json$/.exec(name)
+            : area === 'corporate-actions' ? /^(\d{4}-\d{2}-\d{2})$/.exec(name) : null;
+        return Boolean(m) && m[1] < today;
+    });
+}
