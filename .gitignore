@@ -63,6 +63,9 @@ api/node_modules/
 # durable record is sonar.source_version in Postgres.
 stocks/data/sources/
 stocks/data/sources-state.json
+# Per-day outcomes extracted from the old daily checkpoints before stocks/prune-run-caches.mjs
+# deleted them (the only copy; server state, safe from the deploy's `git clean -fd`).
+stocks/data/source-check-history.json
 
 # Live trade collector output. These files are mutable runtime state: production and local
 # collectors refresh them independently, while tests use the deterministic fixture below.
