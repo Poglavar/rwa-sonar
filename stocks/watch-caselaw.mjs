@@ -12,19 +12,23 @@
 // lib/caselaw.mjs and unit tested in caselaw.test.js; this file is the IO: pacing, retries, psql,
 // the circular queue's state file and the one Telegram summary.
 
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir, readFile, rm } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import {
     COURTLISTENER_SEARCH, SEC_FEEDS, backoffMs, buildCaseUpsertSql, buildQueryRunSql,
     buildReadCasesQuery, buildReadQueriesQuery, courtListenerUrl, deriveQueries, entryEvent, foldHits,
-    formatTelegramSummary, latestEntryFromDocuments, matchSecItems, normaliseStoredRows, parseCourtListenerResults,
-    activeQuotaStops, FEED_INTERVAL_MS, parseSecFeed, QUOTA_STOP_MS, queueHealth, queueOrder, quotaExhaustion, rankRows, reconcileQueue, retryable, reviewIndex, runOutcome, secFeedGap, selectEntryChecks, validateExtra
+    formatTelegramSummary, latestEntryFromDocuments, normaliseStoredRows, parseCourtListenerResults,
+    activeQuotaStops, FEED_INTERVAL_MS, QUOTA_STOP_MS, queueHealth, queueOrder, quotaExhaustion, rankRows, reconcileQueue, retryable, reviewIndex, runOutcome, selectEntryChecks, validateExtra
 } from './lib/caselaw.mjs';
+import { feedItemRows, parseFeedItems, runFeedTask } from './lib/caselaw-feed.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
+import { keepRaw, listKept, pruneKept, readKept } from './lib/raw-keep.mjs';
+import { buildNoticeStoreSql, buildReadUnmatchedQuery, parseStoreCounts } from './lib/regulators.mjs';
+import { stageFail, stageOk, stageSkip, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql, userAgentFor } from './lib/watch.mjs';
 
@@ -36,6 +40,10 @@ const EXTRA_FILE = join(HERE, 'data', 'caselaw-extra.json');
 const REVIEWED_FILE = join(HERE, 'data', 'caselaw-reviewed.json');
 const STATS_FILE = join(REPO, '.last-caselaw-watch-stats.json');
 const QUEUE_FILE = join(REPO, '.caselaw-watch-queue.json');
+/** SEC feed bodies whose items could not be stored (parse or store failed), gzip, once per content; replayed until stored. */
+const FEED_PENDING_DIR = join(HERE, 'data', 'raw', 'caselaw-pending');
+const PENDING_MAX_AGE_MS = 30 * 86_400_000;
+const PENDING_MAX_FILES = 30;
 const RUN_STARTED_MS = Date.now();
 
 const DEFAULT_PACE_MS = 1500;
@@ -76,9 +84,13 @@ WHAT A RUN DOES
   2. Per phrase: CourtListener v4 search, type=r (RECAP dockets), exact phrase, newest filing first,
      first page (20). Opinions (type=o) are no longer searched: 1 hit against RECAP's 81, at double
      the requests (2026-10-10). Per known docket: a docketNumber search in its court.
-  3. The SEC litigation-release and administrative-proceeding RSS feeds (25 newest items each),
-     matched locally against every phrase; a warning when the feed no longer reaches back to the
-     previous poll.
+  3. The SEC litigation-release and administrative-proceeding RSS feeds (25 newest items each).
+     INGEST first: EVERY item is stored in sonar.regulator_notice (source sec-lr / sec-ap, once per
+     content; a re-read only moves last_seen_at) before anything is matched. A body that will not
+     parse, or items that cannot be stored, are kept gzip in ${relative(REPO, FEED_PENDING_DIR)}/<feed>/
+     and replayed until stored. PROCESSING then matches this run's items plus any stored ones no run
+     has matched yet against every phrase; a warning when the feed no longer reaches back to the
+     previous poll. A failed processing step is recorded and the items wait for the next run.
   4. Every followed docket (caption matches, known dockets, confirmed) gets its newest RECAP entry
      read (type=rd, newest first).
   5. Each task is written to Postgres in one transaction as it finishes: the cases
@@ -88,7 +100,9 @@ WHAT A RUN DOES
      caption or among the parties, info when only in the text), and a newer docket entry -> caution.
      Cases marked \`dismissed\` in stocks/data/caselaw-reviewed.json are recorded but raise nothing.
   7. ONE Telegram summary when there are events or failures (a quota stop is pacing, not news);
-     ${relative(REPO, STATS_FILE)}; exit 1 if any request failed.
+     ${relative(REPO, STATS_FILE)} (ingestStatus / processingStatus apart, plus watchStatus, the worst
+     of them); exit 1 if any task failed. A stored state that cannot be read is not fatal: the feeds
+     are still fetched and stored, the CourtListener tasks (a queryable archive) wait for the next run.
 
 THE QUEUE
   Steps 2-4 are tasks in one circular queue (${relative(REPO, QUEUE_FILE)}: each task's lastDoneAt).
@@ -180,6 +194,33 @@ async function pacedGet(url, { headers, paceMs, accept }) {
     throw new Error(`${url.replace(/([?&])(token|key)=[^&]*/gi, '$1$2=…')}: ${lastError}`);
 }
 
+/**
+ * Store the items of every kept body of this feed (oldest first), deleting each once stored. A body
+ * that still fails stays, failing the ingest verdict each run, until it is PENDING_MAX_AGE_MS old.
+ */
+async function replayPendingFeed(feed, dbUrl) {
+    const dir = join(FEED_PENDING_DIR, feed.id);
+    const out = { inserted: 0, failed: 0, errors: [] };
+    for (const f of await pruneKept(dir, { maxFiles: PENDING_MAX_FILES, maxAgeMs: PENDING_MAX_AGE_MS })) {
+        logError(`${feed.id}: kept feed body ${relative(REPO, f.path)} dropped unstored after ${PENDING_MAX_AGE_MS / 86_400_000} days / ${PENDING_MAX_FILES} files`);
+    }
+    for (const f of (await listKept(dir)).reverse()) {
+        try {
+            const rows = feedItemRows(feed, parseFeedItems((await readKept(f.path)).toString('utf8'), feed));
+            // When it was fetched: the kept file's last-seen time, never now.
+            const counts = parseStoreCounts(await psql(dbUrl, buildNoticeStoreSql(rows, { seenAt: ts(new Date(f.mtimeMs)) }).sql, `store ${feed.id} (pending)`, ['-t', '-A']));
+            await rm(f.path, { force: true });
+            out.inserted += counts.inserted;
+            log(`${feed.id}: kept feed body ${relative(REPO, f.path)} stored — ${rows.length} item(s), ${counts.inserted} new`);
+        } catch (err) {
+            out.failed += 1;
+            out.errors.push(err.message);
+            logError(`${feed.id}: kept feed body ${relative(REPO, f.path)} still not stored — ${err.message}`);
+        }
+    }
+    return out;
+}
+
 // ---------------------------------------------------------------------------------------------
 // Inputs
 // ---------------------------------------------------------------------------------------------
@@ -269,31 +310,46 @@ async function main() {
         + ` ${queries.filter((q) => q.kind === 'docket').length} known dockets); ${review.size} reviewed decision(s)`);
 
     // --- stored state -------------------------------------------------------------------------
+    // The stored cases and runs are needed to PROCESS (what is new, what is a baseline). A failed read
+    // stops no fetch of an ephemeral source: the SEC feeds (newest 25) are still fetched and every item
+    // stored, to be matched by the next run that can read the state. The CourtListener searches and
+    // docket checks are a queryable archive, so they wait for that run instead of spending quota on
+    // results nothing could be compared with.
     const previous = new Map();
     const runs = new Map();
+    let stateError = null;
     if (dbUrl) {
         log(`db: ${describeUrl(dbUrl)}`);
-        const cases = normaliseStoredRows(JSON.parse((await psql(dbUrl, buildReadCasesQuery(), 'read cases', ['-t', '-A'])).trim() || '[]'));
-        for (const row of cases) {
-            // A decision made since the last run applies now, not when the case next turns up.
-            const decision = review.get(row.key);
-            previous.set(row.key, { ...row, reviewStatus: decision?.status ?? 'candidate', reviewNote: decision?.reason ?? null });
+        try {
+            const cases = normaliseStoredRows(JSON.parse((await psql(dbUrl, buildReadCasesQuery(), 'read cases', ['-t', '-A'])).trim() || '[]'));
+            for (const row of cases) {
+                // A decision made since the last run applies now, not when the case next turns up.
+                const decision = review.get(row.key);
+                previous.set(row.key, { ...row, reviewStatus: decision?.status ?? 'candidate', reviewNote: decision?.reason ?? null });
+            }
+            const stored = normaliseStoredRows(JSON.parse((await psql(dbUrl, buildReadQueriesQuery(), 'read queries', ['-t', '-A'])).trim() || '[]'));
+            for (const r of stored) runs.set(`${r.source}|${r.query}`, r);
+            log(`db: ${previous.size} stored case(s), ${runs.size} stored search run(s)`);
+        } catch (err) {
+            stateError = err.message;
+            previous.clear();
+            runs.clear();
+            logError(`db: could not read the stored cases/runs — the SEC feeds are still fetched and stored; searches,`
+                + ` docket checks and all matching wait for the next run: ${err.message}`);
         }
-        const stored = normaliseStoredRows(JSON.parse((await psql(dbUrl, buildReadQueriesQuery(), 'read queries', ['-t', '-A'])).trim() || '[]'));
-        for (const r of stored) runs.set(`${r.source}|${r.query}`, r);
-        log(`db: ${previous.size} stored case(s), ${runs.size} stored search run(s)`);
     } else {
         logWarn('--no-db: no stored state — every query is a baseline and this run raises NO events');
     }
-    const firstRunEver = runs.size === 0;
+    const firstRunEver = !stateError && runs.size === 0;
     if (firstRunEver && dbUrl) log('db: no search has ever run — this run is the BASELINE: everything is recorded, nothing is raised');
 
     // --- the queue ----------------------------------------------------------------------------
     // Every task, every run: the queue order decides what runs first and the quota decides how much
     // runs (see queueOrder). A scoped run covers only some tasks, so it neither reads nor writes the
     // queue state: it runs its tasks in order and leaves the round where it was.
-    const scoped = Boolean(flags.only || flags.limit || flags['no-db']);
-    if (scoped) logWarn('scoped run (--only / --limit / --no-db): the queue state is neither read nor written');
+    // A run that could not read the state runs only the feeds; it leaves the queue as it was.
+    const scoped = Boolean(flags.only || flags.limit || flags['no-db'] || stateError);
+    if (scoped) logWarn(`scoped run (${stateError ? 'stored state unreadable' : '--only / --limit / --no-db'}): the queue state is neither read nor written`);
     const detectedAt = ts(new Date(RUN_STARTED_MS));
     const tasks = [];
     for (const q of queries) {
@@ -316,7 +372,7 @@ async function main() {
         quotaStops.set(host, stop);
         log(`${host}: quota exhausted until ${stop.resumeAt} (found by an earlier run) — its tasks wait, no request is spent`);
     }
-    const ordered = scoped ? tasks : queueOrder(tasks, queue);
+    const ordered = stateError ? tasks.filter((t) => t.kind === 'feed') : scoped ? tasks : queueOrder(tasks, queue);
     const before = queueHealth(queue);
     log(`queue: ${tasks.length} task(s) (${tasks.filter((t) => t.kind === 'search').length} searches, ${tasks.filter((t) => t.kind === 'docket').length} known dockets,`
         + ` ${tasks.filter((t) => t.kind === 'feed').length} feeds, ${tasks.filter((t) => t.kind === 'entries').length} docket-entry checks);`
@@ -333,18 +389,43 @@ async function main() {
     let skippedForQuota = 0;
     let completed = 0;
     let baselineRecords = 0;
+    // INGEST (the fetch, and for the SEC feeds the store of every item) and PROCESSING (matching,
+    // folding, the case/run/event writes) are counted apart; a processing failure never touches ingest.
+    const ingest = stageTally();
+    const processing = stageTally();
+    let feedItemsStored = 0;
+    if (stateError) {
+        stageFail(processing, 'read-state');
+        stageSkip(ingest, tasks.filter((t) => t.kind !== 'feed').length);
+    }
 
     /** One task's results into Postgres, in one transaction — this is the checkpoint. */
     const persist = async ({ rows = [], run = null, taskEvents = [] }) => {
+        if (dbUrl) {
+            const statements = [];
+            if (rows.length) statements.push(buildCaseUpsertSql(rows).sql);
+            if (run) statements.push(buildQueryRunSql([run]).sql);
+            if (taskEvents.length) statements.push(buildChangeEventSql(taskEvents).sql);
+            if (statements.length) await psql(dbUrl, wrapTransaction(statements), 'task');
+        }
+        // Counted only once written: an event whose write failed is not reported as raised.
         for (const row of rows) touched.add(row.key);
         events.push(...taskEvents);
         if (!dbUrl) return;
-        const statements = [];
-        if (rows.length) statements.push(buildCaseUpsertSql(rows).sql);
-        if (run) statements.push(buildQueryRunSql([run]).sql);
-        if (taskEvents.length) statements.push(buildChangeEventSql(taskEvents).sql);
-        if (statements.length) await psql(dbUrl, wrapTransaction(statements), 'task');
         if (run) runs.set(`${run.source}|${run.query}`, { ...run, firstRunAt: runs.get(`${run.source}|${run.query}`)?.firstRunAt ?? run.runAt });
+    };
+
+    // A task's outcome per stage, for the split verdicts: null = ok, a string = the failing step,
+    // absent = not reached. Thrown on the error so `execute` can count it.
+    const failed = (err, outcome) => Object.assign(err, { outcome });
+    /** The fetch is the ingest of a search/docket/entries task; a quota stop passes through untouched. */
+    const fetchStep = async (fn) => {
+        try {
+            return await fn();
+        } catch (err) {
+            if (err instanceof QuotaExhaustedError) throw err;
+            throw failed(err, { ingest: 'fetch' });
+        }
     };
 
     const runTask = async (task) => {
@@ -355,68 +436,80 @@ async function main() {
             const baseline = !dbUrl || !runs.has(`${source}|${runKey}`);
             const url = courtListenerUrl(task.kind === 'docket' ? { kind: 'docket', courtId: q.courtId, docketNumber: q.docketNumber }
                 : { kind: 'search', type: task.type, phrase: q.phrase });
-            const json = JSON.parse(await pacedGet(url, { headers: clHeaders, paceMs, accept: 'application/json' }));
-            const parsed = parseCourtListenerResults(json, { type: task.kind === 'docket' ? 'r' : task.type, phrase: q.phrase });
-            if (task.kind === 'docket' && parsed.records.length === 0) {
-                throw new Error(`known docket ${q.courtId} ${q.docketNumber} (${q.name}) was not found on CourtListener`);
+            const body = await fetchStep(() => pacedGet(url, { headers: clHeaders, paceMs, accept: 'application/json' }));
+            try {
+                const json = JSON.parse(body);
+                const parsed = parseCourtListenerResults(json, { type: task.kind === 'docket' ? 'r' : task.type, phrase: q.phrase });
+                if (task.kind === 'docket' && parsed.records.length === 0) {
+                    throw new Error(`known docket ${q.courtId} ${q.docketNumber} (${q.name}) was not found on CourtListener`);
+                }
+                const label = q.phrase ?? `docket ${q.courtId} ${q.docketNumber}`;
+                const { rows, events: taskEvents } = foldHits(parsed.records, { previous, query: { ...q, phrase: label }, baseline, detectedAt, review });
+                hitsBySource[source] = (hitsBySource[source] ?? 0) + parsed.records.length;
+                if (baseline) baselineRecords += rows.length;
+                await persist({
+                    rows,
+                    taskEvents,
+                    run: { source, query: runKey, issuers: q.issuers, origins: q.origins, runAt: detectedAt, total: parsed.total }
+                });
+                return `${parsed.records.length}/${parsed.total ?? '?'} hit(s)${parsed.more ? ' (first page)' : ''}${baseline ? ' · baseline' : ''}`
+                    + `${taskEvents.length ? ` · ${taskEvents.length} event(s)` : ''}`;
+            } catch (err) {
+                // CourtListener is a queryable archive: the task keeps its place and is searched again next run.
+                throw failed(err, { ingest: null, processing: 'process-results' });
             }
-            const label = q.phrase ?? `docket ${q.courtId} ${q.docketNumber}`;
-            const { rows, events: taskEvents } = foldHits(parsed.records, { previous, query: { ...q, phrase: label }, baseline, detectedAt, review });
-            hitsBySource[source] = (hitsBySource[source] ?? 0) + parsed.records.length;
-            if (baseline) baselineRecords += rows.length;
-            await persist({
-                rows,
-                taskEvents,
-                run: { source, query: runKey, issuers: q.issuers, origins: q.origins, runAt: detectedAt, total: parsed.total }
-            });
-            return `${parsed.records.length}/${parsed.total ?? '?'} hit(s)${parsed.more ? ' (first page)' : ''}${baseline ? ' · baseline' : ''}`
-                + `${taskEvents.length ? ` · ${taskEvents.length} event(s)` : ''}`;
         }
         if (task.kind === 'feed') {
             const { feed } = task;
             const prevRun = runs.get(`${feed.id}|(feed)`) ?? null;
             const baseline = !dbUrl || prevRun === null;
-            const xml = await pacedGet(feed.url, { headers: secHeaders, paceMs, accept: 'application/rss+xml,application/xml' });
-            const items = parseSecFeed(xml, feed);
-            if (items.length === 0) throw new Error(`${feed.url}: no <item> parsed — the feed format changed`);
-            if (secFeedGap(items, prevRun?.lastRunAt ?? null)) {
+            const outcome = await runFeedTask(
+                { feed, queries, previous, prevRun, baseline, detectedAt, review, stateError },
+                {
+                    replayPending: dbUrl ? () => replayPendingFeed(feed, dbUrl) : null,
+                    fetch: () => pacedGet(feed.url, { headers: secHeaders, paceMs, accept: 'application/rss+xml,application/xml' }),
+                    keepPending: async (xml) => ({ path: relative(REPO, (await keepRaw(join(FEED_PENDING_DIR, feed.id), xml, { ext: 'xml' })).path) }),
+                    store: dbUrl ? async (rows) => parseStoreCounts(await psql(dbUrl, buildNoticeStoreSql(rows, { seenAt: detectedAt }).sql, `store ${feed.id}`, ['-t', '-A'])) : null,
+                    readBacklog: dbUrl ? async () => JSON.parse((await psql(dbUrl, buildReadUnmatchedQuery(feed.id), `backlog ${feed.id}`, ['-t', '-A'])).trim() || '[]') : null,
+                    write: dbUrl ? (statements) => psql(dbUrl, wrapTransaction(statements), `feed ${feed.id}`) : null
+                }
+            );
+            feedItemsStored += outcome.inserted;
+            if (outcome.gap) {
                 failures.push(`${feed.label}: the feed's oldest item is newer than our last poll (${prevRun.lastRunAt}) — releases in between may have been missed`);
             }
-            // One record per item, attributed to every phrase it names.
-            const byKey = new Map();
-            for (const { record, query } of matchSecItems(items, queries)) {
-                const entry = byKey.get(record.key) ?? { record, phrases: [], issuers: new Set(), origins: [] };
-                entry.phrases.push(query.phrase);
-                query.issuers.forEach((i) => entry.issuers.add(i));
-                entry.origins.push(...query.origins);
-                if (record.matchLevel === 'caption') entry.record = record;
-                byKey.set(record.key, entry);
+            if (!outcome.processingError && outcome.ingestError?.step !== 'fetch' && outcome.ingestError?.step !== 'parse') {
+                for (const row of outcome.rows) touched.add(row.key);
+                events.push(...outcome.events);
+                if (dbUrl) runs.set(`${feed.id}|(feed)`, { source: feed.id, query: '(feed)', runAt: detectedAt, lastRunAt: detectedAt, firstRunAt: prevRun?.firstRunAt ?? detectedAt });
+                hitsBySource[feed.id] = (hitsBySource[feed.id] ?? 0) + outcome.rows.length;
+                if (baseline) baselineRecords += outcome.rows.length;
             }
-            const rows = [];
-            const taskEvents = [];
-            for (const { record, phrases, issuers } of byKey.values()) {
-                const folded = foldHits([record], {
-                    previous, query: { phrase: phrases.join(' | '), issuers: [...issuers].sort() }, baseline, detectedAt, review
-                });
-                rows.push(...folded.rows);
-                taskEvents.push(...folded.events);
+            if (outcome.ingestError || outcome.processingError) {
+                const err = new Error([outcome.ingestError && `ingest ${outcome.ingestError.step}: ${outcome.ingestError.message}`,
+                    outcome.processingError && `processing ${outcome.processingError.step}: ${outcome.processingError.message}`].filter(Boolean).join('; '));
+                const reached = outcome.ingestError?.step === 'fetch' || outcome.ingestError?.step === 'parse' ? {} : { processing: outcome.processingError?.step ?? null };
+                throw failed(err, { ingest: outcome.ingestError?.step ?? null, ...reached });
             }
-            hitsBySource[feed.id] = (hitsBySource[feed.id] ?? 0) + rows.length;
-            if (baseline) baselineRecords += rows.length;
-            await persist({ rows, taskEvents, run: { source: feed.id, query: '(feed)', issuers: [], origins: [], runAt: detectedAt, total: items.length } });
-            return `${items.length} item(s) since ${items.map((i) => i.dateFiled).filter(Boolean).sort()[0] ?? '?'}, ${rows.length} naming a watched party`
-                + `${baseline ? ' · baseline' : ''}${taskEvents.length ? ` · ${taskEvents.length} event(s)` : ''}`;
+            const items = outcome.items;
+            return `${items.length} item(s) since ${items.map((i) => i.dateFiled).filter(Boolean).sort()[0] ?? '?'}, ${outcome.inserted} new stored,`
+                + ` ${outcome.rows.length} naming a watched party${outcome.backlogCount ? ` (+${outcome.backlogCount} unmatched from earlier runs)` : ''}`
+                + `${baseline ? ' · baseline' : ''}${outcome.events.length ? ` · ${outcome.events.length} event(s)` : ''}`;
         }
         if (task.kind === 'entries') {
             const row = previous.get(task.key);
-            const json = JSON.parse(await pacedGet(courtListenerUrl({ kind: 'entries', docketId: row.docketId }),
+            const body = await fetchStep(() => pacedGet(courtListenerUrl({ kind: 'entries', docketId: row.docketId }),
                 { headers: clHeaders, paceMs, accept: 'application/json' }));
-            const latest = latestEntryFromDocuments(json.results);
-            const { row: next, events: taskEvents } = entryEvent(row, latest, { detectedAt });
-            previous.set(next.key, next);
-            await persist({ rows: [next], taskEvents });
-            return `${row.caseName} — newest entry ${latest ? `#${latest.number ?? '?'} of ${latest.date ?? '?'}` : 'none in RECAP'}`
-                + `${taskEvents.length ? ` · ${taskEvents.length} event(s)` : ''}`;
+            try {
+                const latest = latestEntryFromDocuments(JSON.parse(body).results);
+                const { row: next, events: taskEvents } = entryEvent(row, latest, { detectedAt });
+                await persist({ rows: [next], taskEvents });
+                previous.set(next.key, next);
+                return `${row.caseName} — newest entry ${latest ? `#${latest.number ?? '?'} of ${latest.date ?? '?'}` : 'none in RECAP'}`
+                    + `${taskEvents.length ? ` · ${taskEvents.length} event(s)` : ''}`;
+            } catch (err) {
+                throw failed(err, { ingest: null, processing: 'process-entries' });
+            }
         }
         throw new Error(`unknown task kind ${task.kind}`);
     };
@@ -431,6 +524,8 @@ async function main() {
             }
             try {
                 const outcome = await runTask(task);
+                stageOk(ingest);
+                stageOk(processing);
                 queue[task.id] = { ...queue[task.id], lastDoneAt: ts() };
                 completed += 1;
                 await saveQueue();
@@ -442,6 +537,11 @@ async function main() {
                     continue;
                 }
                 // A failed task keeps its place at the front of the queue and is retried next run.
+                const outcome = err.outcome ?? { processing: 'task' };
+                for (const [stage, tally] of [['ingest', ingest], ['processing', processing]]) {
+                    if (outcome[stage] === null) stageOk(tally);
+                    else if (typeof outcome[stage] === 'string') stageFail(tally, outcome[stage]);
+                }
                 failures.push(`${task.id}: ${err.message}`);
                 logError(`${task.kind} [${progress(i + 1, list.length, startedMs)}] ${task.id} FAILED — ${err.message}`);
             }
@@ -478,9 +578,13 @@ async function main() {
     log(`watch-caselaw: ${events.length} event(s)`);
     for (const e of events.slice(0, 20)) log(`  [${e.severity}] ${e.subjectId}: ${e.summary}`);
 
+    if (stateError) failures.push(`stored state unreadable — searches, docket checks and matching skipped this run: ${stateError}`);
     const outcome = runOutcome({ failures: failures.length });
+    const stages = stageStats(ingest, processing);
     const stats = {
-        watchStatus: outcome.watchStatus,
+        watchStatus: worstStatus(outcome.watchStatus, stages.ingestStatus, stages.processingStatus),
+        ...stages,
+        feedItemsStored,
         generatedAt: ts(),
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         detectedAt,
@@ -538,6 +642,11 @@ main().catch(async (err) => {
     try {
         await writeJson(STATS_FILE, {
             watchStatus: 'failed',
+            // A crash outside the per-task steps: which stage it hit is unknown, so both say failed.
+            ingestStatus: 'failed',
+            processingStatus: 'failed',
+            ingest: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
+            processing: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
             generatedAt: ts(),
             lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
             durationMs: Date.now() - RUN_STARTED_MS,

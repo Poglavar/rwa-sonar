@@ -944,19 +944,24 @@ export function noticeHash(notice) {
     return createHash('sha256').update(canonicalJson(notice)).digest('hex');
 }
 
-/** Store rows for one source's notices: one per (notice id, content hash). */
-export function noticeRows(sourceId, notices) {
+/**
+ * Store rows for one source's notices: one per (notice id, content hash). `idOf` / `dateOf` read
+ * the id and the source's own date from another parser's shape (the case-law SEC feed items carry
+ * `externalId` and `dateFiled`).
+ */
+export function noticeRows(sourceId, notices, { idOf = (n) => n.id, dateOf = (n) => n.publishedDate } = {}) {
     const byKey = new Map();
     for (const notice of notices ?? []) {
-        if (!notice?.id) throw new Error(`${sourceId}: a notice without an id cannot be stored`);
+        const id = notice ? idOf(notice) : null;
+        if (!id) throw new Error(`${sourceId}: a notice without an id cannot be stored`);
         const contentHash = noticeHash(notice);
-        byKey.set(`${notice.id}|${contentHash}`, {
+        byKey.set(`${id}|${contentHash}`, {
             source: sourceId,
-            noticeId: String(notice.id),
+            noticeId: String(id),
             contentHash,
             notice,
             publishedAt: notice.publishedAt ?? null,
-            publishedDate: notice.publishedDate ?? null
+            publishedDate: dateOf(notice) ?? null
         });
     }
     return [...byKey.values()];
@@ -1003,10 +1008,10 @@ export function buildReadUnmatchedQuery(sourceId, { tag = 'sonar' } = {}) {
 }
 
 /** This run's notices plus the stored backlog, one per id; this run's version wins. */
-export function withBacklog(current, backlog) {
+export function withBacklog(current, backlog, { idOf = (n) => n.id } = {}) {
     const byId = new Map();
-    for (const b of backlog ?? []) if (b?.notice?.id) byId.set(String(b.notice.id), b.notice);
-    for (const n of current ?? []) byId.set(String(n.id), n);
+    for (const b of backlog ?? []) if (b?.notice && idOf(b.notice)) byId.set(String(idOf(b.notice)), b.notice);
+    for (const n of current ?? []) byId.set(String(idOf(n)), n);
     return [...byId.values()];
 }
 
@@ -1015,8 +1020,8 @@ export function withBacklog(current, backlog) {
  * the newest version of each, which supersedes any older one still waiting. Rows already matched
  * are not rewritten.
  */
-export function buildMarkMatchedSql(sourceId, notices, { matchedAt }, { tag = 'sonar' } = {}) {
-    const ids = [...new Set((notices ?? []).map((n) => String(n.id)))];
+export function buildMarkMatchedSql(sourceId, notices, { matchedAt, idOf = (n) => n.id }, { tag = 'sonar' } = {}) {
+    const ids = [...new Set((notices ?? []).map((n) => String(idOf(n))))];
     const sql = `UPDATE sonar.regulator_notice n SET matched_at = (${jsonbLiteral(matchedAt, tag)} #>> '{}')::timestamptz, updated_at = now()\n`
         + ` WHERE n.source = (${jsonbLiteral(sourceId, tag)} #>> '{}') AND n.matched_at IS NULL\n`
         + `   AND n.notice_id IN (SELECT jsonb_array_elements_text(${jsonbLiteral(ids, tag)}));\n`;
