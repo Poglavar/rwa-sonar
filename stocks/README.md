@@ -1691,7 +1691,9 @@ capped.
 stocks/data/sources.json                        the registry (committed)
 stocks/data/sources/<id>/<fetched_at>.{pdf,html,json,txt}   raw + normalised, last 5 versions (gitignored)
 stocks/data/sources-state.json                  per-URL hash/etag/last-checked (gitignored)
-stocks/data/raw/sources-<date>.json             per-source checkpoint, resumable (gitignored)
+stocks/data/raw/sources-checkpoint.json         the current day's per-source checkpoint, resumable (gitignored)
+stocks/data/raw/unread/<id>/                    bytes a host served that could not be read (gzip, 3 per source, 30 days)
+.source-watch-pending-load.json                 rows a failed Postgres load kept; offered first by the next run
 ```
 
 `<id>` is `left(sha256(url), 12)`, the same value as `sonar.source.id`, so nothing has to look an

@@ -146,5 +146,7 @@ next-steps.md
 # Job state written on the server. Deploy scripts run `git clean -fd`, which deletes untracked files
 # that are NOT ignored; ignored ones survive (2026-10-13).
 .caselaw-watch-queue.json
+# Rows a failed Postgres load of the document watcher kept for the next run (stocks/watch-sources.mjs).
+.source-watch-pending-load.json
 .last-*-stats.json
 .last-*-stats-*.json

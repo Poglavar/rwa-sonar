@@ -42,7 +42,9 @@ import {
     storedReading, userAgentFor, dossierQuotes, selectSourceIds, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
     ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
 } from './lib/watch.mjs';
-import { buildRows, nextState, settleExtractorUpgrade } from './lib/watch-rows.mjs';
+import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
+import { keepRaw, pruneKept } from './lib/raw-keep.mjs';
+import { stageFail, stageOk, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
@@ -58,6 +60,12 @@ const ISSUERS_DIR = join(HERE, 'data', 'issuers');
 const VERSIONS_DIR = join(HERE, 'data', 'sources');
 const RAW_DIR = join(HERE, 'data', 'raw');
 const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
+/** Bytes a host served that our reader could not read (extraction threw, or not the document): gzip, deduplicated. */
+const UNREAD_DIR = join(RAW_DIR, 'unread');
+const UNREAD_KEEP = 3;
+const UNREAD_MAX_AGE_MS = 30 * 86_400_000;
+/** Rows a failed Postgres load could not write; the next run offers them first. */
+const PENDING_LOAD_FILE = join(REPO, '.source-watch-pending-load.json');
 let runStatsFile = STATS_FILE;
 const RUN_STARTED_MS = Date.now();
 const RUN_STARTED_AT = ts(new Date(RUN_STARTED_MS));
@@ -193,7 +201,9 @@ FILES
   stocks/data/sources.json                          input registry (extract-sources.mjs)
   stocks/data/sources/<id>/<fetched_at>.{pdf,docx,html,json,txt}   raw + normalised copies (gitignored)
   stocks/data/sources-state.json                    last hash/etag per URL (gitignored)
-  stocks/data/raw/sources-<date>.json               per-source checkpoint, resumable (gitignored)
+  stocks/data/raw/sources-checkpoint.json           the current day's per-source checkpoint, resumable (gitignored)
+  stocks/data/raw/unread/<id>/                      bytes a host served that could not be read (gzip, 3 per source, 30 days)
+  .source-watch-pending-load.json                   rows a failed Postgres load kept; offered first by the next run
   sonar.source / sonar.source_version / sonar.change_event   the mirror in Postgres
 
 REQUIREMENTS
@@ -736,6 +746,8 @@ async function watchOne(source, prev, options) {
             result.status = notionBlocked ? 'blocked' : 'error';
             result.reason = `${stage}: ${err.message}`;
             result.error = err.message;
+            // The host answered and our reader failed: the bytes are kept for reprocessing (main loop).
+            if (!notionBlocked) result.extractionFailed = true;
             return { result, text: null, quoteText: null, raw, previousTextPath: prev?.textPath ?? null };
         }
     }
@@ -1465,11 +1477,19 @@ async function main() {
 
     const previous = await readJson(STATE_FILE, {});
     const quoteRegistry = await loadQuoteRegistry();
-    const checkpointFile = join(RAW_DIR, `sources-${isoDate()}.json`);
+    // One checkpoint file, holding the current day's results: a new day starts it afresh instead of
+    // leaving one ~2.5 MB file per day behind (until 2026-11-23 it was raw/sources-<date>.json, and
+    // those dated files are left for stocks/prune-run-caches.mjs).
+    const checkpointFile = join(RAW_DIR, 'sources-checkpoint.json');
+    const runDate = isoDate();
+    const readCheckpointDay = async () => {
+        const doc = await readJson(checkpointFile, null);
+        return doc?.date === runDate && doc.results && typeof doc.results === 'object' ? doc.results : {};
+    };
     // The day's checkpoint is always loaded, so a --force or --only-blocked run adds to it instead
     // of replacing the other sources' entries; those two modes just never reuse an entry — a
     // repair run over blocked sources that reused today's `blocked` outcomes would fetch nothing.
-    const checkpoint = await readJson(checkpointFile, {});
+    const checkpoint = await readCheckpointDay();
     const reuseCheckpoint = !flags.force && !onlyBlocked;
     const resumed = reuseCheckpoint ? Object.entries(checkpoint)
         .filter(([url, result]) => reusableCheckpoint(result) && sources.some((s) => s.url === url)).length : 0;
@@ -1493,6 +1513,7 @@ async function main() {
     let lastArchiveMs = 0;
     // Wayback fallback for hosts that refuse us (lib/wayback.mjs): paced and capped per run.
     const wayback = { used: 0, read: 0, failed: 0, skipped: 0, standing: 0, capLogged: false };
+    let unreadKept = 0;
 
     for (const source of ordered) {
         done += 1;
@@ -1536,10 +1557,29 @@ async function main() {
             result.error = null;
         }
 
+        // A 2xx our reader could not turn into the document (the extraction threw, or the body was a
+        // shell / block page): its bytes are kept, gzip and once per content, for reprocessing.
+        if (wantsRawKept(result, raw)) {
+            const dir = join(UNREAD_DIR, result.id);
+            try {
+                const kept = await keepRaw(dir, raw, { ext: rawExtension(result.rawKind ?? result.servedKind ?? result.kind) });
+                await pruneKept(dir, { maxFiles: UNREAD_KEEP, maxAgeMs: UNREAD_MAX_AGE_MS });
+                result.keptRawPath = relative(REPO, kept.path);
+                if (kept.written) unreadKept += 1;
+            } catch (err) {
+                logWarn(`${source.url}: could not keep the unread bytes (${err.message})`);
+            }
+        }
         if (result.status === 'changed') {
             // The raw bytes only exist in memory, so the version files are written here, before
-            // the checkpoint records the paths.
-            await recordChange(result, { text, raw, previousTextPath, prev, quotes: registered });
+            // the checkpoint records the paths. If they cannot be written the change is not stored,
+            // so the read stands on the previous version and the next run sees the change again.
+            try {
+                await recordChange(result, { text, raw, previousTextPath, prev, quotes: registered });
+            } catch (err) {
+                revertUnstoredChange(result, prev, err.message);
+                logError(`${source.url}: the new version could not be stored — ${err.message}`);
+            }
             // Changed only because the extractor did: a silent re-baseline (lib/watch-rows.mjs).
             settleExtractorUpgrade(result);
         }
@@ -1627,7 +1667,7 @@ async function main() {
         checkpoint[source.url] = result;
         // Re-read before writing: a concurrent `--only=<issuer>` run shares today's checkpoint, and
         // writing our start-of-run copy back would drop every entry it wrote meanwhile.
-        await writeJson(checkpointFile, { ...(await readJson(checkpointFile, {})), [source.url]: result });
+        await writeJson(checkpointFile, { date: runDate, results: { ...(await readCheckpointDay()), [source.url]: result } });
     }
 
     // Retired sources were not fetched; they are written as `retired` (lib/watch-rows.mjs).
@@ -1747,32 +1787,55 @@ async function main() {
         for (const r of failures) logError(`    ${r.reason} ${r.url}`);
     }
 
+    // INGEST is the fetch, the kept bytes and the version files (counted per source); PROCESSING is
+    // the Postgres load. The state file above already stands on what was stored on disk, so a failed
+    // load must not lose its rows: they are kept in PENDING_LOAD_FILE and offered first next run.
+    const ingest = stageTally();
+    for (const r of results) {
+        if (r.status === 'error') stageFail(ingest, r.storeFailed ? 'store-version' : r.extractionFailed ? 'extract' : 'fetch');
+        else stageOk(ingest);
+    }
+    const processing = stageTally();
+    let pendingLoaded = 0;
     if (!flags['no-db']) {
+        const claimChecks = [];
+        for (const r of results) {
+            if (!r.quotes) continue;
+            // Only a quote that got a verdict is written back: a not-checkable one (blocked
+            // source) or one too short to check was not looked for, so it is neither found nor lost.
+            // A re-baseline's missing quote is not written back as lost: the next run decides.
+            const lostIds = new Set(r.rebaselined ? [] : r.quotes.lost.map((q) => q.id));
+            const foundIds = new Set(r.quotes.foundIds ?? []);
+            for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
+                if (q.kind !== 'claim' || (!lostIds.has(q.id) && !foundIds.has(q.id))) continue;
+                claimChecks.push({ id: q.id, found: foundIds.has(q.id), checkedAt: r.fetchedAt });
+            }
+        }
+        const pending = await readJson(PENDING_LOAD_FILE, null);
+        const toLoad = mergePendingLoad(pending?.rows ?? null, rows);
+        const allChecks = [...(pending?.claimChecks ?? []), ...claimChecks];
+        if (pending) {
+            pendingLoaded = (pending.rows?.versions?.length ?? 0) + (pending.rows?.events?.length ?? 0);
+            log(`db: offering ${pending.rows?.versions?.length ?? 0} version(s) and ${pending.rows?.events?.length ?? 0} event(s) a failed load since ${pending.since} kept`);
+        }
         const env = await readEnvFile(join(REPO, '.env'));
         const dbUrl = process.env.DATABASE_URL || env.DATABASE_URL;
-        if (!dbUrl) {
-            logWarn(`DATABASE_URL is not set in ${join(REPO, '.env')} — skipping the Postgres load`);
-        } else {
+        try {
+            if (!dbUrl) throw new Error(`DATABASE_URL is not set in ${join(REPO, '.env')}`);
             log(`db: ${describeUrl(dbUrl)}`);
-            await loadToPostgres(rows, { url: dbUrl });
-            const claimChecks = [];
-            for (const r of results) {
-                if (!r.quotes) continue;
-                // Only a quote that got a verdict is written back: a not-checkable one (blocked
-                // source) or one too short to check was not looked for, so it is neither found nor lost.
-                // A re-baseline's missing quote is not written back as lost: the next run decides.
-                const lostIds = new Set(r.rebaselined ? [] : r.quotes.lost.map((q) => q.id));
-                const foundIds = new Set(r.quotes.foundIds ?? []);
-                for (const q of quoteRegistry.byUrl.get(normaliseUrl(r.url)) ?? []) {
-                    if (q.kind !== 'claim' || (!lostIds.has(q.id) && !foundIds.has(q.id))) continue;
-                    claimChecks.push({ id: q.id, found: foundIds.has(q.id), checkedAt: r.fetchedAt });
-                }
-            }
-            if (claimChecks.length) {
-                const check = buildClaimCheckSql(claimChecks);
+            await loadToPostgres(toLoad, { url: dbUrl });
+            if (allChecks.length) {
+                const check = buildClaimCheckSql(allChecks);
                 await psql(dbUrl, wrapTransaction(check.sql), check.table);
                 log(`db: ${check.rows} claim(s) marked checked`);
             }
+            if (pending) await rm(PENDING_LOAD_FILE, { force: true });
+            stageOk(processing);
+        } catch (err) {
+            await writeJson(PENDING_LOAD_FILE, { since: pending?.since ?? RUN_STARTED_AT, rows: toLoad, claimChecks: allChecks });
+            stageFail(processing, 'db-load');
+            logError(`db: load FAILED — ${toLoad.versions.length} version(s) and ${toLoad.events.length} event(s) kept in`
+                + ` ${relative(REPO, PENDING_LOAD_FILE)} and offered again by the next run: ${err.message}`);
         }
     }
 
@@ -1789,8 +1852,12 @@ async function main() {
         ...materialEvents.slice(0, 3).map((event) => `  • ${event.summary} · https://rwasonar.com/watch.html`),
         'Evidence: https://rwasonar.com/watch.html'
     ];
+    const stages = stageStats(ingest, processing);
     const sourceStats = {
-        watchStatus: failures.length ? 'partial' : 'ok',
+        watchStatus: worstStatus(failures.length ? 'partial' : 'ok', stages.processingStatus),
+        ...stages,
+        unreadBytesKept: unreadKept,
+        pendingLoadOffered: pendingLoaded,
         lastRunStartedAt: RUN_STARTED_AT,
         lastRunEndedAt: endedAt,
         durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),
@@ -1832,8 +1899,9 @@ async function main() {
     }
     log(`watch-sources: wrote ${relative(REPO, runStatsFile)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
 
-    if (runFailed(results)) {
-        logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`);
+    if (runFailed(results) || stages.processingStatus !== 'ok') {
+        logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`
+            + `${stages.processingStatus !== 'ok' ? '; the Postgres load failed (its rows are kept for the next run)' : ''}`);
         process.exitCode = 1;
         return;
     }
@@ -1845,6 +1913,11 @@ main().catch(async (err) => {
     try {
         await writeJson(runStatsFile, {
             watchStatus: 'failed',
+            // A crash outside the per-source steps: which stage it hit is unknown, so both say failed.
+            ingestStatus: 'failed',
+            processingStatus: 'failed',
+            ingest: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
+            processing: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
             lastRunStartedAt: RUN_STARTED_AT,
             lastRunEndedAt: ts(),
             durationSec: Math.round((Date.now() - RUN_STARTED_MS) / 1000),

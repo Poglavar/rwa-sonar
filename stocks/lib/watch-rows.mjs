@@ -267,3 +267,55 @@ export function buildRows(results, previousState = {}, { checkEvery = CHECK_EVER
     }
     return { sources, versions, events };
 }
+
+// ---------------------------------------------------------------------------------------------
+// Ingest apart from the database load (2026-11-23). The fetch, the raw bytes and the version files
+// on disk are the ingest; the Postgres load is processing, and a failed load must not lose what the
+// run found: its rows are kept and offered again first by the next run (mergePendingLoad).
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * A `changed` read whose version files could not be written (a full disk) did not store the new
+ * version, so it must not advance the state to it: the read becomes an `error` that stands on the
+ * previous version (its hash and validators), and the next run sees the change again. Mutates and
+ * returns `result`.
+ */
+export function revertUnstoredChange(result, prev, message) {
+    result.status = 'error';
+    result.reason = `store-version: ${message}`;
+    result.error = result.reason;
+    result.storeFailed = true;
+    result.contentHash = prev?.contentHash ?? null;
+    result.etag = prev?.etag ?? null;
+    result.lastModified = prev?.lastModified ?? null;
+    result.validatorStatus = prev?.validatorStatus ?? null;
+    result.rawPath = null;
+    result.textPath = null;
+    result.diff = null;
+    result.versionRecorded = false;
+    return result;
+}
+
+/**
+ * True when a read answered with bytes we could not turn into the document — the extraction threw
+ * (`extractionFailed`) or the body was not the document (`unreadableCode`, lib/unreadable.mjs) — so
+ * the bytes are kept for reprocessing instead of being dropped with the read.
+ */
+export function wantsRawKept(result, raw) {
+    return Boolean(raw?.length) && (result?.extractionFailed === true || Boolean(result?.unreadableCode));
+}
+
+/**
+ * The rows a load must write: the rows a failed earlier load kept (`pending`, offered first, so a
+ * version is never skipped), then this run's. A source row of this run replaces the pending one;
+ * versions and events are all offered (their inserts are idempotent).
+ */
+export function mergePendingLoad(pending, rows) {
+    if (!pending) return rows;
+    const current = new Set(rows.sources.map((s) => s.id));
+    return {
+        sources: [...(pending.sources ?? []).filter((s) => !current.has(s.id)), ...rows.sources],
+        versions: [...(pending.versions ?? []), ...rows.versions],
+        events: [...(pending.events ?? []), ...rows.events]
+    };
+}

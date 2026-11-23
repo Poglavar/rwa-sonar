@@ -4,7 +4,7 @@
 // single event while a real change after it still raises one, a read archive.org throttled writes
 // nothing and keeps the stored state, and a retired source is written as retired, never as an event.
 
-import { buildRows, nextState, settleExtractorUpgrade } from './lib/watch-rows.mjs';
+import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
 import { publisherNormalizerVersion, HTML_EXTRACTOR_VERSION, settleThrottle } from './lib/watch.mjs';
 
 const URL_ = 'https://www.cysec.gov.cy/en-GB/public-info/announcements/';
@@ -158,5 +158,39 @@ describe('a retired source', () => {
             error: 'retired 2026-09-30: Remora Markets is wound down; the domain answers DNS SERVFAIL.'
         });
         expect(nextState([result], { [url]: prev })[url]).toMatchObject({ status: 'retired', retiredAt: '2026-09-30', lastCheckedAt: '2026-09-30T04:00:00Z' });
+    });
+});
+
+describe('ingest apart from the Postgres load (2026-11-23)', () => {
+    test('a change whose version files could not be written does not advance the state, so the next run sees it again', () => {
+        const prev = { ...storedV2, normalizerVersion: publisherNormalizerVersion(URL_, 'html') };
+        const read = revertUnstoredChange(changedRead({ fetchedAt: '2026-11-23T02:41:00Z', hash: 'hash-new', normalizerUpgrade: false, prev }), prev, 'ENOSPC: no space left on device');
+        expect(read).toMatchObject({ status: 'error', storeFailed: true, contentHash: 'hash-v2', etag: '"e1"', textPath: null, rawPath: null });
+        const state = nextState([read], { [URL_]: prev })[URL_];
+        expect(state.contentHash).toBe('hash-v2');
+        expect(state.textPath).toBe(prev.textPath);
+        expect(state.etag).toBe('"e1"');
+        expect(buildRows([read], { [URL_]: prev }).versions).toEqual([]);
+    });
+
+    test('the bytes of a read our reader could not use are kept; a 304 with no body is not', () => {
+        expect(wantsRawKept({ extractionFailed: true }, Buffer.from('%PDF-1.7 broken'))).toBe(true);
+        expect(wantsRawKept({ unreadableCode: 'js-shell' }, Buffer.from('<html><script></script></html>'))).toBe(true);
+        expect(wantsRawKept({ unreadableCode: 'js-shell' }, Buffer.alloc(0))).toBe(false);
+        expect(wantsRawKept({ status: 'ok' }, Buffer.from('fine'))).toBe(false);
+    });
+
+    test('rows a failed load kept are offered first next run; this run\'s source row replaces the kept one', () => {
+        const pending = {
+            sources: [{ id: 'a', status: 'changed' }, { id: 'b', status: 'ok' }],
+            versions: [{ sourceId: 'a', fetchedAt: '2026-11-22T02:41:00Z' }],
+            events: [{ subjectId: 'a', kind: 'legal-term', detectedAt: '2026-11-22T02:41:00Z' }]
+        };
+        const rows = { sources: [{ id: 'a', status: 'ok' }], versions: [], events: [] };
+        const merged = mergePendingLoad(pending, rows);
+        expect(merged.versions).toEqual(pending.versions);
+        expect(merged.events).toEqual(pending.events);
+        expect(merged.sources).toEqual([{ id: 'b', status: 'ok' }, { id: 'a', status: 'ok' }]);
+        expect(mergePendingLoad(null, rows)).toBe(rows);
     });
 });
