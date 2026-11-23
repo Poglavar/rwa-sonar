@@ -185,7 +185,7 @@ const CHURN_PATTERNS = [
     /^(last )?(updated|edited|modified|published|posted|changed)( on)? (about |over |almost |~)?\d+ (second|minute|hour|day|week|month|year)s? ago$/i,
     /^(just now|yesterday|today|a (few )?(second|minute|hour|day)s? ago)$/i,
     // Counters.
-    /^(join )?\d[\d,. ]*(k|m|b)? ?(views?|reads?|followers?|following|likes?|comments?|members?|online|users?|shares?|replies|posts?)$/i,
+    /^(join )?\d[\d,. ]*(k|m|b)? ?(views?|reads?|followers?|following|likes?|comments?|members?|online|users?|shares?|replies|posts?|articles?)$/i,
     /^\(\d[\d,.]*\)$/,
     // Spinners, nav chrome and no-JS notices.
     /^(loading|loading[.…]{1,3}|please wait[.…]{0,3}|skip to (main )?content|back to top|menu|close|search)$/i,
@@ -247,7 +247,7 @@ const HTML_WIDGET_PATTERNS = [
  */
 function stripInlineWidgets(line) {
     return line
-        .replace(/ [$€£]\d[\d,.]*(k|m|b|t)? [-+−]\d[\d.,]*%(?=[ ,.;:)]|$)/gi, '')
+        .replace(/ [$€£]\d[\d,.]*(k|m|b|t)? [-+−]?\d[\d.,]*%(?=[ ,.;:)]|$)/gi, '')
         .replace(/^(\d{1,2}:\d{2}( ?[ap]\.?m\.?)? · [^·]{3,24}\d{4}) · \d[\d.,]*[kmb]?( views?)?$/i, '$1')
         .replace(/ +(?=[,:](\s|$))/g, '');
 }
@@ -300,9 +300,69 @@ export function normaliseLines(text, { htmlWidgets = false, keepChurn = false } 
 /**
  * HTML -> readable text: chrome elements removed, tags stripped, entities decoded. `forQuotes`
  * is the quote check's reading: churn lines kept (see `normaliseLines`) and every `<header>` and
- * `<form>` kept (see `WRAPPER_BLOCK`). The default is the reading that is hashed and diffed.
+ * `<form>` kept (see `WRAPPER_BLOCK`). The default is the reading that is hashed and diffed, and
+ * on a page whose document is an `<article>` it is that article alone (`documentArticle`).
  */
 export function htmlToText(html, { forQuotes = false } = {}) {
+    if (!forQuotes) {
+        const article = documentArticle(html);
+        if (article !== null) return article;
+    }
+    return pageText(html, { forQuotes });
+}
+
+/** Outermost `<tag>…</tag>` elements of `html`, in order (nesting counted, so an inner one stays inside). */
+function outermostElements(html, tag) {
+    const re = new RegExp(`<(/?)${tag}\\b[^>]*>`, 'gi');
+    const out = [];
+    let depth = 0;
+    let start = -1;
+    for (const m of html.matchAll(re)) {
+        if (!m[1]) {
+            if (depth === 0) start = m.index;
+            depth += 1;
+        } else if (depth > 0) {
+            depth -= 1;
+            if (depth === 0) out.push(html.slice(start, m.index + m[0].length));
+        }
+    }
+    return out;
+}
+
+/**
+ * The bounds of `documentArticle`: the article must read at least `ARTICLE_MIN_CHARS` (the
+ * `SHORT_HTML_TEXT` bound, so a card or teaser never qualifies: the largest on bitgo.com, galaxy.com,
+ * backpack.exchange and ondo.finance read 111-550) and hold at least `ARTICLE_MIN_SHARE` of the
+ * page's text (a news story is 46-93% of its page; an article that is a small part of a page is not
+ * evidently the document, and the page is read whole).
+ */
+const ARTICLE_MIN_CHARS = 600;
+const ARTICLE_MIN_SHARE = 0.4;
+
+/**
+ * The hashed reading of a page whose document is an `<article>`: the largest outermost article,
+ * with the page's one `<h1>` in front of it when the heading sits outside (cryptodaily.co.uk,
+ * panews.io). What lies outside the article is the publisher's frame, and on news pages it rotates
+ * every day: "latest news", "most read", related stories and token rails made holder.io, crypto.news,
+ * altcoinbuzz.io, mondaq.com and cryptodaily.co.uk record a version on every fetch of 2026-11
+ * while the story itself never changed. `<main>` is not used the same way: on x.com and nyse.com it
+ * holds 56-58 characters, on docs.tessera.pe 228 of a 46,000-character page. Null when no article
+ * qualifies, and the page is read whole. The quote reading always reads the whole page.
+ */
+function documentArticle(html) {
+    const clean = String(html).replace(/<!--[\s\S]*?-->/g, ' ').replace(/<(script|style|template|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ');
+    const articles = outermostElements(clean, 'article');
+    if (!articles.length) return null;
+    const read = articles.map((markup) => ({ markup, text: pageText(markup) })).sort((a, b) => b.text.length - a.text.length);
+    const best = read[0];
+    if (best.text.length < ARTICLE_MIN_CHARS) return null;
+    if (best.text.length < ARTICLE_MIN_SHARE * pageText(clean).length) return null;
+    const headings = clean.match(/<h1\b[^>]*>[\s\S]*?<\/h1\s*>/gi) ?? [];
+    const title = headings.length === 1 && !/<h1\b/i.test(best.markup) ? pageText(headings[0]) : '';
+    return title ? `${title}\n${best.text}` : best.text;
+}
+
+function pageText(html, { forQuotes = false } = {}) {
     let text = String(html);
     text = text.replace(/<!--[\s\S]*?-->/g, ' ');
     const payloads = forQuotes ? [...text.matchAll(INLINE_SCRIPT)].map((m) => m[1].trim()).filter((body) => body !== '') : [];
@@ -482,6 +542,29 @@ export function storedReading({ rawExt, via = null, payload }) {
 }
 
 /**
+ * Where each publisher's frame starts after the cited text: everything from the first marker found
+ * on is cut from the hashed reading. The 2026-11 entries are the rotating blocks measured on prod
+ * (a new version on nearly every daily fetch, the story unchanged): Solana Compass's "Back to News"
+ * author box, comments and token rails (and, on a project page, its directory note and token
+ * list), Talos's "Latest insights and research", The Coin Republic's "Related News" (inside the
+ * article element), Finance Magnates' "Most Viewed"/"Latest News", PANews's "Recommended Reading"
+ * newsflash list, CoinMarketCap's "Explore Similar Coins" cards and The Defiant's related posts
+ * and newsletter box after its Filecoin note.
+ */
+const PUBLISHER_TAILS = {
+    'www.coindesk.com': ['\nLatest Crypto News\n'],
+    'www.tekedia.com': ['\nProducts\n'],
+    'www.cryptotimes.io': ['\nCrypto Connections\n'],
+    'solanacompass.com': ['\nBack to News\n', '\nNote: inclusion in Solana Compass directory', '\nSolana tokens\nSolana Token Markets\n'],
+    'www.talos.com': ['\nLatest insights and research\n'],
+    'www.thecoinrepublic.com': ['\nRelated News\n'],
+    'www.financemagnates.com': ['\nMost Viewed\n'],
+    'panews.io': [/\nOriginal link\b/],
+    'coinmarketcap.com': ['\nExplore Similar Coins\n'],
+    'thedefiant.io': ['\nOur articles are stored on Filecoin.']
+};
+
+/**
  * Publisher-specific article tails that change independently of the cited story. This runs after
  * generic HTML extraction and is deliberately host-scoped: stripping a heading globally could
  * remove substantive text from another document. The retained prefix contains the full article.
@@ -493,18 +576,16 @@ export function stripPublisherChrome(url, text) {
     } catch {
         return text;
     }
-    const markers = host === 'www.coindesk.com'
-        ? ['\nLatest Crypto News\n']
-        : host === 'www.tekedia.com'
-            ? ['\nProducts\n']
-            : host === 'www.cryptotimes.io'
-                ? ['\nCrypto Connections\n']
-            : [];
+    const markers = Object.hasOwn(PUBLISHER_TAILS, host) ? PUBLISHER_TAILS[host] : [];
     let output = String(text);
     for (const marker of markers) {
-        const index = output.indexOf(marker);
+        const index = typeof marker === 'string' ? output.indexOf(marker) : output.search(marker);
         if (index >= 0) output = output.slice(0, index);
     }
+    // The Defiant signs the same story "The Defiant Team" or "The Defiant" from one fetch to the next.
+    if (host === 'thedefiant.io') output = output.replace(/^By: The Defiant( Team)? •$/m, 'By: The Defiant •');
+    // A Solana Compass project page shows the site's newest article as a teaser near its top.
+    if (host === 'solanacompass.com') output = output.replace(/\n[A-Z][a-z]{2}\n[^\n]+\nArticle\n[^\n]+\n[^\n]+\nRead(?=\n)/g, '');
     // FinCEN's MSB "Registration Status Information" transcript is generated per request and opens
     // with the day it was printed ("Date: 09/24/2026"): the fetch date, not a registration date, so
     // it would record a new version every day. The registration's own dates ("Authorized Signature
@@ -519,7 +600,8 @@ export function stripPublisherChrome(url, text) {
  * 3 keeps a `<header>`/`<form>` that holds prose and reads quoted attribute values as part of their
  * tag (`WRAPPER_BLOCK`, `TAG`): CySEC's ASP.NET page-wide form and backed.fi's article header.
  * 4 drops live widgets the daily versions of 2026-10/11 were made of (`HTML_WIDGET_PATTERNS`,
- * `stripInlineWidgets`: market strips, price chips, view counters, render stamps).
+ * `stripInlineWidgets`: market strips, price chips, view counters, render stamps) and reads a page
+ * whose document is an `<article>` as that article alone (`documentArticle`).
  */
 export const HTML_EXTRACTOR_VERSION = 4;
 
@@ -540,7 +622,7 @@ export function publisherNormalizerVersion(url, kind = 'html') {
     const base = kind === 'html' ? HTML_EXTRACTOR_VERSION : kind === 'api' ? API_EXTRACTOR_VERSION : 1;
     try {
         const host = new URL(url).hostname.toLowerCase();
-        return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io', 'msb.fincen.gov'].includes(host) ? base + 1 : base;
+        return Object.hasOwn(PUBLISHER_TAILS, host) || host === 'msb.fincen.gov' ? base + 1 : base;
     } catch {
         return base;
     }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // One-off migration: delete the sonar.source_version rows (and their kept files) that were only
 // noise, i.e. consecutive versions of a source that read the same under the current normaliser
-// (lib/watch.mjs, 2026-11-23: prices, counters and render stamps no longer make a version). The
+// (lib/watch.mjs, 2026-11-23: prices, counters, render stamps and a news page's rotating frame
+// outside its <article> or past its publisher's cut-off no longer make a version). The
 // plan is lib/version-collapse.mjs: only versions whose raw file is still kept can be read again
 // (the watcher keeps the last five per source), the newest version of a source is never deleted,
 // and neither is a version a change_event cites or the one just before it. Dry run by default

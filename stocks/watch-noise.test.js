@@ -1,10 +1,11 @@
 // The document watcher's noise rules (lib/watch.mjs `HTML_WIDGET_PATTERNS`, `stripInlineWidgets`,
-// `VOLATILE_JSON_KEY`): two reads of an unchanged document must hash the same, and a real change
+// `VOLATILE_JSON_KEY`, `documentArticle`, `PUBLISHER_TAILS`): two reads of an unchanged document
+// must hash the same, and a real change
 // must not. The samples are cut from consecutive prod versions of the sources that recorded a new
 // version every day between 2026-10-08 and 2026-11-23 (91-181 versions a day); each pair below is
 // the whole difference those two versions had, unless the test says it adds a genuine change.
 
-import { htmlToText, jsonToText, sha256Hex } from './lib/watch.mjs';
+import { HTML_EXTRACTOR_VERSION, htmlDocumentText, htmlToText, jsonToText, publisherNormalizerVersion, sha256Hex, stripPublisherChrome } from './lib/watch.mjs';
 
 const sameHash = (a, b) => sha256Hex(a) === sha256Hex(b);
 const page = (lines) => `<html><body><main><h1>Doc</h1>${lines.map((l) => `<p>${l}</p>`).join('')}<p>The terms of this document.</p></main></body></html>`;
@@ -25,6 +26,9 @@ describe('HTML: live widgets do not make a new version', () => {
             ['Fear &amp; Greed 12 Extreme Fear', 'Crypto market $2.10T +0.9% 24h breadth 135 up 114 down Bitcoin $59,796 +0.8%'],
             ['Fear &amp; Greed 11 Extreme Fear', 'Crypto market $2.13T +1.1% 24h breadth 149 up 92 down Bitcoin $60,959 +1.3%']],
         ['a staking banner (solanacompass.com)', ['Earn 5.26% APY natively staking SOL with Solana Compass', 'Earn 5.26%'], ['Earn 5.19% APY natively staking SOL with Solana Compass', 'Earn 5.19%']],
+        ['an unsigned price chip (solanacompass.com)', ['The main incumbent is xStocks. Ondo USDY $1.15 0.0% Global Markets focuses on U.S. securities.'],
+            ['The main incumbent is xStocks. Ondo USDY Global Markets focuses on U.S. securities.']],
+        ['an author\'s article count (financemagnates.com)', ['2571 Articles'], ['2572 Articles']],
         ['a price chip in article prose (solanacompass.com)',
             ['Shift RWA has listed its products on Jupiter JUP $0.218 -2.8% , making them tradeable.'],
             ['Shift RWA has listed its products on Jupiter JUP $0.232 +2.8% , making them tradeable.']],
@@ -112,5 +116,69 @@ describe('JSON: market and request fields do not make a new version', () => {
         const text = jsonToText(JSON.stringify({ b: [2, 1], usdPrice: 431.2 }), { keepChurn: true });
         expect(text).toContain('431.2');
         expect(text.indexOf('2')).toBeLessThan(text.indexOf('1,') === -1 ? text.lastIndexOf('1') : text.indexOf('1,'));
+    });
+});
+
+// The hashed reading as the watcher takes it: the document text, then the publisher's frame cut.
+const hashed = (url, markup) => stripPublisherChrome(url, htmlDocumentText(markup).text);
+const story = 'Backpack\'s tokenized SpaceX share token has crossed 10,000 onchain holders on Solana. '.repeat(12);
+const latest = (titles) => titles.map((t) => `<li><a href="/n">${t}</a></li>`).join('');
+
+describe('HTML: a page whose document is an <article> is hashed as that article', () => {
+    test('a news story with a rotating sidebar (holder.io, crypto.news, mondaq.com shape)', () => {
+        const pageOf = (side, body = story) => `<html><head><title>Story | Site</title></head><body><header><a href="/">Site</a></header>
+<main><article><h1>Step Finance acquires Moose Capital</h1><p>${body}</p></article>
+<aside><h3>Latest news</h3><ul>${latest(side)}</ul></aside></main><footer>© Site</footer></body></html>`;
+        const a = pageOf(['ETH Falls Below $1,700', 'Thai Police Bust Gang']);
+        const b = pageOf(['South Korea to Strengthen AML Supervision', 'Address Loses Over $19.76M']);
+        expect(sameHash(hashed('https://holder.io/news/x', a), hashed('https://holder.io/news/x', b))).toBe(true);
+        expect(sameHash(hashed('https://holder.io/news/x', a), hashed('https://holder.io/news/x', pageOf(['ETH Falls Below $1,700', 'Thai Police Bust Gang'], `${story} The deal was cancelled.`)))).toBe(false);
+        // The quote reading still reads the whole page.
+        expect(htmlDocumentText(a).quoteText).toContain('Thai Police Bust Gang');
+    });
+
+    test('a heading outside the story is kept in front of it; related cards are not the document (cryptodaily.co.uk)', () => {
+        const pageOf = (cards) => `<html><body><main class="cd-article"><h1 class="cd-article__title">Shift launches tokenized leveraged stocks</h1>
+<article data-url="x"><p>${story}</p></article>${cards.map((c) => `<article class="cd-article__related-card"><p>${c}</p></article>`).join('')}</main></body></html>`;
+        const a = hashed('https://cryptodaily.co.uk/2026/06/x', pageOf(['SHIB Falls to $0.0000038']));
+        expect(a.split('\n')[0]).toBe('Shift launches tokenized leveraged stocks');
+        expect(sameHash(a, hashed('https://cryptodaily.co.uk/2026/06/x', pageOf(['HYPE Could Slide to $60', 'ETH Down 30% This Year'])))).toBe(true);
+    });
+
+    test('a page of small cards (a homepage) and an article that is a small part of its page are read whole', () => {
+        const home = (cards) => `<html><body><h1>BitGo</h1><p>${story}</p>${cards.map((c) => `<article><h3>${c}</h3><p>Read more</p></article>`).join('')}</body></html>`;
+        expect(sameHash(hashed('https://www.bitgo.com/', home(['Q3 report'])), hashed('https://www.bitgo.com/', home(['Q4 report'])))).toBe(false);
+        const minor = (extra) => `<html><body><h1>Guide</h1>${`<p>${story}</p>`.repeat(3)}<p>${extra}</p><article><p>${story}</p></article></body></html>`;
+        expect(sameHash(hashed('https://docs.example/x', minor('Fee 0.50%')), hashed('https://docs.example/x', minor('Fee 0.75%')))).toBe(false);
+    });
+});
+
+describe('HTML: per-publisher frames are cut from the hashed reading', () => {
+    // Each case: the text after the marker rotates between two fetches; the story before it does not.
+    const lines = (arr) => `<html><body>${arr.map((l) => `<p>${l}</p>`).join('')}</body></html>`;
+    test.each([
+        ['solanacompass.com news', 'https://solanacompass.com/news/shift-rwa-lists', ['Back to News', 'Latest news', 'Securitize Pays Its First Onchain Dividend', 'Solana tokens', 'Solana Token Markets', 'SOL', 'ZEC', 'HYPE']],
+        ['solanacompass.com project', 'https://solanacompass.com/projects/remora-markets', ['Note: inclusion in Solana Compass directory does not indicate a recommendation', 'Remora Markets tokens', 'TSLAr', 'View token →']],
+        ['talos.com', 'https://www.talos.com/insights/state-of-the-network-367', ['Latest insights and research', 'News', 'Talos Recognized as the Best Sell-Side Middle-Office Platform']],
+        ['thecoinrepublic.com', 'https://www.thecoinrepublic.com/2025/06/26/x', ['Related News', 'Glory Kaburu', 'Coinbase Prediction Market Plans Point to US Launch']],
+        ['financemagnates.com', 'https://www.financemagnates.com/cryptocurrency/x', ['Most Viewed', 'IG Group to Close Its Offices', 'Latest News', 'BridgeWise Files for a Tel Aviv IPO']],
+        ['panews.io', 'https://panews.io/articles/019c8d3d', ['Original link Recommended Reading', 'PA一线 ETH Falls Below $1,700, Down 1.10% Intraday']],
+        ['coinmarketcap.com', 'https://coinmarketcap.com/cmc-ai/spacex/latest-updates/', ['Explore Similar Coins', 'Aster', 'ASTER', 'See ASTER Price']],
+        ['thedefiant.io', 'https://thedefiant.io/news/defi/x', ['Our articles are stored on Filecoin.', 'Related Posts', 'Musk Backs Petition to Bring Jensen Huang Back to Nvidia']]
+    ])('%s', (_name, url, tail) => {
+        const body = ['Remora Markets ceased operations in February 2026.', 'Its website is offline.'];
+        const a = hashed(url, lines([...body, ...tail]));
+        const b = hashed(url, lines([...body, ...tail.slice(0, 1), 'Something else entirely', 'And more']));
+        expect(a).toBe(body.join('\n'));
+        expect(sameHash(a, b)).toBe(true);
+        expect(publisherNormalizerVersion(url, 'html')).toBe(HTML_EXTRACTOR_VERSION + 1);
+    });
+
+    test('a Solana Compass project page loses the rotating "Article" teaser; The Defiant\'s two bylines are one', () => {
+        const teaser = (title) => lines(['Remora Markets', 'Visit', 'Nov', 'Real World Assets (RWA)', 'Article', title, 'An excerpt of it.', 'Read', 'About', 'Remora Markets built a tokenized platform.']);
+        const url = 'https://solanacompass.com/projects/remora-markets';
+        expect(sameHash(hashed(url, teaser('Sunrise Lists Tokenized SPY on Solana')), hashed(url, teaser('Solana\'s 200ms Slot Time Is Pending')))).toBe(true);
+        const byline = (who) => lines(['Story title', `By: ${who} •`, 'Story text.']);
+        expect(sameHash(hashed('https://thedefiant.io/x', byline('The Defiant Team')), hashed('https://thedefiant.io/x', byline('The Defiant')))).toBe(true);
     });
 });
