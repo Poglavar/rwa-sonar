@@ -100,3 +100,5 @@
 - 2026-10-11: General Solana RPC traffic uses Alchemy; Loopscale's `getProgramAccounts` listing has a separate `SOLANA_PROGRAM_ACCOUNTS_RPC_URL` so its Helius endpoint can remain in place.
 
 - 2026-10-11: The user paused all seven scheduled Solana-reading jobs (trades, chain, lending, powers, refresh, redemptions, reserves) while the project is on the backburner to preserve RPC quota; keep existing data and document/legal watchers, and retain the five-account batch compatibility changes for an explicit future resume.
+
+- 2026-11-23: **Watchers ingest apart from processing, and store nothing twice** (user rule). Regulator notices and the SEC litigation feed items are all stored in `sonar.regulator_notice` (once per content hash, `matched_at` null until matched) before matching; entity observations are stored with `processed_at` null and compared afterwards; the document watcher keeps unread bytes (`raw/unread/`) and re-offers rows a failed load kept (`.source-watch-pending-load.json`). Raw kept on disk goes through `stocks/lib/raw-keep.mjs` (gzip, sha256-deduplicated, bounded); stats carry `ingestStatus`/`processingStatus` (`stocks/lib/run-stages.mjs`).
