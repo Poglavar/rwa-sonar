@@ -5,7 +5,7 @@
 // nothing and keeps the stored state, and a retired source is written as retired, never as an event.
 
 import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
-import { publisherNormalizerVersion, HTML_EXTRACTOR_VERSION, settleThrottle } from './lib/watch.mjs';
+import { publisherNormalizerVersion, HTML_EXTRACTOR_VERSION, settleThrottle, settleUnanswered } from './lib/watch.mjs';
 
 const URL_ = 'https://www.cysec.gov.cy/en-GB/public-info/announcements/';
 const QUOTE = { id: 'issuer:regulatoryStatus:1', kind: 'claim', ref: 'regulatoryStatus', slug: 'issuer', quote: 'Withdrawal of Investors Compensation Fund (ICF) membership' };
@@ -139,6 +139,23 @@ describe('a throttled read writes nothing and keeps the stored state', () => {
 
         const ok = { ...changedRead({ fetchedAt: '2026-10-04T02:00:00Z', hash: 'hash-v2', normalizerUpgrade: false }), url: capture, status: 'ok', diff: null, quotes: null };
         expect(nextState([ok], { [capture]: twice })[capture].throttledRuns).toBeUndefined();
+    });
+});
+
+describe('a server that does not answer', () => {
+    test('the count of unanswered runs is carried between runs, and the third run in a row is blocked', () => {
+        const url = 'https://msb.fincen.gov/';
+        let prev = { ...storedV2, id: 'f1nc3n000001' };
+        const run = (fetchedAt) => settleUnanswered({ id: 'f1nc3n000001', url, fetchedAt, status: 'error', httpStatus: null,
+            contentHash: null, reason: 'network: ETIMEDOUT', error: 'network: ETIMEDOUT' }, prev);
+        const statuses = [];
+        for (const day of ['2026-11-21', '2026-11-22', '2026-11-23']) {
+            const result = run(`${day}T03:00:00Z`);
+            statuses.push(result.status);
+            prev = nextState([result], { [url]: prev })[url];
+        }
+        expect(statuses).toEqual(['error', 'error', 'blocked']);
+        expect(prev.unansweredRuns).toBe(3);
     });
 });
 

@@ -28,8 +28,8 @@ import {
     driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     emptyPublishedPage, jsOnlyShell, jsonToText, looksLikeText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
     pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
-    sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, archivePushback, isArchiveHost, settleThrottle,
-    ARCHIVE_PAUSED, HTML_EXTRACTOR_VERSION, THROTTLE_PERSISTS_AFTER,
+    sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, archivePushback, isArchiveHost, settleThrottle, settleUnanswered,
+    ARCHIVE_PAUSED, HTML_EXTRACTOR_VERSION, THROTTLE_PERSISTS_AFTER, UNANSWERED_BLOCKED_AFTER,
     verificationUrlFor,
     dossierQuotes,
     previouslyBlocked,
@@ -574,6 +574,25 @@ describe('decideOutcome', () => {
         expect(decideOutcome({ httpStatus: 503, retriedAfterBackoff: true, host: 'docs.ondo.finance' }).status).toBe('error');
         expect(decideOutcome({ networkErrorCode: 'ECONNREFUSED', retriedAfterBackoff: true, host: 'continentalstock.com' }).status).toBe('error');
         expect(decideOutcome({ networkErrorCode: 'ETIMEDOUT', retriedAfterBackoff: true, host: 'rmiparliament.org' }).status).toBe('error');
+    });
+
+    test('a server that does not answer fails the run twice, then is blocked; an answer resets the count', () => {
+        // msb.fincen.gov timed out every night from 2026-11-14, from the server and the laptop alike.
+        const unanswered = (code = 'ETIMEDOUT') => ({ status: 'error', reason: `network: ${code}`, error: `network: ${code}` });
+        const first = settleUnanswered(unanswered(), { status: 'ok' });
+        expect(first).toMatchObject({ status: 'error', unansweredRuns: 1 });
+        expect(runFailed([first])).toBe(true);
+        const second = settleUnanswered(unanswered('UND_ERR_CONNECT_TIMEOUT'), { status: 'error', unansweredRuns: 1 });
+        expect(second).toMatchObject({ status: 'error', unansweredRuns: 2 });
+        const third = settleUnanswered(unanswered(), { status: 'error', unansweredRuns: UNANSWERED_BLOCKED_AFTER - 1 });
+        expect(third.status).toBe('blocked');
+        expect(third.unansweredRuns).toBe(UNANSWERED_BLOCKED_AFTER);
+        expect(third.error).toMatch(/no answer on 3 consecutive runs: the server refuses our traffic or is down$/);
+        expect(runFailed([third])).toBe(false);
+        // Other errors (a refused connection, a 5xx) and readable results pass through without a count.
+        const refused = { status: 'error', reason: 'network: ECONNREFUSED' };
+        expect(settleUnanswered({ ...refused }, { unansweredRuns: 5 })).toEqual(refused);
+        expect(settleUnanswered({ status: 'ok', reason: 'same hash' }, { unansweredRuns: 5 })).toEqual({ status: 'ok', reason: 'same hash' });
     });
 
     test('a throttle is retried next run, and only a persistent one fails the run', () => {

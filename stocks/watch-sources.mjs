@@ -40,7 +40,7 @@ import {
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, selectSourceIds, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
-    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle
+    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle, settleUnanswered
 } from './lib/watch.mjs';
 import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
 import { keepRaw, pruneKept } from './lib/raw-keep.mjs';
@@ -1553,6 +1553,8 @@ async function main() {
         // archive.org pushing back on our traffic: not a look at the source, retried next run —
         // unless it has refused this source on THROTTLE_PERSISTS_AFTER runs in a row (lib/watch.mjs).
         settleThrottle(result, prev);
+        // A server that has not answered on UNANSWERED_BLOCKED_AFTER runs in a row is a refusal (lib/watch.mjs).
+        settleUnanswered(result, prev);
         // No fresh text: the read stands on the stored version, which may itself be unreadable.
         const storedQuoteText = text === null && result.status === 'ok'
             ? await reviewStoredCopy(result, prev, { needQuotes: registered.length > 0, quotes: registered })

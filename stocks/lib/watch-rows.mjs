@@ -103,7 +103,9 @@ export function nextState(results, previous = {}) {
             // is still a TRANSITION — and an event — on the next run's read.
             quotesLost: result.quotes && !result.rebaselined ? result.quotes.lost.map((q) => q.id) : (prev?.quotesLost ?? []),
             // A persistent throttle that became an `error` keeps counting until a real read.
-            ...(Number.isInteger(result.throttledRuns) ? { throttledRuns: result.throttledRuns } : {})
+            ...(Number.isInteger(result.throttledRuns) ? { throttledRuns: result.throttledRuns } : {}),
+            // Consecutive runs without an answer from the server (lib/watch.mjs settleUnanswered).
+            ...(Number.isInteger(result.unansweredRuns) ? { unansweredRuns: result.unansweredRuns } : {})
         };
     }
     return state;

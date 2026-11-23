@@ -1183,6 +1183,33 @@ export function settleThrottle(result, prev = null, { persistAfter = THROTTLE_PE
 }
 
 /**
+ * A server that has not answered our connection (a timeout, never a reply) on this many consecutive
+ * runs is a refusal, not a run failure: msb.fincen.gov timed out every night from 2026-11-14 on, from
+ * the server and the laptop alike, and failed every run on its own. The first runs stay `error`, so a
+ * fresh outage still fails the run; from this run on the source is `blocked`, which stays visible in
+ * statusCounts and on the watch page like every other refusal.
+ */
+export const UNANSWERED_BLOCKED_AFTER = 3;
+const UNANSWERED_REASON = /^network: (?:ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT)$/;
+
+/**
+ * Count consecutive unanswered runs (`unansweredRuns`, carried in sources-state.json) and turn an
+ * unanswered `error` into `blocked` once it reaches `blockedAfter`. Any other result is returned
+ * untouched and carries no count, so it restarts at the next timeout. Mutates and returns `result`.
+ */
+export function settleUnanswered(result, prev = null, { blockedAfter = UNANSWERED_BLOCKED_AFTER } = {}) {
+    if (result?.status !== 'error' || !UNANSWERED_REASON.test(String(result.reason ?? ''))) return result;
+    const runs = (Number.isInteger(prev?.unansweredRuns) ? prev.unansweredRuns : 0) + 1;
+    result.unansweredRuns = runs;
+    if (runs >= blockedAfter) {
+        result.status = 'blocked';
+        result.reason = `${result.reason} — no answer on ${runs} consecutive runs: the server refuses our traffic or is down`;
+        result.error = result.reason;
+    }
+    return result;
+}
+
+/**
  * A bot wall is recognised from the BODY, never from the headers. Every site behind Cloudflare
  * sends `cf-ray` and `server: cloudflare` on a perfectly good 200, so a header check marks most of
  * the web as blocked — measured on the first run, where it mislabelled prestocks' own pages.
