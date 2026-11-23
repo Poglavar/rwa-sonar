@@ -47,7 +47,7 @@ describe('an extractor upgrade re-baselines silently; a real change after it doe
         expect(rows.events).toEqual([]);
         expect(rows.versions).toHaveLength(1);
         expect(rows.versions[0]).toMatchObject({ contentHash: 'hash-v3', diffSeverity: null });
-        expect(rows.versions[0].diffSummary).toMatch(/^re-baseline under extractor v3, not a document change: \+120 -1/);
+        expect(rows.versions[0].diffSummary).toMatch(new RegExp(`^re-baseline under extractor v${HTML_EXTRACTOR_VERSION}, not a document change: \\+120 -1`));
         expect(rows.sources[0]).toMatchObject({ status: 'ok', contentHash: 'hash-v3', lastChangedAt: null });
 
         // The quote the re-baseline misses is NOT recorded as lost, so the next run can still raise it.

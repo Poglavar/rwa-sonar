@@ -179,11 +179,13 @@ const CHURN_PATTERNS = [
     /^(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.? \d{1,2},? \d{4}$/i,
     /^\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.? \d{4}$/i,
     /^\d{1,2}:\d{2}(:\d{2})?( ?[ap]\.?m\.?)?( [a-z]{2,5})?$/i,
-    // Relative times.
+    // Relative times, also behind an "updated" label: "Last updated 23 days ago" reads "24 days
+    // ago" the next day with nothing changed (terms.tessera.pe, docs.superstate.com, 2026-11).
     /^(about |over |almost |~)?\d+ (second|minute|hour|day|week|month|year)s? ago$/i,
+    /^(last )?(updated|edited|modified|published|posted|changed)( on)? (about |over |almost |~)?\d+ (second|minute|hour|day|week|month|year)s? ago$/i,
     /^(just now|yesterday|today|a (few )?(second|minute|hour|day)s? ago)$/i,
     // Counters.
-    /^\d[\d,. ]*(k|m|b)? ?(views?|reads?|followers?|following|likes?|comments?|members?|online|users?|shares?|replies|posts?)$/i,
+    /^(join )?\d[\d,. ]*(k|m|b)? ?(views?|reads?|followers?|following|likes?|comments?|members?|online|users?|shares?|replies|posts?)$/i,
     /^\(\d[\d,.]*\)$/,
     // Spinners, nav chrome and no-JS notices.
     /^(loading|loading[.…]{1,3}|please wait[.…]{0,3}|skip to (main )?content|back to top|menu|close|search)$/i,
@@ -206,7 +208,49 @@ const COOKIE_BANNER_MAX = 300;
  * to HTML ONLY, never to PDF text — in a prospectus a bare `0.50%` on its own line is a cell of a
  * fee table, and a fee changing is exactly what must not be filtered away.
  */
-const BARE_NUMBER = /^[-+]?[$€£¥]?\d[\d, .]*%?$/;
+const BARE_NUMBER = /^[-+]?[$€£¥]? ?\d[\d, .]*(k|m|b|bn|t)?%?$/i;
+
+/**
+ * More live-widget lines, HTML only like `BARE_NUMBER`, measured on the sources that recorded a
+ * new version every day between 2026-10-08 and 2026-11-23 (prod: 91-181 versions a day, ~120
+ * sources, every one of them a moved number or a render time, see stocks/watch-noise.test.js):
+ * a price move with its window (`$15.18 (10.44%) 24H` on ondo.finance), a change "from 30d ago"
+ * (app.rwa.xyz), an amount in a token's own unit (`60,335,319 USTB`, superstate.com/assets), a
+ * data stamp (`as of 11/23/2026`) and a page's render time (`Generated on Monday, 23 November 2026
+ * 15:42:10 NZDT`, the NZ Companies Office). A labelled date that dates the DOCUMENT ("Last updated
+ * 2026-09-08", "Effective date ...") is not among them and stays.
+ */
+const HTML_WIDGET_PATTERNS = [
+    /^[-+▲▼↑↓]? ?[$€£¥]? ?[-+]? ?\d[\d,.]*(k|m|b|bn|t)? ?%?( \([-+]?\d[\d,.]* ?%\))? (24h|7d|30d|1d|1w|1m|1y|ytd)$/i,
+    /^[-+▲▼↑↓]? ?[-+]? ?\d[\d,.]* ?% (from|vs\.?|since) \d+ ?[a-z]+ ago$/i,
+    /^[$€£¥]?\d[\d,.]*(k|m|b|bn|t)? [A-Z][A-Z0-9]{1,9}$/,
+    /^(data |prices? )?as (of|at) (\d{1,2}[/.]\d{1,2}[/.]\d{2,4}|\d{4}-\d{2}-\d{2})([ T]\d{1,2}:\d{2}(:\d{2})?)?( ?[ap]m)?( [a-z]{2,5})?$/i,
+    /^(page )?(generated|rendered|printed) (on|at) [^\n]{0,60}\b\d{4}\b[^\n]{0,30}$/i,
+    // Market strips and staking banners in a site's chrome (cryptobriefing.com, solanacompass.com)
+    // and a trading-session label (app.ondo.finance).
+    /^fear (&|and) greed( index)? \d+\b/i,
+    /^crypto market ([$€£]\d|24h breadth)/i,
+    /^earn \d[\d.]*% apy\b/i,
+    /^earn \d[\d.]*%$/i,
+    /^\(? ?(off-hours|overnight|pre-market|after-hours|market (open|closed)) ?\)?$/i,
+    // The agent hint GitBook/Mintlify put at the top of a docs page, served in two wordings that
+    // alternate between fetches (docs.tessera.pe, shiftrwa.gitbook.io, support.backpack.exchange).
+    /^for the complete documentation index, see llms\.txt\b/i
+];
+
+/**
+ * Live values inside a line, HTML hashed reading only (the quote reading keeps them): a price chip
+ * a site renders after a ticker in article prose (`Jupiter JUP $0.218 -2.8% ,` on solanacompass.com),
+ * the view counter on a post's time line (`13:00 · 8 Oct 2026 · 799.9k` on x.com), and the space a
+ * syntax highlighter's spans leave before `,` and `:` in a code block, which docs.ondo.finance
+ * serves with and without on alternate days.
+ */
+function stripInlineWidgets(line) {
+    return line
+        .replace(/ [$€£]\d[\d,.]*(k|m|b|t)? [-+−]\d[\d.,]*%(?=[ ,.;:)]|$)/gi, '')
+        .replace(/^(\d{1,2}:\d{2}( ?[ap]\.?m\.?)? · [^·]{3,24}\d{4}) · \d[\d.,]*[kmb]?( views?)?$/i, '$1')
+        .replace(/ +(?=[,:](\s|$))/g, '');
+}
 
 /**
  * Note what is deliberately NOT churn: a long opaque token on its own line. A 32-44 character
@@ -221,7 +265,7 @@ export function looksLikeChurn(line, { htmlWidgets = false } = {}) {
     if (COOKIE_WORD.test(text) && COOKIE_BANNER_VERB.test(text) && text.length < COOKIE_BANNER_MAX) {
         return true;
     }
-    if (htmlWidgets && BARE_NUMBER.test(text)) return true;
+    if (htmlWidgets && (BARE_NUMBER.test(text) || HTML_WIDGET_PATTERNS.some((pattern) => pattern.test(text)))) return true;
     return CHURN_PATTERNS.some((pattern) => pattern.test(text));
 }
 
@@ -245,7 +289,8 @@ const INVISIBLE = new RegExp(`[${String.fromCharCode(0x00a0, 0x200b, 0x200c, 0x2
 export function normaliseLines(text, { htmlWidgets = false, keepChurn = false } = {}) {
     const out = [];
     for (const raw of String(text).replace(/\r\n?/g, '\n').replace(INVISIBLE, ' ').split('\n')) {
-        const line = raw.replace(/[\t\f\v]/g, ' ').replace(/ {2,}/g, ' ').trim();
+        const spaced = raw.replace(/[\t\f\v]/g, ' ').replace(/ {2,}/g, ' ').trim();
+        const line = htmlWidgets && !keepChurn ? stripInlineWidgets(spaced) : spaced;
         if (keepChurn ? line === '' : looksLikeChurn(line, { htmlWidgets })) continue;
         out.push(line);
     }
@@ -307,22 +352,80 @@ export function htmlDocumentText(html) {
 }
 
 /**
+ * JSON fields that move with the market or the request, never with the document: prices and their
+ * changes, volumes, market caps and valuations, TVL and liquidity, holder counts, spreads, APYs,
+ * search scores, response times and fetch/update stamps. Measured on the API sources that recorded
+ * a new version every day 2026-10-08..11-23 (Jupiter token search, Backpack ticker, CoinGecko
+ * tickers, Tessera token details, PreStocks marks, Ondo assets' price series, SEC full-text search
+ * `took`/`_score`, GLEIF `goldenCopy.publishDate`). The hashed reading keeps the key and masks its
+ * value, so a field appearing or going is still a change; supplies, reserves, fees, addresses,
+ * authorities and every other field are compared as served. The quote reading keeps all values.
+ */
+const VOLATILE_JSON_KEY = new RegExp([
+    'price', 'volume', 'mcap', 'marketcap', 'market_cap', 'fdv', 'valuation', '^tvl', 'liquidity', 'holder',
+    'spread', '^apy', '^apr$', '^(high|low|open|close|last|change)(24h)?$', '^change_?(percent|pct)', 'percent_?change',
+    '^(timestamp|took|_score|servertime|goldencopy)$', '(updated|fetch|fetched|traded|refreshed)_?(at|time)$', '^lastupdated$',
+    '^stats\\d+[mhd]$', '^converted_(last|volume)$', '^trust_score$', '^is_(anomaly|stale)$', '^trades$', '^organicscore',
+    // Market-session state, which follows the clock of the fetch (Ondo assets, xStocks assets).
+    '^(currentsession|currentperiod|ismarketopen|opennow|nextmarket(open|close))$',
+    // Repository and request counters (GitHub's stars/forks/watchers; per-request ids).
+    '^(forks|watchers|stargazers|network|subscribers|open_issues)(_count)?$', '^(request|trace)_?id$',
+    // A market-data vendor's block on the underlying share (52-week range, volume, shares, cap):
+    // app.ondo.finance/api/v2/assets carries one per asset, and some share count moves every day.
+    '^underlyingmarket$'
+].join('|'), 'i');
+const MASK = '•';
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * A value masked by what it is rather than by its key alone: Ondo's `assetPauseReason`
+ * `unavailable_in_session` is its session calendar (MEMORY 2026-09-25), not a halt, so it reads as
+ * no pause while any other reason stays; a UUID `id` at the top of a response is the request's own
+ * id (api-v3.raydium.io), unlike an `id` inside the data.
+ */
+function maskedValue(key, value, depth, parent) {
+    if (key === 'assetPauseReason' && value === 'unavailable_in_session') return null;
+    // The tradeable/paused flags of an asset whose only pause is the session follow the clock too;
+    // with any other pause reason they are compared as served.
+    if (key === 'isTradingPaused' || key === 'isAssetTradeable') {
+        const status = 'assetPauseReason' in parent ? parent : parent.assetTradingStatus;
+        if (status && 'assetPauseReason' in status
+            && (status.assetPauseReason === null || status.assetPauseReason === 'unavailable_in_session')) return MASK;
+    }
+    if (depth === 0 && key === 'id' && typeof value === 'string' && UUID.test(value)) return MASK;
+    return undefined;
+}
+
+/**
  * JSON -> text with keys sorted, so a server that shuffles its key order is not reported as
- * having changed anything. Unparseable JSON falls back to plain text normalisation.
+ * having changed anything. The hashed reading also masks `VOLATILE_JSON_KEY` values and sorts
+ * array items, because a list served in another order is the same list (api.xstocks.fi's assets
+ * come back reshuffled on most days). The quote reading (`keepChurn`) keeps every value and the
+ * served order. Unparseable JSON falls back to plain text normalisation.
  */
 export function jsonToText(body, { keepChurn = false } = {}) {
     try {
-        const sorted = sortKeysDeep(JSON.parse(body));
+        const sorted = sortKeysDeep(JSON.parse(body), { volatile: !keepChurn });
         return normaliseLines(JSON.stringify(sorted, null, 1), { keepChurn });
     } catch {
         return normaliseLines(body, { keepChurn });
     }
 }
 
-function sortKeysDeep(value) {
-    if (Array.isArray(value)) return value.map(sortKeysDeep);
+function sortKeysDeep(value, { volatile = false, depth = 0 } = {}) {
+    if (Array.isArray(value)) {
+        const items = value.map((v) => sortKeysDeep(v, { volatile, depth: depth + 1 }));
+        if (!volatile) return items;
+        return items.map((v) => [JSON.stringify(v), v]).sort((a, b) => byString(a[0], b[0])).map(([, v]) => v);
+    }
     if (value && typeof value === 'object') {
-        return Object.fromEntries(Object.keys(value).sort(byString).map((k) => [k, sortKeysDeep(value[k])]));
+        return Object.fromEntries(Object.keys(value).sort(byString).map((k) => {
+            if (!volatile) return [k, sortKeysDeep(value[k], { depth: depth + 1 })];
+            const special = maskedValue(k, value[k], depth, value);
+            if (special !== undefined) return [k, special];
+            if (VOLATILE_JSON_KEY.test(k) && value[k] !== null) return [k, MASK];
+            return [k, sortKeysDeep(value[k], { volatile, depth: depth + 1 })];
+        }));
     }
     return value;
 }
@@ -415,17 +518,26 @@ export function stripPublisherChrome(url, text) {
  * bump a page stored as a title would keep answering 304 to its old etag and never be read again.
  * 3 keeps a `<header>`/`<form>` that holds prose and reads quoted attribute values as part of their
  * tag (`WRAPPER_BLOCK`, `TAG`): CySEC's ASP.NET page-wide form and backed.fi's article header.
+ * 4 drops live widgets the daily versions of 2026-10/11 were made of (`HTML_WIDGET_PATTERNS`,
+ * `stripInlineWidgets`: market strips, price chips, view counters, render stamps).
  */
-export const HTML_EXTRACTOR_VERSION = 3;
+export const HTML_EXTRACTOR_VERSION = 4;
+
+/**
+ * The JSON extraction generation. 2 masks the market and request fields (`VOLATILE_JSON_KEY`) and
+ * compares array items regardless of order.
+ */
+export const API_EXTRACTOR_VERSION = 2;
 
 /**
  * The text-extraction generation a source is read with; a rise drops the conditional headers once
  * and refreshes the baseline without an external-change event (watch-sources.mjs,
- * `settleExtractorUpgrade`). Increment when an extraction rule changes. PDF and JSON extraction
- * are generation 1, HTML is `HTML_EXTRACTOR_VERSION`; the host-scoped publisher rules add one.
+ * `settleExtractorUpgrade`). Increment when an extraction rule changes. PDF extraction is
+ * generation 1, HTML is `HTML_EXTRACTOR_VERSION`, JSON `API_EXTRACTOR_VERSION`; the host-scoped
+ * publisher rules add one.
  */
 export function publisherNormalizerVersion(url, kind = 'html') {
-    const base = kind === 'html' ? HTML_EXTRACTOR_VERSION : 1;
+    const base = kind === 'html' ? HTML_EXTRACTOR_VERSION : kind === 'api' ? API_EXTRACTOR_VERSION : 1;
     try {
         const host = new URL(url).hostname.toLowerCase();
         return ['www.coindesk.com', 'www.tekedia.com', 'www.cryptotimes.io', 'msb.fincen.gov'].includes(host) ? base + 1 : base;

@@ -113,14 +113,15 @@ describe('identity and paths', () => {
         expect(publisherNormalizerVersion('https://issuer.example/legal')).toBe(HTML_EXTRACTOR_VERSION);
     });
 
-    test('each HTML extraction rule is a new generation; PDF and JSON stay at 1', () => {
+    test('each HTML and JSON extraction rule is a new generation; PDF stays at 1', () => {
         // Generation 2 (the Next.js flight reader) dropped the stored etag once, so a page stored as a
         // bare title (ventuals.com answered 304 to it every day) was read again; generation 3 keeps
-        // prose-holding <header>/<form> wrappers (CySEC, backed.fi news).
-        expect(HTML_EXTRACTOR_VERSION).toBe(3);
-        expect(publisherNormalizerVersion('https://ventuals.com/terms', 'html')).toBe(3);
+        // prose-holding <header>/<form> wrappers (CySEC, backed.fi news); generation 4 drops live
+        // widgets. JSON generation 2 masks market/request fields (watch-noise.test.js).
+        expect(HTML_EXTRACTOR_VERSION).toBe(4);
+        expect(publisherNormalizerVersion('https://ventuals.com/terms', 'html')).toBe(4);
         expect(publisherNormalizerVersion('https://issuer.example/prospectus.pdf', 'pdf')).toBe(1);
-        expect(publisherNormalizerVersion('https://api.example/v1/x', 'api')).toBe(1);
+        expect(publisherNormalizerVersion('https://api.example/v1/x', 'api')).toBe(2);
         expect(publisherNormalizerVersion('https://www.coindesk.com/x', 'pdf')).toBe(2);
     });
 
