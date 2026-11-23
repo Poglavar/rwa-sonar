@@ -11,8 +11,9 @@
 import { readdirSync, readFileSync } from 'node:fs';
 
 import {
-    buildObservationSql, buildReadLatestQuery, changedFields, companiesHouseState, completesName,
-    deriveEntities, diffStates, foldObservation, formatTelegramSummary, gazetteState, gleifSearchNames,
+    buildObservationSql, buildProcessedSql, buildReadUnprocessedQuery, changedFields, companiesHouseState, completesName,
+    deriveEntities, diffStates, formatTelegramSummary, gazetteState, gleifSearchNames, observationRow, parseObservationResult,
+    processObservation,
     gleifState, jurisdictionCode, jurisdictionConsistent, legalNameKey, matchGleif, matchZefix,
     padCompanyNumber, parseCompaniesHouseOfficers, parseCompaniesHouseProfile, parseGazetteNoticeData,
     parseGazetteSearch, parseGleifRecord, parseGleifReportingException, parseGleifSearch, parseZefixFirm,
@@ -288,33 +289,32 @@ describe('change detection', () => {
     });
 });
 
-describe('folding an observation into a row and events', () => {
+describe('storing an observation, then comparing it', () => {
     const task = { id: 'gleif:254900QXDWGM1T0HGF47', source: 'gleif', identifier: '254900QXDWGM1T0HGF47', entityKey: 'bitgo trust co inc', entityName: 'BitGo Trust Company, Inc.', issuers: ['republic-mirror', 'ondo-global-markets'] };
     const issued = gleifState({ ...BITGO, registrationStatus: 'ISSUED' });
     const lapsed = gleifState(BITGO);
+    const stored = (observation, at, prevState) => ({ ...observationRow(task, { ...observation, url: 'https://search.gleif.org/#/record/254900QXDWGM1T0HGF47' }, { detectedAt: at }), prevState });
 
-    it('the same state again writes no row, only a confirmation', () => {
-        const prev = { state: lapsed.state, stateHash: stateHash(lapsed.state) };
-        const r = foldObservation(task, { ...lapsed, url: 'u' }, { previous: prev, detectedAt: LATER });
-        expect(r.row).toBeNull();
-        expect(r.events).toEqual([]);
-        expect(r.confirm).toMatchObject({ entityKey: task.entityKey, stateHash: prev.stateHash, observedAt: LATER });
+    it('the stored row is the observation alone: its state, its hash and the source\'s own date — no comparison', () => {
+        const row = observationRow(task, { ...lapsed, url: 'u' }, { detectedAt: LATER });
+        expect(row).toMatchObject({ entityKey: task.entityKey, stateHash: stateHash(lapsed.state), sourceUpdatedAt: BITGO.lastUpdateDate, observedAt: LATER, issuers: ['ondo-global-markets', 'republic-mirror'] });
+        expect(row).not.toHaveProperty('findings');
+        expect(row).not.toHaveProperty('changeKind');
     });
 
-    it('a change writes one row with the source\'s own date and one event per issuer in the chain', () => {
-        const prev = { state: issued.state, stateHash: stateHash(issued.state) };
-        const r = foldObservation(task, { ...lapsed, url: 'https://search.gleif.org/#/record/254900QXDWGM1T0HGF47' }, { previous: prev, detectedAt: LATER });
-        expect(r.row).toMatchObject({ changeKind: 'changed', changedFields: ['registrationStatus'], sourceUpdatedAt: BITGO.lastUpdateDate, observedAt: LATER, issuers: ['ondo-global-markets', 'republic-mirror'] });
-        expect(r.row.sourceUpdatedAt).not.toBe(LATER);
+    it('a change compared with the row before it: one event per issuer in the chain, dated by the observation', () => {
+        const r = processObservation(stored(lapsed, LATER, issued.state));
+        expect(r).toMatchObject({ changeKind: 'changed', changedFields: ['registrationStatus'] });
         expect(r.events.map((e) => e.subjectId)).toEqual(['ondo-global-markets', 'republic-mirror']);
         expect(r.events[0]).toMatchObject({ kind: 'entity-status', subjectType: 'issuer', severity: 'warning', before: 'ISSUED', after: 'LAPSED', detectedAt: LATER });
         expect(r.events[0].field).toBe('BitGo Trust Company, Inc. · gleif:registrationStatus');
     });
 
-    it('the first observation is a baseline row', () => {
-        const r = foldObservation(task, { ...issued, url: 'u' }, { previous: null, detectedAt: AT });
-        expect(r.row.changeKind).toBe('baseline');
+    it('the first observation is a baseline: no event unless it is already adverse', () => {
+        const r = processObservation(stored(issued, AT, null));
+        expect(r.changeKind).toBe('baseline');
         expect(r.events).toEqual([]);
+        expect(processObservation(stored(lapsed, AT, null)).findings.length).toBeGreaterThan(0);
     });
 });
 
@@ -351,17 +351,25 @@ describe('what is watched', () => {
 });
 
 describe('SQL and the schema', () => {
-    it('inserts only when the latest stored state differs, and names only columns the DDL has', () => {
-        const { sql } = buildObservationSql({ rows: [{ entityKey: 'k', source: 'gleif', identifier: 'L', stateHash: 'h', state: {}, observedAt: AT }], confirms: [{ entityKey: 'k', source: 'gleif', identifier: 'L', stateHash: 'h', observedAt: AT }] });
-        expect(sql).toMatch(/IS DISTINCT FROM r->>'stateHash'/);
+    it('inserts only when the latest stored state differs, else confirms; names only columns the DDL has', () => {
+        const { sql } = buildObservationSql({ entityKey: 'k', source: 'gleif', identifier: 'L', stateHash: 'h', state: {}, observedAt: AT });
+        expect(sql).toMatch(/latest_hash IS DISTINCT FROM r->>'stateHash'/);
         expect(sql).toMatch(/ON CONFLICT \(entity_key, source, identifier, observed_at\) DO NOTHING/);
-        expect(sql).toMatch(/UPDATE sonar\.entity_observation/);
+        expect(sql).toMatch(/UPDATE sonar\.entity_observation t\n\s+SET last_confirmed_at/);
+        expect(sql).not.toMatch(/findings|changed_fields|processed_at/);
         const table = DDL.slice(DDL.indexOf('CREATE TABLE IF NOT EXISTS sonar.entity_observation'), DDL.indexOf('CREATE INDEX'));
         const insertCols = /INSERT INTO sonar\.entity_observation\s*\(([^)]+)\)/.exec(sql)[1].split(',').map((c) => c.trim());
         for (const col of insertCols) expect(table).toMatch(new RegExp(`\\n\\s+${col}\\s`));
+        expect(table).toMatch(/\n\s+processed_at\s+timestamptz,/);
         expect(DDL).toMatch(/entity_observation_once UNIQUE \(entity_key, source, identifier, observed_at\)/);
-        expect(buildReadLatestQuery()).toMatch(/DISTINCT ON \(entity_key, source, identifier\)/);
-        expect(buildObservationSql({}).sql).toBe('');
+        expect(parseObservationResult('1|0|baseline\n')).toEqual({ inserted: 1, confirmed: 0, changeKind: 'baseline' });
+        expect(parseObservationResult('0|1|')).toEqual({ inserted: 0, confirmed: 1, changeKind: null });
+        expect(buildReadUnprocessedQuery()).toMatch(/WHERE o\.processed_at IS NULL/);
+        expect(buildProcessedSql(7, { changedFields: [], findings: [] })).toMatch(/AND t\.processed_at IS NULL/);
+    });
+
+    it('the processed_at column is backfilled once, only when it is added', () => {
+        expect(DDL).toMatch(/IF NOT EXISTS \(SELECT 1 FROM information_schema\.columns[\s\S]*?column_name = 'processed_at'\) THEN\n\s+ALTER TABLE sonar\.entity_observation ADD COLUMN processed_at timestamptz;\n\s+UPDATE sonar\.entity_observation SET processed_at = observed_at;\n\s+END IF;/);
     });
 
     it('the change_event kind list accepts both new kinds, and every source is allowed', () => {

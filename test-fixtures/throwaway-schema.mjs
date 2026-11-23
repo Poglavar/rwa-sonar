@@ -15,6 +15,7 @@ export function throwawaySchema(label) {
      */
     const rewrite = (sql) => sql.replace(/\bsonar\./g, `${name}.`)
         .replace(/CREATE SCHEMA IF NOT EXISTS sonar;/g, `CREATE SCHEMA IF NOT EXISTS ${name};`)
+        .replace(/table_schema = 'sonar'/g, `table_schema = '${name}'`)
         .replace(/SET ROLE geo_user/g, 'SET ROLE NONE').replace(/OWNER TO geo_user/g, 'OWNER TO CURRENT_USER');
     const run = (sql, extra = []) => psql(TEST_DB_URL, rewrite(sql), `test ${name}`, extra);
     return {

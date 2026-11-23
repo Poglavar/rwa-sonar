@@ -16,8 +16,8 @@ import { join, relative } from 'node:path';
 import { backoffMs, retryable } from './lib/caselaw.mjs';
 import { wrapTransaction } from './lib/db-load.mjs';
 import {
-    ZEFIX_SEARCH_URL, buildObservationSql, buildReadLatestQuery, companiesHouseOfficersUrl,
-    companiesHouseProfileUrl, companiesHouseState, deriveEntities, foldObservation, formatTelegramSummary,
+    ZEFIX_SEARCH_URL, buildObservationSql, buildProcessedSql, buildReadUnprocessedQuery, companiesHouseOfficersUrl,
+    companiesHouseProfileUrl, companiesHouseState, deriveEntities, formatTelegramSummary, observationRow, parseObservationResult, processObservation,
     gazetteNoticeDataUrl, gazetteSearchUrl, gazetteState, gleifParentExceptionUrl, gleifParentUrl, gleifRecordUrl, gleifSearchNames, gleifSearchUrl,
     gleifState, matchGleif, matchZefix, parseCompaniesHouseOfficers, parseCompaniesHouseProfile,
     parseGazetteNoticeData, parseGazetteSearch, parseGleifRecord, parseGleifReportingException, parseGleifSearch, parseZefixFirm,
@@ -26,6 +26,7 @@ import {
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
+import { stageFail, stageOk, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
 import { buildChangeEventSql } from './lib/watch.mjs';
 
@@ -89,10 +90,16 @@ WHAT A RUN DOES (--run)
   recorded, and a finding only when the state is already adverse (LEI lapsed, entity INACTIVE, firm not
   EXISTIEREND, company not active, any insolvency notice). After that every difference is a finding
   with a severity; one sonar.change_event per finding per issuer whose chain includes the entity.
+  INGEST and PROCESSING are apart: each observation is stored first (a new row only when its state
+  differs from the latest stored one, else only last_confirmed_at moves), with no stored state read
+  before any fetch; then every stored row not yet compared (processed_at null — this run's, and any a
+  failed earlier comparison left) is compared with the row before it, and its findings and events
+  written in one transaction per row. A failed comparison is counted (processingStatus in the stats)
+  and the row is compared by the next run; it never stops a fetch.
   ONE Telegram summary when there are findings or failures; ${relative(REPO, STATS_FILE)}; exit 1 on any failure.
 
 RESUME
-  Each task is written to Postgres in its own transaction and listed in ${relative(REPO, CHECKPOINT_FILE)};
+  Each task's observation is written to Postgres as it is read and listed in ${relative(REPO, CHECKPOINT_FILE)};
   a killed run is resumed by the next within ${RESUME_MAX_AGE_MS / 3600000} h (same detected_at). The insert is itself
   idempotent (a row is written only when the latest stored state differs).
 
@@ -383,15 +390,11 @@ async function run(flags, env) {
     log(`entities: ${scope.length} derived · ${watchedEntities.size} with an accepted id · ${unresolved.length} unresolved · ${tasks.length} task(s)`
         + ` (${['gleif', 'zefix', 'companies-house', 'gazette'].map((s) => `${s} ${tasks.filter((t) => t.source === s).length}`).join(', ')})`);
 
-    const previous = new Map();
-    if (dbUrl) {
-        log(`db: ${describeUrl(dbUrl)}`);
-        const rows = JSON.parse((await psql(dbUrl, buildReadLatestQuery(), 'read latest', ['-t', '-A'])).trim() || '[]');
-        for (const r of rows) previous.set(`${r.entityKey}|${r.source}|${r.identifier}`, r);
-        log(`db: ${previous.size} stored state(s)`);
-    } else {
-        logWarn('--no-db: no stored state — every observation is a baseline and nothing is written');
-    }
+    // No stored state is read before fetching: whether an observation is new is decided by the
+    // store itself (buildObservationSql), and the comparison with the state before is processing,
+    // done afterwards from what is stored.
+    if (dbUrl) log(`db: ${describeUrl(dbUrl)}`);
+    else logWarn('--no-db: nothing is read or written — every observation is compared with nothing (a baseline)');
 
     const checkpoint = await readCheckpoint(Boolean(flags.fresh));
     const detectedAt = checkpoint?.detectedAt ?? ts(new Date(RUN_STARTED_MS));
@@ -407,33 +410,39 @@ async function run(flags, env) {
     let confirmed = 0;
     let skipped = 0;
     let completed = 0;
+    const ingest = stageTally();
+    const processing = stageTally();
     const startedMs = Date.now();
+
+    // --- ingest: fetch, parse, store each observation (or confirm the stored one) --------------
     for (const [i, task] of tasks.entries()) {
         const label = `watch [${progress(i + 1, tasks.length, startedMs)}] ${task.entityName} · ${task.source} ${task.identifier}`;
         if (done.has(`${task.id}|${task.entityKey}`)) {
             skipped += 1;
             continue;
         }
+        let step = 'fetch';
         try {
             const observation = await observe(task, { chKey });
-            const prev = previous.get(`${task.entityKey}|${task.source}|${task.identifier}`) ?? null;
-            const folded = foldObservation(task, observation, { previous: prev, detectedAt });
+            const row = observationRow(task, observation, { detectedAt });
+            let outcome = 'observed';
             if (dbUrl) {
-                const statements = [];
-                const obs = buildObservationSql({ rows: folded.row ? [folded.row] : [], confirms: folded.confirm ? [folded.confirm] : [] });
-                if (obs.sql) statements.push(obs.sql);
-                if (folded.events.length) statements.push(buildChangeEventSql(folded.events).sql);
-                await psql(dbUrl, wrapTransaction(statements), `task ${task.id}`);
-            }
-            if (folded.row) {
-                rowsWritten += 1;
-                if (folded.row.changeKind === 'baseline') baselineRows += 1;
-                previous.set(`${task.entityKey}|${task.source}|${task.identifier}`, { state: folded.row.state, stateHash: folded.row.stateHash });
+                step = 'store-observation';
+                const stored = parseObservationResult(await psql(dbUrl, buildObservationSql(row).sql, `task ${task.id}`, ['-t', '-A']));
+                if (stored.inserted) {
+                    rowsWritten += 1;
+                    if (stored.changeKind === 'baseline') baselineRows += 1;
+                    outcome = stored.changeKind ?? 'changed';
+                } else {
+                    confirmed += 1;
+                    outcome = 'unchanged';
+                }
             } else {
-                confirmed += 1;
+                // --no-db: compared with nothing, in memory only, so the findings can still be read.
+                const r = processObservation({ ...row, prevState: null });
+                findings.push(...r.findings.map((f) => ({ ...f, entityName: task.entityName, source: task.source, identifier: task.identifier })));
             }
-            findings.push(...folded.findings.map((f) => ({ ...f, entityName: task.entityName, source: task.source, identifier: task.identifier })));
-            eventCount += folded.events.length;
+            stageOk(ingest);
             done.add(`${task.id}|${task.entityKey}`);
             completed += 1;
             await saveCheckpoint();
@@ -442,11 +451,46 @@ async function run(flags, env) {
                 : task.source === 'zefix' ? `${s.status} "${s.name}" ${s.legalSeat}`
                     : task.source === 'companies-house' ? `${s.status} "${s.name}"${s.hasInsolvencyHistory ? ' INSOLVENCY HISTORY' : ''}`
                         : `${s.confirmed.length} confirmed / ${s.nameOnly.length} name-only insolvency notice(s)`;
-            log(`${label} — ${summary} · ${folded.row ? folded.row.changeKind : 'unchanged'}`
-                + `${folded.findings.length ? ` · ${folded.findings.map((f) => `[${f.severity}] ${f.field}`).join(', ')}` : ''}`);
+            log(`${label} — ${summary} · ${outcome}`);
         } catch (err) {
-            failures.push(`${task.entityName} ${task.source} ${task.identifier}: ${err.message}`);
-            logError(`${label} FAILED — ${err.message}`);
+            stageFail(ingest, step);
+            failures.push(`${task.entityName} ${task.source} ${task.identifier}: ${step} — ${err.message}`);
+            logError(`${label} FAILED at ${step} — ${err.message}`);
+        }
+    }
+
+    // --- processing: compare every stored observation not yet compared (this run's and any a ---
+    // --- failed earlier run left) with the state before it; findings and events per row. ----
+    if (dbUrl) {
+        let pending = null;
+        try {
+            pending = JSON.parse((await psql(dbUrl, buildReadUnprocessedQuery(), 'read unprocessed', ['-t', '-A'])).trim() || '[]');
+        } catch (err) {
+            stageFail(processing, 'read-unprocessed');
+            failures.push(`processing: could not read the observations to compare — they wait for the next run: ${err.message}`);
+            logError(`processing: could not read the observations to compare — ${err.message}`);
+        }
+        const earlier = (pending ?? []).filter((r) => r.observedAt && Date.parse(r.observedAt) < Date.parse(detectedAt)).length;
+        if (pending) log(`processing: ${pending.length} observation(s) to compare${earlier ? ` (${earlier} left by an earlier run)` : ''}`);
+        for (const row of pending ?? []) {
+            let step = 'compare';
+            try {
+                const r = processObservation(row);
+                step = 'record-findings';
+                const statements = [buildProcessedSql(row.id, r)];
+                if (r.events.length) statements.push(buildChangeEventSql(r.events).sql);
+                await psql(dbUrl, wrapTransaction(statements), `process ${row.source} ${row.identifier}`);
+                stageOk(processing);
+                findings.push(...r.findings.map((f) => ({ ...f, entityName: row.entityName, source: row.source, identifier: row.identifier })));
+                eventCount += r.events.length;
+                if (r.findings.length) {
+                    log(`  ${row.entityName} · ${row.source} ${row.identifier} (${r.changeKind}): ${r.findings.map((f) => `[${f.severity}] ${f.field}`).join(', ')}`);
+                }
+            } catch (err) {
+                stageFail(processing, step);
+                failures.push(`${row.entityName} ${row.source} ${row.identifier}: processing ${step} — ${err.message} (stored; compared by the next run)`);
+                logError(`processing ${row.entityName} · ${row.source} ${row.identifier} FAILED at ${step} — ${err.message}`);
+            }
         }
     }
 
@@ -459,8 +503,10 @@ async function run(flags, env) {
     for (const f of findings.slice(0, 30)) log(`  [${f.severity}] ${f.entityName} (${f.source} ${f.identifier}): ${f.field} ${f.before ?? ''} → ${f.after ?? '(none)'}`);
     if (unresolved.length) log(`watch-entities: unresolved (no accepted id, not watched): ${unresolved.join('; ')}`);
 
+    const stages = stageStats(ingest, processing);
     const stats = {
-        watchStatus: failures.length ? 'partial' : 'ok',
+        watchStatus: worstStatus(failures.length ? 'partial' : 'ok', stages.ingestStatus, stages.processingStatus),
+        ...stages,
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         lastRunEndedAt: ts(),
         detectedAt,
@@ -526,6 +572,11 @@ main().catch(async (err) => {
     try {
         await writeJson(STATS_FILE, {
             watchStatus: 'failed',
+            // A crash outside the per-task steps: which stage it hit is unknown, so both say failed.
+            ingestStatus: 'failed',
+            processingStatus: 'failed',
+            ingest: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
+            processing: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
             lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
             lastRunEndedAt: ts(),
             durationMs: Date.now() - RUN_STARTED_MS,

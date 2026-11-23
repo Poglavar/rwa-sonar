@@ -781,47 +781,53 @@ export function sourceUrl(source, identifier, extra = {}) {
 }
 
 /**
- * One observation of one entity at one source → the row to store (only if its state differs from
- * the latest stored one) and the change events, one per issuer whose chain includes the entity.
+ * INGEST: one observation of one entity at one source → the row to store, with no comparison: the
+ * SQL (buildObservationSql) writes it only when the latest stored state for its key has a different
+ * hash, else only moves that row's last_confirmed_at. Comparing it with the state before is
+ * processing (processObservation), done afterwards from what is stored.
  */
-export function foldObservation(task, { state, sourceUpdatedAt, url }, { previous, detectedAt }) {
-    const hash = stateHash(state);
-    const prevState = previous?.state ?? null;
-    if (previous && previous.stateHash === hash) {
-        return { row: null, confirm: { ...rowKey(task), stateHash: hash, observedAt: detectedAt }, findings: [], events: [] };
-    }
-    const findings = diffStates(task.source, prevState, state);
-    const row = {
+export function observationRow(task, { state, sourceUpdatedAt, url }, { detectedAt }) {
+    return {
         ...rowKey(task),
         entityName: task.entityName,
         issuers: [...task.issuers].sort(),
         state,
-        stateHash: hash,
+        stateHash: stateHash(state),
         sourceUpdatedAt: sourceUpdatedAt ?? null,
-        changeKind: previous ? 'changed' : 'baseline',
-        changedFields: changedFields(prevState, state),
-        findings,
         url,
         observedAt: detectedAt
     };
+}
+
+/**
+ * PROCESSING: one stored observation row (as buildReadUnprocessedQuery returns it, with the state
+ * stored before it as `prevState`, null for the first) → what changed, the findings, and the
+ * change events: one per finding per issuer whose chain includes the entity. Events are dated by
+ * the observation's own observed_at, so reprocessing a row later raises the same events (the
+ * change_event insert is idempotent on that date).
+ */
+export function processObservation(row) {
+    const prevState = row.prevState ?? null;
+    const baseline = prevState === null;
+    const findings = diffStates(row.source, prevState, row.state);
     const events = [];
     for (const fnd of findings) {
-        for (const issuer of row.issuers) {
+        for (const issuer of [...(row.issuers ?? [])].sort()) {
             events.push({
-                detectedAt,
+                detectedAt: row.observedAt,
                 kind: fnd.kind,
                 subjectType: 'issuer',
                 subjectId: issuer,
-                field: `${task.entityName} · ${task.source}:${fnd.field}`,
+                field: `${row.entityName} · ${row.source}:${fnd.field}`,
                 before: fnd.before,
                 after: fnd.after,
                 severity: fnd.severity,
-                evidence: { entity: task.entityName, source: task.source, identifier: task.identifier, url, sourceUpdatedAt: sourceUpdatedAt ?? null, baseline: !previous },
-                summary: `${task.entityName} (${task.source} ${task.identifier}): ${fnd.field} ${fnd.before === null ? '' : `${String(fnd.before).slice(0, 80)} → `}${String(fnd.after ?? '(none)').slice(0, 160)}${previous ? '' : ' (first observation)'}`
+                evidence: { entity: row.entityName, source: row.source, identifier: row.identifier, url: row.url ?? null, sourceUpdatedAt: row.sourceUpdatedAt ?? null, baseline },
+                summary: `${row.entityName} (${row.source} ${row.identifier}): ${fnd.field} ${fnd.before === null ? '' : `${String(fnd.before).slice(0, 80)} → `}${String(fnd.after ?? '(none)').slice(0, 160)}${baseline ? ' (first observation)' : ''}`
             });
         }
     }
-    return { row, confirm: null, findings, events };
+    return { changeKind: baseline ? 'baseline' : 'changed', changedFields: changedFields(prevState, row.state), findings, events };
 }
 
 function rowKey(task) {
@@ -832,53 +838,74 @@ function rowKey(task) {
 // SQL (psql over stdin, like every other loader here)
 // ---------------------------------------------------------------------------------------------
 
-/** The latest stored observation per (entity, source, identifier), as one JSON array. */
-export function buildReadLatestQuery() {
-    return "SELECT coalesce(jsonb_agg(jsonb_build_object('entityKey', entity_key, 'source', source,\n"
-        + "  'identifier', identifier, 'state', state, 'stateHash', state_hash, 'observedAt', observed_at)), '[]'::jsonb)\n"
-        + '  FROM (SELECT DISTINCT ON (entity_key, source, identifier) *\n'
-        + '          FROM sonar.entity_observation\n'
-        + '         ORDER BY entity_key, source, identifier, observed_at DESC, id DESC) latest;\n';
+/**
+ * INGEST: insert the observation — only when the latest stored state for its (entity, source,
+ * identifier) has a different hash, so a re-run or a resumed run writes nothing twice; change_kind
+ * is `baseline` when nothing was stored before — or else move `last_confirmed_at` on the latest row.
+ * The row waits for processing (processed_at null). Prints `inserted|confirmed|change_kind` (psql -t -A).
+ */
+export function buildObservationSql(row, { tag = 'sonar' } = {}) {
+    const latest = (col) => `(SELECT o.${col} FROM sonar.entity_observation o\n`
+        + "          WHERE o.entity_key = r->>'entityKey' AND o.source = r->>'source' AND o.identifier = r->>'identifier'\n"
+        + '          ORDER BY o.observed_at DESC, o.id DESC LIMIT 1)';
+    const sql = `WITH src AS (SELECT ${jsonbLiteral(row, tag)} AS r),\n`
+        + `     cur AS (SELECT r, ${latest('id')} AS latest_id, ${latest('state_hash')} AS latest_hash FROM src),\n`
+        + '     ins AS (\n'
+        + 'INSERT INTO sonar.entity_observation\n'
+        + '       (entity_key, entity_name, source, identifier, issuers, state, state_hash, source_updated_at,\n'
+        + '        change_kind, url, observed_at, last_confirmed_at)\n'
+        + "SELECT r->>'entityKey', r->>'entityName', r->>'source', r->>'identifier',\n"
+        + "       ARRAY(SELECT jsonb_array_elements_text(coalesce(r->'issuers', '[]'::jsonb)) ORDER BY 1),\n"
+        + "       r->'state', r->>'stateHash', (r->>'sourceUpdatedAt')::timestamptz,\n"
+        + "       CASE WHEN latest_id IS NULL THEN 'baseline' ELSE 'changed' END,\n"
+        + "       r->>'url', (r->>'observedAt')::timestamptz, (r->>'observedAt')::timestamptz\n"
+        + '  FROM cur\n'
+        + " WHERE latest_hash IS DISTINCT FROM r->>'stateHash'\n"
+        + 'ON CONFLICT (entity_key, source, identifier, observed_at) DO NOTHING\n'
+        + 'RETURNING change_kind),\n'
+        + '     conf AS (\n'
+        + 'UPDATE sonar.entity_observation t\n'
+        + "   SET last_confirmed_at = (r->>'observedAt')::timestamptz, updated_at = now()\n"
+        + '  FROM cur\n'
+        + " WHERE t.id = cur.latest_id AND t.state_hash = r->>'stateHash'\n"
+        + "   AND t.last_confirmed_at < (r->>'observedAt')::timestamptz\n"
+        + 'RETURNING t.id)\n'
+        + "SELECT (SELECT count(*) FROM ins) || '|' || (SELECT count(*) FROM conf) || '|' || coalesce((SELECT max(change_kind) FROM ins), '');\n";
+    return { table: 'sonar.entity_observation', sql };
+}
+
+/** psql's `inserted|confirmed|change_kind` line → {inserted, confirmed, changeKind}. */
+export function parseObservationResult(out) {
+    const [inserted, confirmed, changeKind] = String(out ?? '').trim().split('|');
+    return { inserted: Number(inserted) || 0, confirmed: Number(confirmed) || 0, changeKind: changeKind || null };
 }
 
 /**
- * Insert observation rows — each only when the latest stored state for its (entity, source,
- * identifier) has a different hash, so a re-run or a resumed run writes nothing twice — and move
- * `last_confirmed_at` on the latest row of every unchanged one.
+ * PROCESSING input: every stored observation no processing step has compared yet, oldest first,
+ * each with the state stored before it for the same key (null for the first), as one JSON array.
  */
-export function buildObservationSql({ rows = [], confirms = [] }, { tag = 'sonar' } = {}) {
-    const statements = [];
-    const latestHash = "(SELECT o.state_hash FROM sonar.entity_observation o\n"
-        + "          WHERE o.entity_key = r->>'entityKey' AND o.source = r->>'source' AND o.identifier = r->>'identifier'\n"
-        + '          ORDER BY o.observed_at DESC, o.id DESC LIMIT 1)';
-    if (rows.length) {
-        statements.push(`WITH doc AS (SELECT ${jsonbLiteral({ rows }, tag)} AS d),\n`
-            + "     src AS (SELECT x.r FROM doc, jsonb_array_elements(d->'rows') AS x(r))\n"
-            + 'INSERT INTO sonar.entity_observation\n'
-            + '       (entity_key, entity_name, source, identifier, issuers, state, state_hash, source_updated_at,\n'
-            + '        change_kind, changed_fields, findings, url, observed_at, last_confirmed_at)\n'
-            + "SELECT r->>'entityKey', r->>'entityName', r->>'source', r->>'identifier',\n"
-            + "       ARRAY(SELECT jsonb_array_elements_text(coalesce(r->'issuers', '[]'::jsonb)) ORDER BY 1),\n"
-            + "       r->'state', r->>'stateHash', (r->>'sourceUpdatedAt')::timestamptz, r->>'changeKind',\n"
-            + "       ARRAY(SELECT jsonb_array_elements_text(coalesce(r->'changedFields', '[]'::jsonb))),\n"
-            + "       coalesce(r->'findings', '[]'::jsonb), r->>'url', (r->>'observedAt')::timestamptz, (r->>'observedAt')::timestamptz\n"
-            + '  FROM src\n'
-            + ` WHERE ${latestHash} IS DISTINCT FROM r->>'stateHash'\n`
-            + 'ON CONFLICT (entity_key, source, identifier, observed_at) DO NOTHING;\n');
-    }
-    if (confirms.length) {
-        statements.push(`WITH doc AS (SELECT ${jsonbLiteral({ rows: confirms }, tag)} AS d),\n`
-            + "     src AS (SELECT x.r FROM doc, jsonb_array_elements(d->'rows') AS x(r))\n"
-            + 'UPDATE sonar.entity_observation t\n'
-            + "   SET last_confirmed_at = (r->>'observedAt')::timestamptz, updated_at = now()\n"
-            + '  FROM src\n'
-            + ' WHERE t.id = (SELECT o.id FROM sonar.entity_observation o\n'
-            + "                WHERE o.entity_key = r->>'entityKey' AND o.source = r->>'source' AND o.identifier = r->>'identifier'\n"
-            + '                ORDER BY o.observed_at DESC, o.id DESC LIMIT 1)\n'
-            + "   AND t.state_hash = r->>'stateHash'\n"
-            + "   AND t.last_confirmed_at < (r->>'observedAt')::timestamptz;\n");
-    }
-    return { table: 'sonar.entity_observation', rows: rows.length, confirms: confirms.length, sql: statements.join('') };
+export function buildReadUnprocessedQuery() {
+    return "SELECT coalesce(jsonb_agg(jsonb_build_object('id', o.id, 'entityKey', o.entity_key, 'entityName', o.entity_name,\n"
+        + "  'source', o.source, 'identifier', o.identifier, 'issuers', to_jsonb(o.issuers), 'state', o.state,\n"
+        + "  'url', o.url, 'sourceUpdatedAt', o.source_updated_at, 'observedAt', o.observed_at, 'prevState', p.state)\n"
+        + '  ORDER BY o.observed_at, o.id), \'[]\'::jsonb)\n'
+        + '  FROM sonar.entity_observation o\n'
+        + '  LEFT JOIN LATERAL (SELECT q.state FROM sonar.entity_observation q\n'
+        + '                      WHERE q.entity_key = o.entity_key AND q.source = o.source AND q.identifier = o.identifier\n'
+        + '                        AND (q.observed_at, q.id) < (o.observed_at, o.id)\n'
+        + '                      ORDER BY q.observed_at DESC, q.id DESC LIMIT 1) p ON true\n'
+        + ' WHERE o.processed_at IS NULL;\n';
+}
+
+/** PROCESSING output for one row: what changed and the findings, and that it was processed. */
+export function buildProcessedSql(rowId, { changedFields: fields, findings }, { tag = 'sonar' } = {}) {
+    const doc = jsonbLiteral({ id: rowId, changedFields: fields, findings }, tag);
+    return `WITH d AS (SELECT ${doc} AS r)\n`
+        + 'UPDATE sonar.entity_observation t\n'
+        + "   SET changed_fields = ARRAY(SELECT jsonb_array_elements_text(coalesce(r->'changedFields', '[]'::jsonb))),\n"
+        + "       findings = coalesce(r->'findings', '[]'::jsonb), processed_at = now(), updated_at = now()\n"
+        + '  FROM d\n'
+        + " WHERE t.id = (r->>'id')::bigint AND t.processed_at IS NULL;\n";
 }
 
 // ---------------------------------------------------------------------------------------------
