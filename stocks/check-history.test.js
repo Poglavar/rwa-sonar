@@ -1,13 +1,15 @@
-// Tests for the document watcher's per-day check history (stocks/lib/check-history.mjs) and the
+// Tests for the document watcher's per-day check history (stocks/lib/check-history.mjs), the
 // prune that deletes the old daily checkpoints only once the history reproduces them
-// (stocks/prune-run-caches.mjs `pruneRunCaches`): extraction completeness, refusal when a
-// checkpoint is not covered, and a rerun that changes nothing.
+// (stocks/prune-run-caches.mjs `pruneRunCaches`), and the watcher's start-of-day fold of the
+// previous day's checkpoint (`foldCheckpoints`): extraction completeness, refusal when a
+// checkpoint is not covered, a failed fold that keeps the day and never stops the run, and reruns
+// that change nothing.
 
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { checkpointRows, checkRow, compileHistory, expandHistory, parseHistory, uncoveredRows } from './lib/check-history.mjs';
+import { checkpointRows, checkRow, compileHistory, expandHistory, foldCheckpoints, parseHistory, uncoveredRows } from './lib/check-history.mjs';
 import { pruneRunCaches } from './prune-run-caches.mjs';
 
 const H1 = 'a'.repeat(64);
@@ -167,5 +169,68 @@ describe('pruneRunCaches', () => {
         expect(r.refused).toBe(false);
         expect(readFileSync(historyFile, 'utf8')).toBe(before);
         expect(existsSync(join(rawDir, 'sources-2026-11-02.json'))).toBe(false);
+    });
+});
+
+describe('foldCheckpoints (the watcher, when a new day starts)', () => {
+    const checkpointFile = () => join(rawDir, 'sources-checkpoint.json');
+    const writeCheckpoint = (date) => writeFileSync(checkpointFile(), JSON.stringify({ date, results: checkpoints()[date] }));
+    const fold = (today) => foldCheckpoints({ rawDir, checkpointFile: checkpointFile(), historyFile, today });
+
+    test('the previous day is folded in, verified and its checkpoint moved out of today\'s way', async () => {
+        writeCheckpoint('2026-11-01');
+        const r = await fold('2026-11-02');
+        expect(r).toEqual({ folded: ['2026-11-01'], failed: [] });
+        expect(existsSync(checkpointFile())).toBe(false);
+        expect(existsSync(join(rawDir, 'sources-unfolded-2026-11-01.json'))).toBe(false);
+        const day = expandHistory(onDisk()).get('2026-11-01');
+        for (const res of Object.values(checkpoints()['2026-11-01'])) expect(day.get(res.id)).toEqual(checkRow(res));
+    });
+
+    test('today\'s own checkpoint is left alone', async () => {
+        writeCheckpoint('2026-11-02');
+        expect(await fold('2026-11-02')).toEqual({ folded: [], failed: [] });
+        expect(existsSync(checkpointFile())).toBe(true);
+        expect(existsSync(historyFile)).toBe(false);
+    });
+
+    test('a fold that fails keeps the day aside, does not throw, and the next run folds it', async () => {
+        writeCheckpoint('2026-11-01');
+        writeFileSync(historyFile, '{ broken');
+        const r = await fold('2026-11-02');
+        expect(r.folded).toEqual([]);
+        expect(r.failed).toEqual([{ name: 'check-history', problem: expect.any(String) }]);
+        // Today's run starts its own checkpoint (it fetches everything); the day waits aside.
+        expect(existsSync(checkpointFile())).toBe(false);
+        expect(existsSync(join(rawDir, 'sources-unfolded-2026-11-01.json'))).toBe(true);
+        rmSync(historyFile);
+        const next = await fold('2026-11-03');
+        expect(next).toEqual({ folded: ['2026-11-01'], failed: [] });
+        expect(existsSync(join(rawDir, 'sources-unfolded-2026-11-01.json'))).toBe(false);
+        expect(onDisk().dates).toEqual(['2026-11-01']);
+    });
+
+    test('an unchanged source over several days stays one run, and a fold with nothing new writes nothing', async () => {
+        for (const [date, today] of [['2026-11-01', '2026-11-02'], ['2026-11-02', '2026-11-03'], ['2026-11-03', '2026-11-04']]) {
+            writeCheckpoint(date);
+            await fold(today);
+        }
+        expect(onDisk().sources.aaaaaaaaaaaa).toEqual([['2026-11-01', '2026-11-03', 'ok', 200, H1.slice(0, 16), null, 'html', null]]);
+        const before = readFileSync(historyFile, 'utf8');
+        const mtime = statSync(historyFile).mtimeMs;
+        expect(await fold('2026-11-05')).toEqual({ folded: [], failed: [] });
+        // The same day offered again (a late run of that day) adds nothing.
+        writeCheckpoint('2026-11-03');
+        expect((await fold('2026-11-05')).folded).toEqual(['2026-11-03']);
+        expect(readFileSync(historyFile, 'utf8')).toBe(before);
+        expect(statSync(historyFile).mtimeMs).toBe(mtime);
+    });
+
+    test('a late run of an already folded day adds its sources to that day instead of replacing it', async () => {
+        writeCheckpoint('2026-11-01');
+        await fold('2026-11-02');
+        writeFileSync(checkpointFile(), JSON.stringify({ date: '2026-11-01', results: { 'https://d/': result('https://d/', 'dddddddddddd') } }));
+        expect((await fold('2026-11-02')).failed).toEqual([]);
+        expect([...expandHistory(onDisk()).get('2026-11-01').keys()].sort()).toEqual(['aaaaaaaaaaaa', 'bbbbbbbbbbbb', 'cccccccccccc', 'dddddddddddd']);
     });
 });

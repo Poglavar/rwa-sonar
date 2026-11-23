@@ -44,6 +44,7 @@ import {
 } from './lib/watch.mjs';
 import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
 import { keepRaw, pruneKept } from './lib/raw-keep.mjs';
+import { foldCheckpoints } from './lib/check-history.mjs';
 import { stageFail, stageOk, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
 import {
@@ -64,6 +65,8 @@ const STATS_FILE = join(REPO, '.last-source-watch-stats.json');
 const UNREAD_DIR = join(RAW_DIR, 'unread');
 const UNREAD_KEEP = 3;
 const UNREAD_MAX_AGE_MS = 30 * 86_400_000;
+/** Per-day outcomes of every finished day's checkpoint (lib/check-history.mjs), gitignored server state. */
+const HISTORY_FILE = join(HERE, 'data', 'source-check-history.json');
 /** Rows a failed Postgres load could not write; the next run offers them first. */
 const PENDING_LOAD_FILE = join(REPO, '.source-watch-pending-load.json');
 let runStatsFile = STATS_FILE;
@@ -202,6 +205,9 @@ FILES
   stocks/data/sources/<id>/<fetched_at>.{pdf,docx,html,json,txt}   raw + normalised copies (gitignored)
   stocks/data/sources-state.json                    last hash/etag per URL (gitignored)
   stocks/data/raw/sources-checkpoint.json           the current day's per-source checkpoint, resumable (gitignored)
+  stocks/data/source-check-history.json             every finished day's per-source outcome, folded in when a new day
+                                                    starts (lib/check-history.mjs); a day that could not be folded waits
+                                                    in stocks/data/raw/sources-unfolded-<date>.json for the next run
   stocks/data/raw/unread/<id>/                      bytes a host served that could not be read (gzip, 3 per source, 30 days)
   .source-watch-pending-load.json                   rows a failed Postgres load kept; offered first by the next run
   sonar.source / sonar.source_version / sonar.change_event   the mirror in Postgres
@@ -1486,6 +1492,12 @@ async function main() {
         const doc = await readJson(checkpointFile, null);
         return doc?.date === runDate && doc.results && typeof doc.results === 'object' ? doc.results : {};
     };
+    // A checkpoint of an earlier day is that day's only per-source record: it is moved aside and
+    // folded into the history before today's run starts its own checkpoint. A fold that fails
+    // keeps the day aside for the next run and is a processing failure; it never stops the fetch.
+    const fold = await foldCheckpoints({ rawDir: RAW_DIR, checkpointFile, historyFile: HISTORY_FILE, today: runDate });
+    if (fold.folded.length) log(`watch-sources: day(s) ${fold.folded.join(', ')} folded into ${relative(REPO, HISTORY_FILE)}`);
+    for (const f of fold.failed) logError(`check-history: ${f.name} not folded (kept for the next run): ${f.problem}`);
     // The day's checkpoint is always loaded, so a --force or --only-blocked run adds to it instead
     // of replacing the other sources' entries; those two modes just never reuse an entry — a
     // repair run over blocked sources that reused today's `blocked` outcomes would fetch nothing.
@@ -1796,6 +1808,8 @@ async function main() {
         else stageOk(ingest);
     }
     const processing = stageTally();
+    if (fold.failed.length) stageFail(processing, 'check-history', fold.failed.length);
+    else if (fold.folded.length) stageOk(processing, fold.folded.length);
     let pendingLoaded = 0;
     if (!flags['no-db']) {
         const claimChecks = [];
@@ -1857,6 +1871,7 @@ async function main() {
         watchStatus: worstStatus(failures.length ? 'partial' : 'ok', stages.processingStatus),
         ...stages,
         unreadBytesKept: unreadKept,
+        checkHistory: { folded: fold.folded, failed: fold.failed },
         pendingLoadOffered: pendingLoaded,
         lastRunStartedAt: RUN_STARTED_AT,
         lastRunEndedAt: endedAt,
@@ -1901,7 +1916,7 @@ async function main() {
 
     if (runFailed(results) || stages.processingStatus !== 'ok') {
         logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`
-            + `${stages.processingStatus !== 'ok' ? '; the Postgres load failed (its rows are kept for the next run)' : ''}`);
+            + `${stages.processingStatus !== 'ok' ? `; processing failed at ${stages.processing.failingSteps.map((s) => s.step).join(', ')} (its input is kept for the next run)` : ''}`);
         process.exitCode = 1;
         return;
     }

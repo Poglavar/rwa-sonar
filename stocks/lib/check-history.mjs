@@ -1,11 +1,16 @@
-// The document watcher's per-day check history, kept compactly before its daily checkpoints
-// (stocks/data/raw/sources-<date>.json, the layout before 2026-11-23) are deleted: each checkpoint
-// is the only record of what every source looked like on that day (sonar.source holds only the
-// latest look, sonar.source_version only new content). Per day and source only the fields stored
-// nowhere else are kept, and consecutive days with the same values collapse into one run, so an
-// unchanged source is one line, not one copy per day. Pure: unit tested in check-history.test.js;
-// stocks/prune-run-caches.mjs does the IO and refuses to delete a checkpoint the history does not
-// reproduce exactly.
+// The document watcher's per-day check history (stocks/data/source-check-history.json): each day's
+// checkpoint is the only record of what every source looked like that day (sonar.source holds only
+// the latest look, sonar.source_version only new content), so before a checkpoint goes its days are
+// kept here. Per day and source only the fields stored nowhere else are kept, and consecutive days
+// with the same values collapse into one run, so an unchanged source is one line, not one copy per
+// day. Two writers: stocks/prune-run-caches.mjs (the dated checkpoints of the layout before
+// 2026-11-23) and stocks/watch-sources.mjs, which folds the previous day's checkpoint in when a new
+// day starts (`foldCheckpoints`). Both write through `appendDaysVerified`, which reads the file back
+// and reports any day it does not reproduce exactly. The functions above the IO section are pure;
+// all are unit tested in check-history.test.js.
+
+import { readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 /**
  * The kept fields, in run order after [fromDate, toDate]. Why each one:
@@ -118,16 +123,20 @@ export function compileHistory(days) {
     return { dates, sources: sorted };
 }
 
-/** `history` with the given days added (a date already present is replaced by the new rows). */
+/**
+ * `history` with the given days added. A date already present keeps its sources and takes the new
+ * rows over them (a run that finished after its day was folded adds to that day, never replaces it).
+ */
 export function mergeDays(history, newDays) {
     const days = expandHistory(history);
-    for (const [date, rows] of newDays) days.set(date, new Map(rows));
+    for (const [date, rows] of newDays) days.set(date, new Map([...(days.get(date) ?? []), ...rows]));
     return compileHistory(days);
 }
 
 /**
  * What the history fails to reproduce of one day's checkpoint rows: a list of { id, problem }
- * (empty when the day is covered exactly — every source with identical values, and no extra one).
+ * (empty when the day is covered — every source of the checkpoint with identical values; the day
+ * may hold more sources, from another run of the same day).
  * `expanded` is expandHistory(history), passed in so a run over many days expands once.
  */
 export function uncoveredRows(expanded, date, rows) {
@@ -139,7 +148,6 @@ export function uncoveredRows(expanded, date, rows) {
         if (!kept) problems.push({ id, problem: 'missing' });
         else if (!sameRow(kept, row)) problems.push({ id, problem: 'differs' });
     }
-    for (const id of day.keys()) if (!rows.has(id)) problems.push({ id, problem: 'not in the checkpoint' });
     return problems;
 }
 
@@ -169,4 +177,126 @@ export function parseHistory(doc) {
     if (JSON.stringify(doc?.fields) !== want) throw new Error(`history fields ${JSON.stringify(doc?.fields)} are not ${want}`);
     if (!Array.isArray(doc.dates) || !doc.sources || typeof doc.sources !== 'object') throw new Error('history has no dates/sources');
     return { dates: doc.dates, sources: doc.sources };
+}
+
+/** One day's rows from either checkpoint layout: `{ date, results }` (since 2026-11-23) or the URL map. */
+export function checkpointDocRows(doc) {
+    return checkpointRows(doc && typeof doc.date === 'string' && doc.results ? doc.results : doc);
+}
+
+// ---------------------------------------------------------------------------------------------
+// IO
+// ---------------------------------------------------------------------------------------------
+
+export const HISTORY_ABOUT = 'Per-day document-watch outcomes, one entry per source and run of equal days, '
+    + 'kept from the watcher\'s daily checkpoints (stocks/watch-sources.mjs folds each finished day in; '
+    + 'stocks/prune-run-caches.mjs folded the dated sources-<date>.json files before deleting them). '
+    + 'sources: source id (sonar.source.id) -> runs; fields and why they were kept: stocks/lib/check-history.mjs.';
+
+/** The history file as { dates, sources }; an absent file is an empty history, a broken one throws. */
+export async function readHistory(path) {
+    try {
+        return parseHistory(JSON.parse(await readFile(path, 'utf8')));
+    } catch (err) {
+        if (err.code === 'ENOENT') return emptyHistory();
+        throw err;
+    }
+}
+
+/**
+ * Merge `days` (Map(date -> Map(id -> row))) into the history file, then read the file back and
+ * check every one of those days is reproduced exactly. Returns { written, history, problems }:
+ * `problems` lists [{ date, problem }] (empty = every day is kept); `written` is false when the
+ * merged history is what the file already held (nothing is rewritten).
+ */
+export async function appendDaysVerified(historyFile, days) {
+    let before = null;
+    try {
+        before = await readFile(historyFile, 'utf8');
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+    }
+    const existing = before === null ? emptyHistory() : parseHistory(JSON.parse(before));
+    const merged = days.size ? mergeDays(existing, days) : existing;
+    const text = serializeHistory(merged, HISTORY_ABOUT);
+    const written = days.size > 0 && text !== before;
+    if (written) {
+        const tmp = `${historyFile}.${process.pid}.tmp`;
+        await writeFile(tmp, text, 'utf8');
+        await rename(tmp, historyFile);
+    }
+    const expanded = expandHistory(await readHistory(historyFile));
+    const problems = [];
+    for (const [date, rows] of days) {
+        const missing = uncoveredRows(expanded, date, rows);
+        if (missing.length) problems.push({ date, problem: `${missing.length} source(s) not reproduced, e.g. ${missing.slice(0, 3).map((p) => `${p.id ?? ''} ${p.problem}`.trim()).join('; ')}` });
+    }
+    return { written, history: merged, problems };
+}
+
+const UNFOLDED_RE = /^sources-unfolded-(\d{4}-\d{2}-\d{2})\.json$/;
+
+/**
+ * The watcher's start-of-run step: a checkpoint (`checkpointFile`, `{ date, results }`) left by an
+ * earlier day is moved aside to `<rawDir>/sources-unfolded-<date>.json`, so today's run starts its
+ * own checkpoint at once, and every such file is then folded into the history and deleted once the
+ * history is verified to reproduce it. A file that cannot be folded stays where it is and is tried
+ * again next run, so a failure here costs neither the day nor today's fetching. Never throws:
+ * returns { folded: [date], failed: [{ name, problem }] }.
+ */
+export async function foldCheckpoints({ rawDir, checkpointFile, historyFile, today }) {
+    const folded = [];
+    const failed = [];
+    try {
+        let doc = null;
+        try {
+            doc = JSON.parse(await readFile(checkpointFile, 'utf8'));
+        } catch (err) {
+            // Absent: nothing to fold. Unreadable: moved aside below, so the fold reports it.
+            if (err.code !== 'ENOENT') doc = { date: 'unreadable' };
+        }
+        if (doc && doc.date !== today) {
+            // A checkpoint without a date cannot be folded; it is kept aside and reported every run.
+            const date = /^\d{4}-\d{2}-\d{2}$/.test(doc.date ?? '') ? doc.date : `undated-${Date.now()}`;
+            try {
+                await rename(checkpointFile, join(rawDir, `sources-unfolded-${date}.json`));
+            } catch (err) {
+                // A concurrent run of the same day moved it first.
+                if (err.code !== 'ENOENT') throw err;
+            }
+        }
+        let names = [];
+        try {
+            names = await readdir(rawDir);
+        } catch (err) {
+            if (err.code !== 'ENOENT') throw err;
+        }
+        const pending = names.filter((n) => n.startsWith('sources-unfolded-') && n.endsWith('.json')).sort();
+        const days = new Map();
+        const files = new Map();
+        for (const name of pending) {
+            try {
+                const m = UNFOLDED_RE.exec(name);
+                if (!m) throw new Error('the checkpoint carried no date');
+                const doc = JSON.parse(await readFile(join(rawDir, name), 'utf8'));
+                days.set(m[1], checkpointDocRows(doc));
+                files.set(m[1], name);
+            } catch (err) {
+                failed.push({ name, problem: err.message });
+            }
+        }
+        if (days.size) {
+            const { problems } = await appendDaysVerified(historyFile, days);
+            const bad = new Set(problems.map((p) => p.date));
+            for (const p of problems) failed.push({ name: files.get(p.date), problem: p.problem });
+            for (const [date, name] of files) {
+                if (bad.has(date)) continue;
+                await rm(join(rawDir, name), { force: true });
+                folded.push(date);
+            }
+        }
+    } catch (err) {
+        failed.push({ name: 'check-history', problem: err.message });
+    }
+    return { folded, failed };
 }

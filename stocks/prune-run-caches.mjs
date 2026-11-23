@@ -9,21 +9,17 @@
 // (lib/check-history.mjs), the file is read back from disk, and every checkpoint is checked to be
 // reproduced exactly by it; if one is not (or cannot be read), nothing at all is deleted.
 
-import { readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { readdir, readFile, rm, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { checkpointRows, emptyHistory, expandHistory, mergeDays, parseHistory, serializeHistory, uncoveredRows } from './lib/check-history.mjs';
+import { appendDaysVerified, checkpointDocRows, expandHistory, HISTORY_ABOUT, mergeDays, readHistory, serializeHistory, uncoveredRows } from './lib/check-history.mjs';
 import { isoDate, log, logError, parseArgs } from './lib/io.mjs';
 import { planDatedCachePrune } from './lib/raw-keep.mjs';
 
 const REPO = join(import.meta.dirname, '..');
 const RAW_DIR = join(REPO, 'stocks', 'data', 'raw');
 const HISTORY_FILE = join(REPO, 'stocks', 'data', 'source-check-history.json');
-const HISTORY_ABOUT = 'Per-day document-watch outcomes extracted from the daily checkpoints '
-    + 'stocks/data/raw/sources-<date>.json (deleted afterwards) by stocks/prune-run-caches.mjs. '
-    + 'sources: source id (sonar.source.id) -> runs of consecutive dates with the same values; '
-    + 'fields and why they were kept: stocks/lib/check-history.mjs.';
 
 function usage() {
     console.log(`prune-run-caches.mjs — remove the per-day run caches older than today (layout before 2026-11-23)
@@ -57,42 +53,18 @@ async function sizeOf(path) {
 
 const checkpointDate = (name) => /^sources-(\d{4}-\d{2}-\d{2})\.json$/.exec(name)[1];
 
-async function readHistory(path) {
-    try {
-        return parseHistory(JSON.parse(await readFile(path, 'utf8')));
-    } catch (err) {
-        if (err.code === 'ENOENT') return emptyHistory();
-        throw err;
-    }
-}
-
 /** Each checkpoint's rows; a checkpoint that cannot be read or parsed is a failure, not an empty day. */
 async function readCheckpoints(checkpoints) {
     const days = new Map();
     const failures = [];
     for (const e of checkpoints) {
         try {
-            days.set(checkpointDate(e.name), checkpointRows(JSON.parse(await readFile(e.path, 'utf8'))));
+            days.set(checkpointDate(e.name), checkpointDocRows(JSON.parse(await readFile(e.path, 'utf8'))));
         } catch (err) {
             failures.push({ name: e.name, problem: err.message });
         }
     }
     return { days, failures };
-}
-
-/** Problems of the history against every checkpoint, re-read from disk: [{ name, problem }]. */
-async function verifyCoverage(history, checkpoints) {
-    const expanded = expandHistory(history);
-    const { days, failures } = await readCheckpoints(checkpoints);
-    for (const e of checkpoints) {
-        const rows = days.get(checkpointDate(e.name));
-        if (!rows) continue;
-        const problems = uncoveredRows(expanded, checkpointDate(e.name), rows);
-        if (problems.length) {
-            failures.push({ name: e.name, problem: `${problems.length} source(s) not reproduced, e.g. ${problems.slice(0, 3).map((p) => `${p.id ?? ''} ${p.problem}`.trim()).join('; ')}` });
-        }
-    }
-    return failures;
 }
 
 /**
@@ -131,14 +103,11 @@ export async function pruneRunCaches({ rawDir = RAW_DIR, historyFile = HISTORY_F
         return { doomed, removed: [], historyBytes, history, refused: failures.length > 0, failures };
     }
     if (failures.length) return { doomed, removed: [], historyBytes, history, refused: true, failures };
-    if (days.size) {
-        const tmp = `${historyFile}.${process.pid}.tmp`;
-        await writeFile(tmp, text, 'utf8');
-        await rename(tmp, historyFile);
+    // Written, read back from disk, and every checkpoint about to go held against it.
+    const { problems } = await appendDaysVerified(historyFile, days);
+    if (problems.length) {
+        return { doomed, removed: [], historyBytes, history, refused: true, failures: problems.map((p) => ({ name: `sources-${p.date}.json`, problem: p.problem })) };
     }
-    // Read back what is on disk now and hold every checkpoint about to go against it.
-    const verifyFailures = await verifyCoverage(await readHistory(historyFile), checkpoints);
-    if (verifyFailures.length) return { doomed, removed: [], historyBytes, history, refused: true, failures: verifyFailures };
     for (const e of doomed) await rm(e.path, { recursive: true, force: true });
     return { doomed, removed: doomed, historyBytes, history, refused: false, failures: [] };
 }
