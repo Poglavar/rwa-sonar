@@ -874,6 +874,155 @@ export function selectSources(only = null) {
     return SOURCES.filter((s) => wanted.includes(s.id));
 }
 
+// ---------------------------------------------------------------------------------------------
+// Collecting one source: requests → notices. `get(url, opts)` is the only IO: the watcher passes a
+// paced fetch that records every body, and a replay of those recorded bodies reprocesses a kept
+// raw payload the same way (watch-regulators.mjs replayKept), so a parse that failed once can be
+// redone from what the source sent, without asking it again.
+// ---------------------------------------------------------------------------------------------
+
+/** All of one source's notices, one per id (EDGAR returns a filing once per matched name). */
+export async function collectNotices(source, ctx, get) {
+    let notices = [];
+    let note = null;
+    if (source.id === 'finra-brokercheck') {
+        // Two stages: find each US legal name's firm, then read that firm's disclosures.
+        const firms = new Map();
+        for (const name of brokerCheckNames(ctx.names)) {
+            const q = encodeURIComponent(nameCore(name.phrase) || name.phrase);
+            const hits = parseBrokerCheckSearch(JSON.parse(await get(
+                `https://api.brokercheck.finra.org/search/firm?query=${q}&hl=true&nrows=12&start=0&r=25&sort=score+desc&wt=json`,
+                { headers: { accept: 'application/json' }, redirect: 'manual' })));
+            for (const h of hits) {
+                const same = [h.name, ...h.otherNames].some((n) => canonicalName(n) === name.canonical);
+                if (same) firms.set(h.crd, h);
+            }
+        }
+        for (const crd of firms.keys()) {
+            const { notices: found } = parseBrokerCheckFirm(JSON.parse(await get(
+                `https://api.brokercheck.finra.org/search/firm/${crd}?hl=true&nrows=12&start=0&r=25&wt=json`,
+                { headers: { accept: 'application/json' }, redirect: 'manual' })));
+            notices.push(...found);
+        }
+        note = `${firms.size} firm(s) found on BrokerCheck: ${[...firms.values()].map((f) => `${f.name} ${f.crd}`).join(', ') || 'none'}`;
+    } else if (source.requests) {
+        for (const req of source.requests(ctx)) notices.push(...source.parseEach(await get(req.url), req));
+    } else if (source.pageUrl) {
+        for (let page = 0; page < source.maxPages; page += 1) {
+            const found = source.parsePage(await get(source.pageUrl(ctx, page)));
+            notices.push(...found);
+            if (found.length < source.pageSize) break;
+            if (page === source.maxPages - 1 && source.window !== 'newest') {
+                throw new Error(`still a full page after ${source.maxPages} pages — raise maxPages, or notices are being cut off`);
+            }
+        }
+    } else {
+        notices = source.parse(await get(source.url, { method: source.method, body: source.body, headers: source.headers }));
+    }
+    const byId = new Map();
+    for (const n of notices) if (!byId.has(n.id)) byId.set(n.id, n);
+    return { notices: [...byId.values()], note };
+}
+
+// ---------------------------------------------------------------------------------------------
+// The notice store (sonar.regulator_notice): every parsed notice of every source, once per distinct
+// content, written BEFORE anything is matched. Shared with the case-law watcher's SEC feeds.
+// ---------------------------------------------------------------------------------------------
+
+/** JSON with object keys sorted at every level, so equal notices hash equal whatever the key order. */
+export function canonicalJson(value) {
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+    if (value && typeof value === 'object') {
+        return `{${Object.keys(value).filter((k) => value[k] !== undefined).sort()
+            .map((k) => `${JSON.stringify(k)}:${canonicalJson(value[k])}`).join(',')}}`;
+    }
+    return JSON.stringify(value ?? null);
+}
+
+/** A notice version's identity: sha256 of its canonical JSON. A changed notice is a new version. */
+export function noticeHash(notice) {
+    return createHash('sha256').update(canonicalJson(notice)).digest('hex');
+}
+
+/** Store rows for one source's notices: one per (notice id, content hash). */
+export function noticeRows(sourceId, notices) {
+    const byKey = new Map();
+    for (const notice of notices ?? []) {
+        if (!notice?.id) throw new Error(`${sourceId}: a notice without an id cannot be stored`);
+        const contentHash = noticeHash(notice);
+        byKey.set(`${notice.id}|${contentHash}`, {
+            source: sourceId,
+            noticeId: String(notice.id),
+            contentHash,
+            notice,
+            publishedAt: notice.publishedAt ?? null,
+            publishedDate: notice.publishedDate ?? null
+        });
+    }
+    return [...byKey.values()];
+}
+
+/**
+ * Insert each notice version once; a version already stored only has `last_seen_at` moved (never
+ * back). Prints one line `inserted|seen` (psql -t -A): new versions, and rows touched in all.
+ */
+export function buildNoticeStoreSql(rows, { seenAt }, { tag = 'sonar' } = {}) {
+    if (!seenAt) throw new Error('buildNoticeStoreSql: seenAt is required (when the notices were fetched)');
+    const sql = `WITH doc AS (SELECT ${jsonbLiteral({ rows, seenAt }, tag)} AS d),\n`
+        + "     src AS (SELECT x.r, (d->>'seenAt')::timestamptz AS seen FROM doc, jsonb_array_elements(d->'rows') AS x(r)),\n"
+        + '     up AS (\n'
+        + 'INSERT INTO sonar.regulator_notice AS n\n'
+        + '       (source, notice_id, content_hash, notice, published_at, published_date, first_seen_at, last_seen_at)\n'
+        + "SELECT r->>'source', r->>'noticeId', r->>'contentHash', r->'notice',\n"
+        + "       (r->>'publishedAt')::timestamptz, (r->>'publishedDate')::date, seen, seen\n"
+        + '  FROM src\n'
+        + 'ON CONFLICT (source, notice_id, content_hash) DO UPDATE SET\n'
+        + '       last_seen_at = EXCLUDED.last_seen_at, updated_at = now()\n'
+        + ' WHERE n.last_seen_at < EXCLUDED.last_seen_at\n'
+        + 'RETURNING (xmax = 0) AS inserted)\n'
+        + "SELECT count(*) FILTER (WHERE inserted) || '|' || count(*) FROM up;\n";
+    return { table: 'sonar.regulator_notice', rows: rows.length, sql };
+}
+
+/** psql's `inserted|seen` line → numbers. */
+export function parseStoreCounts(out) {
+    const [inserted, touched] = String(out ?? '').trim().split('|').map(Number);
+    return { inserted: Number.isFinite(inserted) ? inserted : 0, touched: Number.isFinite(touched) ? touched : 0 };
+}
+
+/**
+ * The stored notices of one source that no processing run has matched yet (its newest unmatched
+ * version per notice id), as one JSON array: the backlog a failed processing step leaves.
+ */
+export function buildReadUnmatchedQuery(sourceId, { tag = 'sonar' } = {}) {
+    return "SELECT coalesce(jsonb_agg(jsonb_build_object('notice', notice, 'contentHash', content_hash) ORDER BY notice_id), '[]'::jsonb)\n"
+        + '  FROM (SELECT DISTINCT ON (notice_id) notice_id, notice, content_hash\n'
+        + '          FROM sonar.regulator_notice\n'
+        + `         WHERE source = (${jsonbLiteral(sourceId, tag)} #>> '{}') AND matched_at IS NULL\n`
+        + '         ORDER BY notice_id, first_seen_at DESC) b;\n';
+}
+
+/** This run's notices plus the stored backlog, one per id; this run's version wins. */
+export function withBacklog(current, backlog) {
+    const byId = new Map();
+    for (const b of backlog ?? []) if (b?.notice?.id) byId.set(String(b.notice.id), b.notice);
+    for (const n of current ?? []) byId.set(String(n.id), n);
+    return [...byId.values()];
+}
+
+/**
+ * Mark every not-yet-matched stored version of the given notice ids as matched: this run matched
+ * the newest version of each, which supersedes any older one still waiting. Rows already matched
+ * are not rewritten.
+ */
+export function buildMarkMatchedSql(sourceId, notices, { matchedAt }, { tag = 'sonar' } = {}) {
+    const ids = [...new Set((notices ?? []).map((n) => String(n.id)))];
+    const sql = `UPDATE sonar.regulator_notice n SET matched_at = (${jsonbLiteral(matchedAt, tag)} #>> '{}')::timestamptz, updated_at = now()\n`
+        + ` WHERE n.source = (${jsonbLiteral(sourceId, tag)} #>> '{}') AND n.matched_at IS NULL\n`
+        + `   AND n.notice_id IN (SELECT jsonb_array_elements_text(${jsonbLiteral(ids, tag)}));\n`;
+    return { table: 'sonar.regulator_notice', rows: ids.length, sql };
+}
+
 /**
  * True when a newest-N source no longer reaches back to the last good read: its oldest notice is
  * newer than that read, so anything published in between may have scrolled off unseen.

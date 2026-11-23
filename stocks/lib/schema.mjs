@@ -27,6 +27,7 @@ export const SCHEMA_FILES = [
     '2026-10-01-sonar-entities.sql',
     '2026-10-01-sonar-corporate-actions.sql',
     '2026-10-01-sonar-regulators.sql',
+    '2026-11-23-sonar-regulator-notice.sql',
     '2026-10-01-sonar-powers.sql',
     // Always last: the one statement of the allowed change_event kinds.
     '2026-10-01-sonar-change-event-kinds.sql'

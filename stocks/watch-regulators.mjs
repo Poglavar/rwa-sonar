@@ -5,12 +5,15 @@
 // case-law watcher derives from the dossiers, stores each match in sonar.regulator_notice_match and
 // each source's check in sonar.regulator_check, and raises a sonar.change_event of kind
 // `regulator-notice` for every NEW match. An event is a candidate for a human to read, never a finding.
+// Every notice read, matched or not, is first stored in sonar.regulator_notice (ingest), and the
+// matching reads from there (processing): a failure of the second never costs the first
+// (lib/regulator-run.mjs).
 //
 // The decisions (names, parsers, match strength, events, SQL) are in lib/regulators.mjs and unit
-// tested in regulators.test.js; this file is the IO: pacing, retries, the raw cache, psql, the
+// tested in regulators.test.js; this file is the IO: pacing, retries, the kept raw reads, psql, the
 // per-source checkpoint and the one Telegram summary.
 
-import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { readdir, readFile, rm, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 import { backoffMs, retryable, reviewIndex } from './lib/caselaw.mjs';
@@ -18,14 +21,16 @@ import { wrapTransaction } from './lib/db-load.mjs';
 import { readEnvFile } from './lib/env.mjs';
 import { log, logError, logWarn, parseArgs, readJson, sleep, ts, writeJson } from './lib/io.mjs';
 import { describeUrl, psql } from './lib/psql.mjs';
+import { isKeptName, keepRaw, listKept, pruneKept, readKept } from './lib/raw-keep.mjs';
+import { ingestSource, processSource } from './lib/regulator-run.mjs';
 import {
-    NOT_FEASIBLE, QUERY_WINDOW_DAYS, SOURCES, brokerCheckNames, buildCheckSql, buildMatchUpsertSql,
-    buildReadChecksQuery, buildReadMatchesQuery, canonicalName, checkVerdict, deriveWatchNames, foldMatches,
-    formatTelegramSummary, knownBlock, matchNotices, nameCore, normaliseStoredChecks, normaliseStoredMatches,
-    parseBrokerCheckFirm, parseBrokerCheckSearch, runVerdict, selectSources
+    NOT_FEASIBLE, QUERY_WINDOW_DAYS, SOURCES, buildNoticeStoreSql, buildReadChecksQuery, buildReadMatchesQuery,
+    buildReadUnmatchedQuery, collectNotices, deriveWatchNames, formatTelegramSummary, knownBlock,
+    normaliseStoredChecks, normaliseStoredMatches, noticeRows, parseStoreCounts, runVerdict, selectSources
 } from './lib/regulators.mjs';
+import { stageFail, stageOk, stageSkip, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { postRunNotifications, telegramConfigured } from './lib/telegram.mjs';
-import { buildChangeEventSql, userAgentFor } from './lib/watch.mjs';
+import { userAgentFor } from './lib/watch.mjs';
 
 const HERE = import.meta.dirname;
 const REPO = join(HERE, '..');
@@ -39,7 +44,11 @@ const DEFAULT_PACE_MS = 1500;
 const SEC_PACE_MS = 1000;
 const MAX_ATTEMPTS = 3;
 const TIMEOUT_MS = 45_000;
+/** Distinct raw reads kept per source (gzip, deduplicated), for looking at what a parser was given. */
 const RAW_KEEP = 5;
+/** Reads whose notices could not be stored are retried for this long, then dropped with an error. */
+const PENDING_MAX_AGE_MS = 30 * 86_400_000;
+const PENDING_MAX_FILES = 30;
 /** A checkpoint older than this belongs to an earlier day's run and is not resumed. */
 const CHECKPOINT_MAX_AGE_MS = 6 * 3600 * 1000;
 
@@ -84,9 +93,17 @@ ${NOT_FEASIBLE.map((n) => `  ${n.regulator}: ${n.reason}`).join('\n')}
 WHAT A RUN DOES
   1. Derives the watched names from the dossiers with the case-law watcher's own deriveQueries
      (lib/caselaw.mjs) plus stocks/data/caselaw-extra.json — the two watchers watch the same parties.
-  2. Per source (in order, checkpointed): fetch (paced per host, retried on 429/5xx), cache the raw
-     body under ${relative(REPO, RAW_DIR)}/<source>/ (newest ${RAW_KEEP} kept), parse into notices with
-     the regulator's OWN dates, and match every notice against every name:
+  2. Per source (in order, checkpointed), INGEST: fetch (paced per host, retried on 429/5xx), keep the
+     raw bodies gzip-compressed and once per distinct content under ${relative(REPO, RAW_DIR)}/<source>/
+     (newest ${RAW_KEEP} distinct reads), parse into notices with the regulator's OWN dates, and store EVERY
+     notice in sonar.regulator_notice (one row per notice version; a re-read only moves last_seen_at)
+     in its own write, before any matching. A body that will not parse, or notices that cannot be
+     stored, are kept in <source>/pending/ and replayed through the parser at the start of the next
+     runs until they are stored (dropped with an error after ${PENDING_MAX_AGE_MS / 86_400_000} days).
+     The stored matches/checks are read only to PROCESS: when that read fails, every source is still
+     fetched and stored, and nothing is matched until a run can read them.
+     PROCESSING: this run's notices plus any stored ones no run has matched yet (matched_at null)
+     are matched against every name:
        strong = the full legal name, corporate suffix included (Ltd = Limited, Inc = Incorporated, …);
        weak   = a brand or bare name ("xStocks", "DekaBank"), or the legal name's distinctive core
                 without its suffix ("Payward" for "Payward, Inc."); never a stoplisted word.
@@ -94,9 +111,11 @@ WHAT A RUN DOES
      Query sources look back ${QUERY_WINDOW_DAYS} days: EDGAR full-text search per legal name (only
      filings the entity itself FILED), BrokerCheck per US legal name (disclosure counts), FINRA
      disciplinary actions for the window.
-  3. Each source is written in one transaction as it finishes (the checkpoint): its matches
+  3. Each source's processing is written in one transaction as it finishes (the checkpoint): its matches
      (sonar.regulator_notice_match, idempotent on regulator + notice + entity), its check row
-     (sonar.regulator_check: status, consecutive failures, newest notice date) and its events.
+     (sonar.regulator_check: status, consecutive failures, newest notice date), its events and the
+     notices' matched_at. A failed processing step is recorded (processingStatus in the stats, a
+     failure line) and never stops the next source's fetch.
   4. A source's FIRST good read is a baseline: matches recorded, nothing raised. After that a new
      match -> one change_event per (issuer, notice), kind regulator-notice: warning (strong, in the
      subject of a warning / enforcement / suspension / sanction), caution (other strong), info (weak).
@@ -115,7 +134,13 @@ FILES
   .last-regulators-watch-stats.json         the outcome (…-stats-<ids>.json for an --only run)
   stocks/data/regulators-reviewed.json      optional human decisions {decisions:[{key, status, reason}]},
                                             key = "<source>|<notice id>|<entity>", status dismissed | confirmed
-  sonar.regulator_notice_match / sonar.regulator_check / sonar.change_event   the record in Postgres`);
+  stocks/data/raw/regulators/<source>/pending/  reads whose notices are not stored yet (replayed)
+  sonar.regulator_notice                    every notice read, once per version (db/2026-11-23-sonar-regulator-notice.sql)
+  sonar.regulator_notice_match / sonar.regulator_check / sonar.change_event   the record in Postgres
+
+STATS
+  ingestStatus / processingStatus (ok | partial | failed) with ingest / processing {attempted, ok,
+  failed, skipped, failingSteps}; watchStatus is the worst of those and the sources' own verdicts.`);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -182,78 +207,106 @@ async function pacedFetch(url, { method = 'GET', body = null, headers = {}, pace
 }
 
 // ---------------------------------------------------------------------------------------------
-// Collecting one source: fetch → raw cache → notices
+// Collecting one source: fetch → raw kept → notices. The raw bodies are kept gzip-compressed and
+// once per distinct content (lib/raw-keep.mjs): the newest RAW_KEEP in the source's ring, and in
+// its pending/ directory whenever the notices could not be stored (the parse failed, or the
+// store did) — those are replayed through the same parser at the start of the next runs until
+// they are stored, so what the source sent is never lost to a failure on our side.
 // ---------------------------------------------------------------------------------------------
 
-async function cacheRaw(source, raw, stamp) {
-    const dir = join(RAW_DIR, source.id);
-    await mkdir(dir, { recursive: true });
-    const single = raw.length === 1;
-    const ext = single ? ({ rss: 'xml', json: 'json', csv: 'csv', html: 'html' }[source.format] ?? 'txt') : 'json';
-    const path = join(dir, `${stamp}.${ext}`);
-    await writeFile(path, single ? raw[0].body : `${JSON.stringify(raw, null, 1)}\n`, 'utf8');
-    const files = (await readdir(dir)).sort();
-    for (const old of files.slice(0, Math.max(0, files.length - RAW_KEEP))) await rm(join(dir, old), { force: true });
-    return path;
+const pendingDir = (source) => join(RAW_DIR, source.id, 'pending');
+
+/** The kept envelope: the bodies with the context that produced their URLs. Deduped on the bodies alone. */
+function rawEnvelope(source, ctx, raw) {
+    const payload = `${JSON.stringify({ source: source.id, today: ctx.today, windowDays: ctx.windowDays, requests: raw })}\n`;
+    return { payload, identity: JSON.stringify(raw.map((r) => [r.url, r.body])) };
 }
 
-/** A failed read still caches what it read, the body that failed to parse included, and says where. */
+/** Keep this read in the source's ring of recent raw reads, and drop the ring's oldest beyond RAW_KEEP. */
+async function keepInRing(source, ctx, raw) {
+    const dir = join(RAW_DIR, source.id);
+    const { payload, identity } = rawEnvelope(source, ctx, raw);
+    const kept = await keepRaw(dir, payload, { identity });
+    await pruneKept(dir, { maxFiles: RAW_KEEP });
+    // The ring before 2026-11-23 was one plain file per run (<stamp>.xml/.json/…); it is replaced.
+    for (const name of await readdir(dir)) {
+        if (!isKeptName(name) && /^\d{8}T\d{6}Z\.[a-z]+$/.test(name)) await rm(join(dir, name), { force: true });
+    }
+    return kept;
+}
+
+/** Keep a read whose notices are not stored yet; replayed by replayPending. */
+async function keepPending(source, ctx, raw) {
+    const { payload, identity } = rawEnvelope(source, ctx, raw);
+    return keepRaw(pendingDir(source), payload, { identity });
+}
+
+/**
+ * Fetch and parse one source. A failed request is `stage: 'fetch'`; a body that came back but
+ * would not parse is `stage: 'parse'`, and carries the raw bodies so they can be kept.
+ */
 async function collect(source, ctx) {
     const raw = [];
+    const get = async (url, opts = {}) => {
+        let body;
+        try {
+            body = await pacedFetch(url, { paceMs: source.paceMs ?? DEFAULT_PACE_MS, transientBody: source.transientBody ?? null, ...opts });
+        } catch (err) {
+            throw Object.assign(err, { stage: 'fetch' });
+        }
+        raw.push({ url, body });
+        return body;
+    };
     try {
-        return await collectInto(source, ctx, raw);
+        const { notices, note } = await collectNotices(source, ctx, get);
+        ctx.note = note;
+        return { notices, raw, requests: raw.length };
     } catch (err) {
-        if (raw.length) err.message += ` (raw: ${relative(REPO, await cacheRaw(source, raw, ctx.stamp))})`;
+        if (!err.stage) Object.assign(err, { stage: 'parse' });
+        err.raw = raw;
         throw err;
     }
 }
 
-async function collectInto(source, ctx, raw) {
-    const get = async (url, opts = {}) => {
-        const body = await pacedFetch(url, { paceMs: source.paceMs ?? DEFAULT_PACE_MS, transientBody: source.transientBody ?? null, ...opts });
-        raw.push({ url, body });
-        return body;
+/** Parse a kept envelope again: every request is answered from the recorded bodies, by URL. */
+async function replayKept(source, envelope, names) {
+    const bodies = new Map(envelope.requests.map((r) => [r.url, r.body]));
+    const get = async (url) => {
+        if (!bodies.has(url)) throw new Error(`replay: no recorded body for ${url}`);
+        return bodies.get(url);
     };
-    let notices = [];
-    if (source.id === 'finra-brokercheck') {
-        // Two stages: find each US legal name's firm, then read that firm's disclosures.
-        const firms = new Map();
-        for (const name of brokerCheckNames(ctx.names)) {
-            const q = encodeURIComponent(nameCore(name.phrase) || name.phrase);
-            const hits = parseBrokerCheckSearch(JSON.parse(await get(
-                `https://api.brokercheck.finra.org/search/firm?query=${q}&hl=true&nrows=12&start=0&r=25&sort=score+desc&wt=json`,
-                { headers: { accept: 'application/json' }, redirect: 'manual' })));
-            for (const h of hits) {
-                const same = [h.name, ...h.otherNames].some((n) => canonicalName(n) === name.canonical);
-                if (same) firms.set(h.crd, h);
-            }
+    return collectNotices(source, { names, today: envelope.today, windowDays: envelope.windowDays }, get);
+}
+
+/**
+ * Store the notices of every pending read of this source (oldest first), deleting each once it is
+ * stored. A read that still fails stays (and keeps failing the ingest verdict, loudly) until it is
+ * older than PENDING_MAX_AGE_MS. Returns { stored, failed, inserted }.
+ */
+async function replayPending(source, { dbUrl, names }) {
+    const out = { stored: 0, failed: 0, inserted: 0, errors: [] };
+    const dropped = await pruneKept(pendingDir(source), { maxFiles: PENDING_MAX_FILES, maxAgeMs: PENDING_MAX_AGE_MS });
+    for (const f of dropped) logError(`${source.id}: pending raw ${relative(REPO, f.path)} dropped unstored after ${PENDING_MAX_AGE_MS / 86_400_000} days / ${PENDING_MAX_FILES} files`);
+    const pending = (await listKept(pendingDir(source))).reverse();
+    for (const f of pending) {
+        try {
+            const envelope = JSON.parse((await readKept(f.path)).toString('utf8'));
+            const { notices } = await replayKept(source, envelope, names);
+            const rows = noticeRows(source.id, notices);
+            // When the notices were fetched: the kept file's last-seen time, never now.
+            const seenAt = ts(new Date(f.mtimeMs));
+            const counts = rows.length ? parseStoreCounts(await psql(dbUrl, buildNoticeStoreSql(rows, { seenAt }).sql, `store ${source.id} (pending)`, ['-t', '-A'])) : { inserted: 0 };
+            await rm(f.path, { force: true });
+            out.stored += 1;
+            out.inserted += counts.inserted;
+            log(`${source.id}: pending raw ${relative(REPO, f.path)} stored — ${rows.length} notice(s), ${counts.inserted} new version(s)`);
+        } catch (err) {
+            out.failed += 1;
+            out.errors.push(err.message);
+            logError(`${source.id}: pending raw ${relative(REPO, f.path)} still not stored — ${err.message}`);
         }
-        for (const crd of firms.keys()) {
-            const { notices: found } = parseBrokerCheckFirm(JSON.parse(await get(
-                `https://api.brokercheck.finra.org/search/firm/${crd}?hl=true&nrows=12&start=0&r=25&wt=json`,
-                { headers: { accept: 'application/json' }, redirect: 'manual' })));
-            notices.push(...found);
-        }
-        ctx.note = `${firms.size} firm(s) found on BrokerCheck: ${[...firms.values()].map((f) => `${f.name} ${f.crd}`).join(', ') || 'none'}`;
-    } else if (source.requests) {
-        for (const req of source.requests(ctx)) notices.push(...source.parseEach(await get(req.url), req));
-    } else if (source.pageUrl) {
-        for (let page = 0; page < source.maxPages; page += 1) {
-            const found = source.parsePage(await get(source.pageUrl(ctx, page)));
-            notices.push(...found);
-            if (found.length < source.pageSize) break;
-            if (page === source.maxPages - 1 && source.window !== 'newest') {
-                throw new Error(`still a full page after ${source.maxPages} pages — raise maxPages, or notices are being cut off`);
-            }
-        }
-    } else {
-        notices = source.parse(await get(source.url, { method: source.method, body: source.body, headers: source.headers }));
     }
-    // One notice per id (EDGAR returns a filing once per matched name).
-    const byId = new Map();
-    for (const n of notices) if (!byId.has(n.id)) byId.set(n.id, n);
-    const rawPath = raw.length ? await cacheRaw(source, raw, ctx.stamp) : null;
-    return { notices: [...byId.values()], rawPath, requests: raw.length };
+    return out;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -323,17 +376,27 @@ async function main() {
     log(`sources: ${sources.length} — ${sources.map((s) => s.id).join(', ')}`);
 
     // --- stored state -------------------------------------------------------------------------
+    // Needed only to PROCESS (what is new, what is a baseline): a failed read never stops a fetch.
+    // Every source is still fetched and its notices stored; they wait (matched_at null) for a run
+    // that can read the state.
     const previous = new Map();
     const checks = new Map();
+    let stateError = null;
     if (dbUrl) {
         log(`db: ${describeUrl(dbUrl)}`);
-        for (const row of normaliseStoredMatches(JSON.parse((await psql(dbUrl, buildReadMatchesQuery(), 'read matches', ['-t', '-A'])).trim() || '[]'))) {
-            previous.set(row.key, row);
+        try {
+            for (const row of normaliseStoredMatches(JSON.parse((await psql(dbUrl, buildReadMatchesQuery(), 'read matches', ['-t', '-A'])).trim() || '[]'))) {
+                previous.set(row.key, row);
+            }
+            for (const row of normaliseStoredChecks(JSON.parse((await psql(dbUrl, buildReadChecksQuery(), 'read checks', ['-t', '-A'])).trim() || '[]'))) {
+                checks.set(row.regulator, row);
+            }
+            log(`db: ${previous.size} stored match(es), ${checks.size} source(s) checked before`);
+        } catch (err) {
+            stateError = err.message;
+            logError(`db: could not read the stored matches/checks — every source is still fetched and its notices stored,`
+                + ` but nothing is matched this run: ${err.message}`);
         }
-        for (const row of normaliseStoredChecks(JSON.parse((await psql(dbUrl, buildReadChecksQuery(), 'read checks', ['-t', '-A'])).trim() || '[]'))) {
-            checks.set(row.regulator, row);
-        }
-        log(`db: ${previous.size} stored match(es), ${checks.size} source(s) checked before`);
     } else {
         logWarn('--no-db: no stored state — every source is a baseline and this run raises NO events');
     }
@@ -348,11 +411,14 @@ async function main() {
     const saveCheckpoint = () => writeJson(files.checkpoint, { detectedAt, done: [...done], results });
 
     const today = detectedAt.slice(0, 10);
-    const stamp = detectedAt.replace(/[-:]/g, '').replace(/Z$/, 'Z');
     const failures = [];
     const events = [];
     let skipped = 0;
     const loopStartedMs = Date.now();
+    // INGEST (fetch + store the notices) and PROCESSING (match, check row, events) are judged apart.
+    const ingest = stageTally();
+    const processing = stageTally();
+    let noticesInserted = 0;
 
     for (const [i, source] of sources.entries()) {
         const label = `[${progress(i + 1, sources.length, loopStartedMs)}] ${source.id}`;
@@ -361,39 +427,75 @@ async function main() {
             log(`${label} — done earlier in this run (checkpoint), skipped: ${results[source.id]?.summary ?? ''}`);
             continue;
         }
+
+        // --- ingest: reads kept from earlier runs first, then this run's fetch, stored before any matching.
+        const ctx = { names, today, windowDays, note: null };
+        const ingested = await ingestSource({
+            replayPending: dbUrl ? () => replayPending(source, { dbUrl, names }) : null,
+            collect: async () => {
+                const c = await collect(source, ctx);
+                return { ...c, note: ctx.note };
+            },
+            keepRing: (raw) => keepInRing(source, ctx, raw),
+            keepPending: async (raw) => {
+                const kept = await keepPending(source, ctx, raw);
+                return { path: relative(REPO, kept.path) };
+            },
+            store: dbUrl ? async (list) => parseStoreCounts(await psql(dbUrl,
+                buildNoticeStoreSql(noticeRows(source.id, list), { seenAt: detectedAt }).sql, `store ${source.id}`, ['-t', '-A'])) : null
+        });
+        const { notices, error } = ingested;
+        const ingestErrors = ingested.errors;
+        noticesInserted += ingested.inserted;
+        if (ingested.stored) ctx.stored = ingested.stored;
+        if (knownBlock(source, error) && ingestErrors.length === 1 && ingestErrors[0].step === 'fetch') {
+            // A known bot wall is reported apart (knownBlocked), not as an ingest failure every run.
+            stageSkip(ingest);
+        } else if (ingestErrors.length) {
+            for (const e of ingestErrors) stageFail(ingest, e.step);
+        } else {
+            stageOk(ingest);
+        }
+
+        // --- processing: match this run's notices plus any stored ones no run has matched yet.
         const prev = checks.get(source.id) ?? null;
         const baseline = !dbUrl || !prev?.lastOkAt;
-        const ctx = { names, today, stamp, windowDays, note: null };
-        let collected = null;
-        let error = null;
-        try {
-            collected = await collect(source, ctx);
-        } catch (err) {
-            error = err.message;
-        }
-        const notices = collected?.notices ?? [];
-        const matches = error ? [] : matchNotices(notices, names);
-        const verdict = checkVerdict(source, { prev, error, notices, matches: matches.length, runAt: detectedAt });
-        // The DB row stays `failed` (the read did fail); only the run's verdict excuses a known block.
         const blockedAs = knownBlock(source, error);
-        const { rows, events: sourceEvents } = foldMatches(matches, { regulator: source, previous, baseline, detectedAt, review });
-        if (dbUrl) {
-            const statements = [buildCheckSql([verdict]).sql];
-            if (rows.length) statements.push(buildMatchUpsertSql(rows).sql);
-            if (sourceEvents.length) statements.push(buildChangeEventSql(sourceEvents).sql);
-            await psql(dbUrl, wrapTransaction(statements), `source ${source.id}`);
+        const processed = await processSource(
+            { source, notices, error, stateError, prev, baseline, names, previous, detectedAt, review },
+            {
+                readBacklog: dbUrl ? async () => JSON.parse((await psql(dbUrl, buildReadUnmatchedQuery(source.id), `backlog ${source.id}`, ['-t', '-A'])).trim() || '[]') : null,
+                write: dbUrl ? (statements) => psql(dbUrl, wrapTransaction(statements), `source ${source.id}`) : null
+            }
+        );
+        let { verdict } = processed;
+        const { rows, events: sourceEvents, backlogCount } = processed;
+        const processingError = processed.error;
+        if (processingError) {
+            stageFail(processing, processingError.step);
+            failures.push(`${source.id}: processing failed at ${processingError.step} — ${processingError.message}`
+                + ' (its notices are stored and are matched by the next run that can)');
+        } else {
+            stageOk(processing);
         }
+        // Without a processing verdict the read is still reported: failed when it failed, else ok-unprocessed.
+        verdict ??= { status: error ? 'failed' : 'ok', consecutiveFailures: null, newestPublishedAt: null, lastError: error };
         events.push(...sourceEvents);
         const strong = rows.filter((r) => r.strength === 'strong').length;
+        const stored = ctx.stored ? ` · ${ctx.stored.inserted} new version(s) stored` : '';
         const summary = blockedAs ? `blocked (known since ${blockedAs.since}) — ${error}`
             : error ? `FAILED — ${error}`
-            : `${notices.length} notice(s) · ${rows.length} match(es) (${strong} strong, ${rows.length - strong} weak)`
+            : `${notices.length} notice(s)${stored}${backlogCount > 0 ? ` (+${backlogCount} unmatched from earlier runs)` : ''}`
+                + ` · ${rows.length} match(es) (${strong} strong, ${rows.length - strong} weak)`
                 + ` · ${sourceEvents.length} new${baseline ? ' · baseline' : ''} · ${verdict.status}`
                 + `${verdict.newestPublishedAt ? ` · newest ${verdict.newestPublishedAt.slice(0, 10)}` : ''}`;
         results[source.id] = {
             status: blockedAs ? 'blocked' : verdict.status,
             knownBlocked: blockedAs,
             notices: error ? null : notices.length,
+            noticesStored: ctx.stored?.inserted ?? null,
+            ingest: ingestErrors.length ? ingestErrors.map((e) => e.step).join(',') : 'ok',
+            processing: processingError ? processingError.step : 'ok',
             matches: rows.length,
             strongMatches: strong,
             newMatches: sourceEvents.length,
@@ -401,23 +503,30 @@ async function main() {
             consecutiveFailures: verdict.consecutiveFailures,
             newestPublishedAt: verdict.newestPublishedAt,
             lastError: verdict.lastError,
-            requests: collected?.requests ?? null,
+            requests: ingested.requests,
             summary
         };
-        if (verdict.status === 'ok') {
+        if (verdict.status === 'ok' && !ingestErrors.length) {
             log(`${label} — ${summary}${ctx.note ? ` · ${ctx.note}` : ''}`);
         } else if (blockedAs) {
             logWarn(`${label} — ${summary} (${verdict.consecutiveFailures} run(s) in a row; not counted as a failure)`);
         } else {
             logError(`${label} — ${summary}${verdict.lastError && !error ? ` — ${verdict.lastError}` : ''}`
-                + ` (${verdict.consecutiveFailures} run(s) in a row)`);
+                + `${verdict.consecutiveFailures === null ? '' : ` (${verdict.consecutiveFailures} run(s) in a row)`}`
+                + `${ingestErrors.filter((e) => e.step !== 'fetch').map((e) => ` · ingest ${e.step}: ${e.message}`).join('')}`);
         }
+        if (processingError) logError(`${label} — processing FAILED at ${processingError.step}: ${processingError.message}`);
         for (const r of rows.filter((x) => x.strength === 'strong').slice(0, 5)) {
             log(`    strong ${r.matchedIn}: "${r.phrase}" — ${r.noticeTitle} (${r.publishedDate ?? 'undated'}) ${r.noticeUrl ?? ''}`);
         }
-        if (verdict.status === 'ok') {
+        // Done (skipped by a resumed run) only when it was fetched, stored AND processed.
+        if (verdict.status === 'ok' && !ingestErrors.length && !processingError) {
             done.add(source.id);
             await saveCheckpoint();
+        }
+        // A store failure or a pending read that will not store is an ingest failure the run must report.
+        for (const e of ingestErrors.filter((x) => x.step !== 'fetch' && x.step !== 'parse')) {
+            failures.push(`${source.id}: ingest ${e.step} — ${e.message}`);
         }
     }
 
@@ -427,8 +536,12 @@ async function main() {
     const durationMs = Date.now() - RUN_STARTED_MS;
     const all = Object.values(results);
     const sum = (k) => all.reduce((acc, r) => acc + (r[k] ?? 0), 0);
+    const stages = stageStats(ingest, processing);
     const stats = {
-        watchStatus: run.watchStatus,
+        // The worst of the three: a source's own verdict (failed / stale / gap), ingest, processing.
+        watchStatus: worstStatus(run.watchStatus, stages.ingestStatus, stages.processingStatus),
+        ...stages,
+        noticesStored: noticesInserted,
         generatedAt: ts(),
         lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
         lastRunEndedAt: ts(),
@@ -482,6 +595,11 @@ main().catch(async (err) => {
     try {
         await writeJson(statsFile, {
             watchStatus: 'failed',
+            // A crash outside the per-source steps: which stage it hit is unknown, so both say failed.
+            ingestStatus: 'failed',
+            processingStatus: 'failed',
+            ingest: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
+            processing: { status: 'failed', failingSteps: [{ step: 'crash', count: 1 }] },
             generatedAt: ts(),
             lastRunStartedAt: ts(new Date(RUN_STARTED_MS)),
             lastRunEndedAt: ts(),

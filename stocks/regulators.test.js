@@ -12,7 +12,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 
 import { deriveQueries } from './lib/caselaw.mjs';
 import {
-    ROUTINE_FORMS, SOURCES, brokerCheckNames, buildCheckSql, buildMatchUpsertSql, canonicalName, checkVerdict,
+    ROUTINE_FORMS, SOURCES, brokerCheckNames, buildCheckSql, buildMarkMatchedSql, buildMatchUpsertSql, buildNoticeStoreSql,
+    buildReadUnmatchedQuery, canonicalJson, canonicalName, checkVerdict, collectNotices, noticeHash, noticeRows, parseStoreCounts,
+    withBacklog,
     deriveWatchNames, distinctiveCore, fcaDates, feedGap, foldMatches, formatTelegramSummary, knownBlock, matchKey, matchNotices,
     nameCore, nameStrength, normaliseStoredChecks, normaliseStoredMatches, numericDate, parseAsicReleases,
     parseBafinMeasures, parseBafinNews, parseBrokerCheckFirm, parseBrokerCheckSearch, parseCbiUnauthorised,
@@ -474,5 +476,65 @@ describe('formatTelegramSummary', () => {
         expect(lines[0]).toBe('RWA Sonar regulator watch: 2 new match event(s), 1 failure(s)');
         expect(lines[2]).toContain('[warning]');
         expect(text).toContain('✗ fca-news: failed — HTTP 403');
+    });
+});
+
+describe('every notice is stored once, before matching (sonar.regulator_notice)', () => {
+    const NOTICE_DDL = readFileSync(new URL('../db/2026-11-23-sonar-regulator-notice.sql', import.meta.url), 'utf8');
+    const noticeColumns = NOTICE_DDL.match(/CREATE TABLE IF NOT EXISTS sonar\.regulator_notice \(([\s\S]*?)\n\);/)[1]
+        .split('\n').map((l) => l.trim().split(/\s+/)[0]).filter((c) => /^[a-z_]+$/.test(c));
+
+    test('collectNotices replays recorded bodies through the same parser the fetch used', async () => {
+        const source = SOURCES.find((s) => s.id === 'fca-warnings');
+        const asked = [];
+        const { notices } = await collectNotices(source, { names: NAMES, today: '2026-11-23', windowDays: 30 },
+            async (url) => { asked.push(url); return fixture('fca-warnings.xml'); });
+        expect(asked).toEqual([source.url]);
+        expect(notices).toEqual(parseFcaWarnings(fixture('fca-warnings.xml')));
+    });
+
+    test('a notice version is identified by its content, whatever the key order; a change is a new version', () => {
+        const n = parseFcaWarnings(fixture('fca-warnings.xml'))[0];
+        const reordered = Object.fromEntries(Object.entries(n).reverse());
+        expect(noticeHash(reordered)).toBe(noticeHash(n));
+        expect(canonicalJson({ b: 1, a: [{ d: 2, c: null }] })).toBe('{"a":[{"c":null,"d":2}],"b":1}');
+        const changed = { ...n, title: `${n.title} (updated)` };
+        const rows = noticeRows('fca-warnings', [n, n, changed]);
+        expect(rows).toHaveLength(2);
+        expect(new Set(rows.map((r) => r.noticeId))).toEqual(new Set([n.id]));
+        expect(rows[0]).toMatchObject({ source: 'fca-warnings', publishedDate: n.publishedDate ?? null });
+    });
+
+    test('the store writes only declared columns, inserts a version once and only moves last_seen_at after', () => {
+        const rows = noticeRows('fca-warnings', parseFcaWarnings(fixture('fca-warnings.xml')));
+        const { sql } = buildNoticeStoreSql(rows, { seenAt: AT });
+        const written = sql.match(/INSERT INTO sonar\.regulator_notice AS n\n\s+\(([\s\S]*?)\)\n/)[1].split(',').map((c) => c.trim());
+        expect(written.filter((c) => !noticeColumns.includes(c))).toEqual([]);
+        expect(sql).toContain('ON CONFLICT (source, notice_id, content_hash) DO UPDATE SET');
+        expect(sql.split('DO UPDATE SET')[1].split('WHERE')[0]).not.toMatch(/notice =|first_seen_at|matched_at/);
+        expect(NOTICE_DDL).toContain('PRIMARY KEY (source, notice_id, content_hash)');
+        expect(() => buildNoticeStoreSql(rows, {})).toThrow(/seenAt/);
+        expect(parseStoreCounts('3|20\n')).toEqual({ inserted: 3, touched: 20 });
+    });
+
+    test('the backlog is this run\'s notices plus unmatched stored ones, this run\'s version winning', () => {
+        const [a, b] = parseFcaWarnings(fixture('fca-warnings.xml'));
+        const older = { ...a, title: 'older version' };
+        const merged = withBacklog([a], [{ notice: older }, { notice: b }]);
+        expect(merged.map((n) => n.id).sort()).toEqual([a.id, b.id].sort());
+        expect(merged.find((n) => n.id === a.id).title).toBe(a.title);
+        expect(buildReadUnmatchedQuery('fca-warnings')).toContain('matched_at IS NULL');
+        const mark = buildMarkMatchedSql('fca-warnings', [a, b], { matchedAt: AT }).sql;
+        expect(mark).toContain('n.matched_at IS NULL');
+        expect(mark).toContain(a.id);
+    });
+
+    test('the notice DDL is in the applied schema list, before the change-event kinds file', async () => {
+        const { SCHEMA_FILES } = await import('./lib/schema.mjs');
+        const at = SCHEMA_FILES.indexOf('2026-11-23-sonar-regulator-notice.sql');
+        expect(at).toBeGreaterThan(-1);
+        expect(at).toBeLessThan(SCHEMA_FILES.length - 1);
+        expect(NOTICE_DDL).toMatch(/SET ROLE geo_user/);
+        expect(NOTICE_DDL).toMatch(/created_at\s+timestamptz NOT NULL DEFAULT now\(\)/);
     });
 });
