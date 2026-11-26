@@ -1183,29 +1183,40 @@ export function settleThrottle(result, prev = null, { persistAfter = THROTTLE_PE
 }
 
 /**
- * A server that has not answered our connection (a timeout, never a reply) on this many consecutive
- * runs is a refusal, not a run failure: msb.fincen.gov timed out every night from 2026-11-14 on, from
- * the server and the laptop alike, and failed every run on its own. The first runs stay `error`, so a
- * fresh outage still fails the run; from this run on the source is `blocked`, which stays visible in
- * statusCounts and on the watch page like every other refusal.
+ * A transient network failure — the server did not answer (connect/read timeout), dropped or refused
+ * the connection, DNS did not answer (EAI_AGAIN; NXDOMAIN is `gone`), or it answered 5xx / 429 —
+ * says nothing about the document, and on 623 foreign sources a different 1–4 hosts do it once on
+ * most days (2026-11-17..26: companiesoffice.govt.nz, msb.fincen.gov, sec.gov 504). So the first
+ * such runs are `deferred`: still `error` in the state and on the watch page, retried next run, but
+ * not a run failure. On this many consecutive runs the source is `blocked` (msb.fincen.gov timed out
+ * every night from 2026-11-14, from the server and the laptop alike), and the run in which it becomes
+ * blocked fails, so a lasting outage alerts once; after that it stays visible in statusCounts and on
+ * the watch page like every other refusal. Any other error (4xx such as 402, a parser failure, a
+ * store failure) fails the run at once.
  */
 export const UNANSWERED_BLOCKED_AFTER = 3;
-const UNANSWERED_REASON = /^network: (?:ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT)$/;
+const TRANSIENT_REASON = new RegExp('^(?:network: (?:ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT|UND_ERR_HEADERS_TIMEOUT|UND_ERR_BODY_TIMEOUT'
+    + '|UND_ERR_SOCKET|ECONNRESET|ECONNREFUSED|ECONNABORTED|EPIPE|EHOSTUNREACH|ENETUNREACH|EAI_AGAIN)|http-(?:5\\d\\d|429))$');
 
 /**
- * Count consecutive unanswered runs (`unansweredRuns`, carried in sources-state.json) and turn an
- * unanswered `error` into `blocked` once it reaches `blockedAfter`. Any other result is returned
- * untouched and carries no count, so it restarts at the next timeout. Mutates and returns `result`.
+ * Count consecutive transient failures (`unansweredRuns`, carried in sources-state.json). Below
+ * `blockedAfter` the `error` is marked `deferred`; on reaching it the source turns `blocked` and is
+ * marked `newlyBlocked` (that run fails); beyond it the source stays `blocked` quietly. Any other
+ * result is returned untouched and carries no count, so it restarts at the next transient failure.
+ * Mutates and returns `result`.
  */
 export function settleUnanswered(result, prev = null, { blockedAfter = UNANSWERED_BLOCKED_AFTER } = {}) {
-    if (result?.status !== 'error' || !UNANSWERED_REASON.test(String(result.reason ?? ''))) return result;
+    if (result?.status !== 'error' || !TRANSIENT_REASON.test(String(result.reason ?? ''))) return result;
     const runs = (Number.isInteger(prev?.unansweredRuns) ? prev.unansweredRuns : 0) + 1;
     result.unansweredRuns = runs;
-    if (runs >= blockedAfter) {
-        result.status = 'blocked';
-        result.reason = `${result.reason} — no answer on ${runs} consecutive runs: the server refuses our traffic or is down`;
-        result.error = result.reason;
+    if (runs < blockedAfter) {
+        result.deferred = true;
+        return result;
     }
+    result.status = 'blocked';
+    result.reason = `${result.reason} — failed on ${runs} consecutive runs (no answer, a dropped connection or a server error): the server refuses our traffic or is down`;
+    result.error = result.reason;
+    if (runs === blockedAfter) result.newlyBlocked = true;
     return result;
 }
 
@@ -1438,12 +1449,32 @@ export function quotelessRefusal({ status, httpStatus = null, reason = '', quote
 }
 
 /**
- * A run fails on `error` only: `gone` is a finding about the citation, `blocked` is the host, and
+ * A run fails on an `error` that is not `deferred` (a transient failure on its first runs,
+ * `settleUnanswered`) and on a source that became `blocked` this run after repeated transient
+ * failures (`newlyBlocked`): `gone` is a finding about the citation, `blocked` is the host, and
  * `throttled` is archive.org pushing back on our own traffic — until it persists, when
  * `settleThrottle` has already made it an `error`.
  */
+export function failsRun(result) {
+    return (result?.status === 'error' && result.deferred !== true) || result?.newlyBlocked === true;
+}
+
 export function runFailed(results) {
-    return results.some((r) => r.status === 'error');
+    return results.some(failsRun);
+}
+
+/**
+ * The run's verdict over its settled results: the failing, deferred and newly blocked sources, and
+ * the fetch verdict (`partial` when anything failed). watch-sources.mjs writes these to its run-stats.
+ */
+export function runOutcome(results) {
+    const failures = results.filter(failsRun);
+    return {
+        status: failures.length ? 'partial' : 'ok',
+        failures,
+        deferred: results.filter((r) => r.status === 'error' && r.deferred === true),
+        newlyBlocked: results.filter((r) => r.newlyBlocked === true)
+    };
 }
 
 /** A restart can reuse completed outcomes, but transient errors and throttles must make a real request again. */

@@ -40,12 +40,13 @@ import {
     parseSpnStatus, rawExtension, spnAlreadyCaptured, spnBusy, spnTransient,
     quoteVerdicts, quotelessRefusal, responseValidators, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
     storedReading, userAgentFor, dossierQuotes, selectSourceIds, previouslyBlocked, sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion,
-    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle, settleUnanswered
+    ARCHIVE_PAUSED, THROTTLE_PERSISTS_AFTER, archivePushback, isArchiveHost, settleThrottle, settleUnanswered,
+    UNANSWERED_BLOCKED_AFTER, runOutcome
 } from './lib/watch.mjs';
 import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
 import { keepRaw, pruneKept } from './lib/raw-keep.mjs';
 import { foldCheckpoints } from './lib/check-history.mjs';
-import { stageFail, stageOk, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
+import { stageFail, stageOk, stageSkip, stageStats, stageTally, worstStatus } from './lib/run-stages.mjs';
 import { classifyRead, needsPreviousChars } from './lib/unreadable.mjs';
 import {
     CDX_TIMEOUT_MS, WAYBACK_FALLBACK_CAP, WAYBACK_PACE_MS, captureIso, captureIsStale, citedCapture, decodeCaptureBody, captureRawUrl, captureViewUrl, cdxQueryUrl,
@@ -182,9 +183,13 @@ WHAT A RUN DOES
   read) · throttled (archive.org — a cited web.archive.org capture or CDX query — refused OUR
   traffic: connection refused/reset, timeout, 429/5xx after a 30 s + 90 s backoff; not a look at
   the source, so nothing is written and it is retried next run; after the first such refusal the run
-  reads nothing more from the archive) · error (5xx, timeout, reset, or a source archive.org has
-  throttled on ${THROTTLE_PERSISTS_AFTER} runs in a row). A run with ANY error does not report success and exits
-  non-zero; gone, blocked, unreadable, reachable-unverified and throttled are recorded, not failures.
+  reads nothing more from the archive) · error (5xx, timeout, reset, a parser failure, any other
+  4xx such as 402, or a source archive.org has throttled on ${THROTTLE_PERSISTS_AFTER} runs in a row). A transient
+  network error (timeout, reset/refused connection, EAI_AGAIN, 5xx, 429) is DEFERRED on its first
+  ${UNANSWERED_BLOCKED_AFTER - 1} runs in a row: recorded as an error, retried next run, counted in \`deferred\`, not a
+  failure; on run ${UNANSWERED_BLOCKED_AFTER} the source becomes blocked and that run fails once. A run with any other
+  error does not report success and exits non-zero; gone, blocked, unreadable,
+  reachable-unverified and throttled are recorded, not failures.
 
   A URL listed in stocks/data/retired-sources.json (gone for good) is not fetched; its row and state
   say \`retired\`, with the date and reason.
@@ -1553,7 +1558,8 @@ async function main() {
         // archive.org pushing back on our traffic: not a look at the source, retried next run —
         // unless it has refused this source on THROTTLE_PERSISTS_AFTER runs in a row (lib/watch.mjs).
         settleThrottle(result, prev);
-        // A server that has not answered on UNANSWERED_BLOCKED_AFTER runs in a row is a refusal (lib/watch.mjs).
+        // A transient network error is deferred to the next run; on UNANSWERED_BLOCKED_AFTER runs in a
+        // row it is a refusal, and that run fails (lib/watch.mjs).
         settleUnanswered(result, prev);
         // No fresh text: the read stands on the stored version, which may itself be unreadable.
         const storedQuoteText = text === null && result.status === 'ok'
@@ -1795,9 +1801,18 @@ async function main() {
             logWarn(`    ${host}: ${reasons.length} (${[...new Set(reasons)].join(', ')})`);
         }
     }
-    const failures = results.filter((r) => r.status === 'error');
+    // A transient network error on its first runs in a row is retried next run, not a failure
+    // (lib/watch.mjs settleUnanswered); the run in which it becomes blocked is.
+    const verdict = runOutcome(results);
+    const { deferred, newlyBlocked, failures } = verdict;
+    if (deferred.length) {
+        logWarn(`${deferred.length} source(s) deferred — a transient network error; retried next run, blocked and failing the run`
+            + ` on ${UNANSWERED_BLOCKED_AFTER} runs in a row:`);
+        for (const r of deferred) logWarn(`    ${r.url} (run ${r.unansweredRuns} of ${UNANSWERED_BLOCKED_AFTER}): ${r.reason}`);
+    }
     if (failures.length) {
-        logError(`${failures.length} source(s) FAILED for a reason that is neither gone nor blocked:`);
+        logError(`${failures.length} source(s) FAILED — an error that is neither transient, gone nor blocked,`
+            + ` or blocked this run after ${UNANSWERED_BLOCKED_AFTER} transient failures in a row:`);
         for (const r of failures) logError(`    ${r.reason} ${r.url}`);
     }
 
@@ -1806,7 +1821,9 @@ async function main() {
     // load must not lose its rows: they are kept in PENDING_LOAD_FILE and offered first next run.
     const ingest = stageTally();
     for (const r of results) {
-        if (r.status === 'error') stageFail(ingest, r.storeFailed ? 'store-version' : r.extractionFailed ? 'extract' : 'fetch');
+        // A deferred source was not fetched this run and is retried next run: skipped, not failed.
+        if (r.status === 'error' && r.deferred === true) stageSkip(ingest);
+        else if (r.status === 'error') stageFail(ingest, r.storeFailed ? 'store-version' : r.extractionFailed ? 'extract' : 'fetch');
         else stageOk(ingest);
     }
     const processing = stageTally();
@@ -1870,7 +1887,7 @@ async function main() {
     ];
     const stages = stageStats(ingest, processing);
     const sourceStats = {
-        watchStatus: worstStatus(failures.length ? 'partial' : 'ok', stages.processingStatus),
+        watchStatus: worstStatus(verdict.status, stages.processingStatus),
         ...stages,
         unreadBytesKept: unreadKept,
         checkHistory: { folded: fold.folded, failed: fold.failed },
@@ -1903,6 +1920,9 @@ async function main() {
         retired: retiredResults.length,
         waybackFallback: { tried: wayback.used, read: wayback.read, failed: wayback.failed, skippedAtCap: wayback.skipped, stoodOnPrevious: wayback.standing },
         readVia: viaCounts,
+        deferred: deferred.length,
+        deferredSources: deferred.slice(0, 20).map((result) => ({ url: result.url, runs: result.unansweredRuns, reason: result.reason })),
+        newlyBlocked: newlyBlocked.length,
         failures: failures.length,
         failureReasons: failures.slice(0, 20).map((result) => ({ url: result.url, reason: result.reason })),
         noticeLines
@@ -1917,7 +1937,7 @@ async function main() {
     log(`watch-sources: wrote ${relative(REPO, runStatsFile)} — status=${sourceStats.watchStatus}, evaluated ${sourceStats.sourcesEvaluated}/${sourceStats.activeSources}, fetched ${sourceStats.httpFetches}`);
 
     if (runFailed(results) || stages.processingStatus !== 'ok') {
-        logError(`watch-sources: run NOT successful — ${failures.length} source(s) errored`
+        logError(`watch-sources: run NOT successful — ${failures.length} source(s) failed`
             + `${stages.processingStatus !== 'ok' ? `; processing failed at ${stages.processing.failingSteps.map((s) => s.step).join(', ')} (its input is kept for the next run)` : ''}`);
         process.exitCode = 1;
         return;

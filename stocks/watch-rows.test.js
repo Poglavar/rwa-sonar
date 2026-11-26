@@ -5,7 +5,7 @@
 // nothing and keeps the stored state, and a retired source is written as retired, never as an event.
 
 import { buildRows, mergePendingLoad, nextState, revertUnstoredChange, settleExtractorUpgrade, wantsRawKept } from './lib/watch-rows.mjs';
-import { publisherNormalizerVersion, HTML_EXTRACTOR_VERSION, settleThrottle, settleUnanswered } from './lib/watch.mjs';
+import { publisherNormalizerVersion, HTML_EXTRACTOR_VERSION, runFailed, runOutcome, settleThrottle, settleUnanswered } from './lib/watch.mjs';
 
 const URL_ = 'https://www.cysec.gov.cy/en-GB/public-info/announcements/';
 const QUOTE = { id: 'issuer:regulatoryStatus:1', kind: 'claim', ref: 'regulatoryStatus', slug: 'issuer', quote: 'Withdrawal of Investors Compensation Fund (ICF) membership' };
@@ -143,19 +143,54 @@ describe('a throttled read writes nothing and keeps the stored state', () => {
 });
 
 describe('a server that does not answer', () => {
-    test('the count of unanswered runs is carried between runs, and the third run in a row is blocked', () => {
-        const url = 'https://msb.fincen.gov/';
+    const url = 'https://msb.fincen.gov/';
+    const timedOut = (fetchedAt) => ({ id: 'f1nc3n000001', url, fetchedAt, status: 'error', httpStatus: null,
+        contentHash: null, reason: 'network: ETIMEDOUT', error: 'network: ETIMEDOUT' });
+    const answered = (fetchedAt) => ({ ...changedRead({ fetchedAt, hash: 'hash-v2', normalizerUpgrade: false }), url,
+        id: 'f1nc3n000001', status: 'ok', diff: null, quotes: null });
+    // One run's verdict over this source, with the state it leaves for the next run.
+    const runOnce = (read, prev) => {
+        const result = settleUnanswered(read, prev);
+        return { result, outcome: runOutcome([answered('2026-11-21T03:00:00Z'), result]), next: nextState([result], { [url]: prev })[url] };
+    };
+
+    test('one timeout is deferred: the run ends ok with deferred=1 and failures=0, and an answer resets the count', () => {
+        const { result, outcome, next } = runOnce(timedOut('2026-11-26T03:00:00Z'), { ...storedV2, id: 'f1nc3n000001' });
+        expect(result.status).toBe('error');
+        expect(outcome.status).toBe('ok');
+        expect(outcome.deferred).toHaveLength(1);
+        expect(outcome.failures).toHaveLength(0);
+        expect(runFailed([result])).toBe(false);
+        expect(next).toMatchObject({ status: 'error', unansweredRuns: 1 });
+        const after = runOnce(answered('2026-11-27T03:00:00Z'), next);
+        expect(after.outcome).toMatchObject({ status: 'ok', failures: [], deferred: [] });
+        expect(after.next.unansweredRuns).toBeUndefined();
+    });
+
+    test('the count is carried between runs: the third timeout in a row is blocked and makes that run partial, once', () => {
         let prev = { ...storedV2, id: 'f1nc3n000001' };
-        const run = (fetchedAt) => settleUnanswered({ id: 'f1nc3n000001', url, fetchedAt, status: 'error', httpStatus: null,
-            contentHash: null, reason: 'network: ETIMEDOUT', error: 'network: ETIMEDOUT' }, prev);
-        const statuses = [];
-        for (const day of ['2026-11-21', '2026-11-22', '2026-11-23']) {
-            const result = run(`${day}T03:00:00Z`);
-            statuses.push(result.status);
-            prev = nextState([result], { [url]: prev })[url];
+        const runs = [];
+        for (const day of ['2026-11-21', '2026-11-22', '2026-11-23', '2026-11-24']) {
+            const { result, outcome, next } = runOnce(timedOut(`${day}T03:00:00Z`), prev);
+            runs.push({ status: result.status, run: outcome.status, deferred: outcome.deferred.length, failures: outcome.failures.length });
+            prev = next;
         }
-        expect(statuses).toEqual(['error', 'error', 'blocked']);
-        expect(prev.unansweredRuns).toBe(3);
+        expect(runs).toEqual([
+            { status: 'error', run: 'ok', deferred: 1, failures: 0 },
+            { status: 'error', run: 'ok', deferred: 1, failures: 0 },
+            { status: 'blocked', run: 'partial', deferred: 0, failures: 1 },
+            { status: 'blocked', run: 'ok', deferred: 0, failures: 0 }
+        ]);
+        expect(prev).toMatchObject({ status: 'blocked', unansweredRuns: 4 });
+    });
+
+    test('a parse error is never deferred: the run is partial on its first occurrence', () => {
+        const parse = { ...timedOut('2026-11-26T03:00:00Z'), httpStatus: 200, reason: 'pdf: pdftotext exited with code 1',
+            error: 'pdftotext exited with code 1', extractionFailed: true };
+        const { result, outcome } = runOnce(parse, { ...storedV2, id: 'f1nc3n000001' });
+        expect(result.deferred).toBeUndefined();
+        expect(outcome).toMatchObject({ status: 'partial', deferred: [] });
+        expect(outcome.failures).toEqual([result]);
     });
 });
 

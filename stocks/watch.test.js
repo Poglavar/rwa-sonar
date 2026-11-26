@@ -27,7 +27,7 @@ import {
     DEFAULT_USER_AGENT, EXTRA_CA_HOSTS, archiveRefusal, conditionalHeaders, extraCaFor, buildClaimCheckSql, challengeInBody, checkQuotes, decideOutcome,
     driveDownloadUrl, dropboxDownloadUrl, fileStamp, htmlToText, isTextual, looksLikePdf,
     emptyPublishedPage, jsOnlyShell, jsonToText, looksLikeText, looksLikeChurn, normaliseByKind, normaliseLines, parseArchiveLocation,
-    pdfTextToText, rawExtension, reusableCheckpoint, runFailed, severityForChange, sha256Hex, sourceId,
+    pdfTextToText, rawExtension, reusableCheckpoint, runFailed, runOutcome, severityForChange, sha256Hex, sourceId,
     sourceWatchStatsFileName, stripPublisherChrome, publisherNormalizerVersion, archivePushback, isArchiveHost, settleThrottle, settleUnanswered,
     ARCHIVE_PAUSED, HTML_EXTRACTOR_VERSION, THROTTLE_PERSISTS_AFTER, UNANSWERED_BLOCKED_AFTER,
     verificationUrlFor,
@@ -576,23 +576,45 @@ describe('decideOutcome', () => {
         expect(decideOutcome({ networkErrorCode: 'ETIMEDOUT', retriedAfterBackoff: true, host: 'rmiparliament.org' }).status).toBe('error');
     });
 
-    test('a server that does not answer fails the run twice, then is blocked; an answer resets the count', () => {
-        // msb.fincen.gov timed out every night from 2026-11-14, from the server and the laptop alike.
-        const unanswered = (code = 'ETIMEDOUT') => ({ status: 'error', reason: `network: ${code}`, error: `network: ${code}` });
-        const first = settleUnanswered(unanswered(), { status: 'ok' });
-        expect(first).toMatchObject({ status: 'error', unansweredRuns: 1 });
-        expect(runFailed([first])).toBe(true);
-        const second = settleUnanswered(unanswered('UND_ERR_CONNECT_TIMEOUT'), { status: 'error', unansweredRuns: 1 });
-        expect(second).toMatchObject({ status: 'error', unansweredRuns: 2 });
-        const third = settleUnanswered(unanswered(), { status: 'error', unansweredRuns: UNANSWERED_BLOCKED_AFTER - 1 });
-        expect(third.status).toBe('blocked');
-        expect(third.unansweredRuns).toBe(UNANSWERED_BLOCKED_AFTER);
-        expect(third.error).toMatch(/no answer on 3 consecutive runs: the server refuses our traffic or is down$/);
-        expect(runFailed([third])).toBe(false);
-        // Other errors (a refused connection, a 5xx) and readable results pass through without a count.
-        const refused = { status: 'error', reason: 'network: ECONNREFUSED' };
-        expect(settleUnanswered({ ...refused }, { unansweredRuns: 5 })).toEqual(refused);
+    test('a transient network error is deferred twice, then blocked once as a failure; an answer resets the count', () => {
+        // msb.fincen.gov timed out every night from 2026-11-14, from the server and the laptop alike;
+        // companiesoffice.govt.nz timed out once on 2026-11-26 after 9 good days.
+        const transient = (reason = 'network: ETIMEDOUT') => ({ status: 'error', reason, error: reason });
+        const first = settleUnanswered(transient(), { status: 'ok' });
+        expect(first).toMatchObject({ status: 'error', unansweredRuns: 1, deferred: true });
+        expect(runFailed([first])).toBe(false);
+        const second = settleUnanswered(transient('network: UND_ERR_CONNECT_TIMEOUT'), { status: 'error', unansweredRuns: 1 });
+        expect(second).toMatchObject({ status: 'error', unansweredRuns: 2, deferred: true });
+        expect(runFailed([second])).toBe(false);
+        const third = settleUnanswered(transient(), { status: 'error', unansweredRuns: UNANSWERED_BLOCKED_AFTER - 1 });
+        expect(third).toMatchObject({ status: 'blocked', unansweredRuns: UNANSWERED_BLOCKED_AFTER, newlyBlocked: true });
+        expect(third.deferred).toBeUndefined();
+        expect(third.error).toMatch(/failed on 3 consecutive runs \(no answer, a dropped connection or a server error\): the server refuses our traffic or is down$/);
+        expect(runFailed([third])).toBe(true);
+        // Still unanswered the run after: blocked, visible in statusCounts, no longer a failure.
+        const fourth = settleUnanswered(transient(), { status: 'blocked', unansweredRuns: UNANSWERED_BLOCKED_AFTER });
+        expect(fourth).toMatchObject({ status: 'blocked', unansweredRuns: UNANSWERED_BLOCKED_AFTER + 1 });
+        expect(fourth.newlyBlocked).toBeUndefined();
+        expect(runFailed([fourth])).toBe(false);
+        // Every transient kind counts: a dropped or refused connection, DNS not answering, 5xx, 429.
+        for (const reason of ['network: ECONNREFUSED', 'network: ECONNRESET', 'network: EAI_AGAIN', 'network: UND_ERR_SOCKET',
+            'http-500', 'http-503', 'http-504', 'http-429']) {
+            expect(settleUnanswered(transient(reason), null)).toMatchObject({ status: 'error', deferred: true, unansweredRuns: 1 });
+        }
+        // Readable results pass through without a count.
         expect(settleUnanswered({ status: 'ok', reason: 'same hash' }, { unansweredRuns: 5 })).toEqual({ status: 'ok', reason: 'same hash' });
+    });
+
+    test('a non-transient error fails the run at once and is never deferred', () => {
+        // A parser failure, a paywall answer (cdn.tesseralab.co answered 402 from 2026-11-14 to 11-22),
+        // an unknown error name and a persistent archive.org throttle are not network blips.
+        for (const reason of ['pdf: pdftotext exited with code 1', 'http-402', 'network: TypeError', 'no response',
+            'archive.org pushed back (ECONNREFUSED after backoff) — our traffic, not the source; retried next run — on 3 consecutive runs, so no longer treated as a transient throttle']) {
+            const result = settleUnanswered({ status: 'error', reason, error: reason }, { status: 'error', unansweredRuns: 1 });
+            expect(result).toEqual({ status: 'error', reason, error: reason });
+            expect(runFailed([result])).toBe(true);
+        }
+        expect(decideOutcome({ httpStatus: 402 })).toEqual({ status: 'error', reason: 'http-402' });
     });
 
     test('a throttle is retried next run, and only a persistent one fails the run', () => {
@@ -627,6 +649,16 @@ describe('decideOutcome', () => {
     test('only an error fails the run — a dead citation and a hostile host do not', () => {
         expect(runFailed([{ status: 'gone' }, { status: 'blocked' }, { status: 'ok' }])).toBe(false);
         expect(runFailed([{ status: 'ok' }, { status: 'error' }])).toBe(true);
+    });
+
+    test('the run verdict counts deferred, newly blocked and failing sources apart', () => {
+        const deferred = { url: 'a', status: 'error', reason: 'network: ETIMEDOUT', deferred: true, unansweredRuns: 1 };
+        const newly = { url: 'b', status: 'blocked', newlyBlocked: true, unansweredRuns: 3 };
+        const parse = { url: 'c', status: 'error', reason: 'pdf: bad xref' };
+        expect(runOutcome([{ status: 'ok' }, deferred, { status: 'blocked' }]))
+            .toEqual({ status: 'ok', failures: [], deferred: [deferred], newlyBlocked: [] });
+        expect(runOutcome([deferred, newly, parse]))
+            .toEqual({ status: 'partial', failures: [newly, parse], deferred: [deferred], newlyBlocked: [newly] });
     });
 });
 
